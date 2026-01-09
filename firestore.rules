@@ -1,0 +1,450 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ====================
+    // HELPER FUNCTIONS
+    // ====================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isUser(uid) {
+      return request.auth.uid == uid;
+    }
+    
+    function isStudent() {
+      return getUserRole() == 'student';
+    }
+    
+    function isFaculty() {
+      return getUserRole() == 'faculty';
+    }
+    
+    function isPlacementOfficer() {
+      return getUserRole() == 'placement_officer';
+    }
+    
+    function isRecruiter() {
+      return getUserRole() == 'recruiter';
+    }
+    
+    function isCollegeAdmin() {
+      return getUserRole() == 'college_admin';
+    }
+    
+    function isSuperAdmin() {
+      return getUserRole() == 'super_admin';
+    }
+    
+    function isAdmin() {
+      return isCollegeAdmin() || isSuperAdmin();
+    }
+    
+    // ====================
+    // USERS COLLECTION
+    // ====================
+    
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isUser(userId);
+      
+      // Users can create their own profile during signup
+      allow create: if isUser(userId);
+      
+      // Users can update their own profile with rules
+      allow update: if isUser(userId) && (
+        (resource.data.role == null && request.resource.data.role != null) ||
+        (resource.data.role != null && request.resource.data.role == resource.data.role)
+      ) && request.resource.data.uid == resource.data.uid;
+      
+      // ADMINS: Full access to all users
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // STUDENT PROFILES
+    // ====================
+    
+    match /studentProfiles/{studentId} {
+      // Students can manage their own profile
+      allow read, create, update: if isUser(studentId);
+      
+      // Faculty can read student profiles
+      allow read: if isFaculty();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // FACULTY PROFILES
+    // ====================
+    
+    match /facultyProfiles/{facultyId} {
+      // Faculty can manage their own profile
+      allow read, create, update: if isUser(facultyId);
+      
+      // Students can read faculty profiles
+      allow read: if isStudent();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // OTHER PROFILE COLLECTIONS
+    // ====================
+    
+    match /collegeAdminProfiles/{adminId} {
+      allow read, create, update: if isUser(adminId);
+      allow read, write, delete: if isAdmin();
+    }
+    
+    match /placementOfficerProfiles/{officerId} {
+      allow read, create, update: if isUser(officerId);
+      allow read, write, delete: if isAdmin();
+    }
+    
+    match /recruiterProfiles/{recruiterId} {
+      allow read, create, update: if isUser(recruiterId);
+      allow read: if isPlacementOfficer();
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // COURSES COLLECTION
+    // ====================
+    
+    match /courses/{courseId} {
+      // All authenticated users can read courses
+      allow read: if isAuthenticated();
+      
+      // Faculty can create and update courses they teach
+      allow create: if isFaculty();
+      allow update: if isFaculty();
+      
+      // ADMINS: Full access to all courses
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // ENROLLMENTS COLLECTION
+    // ====================
+    
+    match /enrollments/{enrollmentId} {
+      // Students can read their own enrollments
+      allow read: if isAuthenticated();
+      
+      // Students can create enrollments (enroll in courses)
+      allow create: if isAuthenticated() && request.resource.data.studentId == request.auth.uid;
+      
+      // Students can update their own enrollments (drop courses)
+      allow update: if isUser(resource.data.studentId);
+      
+      // Faculty can view enrollments
+      allow read: if isFaculty();
+      
+      // ADMINS: Full access to all enrollments
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // ATTENDANCE COLLECTION
+    // ====================
+    
+    match /attendance/{attendanceId} {
+      // Students can read their own attendance
+      allow read: if isAuthenticated();
+      
+      // Faculty can mark and manage attendance
+      allow create, update: if isFaculty();
+      allow read: if isFaculty();
+      
+      // ADMINS: Full access to all attendance
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // GRADES COLLECTION
+    // ====================
+    
+    match /grades/{gradeId} {
+      // Students can read their own grades
+      allow read: if isAuthenticated();
+      
+      // Faculty can enter and update grades
+      allow create, update: if isFaculty();
+      allow read: if isFaculty();
+      
+      // ADMINS: Full access to all grades
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // ASSIGNMENTS COLLECTION
+    // ====================
+    
+    match /assignments/{assignmentId} {
+      // All authenticated users can read assignments
+      allow read: if isAuthenticated();
+      
+      // Faculty can create and manage assignments
+      allow create, update, delete: if isFaculty();
+      
+      // ADMINS: Full access to all assignments
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // SUBMISSIONS COLLECTION
+    // ====================
+    
+    match /submissions/{submissionId} {
+      // Students can read their own submissions
+      allow read: if isAuthenticated();
+      
+      // Students can create and update their own submissions
+      allow create: if isAuthenticated() && request.resource.data.studentId == request.auth.uid;
+      allow update: if isUser(resource.data.studentId);
+      
+      // Faculty can read and grade submissions
+      allow read, update: if isFaculty();
+      
+      // ADMINS: Full access to all submissions
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // FEE RECORDS COLLECTION
+    // ====================
+    
+    match /feeRecords/{feeId} {
+      // Students can read their own fee records
+      allow read: if isAuthenticated();
+      
+      // ADMINS: Full access to all fee records
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // TIMETABLE SLOTS COLLECTION
+    // ====================
+    
+    match /timetableSlots/{slotId} {
+      // All authenticated users can read timetable
+      allow read: if isAuthenticated();
+      
+      // Faculty can manage timetable
+      allow create, update, delete: if isFaculty();
+      
+      // ADMINS: Full access to timetable
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // NOTIFICATIONS COLLECTION
+    // ====================
+    
+    match /notifications/{notificationId} {
+      // Users can read their own notifications
+      allow read: if isAuthenticated();
+      allow update: if isAuthenticated();
+      
+      // Faculty can send notifications
+      allow create: if isFaculty();
+      
+      // ADMINS: Full access to all notifications
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // COLLEGES COLLECTION
+    // ====================
+    
+    match /colleges/{collegeId} {
+      // All authenticated users can read college info
+      allow read: if isAuthenticated();
+      
+      // ADMINS: Full access to college data
+      allow read, write, delete: if isAdmin();
+      
+      // Sub-collections
+      match /departments/{departmentId} {
+        allow read: if isAuthenticated();
+        allow write, delete: if isAdmin();
+      }
+      
+      match /courses/{courseId} {
+        allow read: if isAuthenticated();
+        allow write: if isFaculty() || isAdmin();
+        allow delete: if isAdmin();
+      }
+    }
+    
+    // ====================
+    // PLACEMENTS COLLECTION
+    // ====================
+    
+    match /placements/{placementId} {
+      // All authenticated users can read placements
+      allow read: if isAuthenticated();
+      
+      // Placement officers can manage
+      allow create, update: if isPlacementOfficer();
+      
+      // Recruiters can create
+      allow create: if isRecruiter();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+      
+      // Sub-collection: Jobs
+      match /jobs/{jobId} {
+        allow read: if isAuthenticated();
+        allow write: if isRecruiter() || isPlacementOfficer() || isAdmin();
+      }
+      
+      // Sub-collection: Applications
+      match /applications/{appId} {
+        allow read: if isAuthenticated();
+        allow create, update: if isStudent() || isAdmin();
+        allow delete: if isAdmin();
+      }
+    }
+    
+    // ====================
+    // RECRUITERS COLLECTION
+    // ====================
+    
+    match /recruiters/{recruiterId} {
+      // Recruiters can read their own profile
+      allow read, update: if isUser(recruiterId);
+      
+      // Placement officers can view recruiters
+      allow read: if isPlacementOfficer();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+      
+      // Sub-collection: Posted Jobs
+      match /jobs/{jobId} {
+        allow read: if isAuthenticated();
+        allow write: if isUser(recruiterId) || isPlacementOfficer() || isAdmin();
+      }
+    }
+    
+    // ====================
+    // COURSE MATERIALS COLLECTION
+    // ====================
+    
+    match /courseMaterials/{materialId} {
+      // All authenticated users can read materials
+      allow read: if isAuthenticated();
+      
+      // Faculty can create and manage materials
+      allow create, update, delete: if isFaculty();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // EXAM SCHEDULES COLLECTION
+    // ====================
+    
+    match /examSchedules/{scheduleId} {
+      // All authenticated users can read exam schedules
+      allow read: if isAuthenticated();
+      
+      // Faculty can create and manage exam schedules
+      allow create, update, delete: if isFaculty();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // DEPARTMENTS COLLECTION
+    // ====================
+    
+    match /departments/{deptId} {
+      // All authenticated users can read departments
+      allow read: if isAuthenticated();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // JOBS COLLECTION (Top-level)
+    // ====================
+    
+    match /jobs/{jobId} {
+      // All authenticated users can read jobs
+      allow read: if isAuthenticated();
+      
+      // Recruiters can create and manage their own jobs
+      allow create: if isRecruiter();
+      allow update, delete: if isRecruiter() && resource.data.postedBy == request.auth.uid;
+      
+      // Placement officers can manage all jobs
+      allow create, update, delete: if isPlacementOfficer();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // APPLICATIONS COLLECTION (Top-level)
+    // ====================
+    
+    match /applications/{appId} {
+      // Students can read their own applications
+      allow read: if isAuthenticated() && resource.data.studentId == request.auth.uid;
+      
+      // Students can create applications
+      allow create: if isStudent() && request.resource.data.studentId == request.auth.uid;
+      
+      // Recruiters can read applications for their jobs
+      allow read: if isRecruiter();
+      allow update: if isRecruiter();
+      
+      // Placement officers can read and manage all applications
+      allow read, update: if isPlacementOfficer();
+      
+      // ADMINS: Full access
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ====================
+    // ADMIN SPECIFIC COLLECTIONS
+    // ====================
+    
+    match /admin/{adminId} {
+      allow read: if isUser(adminId);
+      allow write, delete: if isSuperAdmin();
+      
+      match /audit_logs/{logId} {
+        allow read, create: if isSuperAdmin();
+      }
+      
+      match /system_config/{configId} {
+        allow read, write: if isSuperAdmin();
+      }
+    }
+    
+    // ====================
+    // WILDCARD FALLBACK
+    // ====================
+    // Admins can access ANY new collection not explicitly defined
+    match /{document=**} {
+      allow read, write, delete: if isAdmin();
+    }
+  }
+}
