@@ -170,6 +170,7 @@ export function StudentProfile() {
           const cData = courseDoc.data();
           const percentage = Math.round((counts.attended / counts.total) * 100);
           return {
+            id: courseId,
             subject: cData?.name || 'Unknown Course',
             code: cData?.code || 'N/A',
             attended: counts.attended,
@@ -584,7 +585,7 @@ export function StudentProfile() {
                     <p className="text-sm text-muted-foreground text-center py-8">No current courses.</p>
                   ) : (
                     currentCourses.map((course: any) => (
-                      <div key={course.code} className="p-3 rounded-lg border border-border group hover:border-primary/20 transition-all">
+                      <div key={course.id} className="p-3 rounded-lg border border-border group hover:border-primary/20 transition-all">
                         <div className="flex items-start justify-between">
                           <div>
                             <span className="text-xs text-muted-foreground font-bold">{course.code}</span>
@@ -613,7 +614,7 @@ export function StudentProfile() {
                   attendanceBreakdown.map((course) => {
                     const statusColor = course.percentage >= 75 ? 'bg-success' : course.percentage >= 65 ? 'bg-warning' : 'bg-destructive';
                     return (
-                      <div key={course.subject}>
+                      <div key={course.id || course.code || course.subject}>
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-muted-foreground uppercase">{course.code}</span>

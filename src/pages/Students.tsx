@@ -235,20 +235,19 @@ export default function Students() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Students Management</h1>
           <p className="text-muted-foreground mt-1">Manage all student records</p>
         </div>
-        <Button onClick={() => { resetForm(); setEditingStudent(null); setShowDialog(true); }}>
+        <Button onClick={() => { resetForm(); setEditingStudent(null); setShowDialog(true); }} className="w-full md:w-auto">
           <UserPlus className="w-4 h-4 mr-2" />
           Add Student
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <div className="card-elevated p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-primary/10">
@@ -299,7 +298,7 @@ export default function Students() {
       {/* Table */}
       <div className="card-elevated overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[900px]">
             <thead className="bg-muted/30 border-b border-border">
               <tr>
                 <th className="text-left p-4 text-sm font-medium text-muted-foreground">Enrollment No.</th>

@@ -18,6 +18,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { db, auth } from '@/config/firebase';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { usePermissions } from '@/hooks/usePermissions';
+import { Loader2 } from 'lucide-react';
 
 interface Invoice {
   id: string;
@@ -30,49 +35,7 @@ interface Invoice {
   breakdown?: { item: string; amount: number }[];
 }
 
-const invoices: Invoice[] = [
-  { 
-    id: 'INV-001', 
-    description: 'Tuition Fee - Fall 2024', 
-    amount: 45000, 
-    dueDate: '2024-01-15', 
-    status: 'paid', 
-    paidDate: '2024-01-10', 
-    category: 'tuition',
-    breakdown: [
-      { item: 'Tuition Fee', amount: 40000 },
-      { item: 'Development Fee', amount: 3000 },
-      { item: 'Library Fee', amount: 2000 },
-    ]
-  },
-  { 
-    id: 'INV-002', 
-    description: 'Hostel Fee - Semester 5', 
-    amount: 18000, 
-    dueDate: '2024-01-20', 
-    status: 'pending', 
-    category: 'hostel',
-    breakdown: [
-      { item: 'Room Rent', amount: 12000 },
-      { item: 'Mess Charges', amount: 5000 },
-      { item: 'Maintenance', amount: 1000 },
-    ]
-  },
-  { 
-    id: 'INV-003', 
-    description: 'Examination Fee', 
-    amount: 2500, 
-    dueDate: '2024-01-05', 
-    status: 'overdue', 
-    category: 'exam',
-    breakdown: [
-      { item: 'Exam Registration', amount: 2000 },
-      { item: 'Late Fee', amount: 500 },
-    ]
-  },
-  { id: 'INV-004', description: 'Library Fine', amount: 150, dueDate: '2024-01-25', status: 'pending', category: 'library' },
-  { id: 'INV-005', description: 'Lab Equipment Fee', amount: 3500, dueDate: '2023-12-15', status: 'paid', paidDate: '2023-12-12', category: 'other' },
-];
+// No static invoices needed here anymore
 
 const bankDetails = {
   bankName: 'State Bank of India',
@@ -85,10 +48,47 @@ const bankDetails = {
 export default function PaymentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, isAdmin, loading: authLoading } = usePermissions();
+  const [loading, setLoading] = useState(true);
+  const [invoice, setInvoice] = useState<any>(null);
   const [qrTimeLeft, setQrTimeLeft] = useState(300); // 5 minutes in seconds
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
-  
-  const invoice = invoices.find(inv => inv.id === id);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    const fetchInvoice = async () => {
+      try {
+        if (!id) return;
+        const docRef = doc(db, 'feeRecords', id);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          // RBAC check
+          if (!isAdmin && data.studentId !== user.uid) {
+            toast.error('Unauthorized access');
+            navigate('/finance');
+            return;
+          }
+          setInvoice({ id: docSnap.id, ...data });
+        } else {
+          toast.error('Invoice not found');
+        }
+      } catch (error) {
+        console.error('Error fetching invoice:', error);
+        toast.error('Failed to load invoice details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInvoice();
+  }, [id, authLoading, user, isAdmin, navigate]);
 
   useEffect(() => {
     if (invoice?.status !== 'paid' && showPaymentOptions) {
@@ -110,10 +110,45 @@ export default function PaymentDetail() {
     toast.success('QR code refreshed');
   };
 
+  const handleConfirmPayment = async () => {
+    if (!id || !user) return;
+    
+    try {
+      setLoading(true);
+      const docRef = doc(db, 'feeRecords', id);
+      await updateDoc(docRef, {
+        status: 'paid',
+        paidDate: serverTimestamp()
+      });
+      
+      setInvoice({
+        ...invoice,
+        status: 'paid',
+        paidDate: { seconds: Math.floor(Date.now() / 1000) } // Optimistic update for UI
+      });
+      
+      toast.success('Payment confirmed successfully!');
+      setShowPaymentOptions(false);
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      toast.error('Failed to confirm payment. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copied to clipboard`);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!invoice) {
     return (
@@ -169,8 +204,8 @@ export default function PaymentDetail() {
             </div>
             <p className="text-muted-foreground">Invoice ID: {invoice.id}</p>
             <div className="flex gap-4 mt-3 text-sm text-muted-foreground">
-              <span>Due Date: {invoice.dueDate}</span>
-              {invoice.paidDate && <span>Paid: {invoice.paidDate}</span>}
+              <span>Due Date: {invoice.dueDate?.seconds ? new Date(invoice.dueDate.seconds * 1000).toLocaleDateString() : invoice.dueDate}</span>
+              {invoice.paidDate && <span>Paid: {invoice.paidDate?.seconds ? new Date(invoice.paidDate.seconds * 1000).toLocaleDateString() : invoice.paidDate}</span>}
             </div>
           </div>
           <div className="text-right">
@@ -296,8 +331,13 @@ export default function PaymentDetail() {
                   </div>
                 </div>
 
+                <Button className="w-full h-12 text-lg font-semibold bg-success hover:bg-success/90 text-white" onClick={handleConfirmPayment}>
+                  Confirm Payment
+                </Button>
+
                 <p className="text-xs text-muted-foreground text-center">
-                  Payment confirmation may take 24-48 hours after bank transfer
+                  Payment confirmation may take 24-48 hours after bank transfer.
+                  For demonstration, clicking "Confirm" will mark it as paid.
                 </p>
               </div>
             )}

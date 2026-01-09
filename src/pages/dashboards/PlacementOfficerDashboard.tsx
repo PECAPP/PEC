@@ -230,7 +230,7 @@ export function PlacementOfficerDashboard() {
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </Button>
             </div>
-            <div className="grid grid-cols-4 gap-4 text-center">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
               <div className="p-4 rounded-lg bg-secondary/50">
                 <p className="text-2xl font-bold text-foreground">12</p>
                 <p className="text-xs text-muted-foreground">Contacted</p>

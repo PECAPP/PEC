@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Upload,
   Download,
+  ExternalLink,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -142,12 +143,6 @@ export default function Finance() {
       return;
     }
 
-    if (!isAdmin) {
-      toast.error('Access denied. Admin only.');
-      navigate('/dashboard');
-      return;
-    }
-
     const loadData = async () => {
       try {
         await fetchData();
@@ -163,17 +158,26 @@ export default function Finance() {
   }, [authLoading, user, isAdmin, navigate]);
 
   const fetchData = async () => {
+    if (!user) return;
     try {
       // Fetch fee records
-      const feeSnapshot = await getDocs(collection(db, 'feeRecords'));
+      let feeSnapshot;
+      if (isAdmin) {
+        feeSnapshot = await getDocs(collection(db, 'feeRecords'));
+      } else {
+        const q = query(collection(db, 'feeRecords'), where('studentId', '==', user.uid));
+        feeSnapshot = await getDocs(q);
+      }
       const fees = feeSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setFeeRecords(fees);
 
-      // Fetch students for dropdown
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      const allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const studentUsers = allUsers.filter((u: any) => u.role === 'student');
-      setStudents(studentUsers);
+      // Fetch students for dropdown (only for admin)
+      if (isAdmin) {
+        const usersSnapshot = await getDocs(collection(db, 'users'));
+        const allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const studentUsers = allUsers.filter((u: any) => u.role === 'student');
+        setStudents(studentUsers);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -227,10 +231,10 @@ export default function Finance() {
 
   const resetForm = () => {
     setFeeForm({
-      studentId: '',
+      studentId: isAdmin ? '' : (user?.uid || ''),
       amount: 0,
       description: '',
-      dueDate: '',
+      dueDate: new Date().toISOString().split('T')[0],
       category: 'tuition',
       status: 'pending',
     });
@@ -270,28 +274,38 @@ export default function Finance() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Finance Management</h1>
           <p className="text-muted-foreground mt-1">Manage student fees and payments</p>
         </div>
-        <div className="flex gap-2">
-           <Button variant="outline" onClick={exportFees}>
+        <div className="flex flex-wrap gap-2">
+           <Button variant="outline" onClick={exportFees} className="flex-1 lg:flex-none">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
-            <Upload className="w-4 h-4 mr-2" />
-            Bulk Upload
-          </Button>
-          <Button onClick={() => { resetForm(); setEditingFee(null); setShowDialog(true); }}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Fee Record
-          </Button>
+          {isAdmin && (
+            <>
+              <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="flex-1 lg:flex-none">
+                <Upload className="w-4 h-4 mr-2" />
+                Bulk Upload
+              </Button>
+              <Button onClick={() => { resetForm(); setEditingFee(null); setShowDialog(true); }} className="flex-1 lg:flex-none">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Fee Record
+              </Button>
+            </>
+          )}
+          {!isAdmin && user && (
+            <Button onClick={() => { resetForm(); setEditingFee(null); setShowDialog(true); }} className="flex-1 lg:flex-none">
+              <Plus className="w-4 h-4 mr-2" />
+              Pay Fee for Semester
+            </Button>
+          )}
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <div className="card-elevated p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-primary/10">
@@ -346,7 +360,7 @@ export default function Finance() {
 
       <div className="card-elevated overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead className="bg-muted/30 border-b border-border">
               <tr>
                 <th className="text-left p-4 text-sm font-medium text-muted-foreground">Student ID</th>
@@ -378,12 +392,19 @@ export default function Finance() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => openEditDialog(fee)}>
-                          <Edit className="w-4 h-4" />
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/finance/${fee.id}`)}>
+                          <ExternalLink className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(fee.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                        {isAdmin && (
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => openEditDialog(fee)}>
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleDelete(fee.id)}>
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -401,49 +422,99 @@ export default function Finance() {
             <DialogDescription>{editingFee ? 'Update fee details' : 'Add a new fee record'}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Student *</label>
-              <Select value={feeForm.studentId} onValueChange={(value) => setFeeForm({ ...feeForm, studentId: value })}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Select student" />
-                </SelectTrigger>
-                <SelectContent>
-                  {students.map((s: any) => (
-                    <SelectItem key={s.id} value={s.id}>{s.fullName} ({s.email})</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {isAdmin ? (
+              <div>
+                <label className="text-sm font-medium">Student *</label>
+                <Select value={feeForm.studentId} onValueChange={(value) => setFeeForm({ ...feeForm, studentId: value })}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select student" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {students.map((s: any) => (
+                      <SelectItem key={s.id} value={s.id}>{s.fullName} ({s.email})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="p-3 bg-secondary/50 rounded-lg">
+                <p className="text-sm font-medium">Paying for: {user?.fullName || 'My Profile'}</p>
+                <p className="text-xs text-muted-foreground">Student ID: {user?.uid}</p>
+              </div>
+            )}
             <div>
               <label className="text-sm font-medium">Description *</label>
-              <Input value={feeForm.description} onChange={(e) => setFeeForm({ ...feeForm, description: e.target.value })} placeholder="Tuition Fee - Fall 2024" className="mt-1" />
+              <Input 
+                value={feeForm.description} 
+                onChange={(e) => setFeeForm({ ...feeForm, description: e.target.value })} 
+                placeholder="Tuition Fee - Fall 2024" 
+                className="mt-1" 
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Amount *</label>
-                <Input type="number" value={feeForm.amount} onChange={(e) => setFeeForm({ ...feeForm, amount: parseInt(e.target.value) })} placeholder="50000" className="mt-1" />
+                <Input 
+                  type="number" 
+                  value={feeForm.amount} 
+                  onChange={(e) => setFeeForm({ ...feeForm, amount: parseInt(e.target.value) })} 
+                  placeholder="50000" 
+                  className="mt-1" 
+                />
               </div>
               <div>
                 <label className="text-sm font-medium">Due Date</label>
-                <Input type="date" value={feeForm.dueDate} onChange={(e) => setFeeForm({ ...feeForm, dueDate: e.target.value })} className="mt-1" />
+                <Input 
+                  type="date" 
+                  value={feeForm.dueDate} 
+                  onChange={(e) => setFeeForm({ ...feeForm, dueDate: e.target.value })} 
+                  className="mt-1" 
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Category</label>
-                <Select value={feeForm.category} onValueChange={(value) => setFeeForm({ ...feeForm, category: value })}>
+                <Select 
+                  value={feeForm.category} 
+                  onValueChange={(value) => setFeeForm({ ...feeForm, category: value })}
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="tuition">Tuition</SelectItem>
-                    <SelectItem value="hostel">Hostel</SelectItem>
-                    <SelectItem value="exam">Exam</SelectItem>
-                    <SelectItem value="library">Library</SelectItem>
+                    <SelectItem value="tuition">Tuition Fee</SelectItem>
+                    <SelectItem value="hostel">Hostel Fee</SelectItem>
+                    <SelectItem value="exam">Exam Fee</SelectItem>
+                    <SelectItem value="library">Library Fee</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+              <div>
+                <label className="text-sm font-medium">Semester *</label>
+                <Select
+                  value={feeForm.description?.includes('Semester') ? feeForm.description.split(' - ')[1] : ''}
+                  onValueChange={(value) => {
+                    setFeeForm({ 
+                      ...feeForm, 
+                      description: `${feeForm.category.charAt(0).toUpperCase() + feeForm.category.slice(1)} Fee - ${value}` 
+                    });
+                  }}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select semester" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 8 }, (_, i) => (
+                      <SelectItem key={i + 1} value={`Semester ${i + 1}`}>Semester {i + 1}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            {isAdmin && (
               <div>
                 <label className="text-sm font-medium">Status</label>
                 <Select value={feeForm.status} onValueChange={(value) => setFeeForm({ ...feeForm, status: value })}>
@@ -457,13 +528,13 @@ export default function Finance() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div className="flex gap-2 pt-4">
-              <Button onClick={editingFee ? handleUpdate : handleCreate} className="flex-1">
-                {editingFee ? 'Update Fee' : 'Create Fee'}
-              </Button>
-              <Button variant="outline" onClick={() => { setShowDialog(false); setEditingFee(null); resetForm(); }}>Cancel</Button>
-            </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-3 mt-6">
+            <Button variant="outline" onClick={() => setShowDialog(false)}>Cancel</Button>
+            <Button onClick={editingFee ? handleUpdate : handleCreate}>
+              {editingFee ? 'Update Record' : (isAdmin ? 'Create Record' : 'Initiate Payment')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

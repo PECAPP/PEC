@@ -101,7 +101,7 @@ export function MainLayout() {
           isMobile ? 'pl-0' : (sidebarCollapsed ? 'pl-16' : 'pl-64')
         )}
       >
-        <div className="p-6">
+        <div className="p-4 lg:p-6">
           <Outlet />
         </div>
       </main>

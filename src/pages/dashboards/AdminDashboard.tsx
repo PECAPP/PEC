@@ -374,14 +374,15 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Complete control over your ERP system</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Complete control over your ERP system</p>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card-elevated p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-primary/10">
@@ -442,16 +443,16 @@ export function AdminDashboard() {
 
         {/* Courses Tab */}
         <TabsContent value="courses" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Input placeholder="Search courses..." className="max-w-sm" />
-            <Button onClick={() => { resetCourseForm(); setEditingCourse(null); setShowCourseDialog(true); }}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Input placeholder="Search courses..." className="max-w-sm w-full" />
+            <Button onClick={() => { resetCourseForm(); setEditingCourse(null); setShowCourseDialog(true); }} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />Add Course
             </Button>
           </div>
 
           <div className="card-elevated overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[800px]">
                 <thead className="bg-muted/30 border-b border-border">
                   <tr>
                     <th className="text-left p-4 text-sm font-medium text-muted-foreground">Code</th>
@@ -496,16 +497,16 @@ export function AdminDashboard() {
 
         {/* Users Tab */}
         <TabsContent value="users" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Input placeholder="Search users..." className="max-w-sm" />
-            <Button onClick={() => { resetUserForm(); setEditingUser(null); setShowUserDialog(true); }}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Input placeholder="Search users..." className="max-w-sm w-full" />
+            <Button onClick={() => { resetUserForm(); setEditingUser(null); setShowUserDialog(true); }} className="w-full sm:w-auto">
               <UserPlus className="w-4 h-4 mr-2" />Add User
             </Button>
           </div>
 
           <div className="card-elevated overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[800px]">
                 <thead className="bg-muted/30 border-b border-border">
                   <tr>
                     <th className="text-left p-4 text-sm font-medium text-muted-foreground">Name</th>
@@ -548,16 +549,16 @@ export function AdminDashboard() {
 
         {/* Fees Tab */}
         <TabsContent value="fees" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Input placeholder="Search fees..." className="max-w-sm" />
-            <Button onClick={() => { resetFeeForm(); setShowFeeDialog(true); }}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Input placeholder="Search fees..." className="max-w-sm w-full" />
+            <Button onClick={() => { resetFeeForm(); setShowFeeDialog(true); }} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />Add Fee Record
             </Button>
           </div>
 
           <div className="card-elevated overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[800px]">
                 <thead className="bg-muted/30 border-b border-border">
                   <tr>
                     <th className="text-left p-4 text-sm font-medium text-muted-foreground">Student ID</th>

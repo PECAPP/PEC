@@ -435,28 +435,28 @@ export default function Courses() {
   if (isAdmin) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Course Management</h1>
             <p className="text-muted-foreground mt-1">Manage all courses in the system</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={exportCourses}>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={exportCourses} className="w-full sm:w-auto">
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
-            <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
+            <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="w-full sm:w-auto">
               <Upload className="w-4 h-4 mr-2" />
               Bulk Upload
             </Button>
-            <Button onClick={() => { resetCourseForm(); setEditingCourse(null); setShowCourseDialog(true); }}>
+            <Button onClick={() => { resetCourseForm(); setEditingCourse(null); setShowCourseDialog(true); }} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Add Course
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <div className="card-elevated p-5">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-primary/10">
@@ -500,7 +500,7 @@ export default function Courses() {
 
         <div className="card-elevated overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[900px]">
               <thead className="bg-muted/30 border-b border-border">
                 <tr>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Code</th>
@@ -623,13 +623,15 @@ export default function Courses() {
   if (isStudent) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Courses</h1>
-          <p className="text-muted-foreground mt-1">Browse and enroll in courses</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Courses</h1>
+            <p className="text-muted-foreground mt-1">Browse and enroll in courses</p>
+          </div>
         </div>
 
         <Tabs defaultValue="available" className="space-y-6">
-          <TabsList>
+          <TabsList className="w-full justify-start overflow-x-auto overflow-y-hidden flex-nowrap tabs-list-scroll">
             <TabsTrigger value="available">
               <Search className="w-4 h-4 mr-2" />
               Available Courses ({availableCourses.length})

@@ -9,6 +9,7 @@ export interface CurrentUser {
   email: string | null;
   fullName: string | null;
   role: UserRole;
+  department?: string;
   permissions: RolePermissions;
   avatar: string | null;
   verified: boolean;
@@ -53,6 +54,7 @@ export function useAuth(): UseAuthResult {
           email: authUser.email,
           fullName: userData.fullName,
           role: userData.role as UserRole,
+          department: userData.department,
           permissions: userData.permissions,
           avatar: userData.avatar,
           verified: userData.verified,

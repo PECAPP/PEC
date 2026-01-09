@@ -226,7 +226,13 @@ service cloud.firestore {
     
     match /feeRecords/{feeId} {
       // Students can read their own fee records
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && (isAdmin() || resource.data.studentId == request.auth.uid);
+      
+      // Students can mark their own fees as paid
+      allow update: if isAuthenticated() && resource.data.studentId == request.auth.uid && request.resource.data.status == 'paid';
+      
+      // Students can initiate their own fee records
+      allow create: if isAuthenticated() && request.resource.data.studentId == request.auth.uid && request.resource.data.status == 'pending';
       
       // ADMINS: Full access to all fee records
       allow read, write, delete: if isAdmin();
@@ -245,6 +251,14 @@ service cloud.firestore {
       
       // ADMINS: Full access to timetable
       allow read, write, delete: if isAdmin();
+    }
+
+    match /timetable/{slotId} {
+      // All authenticated users can read timetable
+      allow read: if isAuthenticated();
+      
+      // Faculty can manage timetable
+      allow create, update, delete: if isFaculty() || isAdmin();
     }
     
     // ====================
