@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Home,
@@ -38,6 +38,20 @@ import {
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+import { db, auth } from '@/config/firebase';
+import { 
+  collection, 
+  query, 
+  onSnapshot, 
+  addDoc, 
+  serverTimestamp, 
+  where, 
+  doc, 
+  updateDoc, 
+  arrayUnion,
+  orderBy
+} from 'firebase/firestore';
+
 interface HostelIssue {
   id: string;
   title: string;
@@ -46,64 +60,12 @@ interface HostelIssue {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   roomNumber: string;
-  createdAt: string;
-  updatedAt: string;
-  responses?: { from: string; message: string; time: string }[];
+  studentId: string;
+  studentName: string;
+  createdAt: any;
+  updatedAt: any;
+  responses?: { from: string; message: string; timestamp: any }[];
 }
-
-const mockIssues: HostelIssue[] = [
-  {
-    id: '1',
-    title: 'AC not cooling properly',
-    description: 'The air conditioner in my room is running but not cooling. The temperature stays the same even after hours of running.',
-    category: 'hvac',
-    priority: 'high',
-    status: 'in_progress',
-    roomNumber: 'A-204',
-    createdAt: '2024-01-20',
-    updatedAt: '2024-01-21',
-    responses: [
-      { from: 'Maintenance Team', message: 'We have scheduled a technician visit for tomorrow between 10 AM - 12 PM.', time: '1 day ago' },
-    ],
-  },
-  {
-    id: '2',
-    title: 'WiFi connectivity issues',
-    description: 'WiFi signal is very weak in my room. Unable to attend online classes properly.',
-    category: 'internet',
-    priority: 'medium',
-    status: 'open',
-    roomNumber: 'A-204',
-    createdAt: '2024-01-22',
-    updatedAt: '2024-01-22',
-  },
-  {
-    id: '3',
-    title: 'Leaking tap in bathroom',
-    description: 'The bathroom tap is leaking continuously, wasting water.',
-    category: 'plumbing',
-    priority: 'medium',
-    status: 'resolved',
-    roomNumber: 'A-204',
-    createdAt: '2024-01-15',
-    updatedAt: '2024-01-17',
-    responses: [
-      { from: 'Maintenance Team', message: 'Issue has been fixed. Please confirm if the problem persists.', time: '5 days ago' },
-      { from: 'You', message: 'Fixed. Thank you!', time: '5 days ago' },
-    ],
-  },
-  {
-    id: '4',
-    title: 'Light fixture not working',
-    description: 'The ceiling light in the study area is not working.',
-    category: 'electrical',
-    priority: 'low',
-    status: 'closed',
-    roomNumber: 'A-204',
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-12',
-  },
-];
 
 const categoryIcons = {
   electrical: Zap,
@@ -114,23 +76,59 @@ const categoryIcons = {
 };
 
 export default function HostelIssues() {
-  const [issues, setIssues] = useState(mockIssues);
+  const [issues, setIssues] = useState<HostelIssue[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
-  const [newIssue, setNewIssue] = useState({ title: '', description: '', category: '', priority: 'medium' });
+  const [newIssue, setNewIssue] = useState({ title: '', description: '', category: '', priority: 'medium', roomNumber: '' });
   const [selectedIssue, setSelectedIssue] = useState<HostelIssue | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const filteredIssues = issues.filter(issue => {
-    if (activeTab === 'all') return true;
-    return issue.status === activeTab;
-  });
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Show personal issues AND seeded issues for demo purposes
+    const seededIds = ['25111001', '25111002'];
+    // Use a simple query without orderBy to avoid composite index requirement
+    const q = query(
+      collection(db, 'hostelIssues'), 
+      where('studentId', 'in', [user.uid, ...seededIds])
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const issuesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as HostelIssue[];
+      
+      // Sort on client side to avoid index requirement
+      const sortedIssues = issuesData.sort((a, b) => {
+        const timeA = a.createdAt?.seconds || 0;
+        const timeB = b.createdAt?.seconds || 0;
+        return timeB - timeA;
+      });
+
+      setIssues(sortedIssues);
+      setLoading(false);
+      
+      if (selectedIssue) {
+        const updated = sortedIssues.find(i => i.id === selectedIssue.id);
+        if (updated) setSelectedIssue(updated);
+      }
+    }, (error) => {
+      console.error("Error fetching hostel issues:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [auth.currentUser?.uid]);
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'open': return { color: 'text-warning', bg: 'bg-warning/10', label: 'Open' };
-      case 'in_progress': return { color: 'text-primary', bg: 'bg-primary/10', label: 'In Progress' };
-      case 'resolved': return { color: 'text-success', bg: 'bg-success/10', label: 'Resolved' };
+      case 'open': return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Open' };
+      case 'in_progress': return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'In Progress' };
+      case 'resolved': return { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Resolved' };
       case 'closed': return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Closed' };
       default: return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
     }
@@ -138,61 +136,70 @@ export default function HostelIssues() {
 
   const getPriorityConfig = (priority: string) => {
     switch (priority) {
-      case 'urgent': return { color: 'text-destructive', bg: 'bg-destructive/10' };
-      case 'high': return { color: 'text-warning', bg: 'bg-warning/10' };
-      case 'medium': return { color: 'text-primary', bg: 'bg-primary/10' };
+      case 'urgent': return { color: 'text-red-500', bg: 'bg-red-500/10' };
+      case 'high': return { color: 'text-orange-500', bg: 'bg-orange-500/10' };
+      case 'medium': return { color: 'text-blue-500', bg: 'bg-blue-500/10' };
       default: return { color: 'text-muted-foreground', bg: 'bg-muted' };
     }
   };
 
-  const handleSubmitIssue = () => {
-    if (!newIssue.title || !newIssue.description || !newIssue.category) {
+  const handleSubmitIssue = async () => {
+    if (!newIssue.title || !newIssue.description || !newIssue.category || !newIssue.roomNumber) {
       toast.error('Please fill in all required fields');
       return;
     }
 
-    const issue: HostelIssue = {
-      id: Date.now().toString(),
-      title: newIssue.title,
-      description: newIssue.description,
-      category: newIssue.category as HostelIssue['category'],
-      priority: newIssue.priority as HostelIssue['priority'],
-      status: 'open',
-      roomNumber: 'A-204',
-      createdAt: new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0],
-    };
+    const user = auth.currentUser;
+    try {
+      await addDoc(collection(db, 'hostelIssues'), {
+        title: newIssue.title,
+        description: newIssue.description,
+        category: newIssue.category,
+        priority: newIssue.priority,
+        status: 'open',
+        roomNumber: newIssue.roomNumber,
+        studentId: user?.uid,
+        studentName: user?.displayName || user?.email?.split('@')[0],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        responses: []
+      });
 
-    setIssues(prev => [issue, ...prev]);
-    setNewIssue({ title: '', description: '', category: '', priority: 'medium' });
-    setDialogOpen(false);
-    toast.success('Issue submitted successfully');
+      setNewIssue({ title: '', description: '', category: '', priority: 'medium', roomNumber: '' });
+      setDialogOpen(false);
+      toast.success('Issue submitted successfully');
+    } catch (error) {
+      console.error("Error submitting issue:", error);
+      toast.error('Failed to submit issue');
+    }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedIssue) return;
 
-    const updatedIssues = issues.map(issue => {
-      if (issue.id === selectedIssue.id) {
-        return {
-          ...issue,
-          responses: [
-            ...(issue.responses || []),
-            { from: 'You', message: newMessage, time: 'Just now' },
-          ],
-        };
-      }
-      return issue;
-    });
+    try {
+      const issueRef = doc(db, 'hostelIssues', selectedIssue.id);
+      await updateDoc(issueRef, {
+        responses: arrayUnion({
+          from: 'Student',
+          message: newMessage,
+          timestamp: new Date()
+        }),
+        updatedAt: serverTimestamp()
+      });
 
-    setIssues(updatedIssues);
-    setSelectedIssue(prev => prev ? {
-      ...prev,
-      responses: [...(prev.responses || []), { from: 'You', message: newMessage, time: 'Just now' }],
-    } : null);
-    setNewMessage('');
-    toast.success('Message sent');
+      setNewMessage('');
+      toast.success('Message sent');
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error('Failed to send message');
+    }
   };
+
+  const filteredIssues = issues.filter(issue => {
+    if (activeTab === 'all') return true;
+    return issue.status === activeTab;
+  });
 
   const stats = {
     total: issues.length,
@@ -237,6 +244,15 @@ export default function HostelIssues() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <label className="text-sm font-medium text-foreground">Room Number *</label>
+                  <Input
+                    placeholder="e.g. A-204"
+                    value={newIssue.roomNumber}
+                    onChange={(e) => setNewIssue(prev => ({ ...prev, roomNumber: e.target.value }))}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
                   <label className="text-sm font-medium text-foreground">Category *</label>
                   <Select value={newIssue.category} onValueChange={(v) => setNewIssue(prev => ({ ...prev, category: v }))}>
                     <SelectTrigger className="mt-1">
@@ -251,20 +267,20 @@ export default function HostelIssues() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground">Priority</label>
-                  <Select value={newIssue.priority} onValueChange={(v) => setNewIssue(prev => ({ ...prev, priority: v }))}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="urgent">Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground">Priority</label>
+                <Select value={newIssue.priority} onValueChange={(v) => setNewIssue(prev => ({ ...prev, priority: v }))}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground">Description *</label>
@@ -380,7 +396,9 @@ export default function HostelIssues() {
                               <Badge className={cn(statusConfig.bg, statusConfig.color, 'border-0 text-xs')}>
                                 {statusConfig.label}
                               </Badge>
-                              <span className="text-xs text-muted-foreground">{issue.createdAt}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {issue.createdAt?.toDate ? issue.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                              </span>
                             </div>
                           </div>
                           {issue.responses && issue.responses.length > 0 && (
@@ -415,8 +433,8 @@ export default function HostelIssues() {
                 </div>
                 <p className="mt-4 text-muted-foreground">{selectedIssue.description}</p>
                 <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
-                  <span>Created: {selectedIssue.createdAt}</span>
-                  <span>Updated: {selectedIssue.updatedAt}</span>
+                  <span>Created: {selectedIssue.createdAt?.toDate ? selectedIssue.createdAt.toDate().toLocaleDateString() : 'Just now'}</span>
+                  <span>Updated: {selectedIssue.updatedAt?.toDate ? selectedIssue.updatedAt.toDate().toLocaleDateString() : 'Just now'}</span>
                 </div>
               </div>
 
@@ -434,7 +452,9 @@ export default function HostelIssues() {
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium text-foreground">{response.from}</span>
-                          <span className="text-xs text-muted-foreground">{response.time}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {response.timestamp?.toDate ? response.timestamp.toDate().toLocaleTimeString() : 'Just now'}
+                          </span>
                         </div>
                         <p className="text-sm text-muted-foreground">{response.message}</p>
                       </div>

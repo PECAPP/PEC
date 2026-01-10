@@ -32,23 +32,31 @@ const faqs = [
   },
   {
     question: 'How can I view my attendance records?',
-    answer: 'Navigate to the Attendance section from the sidebar. You can view your attendance percentage by subject, see detailed records, and download attendance reports.',
+    answer: 'Navigate to the Attendance section from the sidebar. You can view your attendance percentage by subject, see detailed records, and download attendance reports. For faculty, you can mark attendance by selecting your course and clicking "Mark Attendance".',
   },
   {
     question: 'How do I apply for placement opportunities?',
-    answer: 'Visit the Placements section to view available job listings. Click on any job to see details and use the "Apply Now" button to submit your application along with your resume.',
+    answer: 'Visit the Placements section to view available job listings. Click on any job to see details and use the "Apply Now" button to submit your application along with your resume. You can also track your applications from the "My Applications" tab.',
   },
   {
-    question: 'How can I download my transcript?',
-    answer: 'Go to Examinations > Transcript. Select the academic year and click "Download Transcript". You can choose between official and unofficial versions.',
+    question: 'How can I report a hostel maintenance issue?',
+    answer: 'Go to the Hostel Issues section in the sidebar. Click on "Report Issue", select a category (Plumbing, Electrical, etc.), describe your problem, and submit. You can track the status of your request and message the maintenance team directly.',
+  },
+  {
+    question: 'How do I order from the Night Canteen?',
+    answer: 'Navigate to the Night Canteen section. Browse the menu, add items to your cart, and place your order. You can track your order status in real-time and view your order history.',
   },
   {
     question: 'How do I pay my semester fees?',
-    answer: 'Navigate to Finance > Fee Payment. View your pending fees and click "Pay Now". You can pay via credit/debit card, net banking, or UPI.',
+    answer: 'Navigate to Finance > Fee Payment. View your pending fees and click "Pay Now". You can pay via credit/debit card, net banking, or UPI. A receipt will be generated automatically after a successful transaction.',
+  },
+  {
+    question: 'How can I use the AI Resume Analyzer?',
+    answer: 'Go to Resume Builder > AI Analyzer. Upload your PDF resume, and the system will provide detailed feedback, score your resume, and suggest improvements based on industry standards.',
   },
   {
     question: 'How can I contact my faculty?',
-    answer: 'Go to Courses and select the relevant course. You\'ll find the faculty details and contact information there. You can also send messages through the platform.',
+    answer: 'Go to Courses and select the relevant course. You\'ll find the faculty details and contact information there. You can also send messages through the platform\'s messaging system.',
   },
 ];
 

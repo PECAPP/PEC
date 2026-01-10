@@ -188,7 +188,7 @@ export default function Settings() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground">Phone</label>
-                  <Input value={profileData?.phone || ''} className="mt-1" />
+                  <Input defaultValue={profileData?.phone || ''} className="mt-1" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="text-sm font-medium text-foreground">Department</label>

@@ -19,6 +19,9 @@ import {
   UserCog,
   Menu,
   X,
+  UtensilsCrossed,
+  Wrench,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types";
@@ -162,6 +165,24 @@ const navItems: NavItem[] = [
     roles: ["student"],
   },
   {
+    icon: UtensilsCrossed,
+    label: "Night Canteen",
+    path: "/canteen",
+    roles: ["student"],
+  },
+  {
+    icon: UtensilsCrossed,
+    label: "Canteen Manager",
+    path: "/admin/canteen",
+    roles: ["super_admin", "college_admin"],
+  },
+  {
+    icon: Wrench,
+    label: "Manage Hostel",
+    path: "/admin/hostel",
+    roles: ["super_admin", "college_admin"],
+  },
+  {
     icon: Building2,
     label: "Organizations",
     path: "/admin/organizations",
@@ -177,6 +198,19 @@ const navItems: NavItem[] = [
     icon: Settings,
     label: "Settings",
     path: "/settings",
+    roles: [
+      "student",
+      "faculty",
+      "college_admin",
+      "super_admin",
+      "placement_officer",
+      "recruiter",
+    ],
+  },
+  {
+    icon: HelpCircle,
+    label: "Help & Support",
+    path: "/help",
     roles: [
       "student",
       "faculty",

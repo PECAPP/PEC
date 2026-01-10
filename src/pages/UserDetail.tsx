@@ -4,7 +4,8 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import { db } from '@/config/firebase';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Mail, Phone, Building2, Calendar, User, BookOpen, ClipboardCheck, FileText, Award } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Building2, Calendar, User, BookOpen, ClipboardCheck, FileText, Award, CreditCard, Receipt, Wrench, ShieldAlert, UtensilsCrossed, Briefcase, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
 export default function UserDetail() {
@@ -16,6 +17,11 @@ export default function UserDetail() {
   const [grades, setGrades] = useState<any[]>([]);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [assignments, setAssignments] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [hostelIssues, setHostelIssues] = useState<any[]>([]);
+  const [profileData, setProfileData] = useState<any>(null);
+  const [canteenOrders, setCanteenOrders] = useState<any[]>([]);
+  const [placementApps, setPlacementApps] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -27,64 +33,93 @@ export default function UserDetail() {
           navigate('/users');
           return;
         }
-        const userData = { id: userDoc.id, ...userDoc.data() };
+        const userData = { id: userDoc.id, ...userDoc.data() } as any;
         setUser(userData);
 
-        // Fetch enrollments if student
+        // Fetch role-specific profile
+        let profileTable = '';
+        if (userData.role === 'student') profileTable = 'studentProfiles';
+        else if (userData.role === 'faculty') profileTable = 'facultyProfiles';
+        else if (userData.role === 'college_admin') profileTable = 'collegeAdminProfiles';
+        else if (userData.role === 'placement_officer') profileTable = 'placementOfficerProfiles';
+        else if (userData.role === 'recruiter') profileTable = 'recruiterProfiles';
+
+        if (profileTable) {
+          const profileDoc = await getDoc(doc(db, profileTable, userId!));
+          if (profileDoc.exists()) {
+            setProfileData(profileDoc.data());
+          }
+        }
+
+        // Fetch student-specific data
         if (userData.role === 'student') {
-          const enrollmentsQuery = query(
-            collection(db, 'enrollments'),
-            where('studentId', '==', userId)
-          );
+          // Fetch enrollments
+          const enrollmentsQuery = query(collection(db, 'enrollments'), where('studentId', '==', userId));
           const enrollmentsSnap = await getDocs(enrollmentsQuery);
           const enrollmentsData = await Promise.all(
             enrollmentsSnap.docs.map(async (enrollDoc) => {
               const enrollment = { id: enrollDoc.id, ...enrollDoc.data() } as any;
-              // Fetch course details
-              const courseDoc = await getDoc(doc(db, 'courses', enrollment.courseId));
-              return {
-                ...enrollment,
-                courseName: courseDoc.data()?.name,
-                courseCode: courseDoc.data()?.code,
-              };
+              if (enrollment.courseId) {
+                const courseDoc = await getDoc(doc(db, 'courses', enrollment.courseId));
+                return {
+                  ...enrollment,
+                  courseName: courseDoc.data()?.name || 'Unknown Course',
+                  courseCode: courseDoc.data()?.code || 'N/A',
+                };
+              }
+              return { ...enrollment, courseName: 'Unknown Course', courseCode: 'N/A' };
             })
           );
           setEnrollments(enrollmentsData);
 
           // Fetch grades
-          const gradesQuery = query(
-            collection(db, 'grades'),
-            where('studentId', '==', userId)
-          );
+          const gradesQuery = query(collection(db, 'grades'), where('studentId', '==', userId));
           const gradesSnap = await getDocs(gradesQuery);
           const gradesData = await Promise.all(
             gradesSnap.docs.map(async (gradeDoc) => {
               const grade = { id: gradeDoc.id, ...gradeDoc.data() } as any;
-              const courseDoc = await getDoc(doc(db, 'courses', grade.courseId));
-              return {
-                ...grade,
-                courseName: courseDoc.data()?.name,
-                courseCode: courseDoc.data()?.code,
-              };
+              if (grade.courseId) {
+                const courseDoc = await getDoc(doc(db, 'courses', grade.courseId));
+                return {
+                  ...grade,
+                  courseName: courseDoc.data()?.name || 'Unknown Course',
+                  courseCode: courseDoc.data()?.code || 'N/A',
+                };
+              }
+              return { ...grade, courseName: 'Unknown Course', courseCode: 'N/A' };
             })
           );
           setGrades(gradesData);
 
           // Fetch attendance
-          const attendanceQuery = query(
-            collection(db, 'attendance'),
-            where('studentId', '==', userId)
-          );
+          const attendanceQuery = query(collection(db, 'attendance'), where('studentId', '==', userId));
           const attendanceSnap = await getDocs(attendanceQuery);
           setAttendance(attendanceSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-          // Fetch assignments (submitted)
-          const assignmentsQuery = query(
-            collection(db, 'submissions'),
-            where('studentId', '==', userId)
-          );
+          // Fetch assignments
+          const assignmentsQuery = query(collection(db, 'submissions'), where('studentId', '==', userId));
           const assignmentsSnap = await getDocs(assignmentsQuery);
           setAssignments(assignmentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+          // Fetch Finance/Payments
+          const paymentsQuery = query(collection(db, 'payments'), where('studentId', '==', userId));
+          const paymentsSnap = await getDocs(paymentsQuery);
+          setPayments(paymentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+          // Fetch Hostel Issues
+          const hostelQuery = query(collection(db, 'hostelIssues'), where('studentId', '==', userId));
+          const hostelSnap = await getDocs(hostelQuery);
+          setHostelIssues(hostelSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+          // Fetch Canteen Orders
+          const canteenQuery = query(collection(db, 'canteenOrders'), where('studentId', '==', userId));
+          const canteenSnap = await getDocs(canteenQuery);
+          setCanteenOrders(canteenSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+          // Fetch Placement Applications
+          const placementQuery = query(collection(db, 'placementApplications'), where('studentId', '==', userId));
+          const placementSnap = await getDocs(placementQuery);
+          setPlacementApps(placementSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -195,7 +230,7 @@ export default function UserDetail() {
             Academic Information
           </h2>
           <div className="space-y-3">
-            {user.department && (
+            {(user.department || profileData?.department) && (
               <div>
                 <label className="text-sm text-muted-foreground">Department</label>
                 <p 
@@ -203,26 +238,30 @@ export default function UserDetail() {
                   onClick={() => navigate('/departments')}
                   title="View Departments"
                 >
-                  {user.department}
+                  {user.department || profileData?.department}
                 </p>
               </div>
             )}
-            {user.enrollmentNumber && (
+            {(user.enrollmentNumber || profileData?.enrollmentNumber || profileData?.employeeId) && (
               <div>
-                <label className="text-sm text-muted-foreground">Enrollment Number</label>
-                <p className="text-foreground font-mono">{user.enrollmentNumber}</p>
+                <label className="text-sm text-muted-foreground">
+                  {user.role === 'student' ? 'Enrollment Number' : 'Employee ID'}
+                </label>
+                <p className="text-foreground font-mono">
+                  {user.enrollmentNumber || profileData?.enrollmentNumber || profileData?.employeeId}
+                </p>
               </div>
             )}
-            {user.semester && (
+            {(user.semester || profileData?.semester) && (
               <div>
                 <label className="text-sm text-muted-foreground">Current Semester</label>
-                <p className="text-foreground">{user.semester}</p>
+                <p className="text-foreground">{user.semester || profileData?.semester}</p>
               </div>
             )}
-            {user.batch && (
+            {(user.batch || profileData?.batch) && (
               <div>
                 <label className="text-sm text-muted-foreground">Batch</label>
-                <p className="text-foreground">{user.batch}</p>
+                <p className="text-foreground">{user.batch || profileData?.batch}</p>
               </div>
             )}
             <div>
@@ -401,6 +440,172 @@ export default function UserDetail() {
             )}
           </div>
         </>
+      )}
+
+      {/* Financial Records */}
+      {user.role === 'student' && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-elevated p-6"
+        >
+          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-accent" />
+            Financial Records & Fees
+          </h2>
+          {payments.length > 0 ? (
+            <div className="space-y-3">
+              {payments.map((payment) => (
+                <div key={payment.id} className="p-4 border border-border rounded-lg flex items-center justify-between">
+                  <div className="flex gap-3">
+                    <div className="p-2 rounded-full bg-accent/10">
+                      <Receipt className="w-4 h-4 text-accent" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">{payment.title || 'Fee Payment'}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(payment.paidAt || payment.updatedAt)}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-foreground">₹{payment.amount}</p>
+                    <Badge variant={payment.status === 'success' || payment.status === 'paid' ? 'default' : 'secondary'}>
+                      {payment.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-muted/20 rounded-lg flex flex-col items-center">
+              <Receipt className="w-10 h-10 text-muted-foreground/30 mb-2" />
+              <p className="text-muted-foreground">No financial records found</p>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Hostel Issues */}
+      {user.role === 'student' && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-elevated p-6"
+        >
+          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Wrench className="w-5 h-5 text-primary" />
+            Hostel Maintenance Issues
+          </h2>
+          {hostelIssues.length > 0 ? (
+            <div className="space-y-3">
+              {hostelIssues.map((issue) => (
+                <div 
+                  key={issue.id} 
+                  className="group p-4 border border-border rounded-lg cursor-pointer hover:bg-muted/10 transition-all"
+                  onClick={() => navigate('/admin/hostel')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-3">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <ShieldAlert className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground group-hover:text-primary transition-colors">{issue.title}</p>
+                        <p className="text-sm text-muted-foreground">Category: {issue.category}</p>
+                      </div>
+                    </div>
+                    <Badge variant={issue.status === 'resolved' ? 'default' : 'secondary'}>
+                      {issue.status}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2 pl-9">Reported: {formatDate(issue.createdAt)}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-muted/20 rounded-lg flex flex-col items-center">
+              <ShieldAlert className="w-10 h-10 text-muted-foreground/30 mb-2" />
+              <p className="text-muted-foreground">No hostel issues reported</p>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Placement Applications */}
+      {user.role === 'student' && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-elevated p-6"
+        >
+          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-indigo-500" />
+            Placement Applications ({placementApps.length})
+          </h2>
+          {placementApps.length > 0 ? (
+            <div className="space-y-3">
+              {placementApps.map((app) => (
+                <div key={app.id} className="p-4 border border-border rounded-lg flex items-center justify-between">
+                  <div className="flex gap-3">
+                    <div className="p-2 rounded-full bg-indigo-500/10">
+                      <Briefcase className="w-4 h-4 text-indigo-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">{app.jobTitle || 'Job Application'}</p>
+                      <p className="text-sm text-muted-foreground">{app.companyName}</p>
+                    </div>
+                  </div>
+                  <Badge variant={app.status === 'placed' ? 'success' : app.status === 'rejected' ? 'destructive' : 'secondary'}>
+                    {app.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-muted/20 rounded-lg flex flex-col items-center">
+              <Briefcase className="w-10 h-10 text-muted-foreground/30 mb-2" />
+              <p className="text-muted-foreground">No placement applications yet</p>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Canteen Orders */}
+      {user.role === 'student' && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-elevated p-6"
+        >
+          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <UtensilsCrossed className="w-5 h-5 text-orange-500" />
+            Canteen Orders ({canteenOrders.length})
+          </h2>
+          {canteenOrders.length > 0 ? (
+            <div className="space-y-3">
+              {canteenOrders.map((order) => (
+                <div key={order.id} className="p-4 border border-border rounded-lg flex items-center justify-between">
+                  <div className="flex gap-3">
+                    <div className="p-2 rounded-full bg-orange-500/10">
+                      <UtensilsCrossed className="w-4 h-4 text-orange-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Order #{order.id.slice(-6).toUpperCase()}</p>
+                      <p className="text-sm text-muted-foreground">{order.items?.length || 0} items • ₹{order.total}</p>
+                    </div>
+                  </div>
+                  <Badge variant={order.status === 'delivered' ? 'default' : 'secondary'}>
+                    {order.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-muted/20 rounded-lg flex flex-col items-center">
+              <UtensilsCrossed className="w-10 h-10 text-muted-foreground/30 mb-2" />
+              <p className="text-muted-foreground">No canteen orders found</p>
+            </div>
+          )}
+        </motion.div>
       )}
 
       {/* Metadata */}

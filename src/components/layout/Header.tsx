@@ -79,15 +79,6 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick }: Header
 
         {/* Right Section */}
         <div className="flex items-center gap-3 ml-auto">
-          {/* Help */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-muted-foreground hover:text-foreground"
-            onClick={() => navigate('/help')}
-          >
-            <HelpCircle className="w-5 h-5" />
-          </Button>
           <ColorThemeToggler />
           <ThemeToggler/>
           {/* Notifications */}

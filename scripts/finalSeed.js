@@ -116,6 +116,20 @@ const studentEmails = [
     { email: 'karan.student@pec.edu', name: 'Karan Student', dept: 'Electronics & Communication Engineering', sem: 6, sid: 'TEST003' }
 ];
 
+const canteenCategories = ['Snacks', 'Drinks', 'Meals', 'Desserts'];
+const canteenItems = [
+    { name: 'Maggi Noodles', price: 40, category: 'Meals', description: 'Classic Masala Maggi', image: 'https://images.unsplash.com/photo-1526318896980-cf78c088247c?w=500' },
+    { name: 'Classic Salted Lays', price: 20, category: 'Snacks', description: 'Large pack of salted chips', image: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=500' },
+    { name: 'Coca Cola 250ml', price: 30, category: 'Drinks', description: 'Chilled soft drink', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500' },
+    { name: 'Cheese Sandwich', price: 50, category: 'Meals', description: 'Grilled cheese sandwich', image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=500' },
+    { name: 'Red Bull', price: 110, category: 'Drinks', description: 'Energy drink', image: 'https://images.unsplash.com/photo-1533558701576-23c65eec261f?w=500' },
+    { name: 'Oreo Biscuits', price: 30, category: 'Snacks', description: 'Chocolate cream biscuits', image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=500' },
+    { name: 'Chocolate Muffin', price: 45, category: 'Desserts', description: 'Soft chocolate muffin', image: 'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=500' },
+    { name: 'Cold Coffee', price: 60, category: 'Drinks', description: 'Creamy iced coffee', image: 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=500' },
+    { name: 'Kurkure Masala', price: 20, category: 'Snacks', description: 'Spicy corn puffs', image: 'https://images.unsplash.com/photo-1600490033465-05f3295e8e3c?w=500' },
+    { name: 'Veg Burger', price: 75, category: 'Meals', description: 'Mixed veg patty burger', image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=500' }
+];
+
 async function getOrCreateUser(email, password, role, data) {
     let uid;
     try {
@@ -223,6 +237,20 @@ async function main() {
     const courseMap = {}; // code -> id
     for (const [deptCode, courses] of Object.entries(coursesConfig)) {
         const dept = departments.find(d => d.code === deptCode);
+        const canteenCategories = ['Snacks', 'Drinks', 'Meals', 'Desserts'];
+        const canteenItems = [
+            { name: 'Maggi Noodles', price: 40, category: 'Meals', description: 'Classic Masala Maggi', image: 'https://images.unsplash.com/photo-1526318896980-cf78c088247c?w=500' },
+            { name: 'Classic Salted Lays', price: 20, category: 'Snacks', description: 'Large pack of salted chips', image: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=500' },
+            { name: 'Coca Cola 250ml', price: 30, category: 'Drinks', description: 'Chilled soft drink', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500' },
+            { name: 'Cheese Sandwich', price: 50, category: 'Meals', description: 'Grilled cheese sandwich', image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=500' },
+            { name: 'Red Bull', price: 110, category: 'Drinks', description: 'Energy drink', image: 'https://images.unsplash.com/photo-1533558701576-23c65eec261f?w=500' },
+            { name: 'Oreo Biscuits', price: 30, category: 'Snacks', description: 'Chocolate cream biscuits', image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=500' },
+            { name: 'Chocolate Muffin', price: 45, category: 'Desserts', description: 'Soft chocolate muffin', image: 'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=500' },
+            { name: 'Cold Coffee', price: 60, category: 'Drinks', description: 'Creamy iced coffee', image: 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=500' },
+            { name: 'Kurkure Masala', price: 20, category: 'Snacks', description: 'Spicy corn puffs', image: 'https://images.unsplash.com/photo-1600490033465-05f3295e8e3c?w=500' },
+            { name: 'Veg Burger', price: 75, category: 'Meals', description: 'Mixed veg patty burger', image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=500' }
+        ];
+
         const faculties = facultyByDept[deptCode];
 
         for (const c of courses) {
@@ -443,6 +471,19 @@ async function main() {
         }
     }
     console.log(`  ✓ Created ${gradeCount} historical grade entries`);
+
+    // 12. Night Canteen Items
+    console.log('\n🍔 Seeding Night Canteen Items...');
+    for (const item of canteenItems) {
+        const itemId = item.name.toLowerCase().replace(/\s+/g, '_');
+        await setDoc(doc(db, 'canteenItems', itemId), {
+            ...item,
+            isAvailable: true,
+            stock: 100,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+    }
+    console.log(`  ✓ Seeded ${canteenItems.length} canteen items`);
 
     console.log('\n✅ SEEDING COMPLETE!');
     console.log('Students and Courses are now fully linked.\n');

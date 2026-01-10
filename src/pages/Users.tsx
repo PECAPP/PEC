@@ -602,7 +602,11 @@ export default function Users() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingUser ? 'Edit User' : 'Add New User'}</DialogTitle>
-            <DialogDescription>{editingUser ? 'Update user details' : 'Create a new user account'}</DialogDescription>
+            <DialogDescription>
+              {editingUser 
+                ? 'Make changes to the user profile here. Click save when you\'re done.' 
+                : 'Fill in the details below to create a new user account.'}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

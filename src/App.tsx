@@ -57,6 +57,7 @@ import Faculty from "./pages/college/Faculty";
 import FacultyDetail from "./pages/college/FacultyDetail";
 import AddFaculty from "./pages/college/AddFaculty";
 import AddUser from "./pages/college/AddUser";
+import UserDetail from "./pages/UserDetail";
 import UsersPage from "./pages/Users";
 import Reports from "./pages/college/Reports";
 import AddCourse from "./pages/college/AddCourse";
@@ -65,6 +66,9 @@ import FeeSetup from "./pages/college/FeeSetup";
 import { ThemeProvider } from "next-themes";
 import NotFound from "./pages/NotFound";
 import DemoDashboard from "./pages/DemoDashboard";
+import { NightCanteen } from './pages/NightCanteen';
+import { CanteenManager } from './pages/admin/CanteenManager';
+import HostelAdmin from './pages/admin/HostelAdmin';
 
 const queryClient = new QueryClient();
 
@@ -93,6 +97,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<StudentProfile />} />
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/users/:userId" element={<UserDetail />} />
               <Route path="/courses" element={<Courses />} />
               <Route path="/courses/:id" element={<CourseDetail />} />
               <Route path="/timetable" element={<Timetable />} />
@@ -118,6 +123,12 @@ const App = () => (
               <Route path="/help/academics" element={<AcademicsHelp />} />
               <Route path="/help/settings-privacy" element={<SettingsPrivacy />} />
               <Route path="/hostel-issues" element={<HostelIssues />} />
+              
+              {/* Night Canteen */}
+              <Route path="/canteen" element={<NightCanteen />} />
+              <Route path="/admin/canteen" element={<CanteenManager />} />
+
+              {/* Admin Routes */}
               <Route path="/admin/organizations" element={<Organizations />} />
               <Route path="/admin/organizations/new" element={<AddOrganization />} />
               <Route path="/admin/organizations/:id" element={<OrganizationDetail />} />
@@ -125,6 +136,7 @@ const App = () => (
               <Route path="/admin/system-config" element={<SystemConfig />} />
               <Route path="/admin/logs" element={<SystemLogs />} />
               <Route path="/admin/approvals" element={<Approvals />} />
+              <Route path="/admin/hostel" element={<HostelAdmin />} />
               <Route path="/departments" element={<Departments />} />
               <Route path="/departments/:id" element={<DepartmentDetail />} />
               <Route path="/college/financial-report" element={<FinancialReport />} />

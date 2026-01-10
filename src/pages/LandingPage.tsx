@@ -47,7 +47,6 @@ import GradualBlur from "@/components/ui/GradualBlur";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ScrollReveal from "@/components/animations/ScrollReveal";
-import AnimatedCounter from "@/components/animations/AnimatedCounter";
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
