@@ -64,6 +64,7 @@ import Schedule from "./pages/college/Schedule";
 import FeeSetup from "./pages/college/FeeSetup";
 import { ThemeProvider } from "next-themes";
 import NotFound from "./pages/NotFound";
+import DemoDashboard from "./pages/DemoDashboard";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/role-selection" element={<RoleSelection />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/demo-dashboard" element={<DemoDashboard />} />
             <Route element={<MainLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<StudentProfile />} />

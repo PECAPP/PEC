@@ -13,14 +13,17 @@ import {
   CheckCircle,
   ArrowUpRight,
   Loader2,
+  Camera,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '@/config/firebase';
+import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
 
 const container = {
   hidden: { opacity: 0 },
@@ -40,6 +43,7 @@ export function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<any>(null);
   const [profileData, setProfileData] = useState<any>(null);
+  const [showQRScanner, setShowQRScanner] = useState(false);
   const [stats, setStats] = useState({
     attendancePercentage: 0,
     cgpa: 0,
@@ -125,10 +129,21 @@ export function StudentDashboard() {
       let totalCredits = 0;
       
       for (const grade of grades) {
-        const courseData = (courseDetails.find(c => c.id === grade.courseId) || (await getDoc(doc(db, 'courses', grade.courseId))).data()) as any;
-        const credits = courseData?.credits || 0;
-        totalGradePoints += grade.gradePoints * (grade.credits || credits);
-        totalCredits += (grade.credits || credits);
+        let credits = grade.credits || 0;
+        
+        // Only fetch course data if credits are missing and courseId exists
+        if (!credits && grade.courseId) {
+          try {
+            const courseData = (courseDetails.find(c => c.id === grade.courseId) || 
+                               (await getDoc(doc(db, 'courses', grade.courseId))).data()) as any;
+            credits = courseData?.credits || 0;
+          } catch (e) {
+            console.error('Error fetching course data for grade:', grade.courseId, e);
+          }
+        }
+        
+        totalGradePoints += (grade.gradePoints || 0) * credits;
+        totalCredits += credits;
       }
       
       const cgpa = totalCredits > 0 ? Math.round((totalGradePoints / totalCredits) * 100) / 100 : 0;
@@ -233,14 +248,24 @@ export function StudentDashboard() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-1"
+        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
       >
-        <h1 className="text-2xl font-bold text-foreground">
-          Welcome back, {firstName}! 👋
-        </h1>
-        <p className="text-muted-foreground">
-          {profileData?.enrollmentNumber || 'Student'} • {profileData?.department || 'Department'} • Semester {profileData?.semester || '-'}
-        </p>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold text-foreground">
+            Welcome back, {firstName}! 👋
+          </h1>
+          <p className="text-muted-foreground">
+            {profileData?.enrollmentNumber || 'Student'} • {profileData?.department || 'Department'} • Semester {profileData?.semester || '-'}
+          </p>
+        </div>
+        <Button 
+          onClick={() => setShowQRScanner(true)}
+          variant="gradient"
+          className="w-full md:w-auto"
+        >
+          <Camera className="w-4 h-4 mr-2" />
+          Mark Attendance
+        </Button>
       </motion.div>
 
       {/* Stats Cards */}
@@ -461,6 +486,25 @@ export function StudentDashboard() {
           </div>
         </Button>
       </motion.div>
+
+      {/* QR Attendance Scanner Modal */}
+      <Dialog open={showQRScanner} onOpenChange={setShowQRScanner}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Scan QR Code</DialogTitle>
+          </DialogHeader>
+          <QRAttendanceScanner
+            onSuccess={() => {
+              setShowQRScanner(false);
+              // Refresh attendance data
+              if (userData) {
+                fetchStudentStats(userData.uid, profileData);
+              }
+            }}
+            onClose={() => setShowQRScanner(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

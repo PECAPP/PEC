@@ -43,6 +43,14 @@ import ThemeToggler from "@/components/ThemeToggler";
 import { ColorThemeToggler } from "@/components/ColorThemeToggler";
 import React, { useRef, useEffect, useState } from "react";
 import { WobbleCard } from "@/components/ui/wobble-card";
+import GradualBlur from "@/components/ui/GradualBlur";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ScrollReveal from "@/components/animations/ScrollReveal";
+import AnimatedCounter from "@/components/animations/AnimatedCounter";
+
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger);
 
 const container = {
   hidden: { opacity: 0 },
@@ -228,6 +236,52 @@ export function LandingPage() {
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+
+  // GSAP Scroll Animations
+  useEffect(() => {
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    // Magnetic button effect
+    const magneticButtons = document.querySelectorAll('.magnetic-btn');
+    magneticButtons.forEach((button) => {
+      const handleMouseMove = (e: MouseEvent) => {
+        const rect = (button as HTMLElement).getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+
+        gsap.to(button, {
+          x: x * 0.3,
+          y: y * 0.3,
+          duration: 0.3,
+          ease: 'power2.out',
+        });
+      };
+
+      const handleMouseLeave = () => {
+        gsap.to(button, {
+          x: 0,
+          y: 0,
+          duration: 0.5,
+          ease: 'elastic.out(1, 0.5)',
+        });
+      };
+
+      button.addEventListener('mousemove', handleMouseMove as EventListener);
+      button.addEventListener('mouseleave', handleMouseLeave);
+
+      return () => {
+        button.removeEventListener('mousemove', handleMouseMove as EventListener);
+        button.removeEventListener('mouseleave', handleMouseLeave);
+      };
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       {/* Animated Meshy Gradient Background - Full Page */}
@@ -312,17 +366,16 @@ export function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-3 cursor-pointer"
-            >
-              <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shadow-lg shadow-accent/20">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-foreground">
-                OmniFlow
-              </span>
-            </motion.div>
+            <Link to="/">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center gap-3 cursor-pointer"
+              >
+                <span className="text-xl font-bold text-foreground">
+                  OmniFlow
+                </span>
+              </motion.div>
+            </Link>
             <div className="hidden md:flex items-center gap-8">
               {["Features", "How it Works", "Testimonials"].map((link, i) => (
                 <motion.a
@@ -358,7 +411,7 @@ export function LandingPage() {
               <Button
                 size="sm"
                 asChild
-                className="rounded-full bg-accent hover:bg-accent/90 text-white shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300"
+                className="rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300"
                 aria-label="Get started with free trial"
               >
                 <Link to="/onboarding">Get Started</Link>
@@ -445,7 +498,7 @@ export function LandingPage() {
             <Button
               size="lg"
               asChild
-              className="group rounded-full bg-accent hover:bg-accent/90 text-white shadow-2xl shadow-accent/30 hover:shadow-accent/50 transition-all duration-300 px-8 py-6 text-base font-bold"
+              className="magnetic-btn group rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-2xl shadow-accent/30 hover:shadow-accent/50 transition-all duration-300 px-8 py-6 text-base font-bold"
               aria-label="Start your free trial of OmniFlow"
             >
               <Link to="/onboarding" className="flex items-center gap-3">
@@ -456,7 +509,7 @@ export function LandingPage() {
             <Button
               size="lg"
               variant="outline"
-              className="group rounded-full border-2 border-accent/50 hover:border-accent/80 hover:bg-accent/10 transition-all duration-300 px-8 py-6 text-base font-semibold"
+              className="magnetic-btn group rounded-full border-2 border-accent/50 hover:border-accent/80 hover:bg-accent/10 transition-all duration-300 px-8 py-6 text-base font-semibold"
               aria-label="Watch a demo video of OmniFlow"
             >
               <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -491,7 +544,7 @@ export function LandingPage() {
               }
             `}</style>
             <iframe
-              src="/dashboard"
+              src="/demo-dashboard"
               className="rounded-xl w-full h-[500px] border-0"
               title="OmniFlow Dashboard Live Demo"
               scrolling="no"
@@ -673,10 +726,10 @@ export function LandingPage() {
             >
               <div className="grid grid-cols-2 gap-4 sm:gap-6">
                 {[
-                  { value: "60%", label: "Less Admin Work", gradient: "from-secondary to-secondary/50" },
-                  { value: "99.9%", label: "Uptime SLA", gradient: "from-secondary to-secondary/50" },
-                  { value: "24/7", label: "Support Available", gradient: "from-secondary to-secondary/50" },
-                  { value: "500+", label: "Institutions Trust Us", gradient: "from-secondary to-secondary/50" }
+                  { value: 60, label: "Less Admin Work", gradient: "from-secondary to-secondary/50", suffix: "%" },
+                  { value: 99.9, label: "Uptime SLA", gradient: "from-secondary to-secondary/50", suffix: "%", decimals: 1 },
+                  { value: 24, label: "Support Available", gradient: "from-secondary to-secondary/50", suffix: "/7" },
+                  { value: 500, label: "Institutions Trust Us", gradient: "from-secondary to-secondary/50", suffix: "+" }
                 ].map((stat, i) => (
                   <motion.div
                     key={stat.label}
@@ -688,7 +741,12 @@ export function LandingPage() {
                     className={`bg-gradient-to-br ${stat.gradient} backdrop-blur-sm border border-border rounded-2xl p-6 sm:p-8 text-center hover:border-accent/40 transition-all duration-300`}
                   >
                     <div className="text-4xl sm:text-5xl font-bold mb-2 text-gradient" style={{ fontFamily: "'Monument Extended', serif" }}>
-                      {stat.value}
+                      <AnimatedCounter 
+                        end={stat.value} 
+                        suffix={stat.suffix || ''} 
+                        decimals={stat.decimals || 0}
+                        duration={2.5}
+                      />
                     </div>
                     <div className="text-sm text-muted-foreground font-medium">
                       {stat.label}
@@ -734,7 +792,7 @@ export function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 onClick={() => navigate('/profile')}
-                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 md:row-span-2 bg-foreground rounded-3xl p-6 sm:p-8 relative overflow-hidden group hover:shadow-2xl hover:shadow-foreground/20 transition-all duration-300 cursor-pointer"
+                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 md:row-span-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 sm:p-8 relative overflow-hidden group hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 cursor-pointer"
               >
                 <div className="absolute top-8 right-8 w-32 h-32 bg-white/10 rounded-full" />
                 <div className="relative z-10">
@@ -755,7 +813,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
                 onClick={() => navigate('/courses')}
-                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 bg-foreground/90 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:shadow-foreground/20 transition-all duration-300 cursor-pointer"
+                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 cursor-pointer"
               >
                 <BookOpen className="w-10 h-10 text-white/80" />
                 <div>
@@ -775,7 +833,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
                 onClick={() => navigate('/attendance')}
-                className="col-span-1 row-span-1 md:row-span-2 bg-foreground/80 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-foreground/20 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-emerald-500/30 transition-all duration-300 cursor-pointer"
               >
                 <ClipboardCheck className="w-9 h-9 text-white/80" />
                 <div>
@@ -795,7 +853,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
                 onClick={() => navigate('/placements')}
-                className="col-span-1 row-span-1 bg-foreground/70 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-foreground/20 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 cursor-pointer"
               >
                 <Briefcase className="w-8 h-8 text-white/80" />
                 <div>
@@ -813,7 +871,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
                 onClick={() => navigate('/examinations')}
-                className="col-span-1 row-span-1 md:row-span-2 bg-foreground/60 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:shadow-foreground/20 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-rose-500 to-rose-600 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:shadow-rose-500/30 transition-all duration-300 cursor-pointer"
               >
                 <BarChart3 className="w-10 h-10 text-white/80" />
                 <div>
@@ -833,7 +891,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.5 }}
                 onClick={() => navigate('/finance')}
-                className="col-span-1 row-span-1 md:row-span-2 bg-foreground/50 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-foreground/20 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-amber-500/30 transition-all duration-300 cursor-pointer"
               >
                 <svg className="w-9 h-9 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -855,7 +913,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.6 }}
                 onClick={() => navigate('/resume-builder')}
-                className="col-span-1 row-span-1 md:row-span-2 bg-foreground/40 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-foreground/20 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 cursor-pointer"
               >
                 <FileText className="w-9 h-9 text-white/80" />
                 <div>
@@ -875,7 +933,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.7 }}
                 onClick={() => navigate('/dashboard')}
-                className="col-span-1 md:col-span-1 row-span-1 bg-foreground/30 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-foreground/20 transition-all duration-300 cursor-pointer"
+                className="col-span-1 md:col-span-1 row-span-1 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-300 cursor-pointer"
               >
                 <TrendingUp className="w-8 h-8 text-white/80" />
                 <div>
@@ -926,7 +984,7 @@ export function LandingPage() {
                   "Admission workflows",
                   "Institution-wide reports"
                 ],
-                gradient: "from-foreground/10 to-transparent"
+                gradient: "from-blue-500 to-blue-600"
               },
               {
                 role: "Faculty Members",
@@ -937,7 +995,7 @@ export function LandingPage() {
                   "Course material management",
                   "Exam coordination"
                 ],
-                gradient: "from-foreground/10 to-transparent"
+                gradient: "from-purple-500 to-purple-600"
               },
               {
                 role: "Students",
@@ -948,7 +1006,7 @@ export function LandingPage() {
                   "Placement applications",
                   "Resume builder & analyzer"
                 ],
-                gradient: "from-foreground/10 to-transparent"
+                gradient: "from-emerald-500 to-emerald-600"
               },
               {
                 role: "Recruiters",
@@ -959,7 +1017,7 @@ export function LandingPage() {
                   "Interview scheduling",
                   "Hiring analytics"
                 ],
-                gradient: "from-foreground/10 to-transparent"
+                gradient: "from-orange-500 to-orange-600"
               }
             ].map((roleData, index) => (
               <motion.div
@@ -969,16 +1027,16 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
-                className={`bg-gradient-to-br ${roleData.gradient} backdrop-blur-sm border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-300`}
+                className={`bg-gradient-to-br ${roleData.gradient} backdrop-blur-sm rounded-2xl p-6 hover:shadow-2xl transition-all duration-300`}
               >
-                <div className="w-14 h-14 bg-foreground rounded-xl flex items-center justify-center mb-4 border border-border shadow-lg">
-                  <roleData.icon className="w-7 h-7 text-background" />
+                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 shadow-lg">
+                  <roleData.icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-lg font-bold mb-4 text-foreground">{roleData.role}</h3>
+                <h3 className="text-lg font-bold mb-4 text-white">{roleData.role}</h3>
                 <ul className="space-y-2.5">
                   {roleData.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <li key={feature} className="flex items-start gap-2 text-sm text-white/90">
+                      <CheckCircle className="w-4 h-4 text-white/90 flex-shrink-0 mt-0.5" />
                       {feature}
                     </li>
                   ))}
@@ -1024,14 +1082,14 @@ export function LandingPage() {
             {/* Vertical Line */}
             <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-accent via-primary to-accent opacity-20 hidden md:block" />
 
-            <div className="space-y-8">
+            <div className="space-y-4 md:space-y-8">
               {[
                 {
                   step: "1",
                   title: "Sign Up & Verify",
                   description: "Create your account in 30 seconds. Verify your institution instantly through automated authentication.",
                   icon: Shield,
-                  gradient: "from-foreground/80 to-foreground/50",
+                  gradient: "from-rose-500 to-rose-600",
                   highlights: ["Instant verification", "No paperwork", "Enterprise SSO"]
                 },
                 {
@@ -1039,7 +1097,7 @@ export function LandingPage() {
                   title: "Configure Your System",
                   description: "Import student data, set up departments, and configure user roles with our intelligent setup wizard.",
                   icon: Target,
-                  gradient: "from-foreground/70 to-foreground/40",
+                  gradient: "from-amber-500 to-amber-600",
                   highlights: ["Smart data import", "Custom workflows", "Role templates"]
                 },
                 {
@@ -1047,7 +1105,7 @@ export function LandingPage() {
                   title: "Launch & Scale",
                   description: "Invite your team, activate modules, and start managing operations. Support available 24/7.",
                   icon: Zap,
-                  gradient: "from-foreground/60 to-foreground/30",
+                  gradient: "from-cyan-500 to-cyan-600",
                   highlights: ["One-click launch", "Live training", "Dedicated support"]
                 }
               ].map((step, i) => (
@@ -1057,41 +1115,41 @@ export function LandingPage() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.2 }}
-                  className="relative flex gap-6 md:gap-8 group"
+                  className="relative flex gap-3 md:gap-8 group"
                 >
                   {/* Step Number Circle */}
                   <div className="relative flex-shrink-0">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
-                      className={`w-16 h-16 rounded-full bg-gradient-to-br ${step.gradient} flex items-center justify-center shadow-lg relative z-10`}
+                      className={`w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br ${step.gradient} flex items-center justify-center shadow-lg relative z-10`}
                     >
-                      <span className="text-2xl font-bold text-white">{step.step}</span>
+                      <span className="text-xl md:text-2xl font-bold text-white">{step.step}</span>
                     </motion.div>
                     {i < 2 && (
-                      <div className="absolute top-16 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-gradient-to-b from-accent/50 to-transparent hidden md:block" />
+                      <div className="absolute top-12 md:top-16 left-1/2 -translate-x-1/2 w-0.5 h-4 md:h-8 bg-gradient-to-b from-accent/50 to-transparent md:block" />
                     )}
                   </div>
 
                   {/* Content Card */}
                   <motion.div
                     whileHover={{ y: -5 }}
-                    className="flex-1 bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-accent/40 hover:shadow-xl transition-all duration-300"
+                    className="flex-1 bg-card border border-border rounded-xl md:rounded-2xl p-4 md:p-8 hover:border-accent/40 hover:shadow-xl transition-all duration-300"
                   >
-                    <div className="flex items-start gap-4 mb-4">
+                    <div className="flex items-start gap-4 mb-3 md:mb-4">
                       <div className="flex-1">
-                        <h3 className="text-2xl font-bold mb-2">{step.title}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg md:text-2xl font-bold mb-1 md:mb-2">{step.title}</h3>
+                        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                           {step.description}
                         </p>
                       </div>
                     </div>
 
                     {/* Highlights */}
-                    <div className="flex flex-wrap gap-2 mt-4">
+                    <div className="flex flex-wrap gap-1.5 md:gap-2 mt-3 md:mt-4">
                       {step.highlights.map((highlight) => (
                         <span
                           key={highlight}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium"
+                          className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-accent/10 text-accent text-xs font-medium"
                         >
                           <CheckCircle className="w-3 h-3" />
                           {highlight}
@@ -1253,7 +1311,132 @@ export function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Mobile & Tablet Table View */}
+          <div className="xl:hidden max-w-7xl mx-auto mb-8">
+            <div className="overflow-x-auto -mx-4 px-4">
+              <table className="w-full min-w-[600px] border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-border">
+                    <th className="text-left py-4 px-2 text-sm font-semibold text-foreground sticky left-0 bg-background z-10">Feature</th>
+                    <th className="py-4 px-2 text-center bg-gradient-to-br from-blue-500 to-blue-600 rounded-t-xl">
+                      <div className="text-white">
+                        <div className="text-base font-bold mb-1">Starter</div>
+                        <div className="text-2xl font-bold">Free</div>
+                        <div className="text-xs opacity-80">Forever</div>
+                      </div>
+                    </th>
+                    <th className="py-4 px-2 text-center bg-gradient-to-br from-purple-500 to-purple-600 rounded-t-xl">
+                      <div className="text-white">
+                        <div className="text-base font-bold mb-1">Professional</div>
+                        <div className="text-2xl font-bold">₹1,300</div>
+                        <div className="text-xs opacity-80">/month</div>
+                      </div>
+                    </th>
+                    <th className="py-4 px-2 text-center bg-gradient-to-br from-orange-500 to-orange-600 rounded-t-xl">
+                      <div className="text-white">
+                        <div className="text-base font-bold mb-1">Enterprise</div>
+                        <div className="text-2xl font-bold">Custom</div>
+                        <div className="text-xs opacity-80">Contact sales</div>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { name: "Students", starter: "500", pro: "10,000", enterprise: "Unlimited" },
+                    { name: "Storage", starter: "5 GB", pro: "500 GB", enterprise: "Unlimited" },
+                    { name: "Admin accounts", starter: "2", pro: "10", enterprise: "Unlimited" },
+                    { name: "Student information", starter: true, pro: true, enterprise: true },
+                    { name: "Attendance tracking", starter: true, pro: true, enterprise: true },
+                    { name: "Grade management", starter: true, pro: true, enterprise: true },
+                    { name: "Placement portal", starter: false, pro: true, enterprise: true },
+                    { name: "Resume builder", starter: false, pro: true, enterprise: true },
+                    { name: "Finance management", starter: false, pro: true, enterprise: true },
+                    { name: "Email support", starter: true, pro: true, enterprise: true },
+                    { name: "Priority support", starter: false, pro: true, enterprise: true },
+                    { name: "Dedicated account manager", starter: false, pro: false, enterprise: true },
+                    { name: "Custom integrations", starter: false, pro: true, enterprise: true },
+                    { name: "SLA guarantee (99.9%)", starter: false, pro: false, enterprise: true },
+                    { name: "On-premise deployment", starter: false, pro: false, enterprise: true },
+                    { name: "Advanced analytics", starter: false, pro: false, enterprise: true },
+                  ].map((feature, idx) => (
+                    <tr key={feature.name} className={idx % 2 === 0 ? "bg-secondary/30" : ""}>
+                      <td className="py-3 px-3 text-xs text-foreground sticky left-0 bg-background z-10">{feature.name}</td>
+                      <td className="py-3 px-3 text-center">
+                        {typeof feature.starter === 'string' ? (
+                          <span className="text-xs font-semibold text-foreground">{feature.starter}</span>
+                        ) : feature.starter ? (
+                          <CheckCircle className="w-5 h-5 text-emerald-500 mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-muted-foreground/40 mx-auto" />
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        {typeof feature.pro === 'string' ? (
+                          <span className="text-xs font-semibold text-foreground">{feature.pro}</span>
+                        ) : feature.pro ? (
+                          <CheckCircle className="w-5 h-5 text-emerald-500 mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-muted-foreground/40 mx-auto" />
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        {typeof feature.enterprise === 'string' ? (
+                          <span className="text-xs font-semibold text-foreground">{feature.enterprise}</span>
+                        ) : feature.enterprise ? (
+                          <CheckCircle className="w-5 h-5 text-emerald-500 mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-muted-foreground/40 mx-auto" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td className="py-4 px-3 sticky left-0 bg-background z-10"></td>
+                    <td className="py-4 px-3">
+                      <Button
+                        asChild
+                        size="sm"
+                        className="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-xs"
+                      >
+                        <Link to="/onboarding" className="flex items-center justify-center gap-1">
+                          Get Started
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </Button>
+                    </td>
+                    <td className="py-4 px-3">
+                      <Button
+                        asChild
+                        size="sm"
+                        className="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-xs"
+                      >
+                        <Link to="/onboarding" className="flex items-center justify-center gap-1">
+                          Get Started
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </Button>
+                    </td>
+                    <td className="py-4 px-3">
+                      <Button
+                        asChild
+                        size="sm"
+                        className="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-xs"
+                      >
+                        <Link to="/onboarding" className="flex items-center justify-center gap-1">
+                          Get Started
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </Button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Desktop Card View */}
+          <div className="hidden xl:grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
               {
                 name: "Starter",
@@ -1351,8 +1534,8 @@ export function LandingPage() {
                     size="lg"
                     className={`w-full mb-8 rounded-lg font-semibold transition-all duration-300 ${
                       plan.highlighted
-                        ? "bg-accent hover:bg-accent/90 text-white shadow-lg shadow-accent/30"
-                        : "bg-secondary hover:bg-secondary/80"
+                        ? "bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 shadow-lg"
+                        : "bg-gray-900/10 dark:bg-white/10 hover:bg-gray-900/20 dark:hover:bg-white/20 text-gray-900 dark:text-white border border-gray-900/30 dark:border-white/30"
                     }`}
                     asChild
                   >
@@ -1502,24 +1685,23 @@ export function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-background py-16 px-4 sm:px-6 lg:px-8">
+      <footer className="relative bg-foreground text-background py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Footer Content */}
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
+          <div className="grid md:grid-cols-4 gap-12 mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent via-primary to-accent/50 flex items-center justify-center shadow-lg">
-                  <GraduationCap className="w-6 h-6 text-white" />
+              <Link to="/">
+                <div className="flex items-center gap-3 mb-6 hover:opacity-80 transition-opacity">
+                  <span className="text-2xl font-bold text-background">
+                    OmniFlow
+                  </span>
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                  OmniFlow
-                </span>
-              </div>
-              <p className="text-sm text-foreground/80 leading-relaxed">
+              </Link>
+              <p className="text-sm text-background/80 leading-relaxed max-w-xs">
                 The complete ERP solution for modern educational institutions. Empowering education worldwide.
               </p>
             </motion.div>
@@ -1559,7 +1741,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
               >
-                <h4 className="font-semibold text-foreground mb-4 text-lg">
+                <h4 className="font-semibold text-background mb-6 text-base">
                   {col.title}
                 </h4>
                 <ul className="space-y-3">
@@ -1568,7 +1750,7 @@ export function LandingPage() {
                       <motion.a
                         href={link.href}
                         aria-label={link.aria}
-                        className="text-sm text-foreground/70 hover:text-accent transition-all duration-300 inline-block hover:translate-x-1"
+                        className="text-sm text-background/70 hover:text-background transition-all duration-300 inline-block"
                         whileHover={{ x: 4 }}
                       >
                         {link.label}
@@ -1585,9 +1767,9 @@ export function LandingPage() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6"
+            className="pt-8 border-t border-background/20 flex flex-col sm:flex-row items-center justify-between gap-6"
           >
-            <p className="text-sm text-foreground/80">
+            <p className="text-sm text-background/70">
               © 2025 OmniFlow. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
@@ -1601,7 +1783,7 @@ export function LandingPage() {
                   key={social.name}
                   href={social.url}
                   aria-label={social.ariaLabel}
-                  className="text-foreground/60 hover:text-accent transition-all duration-300"
+                  className="text-background/60 hover:text-background transition-all duration-300"
                   whileHover={{ scale: 1.2, rotate: 10 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -1612,8 +1794,21 @@ export function LandingPage() {
           </motion.div>
         </div>
       </footer>
+
+      {/* Gradual Blur Effect at Bottom - Outside Footer */}
+      <GradualBlur
+        target="page"
+        position="bottom"
+        height="4rem"
+        strength={1.5}
+        divCount={4}
+        curve="bezier"
+        exponential={false}
+        opacity={0.8}
+      />
     </div>
   );
 }
 
 export default LandingPage;
+

@@ -53,6 +53,8 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
 import BulkUpload from '@/components/BulkUpload';
 import * as XLSX from 'xlsx';
+import { exportAttendanceReport } from '@/lib/pdfExport';
+import PDFExportButton from '@/components/common/PDFExportButton';
 
 interface AttendanceRecord {
   id: string;
@@ -130,14 +132,33 @@ function AttendanceManager({ userId, userRole }: { userId: string; userRole: str
 
   const fetchCourses = async () => {
     try {
-      let q;
-      if (isAdmin) {
-        q = query(collection(db, 'courses'));
-      } else {
-        q = query(collection(db, 'courses'), where('facultyId', '==', userId));
-      }
+      let q = query(collection(db, 'courses'));
       const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // Filter for faculty using assignments
+      if (!isAdmin && userId) {
+        const assignmentsQuery = query(
+          collection(db, 'facultyAssignments'),
+          where('facultyId', '==', userId)
+        );
+        const assignmentsSnap = await getDocs(assignmentsQuery);
+        
+        if (assignmentsSnap.docs.length > 0) {
+          // Faculty has assignments - show only assigned courses
+          const assignedCourseIds = assignmentsSnap.docs.map(doc => doc.data().courseId);
+          data = data.filter(course => assignedCourseIds.includes(course.id));
+        } else {
+          // No assignments - filter by department
+          // Get user department
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          const userDept = userDoc.data()?.department;
+          if (userDept) {
+            data = data.filter(course => (course as any).department === userDept);
+          }
+        }
+      }
+      
       setCourses(data);
     } catch (error) {
       console.error('Error fetching courses:', error);
@@ -170,22 +191,25 @@ function AttendanceManager({ userId, userRole }: { userId: string; userRole: str
         })
       );
 
-      // 3. Fetch Existing Attendance for Date
+      // 3. Fetch Existing Attendance
       const startOfDay = new Date(selectedDate);
       startOfDay.setHours(0,0,0,0);
       const endOfDay = new Date(selectedDate);
       endOfDay.setHours(23,59,59,999);
 
+      // Simple query to avoid composite index requirement while building
       const attendanceQ = query(
         collection(db, 'attendance'),
-        where('courseId', '==', selectedCourse),
-        where('date', '>=', Timestamp.fromDate(startOfDay)),
-        where('date', '<=', Timestamp.fromDate(endOfDay))
+        where('courseId', '==', selectedCourse)
       );
       const attendanceSnap = await getDocs(attendanceQ);
+      
       const existingRecords = attendanceSnap.docs.reduce((acc: any, doc) => {
         const data = doc.data();
-        acc[data.studentId] = { id: doc.id, ...data };
+        const recordDate = data.date?.toDate?.() || new Date(data.date);
+        if (recordDate >= startOfDay && recordDate <= endOfDay) {
+          acc[data.studentId] = { id: doc.id, ...data };
+        }
         return acc;
       }, {});
 
@@ -200,7 +224,8 @@ function AttendanceManager({ userId, userRole }: { userId: string; userRole: str
     } catch (error) {
       console.error('Error fetching students:', error);
       toast.error('Failed to load student list');
-    } finally {
+    }
+ finally {
       setLoading(false);
     }
   };
@@ -311,6 +336,29 @@ function AttendanceManager({ userId, userRole }: { userId: string; userRole: str
           <p className="text-muted-foreground">Mark and manage class attendance</p>
         </div>
         <div className="flex gap-2">
+           <PDFExportButton
+             onExport={async () => {
+               if (!selectedCourse) {
+                 toast.error('Please select a course first');
+                 return;
+               }
+               const course = courses.find(c => c.id === selectedCourse);
+               const attendanceData = students.map(s => ({
+                 studentName: s.name,
+                 enrollmentNumber: s.email,
+                 present: s.status === 'present' ? 1 : 0,
+                 absent: s.status === 'absent' ? 1 : 0,
+                 total: s.status ? 1 : 0,
+                 percentage: s.status === 'present' ? 100 : s.status === 'absent' ? 0 : 50
+               }));
+               exportAttendanceReport(
+                 course?.name || 'Course',
+                 attendanceData,
+                 { start: selectedDate, end: selectedDate }
+               );
+             }}
+             label="Export PDF"
+           />
            <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
              <Upload className="w-4 h-4 mr-2" /> Bulk Upload
            </Button>

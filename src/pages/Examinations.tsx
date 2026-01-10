@@ -52,6 +52,8 @@ import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
 import BulkUpload from '@/components/BulkUpload';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
+import { exportGradeSheet } from '@/lib/pdfExport';
+import PDFExportButton from '@/components/common/PDFExportButton';
 
 export default function Examinations() {
   const navigate = useNavigate();
@@ -113,14 +115,33 @@ function ExaminationsManager({ userId, userRole }: { userId: string, userRole: s
   }, [activeTab, selectedCourse]);
 
   const fetchCourses = async () => {
-    let q;
-    if (isAdmin) {
-      q = query(collection(db, 'courses'));
-    } else {
-      q = query(collection(db, 'courses'), where('facultyId', '==', userId));
-    }
+    let q = query(collection(db, 'courses'));
     const snap = await getDocs(q);
-    setCourses(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    let data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    // Filter for faculty using assignments
+    if (!isAdmin && userId) {
+      const assignmentsQuery = query(
+        collection(db, 'facultyAssignments'),
+        where('facultyId', '==', userId)
+      );
+      const assignmentsSnap = await getDocs(assignmentsQuery);
+      
+      if (assignmentsSnap.docs.length > 0) {
+        // Faculty has assignments - show only assigned courses
+        const assignedCourseIds = assignmentsSnap.docs.map(doc => doc.data().courseId);
+        data = data.filter(course => assignedCourseIds.includes(course.id));
+      } else {
+        // No assignments - filter by department
+        const userDoc = await getDoc(doc(db, 'users', userId));
+        const userDept = userDoc.data()?.department;
+        if (userDept) {
+          data = data.filter(course => course.department === userDept);
+        }
+      }
+    }
+    
+    setCourses(data);
   };
 
   const fetchSchedules = async () => {
@@ -304,6 +325,24 @@ function ExaminationsManager({ userId, userRole }: { userId: string, userRole: s
           <p className="text-muted-foreground">Manage schedules and student grades</p>
         </div>
         <div className="flex gap-2">
+          {activeTab === 'grades' && selectedCourse && (
+            <PDFExportButton
+              onExport={async () => {
+                const course = courses.find(c => c.id === selectedCourse);
+                const gradesData = students.map(s => ({
+                  studentName: s.name,
+                  enrollmentNumber: s.email,
+                  internalMarks: s.gradeData.midterm || '-',
+                  externalMarks: s.gradeData.final || '-',
+                  totalMarks: s.gradeData.total || '-',
+                  grade: s.gradeData.grade || '-'
+                }));
+                exportGradeSheet(course?.name || 'Course', gradesData);
+              }}
+              label="Export Grade Sheet"
+              variant="outline"
+            />
+          )}
           <Button variant="outline" onClick={() => setShowBulkUpload(true)}><Upload className="w-4 h-4 mr-2"/> Bulk Upload</Button>
         </div>
       </div>

@@ -13,6 +13,8 @@ import {
   Filter,
 } from 'lucide-react';
 import BulkUpload from '@/components/BulkUpload';
+import { exportTimetablePDF } from '@/lib/pdfExport';
+import PDFExportButton from '@/components/common/PDFExportButton';
 import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -119,23 +121,53 @@ export default function Timetable() {
     try {
       // Fetch courses
       const coursesSnapshot = await getDocs(collection(db, 'courses'));
-      const coursesData = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      let coursesData = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // Filter courses for faculty
+      if (isFaculty && user?.uid) {
+        // Check if faculty has assignments
+        const assignmentsQuery = query(
+          collection(db, 'facultyAssignments'),
+          where('facultyId', '==', user.uid)
+        );
+        const assignmentsSnap = await getDocs(assignmentsQuery);
+        
+        if (assignmentsSnap.docs.length > 0) {
+          // Faculty has assignments - show only assigned courses
+          const assignedCourseIds = assignmentsSnap.docs.map(doc => doc.data().courseId);
+          coursesData = coursesData.filter(course => assignedCourseIds.includes(course.id));
+        } else {
+          // No assignments - filter by department
+          const userDept = (user as any)?.department;
+          if (userDept) {
+            coursesData = coursesData.filter(course => (course as any).department === userDept);
+          }
+        }
+      }
+      
       setCourses(coursesData);
 
       // Fetch timetable entries
       const timetableSnapshot = await getDocs(collection(db, 'timetable'));
       const timetableData: any = {};
+      
+      // Get filtered course IDs for timetable filtering
+      const allowedCourseIds = coursesData.map(c => c.id);
 
       timetableSnapshot.docs.forEach(doc => {
         const data = doc.data();
-        const key = `${data.day}-${data.timeSlot}`;
-        if (!timetableData[key]) {
-          timetableData[key] = [];
+        
+        // Only include timetable entries for faculty's courses
+        if (allowedCourseIds.includes(data.courseId)) {
+          const key = `${data.day}-${data.timeSlot}`;
+          if (!timetableData[key]) {
+            timetableData[key] = [];
+          }
+          timetableData[key].push({
+            id: doc.id,
+            ...data
+          });
         }
-        timetableData[key].push({
-          id: doc.id,
-          ...data
-        });
       });
 
       setTimetable(timetableData);
@@ -422,6 +454,24 @@ export default function Timetable() {
           </p>
         </div>
         <div className="flex gap-2">
+          <PDFExportButton
+            onExport={async () => {
+              const timetableData = Object.entries(timetable).flatMap(([key, slots]: [string, any]) => {
+                const [day, timeSlot] = key.split('_');
+                return (Array.isArray(slots) ? slots : [slots]).map((slot: any) => ({
+                  day,
+                  startTime: timeSlot.split('-')[0],
+                  endTime: timeSlot.split('-')[1],
+                  courseName: slot.courseName || slot.courseCode,
+                  room: slot.room,
+                  facultyName: slot.facultyName
+                }));
+              });
+              exportTimetablePDF(timetableData, 'Weekly Timetable');
+            }}
+            label="Export PDF"
+            variant="outline"
+          />
           {isAdmin && (
             <>
               <Button
@@ -580,8 +630,13 @@ export default function Timetable() {
                         // 1. Role-based filtering
                         let roleFilteredSlots = slotData;
                         
+                        // Faculty: show only their own classes
                         if (user.role === 'faculty') {
-                          roleFilteredSlots = slotData.filter((s: any) => s.facultyId === user.uid);
+                          const facultyName = (user as any)?.fullName || '';
+                          roleFilteredSlots = slotData.filter((s: any) => 
+                            s.facultyId === user.uid || 
+                            s.facultyName === facultyName
+                          );
                         } else if (user.role === 'student') {
                           roleFilteredSlots = slotData.filter((s: any) => studentEnrollments.includes(s.courseId));
                         }

@@ -1,4 +1,7 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { exportTimetablePDF, exportAttendanceReport } from '@/lib/pdfExport';
+import PDFExportButton from '@/components/common/PDFExportButton';
 import {
   BookOpen,
   Users,
@@ -12,9 +15,15 @@ import {
   CheckCircle,
   GraduationCap,
   BarChart3,
+  QrCode,
+  Plus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import QRAttendanceGenerator from '@/components/attendance/QRAttendanceGenerator';
+import FacultyScheduleManager from '@/components/timetable/FacultyScheduleManager';
 
 const container = {
   hidden: { opacity: 0 },
@@ -30,6 +39,26 @@ const item = {
 };
 
 export function FacultyDashboard() {
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [showScheduleManager, setShowScheduleManager] = useState(false);
+
+  // Mock courses data - in production, fetch from Firestore
+  const courses = [
+    { id: '1', name: 'Data Structures', code: 'CS201' },
+    { id: '2', name: 'Database Systems', code: 'CS301' },
+    { id: '3', name: 'Web Development', code: 'CS401' },
+    { id: '4', name: 'Machine Learning', code: 'CS501' },
+  ];
+
+  const handleGenerateQR = () => {
+    if (!selectedCourse) {
+      // Show course selection first
+      return;
+    }
+    setShowQRModal(true);
+  };
+
   return (
     <motion.div
       variants={container}
@@ -44,13 +73,29 @@ export function FacultyDashboard() {
           <p className="text-muted-foreground">Manage your courses, students, and academic activities</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <BarChart3 className="w-4 h-4" />
-            Analytics
+          <Button variant="outline" onClick={() => setShowScheduleManager(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Class
           </Button>
-          <Button variant="gradient">
-            <ClipboardCheck className="w-4 h-4" />
-            Take Attendance
+          <Select value={selectedCourse?.id} onValueChange={(value) => setSelectedCourse(courses.find(c => c.id === value))}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select course" />
+            </SelectTrigger>
+            <SelectContent>
+              {courses.map((course) => (
+                <SelectItem key={course.id} value={course.id}>
+                  {course.code} - {course.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="gradient" 
+            onClick={handleGenerateQR}
+            disabled={!selectedCourse}
+          >
+            <QrCode className="w-4 h-4 mr-2" />
+            Generate QR
           </Button>
         </div>
       </div>
@@ -312,6 +357,37 @@ export function FacultyDashboard() {
           </motion.div>
         </div>
       </div>
+
+      {/* QR Attendance Modal */}
+      <Dialog open={showQRModal} onOpenChange={setShowQRModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>QR Attendance</DialogTitle>
+          </DialogHeader>
+          {selectedCourse && (
+            <QRAttendanceGenerator
+              courseId={selectedCourse.id}
+              courseName={`${selectedCourse.code} - ${selectedCourse.name}`}
+              onClose={() => setShowQRModal(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedule Manager Modal */}
+      <Dialog open={showScheduleManager} onOpenChange={setShowScheduleManager}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manage Schedule</DialogTitle>
+          </DialogHeader>
+          <FacultyScheduleManager
+            courses={courses}
+            onScheduleAdded={() => {
+              setShowScheduleManager(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

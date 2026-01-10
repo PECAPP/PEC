@@ -41,6 +41,8 @@ import { useNavigate } from 'react-router-dom';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
 import BulkUpload from '@/components/BulkUpload';
+import { exportUserListPDF } from '@/lib/pdfExport';
+import PDFExportButton from '@/components/common/PDFExportButton';
 
 interface CourseMaterial {
   id: string;
@@ -237,7 +239,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
     }
   };
 
-  const filteredMaterials = selectedCourse 
+  const filteredMaterials = selectedCourse && selectedCourse !== 'all'
     ? materials.filter(m => m.courseId === selectedCourse)
     : materials;
 
@@ -259,12 +261,12 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
       </div>
 
       <div className="card-elevated p-4">
-        <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+        <Select value={selectedCourse || 'all'} onValueChange={(val) => setSelectedCourse(val === 'all' ? '' : val)}>
           <SelectTrigger>
             <SelectValue placeholder="All courses" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Courses</SelectItem>
+            <SelectItem value="all">All Courses</SelectItem>
             {courses.map(c => (
               <SelectItem key={c.id} value={c.id}>{c.code} - {c.name}</SelectItem>
             ))}

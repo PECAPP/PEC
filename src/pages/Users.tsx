@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { exportUserListPDF } from '@/lib/pdfExport';
+import PDFExportButton from '@/components/common/PDFExportButton';
 import {
   Users as UsersIcon,
   Search,
@@ -434,9 +436,16 @@ export default function Users() {
           <p className="text-muted-foreground mt-1">Manage all users across the system</p>
         </div>
         <div className="flex gap-2">
+          <PDFExportButton
+            onExport={async () => {
+              exportUserListPDF(filteredUsers, roleFilter === 'all' ? 'All Users' : roleFilter);
+            }}
+            label="Export PDF"
+            variant="outline"
+          />
           <Button variant="outline" onClick={exportUsers}>
             <Download className="w-4 h-4 mr-2" />
-            Export
+            Export Excel
           </Button>
           {isAdmin && (
             <>

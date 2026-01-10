@@ -52,6 +52,8 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
 import BulkUpload from '@/components/BulkUpload';
 import * as XLSX from 'xlsx';
+import { exportCourseListPDF } from '@/lib/pdfExport';
+import PDFExportButton from '@/components/common/PDFExportButton';
 
 interface Course {
   id: string;
@@ -221,8 +223,27 @@ export default function Courses() {
         ...doc.data() 
       })) as Course[];
       
-      // Apply department filtering for faculty
-      coursesData = filterByDepartment(coursesData);
+      // For faculty: filter by assignments first, then by department
+      if (isFaculty && user?.uid) {
+        // Check if faculty has assignments
+        const assignmentsQuery = query(
+          collection(db, 'facultyAssignments'),
+          where('facultyId', '==', user.uid)
+        );
+        const assignmentsSnap = await getDocs(assignmentsQuery);
+        
+        if (assignmentsSnap.docs.length > 0) {
+          // Faculty has assignments - show only assigned courses
+          const assignedCourseIds = assignmentsSnap.docs.map(doc => doc.data().courseId);
+          coursesData = coursesData.filter(course => assignedCourseIds.includes(course.id));
+        } else {
+          // No assignments - filter by department
+          coursesData = filterByDepartment(coursesData);
+        }
+      } else if (!isAdmin) {
+        // For non-admin, non-faculty: apply department filter
+        coursesData = filterByDepartment(coursesData);
+      }
       
       setCourses(coursesData);
     } catch (error) {
@@ -431,8 +452,8 @@ export default function Courses() {
     );
   }
 
-  // ============ ADMIN VIEW ============
-  if (isAdmin) {
+  // ============ ADMIN/FACULTY VIEW ============
+  if (isAdmin || isFaculty) {
     return (
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -441,9 +462,17 @@ export default function Courses() {
             <p className="text-muted-foreground mt-1">Manage all courses in the system</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
+            <PDFExportButton
+              onExport={async () => {
+                exportCourseListPDF(filteredCourses);
+              }}
+              label="Export PDF"
+              variant="outline"
+              className="w-full sm:w-auto"
+            />
             <Button variant="outline" onClick={exportCourses} className="w-full sm:w-auto">
               <Download className="w-4 h-4 mr-2" />
-              Export
+              Export Excel
             </Button>
             <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="w-full sm:w-auto">
               <Upload className="w-4 h-4 mr-2" />

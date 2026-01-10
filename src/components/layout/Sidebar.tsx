@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -243,18 +243,17 @@ export function Sidebar({
           </button>
         ) : (
           <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-3"
-            >
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-sidebar-foreground">
-                OmniFlow
-              </span>
-            </motion.div>
+            <Link to="/">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                <span className="font-semibold text-sidebar-foreground">
+                  OmniFlow
+                </span>
+              </motion.div>
+            </Link>
             <button
               onClick={isMobile ? onMobileClose : onToggle}
               className="p-1.5 rounded-md hover:bg-sidebar-accent transition-colors"

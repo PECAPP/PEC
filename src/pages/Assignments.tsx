@@ -50,6 +50,8 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
 import BulkUpload from '@/components/BulkUpload';
 import * as XLSX from 'xlsx';
+import { exportAssignmentReport } from '@/lib/pdfExport';
+import PDFExportButton from '@/components/common/PDFExportButton';
 
 interface Assignment {
   id: string;
@@ -141,14 +143,33 @@ function AssignmentsManager({ userId, userRole }: { userId: string; userRole: st
 
   const fetchCourses = async () => {
     try {
-      let q;
-      if (isAdmin) {
-        q = query(collection(db, 'courses'));
-      } else {
-        q = query(collection(db, 'courses'), where('facultyId', '==', userId));
-      }
+      let q = query(collection(db, 'courses'));
       const snap = await getDocs(q);
-      setCourses(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      let data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      
+      // Filter for faculty using assignments
+      if (!isAdmin && userId) {
+        const assignmentsQuery = query(
+          collection(db, 'facultyAssignments'),
+          where('facultyId', '==', userId)
+        );
+        const assignmentsSnap = await getDocs(assignmentsQuery);
+        
+        if (assignmentsSnap.docs.length > 0) {
+          // Faculty has assignments - show only assigned courses
+          const assignedCourseIds = assignmentsSnap.docs.map(doc => doc.data().courseId);
+          data = data.filter(course => assignedCourseIds.includes(course.id));
+        } else {
+          // No assignments - filter by department
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          const userDept = userDoc.data()?.department;
+          if (userDept) {
+            data = data.filter(course => course.department === userDept);
+          }
+        }
+      }
+      
+      setCourses(data);
     } catch (error) {
       console.error('Error fetching courses:', error);
     }
