@@ -30,7 +30,7 @@ export function ColorThemeToggler() {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'class') {
-          const currentT = localStorage.getItem("color-theme") || "white";
+          const currentT = localStorage.getItem("color-theme") || "green";
           applyColorTheme(currentT);
         }
       });
