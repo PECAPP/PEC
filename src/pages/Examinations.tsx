@@ -525,11 +525,11 @@ function StudentExaminationsView({ userId }: { userId: string }) {
       <div className="grid gap-4 sm:grid-cols-4">
         <div className="card-elevated p-4 flex gap-3 items-center">
            <div className="p-2 rounded bg-primary/10"><TrendingUp className="text-primary w-5 h-5"/></div>
-           <div><p className="text-sm text-muted">CGPA</p><p className="text-2xl font-bold">{cgpa}</p></div>
+           <div><p className="text-sm text-muted-foreground">CGPA</p><p className="text-2xl font-bold">{cgpa}</p></div>
         </div>
         <div className="card-elevated p-4 flex gap-3 items-center">
            <div className="p-2 rounded bg-success/10"><Award className="text-success w-5 h-5"/></div>
-           <div><p className="text-sm text-muted">Credits</p><p className="text-2xl font-bold">{totalCredits}</p></div>
+           <div><p className="text-sm text-muted-foreground">Credits</p><p className="text-2xl font-bold">{totalCredits}</p></div>
         </div>
       </div>
 
