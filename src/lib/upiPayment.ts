@@ -17,12 +17,12 @@ export interface UPIConfig {
  */
 export const generateUPILink = (config: UPIConfig): string => {
   const params = new URLSearchParams();
-  params.append('pa', config.merchantId); // Payee UPI ID
-  params.append('pn', encodeURIComponent(config.merchantName)); // Payee name
-  params.append('am', config.amount.toString()); // Amount in rupees
-  params.append('tn', encodeURIComponent(config.description)); // Transaction note
-  params.append('tr', config.transactionId); // Transaction reference ID
-  
+  params.append("pa", config.merchantId); // Payee UPI ID
+  params.append("pn", encodeURIComponent(config.merchantName)); // Payee name
+  params.append("am", config.amount.toString()); // Amount in rupees
+  params.append("tn", encodeURIComponent(config.description)); // Transaction note
+  params.append("tr", config.transactionId); // Transaction reference ID
+
   return `upi://pay?${params.toString()}`;
 };
 
@@ -33,21 +33,25 @@ export const generateUPILink = (config: UPIConfig): string => {
 export const initiateUPIPayment = (upiLink: string): Promise<void> => {
   return new Promise((resolve) => {
     // For web, we open the UPI link which will trigger app selection on mobile
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = upiLink;
-    link.target = '_self';
-    
+    link.target = "_self";
+
     // Track if the app opened
     const timer = setTimeout(() => {
       resolve();
     }, 1500);
-    
+
     link.click();
-    
-    window.addEventListener('blur', () => {
-      clearTimeout(timer);
-      resolve();
-    }, { once: true });
+
+    window.addEventListener(
+      "blur",
+      () => {
+        clearTimeout(timer);
+        resolve();
+      },
+      { once: true }
+    );
   });
 };
 
@@ -62,7 +66,7 @@ export const generateUPIQRCode = async (upiLink: string): Promise<string> => {
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedUPI}`;
     return qrUrl;
   } catch (error) {
-    console.error('Error generating QR code:', error);
+    console.error("Error generating QR code:", error);
     throw error;
   }
 };

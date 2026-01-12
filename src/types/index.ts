@@ -1,18 +1,23 @@
-export type UserRole = 
-  | 'super_admin'
-  | 'college_admin'
-  | 'placement_officer'
-  | 'faculty'
-  | 'student'
-  | 'recruiter';
+export type UserRole =
+  | "super_admin"
+  | "college_admin"
+  | "placement_officer"
+  | "faculty"
+  | "student"
+  | "recruiter";
 
-export type VerificationStatus = 'idle' | 'loading' | 'verified' | 'possible_match' | 'not_found';
+export type VerificationStatus =
+  | "idle"
+  | "loading"
+  | "verified"
+  | "possible_match"
+  | "not_found";
 
 export interface Organization {
   id: string;
   name: string;
   location?: string;
-  type?: 'university' | 'college' | 'institute';
+  type?: "university" | "college" | "institute";
   verified: boolean;
 }
 
@@ -25,7 +30,7 @@ export interface CollegeSettings {
   website: string;
   tagline: string;
   logoUrl: string;
-  logoDisplayMode?: 'logo-only' | 'text-only' | 'both';
+  logoDisplayMode?: "logo-only" | "text-only" | "both";
   brandingColors?: string[]; // Hex colors users can choose from
   cloudinaryCloudName?: string;
   cloudinaryPreset?: string;
@@ -51,7 +56,7 @@ export interface Student {
   semester: number;
   cgpa: number;
   attendancePercentage: number;
-  status: 'active' | 'graduated' | 'suspended';
+  status: "active" | "graduated" | "suspended";
 }
 
 // Role-specific profile interfaces
@@ -136,12 +141,12 @@ export interface Course {
   instructor: string;
   department: string;
   semester: number;
-  status: 'ongoing' | 'completed' | 'upcoming';
+  status: "ongoing" | "completed" | "upcoming";
 }
 
 export interface AttendanceRecord {
   date: string;
-  status: 'present' | 'absent' | 'late';
+  status: "present" | "absent" | "late";
   subject: string;
 }
 
@@ -150,7 +155,7 @@ export interface Job {
   title: string;
   company: string;
   location: string;
-  type: 'full-time' | 'part-time' | 'internship';
+  type: "full-time" | "part-time" | "internship";
   salary?: string;
   deadline: string;
   matchScore?: number;
@@ -177,7 +182,7 @@ export interface BookBorrow {
   borrowDate: any;
   dueDate: any;
   returnDate?: any;
-  status: 'borrowed' | 'returned' | 'overdue';
+  status: "borrowed" | "returned" | "overdue";
   fine?: number;
 }
 
@@ -185,7 +190,7 @@ export interface BookBorrow {
 export interface Room {
   id: string;
   name: string;
-  type: 'classroom' | 'lab' | 'meeting-room' | 'auditorium';
+  type: "classroom" | "lab" | "meeting-room" | "auditorium";
   capacity: number;
   building: string;
   floor: number;
@@ -204,7 +209,7 @@ export interface RoomBooking {
   endTime: any;
   date: string;
   purpose: string;
-  status: 'pending' | 'approved' | 'rejected' | 'completed';
+  status: "pending" | "approved" | "rejected" | "completed";
   createdAt: any;
 }
 
@@ -226,7 +231,7 @@ export interface Leave {
   endDate: any;
   days: number;
   reason: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   approvedBy?: string;
   approvalDate?: any;
   createdAt: any;
@@ -267,7 +272,7 @@ export interface ClubEvent {
   location: string;
   registrations: number;
   maxRegistrations?: number;
-  status: 'upcoming' | 'completed' | 'cancelled';
+  status: "upcoming" | "completed" | "cancelled";
   createdAt: any;
 }
 
@@ -276,7 +281,7 @@ export interface ClubRecruitment {
   clubId: string;
   userId: string;
   position: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   appliedAt: any;
   approvedAt?: any;
   approvedBy?: string;
@@ -293,7 +298,7 @@ export interface Workshop {
   location: string;
   maxParticipants: number;
   registrations: number;
-  status: 'upcoming' | 'completed' | 'cancelled';
+  status: "upcoming" | "completed" | "cancelled";
   createdAt: any;
 }
 
@@ -304,8 +309,8 @@ export interface HostelComplaint {
   room: string;
   category: string;
   description: string;
-  status: 'pending' | 'in-progress' | 'resolved';
-  priority: 'low' | 'medium' | 'high';
+  status: "pending" | "in-progress" | "resolved";
+  priority: "low" | "medium" | "high";
   createdAt: any;
   resolvedAt?: any;
   notes?: string;
@@ -320,18 +325,23 @@ export interface VisitorPass {
   checkInTime: any;
   checkOutTime?: any;
   room: string;
-  status: 'active' | 'checked-out';
+  status: "active" | "checked-out";
 }
 
 // Approvals
 export interface ApprovalRequest {
   id: string;
-  type: 'room-booking' | 'leave' | 'club-recruitment' | 'book-request' | 'other';
+  type:
+    | "room-booking"
+    | "leave"
+    | "club-recruitment"
+    | "book-request"
+    | "other";
   requesterId: string;
   relatedId: string;
   title: string;
   description: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   createdAt: any;
   approvedAt?: any;
   approvedBy?: string;
@@ -344,7 +354,7 @@ export interface Todo {
   title: string;
   description?: string;
   completed: boolean;
-  priority: 'low' | 'medium' | 'high';
+  priority: "low" | "medium" | "high";
   dueDate?: any;
   createdAt: any;
   updatedAt: any;
