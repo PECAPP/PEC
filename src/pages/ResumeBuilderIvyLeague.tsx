@@ -409,7 +409,7 @@ export default function ResumeBuilderIvyLeague() {
                 <TabsContent value="experience" className="space-y-4">
                   {resumeData.experience.map((exp, idx) => (
                     <div key={idx} className="bg-card rounded-lg p-6 border border-border space-y-4">
-                      <div className="flex justify-between items-start">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                         <div className="flex-1">
                           <label className="text-sm font-medium">Company</label>
                           <Input

@@ -349,13 +349,35 @@ export default function Timetable() {
   const handleDragStart = (e: React.DragEvent, course: any) => {
     if (!isAdmin) return;
     setDraggedCourse(course);
-    e.dataTransfer.effectAllowed = "copy";
+    e.dataTransfer!.effectAllowed = "copy";
+    e.dataTransfer!.setData("text/plain", JSON.stringify(course));
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!isAdmin) return;
-    e.dataTransfer.dropEffect = "copy";
+    e.dataTransfer!.dropEffect = "copy";
+    
+    // Auto-scroll when dragging near edges
+    const scrollContainer = document.querySelector('.timetable-scroll-container');
+    if (scrollContainer) {
+      const rect = scrollContainer.getBoundingClientRect();
+      const scrollThreshold = 50;
+      const scrollSpeed = 10;
+
+      if (e.clientY < rect.top + scrollThreshold) {
+        scrollContainer.scrollTop -= scrollSpeed;
+      } else if (e.clientY > rect.bottom - scrollThreshold) {
+        scrollContainer.scrollTop += scrollSpeed;
+      }
+
+      if (e.clientX < rect.left + scrollThreshold) {
+        scrollContainer.scrollLeft -= scrollSpeed;
+      } else if (e.clientX > rect.right - scrollThreshold) {
+        scrollContainer.scrollLeft += scrollSpeed;
+      }
+    }
   };
 
   const handleDrop = async (
@@ -400,6 +422,17 @@ export default function Timetable() {
     } catch (error) {
       console.error("Error updating timetable:", error);
       toast.error("Failed to update timetable");
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedCourse(null);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Only clear if actually leaving the table
+    if ((e.target as HTMLElement).tagName === 'TD' || (e.target as HTMLElement).tagName === 'TABLE') {
+      e.preventDefault();
     }
   };
 
@@ -490,14 +523,14 @@ export default function Timetable() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Timetable</h1>
+          <h1 className="text-3xl font-bold text-foreground">Timetable</h1>
           <p className="text-muted-foreground mt-1">
             {isAdmin ? "Manage course schedule" : "View class schedule"}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="button-group">
           <PDFExportButton
             onExport={async () => {
               const timetableData = Object.entries(timetable).flatMap(
@@ -554,23 +587,24 @@ export default function Timetable() {
 
       {/* Available Courses (Admin Only) */}
       {isAdmin && (
-        <div className="card-elevated p-4">
-          <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-            <GripVertical className="w-4 h-4" />
+        <div className="card-elevated p-6">
+          <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center gap-2">
+            <GripVertical className="w-5 h-5" />
             Available Courses (Drag to Schedule)
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {courses.map((course) => (
               <div
                 key={course.id}
                 draggable
                 onDragStart={(e) => handleDragStart(e, course)}
-                className="px-3 py-2 bg-primary/10 border border-primary/20 rounded-lg cursor-move hover:bg-primary/20 transition-colors"
+                onDragEnd={handleDragEnd}
+                className="px-4 py-3 bg-primary/10 border-2 border-primary/20 rounded-lg cursor-move hover:bg-primary/20 active:bg-primary/30 transition-all select-none md:hover:shadow-md md:hover:border-primary/40 opacity-100 hover:opacity-95"
               >
-                <div className="flex items-center gap-2">
-                  <GripVertical className="w-4 h-4 text-muted-foreground" />
+                <div className="flex items-center gap-3">
+                  <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-foreground">
+                    <p className="text-sm font-semibold text-foreground">
                       {course.code}
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -646,7 +680,7 @@ export default function Timetable() {
       </div>
 
       {/* Timetable Grid */}
-      <div className="card-elevated overflow-x-auto">
+      <div className="card-elevated overflow-x-auto overflow-y-auto max-h-[70vh] timetable-scroll-container">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-muted/30">
@@ -694,9 +728,11 @@ export default function Timetable() {
                       key={`${day}-${timeSlot}`}
                       className={`border border-border p-2 relative group transition-colors min-h-[80px] ${
                         isAdmin ? "hover:bg-muted/10 cursor-pointer" : ""
-                      }`}
+                      } ${draggedCourse ? "drag-target" : ""}`}
                       onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, day, timeSlot)}
+                      onDragEnd={handleDragEnd}
                       onClick={() => isAdmin && openSlotDialog(day, timeSlot)}
                     >
                       {(() => {

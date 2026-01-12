@@ -612,12 +612,12 @@ export default function UserDetail() {
       <div className="card-elevated p-6">
         <h2 className="text-xl font-semibold text-foreground mb-4">System Information</h2>
         <div className="grid gap-3 text-sm">
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
             <span className="text-muted-foreground">User ID:</span>
-            <span className="text-foreground font-mono">{user.id}</span>
+            <span className="text-foreground font-mono break-all">{user.id}</span>
           </div>
           {user.createdAt && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
               <span className="text-muted-foreground">Account Created:</span>
               <span className="text-foreground">
                 {formatDate(user.createdAt)}
@@ -625,7 +625,7 @@ export default function UserDetail() {
             </div>
           )}
           {user.updatedAt && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
               <span className="text-muted-foreground">Last Updated:</span>
               <span className="text-foreground">
                 {formatDate(user.updatedAt)}

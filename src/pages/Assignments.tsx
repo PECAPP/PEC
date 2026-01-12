@@ -356,12 +356,12 @@ function AssignmentsManager({ userId, userRole }: { userId: string; userRole: st
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Assignment Manager</h1>
           <p className="text-muted-foreground">Create and grade assignments</p>
         </div>
-        <div className="flex gap-2">
+        <div className="button-group">
           <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
             <Upload className="w-4 h-4 mr-2" /> Bulk Upload
           </Button>

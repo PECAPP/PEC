@@ -136,7 +136,7 @@ function ExaminationsManager({ userId, userRole }: { userId: string, userRole: s
         const userDoc = await getDoc(doc(db, 'users', userId));
         const userDept = userDoc.data()?.department;
         if (userDept) {
-          data = data.filter(course => course.department === userDept);
+          data = data.filter(course => (course as any)?.department === userDept);
         }
       }
     }
@@ -319,12 +319,12 @@ function ExaminationsManager({ userId, userRole }: { userId: string, userRole: s
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Exam & Grades Manager</h1>
           <p className="text-muted-foreground">Manage schedules and student grades</p>
         </div>
-        <div className="flex gap-2">
+        <div className="button-group">
           {activeTab === 'grades' && selectedCourse && (
             <PDFExportButton
               onExport={async () => {

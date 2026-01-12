@@ -10,6 +10,7 @@ import {
   BookOpen,
   Video,
   File,
+  ClipboardList,
   Link as LinkIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -233,9 +234,11 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'lecture-notes': return <BookOpen className="w-5 h-5" />;
-      case 'video': return <Video className="w-5 h-5" />;
-      default: return <File className="w-5 h-5" />;
+      case 'lecture-notes': return <BookOpen className="w-6 h-6" />;
+      case 'reference': return <FileText className="w-6 h-6" />;
+      case 'assignment': return <ClipboardList className="w-6 h-6" />;
+      case 'video': return <Video className="w-6 h-6" />;
+      default: return <File className="w-6 h-6" />;
     }
   };
 
@@ -245,12 +248,12 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Course Materials</h1>
           <p className="text-muted-foreground">Upload and manage course materials</p>
         </div>
-        <div className="flex gap-2">
+        <div className="button-group">
           <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
             <Upload className="w-4 h-4 mr-2" /> Bulk Upload
           </Button>
@@ -444,9 +447,11 @@ function StudentMaterialsView({ userId }: { userId: string }) {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'lecture-notes': return <BookOpen className="w-5 h-5" />;
-      case 'video': return <Video className="w-5 h-5" />;
-      default: return <File className="w-5 h-5" />;
+      case 'lecture-notes': return <BookOpen className="w-6 h-6" />;
+      case 'reference': return <FileText className="w-6 h-6" />;
+      case 'assignment': return <ClipboardList className="w-6 h-6" />;
+      case 'video': return <Video className="w-6 h-6" />;
+      default: return <File className="w-6 h-6" />;
     }
   };
 
@@ -515,24 +520,24 @@ function StudentMaterialsView({ userId }: { userId: string }) {
               transition={{ delay: idx * 0.05 }}
               className="card-elevated p-6"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex gap-4 flex-1">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div className="flex gap-4 flex-1 min-w-0">
+                  <div className="p-3 rounded-lg bg-primary/10 text-primary flex-shrink-0">
                     {getTypeIcon(material.type)}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       <h3 className="font-semibold">{material.title}</h3>
                       <Badge variant="outline">{material.courseCode}</Badge>
                       <Badge variant="secondary">{material.type.replace('-', ' ')}</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">{material.description}</p>
+                    <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{material.description}</p>
                     <p className="text-xs text-muted-foreground">
                       Uploaded: {material.uploadedAt?.toDate?.().toLocaleDateString()}
                     </p>
                   </div>
                 </div>
-                <Button size="sm" asChild>
+                <Button size="sm" asChild className="flex-shrink-0 w-full md:w-auto">
                   <a href={material.fileURL} target="_blank" rel="noopener noreferrer">
                     <Download className="w-4 h-4 mr-2" /> Download
                   </a>

@@ -389,4 +389,43 @@ html {
     pointer-events: none;
     z-index: 1000;
   }
+
+  /* Responsive Button Container */
+  .button-group {
+    @apply flex gap-2 flex-wrap;
+  }
+
+  @media (max-width: 640px) {
+    .button-group {
+      @apply gap-1.5;
+    }
+
+    .button-group button {
+      @apply text-sm px-2 py-1;
+    }
+
+    .button-group button .w-4 {
+      @apply w-3 h-3;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .button-group {
+      @apply flex-col gap-1 w-full;
+    }
+
+    .button-group button {
+      @apply w-full justify-center;
+    }
+  }
+}
+
+/* Drag and Drop Styles */
+.drag-target {
+  @apply bg-primary/20 border-2 border-primary/60 !important;
+}
+
+/* Timetable Scroll Container */
+.timetable-scroll-container {
+  scroll-behavior: smooth;
 }

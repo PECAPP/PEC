@@ -240,9 +240,9 @@ export function NightCanteen() {
                       />
                     </div>
                     <div className="p-4">
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
                         <h3 className="font-semibold text-lg">{item.name}</h3>
-                        <span className="text-primary font-bold">₹{item.price}</span>
+                        <span className="text-primary font-bold whitespace-nowrap">₹{item.price}</span>
                       </div>
                       <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                         {item.description}

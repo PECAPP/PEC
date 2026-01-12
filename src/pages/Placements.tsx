@@ -299,14 +299,16 @@ function RecruiterJobsView({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">My Job Postings</h1>
           <p className="text-muted-foreground">Manage your job listings and applications</p>
         </div>
-        <Button onClick={() => { resetForm(); setEditingJob(null); setShowJobDialog(true); }}>
-          <Plus className="w-4 h-4 mr-2" /> Post Job
-        </Button>
+        <div className="button-group">
+          <Button onClick={() => { resetForm(); setEditingJob(null); setShowJobDialog(true); }}>
+            <Plus className="w-4 h-4 mr-2" /> Post Job
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="jobs" onValueChange={() => setSelectedJob('')}>
