@@ -22,7 +22,14 @@ import { db, auth } from '@/config/firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { usePermissions } from '@/hooks/usePermissions';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Smartphone } from 'lucide-react';
+import { 
+  generateUPILink, 
+  initiateUPIPayment, 
+  generateUPIQRCode,
+  isMobile 
+} from '@/lib/upiPayment';
+import { getUPIConfig, generateTransactionId } from '@/config/upi';
 
 interface Invoice {
   id: string;
@@ -53,6 +60,12 @@ export default function PaymentDetail() {
   const [invoice, setInvoice] = useState<any>(null);
   const [qrTimeLeft, setQrTimeLeft] = useState(300); // 5 minutes in seconds
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [paymentSettings, setPaymentSettings] = useState<any>(null);
+  const [verificationMode, setVerificationMode] = useState(false);
+  const [transactionId, setTransactionId] = useState('');
+  const [verificationImage, setVerificationImage] = useState<File | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -61,9 +74,11 @@ export default function PaymentDetail() {
       return;
     }
 
-    const fetchInvoice = async () => {
+    const fetchData = async () => {
       try {
         if (!id) return;
+        
+        // Fetch invoice
         const docRef = doc(db, 'feeRecords', id);
         const docSnap = await getDoc(docRef);
         
@@ -79,19 +94,35 @@ export default function PaymentDetail() {
         } else {
           toast.error('Invoice not found');
         }
+
+        // Fetch payment settings
+        const settingsRef = doc(db, 'paymentSettings', 'admin_config');
+        const settingsSnap = await getDoc(settingsRef);
+        if (settingsSnap.exists()) {
+          setPaymentSettings(settingsSnap.data());
+        } else {
+          // Fallback to UPI if no settings found
+          setPaymentSettings({
+            method: 'upi',
+            upi: getUPIConfig(),
+          });
+        }
       } catch (error) {
-        console.error('Error fetching invoice:', error);
-        toast.error('Failed to load invoice details');
+        console.error('Error fetching data:', error);
+        toast.error('Failed to load payment details');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchInvoice();
+    fetchData();
   }, [id, authLoading, user, isAdmin, navigate]);
 
   useEffect(() => {
     if (invoice?.status !== 'paid' && showPaymentOptions) {
+      // Generate QR code when payment options are shown
+      generateQRCode();
+      
       const timer = setInterval(() => {
         setQrTimeLeft(prev => {
           if (prev <= 1) {
@@ -105,9 +136,104 @@ export default function PaymentDetail() {
     }
   }, [invoice?.status, showPaymentOptions]);
 
+  const generateQRCode = async () => {
+    if (!invoice || !paymentSettings) return;
+    
+    try {
+      // Only generate QR for UPI method
+      if (paymentSettings.method === 'upi') {
+        const upiLink = generateUPILink({
+          merchantId: paymentSettings.upi.upiId,
+          merchantName: paymentSettings.upi.upiName,
+          transactionId: generateTransactionId(),
+          amount: invoice.amount,
+          description: invoice.description,
+        });
+        
+        const qrUrl = await generateUPIQRCode(upiLink);
+        setQrCodeUrl(qrUrl);
+      }
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      toast.error('Failed to generate QR code');
+    }
+  };
+
   const refreshQR = () => {
     setQrTimeLeft(300);
+    generateQRCode();
     toast.success('QR code refreshed');
+  };
+
+  const handleUPIPayment = async () => {
+    if (!invoice || !id || !user || !paymentSettings) return;
+    
+    try {
+      setProcessingPayment(true);
+      
+      const transactionId = generateTransactionId();
+      const upiLink = generateUPILink({
+        merchantId: paymentSettings.upi.upiId,
+        merchantName: paymentSettings.upi.upiName,
+        transactionId,
+        amount: invoice.amount,
+        description: invoice.description,
+      });
+      
+      // Store transaction reference for later verification
+      const docRef = doc(db, 'feeRecords', id);
+      await updateDoc(docRef, {
+        pendingTransactionId: transactionId,
+        lastPaymentAttempt: serverTimestamp(),
+      });
+      
+      // Open UPI payment link
+      await initiateUPIPayment(upiLink);
+      
+      // On mobile, the app will handle the payment
+      // On desktop, show a message about scanning QR
+      if (!isMobile()) {
+        toast.info('Please scan the QR code with your UPI app');
+      }
+      
+      // Start polling for payment confirmation
+      pollPaymentStatus(id, 3);
+      
+    } catch (error) {
+      console.error('Error initiating UPI payment:', error);
+      toast.error('Failed to initiate payment. Please try again.');
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
+
+  const pollPaymentStatus = (invoiceId: string, maxAttempts: number, attempt: number = 0) => {
+    if (attempt >= maxAttempts) {
+      toast.info('Payment verification in progress. Please check after 24-48 hours.');
+      return;
+    }
+
+    const pollTimeout = setTimeout(async () => {
+      try {
+        const docRef = doc(db, 'feeRecords', invoiceId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.status === 'paid') {
+            setInvoice({ id: docSnap.id, ...data });
+            setShowPaymentOptions(false);
+            toast.success('Payment successful!');
+            return;
+          }
+        }
+        
+        // Keep polling
+        pollPaymentStatus(invoiceId, maxAttempts, attempt + 1);
+      } catch (error) {
+        console.error('Error polling payment status:', error);
+      }
+    }, 3000); // Poll every 3 seconds
   };
 
   const handleConfirmPayment = async () => {
@@ -116,19 +242,31 @@ export default function PaymentDetail() {
     try {
       setLoading(true);
       const docRef = doc(db, 'feeRecords', id);
+      
+      // For Razorpay: mark as paid immediately
+      // For UPI/Bank: mark as pending_verification
+      const newStatus = paymentSettings?.method === 'razorpay' ? 'paid' : 'pending_verification';
+      
       await updateDoc(docRef, {
-        status: 'paid',
-        paidDate: serverTimestamp()
+        status: newStatus,
+        paidDate: newStatus === 'paid' ? serverTimestamp() : null,
+        paymentTransactionId: transactionId || null,
+        verificationSubmittedAt: serverTimestamp(),
       });
       
       setInvoice({
         ...invoice,
-        status: 'paid',
-        paidDate: { seconds: Math.floor(Date.now() / 1000) } // Optimistic update for UI
+        status: newStatus,
+        paidDate: newStatus === 'paid' ? { seconds: Math.floor(Date.now() / 1000) } : null
       });
       
-      toast.success('Payment confirmed successfully!');
+      if (newStatus === 'paid') {
+        toast.success('Payment confirmed successfully!');
+      } else {
+        toast.success('Payment submitted for verification. Admin will review shortly.');
+      }
       setShowPaymentOptions(false);
+      setVerificationMode(false);
     } catch (error) {
       console.error('Error confirming payment:', error);
       toast.error('Failed to confirm payment. Please try again.');
@@ -166,6 +304,7 @@ export default function PaymentDetail() {
     switch (status) {
       case 'paid': return { icon: CheckCircle2, color: 'text-success', bg: 'bg-success/10', label: 'Paid' };
       case 'pending': return { icon: Clock, color: 'text-warning', bg: 'bg-warning/10', label: 'Pending' };
+      case 'pending_verification': return { icon: AlertCircle, color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-950/20', label: 'Pending Verification' };
       case 'overdue': return { icon: AlertCircle, color: 'text-destructive', bg: 'bg-destructive/10', label: 'Overdue' };
       default: return { icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
     }
@@ -177,6 +316,17 @@ export default function PaymentDetail() {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const formatDate = (dateValue: any): string => {
+    if (!dateValue) return '';
+    if (dateValue.seconds) {
+      return new Date(dateValue.seconds * 1000).toLocaleDateString();
+    }
+    if (typeof dateValue === 'string') {
+      return new Date(dateValue).toLocaleDateString();
+    }
+    return '';
   };
 
   return (
@@ -265,79 +415,188 @@ export default function PaymentDetail() {
               </div>
             ) : (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-foreground">Payment Options</h2>
+                <h2 className="text-lg font-semibold text-foreground">
+                  {paymentSettings?.method === 'razorpay' ? 'Pay with Razorpay' : 'Payment Method'}
+                </h2>
                 
-                {/* UPI QR Code */}
-                <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium text-foreground flex items-center gap-2">
-                      <QrCode className="w-5 h-5 text-primary" />
-                      UPI Payment
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <span className={cn(
-                        'text-sm font-medium',
-                        qrTimeLeft < 60 ? 'text-destructive' : 'text-muted-foreground'
-                      )}>
-                        {formatTime(qrTimeLeft)}
-                      </span>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshQR}>
-                        <RefreshCw className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <div className="w-48 h-48 bg-background rounded-xl flex items-center justify-center mb-4 border border-border">
-                      <QrCode className="w-32 h-32 text-foreground" />
-                    </div>
-                    <p className="text-sm text-muted-foreground text-center">
-                      Scan with any UPI app to pay
-                    </p>
-                    <p className="text-xs text-primary mt-1">upi://pay?pa=OmniFlow@sbi&am={invoice.amount}</p>
-                  </div>
-                </div>
-
-                {/* Bank Transfer */}
-                <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                  <h3 className="font-medium text-foreground flex items-center gap-2 mb-4">
-                    <Building className="w-5 h-5 text-primary" />
-                    Bank Transfer
-                  </h3>
-                  
-                  <div className="space-y-3">
-                    {[
-                      { label: 'Bank Name', value: bankDetails.bankName },
-                      { label: 'Account Name', value: bankDetails.accountName },
-                      { label: 'Account Number', value: bankDetails.accountNumber },
-                      { label: 'IFSC Code', value: bankDetails.ifscCode },
-                      { label: 'Branch', value: bankDetails.branch },
-                    ].map((item) => (
-                      <div key={item.label} className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-muted-foreground">{item.label}</p>
-                          <p className="text-sm font-medium text-foreground">{item.value}</p>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8"
-                          onClick={() => copyToClipboard(item.value, item.label)}
-                        >
-                          <Copy className="w-4 h-4" />
+                {/* UPI Payment - Show only if configured */}
+                {paymentSettings?.method === 'upi' && (
+                  <div className="p-4 rounded-xl bg-secondary/50 border border-border">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-medium text-foreground flex items-center gap-2">
+                        <QrCode className="w-5 h-5 text-primary" />
+                        UPI Payment
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          'text-sm font-medium',
+                          qrTimeLeft < 60 ? 'text-destructive' : 'text-muted-foreground'
+                        )}>
+                          {formatTime(qrTimeLeft)}
+                        </span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshQR}>
+                          <RefreshCw className="w-4 h-4" />
                         </Button>
                       </div>
-                    ))}
+                    </div>
+                    
+                    <div className="flex flex-col items-center">
+                      {qrCodeUrl ? (
+                        <img 
+                          src={qrCodeUrl} 
+                          alt="UPI QR Code" 
+                          className="w-48 h-48 rounded-xl mb-4 border border-border"
+                        />
+                      ) : (
+                        <div className="w-48 h-48 bg-background rounded-xl flex items-center justify-center mb-4 border border-border animate-pulse">
+                          <QrCode className="w-32 h-32 text-muted-foreground" />
+                        </div>
+                      )}
+                      <p className="text-sm text-muted-foreground text-center mb-4">
+                        {isMobile() 
+                          ? 'Tap the button below to open your UPI app' 
+                          : 'Scan with any UPI app to pay'}
+                      </p>
+                      
+                      {/* UPI Deep Link Button - Works on Mobile */}
+                      {isMobile() && (
+                        <Button 
+                          className="w-full mb-4 bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={handleUPIPayment}
+                          disabled={processingPayment || qrTimeLeft === 0}
+                        >
+                          <Smartphone className="w-4 h-4 mr-2" />
+                          {processingPayment ? 'Opening UPI App...' : 'Pay with UPI'}
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <Button className="w-full h-12 text-lg font-semibold bg-success hover:bg-success/90 text-white" onClick={handleConfirmPayment}>
-                  Confirm Payment
+                {/* Razorpay Payment - Show only if configured */}
+                {paymentSettings?.method === 'razorpay' && (
+                  <div className="p-4 rounded-xl bg-secondary/50 border border-border">
+                    <p className="text-muted-foreground mb-4">
+                      Pay securely with Razorpay. Choose from multiple payment methods.
+                    </p>
+                    <Button className="w-full" size="lg" disabled>
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Razorpay Integration (Coming Soon)
+                    </Button>
+                  </div>
+                )}
+
+                {/* Bank Transfer - Show only if configured */}
+                {paymentSettings?.method === 'bank' && (
+                  <div className="p-4 rounded-xl bg-secondary/50 border border-border">
+                    {!verificationMode ? (
+                      <>
+                        <h3 className="font-medium text-foreground flex items-center gap-2 mb-4">
+                          <Building className="w-5 h-5 text-primary" />
+                          Bank Transfer Details
+                        </h3>
+                        
+                        <div className="space-y-3 mb-4">
+                          {paymentSettings.bank && [
+                            { label: 'Bank Name', value: paymentSettings.bank.bankName },
+                            { label: 'Account Name', value: paymentSettings.bank.accountName },
+                            { label: 'Account Number', value: paymentSettings.bank.accountNumber },
+                            { label: 'IFSC Code', value: paymentSettings.bank.ifscCode },
+                            ...(paymentSettings.bank.branch ? [{ label: 'Branch', value: paymentSettings.bank.branch }] : []),
+                          ].map((item) => (
+                            <div key={item.label} className="flex items-center justify-between">
+                              <div>
+                                <p className="text-xs text-muted-foreground">{item.label}</p>
+                                <p className="text-sm font-medium text-foreground">{item.value}</p>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={() => copyToClipboard(item.value, item.label)}
+                              >
+                                <Copy className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+
+                        <Button 
+                          className="w-full"
+                          onClick={() => setVerificationMode(true)}
+                        >
+                          Proceed to Submit Payment Proof
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="font-medium text-foreground mb-4">Submit Payment Proof</h3>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium text-foreground block mb-2">
+                              Transaction ID / Reference Number *
+                            </label>
+                            <Input
+                              placeholder="e.g., TXN123456789"
+                              value={transactionId}
+                              onChange={(e) => setTransactionId(e.target.value)}
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Find this in your bank app after making the transfer
+                            </p>
+                          </div>
+
+                          <div>
+                            <label className="text-sm font-medium text-foreground block mb-2">
+                              Upload Payment Screenshot (Optional)
+                            </label>
+                            <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-secondary/50">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setVerificationImage(e.target.files?.[0] || null)}
+                                className="hidden"
+                                id="file-upload"
+                              />
+                              <label htmlFor="file-upload" className="cursor-pointer">
+                                <p className="text-sm text-muted-foreground">
+                                  {verificationImage ? verificationImage.name : 'Click to upload or drag image here'}
+                                </p>
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <p className="text-sm text-blue-900 dark:text-blue-200">
+                              ℹ️ Admin will verify your payment using the transaction ID and screenshot. You'll receive confirmation via email.
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <Button 
+                  className="w-full h-12 text-lg font-semibold bg-success hover:bg-success/90 text-white" 
+                  onClick={handleConfirmPayment} 
+                  disabled={processingPayment || (paymentSettings?.method === 'bank' && verificationMode && !transactionId)}
+                >
+                  {processingPayment ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : paymentSettings?.method === 'bank' && verificationMode ? (
+                    'Submit for Verification'
+                  ) : (
+                    'Confirm Payment'
+                  )}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  Payment confirmation may take 24-48 hours after bank transfer.
-                  For demonstration, clicking "Confirm" will mark it as paid.
+                  After payment through UPI, we'll verify your transaction automatically.
+                  Manual verification may take 24-48 hours for bank transfers.
                 </p>
               </div>
             )}
@@ -352,8 +611,31 @@ export default function PaymentDetail() {
                 <CheckCircle2 className="w-8 h-8 text-success" />
               </div>
               <h2 className="text-lg font-semibold text-foreground mb-2">Payment Complete</h2>
-              <p className="text-muted-foreground mb-2">Paid on {invoice.paidDate}</p>
+              <p className="text-muted-foreground mb-2">Paid on {formatDate(invoice.paidDate)}</p>
               <p className="text-sm text-muted-foreground">Transaction ID: TXN{invoice.id.replace('INV-', '')}2024</p>
+            </div>
+          </div>
+        )}
+
+        {/* Pending Verification Status */}
+        {invoice.status === 'pending_verification' && (
+          <div className="card-elevated p-6 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/20">
+            <div className="text-center py-8">
+              <div className="w-16 h-16 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-yellow-600 dark:text-yellow-500" />
+              </div>
+              <h2 className="text-lg font-semibold text-yellow-900 dark:text-yellow-200 mb-2">Payment Pending Verification</h2>
+              <p className="text-yellow-800 dark:text-yellow-300 mb-4">
+                Your payment has been submitted and is awaiting admin verification. This usually takes 24-48 hours.
+              </p>
+              {invoice.paymentTransactionId && (
+                <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                  Transaction ID: {invoice.paymentTransactionId}
+                </p>
+              )}
+              <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-4">
+                You'll receive an email confirmation once the payment is verified.
+              </p>
             </div>
           </div>
         )}

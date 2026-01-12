@@ -40,7 +40,7 @@ import heroDashboard from "@/assets/hero-dashboard.jpg";
 import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
 import ThemeToggler from "@/components/ThemeToggler";
-import { ColorThemeToggler } from "@/components/ColorThemeToggler";
+import { LandingColorTheme } from "@/components/LandingColorTheme";
 import React, { useRef, useEffect, useState } from "react";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import GradualBlur from "@/components/ui/GradualBlur";
@@ -396,7 +396,7 @@ export function LandingPage() {
               transition={{ delay: 0.5 }}
               className="flex items-center gap-3"
             >
-              <ColorThemeToggler />
+              <LandingColorTheme />
               <ThemeToggler />
               <Button
                 variant="ghost"

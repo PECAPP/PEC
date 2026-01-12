@@ -12,6 +12,7 @@ import {
   Upload,
   Download,
   ExternalLink,
+  Settings,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -280,7 +281,18 @@ export default function Finance() {
           <p className="text-muted-foreground mt-1">Manage student fees and payments</p>
         </div>
         <div className="flex flex-wrap gap-2">
-           <Button variant="outline" onClick={exportFees} className="flex-1 lg:flex-none">
+          {isAdmin && (
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/admin/payment-settings')} 
+              className="flex-1 lg:flex-none"
+              title="Configure payment method (Razorpay or UPI)"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Payment Settings
+            </Button>
+          )}
+          <Button variant="outline" onClick={exportFees} className="flex-1 lg:flex-none">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>

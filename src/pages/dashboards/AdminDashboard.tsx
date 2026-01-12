@@ -379,6 +379,17 @@ export function AdminDashboard() {
           <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
           <p className="text-muted-foreground mt-1">Complete control over your ERP system</p>
         </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate('/admin/college-settings')}
+            className="gap-2"
+          >
+            <Settings className="w-4 h-4" />
+            College Settings
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

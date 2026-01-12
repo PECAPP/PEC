@@ -4,7 +4,6 @@ import {
   User,
   Bell,
   Lock,
-  Palette,
   Globe,
   Shield,
   Smartphone,

@@ -243,8 +243,10 @@ html {
   }
 
   .sidebar-item-active {
-    @apply bg-sidebar-accent text-sidebar-foreground font-medium;
+    @apply bg-primary text-primary-foreground font-medium shadow-md hover:bg-primary/90 hover:shadow-lg;
   }
+
+
 
   /* Responsive Tabs */
   [data-radix-collection-item] {

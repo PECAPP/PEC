@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Search, User, ChevronDown, LogOut, Settings, HelpCircle, Menu } from 'lucide-react';
+import { Bell, Search, User, ChevronDown, LogOut, Settings, HelpCircle, Menu, Palette } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { toast } from 'sonner';
@@ -14,8 +14,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { ColorThemeToggler } from "@/components/ColorThemeToggler";
 import ThemeToggler from "../../components/ThemeToggler";
+import { LandingColorTheme } from '@/components/LandingColorTheme';
 import type { User as UserType } from '@/types';
 
 interface HeaderProps {
@@ -79,7 +79,7 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick }: Header
 
         {/* Right Section */}
         <div className="flex items-center gap-3 ml-auto">
-          <ColorThemeToggler />
+          <LandingColorTheme />
           <ThemeToggler/>
           {/* Notifications */}
           <Button 

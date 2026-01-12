@@ -24,6 +24,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCollegeSettings } from "@/hooks/useCollegeSettings";
 import type { UserRole } from "@/types";
 
 interface SidebarProps {
@@ -183,18 +184,6 @@ const navItems: NavItem[] = [
     roles: ["super_admin", "college_admin"],
   },
   {
-    icon: Building2,
-    label: "Organizations",
-    path: "/admin/organizations",
-    roles: ["super_admin"],
-  },
-  {
-    icon: Shield,
-    label: "Approvals",
-    path: "/admin/approvals",
-    roles: ["super_admin"],
-  },
-  {
     icon: Settings,
     label: "Settings",
     path: "/settings",
@@ -231,7 +220,14 @@ export function Sidebar({
   onMobileClose 
 }: SidebarProps) {
   const location = useLocation();
+  const { settings } = useCollegeSettings();
   const filteredItems = navItems.filter((item) => item.roles.includes(role));
+
+  const handleLogoClick = () => {
+    if (settings?.website) {
+      window.open(settings.website, '_blank');
+    }
+  };
 
   return (
     <>
@@ -259,7 +255,7 @@ export function Sidebar({
       {/* Logo */}
       <div
         className={cn(
-          "h-16 flex items-center border-b border-sidebar-border",
+          "min-h-20 flex items-center border-b border-sidebar-border",
           collapsed ? "justify-center px-2" : "justify-between px-4"
         )}
       >
@@ -281,11 +277,27 @@ export function Sidebar({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer flex-1 min-w-0"
+                onClick={handleLogoClick}
               >
-                <span className="font-semibold text-sidebar-foreground">
-                  OmniFlow
-                </span>
+                {(settings?.logoDisplayMode === 'logo-only' || settings?.logoDisplayMode === 'both') && settings?.logoUrl ? (
+                  <div className="flex-shrink-0 flex items-center justify-center">
+                    <img 
+                      src={settings.logoUrl} 
+                      alt={settings.collegeName}
+                      className="max-w-16 max-h-16 w-auto h-auto object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 flex-shrink-0 bg-primary rounded flex items-center justify-center">
+                    <GraduationCap className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                )}
+                {(settings?.logoDisplayMode === 'text-only' || settings?.logoDisplayMode === 'both') && (
+                  <span className="font-semibold text-sidebar-foreground truncate">
+                    {settings?.collegeShortName || 'OmniFlow'}
+                  </span>
+                )}
               </motion.div>
             </Link>
             <button
@@ -307,7 +319,34 @@ export function Sidebar({
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         <ul className="space-y-1">
           {filteredItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            // Smart path matching for different route types
+            let isActive = false;
+            
+            if (item.path === '/finance') {
+              // Finance includes payment settings and other finance routes
+              isActive = location.pathname === item.path || 
+                        location.pathname.startsWith('/finance/') ||
+                        location.pathname === '/admin/payment-settings';
+            } else if (item.path === '/settings') {
+              // Settings includes college settings admin page
+              isActive = location.pathname === item.path || 
+                        location.pathname === '/admin/college-settings' ||
+                        location.pathname === '/admin/hostel';
+            } else if (item.path === '/departments') {
+              // Departments
+              isActive = location.pathname === item.path || 
+                        location.pathname.startsWith('/departments/');
+            } else if (item.path === '/faculty') {
+              // Faculty
+              isActive = location.pathname === item.path || 
+                        location.pathname.startsWith('/faculty/');
+            } else {
+              // Default matching for other routes
+              isActive = location.pathname === item.path || 
+                        location.pathname.startsWith(item.path + '/') ||
+                        (item.path !== '/' && location.pathname.startsWith(item.path));
+            }
+            
             return (
               <li key={item.path}>
                 <NavLink
@@ -320,7 +359,7 @@ export function Sidebar({
                   <item.icon
                     className={cn(
                       "w-5 h-5 shrink-0",
-                      isActive && "text-accent"
+                      isActive ? "text-primary-foreground" : "text-sidebar-foreground/70"
                     )}
                   />
                   <AnimatePresence mode="wait">

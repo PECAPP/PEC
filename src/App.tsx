@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "./components/layout/MainLayout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import Pricing from "./pages/Pricing";
 import Blog from "./pages/Blog";
@@ -69,6 +70,8 @@ import DemoDashboard from "./pages/DemoDashboard";
 import { NightCanteen } from './pages/NightCanteen';
 import { CanteenManager } from './pages/admin/CanteenManager';
 import HostelAdmin from './pages/admin/HostelAdmin';
+import PaymentSettings from './pages/admin/PaymentSettings';
+import CollegeSettings from './pages/admin/CollegeSettings';
 
 const queryClient = new QueryClient();
 
@@ -128,14 +131,13 @@ const App = () => (
               <Route path="/canteen" element={<NightCanteen />} />
               <Route path="/admin/canteen" element={<CanteenManager />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin/organizations" element={<Organizations />} />
-              <Route path="/admin/organizations/new" element={<AddOrganization />} />
-              <Route path="/admin/organizations/:id" element={<OrganizationDetail />} />
-              <Route path="/admin/recruiters" element={<PlacementRecruiters />} />
-              <Route path="/admin/system-config" element={<SystemConfig />} />
-              <Route path="/admin/logs" element={<SystemLogs />} />
-              <Route path="/admin/approvals" element={<Approvals />} />
+              {/* Admin Routes - Super Admin Only - TODO: Uncomment when ready */}
+              {/* <Route path="/admin/organizations" element={<ProtectedRoute requiredPermission="manage_organizations"><Organizations /></ProtectedRoute>} />
+              <Route path="/admin/organizations/new" element={<ProtectedRoute requiredPermission="manage_organizations"><AddOrganization /></ProtectedRoute>} />
+              <Route path="/admin/organizations/:id" element={<ProtectedRoute requiredPermission="manage_organizations"><OrganizationDetail /></ProtectedRoute>} />
+              <Route path="/admin/approvals" element={<ProtectedRoute requiredPermission="manage_organizations"><Approvals /></ProtectedRoute>} /> */}
+              <Route path="/admin/payment-settings" element={<PaymentSettings />} />
+              <Route path="/admin/college-settings" element={<CollegeSettings />} />
               <Route path="/admin/hostel" element={<HostelAdmin />} />
               <Route path="/departments" element={<Departments />} />
               <Route path="/departments/:id" element={<DepartmentDetail />} />
