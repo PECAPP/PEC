@@ -1,23 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  FileText,
-  Upload,
-  Sparkles,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  ArrowRight,
-  Target,
-  TrendingUp,
-  Lightbulb,
-  RefreshCw,
+  FileText, Upload, Sparkles, CheckCircle2, XCircle,
+  AlertCircle, ArrowRight, Target, TrendingUp, Lightbulb, RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+
+import OpenAI from 'openai';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { app } from '@/config/firebase';
 
 interface AnalysisResult {
   matchScore: number;
@@ -27,55 +22,89 @@ interface AnalysisResult {
   keywordMatch: { keyword: string; found: boolean }[];
 }
 
-const mockAnalysis: AnalysisResult = {
-  matchScore: 78,
-  strengths: [
-    'Strong technical skills in Python and Machine Learning',
-    'Relevant internship experience at top tech companies',
-    'Good academic record (CGPA 8.78)',
-    'Open source contributions demonstrate initiative',
-    'Published research shows depth of knowledge',
-  ],
-  gaps: [
-    'Limited experience with cloud platforms mentioned in JD',
-    'No mention of team leadership experience',
-    'Missing certifications in AWS/GCP',
-    'Could highlight more quantifiable achievements',
-  ],
-  suggestions: [
-    'Add AWS/GCP certifications to strengthen cloud skills',
-    'Quantify impact: "Improved model accuracy by 15%" → add context',
-    'Include leadership examples from college projects',
-    'Add keywords: "scalable systems", "distributed computing"',
-    'Highlight any experience with large-scale data processing',
-  ],
-  keywordMatch: [
-    { keyword: 'Python', found: true },
-    { keyword: 'Machine Learning', found: true },
-    { keyword: 'TensorFlow', found: true },
-    { keyword: 'AWS', found: false },
-    { keyword: 'Distributed Systems', found: false },
-    { keyword: 'Leadership', found: false },
-    { keyword: 'Data Structures', found: true },
-    { keyword: 'Problem Solving', found: true },
-  ],
-};
+const storage = getStorage(app);
+
+const openai = new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY, 
+  dangerouslyAllowBrowser: true, 
+  baseURL:"https://models.github.ai/inference"
+});
 
 export default function ResumeAnalyzer() {
   const [jobDescription, setJobDescription] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [selectedResume, setSelectedResume] = useState<string | null>('current');
+  const [selectedResume, setSelectedResume] = useState<'current' | 'upload'>('current');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  const handleAnalyze = () => {
+  const fileToBase64 = (file: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleAnalyze = async () => {
     if (!jobDescription.trim()) return;
     setIsAnalyzing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setAnalysisResult(mockAnalysis);
+    setAnalysisResult(null);
+
+    try {
+      let resumeData: string;
+
+      if (selectedResume === 'upload' && uploadedFile) {
+        resumeData = await fileToBase64(uploadedFile);
+      } else {
+        const resumeRef = ref(storage, 'resumes/current_erp_resume.pdf');
+        const url = await getDownloadURL(resumeRef);
+        const response = await fetch(url);
+        const blob = await response.blob();
+        resumeData = await fileToBase64(blob);
+      }
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert ATS (Applicant Tracking System). Analyze resumes against job descriptions and return strictly JSON."
+          },
+          {
+            role: "user",
+            content: [
+              { 
+                type: "text", 
+                text: `Analyze this resume against the following job description: "${jobDescription}". 
+                Return a JSON object:
+                {
+                  "matchScore": number,
+                  "strengths": string[],
+                  "gaps": string[],
+                  "suggestions": string[],
+                  "keywordMatch": [{"keyword": string, "found": boolean}]
+                }` 
+              },
+            ],
+          },
+        ],
+        response_format: { type: "json_object" } 
+      });
+
+      const content = response.choices[0].message.content;
+      if (content) {
+        setAnalysisResult(JSON.parse(content) as AnalysisResult);
+      }
+      
+    } catch (error) {
+      console.error("OpenAI Error:", error);
+      alert("Analysis failed. Check your API key or billing balance.");
+    } finally {
       setIsAnalyzing(false);
-    }, 2000);
+    }
   };
+
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-success';
@@ -83,234 +112,143 @@ export default function ResumeAnalyzer() {
     return 'text-destructive';
   };
 
-  const getScoreLabel = (score: number) => {
-    if (score >= 80) return 'Excellent Match';
-    if (score >= 60) return 'Good Match';
-    if (score >= 40) return 'Fair Match';
-    return 'Needs Improvement';
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">AI Resume Analyzer</h1>
-        <p className="text-muted-foreground mt-1">
-          Compare your resume against job descriptions to improve your chances
-        </p>
+    <div className="space-y-6 max-w-6xl mx-auto p-4">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold tracking-tight">OpenAI Resume Insights</h1>
+        <p className="text-muted-foreground">Powered by GPT-4o analysis</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Input Section */}
         <div className="space-y-4">
-          {/* Resume Selection */}
-          <div className="card-elevated p-5">
-            <h3 className="font-semibold text-foreground mb-4">Select Resume</h3>
-            <div className="space-y-3">
+          <section className="card-elevated p-5 space-y-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Resume Source</h3>
+            <div className="grid gap-3">
               <button
                 onClick={() => setSelectedResume('current')}
                 className={cn(
-                  'w-full p-4 rounded-lg border-2 text-left transition-all',
-                  selectedResume === 'current'
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50'
+                  'flex items-center gap-4 p-4 rounded-xl border-2 transition-all',
+                  selectedResume === 'current' ? 'border-primary bg-primary/5' : 'border-border'
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <FileText className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Current ERP Resume</p>
-                    <p className="text-sm text-muted-foreground">Auto-generated from your profile</p>
-                  </div>
-                  {selectedResume === 'current' && (
-                    <CheckCircle2 className="w-5 h-5 text-primary ml-auto" />
+                <FileText className="w-6 h-6 text-primary" />
+                <div className="text-left">
+                  <p className="font-bold">Default Resume</p>
+                  <p className="text-xs text-muted-foreground">ERP Profile Data</p>
+                </div>
+              </button>
+
+              <div className="relative">
+                <input 
+                  type="file" 
+                  accept=".pdf" 
+                  className="hidden" 
+                  id="resume-upload" 
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) { setUploadedFile(file); setSelectedResume('upload'); }
+                  }} 
+                />
+                <button
+                  onClick={() => document.getElementById('resume-upload')?.click()}
+                  className={cn(
+                    'w-full flex items-center gap-4 p-4 rounded-xl border-2 border-dashed transition-all',
+                    selectedResume === 'upload' ? 'border-primary bg-primary/5' : 'border-border'
                   )}
-                </div>
-              </button>
-
-              <button
-                onClick={() => setSelectedResume('upload')}
-                className={cn(
-                  'w-full p-4 rounded-lg border-2 text-left transition-all border-dashed',
-                  selectedResume === 'upload'
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50'
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-muted">
-                    <Upload className="w-5 h-5 text-muted-foreground" />
+                >
+                  <Upload className="w-6 h-6 text-muted-foreground" />
+                  <div className="text-left">
+                    <p className="font-bold">{uploadedFile ? uploadedFile.name : 'Upload PDF'}</p>
+                    <p className="text-xs text-muted-foreground">Click to browse files</p>
                   </div>
-                  <div>
-                    <p className="font-medium text-foreground">Upload Custom Resume</p>
-                    <p className="text-sm text-muted-foreground">PDF or DOCX format</p>
-                  </div>
-                </div>
-              </button>
+                </button>
+              </div>
             </div>
-          </div>
+          </section>
 
-          {/* Job Description */}
-          <div className="card-elevated p-5">
-            <h3 className="font-semibold text-foreground mb-4">Job Description</h3>
+          <section className="card-elevated p-5 space-y-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Job Details</h3>
             <Textarea
               placeholder="Paste the job description here..."
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
-              rows={10}
-              className="resize-none"
+              className="min-h-[250px] bg-muted/30 border-none focus-visible:ring-1"
             />
-            <Button
-              className="w-full mt-4"
+            <Button 
+              className="w-full h-12 text-lg font-semibold shadow-lg shadow-primary/20"
               onClick={handleAnalyze}
-              disabled={!jobDescription.trim() || isAnalyzing}
+              disabled={isAnalyzing || !jobDescription}
             >
-              {isAnalyzing ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Analyze Match
-                </>
-              )}
+              {isAnalyzing ? <RefreshCw className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
+              {isAnalyzing ? "Analyzing..." : "Analyze with GPT-4"}
             </Button>
-          </div>
+          </section>
         </div>
 
-        {/* Results Section */}
         <div className="space-y-4">
           {!analysisResult && !isAnalyzing && (
-            <div className="card-elevated p-12 text-center">
-              <Sparkles className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
-              <h3 className="font-medium text-foreground mb-2">Ready to Analyze</h3>
-              <p className="text-sm text-muted-foreground">
-                Paste a job description and click "Analyze Match" to see how well your resume
-                fits the role.
-              </p>
+            <div className="h-full flex flex-col items-center justify-center p-12 text-center opacity-50">
+              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-4">
+                <Target className="w-10 h-10" />
+              </div>
+              <p>Upload a resume and paste a job description to begin</p>
             </div>
           )}
 
           {isAnalyzing && (
-            <div className="card-elevated p-12 text-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                className="w-16 h-16 mx-auto mb-4"
-              >
-                <Sparkles className="w-16 h-16 text-primary" />
-              </motion.div>
-              <h3 className="font-medium text-foreground mb-2">Analyzing Your Resume</h3>
-              <p className="text-sm text-muted-foreground">
-                Our AI is comparing your profile against the job requirements...
-              </p>
+            <div className="card-elevated p-12 text-center animate-pulse">
+              <Sparkles className="w-12 h-12 mx-auto text-primary mb-4" />
+              <h3 className="text-xl font-bold">GPT is Thinking...</h3>
+              <p className="text-muted-foreground mt-2">Extracting skills and matching keywords</p>
             </div>
           )}
 
-          {analysisResult && !isAnalyzing && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
-            >
-              {/* Match Score */}
-              <div className="card-elevated p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="font-semibold text-foreground">Match Score</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {getScoreLabel(analysisResult.matchScore)}
-                    </p>
-                  </div>
-                  <div className={cn('text-4xl font-bold', getScoreColor(analysisResult.matchScore))}>
-                    {analysisResult.matchScore}%
-                  </div>
+          {analysisResult && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <div className="card-elevated p-6 text-center">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Overall Compatibility</p>
+                <div className={cn("text-6xl font-black mb-4", getScoreColor(analysisResult.matchScore))}>
+                  {analysisResult.matchScore}%
                 </div>
                 <Progress value={analysisResult.matchScore} className="h-3" />
               </div>
 
-              {/* Keyword Match */}
               <div className="card-elevated p-5">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Target className="w-5 h-5 text-primary" />
-                  Keyword Match
-                </h3>
+                <h4 className="font-bold flex items-center gap-2 mb-4"><Target className="w-4 h-4 text-primary" /> Keyword Analysis</h4>
                 <div className="flex flex-wrap gap-2">
-                  {analysisResult.keywordMatch.map((item) => (
-                    <Badge
-                      key={item.keyword}
-                      variant="outline"
-                      className={cn(
-                        'gap-1',
-                        item.found
-                          ? 'border-success/50 text-success bg-success/5'
-                          : 'border-destructive/50 text-destructive bg-destructive/5'
-                      )}
-                    >
-                      {item.found ? (
-                        <CheckCircle2 className="w-3 h-3" />
-                      ) : (
-                        <XCircle className="w-3 h-3" />
-                      )}
-                      {item.keyword}
+                  {analysisResult.keywordMatch.map((k, i) => (
+                    <Badge key={i} variant={k.found ? "default" : "outline"} className={cn(k.found ? "bg-success hover:bg-success" : "opacity-50")}>
+                      {k.keyword}
                     </Badge>
                   ))}
                 </div>
               </div>
 
-              {/* Strengths */}
-              <div className="card-elevated p-5">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-success" />
-                  Strengths
-                </h3>
-                <ul className="space-y-2">
-                  {analysisResult.strengths.map((strength, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-success mt-0.5 shrink-0" />
-                      <span className="text-muted-foreground">{strength}</span>
-                    </li>
-                  ))}
-                </ul>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="card-elevated p-4 border-l-4 border-success">
+                  <h5 className="font-bold text-success text-sm mb-2">Strengths</h5>
+                  <ul className="text-xs space-y-1">
+                    {analysisResult.strengths.map((s, i) => <li key={i}>• {s}</li>)}
+                  </ul>
+                </div>
+                <div className="card-elevated p-4 border-l-4 border-destructive">
+                  <h5 className="font-bold text-destructive text-sm mb-2">Missing</h5>
+                  <ul className="text-xs space-y-1">
+                    {analysisResult.gaps.map((g, i) => <li key={i}>• {g}</li>)}
+                  </ul>
+                </div>
               </div>
 
-              {/* Gaps */}
-              <div className="card-elevated p-5">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-warning" />
-                  Areas to Improve
-                </h3>
-                <ul className="space-y-2">
-                  {analysisResult.gaps.map((gap, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm">
-                      <XCircle className="w-4 h-4 text-warning mt-0.5 shrink-0" />
-                      <span className="text-muted-foreground">{gap}</span>
-                    </li>
+              <div className="card-elevated p-5 bg-primary/5 border-none">
+                <h4 className="font-bold flex items-center gap-2 mb-3"><Lightbulb className="w-4 h-4 text-primary" /> Optimization Tips</h4>
+                <div className="space-y-2">
+                  {analysisResult.suggestions.map((s, i) => (
+                    <div key={i} className="flex gap-2 text-sm text-foreground/80">
+                      <ArrowRight className="w-4 h-4 text-primary shrink-0 mt-1" />
+                      {s}
+                    </div>
                   ))}
-                </ul>
-              </div>
-
-              {/* Suggestions */}
-              <div className="card-elevated p-5">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-accent" />
-                  AI Suggestions
-                </h3>
-                <ul className="space-y-3">
-                  {analysisResult.suggestions.map((suggestion, index) => (
-                    <li
-                      key={index}
-                      className="flex items-start gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20"
-                    >
-                      <ArrowRight className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                      <span className="text-sm text-foreground">{suggestion}</span>
-                    </li>
-                  ))}
-                </ul>
+                </div>
               </div>
             </motion.div>
           )}
