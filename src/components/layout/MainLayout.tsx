@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
+import { useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import type { User } from '@/types';
+import FloatingAIChat from '../FloatingAIChat';
 
 // Mock user for demo - in real app, this would come from auth context
 const mockUser: User = {
@@ -16,6 +18,7 @@ const mockUser: User = {
 };
 
 export function MainLayout() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, isAuthenticated } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -103,6 +106,7 @@ export function MainLayout() {
       >
         <div className="p-4 lg:p-6">
           <Outlet />
+          {location.pathname!=="/chat" && <FloatingAIChat />}
         </div>
       </main>
     </div>

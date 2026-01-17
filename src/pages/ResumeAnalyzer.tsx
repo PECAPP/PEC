@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  FileText, Upload, Sparkles, CheckCircle2, XCircle,
-  AlertCircle, ArrowRight, Target, TrendingUp, Lightbulb, RefreshCw,
+  FileText, Upload, Sparkles,ArrowRight, Target, Lightbulb, RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -172,7 +171,7 @@ export default function ResumeAnalyzer() {
               placeholder="Paste the job description here..."
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
-              className="min-h-[250px] bg-muted/30 border-none focus-visible:ring-1"
+              className="min-h-[250px] bg-muted/30 border-primary focus-visible:ring-1"
             />
             <Button 
               className="w-full h-12 text-lg font-semibold shadow-lg shadow-primary/20"
