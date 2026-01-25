@@ -11,7 +11,7 @@ import {
   deleteDoc,
   updateDoc,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
 } from "firebase/firestore";
 import { db, auth } from "@/config/firebase";
 
@@ -38,20 +38,16 @@ export interface ChatMessage {
 
 export function subscribeToMessages(
   roomId: string,
-  callback: (messages: ChatMessage[]) => void
+  callback: (messages: ChatMessage[]) => void,
 ) {
   const messagesRef = collection(db, "chatRooms", roomId, "messages");
 
-  const q = query(
-    messagesRef, 
-    orderBy("createdAt", "desc"),
-    limit(50)
-  );
+  const q = query(messagesRef, orderBy("createdAt", "desc"), limit(50));
 
-  return onSnapshot(q, snap => {
-    const msgs = snap.docs.map(d => ({
+  return onSnapshot(q, (snap) => {
+    const msgs = snap.docs.map((d) => ({
       id: d.id,
-      ...d.data()
+      ...d.data(),
     })) as ChatMessage[];
 
     callback(msgs.reverse());
@@ -59,26 +55,30 @@ export function subscribeToMessages(
 }
 
 export async function sendMessage(
-  roomId: string, 
-  text: string, 
-  metadata?: { 
-    parentId?: string; 
+  roomId: string,
+  text: string,
+  metadata?: {
+    parentId?: string;
     replyTo?: { text: string; senderName: string };
     mentions?: string[];
-  }
+  },
 ) {
   if (!auth.currentUser) return;
 
   const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
-  const userName = userDoc.exists() ? userDoc.data()?.fullName || "Unknown User" : "Unknown User";
+  const userName = userDoc.exists()
+    ? userDoc.data()?.fullName || "Unknown User"
+    : "Unknown User";
 
   const messagesRef = collection(db, "chatRooms", roomId, "messages");
 
   // Filter out undefined values from metadata
   const cleanMetadata: Record<string, any> = {};
   if (metadata) {
-    if (metadata.parentId !== undefined) cleanMetadata.parentId = metadata.parentId;
-    if (metadata.replyTo !== undefined) cleanMetadata.replyTo = metadata.replyTo;
+    if (metadata.parentId !== undefined)
+      cleanMetadata.parentId = metadata.parentId;
+    if (metadata.replyTo !== undefined)
+      cleanMetadata.replyTo = metadata.replyTo;
     if (metadata.mentions !== undefined && metadata.mentions.length > 0) {
       cleanMetadata.mentions = metadata.mentions;
     }
@@ -90,7 +90,7 @@ export async function sendMessage(
     text,
     type: "text",
     createdAt: serverTimestamp(),
-    ...cleanMetadata
+    ...cleanMetadata,
   });
 }
 
@@ -103,12 +103,14 @@ export async function sendMediaMessage(
     fileName?: string;
     fileSize?: number;
     thumbnailUrl?: string;
-  }
+  },
 ) {
   if (!auth.currentUser) return;
 
   const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
-  const userName = userDoc.exists() ? userDoc.data()?.fullName || "Unknown User" : "Unknown User";
+  const userName = userDoc.exists()
+    ? userDoc.data()?.fullName || "Unknown User"
+    : "Unknown User";
 
   const messagesRef = collection(db, "chatRooms", roomId, "messages");
 
@@ -119,7 +121,7 @@ export async function sendMediaMessage(
     text: options?.text || "",
     type,
     mediaUrl,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   };
 
   // Only add optional fields if they are defined
@@ -130,28 +132,37 @@ export async function sendMediaMessage(
   await addDoc(messagesRef, messageData);
 }
 
-export async function deleteMessage(roomId: string, messageId: string, hardDelete = false) {
+export async function deleteMessage(
+  roomId: string,
+  messageId: string,
+  hardDelete = false,
+) {
   const messageRef = doc(db, "chatRooms", roomId, "messages", messageId);
-  
+
   if (hardDelete) {
     await deleteDoc(messageRef);
   } else {
     await updateDoc(messageRef, {
-      deletedAt: serverTimestamp()
+      deletedAt: serverTimestamp(),
     });
   }
 }
 
-export async function toggleStarMessage(roomId: string, messageId: string, userId: string, starred: boolean) {
+export async function toggleStarMessage(
+  roomId: string,
+  messageId: string,
+  userId: string,
+  starred: boolean,
+) {
   const messageRef = doc(db, "chatRooms", roomId, "messages", messageId);
-  
+
   if (starred) {
     await updateDoc(messageRef, {
-      starredBy: arrayUnion(userId)
+      starredBy: arrayUnion(userId),
     });
   } else {
     await updateDoc(messageRef, {
-      starredBy: arrayRemove(userId)
+      starredBy: arrayRemove(userId),
     });
   }
 }

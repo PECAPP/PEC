@@ -385,7 +385,7 @@ export function LandingPage() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 + 0.3 }}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-300 relative group"
+                  className="text-sm font-semibold text-foreground/90 hover:text-foreground transition-all duration-300 relative group"
                 >
                   {link}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300" />
@@ -480,7 +480,7 @@ export function LandingPage() {
             style={{ fontFamily: "'Monument Extended', serif", fontWeight: 900 }}
           >
             Powerful Dashboard,{" "}
-            <span className="bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-extrabold">Beautifully Designed</span>
+            <span className="text-accent">Beautifully Designed</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -499,7 +499,7 @@ export function LandingPage() {
             <Button
               size="lg"
               asChild
-              className="magnetic-btn group rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-2xl shadow-accent/30 hover:shadow-accent/50 transition-all duration-300 px-8 py-6 text-base font-bold"
+              className="magnetic-btn group rounded-full bg-accent hover:bg-accent/90 text-white dark:text-black font-bold shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 text-base"
               aria-label="Start your free trial of OmniFlow"
             >
               <Link to="/onboarding" className="flex items-center gap-3">
@@ -511,7 +511,7 @@ export function LandingPage() {
               size="lg"
               variant="outline"
               asChild
-              className="magnetic-btn group rounded-full border-2 border-primary/50 hover:border-primary/80 hover:bg-primary/10 transition-all duration-300 px-8 py-6 text-base font-semibold"
+              className="magnetic-btn group rounded-full border-2 border-foreground/20 hover:border-accent hover:bg-accent/10 transition-all duration-300 px-8 py-6 text-base font-semibold text-foreground"
               aria-label="Apply to onboard your institution"
             >
               <Link to="/apply-institution" className="flex items-center gap-3">
@@ -610,7 +610,7 @@ export function LandingPage() {
                           className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 dark:invert dark:group-hover:invert-0 dark:mix-blend-screen dark:group-hover:mix-blend-normal transition-all duration-300"
                         />
                       </div>
-                      <p className="text-xs font-medium text-muted-foreground group-hover:text-foreground dark:group-hover:text-black transition-colors">
+                      <p className="text-xs font-medium text-foreground/80 group-hover:text-foreground dark:group-hover:text-black transition-colors">
                         {client.name}
                       </p>
                     </div>
@@ -639,7 +639,7 @@ export function LandingPage() {
                           className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 dark:invert dark:group-hover:invert-0 dark:mix-blend-screen dark:group-hover:mix-blend-normal transition-all duration-300"
                         />
                       </div>
-                      <p className="text-xs font-medium text-muted-foreground group-hover:text-foreground dark:group-hover:text-black transition-colors">
+                      <p className="text-xs font-medium text-foreground/80 group-hover:text-foreground dark:group-hover:text-black transition-colors">
                         {client.name}
                       </p>
                     </div>
@@ -754,11 +754,11 @@ export function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 onClick={() => navigate('/profile')}
-                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 md:row-span-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 sm:p-8 relative overflow-hidden group hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 md:row-span-2 bg-accent rounded-3xl p-6 sm:p-8 relative overflow-hidden group hover:shadow-2xl hover:shadow-accent/30 transition-all duration-300 cursor-pointer"
               >
                 <div className="absolute top-8 right-8 w-32 h-32 bg-white/10 rounded-full" />
                 <div className="relative z-10">
-                  <Users className="w-10 h-10 text-background/80 mb-4" />
+                  <Users className="w-10 h-10 text-white/90 mb-4" />
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Monument Extended', serif" }}>
                     Student Information System
                   </h2>
@@ -775,14 +775,14 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
                 onClick={() => navigate('/courses')}
-                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 bg-foreground/5 dark:bg-foreground/10 border-2 border-accent/20 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:border-accent/40 transition-all duration-300 cursor-pointer"
               >
-                <BookOpen className="w-10 h-10 text-white/80" />
+                <BookOpen className="w-10 h-10 text-accent" />
                 <div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic" }}>
+                  <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3" style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic" }}>
                     Academic Management
                   </h3>
-                  <p className="text-sm text-white/90">
+                  <p className="text-sm text-foreground/70">
                     Complete academic core with catalog, scheduling, curriculum planning and examination management.
                   </p>
                 </div>
