@@ -10,6 +10,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import type { UserRole } from '@/types';
+import { auth, db } from '@/config/firebase';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signInWithPopup, 
+  GoogleAuthProvider 
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { getRolePermissions } from '@/lib/rolePermissions';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -31,46 +40,76 @@ export default function Auth() {
     e.preventDefault();
     setIsLoading(true);
     
-    // TODO: Call Supabase auth with loginEmail, loginPassword, and loginRole
-    // Then store user data in database with their selected role
     try {
-      // const { data, error } = await supabase.auth.signInWithPassword({
-      //   email: loginEmail,
-      //   password: loginPassword,
-      // });
-      // if (!error && data.user) {
-      //   // Store user role in database
-      //   await supabase.from('users').update({ role: loginRole }).eq('id', data.user.id);
-      // }
+      const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+      const user = userCredential.user;
+
+      // Check if user profile exists
+      const docRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        // If user exists in Auth but not in Firestore (rare inconsistency), create profile
+        await setDoc(docRef, {
+          email: user.email,
+          role: loginRole,
+          fullName: 'User', // Placeholder
+          permissions: getRolePermissions(loginRole),
+          createdAt: serverTimestamp(),
+          verified: false,
+          profileComplete: false,
+          semester: null,
+          department: null,
+          avatar: null,
+          organizationId: null
+        });
+      }
       
-      setTimeout(() => {
-        setIsLoading(false);
-        toast.success(`Logged in as ${loginRole}!`);
-        navigate('/dashboard');
-      }, 1000);
-    } catch (error) {
+      toast.success(`Logged in as ${loginRole}!`);
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast.error(error.message || 'Login failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      toast.error('Login failed. Please try again.');
     }
   };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      // TODO: Call Supabase Google OAuth
-      // const { data, error } = await supabase.auth.signInWithOAuth({
-      //   provider: 'google',
-      // });
-      // On success, store user role in database
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
       
-      setTimeout(() => {
-        setIsLoading(false);
-        toast.success(`Logged in with Google as ${loginRole}!`);
-        navigate('/dashboard');
-      }, 1500);
-    } catch (error) {
+      // Check if user profile exists
+      const docRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        // Create new profile if it doesn't exist
+        await setDoc(docRef, {
+          email: user.email,
+          role: loginRole,
+          fullName: user.displayName || 'User',
+          permissions: getRolePermissions(loginRole),
+          createdAt: serverTimestamp(),
+          verified: false,
+          profileComplete: false,
+          semester: null,
+          department: null,
+          avatar: user.photoURL,
+          organizationId: null
+        });
+      }
+
+      toast.success(`Logged in with Google as ${loginRole}!`);
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      toast.error(error.message || 'Google login failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      toast.error('Google login failed. Please try again.');
     }
   };
 
@@ -78,54 +117,69 @@ export default function Auth() {
     e.preventDefault();
     setIsLoading(true);
     
-    // TODO: Call Supabase auth to create new account
-    // Then store user data in database with their selected role
     try {
-      // const { data, error } = await supabase.auth.signUp({
-      //   email: signupEmail,
-      //   password: signupPassword,
-      // });
-      // if (!error && data.user) {
-      //   // Store user data and role in database
-      //   await supabase.from('users').insert({
-      //     id: data.user.id,
-      //     name: signupName,
-      //     email: signupEmail,
-      //     role: signupRole,
-      //   });
-      // }
+      const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
+      const user = userCredential.user;
+
+      // Create user profile
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        role: signupRole,
+        fullName: signupName,
+        permissions: getRolePermissions(signupRole),
+        createdAt: serverTimestamp(),
+        verified: false,
+        profileComplete: false,
+        semester: null,
+        department: null,
+        avatar: null,
+        organizationId: null
+      });
       
-      setTimeout(() => {
-        setIsLoading(false);
-        toast.success('Account created successfully!');
-        navigate('/onboarding');
-      }, 1000);
-    } catch (error) {
+      toast.success('Account created successfully!');
+      // Navigate to profile setup or dashboard
+      navigate('/dashboard'); 
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      toast.error(error.message || 'Signup failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      toast.error('Signup failed. Please try again.');
     }
   };
 
   const handleGoogleSignup = async () => {
     setIsLoading(true);
     try {
-      // TODO: Call Supabase Google OAuth for signup
-      // const { data, error } = await supabase.auth.signInWithOAuth({
-      //   provider: 'google',
-      //   options: {
-      //     redirectTo: `${window.location.origin}/auth?role=${signupRole}`,
-      //   },
-      // });
-      // On success, store user with selected role in database
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const docRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        await setDoc(docRef, {
+          email: user.email,
+          role: signupRole,
+          fullName: user.displayName || 'User',
+          permissions: getRolePermissions(signupRole),
+          createdAt: serverTimestamp(),
+          verified: false,
+          profileComplete: false,
+          semester: null,
+          department: null,
+          avatar: user.photoURL,
+          organizationId: null
+        });
+      }
       
-      setTimeout(() => {
-        setIsLoading(false);
-        toast.success('Account created with Google!');
-        navigate('/onboarding');
-      }, 1500);
-    } catch (error) {
+      toast.success('Account created with Google!');
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error("Google signup error:", error);
+      toast.error(error.message || 'Google signup failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      toast.error('Google signup failed. Please try again.');
     }
   };
 

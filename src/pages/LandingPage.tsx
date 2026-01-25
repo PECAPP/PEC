@@ -34,6 +34,7 @@ import {
   Twitter,
   Instagram,
   Building2,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,7 +48,7 @@ import { WobbleCard } from "@/components/ui/wobble-card";
 import GradualBlur from "@/components/ui/GradualBlur";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import ScrollReveal from "@/components/animations/ScrollReveal";
+import DemoDashboard from './DemoDashboard';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
@@ -287,7 +288,7 @@ export function LandingPage() {
       {/* Animated Meshy Gradient Background - Full Page */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         {/* Base gradient background - theme aware */}
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-background to-primary/5" />
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/3 via-background to-primary/3" />
         
         {/* Mesh Gradient Blobs - Subtle and elegant, theme-aware */}
         <motion.div
@@ -301,7 +302,7 @@ export function LandingPage() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-0 left-0 w-[600px] h-[600px] bg-accent rounded-full blur-3xl opacity-30"
+          className="absolute top-0 left-0 w-[600px] h-[600px] bg-accent rounded-full blur-3xl opacity-10 dark:opacity-20"
         />
         <motion.div
           animate={{
@@ -314,7 +315,7 @@ export function LandingPage() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-3xl opacity-25"
+          className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-3xl opacity-8 dark:opacity-18"
         />
         <motion.div
           animate={{
@@ -327,7 +328,7 @@ export function LandingPage() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute bottom-0 left-1/4 w-[550px] h-[550px] bg-accent rounded-full blur-3xl opacity-35"
+          className="absolute bottom-0 left-1/4 w-[550px] h-[550px] bg-accent rounded-full blur-3xl opacity-12 dark:opacity-25"
         />
         <motion.div
           animate={{
@@ -340,7 +341,7 @@ export function LandingPage() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-primary rounded-full blur-3xl opacity-28"
+          className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-primary rounded-full blur-3xl opacity-10 dark:opacity-20"
         />
         <motion.div
           animate={{
@@ -384,7 +385,7 @@ export function LandingPage() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 + 0.3 }}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-300 relative group"
+                  className="text-sm font-semibold text-foreground/90 hover:text-foreground transition-all duration-300 relative group"
                 >
                   {link}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300" />
@@ -485,7 +486,7 @@ export function LandingPage() {
           {/* Subtitle */}
           <motion.p
             variants={item}
-            className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-12"
+            className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-12"
           >
             Manage everything from one intuitive interface. Built for modern educational institutions.
           </motion.p>
@@ -498,7 +499,7 @@ export function LandingPage() {
             <Button
               size="lg"
               asChild
-              className="magnetic-btn group rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-2xl shadow-accent/30 hover:shadow-accent/50 transition-all duration-300 px-8 py-6 text-base font-bold"
+              className="magnetic-btn group rounded-full bg-accent hover:bg-accent/90 text-white dark:text-black font-bold shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 text-base"
               aria-label="Start your free trial of OmniFlow"
             >
               <Link to="/onboarding" className="flex items-center gap-3">
@@ -510,22 +511,13 @@ export function LandingPage() {
               size="lg"
               variant="outline"
               asChild
-              className="magnetic-btn group rounded-full border-2 border-primary/50 hover:border-primary/80 hover:bg-primary/10 transition-all duration-300 px-8 py-6 text-base font-semibold"
+              className="magnetic-btn group rounded-full border-2 border-foreground/20 hover:border-accent hover:bg-accent/10 transition-all duration-300 px-8 py-6 text-base font-semibold text-foreground"
               aria-label="Apply to onboard your institution"
             >
               <Link to="/apply-institution" className="flex items-center gap-3">
                 <Building2 className="w-5 h-5" />
                 Apply as Institution
               </Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="magnetic-btn group rounded-full border-2 border-accent/50 hover:border-accent/80 hover:bg-accent/10 transition-all duration-300 px-8 py-6 text-base font-semibold"
-              aria-label="Watch a demo video of OmniFlow"
-            >
-              <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              Watch Demo
             </Button>
           </motion.div>
         </motion.div>
@@ -537,37 +529,37 @@ export function LandingPage() {
           transition={{ delay: 0.5, duration: 0.6 }}
           style={{
             scale: useTransform(scrollYProgress, [0, 0.3], [1.15, 0.75]),
-            opacity: useTransform(scrollYProgress, [0, 0.3], [1, 0.4]),
+            opacity: useTransform(scrollYProgress, [0, 0.3], [1, 0.7]),
           }}
-          className="mt-40 max-w-5xl mx-auto"
+          className="mt-40 w-full overflow-x-auto"
         >
-          <div className="relative rounded-2xl border border-border bg-card p-2 shadow-xl overflow-hidden">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border shadow-lg z-10">
-              <div className="w-3 h-3 rounded-full bg-destructive" />
-              <div className="w-3 h-3 rounded-full bg-warning" />
-              <div className="w-3 h-3 rounded-full bg-success" />
+          <div className="min-w-[1440px] mx-auto max-w-7xl">
+            <div className="relative rounded-2xl border border-border bg-card p-2 shadow-xl overflow-hidden">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border shadow-lg z-10">
+                <div className="w-3 h-3 rounded-full bg-destructive" />
+                <div className="w-3 h-3 rounded-full bg-warning" />
+                <div className="w-3 h-3 rounded-full bg-success" />
+              </div>
+              <style>{`
+                iframe {
+                  scrollbar-width: none;
+                }
+                iframe::-webkit-scrollbar {
+                  display: none;
+                }
+              `}</style>
+              <div className="rounded-xl w-full h-[800px] overflow-hidden border border-border/30 bg-background">
+                <DemoDashboard />
+              </div>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-card/100 to-transparent pointer-events-none" />
             </div>
-            <style>{`
-              iframe {
-                scrollbar-width: none;
-              }
-              iframe::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
-            <iframe
-              src="/demo-dashboard"
-              className="rounded-xl w-full h-[500px] border-0"
-              title="OmniFlow Dashboard Live Demo"
-              scrolling="no"
-            />
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-card/100 to-transparent pointer-events-none" />
           </div>
         </motion.div>
       </section>
 
       {/* Social Proof - Client Logos & Recently Adopted */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-secondary/30 relative overflow-hidden">
+      {/* Integrations - Light Accent BG */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/5 dark:bg-accent/10 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -619,7 +611,7 @@ export function LandingPage() {
                           className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 dark:invert dark:group-hover:invert-0 dark:mix-blend-screen dark:group-hover:mix-blend-normal transition-all duration-300"
                         />
                       </div>
-                      <p className="text-xs font-medium text-muted-foreground group-hover:text-foreground dark:group-hover:text-black transition-colors">
+                      <p className="text-xs font-medium text-foreground/80 group-hover:text-foreground dark:group-hover:text-black transition-colors">
                         {client.name}
                       </p>
                     </div>
@@ -648,7 +640,7 @@ export function LandingPage() {
                           className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 dark:invert dark:group-hover:invert-0 dark:mix-blend-screen dark:group-hover:mix-blend-normal transition-all duration-300"
                         />
                       </div>
-                      <p className="text-xs font-medium text-muted-foreground group-hover:text-foreground dark:group-hover:text-black transition-colors">
+                      <p className="text-xs font-medium text-foreground/80 group-hover:text-foreground dark:group-hover:text-black transition-colors">
                         {client.name}
                       </p>
                     </div>
@@ -660,118 +652,78 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Key Benefits Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-accent/5 to-background" />
-        <div className="max-w-7xl mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm mb-6">
-                <Zap className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium text-accent">Key Benefits</span>
-              </div>
-              <h2 className="text-4xl sm:text-5xl font-bold mb-6 leading-tight" style={{ fontFamily: "'Monument Extended', serif" }}>
-                Why Institutions Choose{" "}
-                <span className="text-gradient">
-                  OmniFlow
-                </span>
-              </h2>
-              <p className="text-lg text-muted-foreground mb-10 leading-relaxed">
-                Built by educators and technologists who understand the challenges of running modern educational institutions. Here's what makes OmniFlow different.
-              </p>
+      {/* Key Benefits Section - Minimal Design */}
+      {/* Why OmniFlow - Light Accent BG */}
+      <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-accent/5 dark:bg-accent/10">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
+              Why{" "}
+              <span className="text-accent">OmniFlow</span>
+            </h2>
+            <p className="text-xl text-foreground/80 max-w-2xl mx-auto">
+              The all-in-one platform trusted by leading institutions
+            </p>
+          </motion.div>
 
-              {/* Benefits List */}
-              <div className="space-y-6">
-                {[
-                  {
-                    icon: Zap,
-                    title: "Save 60% Admin Time",
-                    desc: "Automate repetitive tasks like attendance, fee reminders, and report generation."
-                  },
-                  {
-                    icon: Server,
-                    title: "Unified Data Platform",
-                    desc: "No more scattered spreadsheets — all your institutional data in one secure place."
-                  },
-                  {
-                    icon: TrendingUp,
-                    title: "Real-time Analytics",
-                    desc: "Make data-driven decisions with live dashboards and comprehensive reports."
-                  },
-                  {
-                    icon: Shield,
-                    title: "Role-Based Access",
-                    desc: "Secure access control for admins, faculty, students, and recruiters with tailored dashboards."
-                  }
-                ].map((benefit, i) => (
-                  <motion.div
-                    key={benefit.title}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex gap-4 group"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 transition-all">
-                      <benefit.icon className="w-6 h-6 text-accent" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg mb-1">{benefit.title}</h3>
-                      <p className="text-sm text-muted-foreground">{benefit.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Right - Stats Grid */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="grid grid-cols-2 gap-4 sm:gap-6">
-                {[
-                  { value: 60, label: "Less Admin Work", gradient: "from-secondary to-secondary/50", suffix: "%" },
-                  { value: 99.9, label: "Uptime SLA", gradient: "from-secondary to-secondary/50", suffix: "%", decimals: 1 },
-                  { value: 24, label: "Support Available", gradient: "from-secondary to-secondary/50", suffix: "/7" },
-                  { value: 500, label: "Institutions Trust Us", gradient: "from-secondary to-secondary/50", suffix: "+" }
-                ].map((stat, i) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    whileHover={{ y: -5, scale: 1.02 }}
-                    className={`bg-gradient-to-br ${stat.gradient} backdrop-blur-sm border border-border rounded-2xl p-6 sm:p-8 text-center hover:border-accent/40 transition-all duration-300`}
-                  >
-                    <div className="text-4xl sm:text-5xl font-bold mb-2 text-gradient" style={{ fontFamily: "'Monument Extended', serif" }}>
-                      <AnimatedCounter 
-                        end={stat.value} 
-                        suffix={stat.suffix || ''} 
-                        decimals={stat.decimals || 0}
-                        duration={2.5}
-                      />
-                    </div>
-                    <div className="text-sm text-muted-foreground font-medium">
-                      {stat.label}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-2 gap-6 mt-12">
+            {[
+              {
+                icon: Zap,
+                title: "Automate Everything",
+                desc: "From attendance to fee collection, automate repetitive tasks and save hours every week."
+              },
+              {
+                icon: Server,
+                title: "One Platform",
+                desc: "Replace scattered spreadsheets with a unified system for all your institutional data."
+              },
+              {
+                icon: BarChart3,
+                title: "Live Analytics",
+                desc: "Real-time dashboards and reports to make data-driven decisions instantly."
+              },
+              {
+                icon: Shield,
+                title: "Secure Access",
+                desc: "Role-based permissions ensure everyone sees only what they need."
+              }
+            ].map((feature, i) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="group p-8 rounded-2xl border border-border hover:border-accent/50 bg-card hover:bg-accent/5 transition-all duration-300 hover:shadow-lg"
+              >
+                <div className="flex items-start gap-5">
+                  <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 group-hover:scale-105 transition-all">
+                    <feature.icon className="w-7 h-7 text-accent" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-foreground mb-3">
+                      {feature.title}
+                    </h3>
+                    <p className="text-foreground/70 leading-relaxed">
+                      {feature.desc}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Bento Grid - Normal BG */}
       <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-accent/5 to-background -z-10" />
         
@@ -788,7 +740,7 @@ export function LandingPage() {
                 Manage Education
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
               From admissions to placements, our platform covers every aspect of
               institutional management with cutting-edge technology.
             </p>
@@ -808,7 +760,7 @@ export function LandingPage() {
               >
                 <div className="absolute top-8 right-8 w-32 h-32 bg-white/10 rounded-full" />
                 <div className="relative z-10">
-                  <Users className="w-10 h-10 text-background/80 mb-4" />
+                  <Users className="w-10 h-10 text-white/90 mb-4" />
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Monument Extended', serif" }}>
                     Student Information System
                   </h2>
@@ -827,7 +779,7 @@ export function LandingPage() {
                 onClick={() => navigate('/courses')}
                 className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 cursor-pointer"
               >
-                <BookOpen className="w-10 h-10 text-white/80" />
+                <BookOpen className="w-10 h-10 text-white/90" />
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic" }}>
                     Academic Management
@@ -847,12 +799,12 @@ export function LandingPage() {
                 onClick={() => navigate('/attendance')}
                 className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-emerald-500/30 transition-all duration-300 cursor-pointer"
               >
-                <ClipboardCheck className="w-9 h-9 text-white/80" />
+                <ClipboardCheck className="w-9 h-9 text-white/90" />
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Monument Extended', serif" }}>
                     Attendance Tracking
                   </h3>
-                  <p className="text-xs text-white/90">
+                  <p className="text-sm text-white/90">
                     Biometric & QR-based with alerts
                   </p>
                 </div>
@@ -960,8 +912,8 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Role-Based Access Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative">
+      {/* Role-Based Access - Light Accent BG */}
+      <section className="py-32 px-4 sm:px-6 lg:px-8 relative bg-accent/5 dark:bg-accent/10">
         <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5" />
         <div className="max-w-7xl mx-auto relative">
           <motion.div
@@ -980,7 +932,7 @@ export function LandingPage() {
                 Every User
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
               Each stakeholder gets a personalized dashboard with features relevant to their role.
             </p>
           </motion.div>
@@ -1059,7 +1011,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* How it Works - Timeline Design */}
+      {/* How it Works - Normal BG */}
       <section
         id="how-it-works"
         className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
@@ -1084,7 +1036,7 @@ export function LandingPage() {
                 3 Easy Steps
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
               From signup to going live in under 10 minutes. No credit card required.
             </p>
           </motion.div>
@@ -1149,8 +1101,8 @@ export function LandingPage() {
                   >
                     <div className="flex items-start gap-4 mb-3 md:mb-4">
                       <div className="flex-1">
-                        <h3 className="text-lg md:text-2xl font-bold mb-1 md:mb-2">{step.title}</h3>
-                        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 text-foreground">{step.title}</h3>
+                        <p className="text-sm md:text-base text-foreground/70 leading-relaxed">
                           {step.description}
                         </p>
                       </div>
@@ -1210,7 +1162,7 @@ export function LandingPage() {
             <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
               Connect With <span className="text-gradient">Your Tools</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
               Seamlessly integrate with your existing systems and third-party services
             </p>
           </motion.div>
@@ -1288,12 +1240,13 @@ export function LandingPage() {
       </section>
 
       {/* Testimonials */}
+      {/* Testimonials - Normal BG */}
       <section id="testimonials" className="py-20 bg-background relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
           <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
              Real Results, <span className="text-accent">Real Time Saved</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-foreground/80">
             See how institutions cut admin work by 80% in the first 3 months.
           </p>
         </div>
@@ -1301,7 +1254,8 @@ export function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative">
+      {/* Pricing - Light Accent BG */}
+      <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative bg-accent/5 dark:bg-accent/10">
         <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-primary/5 -z-10" />
         
         <div className="max-w-7xl mx-auto">
@@ -1318,7 +1272,7 @@ export function LandingPage() {
             <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
               Plans for Every Institution
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
               Start free. Scale as you grow. No hidden fees, no surprises.
             </p>
           </motion.div>
@@ -1599,8 +1553,8 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative">
+      {/* FAQ - Light Accent BG */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/5 dark:bg-accent/10 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5 -z-10" />
         
         <div className="max-w-4xl mx-auto">
@@ -1613,7 +1567,7 @@ export function LandingPage() {
             <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
               Frequently Asked Questions
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-foreground/80">
               Everything you need to know about getting started with OmniFlow
             </p>
           </motion.div>
@@ -1651,9 +1605,9 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Final CTA - Normal BG */}
       <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-primary/10 to-accent/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-accent/10 via-transparent to-transparent -z-10" />
         <FloatingParticles />
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div
@@ -1667,7 +1621,7 @@ export function LandingPage() {
                 on spreadsheets
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/80 mb-10 leading-relaxed max-w-2xl mx-auto">
               Join 500+ institutions saving 2000+ hours annually on admin work. No credit card needed. Free 14-day trial.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -1689,7 +1643,7 @@ export function LandingPage() {
                 Schedule a Demo
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-6">
+            <p className="text-xs text-foreground/70 mt-6">
               14-day free trial. All features included. No credit card required.
             </p>
           </motion.div>

@@ -13,6 +13,9 @@ import {
   BookOpen,
   Upload,
   Download,
+  Crown,
+  MoreVertical,
+  Shield,
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -25,6 +28,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { onAuthStateChanged } from 'firebase/auth';
 import { 
   collection, 
@@ -290,6 +300,55 @@ export default function Faculty() {
     }
   };
 
+  const promoteToHOD = async (fac: any) => {
+    if (!fac.department) {
+      toast.error('Faculty must have a department assigned first');
+      return;
+    }
+    
+    try {
+      // Update faculty profile with HOD designation
+      await updateDoc(doc(db, 'facultyProfiles', fac.id), {
+        designation: 'Head of Department',
+        isHOD: true,
+        updatedAt: serverTimestamp(),
+      });
+
+      // Update the department to set this faculty as HOD
+      const deptQuery = query(collection(db, 'departments'), where('name', '==', fac.department));
+      const deptSnap = await getDocs(deptQuery);
+      
+      if (!deptSnap.empty) {
+        const deptDoc = deptSnap.docs[0];
+        await updateDoc(doc(db, 'departments', deptDoc.id), {
+          hodId: fac.id,
+          hodName: fac.fullName,
+          updatedAt: serverTimestamp(),
+        });
+      }
+
+      toast.success(`${fac.fullName} promoted to HOD of ${fac.department}!`);
+      fetchFaculty();
+    } catch (error) {
+      console.error('Error promoting to HOD:', error);
+      toast.error('Failed to promote to HOD');
+    }
+  };
+
+  const promoteToPlacementOfficer = async (fac: any) => {
+    try {
+      await updateDoc(doc(db, 'users', fac.id), {
+        role: 'placement_officer',
+        updatedAt: serverTimestamp(),
+      });
+      toast.success(`${fac.fullName} is now a Placement Officer!`);
+      fetchFaculty();
+    } catch (error) {
+      console.error('Error promoting to TPO:', error);
+      toast.error('Failed to promote to Placement Officer');
+    }
+  };
+
   const resetForm = () => {
     setFacultyForm({
       fullName: '',
@@ -431,13 +490,32 @@ export default function Faculty() {
                       <Badge variant={fac.status === 'active' ? 'default' : 'secondary'}>{fac.status || 'active'}</Badge>
                     </td>
                     <td className="p-4">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" size="sm" onClick={() => openEditDialog(fac)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(fac.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => promoteToHOD(fac)}>
+                              <Crown className="w-4 h-4 mr-2 text-yellow-500" />
+                              Promote to HOD
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => promoteToPlacementOfficer(fac)}>
+                              <Shield className="w-4 h-4 mr-2 text-blue-500" />
+                              Make Placement Officer
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(fac.id)}>
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete Faculty
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </td>
                   </tr>

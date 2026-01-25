@@ -359,3 +359,388 @@ export interface Todo {
   createdAt: any;
   updatedAt: any;
 }
+
+export interface Assignment {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string;
+  dueDate: any;
+  totalPoints: number;
+  status: 'active' | 'archived';
+  courseCode?: string; // Optional for UI display
+  courseName?: string; // Optional for UI display
+}
+
+export interface Submission {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  submittedAt: any;
+  content: string;
+  attachments?: string[];
+  grade?: number;
+  feedback?: string;
+  status: 'submitted' | 'graded' | 'late';
+}
+
+export interface Grade {
+  id: string;
+  studentId: string;
+  courseId: string;
+  gradePoints: number;
+  credits?: number; // Optional as it might come from Course
+  type: 'midterm' | 'final' | 'assignment';
+}
+
+// ========================================
+// Placement & Job Board Types
+// ========================================
+
+export interface Skill {
+  name: string;
+  proficiency: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  yearsOfExperience?: number;
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  technologies: string[];
+  githubUrl?: string;
+  liveUrl?: string;
+  startDate: string;
+  endDate?: string;
+  isOngoing: boolean;
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  issuingOrganization: string;
+  issueDate: string;
+  expiryDate?: string;
+  credentialId?: string;
+  credentialUrl?: string;
+}
+
+export interface WorkExperience {
+  id: string;
+  companyName: string;
+  role: string;
+  type: 'internship' | 'part-time' | 'full-time' | 'freelance';
+  startDate: string;
+  endDate?: string;
+  isCurrentRole: boolean;
+  description: string;
+  location: string;
+}
+
+export interface PlacementProfile {
+  id: string;
+  userId: string;
+  // Academic Details
+  enrollmentNumber: string;
+  department: string;
+  semester: number;
+  cgpa: number;
+  backlogs: number;
+  // Skills & Profile
+  skills: Skill[];
+  projects: Project[];
+  certifications: Certification[];
+  workExperience: WorkExperience[];
+  // Documents
+  resumeUrl?: string;
+  resumeUpdatedAt?: any;
+  isResumePublic?: boolean;
+  // Career Preferences
+  preferredJobTypes: ('full-time' | 'internship' | 'part-time')[];
+  preferredLocations: string[];
+  expectedSalary?: {
+    min: number;
+    max: number;
+    currency: string;
+  };
+  willingToRelocate: boolean;
+  // Readiness
+  isProfileComplete: boolean;
+  placementReadinessScore: number; // 0-100
+  // Meta
+  createdAt: any;
+  updatedAt: any;
+}
+
+export interface EligibilityCriteria {
+  minCgpa?: number;
+  maxBacklogs?: number;
+  allowedDepartments?: string[];
+  allowedBatches?: string[];
+  requiredSkills?: string[];
+  minProjects?: number;
+}
+
+export interface InterviewRound {
+  id: string;
+  name: string;
+  type: 'aptitude' | 'technical' | 'hr' | 'coding' | 'group-discussion' | 'other';
+  description?: string;
+  duration?: number; // in minutes
+  order: number;
+}
+
+export interface CompensationDetails {
+  baseSalary: string;
+  bonus?: string;
+  joiningBonus?: string;
+  stockOptions?: string;
+  benefits?: string[];
+}
+
+export interface ExtendedJob {
+  id: string;
+  title: string;
+  companyName: string;
+  companyLogo?: string;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+  location: string;
+  locationType: 'onsite' | 'remote' | 'hybrid';
+  type: 'full-time' | 'internship' | 'part-time';
+  // Compensation
+  salary: string;
+  compensation?: CompensationDetails;
+  // Eligibility
+  eligibility: EligibilityCriteria;
+  // Interview Process
+  interviewRounds: InterviewRound[];
+  // Dates
+  deadline: any;
+  postedAt: any;
+  // Status
+  status: 'draft' | 'open' | 'closed' | 'filled';
+  // Counts
+  applicationsCount: number;
+  shortlistedCount: number;
+  hiredCount: number;
+  // Meta
+  tags: string[];
+  recruiterId: string;
+  organizationId?: string;
+  createdAt: any;
+  updatedAt: any;
+}
+
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  studentId: string;
+  // Student Info (denormalized for quick access)
+  studentName: string;
+  studentEmail: string;
+  studentDepartment: string;
+  studentCgpa: number;
+  // Application Data
+  resumeUrl: string;
+  coverLetter?: string;
+  // Status Tracking
+  status: 'applied' | 'under-review' | 'shortlisted' | 'interview-scheduled' | 'interviewed' | 'offered' | 'hired' | 'rejected' | 'withdrawn';
+  currentRound?: number;
+  // Feedback
+  feedback?: string;
+  internalNotes?: string;
+  // Dates
+  appliedAt: any;
+  lastUpdatedAt: any;
+  // Interview
+  interviewSchedule?: InterviewSchedule[];
+}
+
+export interface InterviewSchedule {
+  id: string;
+  applicationId: string;
+  jobId: string;
+  studentId: string;
+  // Interview Details
+  roundNumber: number;
+  roundName: string;
+  roundType: InterviewRound['type'];
+  // Schedule
+  scheduledDate: any;
+  startTime: string;
+  endTime: string;
+  duration: number; // in minutes
+  // Location/Meeting
+  mode: 'in-person' | 'video-call' | 'phone';
+  location?: string; // For in-person
+  meetingLink?: string; // For video calls
+  // Participants
+  interviewerIds?: string[];
+  interviewerNames?: string[];
+  // Status & Outcome
+  status: 'scheduled' | 'completed' | 'cancelled' | 'rescheduled' | 'no-show';
+  outcome?: 'passed' | 'failed' | 'pending';
+  feedback?: string;
+  score?: number;
+  // Meta
+  createdAt: any;
+  updatedAt: any;
+}
+
+export interface Offer {
+  id: string;
+  applicationId: string;
+  jobId: string;
+  studentId: string;
+  recruiterId: string;
+  // Offer Details
+  jobTitle: string;
+  companyName: string;
+  location: string;
+  // Compensation
+  compensation: CompensationDetails;
+  // Dates
+  joiningDate: string;
+  offerValidTill: string;
+  offeredAt: any;
+  // Status
+  status: 'pending' | 'accepted' | 'rejected' | 'expired' | 'revoked';
+  respondedAt?: any;
+  // Documents
+  offerLetterUrl?: string;
+  signedOfferUrl?: string;
+  // Notes
+  notes?: string;
+  rejectionReason?: string;
+  // Meta
+  createdAt: any;
+  updatedAt: any;
+}
+
+export interface PlacementDrive {
+  id: string;
+  companyName: string;
+  companyLogo?: string;
+  role: string;
+  description: string;
+  // Schedule
+  date: any;
+  venue: string;
+  rounds: InterviewRound[];
+  // Eligibility
+  eligibility: EligibilityCriteria;
+  batch: string;
+  // Compensation
+  salary: string;
+  compensation?: CompensationDetails;
+  // Status
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  // Registration
+  registeredStudents: string[];
+  registeredCount: number;
+  maxRegistrations?: number;
+  registrationDeadline: any;
+  // Results
+  shortlistedStudents?: string[];
+  selectedStudents?: string[];
+  // Contact
+  contactPerson: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  // Meta
+  organizationId?: string;
+  createdBy: string;
+  createdAt: any;
+  updatedAt: any;
+}
+
+export interface CompanyPartnership {
+  id: string;
+  companyName: string;
+  companyLogo?: string;
+  industry: string;
+  website?: string;
+  // Contact
+  primaryContactName: string;
+  primaryContactEmail: string;
+  primaryContactPhone?: string;
+  // Partnership Details
+  partnershipType: 'regular' | 'premium' | 'exclusive';
+  partnershipStartDate: string;
+  partnershipEndDate?: string;
+  isActive: boolean;
+  // History
+  totalHires: number;
+  totalDrives: number;
+  averagePackage?: string;
+  lastDriveDate?: any;
+  // Status
+  verificationStatus: 'pending' | 'verified' | 'rejected' | 'blacklisted';
+  verifiedAt?: any;
+  verifiedBy?: string;
+  // Notes
+  notes?: string;
+  // Meta
+  organizationId?: string;
+  createdAt: any;
+  updatedAt: any;
+}
+
+export interface PlacementStats {
+  // Overall Stats
+  totalStudents: number;
+  placedStudents: number;
+  placementPercentage: number;
+  // Package Stats
+  highestPackage: string;
+  averagePackage: string;
+  medianPackage: string;
+  // Company Stats
+  totalCompanies: number;
+  totalOffers: number;
+  // Department-wise
+  departmentStats: {
+    department: string;
+    total: number;
+    placed: number;
+    percentage: number;
+    avgPackage: string;
+  }[];
+  // Package Distribution
+  packageDistribution: {
+    range: string; // e.g., "0-5 LPA", "5-10 LPA"
+    count: number;
+  }[];
+  // Year/Batch
+  year: number;
+  batch: string;
+  // Meta
+  lastUpdated: any;
+}
+
+export interface PlacementSettings {
+  id: string;
+  organizationId: string;
+  // CGPA Requirements
+  minCgpaForPlacements: number;
+  maxBacklogsAllowed: number;
+  // Resume Settings
+  mandatoryResumeFields: string[];
+  allowedResumeFormats: string[];
+  maxResumeSize: number; // in MB
+  // Timeline
+  placementSeasonStart: string;
+  placementSeasonEnd: string;
+  // Company Settings
+  requireCompanyVerification: boolean;
+  companyVerificationDocuments: string[];
+  // Notifications
+  notifyOnNewJob: boolean;
+  notifyOnApplicationUpdate: boolean;
+  notifyOnDriveRegistration: boolean;
+  // Meta
+  updatedAt: any;
+  updatedBy: string;
+}

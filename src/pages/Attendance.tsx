@@ -132,7 +132,7 @@ function AttendanceManager({ userId, userRole }: { userId: string; userRole: str
 
   const fetchCourses = async () => {
     try {
-      let q = query(collection(db, 'courses'));
+      const q = query(collection(db, 'courses'));
       const snapshot = await getDocs(q);
       let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       

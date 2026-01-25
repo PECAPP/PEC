@@ -7,8 +7,16 @@ import {
   TrendingUp, 
   Clock,
   ArrowUpRight,
-  GraduationCap
+  GraduationCap,
+  LayoutDashboard,
+  FileText,
+  DollarSign,
+  MessageSquare,
+  Settings,
+  BarChart3,
+  Building
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const container = {
   hidden: { opacity: 0 },
@@ -23,15 +31,55 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
+const navItems = [
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/demo', active: true },
+  { icon: FileText, label: 'Assignments', path: '/assignments' },
+  { icon: Calendar, label: 'Timetable', path: '/timetable' },
+  { icon: BookOpen, label: 'Courses', path: '/courses' },
+  { icon: CheckCircle, label: 'Attendance', path: '/attendance' },
+  { icon: BarChart3, label: 'Performance', path: '/examinations' },
+  { icon: DollarSign, label: 'Finance', path: '/finance' },
+  { icon: MessageSquare, label: 'Chat', path: '/chat' },
+  { icon: Building, label: 'Placements', path: '/placements' },
+  { icon: Settings, label: 'Settings', path: '/settings' },
+];
+
 export default function DemoDashboard() {
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="space-y-6 max-w-7xl mx-auto"
-      >
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card">
+        <div className="p-6">
+          <h2 className="text-lg font-bold">OmniFlow Demo</h2>
+          <p className="text-xs text-muted-foreground mt-1">Student Portal</p>
+        </div>
+        <nav className="flex-1 px-3 space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.path}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                item.active
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              }`}
+            >
+              <item.icon className="w-4 h-4" />
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-4 sm:p-6 lg:p-8">
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="space-y-6 max-w-7xl mx-auto"
+          >
         {/* Mock Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -173,6 +221,8 @@ export default function DemoDashboard() {
           </div>
         </div>
       </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

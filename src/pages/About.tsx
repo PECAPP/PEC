@@ -179,44 +179,44 @@ const values = [
 
 const faqs = [
   {
-    question: "What is OmniFlow?",
+    question: "What makes OmniFlow different from other college management systems?",
     answer:
-      "OmniFlow is a comprehensive ERP solution designed specifically for educational institutions. It combines student management, academics, finance, attendance tracking, and placement services into a single unified platform.",
+      "OmniFlow is built by educators and technologists who actually understand college operations. Unlike generic ERPs, we focus on the real pain points - from simplifying attendance tracking to automating fee reminders. Everything is designed to save you time, not add more complexity.",
   },
   {
-    question: "How long does implementation take?",
+    question: "How quickly can we get started?",
     answer:
-      "Most institutions are fully onboarded within 2-4 weeks. Our dedicated implementation team handles data migration, training, and configuration to ensure a smooth transition with minimal disruption to your operations.",
+      "Most colleges go live in 2-4 weeks. We handle all the heavy lifting - data migration, system setup, and training. Your team can focus on running the college while we ensure a smooth launch with zero disruption to classes or operations.",
   },
   {
-    question: "Can OmniFlow integrate with our existing systems?",
+    question: "Will this work with our existing tools?",
     answer:
-      "Yes, OmniFlow offers robust API integrations and supports connections with popular LMS platforms, payment gateways, HR systems, and more. Our team can help you plan and execute custom integrations as needed.",
+      "Yes! OmniFlow integrates seamlessly with popular tools you're already using - Google Classroom, payment gateways, library systems, and more. If you have a specific system, our team will build custom integrations to make everything work together.",
   },
   {
-    question: "Is my institution's data secure?",
+    question: "How secure is student and institutional data?",
     answer:
-      "Absolutely. We employ enterprise-grade security including end-to-end encryption, role-based access controls, regular security audits, and daily automated backups. We are SOC 2 Type II certified and GDPR compliant.",
+      "Extremely secure. We use bank-level encryption, role-based access controls, and automatic daily backups. Your data is stored in certified data centers with 99.9% uptime. We're SOC 2 Type II certified and fully GDPR compliant.",
   },
   {
-    question: "What kind of support do you offer?",
+    question: "What if we need help or run into issues?",
     answer:
-      "We provide 24/7 support via chat, email, and phone. All plans include access to our knowledge base, video tutorials, and community forums. Business and Enterprise plans receive dedicated account managers.",
+      "Our support team is available 24/7 via chat, email, and phone. You also get access to video tutorials, detailed guides, and a community forum. Premium plans include a dedicated account manager who knows your college inside out.",
   },
   {
-    question: "Can OmniFlow scale with our institution?",
+    question: "Can OmniFlow grow with our institution?",
     answer:
-      "OmniFlow is built to scale from small colleges to large universities with multiple campuses. Our infrastructure automatically adjusts to handle growing student populations, additional departments, and increased usage.",
+      "Absolutely. Whether you're a small college today or planning to expand to multiple campuses, OmniFlow scales automatically. Add more departments, students, or features anytime without worrying about performance or additional setup.",
   },
   {
-    question: "Do you offer a free trial?",
+    question: "Can we try it before committing?",
     answer:
-      "Yes, we offer a 14-day free trial with full access to all features. No credit card required. You can also schedule a personalized demo with our team to see how OmniFlow fits your specific needs.",
+      "Yes! Get a 14-day free trial with full feature access - no credit card needed. Want to see it in action first? Book a personalized demo where we'll show you exactly how OmniFlow solves your college's specific challenges.",
   },
   {
-    question: "What training is provided?",
+    question: "Do you provide training for our staff and faculty?",
     answer:
-      "We provide comprehensive training for all user roles including administrators, faculty, and staff. This includes live training sessions, recorded tutorials, user guides, and ongoing webinars for new features.",
+      "Comprehensive training is included for everyone - admins, faculty, students, and staff. We offer live sessions, pre-recorded tutorials, step-by-step guides, and regular webinars when new features launch. Your team will feel confident from day one.",
   },
 ];
 

@@ -143,7 +143,7 @@ function AssignmentsManager({ userId, userRole }: { userId: string; userRole: st
 
   const fetchCourses = async () => {
     try {
-      let q = query(collection(db, 'courses'));
+      const q = query(collection(db, 'courses'));
       const snap = await getDocs(q);
       let data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       

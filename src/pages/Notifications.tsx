@@ -120,57 +120,68 @@ export default function Notifications() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Bell className="w-5 h-5 text-primary" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        {/* Total Stats */}
+        <Card className="border-none shadow-lg bg-gradient-to-br from-blue-600 to-violet-600 text-white overflow-hidden relative group">
+          <CardContent className="pt-6 relative z-10">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm shrink-0">
+                <Bell className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
-              <div>
-                <p className="text-2xl font-bold">{notifications.length}</p>
-                <p className="text-sm text-muted-foreground">Total</p>
+              <div className="text-center sm:text-left">
+                <p className="text-2xl md:text-3xl font-bold">{notifications.length}</p>
+                <p className="text-[10px] md:text-sm text-blue-100 font-medium whitespace-nowrap">Total Notifications</p>
               </div>
             </div>
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all" />
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-foreground/10">
-                <Bell className="w-5 h-5 text-foreground" />
+
+        {/* Unread Stats */}
+        <Card className="border-none shadow-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white overflow-hidden relative group">
+          <CardContent className="pt-6 relative z-10">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm shrink-0">
+                <Bell className="w-5 h-5 md:w-6 md:h-6 text-white animate-pulse" />
               </div>
-              <div>
-                <p className="text-2xl font-bold">{unreadCount}</p>
-                <p className="text-sm text-muted-foreground">Unread</p>
+              <div className="text-center sm:text-left">
+                <p className="text-2xl md:text-3xl font-bold">{unreadCount}</p>
+                <p className="text-[10px] md:text-sm text-amber-100 font-medium whitespace-nowrap">Unread Alerts</p>
               </div>
             </div>
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all" />
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-foreground/5">
-                <Check className="w-5 h-5 text-muted-foreground" />
+
+        {/* Read Stats */}
+        <Card className="border-none shadow-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white overflow-hidden relative group">
+          <CardContent className="pt-6 relative z-10">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm shrink-0">
+                <Check className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
-              <div>
-                <p className="text-2xl font-bold">{notifications.length - unreadCount}</p>
-                <p className="text-sm text-muted-foreground">Read</p>
+              <div className="text-center sm:text-left">
+                <p className="text-2xl md:text-3xl font-bold">{notifications.length - unreadCount}</p>
+                <p className="text-[10px] md:text-sm text-emerald-100 font-medium whitespace-nowrap">Read Messages</p>
               </div>
             </div>
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all" />
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Filter className="w-5 h-5 text-primary" />
+
+        {/* Categories Stats */}
+        <Card className="border-none shadow-lg bg-gradient-to-br from-indigo-500 to-cyan-500 text-white overflow-hidden relative group">
+          <CardContent className="pt-6 relative z-10">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm shrink-0">
+                <Filter className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
-              <div>
-                <p className="text-2xl font-bold">4</p>
-                <p className="text-sm text-muted-foreground">Categories</p>
+              <div className="text-center sm:text-left">
+                <p className="text-2xl md:text-3xl font-bold">4</p>
+                <p className="text-[10px] md:text-sm text-indigo-100 font-medium whitespace-nowrap">Active Categories</p>
               </div>
             </div>
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all" />
           </CardContent>
         </Card>
       </div>
@@ -182,21 +193,23 @@ export default function Notifications() {
           <CardDescription>Click on a notification to mark it as read</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="unread">
-                Unread
-                {unreadCount > 0 && (
-                  <Badge variant="secondary" className="ml-2 h-5 px-1.5">
-                    {unreadCount}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="academic">Academic</TabsTrigger>
-              <TabsTrigger value="placement">Placement</TabsTrigger>
-              <TabsTrigger value="finance">Finance</TabsTrigger>
-            </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="overflow-x-auto pb-2 mb-4 scrollbar-none">
+              <TabsList className="inline-flex h-auto p-1 bg-secondary/50 backdrop-blur-sm border border-border/50">
+                <TabsTrigger value="all" className="px-4 py-2 capitalize transition-all">All</TabsTrigger>
+                <TabsTrigger value="unread" className="px-4 py-2 capitalize transition-all">
+                  Unread
+                  {unreadCount > 0 && (
+                    <Badge variant="secondary" className="ml-2 h-5 px-1.5 bg-primary text-primary-foreground">
+                      {unreadCount}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="academic" className="px-4 py-2 capitalize transition-all">Academic</TabsTrigger>
+                <TabsTrigger value="placement" className="px-4 py-2 capitalize transition-all">Placement</TabsTrigger>
+                <TabsTrigger value="finance" className="px-4 py-2 capitalize transition-all">Finance</TabsTrigger>
+              </TabsList>
+            </div>
 
             <div className="space-y-3">
               {filteredNotifications.length === 0 ? (
@@ -208,44 +221,54 @@ export default function Notifications() {
                 filteredNotifications.map((notification, index) => (
                   <motion.div
                     key={notification.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.01 }}
                     transition={{ delay: index * 0.05 }}
                     className={cn(
-                      'flex items-start gap-4 p-4 rounded-lg border cursor-pointer transition-colors',
+                      'flex items-start gap-4 p-4 rounded-xl border-l-[6px] shadow-sm cursor-pointer transition-all duration-200 group',
                       notification.read 
-                        ? 'bg-card hover:bg-secondary/50' 
-                        : 'bg-secondary/50 hover:bg-secondary'
+                        ? 'bg-card border-l-muted border-y border-r hover:border-r-border/80' 
+                        : 'bg-gradient-to-r from-primary/5 to-transparent border-l-primary border-y border-r border-primary/10'
                     )}
                     onClick={() => {
                       markAsRead(notification.id);
-                      window.location.href = `/notifications/${notification.id}`;
+                      // window.location.href = `/notifications/${notification.id}`; // Optional nav
                     }}
                   >
-                    <div className={cn('p-2 rounded-full border', getTypeStyles(notification.type))}>
-                      <Bell className="w-4 h-4" />
+                    <div className={cn(
+                      'p-2.5 rounded-full shadow-sm shrink-0 mt-1', 
+                      getTypeStyles(notification.type).replace('bg-foreground/10', 'bg-white shadow-inner').replace('text-muted-foreground', 'text-primary')
+                    )}>
+                       {/* Contextual Icon based on category/type logic could go here, defaulting to Bell */}
+                      <Bell className={cn(
+                        "w-5 h-5",
+                        notification.type === 'alert' ? "text-destructive" : 
+                        notification.type === 'success' ? "text-emerald-500" :
+                        notification.type === 'warning' ? "text-amber-500" : "text-primary"
+                      )} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <p className={cn(
-                            'font-medium',
-                            !notification.read && 'text-foreground'
+                            'font-semibold text-lg leading-tight',
+                            !notification.read ? 'text-primary' : 'text-foreground/80'
                           )}>
                             {notification.title}
                           </p>
-                          <p className="text-sm text-muted-foreground mt-1">
+                          <p className="text-sm text-foreground/70 mt-1 line-clamp-2 leading-relaxed">
                             {notification.message}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs text-muted-foreground">
+                        <div className="flex flex-col items-end gap-2 shrink-0">
+                          <span className="text-xs font-medium text-muted-foreground/80 bg-background/50 px-2 py-1 rounded-md border">
                             {notification.time}
                           </span>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
                               e.stopPropagation();
                               deleteNotification(notification.id);
@@ -255,13 +278,24 @@ export default function Notifications() {
                           </Button>
                         </div>
                       </div>
-                      <Badge variant="outline" className="mt-2 text-xs capitalize">
-                        {notification.category}
-                      </Badge>
+                      <div className="flex items-center gap-2 mt-3">
+                         <Badge variant="outline" className={cn(
+                           "text-xs px-2 py-0.5 border-primary/20",
+                            notification.category === 'academic' && "bg-blue-500/10 text-blue-600 border-blue-200",
+                            notification.category === 'placement' && "bg-purple-500/10 text-purple-600 border-purple-200",
+                            notification.category === 'finance' && "bg-emerald-500/10 text-emerald-600 border-emerald-200",
+                            notification.category === 'system' && "bg-gray-500/10 text-gray-600 border-gray-200",
+                         )}>
+                            {notification.category}
+                          </Badge>
+                          {!notification.read && (
+                            <span className="flex h-2 w-2 relative">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                            </span>
+                          )}
+                      </div>
                     </div>
-                    {!notification.read && (
-                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-2" />
-                    )}
                   </motion.div>
                 ))
               )}

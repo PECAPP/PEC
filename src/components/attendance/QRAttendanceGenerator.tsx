@@ -6,7 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { collection, addDoc, updateDoc, doc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '@/config/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { QrCode, Users, Clock, X, RefreshCw } from 'lucide-react';
+import { QrCode, Users, Clock, X, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface QRAttendanceGeneratorProps {
   courseId: string;
@@ -22,6 +23,8 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
   const [attendanceCount, setAttendanceCount] = useState(0);
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  const [refreshProgress, setRefreshProgress] = useState(100);
+  const ROTATION_INTERVAL = 10000; // 10 seconds
 
   const generateSession = async (duration: number = 60) => {
     try {
@@ -49,10 +52,12 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
       });
 
       setSessionId(sessionRef.id);
-      setQrValue(uniqueId);
+      // Initial QR with timestamp
+      setQrValue(`${uniqueId}:${Date.now()}`);
       setIsActive(true);
       setExpiresAt(expiry);
       setAttendanceCount(0);
+      setRefreshProgress(100);
 
       toast({
         title: 'QR Code Generated',
@@ -138,6 +143,43 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
     return () => clearInterval(interval);
   }, [expiresAt, isActive]);
 
+  // Rotating QR Code Logic
+  useEffect(() => {
+    if (!isActive || !sessionId) return;
+    
+    const startTime = Date.now();
+    let frameId: number;
+
+    const animate = () => {
+      const now = Date.now();
+      const elapsed = (now - startTime) % ROTATION_INTERVAL;
+      const progress = 100 - (elapsed / ROTATION_INTERVAL) * 100;
+      setRefreshProgress(progress);
+      
+      // Update QR every 10s (approx check)
+      // Actually, we should just derive the QR from Math.floor(now / 10000)
+      // But preserving the original uniqueId is key.
+      // Let's just update the QR value when progress loops? 
+      // Simpler: Just set interval for QR update and use rAF for smooth progress.
+      
+      frameId = requestAnimationFrame(animate);
+    };
+    
+    const qrInterval = setInterval(() => {
+        // Regenerate QR payload with new timestamp
+        const baseId = qrValue.split(':')[0];
+        setQrValue(`${baseId}:${Date.now()}`);
+        setRefreshProgress(100); // Reset visual bar
+    }, ROTATION_INTERVAL);
+
+    frameId = requestAnimationFrame(animate);
+
+    return () => {
+        clearInterval(qrInterval);
+        cancelAnimationFrame(frameId);
+    };
+  }, [isActive, sessionId]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -183,9 +225,13 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
               includeMargin
               className="mb-4"
             />
-            <p className="text-xs text-muted-foreground text-center">
-              Students scan this code to mark attendance
-            </p>
+            <div className="w-full max-w-[256px] space-y-2">
+                <Progress value={refreshProgress} className="h-2 w-full transition-all" />
+                <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                  Auto-refreshing for security
+                </p>
+            </div>
           </Card>
 
           {/* Session Info */}

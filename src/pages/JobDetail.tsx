@@ -4,7 +4,7 @@ import {
   Briefcase,
   MapPin,
   Clock,
-  DollarSign,
+  IndianRupee,
   Users,
   Building2,
   CheckCircle2,
@@ -215,7 +215,7 @@ export default function JobDetail() {
                     {job.type}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <DollarSign className="w-4 h-4" />
+                    <IndianRupee className="w-4 h-4" />
                     {job.salary}
                   </span>
                   <span className="flex items-center gap-1.5">

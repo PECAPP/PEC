@@ -1,0 +1,56 @@
+
+import { 
+  Home, 
+  Settings, 
+  User, 
+  Bell, 
+  HelpCircle, 
+  CreditCard, 
+  GraduationCap, 
+  Briefcase, 
+  FileText, 
+  Calendar, 
+  Users, 
+  Building2,
+  BookOpen,
+  MapPin,
+  Coffee,
+  Shield,
+  LayoutDashboard
+} from 'lucide-react';
+
+export const searchableRoutes = [
+  // Core
+  { title: "Dashboard", path: "/dashboard", icon: LayoutDashboard, keywords: ["home", "main", "overview"] },
+  { title: "Profile", path: "/profile", icon: User, keywords: ["account", "me", "avatar"] },
+  { title: "Settings", path: "/settings", icon: Settings, keywords: ["config", "preferences", "security", "admin"] },
+  { title: "Notifications", path: "/notifications", icon: Bell, keywords: ["alerts", "messages"] },
+  
+  // Academics
+  { title: "Courses", path: "/courses", icon: BookOpen, keywords: ["classes", "subjects", "learning"] },
+  { title: "Timetable", path: "/timetable", icon: Calendar, keywords: ["schedule", "routine"] },
+  { title: "Attendance", path: "/attendance", icon: Calendar, keywords: ["present", "absent"] },
+  { title: "Examinations", path: "/examinations", icon: FileText, keywords: ["exams", "results", "marks"] },
+
+  // Placement
+  { title: "Placements Dashboard", path: "/placements/my-dashboard", icon: Briefcase, keywords: ["jobs", "career", "hiring"] },
+  { title: "Placement Drives", path: "/placements/drives", icon: Building2, keywords: ["interviews", "companies", "events"] },
+  { title: "Job Applications", path: "/placements/applications", icon: FileText, keywords: ["applied", "status", "track"] },
+  { title: "Resume Builder", path: "/resume-builder", icon: FileText, keywords: ["cv", "maker", "templates"] },
+  { title: "Career Portal", path: "/career", icon: Briefcase, keywords: ["jobs", "search", "vacancies"] },
+  { title: "Placement Reports", path: "/placements/reports", icon: FileText, keywords: ["stats", "analytics", "data"] },
+  
+  // Admin
+  { title: "User Management", path: "/users", icon: Users, keywords: ["students", "faculty", "staff", "people"] },
+  { title: "Payment Settings", path: "/admin/payment-settings", icon: CreditCard, keywords: ["fees", "finance", "money"] },
+  { title: "College Settings", path: "/admin/college-settings", icon: Building2, keywords: ["config", "institution"] },
+  
+  // Campus
+  { title: "Campus Map", path: "/campus-map", icon: MapPin, keywords: ["location", "directions", "buildings"] },
+  { title: "Night Canteen", path: "/canteen", icon: Coffee, keywords: ["food", "order", "snacks"] },
+  { title: "Hostel Issues", path: "/hostel-issues", icon: Home, keywords: ["complaints", "support", "maintenance"] },
+  
+  // Help
+  { title: "Help Center", path: "/help", icon: HelpCircle, keywords: ["support", "faq", "docs"] },
+  { title: "Privacy Policy", path: "/privacy", icon: Shield, keywords: ["legal", "gdpr", "data"] },
+];

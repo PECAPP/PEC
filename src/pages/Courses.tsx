@@ -13,7 +13,10 @@ import {
   X,
   Upload,
   Download,
+  Clock,
+  MapPin,
 } from 'lucide-react';
+import { ImageWithBlur, CourseSkeleton } from '@/components/ui/image-with-blur';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -100,6 +103,21 @@ export default function Courses() {
     maxStudents: 60,
     description: '',
   });
+  const [scheduleSlots, setScheduleSlots] = useState<{ day: string; startTime: string; endTime: string; room: string }[]>([]);
+
+  const addScheduleSlot = () => {
+    setScheduleSlots([...scheduleSlots, { day: 'Monday', startTime: '09:00', endTime: '10:00', room: '' }]);
+  };
+
+  const removeScheduleSlot = (index: number) => {
+    setScheduleSlots(scheduleSlots.filter((_, i) => i !== index));
+  };
+
+  const updateScheduleSlot = (index: number, field: string, value: string) => {
+    const updated = [...scheduleSlots];
+    updated[index] = { ...updated[index], [field]: value };
+    setScheduleSlots(updated);
+  };
 
   const handleBulkImport = async (data: any[]) => {
     let successCount = 0;
@@ -180,6 +198,65 @@ export default function Courses() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
+  const [courseSchedule, setCourseSchedule] = useState<{day: string; timeSlot: string; room: string}[]>([]);
+  const [loadingSchedule, setLoadingSchedule] = useState(false);
+
+  // Deterministic Keyword Mapping for Images
+  const getCourseImage = (dept: string, name: string) => {
+     // Fallback map for stability
+     const deptImages: Record<string, string> = {
+        'Computer Science': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80', // Coding laptop
+        'Electronics': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80', // Chip
+        'Mechanical': 'https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?w=800&q=80', // Gears
+        'Civil': 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80', // Architecture
+        'Electrical': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80', // Wires
+        'Mathematics': 'https://images.unsplash.com/photo-1635372722656-389f87a941b7?w=800&q=80', // Math
+        'Physics': 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=800&q=80', // Physics
+     };
+
+     // Keyword-based overrides
+     const nameLower = name.toLowerCase();
+     if(nameLower.includes('data')) return 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80';
+     if(nameLower.includes('web')) return 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&q=80';
+     if(nameLower.includes('ai') || nameLower.includes('intelligence')) return 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80';
+     if(nameLower.includes('network')) return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80';
+     if(nameLower.includes('design')) return 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80';
+
+     return deptImages[dept] || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=80'; // Default book
+  };
+
+  // Fetch schedule from timetable collection when viewing a course
+  const fetchCourseSchedule = async (courseId: string) => {
+    setLoadingSchedule(true);
+    setCourseSchedule([]);
+    try {
+      const timetableQuery = query(
+        collection(db, 'timetable'),
+        where('courseId', '==', courseId)
+      );
+      const snapshot = await getDocs(timetableQuery);
+      const schedule = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          day: data.day,
+          timeSlot: data.timeSlot,
+          room: data.room || 'TBD'
+        };
+      });
+      // Sort by day order, then by time
+      const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      schedule.sort((a, b) => {
+        const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+        if (dayDiff !== 0) return dayDiff;
+        return a.timeSlot.localeCompare(b.timeSlot);
+      });
+      setCourseSchedule(schedule);
+    } catch (error) {
+      console.error('Error fetching course schedule:', error);
+    } finally {
+      setLoadingSchedule(false);
+    }
+  };
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
@@ -277,7 +354,7 @@ export default function Courses() {
       await addDoc(collection(db, 'courses'), {
         ...courseForm,
         enrolledStudents: 0,
-        schedule: [],
+        schedule: scheduleSlots.filter(s => s.day && s.startTime && s.endTime),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -296,6 +373,7 @@ export default function Courses() {
     try {
       await updateDoc(doc(db, 'courses', editingCourse.id), {
         ...courseForm,
+        schedule: scheduleSlots.filter(s => s.day && s.startTime && s.endTime),
         updatedAt: serverTimestamp(),
       });
       toast.success('Course updated successfully!');
@@ -332,6 +410,7 @@ export default function Courses() {
       maxStudents: 60,
       description: '',
     });
+    setScheduleSlots([]);
   };
 
   const openEditDialog = (course: Course) => {
@@ -346,6 +425,7 @@ export default function Courses() {
       maxStudents: course.maxStudents,
       description: course.description,
     });
+    setScheduleSlots(course.schedule || []);
     setShowCourseDialog(true);
   };
 
@@ -659,7 +739,7 @@ export default function Courses() {
           </div>
         </div>
 
-        <Tabs defaultValue="available" className="space-y-6">
+        <Tabs defaultValue="enrolled" className="space-y-6">
           <TabsList className="w-full justify-start overflow-x-auto overflow-y-hidden flex-nowrap tabs-list-scroll">
             <TabsTrigger value="available">
               <Search className="w-4 h-4 mr-2" />
@@ -705,16 +785,20 @@ export default function Courses() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {availableCourses.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  enrolled={false}
-                  onView={(c) => { setSelectedCourse(c); setShowDetailsDialog(true); }}
-                  onEnroll={handleEnroll}
-                />
-              ))}
-              {availableCourses.length === 0 && (
+              {loading ? (
+                 Array.from({length: 6}).map((_, i) => <CourseSkeleton key={i} />)
+              ) : availableCourses.length > 0 ? (
+                 availableCourses.map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      enrolled={false}
+                      image={getCourseImage(course.department, course.name)}
+                      onView={(c) => { setSelectedCourse(c); fetchCourseSchedule(c.id); setShowDetailsDialog(true); }}
+                      onEnroll={handleEnroll}
+                    />
+                 ))
+              ) : (
                 <div className="col-span-full text-center py-12 text-muted-foreground">
                   <BookOpen className="w-12 h-12 mx-auto mb-2 opacity-20" />
                   <p>No courses found</p>
@@ -725,16 +809,20 @@ export default function Courses() {
 
           <TabsContent value="enrolled" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {enrolledCourses.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  enrolled={true}
-                  onView={(c) => { setSelectedCourse(c); setShowDetailsDialog(true); }}
-                  onDrop={handleDrop}
-                />
-              ))}
-              {enrolledCourses.length === 0 && (
+              {loading ? (
+                  Array.from({length: 3}).map((_, i) => <CourseSkeleton key={i} />)
+              ) : enrolledCourses.length > 0 ? (
+                  enrolledCourses.map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      enrolled={true}
+                      image={getCourseImage(course.department, course.name)}
+                      onView={(c) => { setSelectedCourse(c); fetchCourseSchedule(c.id); setShowDetailsDialog(true); }}
+                      onDrop={handleDrop}
+                    />
+                  ))
+              ) : (
                 <div className="col-span-full text-center py-12 text-muted-foreground">
                   <GraduationCap className="w-12 h-12 mx-auto mb-2 opacity-20" />
                   <p>No enrolled courses</p>
@@ -783,20 +871,32 @@ export default function Courses() {
                     <p className="text-sm">{selectedCourse.description}</p>
                   </div>
 
-                  {selectedCourse.schedule && selectedCourse.schedule.length > 0 && (
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">Schedule</p>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Schedule
+                    </p>
+                    {loadingSchedule ? (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Loading schedule...
+                      </div>
+                    ) : courseSchedule.length > 0 ? (
                       <div className="space-y-2">
-                        {selectedCourse.schedule.map((slot, idx) => (
+                        {courseSchedule.map((slot, idx) => (
                           <div key={idx} className="flex items-center gap-4 text-sm p-2 bg-muted rounded">
-                            <span className="font-medium w-20">{slot.day}</span>
-                            <span className="text-muted-foreground">{slot.startTime} - {slot.endTime}</span>
-                            <span className="text-muted-foreground ml-auto">{slot.room}</span>
+                            <span className="font-medium w-24">{slot.day}</span>
+                            <span className="text-muted-foreground">{slot.timeSlot}</span>
+                            <span className="text-muted-foreground ml-auto flex items-center gap-1">
+                              {slot.room}
+                            </span>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">No schedule has been set for this course yet.</p>
+                    )}
+                  </div>
 
                   <div className="flex gap-2">
                     {!enrolledCourseIds.includes(selectedCourse.id) ? (
@@ -854,12 +954,14 @@ export default function Courses() {
 function CourseCard({ 
   course, 
   enrolled, 
+  image,
   onView, 
   onEnroll, 
   onDrop 
 }: { 
   course: Course;
   enrolled: boolean;
+  image: string;
   onView: (course: Course) => void;
   onEnroll?: (course: Course) => void;
   onDrop?: (courseId: string) => void;
@@ -868,59 +970,83 @@ function CourseCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="card-elevated p-4 space-y-3"
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.3 }}
+      className="card-elevated group overflow-hidden hover:shadow-xl transition-all duration-300"
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="font-semibold text-foreground">{course.code}</h3>
-          <p className="text-sm text-muted-foreground line-clamp-1">{course.name}</p>
-        </div>
-        {enrolled ? (
-          <Badge variant="default" className="bg-success">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Enrolled
+      <div className="h-40 w-full relative overflow-hidden bg-muted">
+        <ImageWithBlur 
+          src={image}
+          alt={course.name}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
+        <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end z-10">
+          <Badge variant="outline" className="bg-background/90 backdrop-blur-md shadow-sm border-white/20">
+             {course.code}
           </Badge>
-        ) : isFull ? (
-          <Badge variant="destructive">Full</Badge>
-        ) : (
-          <Badge variant="outline">{course.enrolledStudents}/{course.maxStudents}</Badge>
-        )}
-      </div>
-
-      <div className="space-y-1 text-sm text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <Users className="w-3.5 h-3.5" />
-          {course.facultyName}
-        </div>
-        <div className="flex items-center gap-2">
-          <GraduationCap className="w-3.5 h-3.5" />
-          {course.credits} Credits • Semester {course.semester}
+          {enrolled ? (
+            <Badge variant="default" className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Enrolled
+            </Badge>
+          ) : isFull && (
+            <Badge variant="destructive" className="shadow-lg">Full</Badge>
+          )}
         </div>
       </div>
+      
+      <div className="p-4 space-y-3">
+        <div>
+          <h3 className="font-semibold text-foreground text-lg leading-tight line-clamp-1 group-hover:text-primary transition-colors">{course.name}</h3>
+        </div>
 
-      <div className="flex gap-2 pt-2">
-        <Button variant="outline" size="sm" onClick={() => onView(course)} className="flex-1">
-          View Details
-        </Button>
-        {enrolled ? (
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => onDrop?.(course.id)}
-          >
-            <X className="w-4 h-4" />
+        <div className="space-y-1.5 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Users className="w-3.5 h-3.5 text-primary/70" />
+            <span className="truncate">{course.facultyName}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-3.5 h-3.5 text-primary/70" />
+            {course.credits} Credits • Sem {course.semester}
+          </div>
+           <div className="flex items-center gap-2">
+             <div className="w-3.5 h-3.5 flex items-center justify-center">
+                <div className={`w-2 h-2 rounded-full ${course.enrolledStudents >= course.maxStudents ? 'bg-red-500' : 'bg-green-500'}`} />
+             </div>
+             {course.enrolledStudents} / {course.maxStudents} Students
+          </div>
+        </div>
+
+        <div className="flex gap-2 pt-2">
+          {!enrolled && !isFull && (
+             <Button 
+              size="sm"
+              onClick={() => onEnroll?.(course)}
+              className="flex-1 shadow-sm"
+              variant="default"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Enroll
+            </Button>
+          )}
+          
+          <Button variant="outline" size="sm" onClick={() => onView(course)} className={enrolled || isFull ? "flex-1" : ""}>
+             Details
           </Button>
-        ) : (
-          <Button 
-            size="sm"
-            onClick={() => onEnroll?.(course)}
-            disabled={isFull}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        )}
+
+          {enrolled && (
+            <Button 
+              size="sm"
+              variant="destructive"
+              className="px-3"
+              onClick={() => onDrop?.(course.id)}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
       </div>
     </motion.div>
   );

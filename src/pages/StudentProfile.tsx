@@ -17,7 +17,19 @@ import {
   ExternalLink,
   Loader2,
   Clock,
+  Share2,
+  Copy,
+  Check,
+  Download as DownloadIcon,
 } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -59,6 +71,7 @@ export function StudentProfile() {
   const [assignments, setAssignments] = useState<any[]>([]);
   const [githubStats, setGithubStats] = useState<any>(null);
   const [fetchingGithub, setFetchingGithub] = useState(false);
+  const [qrDialogOpen, setQrDialogOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -383,14 +396,26 @@ export function StudentProfile() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => setQrDialogOpen(true)}>
                   <QrCode className="w-4 h-4" />
                   View QR
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/student/${auth.currentUser?.uid}`);
+                  toast.success('Public profile link copied!');
+                }}>
+                  <Share2 className="w-4 h-4" />
+                  Share Profile
                 </Button>
                 <Button size="sm" onClick={()=>navigate('/resume-builder')} >
                   <Download className="w-4 h-4" />
                   Download Resume
                 </Button>
+              </div>
+              <div className="mt-2 flex items-center gap-2">
+                 <Badge variant={profileData.isPublic !== false ? "success" : "secondary"} className="text-[10px] h-5 px-1.5 uppercase tracking-wider">
+                    {profileData.isPublic !== false ? "Publicly Visible" : "Private Profile"}
+                 </Badge>
               </div>
             </div>
 
@@ -716,6 +741,71 @@ export function StudentProfile() {
           </TabsContent>
         </Tabs>
       </motion.div>
+
+      <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+           <DialogHeader>
+             <DialogTitle className="text-center text-xl">My Profile QR</DialogTitle>
+             <DialogDescription className="text-center">
+               Scan to view full academic profile
+             </DialogDescription>
+           </DialogHeader>
+           
+           <div className="flex flex-col items-center justify-center py-6 space-y-6">
+              <div className="relative p-4 bg-white rounded-2xl shadow-lg border border-border/50">
+                 {/* QR Code */}
+                 <QRCodeCanvas
+                    value={`${window.location.origin}/student/${userData?.uid}`}
+                    size={200}
+                    level={"H"}
+                    includeMargin={true}
+                    imageSettings={{
+                       src: "https://github.com/shadcn.png", // Or user avatar if available
+                       x: undefined,
+                       y: undefined,
+                       height: 24,
+                       width: 24,
+                       excavate: true,
+                    }}
+                 />
+                 
+                 {/* Decorative corners */}
+                 <div className="absolute top-0 left-0 w-8 h-8 border-l-4 border-t-4 border-primary rounded-tl-xl -translate-x-1 -translate-y-1"></div>
+                 <div className="absolute top-0 right-0 w-8 h-8 border-r-4 border-t-4 border-primary rounded-tr-xl translate-x-1 -translate-y-1"></div>
+                 <div className="absolute bottom-0 left-0 w-8 h-8 border-l-4 border-b-4 border-primary rounded-bl-xl -translate-x-1 translate-y-1"></div>
+                 <div className="absolute bottom-0 right-0 w-8 h-8 border-r-4 border-b-4 border-primary rounded-br-xl translate-x-1 translate-y-1"></div>
+              </div>
+
+              <div className="text-center space-y-1">
+                 <h3 className="font-bold text-lg">{userData.fullName}</h3>
+                 <p className="text-sm text-muted-foreground">{profileData.department}</p>
+                 <Badge variant="secondary" className="mt-2">{userData.email}</Badge>
+              </div>
+
+              <div className="flex gap-2 w-full">
+                 <Button className="flex-1" onClick={() => {
+                    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+                    if(canvas) {
+                        const image = canvas.toDataURL("image/png");
+                        const link = document.createElement('a');
+                        link.href = image;
+                        link.download = `profile-qr-${userData.fullName}.png`;
+                        link.click();
+                        toast.success("QR Code downloaded");
+                    }
+                 }}>
+                    <DownloadIcon className="w-4 h-4 mr-2" /> Download
+                 </Button>
+                 <Button variant="outline" className="flex-1" onClick={() => {
+                     navigator.clipboard.writeText(`${window.location.origin}/student/${userData.uid}`);
+                     toast.success("Link copied to clipboard");
+                 }}>
+                    <Copy className="w-4 h-4 mr-2" /> Copy Link
+                 </Button>
+              </div>
+           </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

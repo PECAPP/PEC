@@ -38,7 +38,11 @@ import type { CollegeSettings as CollegeSettingsType } from '@/types';
 
 type CollegeSettings = CollegeSettingsType;
 
-export default function CollegeSettings() {
+interface Props {
+  embedded?: boolean;
+}
+
+export default function CollegeSettings({ embedded }: Props) {
   const navigate = useNavigate();
   const { user, isAdmin, loading: authLoading } = usePermissions();
   const [loading, setLoading] = useState(true);
@@ -286,18 +290,22 @@ export default function CollegeSettings() {
       className="space-y-6"
     >
       {/* Back Button */}
-      <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Dashboard
-      </Button>
+      {!embedded && (
+        <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </Button>
+      )}
 
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">College Settings</h1>
-        <p className="text-muted-foreground mt-2">
-          Configure your college branding and information
-        </p>
-      </div>
+      {!embedded && (
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">College Settings</h1>
+          <p className="text-muted-foreground mt-2">
+            Configure your college branding and information
+          </p>
+        </div>
+      )}
 
       {/* Logo Section */}
       <Card>
@@ -632,13 +640,15 @@ export default function CollegeSettings() {
             </>
           )}
         </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => navigate('/dashboard')}
-        >
-          Cancel
-        </Button>
+        {!embedded && (
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => navigate('/dashboard')}
+          >
+            Cancel
+          </Button>
+        )}
       </div>
     </motion.div>
   );

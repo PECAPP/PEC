@@ -83,8 +83,12 @@ export default function Timetable() {
   const [timetable, setTimetable] = useState<any>({});
   const [draggedCourse, setDraggedCourse] = useState<any>(null);
   const [showSlotDialog, setShowSlotDialog] = useState(false);
-  const [selectedDay, setSelectedDay] = useState("Monday");
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(""); // Renamed to avoid conflict
+  
+  // Smart Day Selection: Default to today if Mon-Sat, else Monday
+  const todayIndex = new Date().getDay(); // 0=Sun, 1=Mon...
+  const initialDay = todayIndex > 0 && todayIndex <= 6 ? DAYS[todayIndex - 1] : "Monday";
+  const [selectedDay, setSelectedDay] = useState(initialDay);
+
   const [generating, setGenerating] = useState(false);
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
@@ -279,13 +283,10 @@ export default function Timetable() {
   };
 
   const bulkUploadTemplate = ["day", "timeSlot", "courseCode", "room"];
+
   const sampleBulkData = [
-    {
-      day: "Monday",
-      timeSlot: "09:00-10:00",
-      courseCode: "CS101",
-      room: "101",
-    },
+    { day: "Monday", timeSlot: "09:00-10:00", courseCode: "MATH101", room: "101" },
+    { day: "Wednesday", timeSlot: "11:00-12:00", courseCode: "ENG202", room: "204" },
   ];
 
   const handleAutoGenerate = async () => {
@@ -510,6 +511,22 @@ export default function Timetable() {
     }
   };
 
+  // Helper to determine status of a time slot relative to NOW
+  const getTimeStatus = (slotTime: string, day: string) => {
+      const now = new Date();
+      const currentDayName = DAYS[now.getDay() - 1] || "Sunday"; // Mon=1 -> Index 0
+      
+      // If the selected day isn't today, everything is just "upcoming" (or normal)
+      if (day !== currentDayName) return "upcoming"; 
+
+      const [start, end] = slotTime.split('-').map(t => parseInt(t.split(':')[0]));
+      const currentHour = now.getHours();
+
+      if (currentHour >= end) return "completed"; // Class over
+      if (currentHour >= start && currentHour < end) return "live"; // Class in progress
+      return "upcoming";
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -618,8 +635,8 @@ export default function Timetable() {
         </div>
       )}
 
-      {/* Department Filter (Role-Based) */}
-      <div className="card-elevated p-4">
+      {/* Department Filter (Role-Based) - Hidden on Mobile for Students */}
+      <div className={`card-elevated p-4 ${user?.role === 'student' ? 'hidden md:block' : ''}`}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -679,8 +696,147 @@ export default function Timetable() {
         </div>
       </div>
 
-      {/* Timetable Grid */}
-      <div className="card-elevated overflow-x-auto overflow-y-auto max-h-[70vh] timetable-scroll-container">
+      {/* Mobile View (Cards) - "Shoe Type Shi" Design */}
+      <div className="md:hidden space-y-6">
+        {/* Day Selector */}
+        <div className="flex overflow-x-auto pb-4 gap-3 no-scrollbar snap-x">
+          {DAYS.map((day) => (
+            <button
+              key={day}
+              onClick={() => setSelectedDay(day)}
+              className={`snap-center shrink-0 px-6 py-2 rounded-full text-sm font-bold transition-all ${
+                selectedDay === day
+                  ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                  : "bg-card text-muted-foreground border border-border"
+              }`}
+            >
+              {day.slice(0, 3)}
+            </button>
+          ))}
+        </div>
+
+        {/* Timeline Feed */}
+        <div className="space-y-4">
+          {TIME_SLOTS.map((timeSlot) => {
+            const key = `${selectedDay}-${timeSlot}`;
+            const slotData = timetable[key];
+            const isLunch = timeSlot === "13:00-14:00";
+            const status = getTimeStatus(timeSlot, selectedDay);
+            
+            // Filter logic reused from table
+            let filteredSlots = slotData || [];
+            if (user.role === "faculty") {
+               filteredSlots = filteredSlots.filter((s:any) => s.facultyId === user.uid || s.facultyName === (user as any).fullName);
+            } else if (user.role === "student") {
+               filteredSlots = filteredSlots.filter((s:any) => studentEnrollments.includes(s.courseId));
+            }
+            if (departmentFilter !== "all" && filteredSlots.length > 0) {
+                filteredSlots = filteredSlots.filter((s:any) => s.department === departmentFilter);
+            }
+
+            if (isLunch) {
+                return (
+                    <div key={timeSlot} className="flex items-center gap-4 opacity-50 my-4">
+                        <span className="text-xs font-mono text-muted-foreground w-12 text-right">{timeSlot.split('-')[0]}</span>
+                        <div className="h-[1px] flex-1 bg-border border-dashed border-b"></div>
+                        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Lunch</span>
+                        <div className="h-[1px] flex-1 bg-border border-dashed border-b"></div>
+                    </div>
+                );
+            }
+
+            // Status Logic
+            const isCompleted = status === "completed";
+            const isLive = status === "live";
+
+            if (!filteredSlots || filteredSlots.length === 0) {
+                 return (
+                    <div key={timeSlot} className={`flex gap-4 group ${isCompleted ? 'opacity-40 grayscale' : ''}`}>
+                        <div className="flex flex-col items-end w-12 shrink-0">
+                            <span className="text-sm font-bold text-foreground">{timeSlot.split('-')[0]}</span>
+                            <span className="text-[10px] text-muted-foreground">{timeSlot.split('-')[1]}</span>
+                        </div>
+                        {isLive ? (
+                            <div className="flex-1 p-3 rounded-2xl border-2 border-primary bg-primary/5 flex items-center justify-center min-h-[80px] relative">
+                                <span className="absolute -top-3 left-4 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">NOW</span>
+                                <span className="text-xs text-primary font-medium">Free Slot</span>
+                            </div>
+                        ) : (
+                            <div className="flex-1 p-3 rounded-2xl border border-dashed border-border bg-muted/5 flex items-center justify-center min-h-[80px]">
+                                <span className="text-xs text-muted-foreground/40 font-medium">Free Slot</span>
+                            </div>
+                        )}
+                    </div>
+                 );
+            }
+
+            return (
+              <div key={timeSlot} className={`flex gap-4 ${isCompleted ? 'opacity-50' : ''}`}>
+                 {/* Time Column */}
+                 <div className="flex flex-col items-end w-12 shrink-0">
+                    <span className={`text-sm font-bold ${isLive ? 'text-primary' : 'text-foreground'}`}>{timeSlot.split('-')[0]}</span>
+                    <span className="text-[10px] text-muted-foreground">{timeSlot.split('-')[1]}</span>
+                    {/* Line connector */}
+                    <div className={`h-full w-[2px] my-2 rounded-full relative ${isLive ? 'bg-primary' : (isCompleted ? 'bg-primary/20' : 'bg-border')}`}>
+                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full ring-4 ring-background ${isLive ? 'bg-primary animate-ping' : (isCompleted ? 'bg-primary/50' : 'bg-primary')}`}></div>
+                        {isLive && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary ring-4 ring-background"></div>}
+                    </div>
+                 </div>
+
+                 {/* Cards Stack */}
+                 <div className="flex-1 space-y-3 pb-6">
+                    {filteredSlots.map((slot: any, idx: number) => (
+                        <div 
+                          key={idx} 
+                          className={`relative overflow-hidden rounded-2xl border-l-4 p-4 transition-all
+                              ${isLive ? 'bg-card border-l-primary shadow-lg ring-1 ring-primary/20' : ''}
+                              ${!isLive && !isCompleted ? 'bg-card border-l-primary shadow-sm hover:shadow-md' : ''}
+                              ${isCompleted ? 'bg-muted/10 border-l-muted-foreground/30 shadow-none' : ''}
+                          `}
+                          onClick={() => isAdmin && openSlotDialog(selectedDay, timeSlot)}
+                        >
+                             {isLive && (
+                                 <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-primary/10 px-2 py-1 rounded-full">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                    <span className="text-[10px] font-bold text-primary">LIVE</span>
+                                 </div>
+                             )}
+                             {isCompleted && (
+                                  <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-muted">
+                                    <span className="text-[10px] font-bold text-muted-foreground">COMPLETED</span>
+                                 </div>
+                             )}
+
+{/* Clock icon removed */}
+                             
+                             <div className="relative z-10">
+                                 <h4 className={`font-bold text-lg line-clamp-1 ${isCompleted ? 'text-muted-foreground' : 'text-foreground'}`}>{slot.courseName}</h4>
+                                 <div className="flex items-center gap-2 mt-1 mb-3">
+                                     <Badge variant={isCompleted ? "outline" : "secondary"} className="text-[10px] uppercase tracking-wider font-bold">{slot.courseCode}</Badge>
+                                     <span className="text-xs text-muted-foreground">|</span>
+                                     <span className={`text-xs font-medium px-2 py-0.5 rounded text-nowrap ${isLive ? 'text-primary bg-primary/10' : 'text-muted-foreground bg-muted'}`}>Room {slot.room}</span>
+                                 </div>
+                                 
+                                 <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                     <div className="flex items-center gap-1.5">
+                                         <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white font-bold ${isCompleted ? 'bg-gray-400' : 'bg-gradient-to-br from-primary to-purple-600'}`}>
+                                             {slot.facultyName?.[0] || "?"}
+                                         </div>
+                                         <span className="font-medium">{slot.facultyName || "TBD"}</span>
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                    ))}
+                 </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block card-elevated overflow-x-auto overflow-y-auto max-h-[70vh] timetable-scroll-container">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-muted/30">
@@ -798,15 +954,16 @@ export default function Timetable() {
                                     {slot.department}
                                   </div>
                                 )}
+                                
                                 {isAdmin && (
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleDeleteSlot(slot.id);
                                     }}
-                                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 p-1 hover:bg-destructive/10 rounded text-destructive transition-all"
                                   >
-                                    <Trash2 className="w-3 h-3 text-destructive" />
+                                    <Trash2 className="w-3 h-3" />
                                   </button>
                                 )}
                               </div>
@@ -823,25 +980,25 @@ export default function Timetable() {
         </table>
       </div>
 
-      {/* Edit Slot Dialog */}
+      {/* Edit Slot Dialog (Admin) */}
       <Dialog open={showSlotDialog} onOpenChange={setShowSlotDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Time Slot</DialogTitle>
+            <DialogTitle>Edit Timetable Slot</DialogTitle>
             <DialogDescription>
-              {selectedSlot && `${selectedSlot.day} ${selectedSlot.timeSlot}`}
+              {selectedSlot?.day} - {selectedSlot?.timeSlot}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
+            <div className="space-y-2">
               <label className="text-sm font-medium">Course</label>
               <Select
                 value={slotForm.courseId}
-                onValueChange={(value) =>
-                  setSlotForm({ ...slotForm, courseId: value })
+                onValueChange={(val) =>
+                  setSlotForm((prev) => ({ ...prev, courseId: val }))
                 }
               >
-                <SelectTrigger className="mt-1">
+                <SelectTrigger>
                   <SelectValue placeholder="Select course" />
                 </SelectTrigger>
                 <SelectContent>
@@ -853,47 +1010,38 @@ export default function Timetable() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label className="text-sm font-medium">Room/Venue</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Room</label>
               <Input
+                placeholder="e.g. 101, Lab 2"
                 value={slotForm.room}
                 onChange={(e) =>
-                  setSlotForm({ ...slotForm, room: e.target.value })
+                  setSlotForm((prev) => ({ ...prev, room: e.target.value }))
                 }
-                placeholder="Room 101"
-                className="mt-1"
               />
             </div>
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handleSaveSlot} className="flex-1">
-                <Save className="w-4 h-4 mr-2" />
-                Save Slot
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowSlotDialog(false)}
-              >
-                Cancel
-              </Button>
-            </div>
+            <Button onClick={handleSaveSlot} className="w-full">
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Bulk Upload Dialog */}
       <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Bulk Upload Timetable</DialogTitle>
             <DialogDescription>
-              Upload CSV/Excel file with columns: day, timeSlot, courseCode,
-              room
+              Upload Excel/CSV file with columns: day, timeSlot,
+              courseCode, room
             </DialogDescription>
           </DialogHeader>
           <BulkUpload
             entityType="timetable"
-            onImport={handleBulkImport}
             templateColumns={bulkUploadTemplate}
+            onImport={handleBulkImport}
             sampleData={sampleBulkData}
           />
         </DialogContent>
