@@ -75,10 +75,33 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
         return;
       }
 
-      // Find active session with this QR code
+      // Parse rotating QR (format: uniqueId:timestamp)
+      const parts = decodedText.split(':');
+      const uniqueId = parts[0];
+      const qrTimestamp = parts.length > 1 ? parseInt(parts[1]) : 0;
+      
+      // 1. Security Check: Freshness
+      const now = Date.now();
+      // Allow 20s window (10s rotation + 10s buffer for network/scanning)
+      if (qrTimestamp && (now - qrTimestamp > 20000)) { 
+         setResult('error');
+         setMessage('QR Code has expired. Please scan the new one.');
+         toast({
+           title: 'Expired QR',
+           description: 'This code is too old. Scan the fresh one on screen!',
+           variant: 'destructive',
+         });
+         return;
+      }
+
+      // Find active session with this QR code (using the BASE uniqueId if your DB stores just that? 
+      // Wait, the DB stores "qrCode". If the generator stored `uniqueId` (without timestamp), we query that.
+      // Yes, generator stored `uniqueId` in Firestore, but displays `uniqueId:timestamp` in QR.
+      // So we query by `uniqueId`.
+      
       const sessionsQuery = query(
         collection(db, 'attendanceSessions'),
-        where('qrCode', '==', decodedText),
+        where('qrCode', '==', uniqueId), 
         where('active', '==', true)
       );
 

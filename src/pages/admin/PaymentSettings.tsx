@@ -53,7 +53,11 @@ interface PaymentConfig {
   updatedBy: string;
 }
 
-export default function PaymentSettings() {
+interface Props {
+  embedded?: boolean;
+}
+
+export default function PaymentSettings({ embedded }: Props) {
   const navigate = useNavigate();
   const { user, isAdmin, loading: authLoading } = usePermissions();
   const [loading, setLoading] = useState(true);
@@ -211,18 +215,22 @@ export default function PaymentSettings() {
       className="space-y-6"
     >
       {/* Back Button */}
-      <Button variant="ghost" onClick={() => navigate('/finance')} className="gap-2">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Finance
-      </Button>
+      {!embedded && (
+        <Button variant="ghost" onClick={() => navigate('/finance')} className="gap-2">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Finance
+        </Button>
+      )}
 
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Payment Settings</h1>
-        <p className="text-muted-foreground mt-2">
-          Configure how students will pay fees
-        </p>
-      </div>
+      {!embedded && (
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Payment Settings</h1>
+          <p className="text-muted-foreground mt-2">
+            Configure how students will pay fees
+          </p>
+        </div>
+      )}
 
       {/* Current Status */}
       {settings && (
@@ -578,13 +586,15 @@ export default function PaymentSettings() {
             </>
           )}
         </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => navigate('/finance')}
-        >
-          Cancel
-        </Button>
+        {!embedded && (
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => navigate('/finance')}
+          >
+            Cancel
+          </Button>
+        )}
       </div>
     </motion.div>
   );

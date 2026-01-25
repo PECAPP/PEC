@@ -310,7 +310,7 @@ export default function Departments() {
                   >
                     <td className="p-4 font-medium text-foreground">{dept.code}</td>
                     <td className="p-4 text-foreground">{dept.name}</td>
-                    <td className="p-4 text-muted-foreground">{dept.hod || '-'}</td>
+                    <td className="p-4 text-muted-foreground">{dept.hodName || dept.hod || '-'}</td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
                         <Button variant="ghost" size="sm" onClick={() => openEditDialog(dept)}>

@@ -4,7 +4,7 @@ import {
   Briefcase,
   MapPin,
   Clock,
-  DollarSign,
+  IndianRupee,
   Search,
   Building2,
   Users,
@@ -335,7 +335,7 @@ function RecruiterJobsView({ userId }: { userId: string }) {
                     <p className="text-primary font-medium mb-2">{job.company}</p>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                       <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {job.location}</span>
-                      <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {job.salary}</span>
+                      <span className="flex items-center gap-1"><IndianRupee className="w-4 h-4" /> {job.salary}</span>
                       <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Deadline: {job.deadline?.toDate?.().toLocaleDateString()}</span>
                     </div>
                     <div className="flex gap-1.5">
@@ -678,7 +678,7 @@ function StudentPlacementsView({ userId }: { userId: string }) {
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {job.location}</span>
                   <span className="flex items-center gap-1"><Briefcase className="w-4 h-4" /> {job.type}</span>
-                  <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {job.salary}</span>
+                  <span className="flex items-center gap-1"><IndianRupee className="w-4 h-4" /> {job.salary}</span>
                   <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Deadline: {job.deadline?.toDate?.().toLocaleDateString()}</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-2">

@@ -484,7 +484,7 @@ const getPermissions = (role) => {
         canManageUsers: false,
         canManageFinance: false,
         canManagePlacements: false,
-        canManageRecuiters: false,
+        canManageRecruiters: false,
         canManageInstitution: false
     };
 
@@ -502,7 +502,7 @@ const getPermissions = (role) => {
                 canManageUsers: true,
                 canManageFinance: true,
                 canManagePlacements: true,
-                canManageRecuiters: true,
+                canManageRecruiters: true,
                 canManageInstitution: true
             };
         case 'faculty':

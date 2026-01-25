@@ -3,27 +3,41 @@ import { motion } from 'framer-motion';
 import {
   BookOpen,
   ClipboardCheck,
-  CreditCard,
   FileText,
   Briefcase,
   TrendingUp,
   Clock,
-  AlertTriangle,
   Calendar,
-  CheckCircle,
   ArrowUpRight,
   Loader2,
   Camera,
+  MapPin,
+  User,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, documentId } from 'firebase/firestore';
 import { auth, db } from '@/config/firebase';
 import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
+import type { 
+  StudentProfile, 
+  Course, 
+  Assignment, 
+  AttendanceRecord, 
+  Grade 
+} from '@/types';
 
 const container = {
   hidden: { opacity: 0 },
@@ -38,22 +52,34 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
+interface StudentStats {
+  attendancePercentage: number;
+  cgpa: number;
+  enrolledCourses: number;
+  pendingAssignments: number;
+}
+
 export function StudentDashboard() {
   const navigate = useNavigate();
+  const { orgSlug } = useParams<{ orgSlug: string }>();
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<any>(null);
-  const [profileData, setProfileData] = useState<any>(null);
+  const [firstName, setFirstName] = useState('Student');
+  const [profileData, setProfileData] = useState<StudentProfile | null>(null);
   const [showQRScanner, setShowQRScanner] = useState(false);
-  const [stats, setStats] = useState({
+  
+  const [semesterGrades, setSemesterGrades] = useState<{semester: string, sgpa: number}[]>([]); 
+  const [stats, setStats] = useState<StudentStats>({
     attendancePercentage: 0,
     cgpa: 0,
     enrolledCourses: 0,
     pendingAssignments: 0,
   });
+  
   const [todayClasses, setTodayClasses] = useState<any[]>([]);
-  const [upcomingAssignments, setUpcomingAssignments] = useState<any[]>([]);
+  const [scheduleDay, setScheduleDay] = useState<string>('Today');
+  const [upcomingAssignments, setUpcomingAssignments] = useState<Assignment[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
-  const [enrolledCoursesList, setEnrolledCoursesList] = useState<any[]>([]);
+  const [enrolledCoursesList, setEnrolledCoursesList] = useState<Course[]>([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -63,20 +89,25 @@ export function StudentDashboard() {
       }
 
       try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        // Parallel fetch for User and Profile
+        const [userDoc, profileDoc] = await Promise.all([
+          getDoc(doc(db, 'users', user.uid)),
+          getDoc(doc(db, 'studentProfiles', user.uid))
+        ]);
+
         const userInfo = userDoc.data();
-        setUserData(userInfo);
+        const pData = profileDoc.data() as StudentProfile;
 
-        if (userInfo?.role === 'student') {
-          const profileDoc = await getDoc(doc(db, 'studentProfiles', user.uid));
-          const pData = profileDoc.data();
-          setProfileData(pData);
+        if (userInfo) {
+            setFirstName(userInfo.fullName?.split(' ')[0] || 'Student');
+        }
+        setProfileData(pData);
 
-          // Fetch real stats
+        if (userInfo?.role === 'student' && pData) {
           await fetchStudentStats(user.uid, pData);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching initial data:', error);
       } finally {
         setLoading(false);
       }
@@ -85,9 +116,9 @@ export function StudentDashboard() {
     return () => unsubscribe();
   }, [navigate]);
 
-  const fetchStudentStats = async (userId: string, pData?: any) => {
+  const fetchStudentStats = async (userId: string, profile: StudentProfile) => {
     try {
-      // Fetch enrollments
+      // 1. Fetch Enrollments first to get Course IDs
       const enrollmentsQuery = query(
         collection(db, 'enrollments'),
         where('studentId', '==', userId),
@@ -95,134 +126,218 @@ export function StudentDashboard() {
       );
       const enrollmentsSnapshot = await getDocs(enrollmentsQuery);
       const enrolledCourseIds = enrollmentsSnapshot.docs.map(doc => doc.data().courseId);
+      
       const enrolledCount = enrolledCourseIds.length;
-
-      // Fetch course details for list
-      const courseDetails = await Promise.all(
-        enrolledCourseIds.map(async (id) => {
-          const courseDoc = await getDoc(doc(db, 'courses', id));
-          return { id, ...courseDoc.data() };
-        })
-      );
-      setEnrolledCoursesList(courseDetails);
-
-      // Fetch attendance
-      const attendanceQuery = query(
-        collection(db, 'attendance'),
-        where('studentId', '==', userId)
-      );
-      const attendanceSnapshot = await getDocs(attendanceQuery);
-      const attendanceRecords = attendanceSnapshot.docs.map(doc => doc.data());
-      const present = attendanceRecords.filter(r => r.status === 'present' || r.status === 'late').length;
-      const total = attendanceRecords.length;
-      const attendancePercentage = total > 0 ? Math.round((present / total) * 100) : 0;
-
-      // Fetch grades and calculate CGPA
-      const gradesQuery = query(
-        collection(db, 'grades'),
-        where('studentId', '==', userId)
-      );
-      const gradesSnapshot = await getDocs(gradesQuery);
-      const grades = gradesSnapshot.docs.map(doc => doc.data());
       
-      let totalGradePoints = 0;
-      let totalCredits = 0;
+      // 2. Fetch Core Data (Grades need to be fetched first to get course IDs)
+      const corePromises = [
+        getDocs(query(collection(db, 'attendance'), where('studentId', '==', userId))),
+        getDocs(query(collection(db, 'grades'), where('studentId', '==', userId))),
+        getDocs(query(collection(db, 'applications'), where('studentId', '==', userId))),
+        getDocs(query(collection(db, 'submissions'), where('studentId', '==', userId))),
+      ];
       
-      for (const grade of grades) {
-        let credits = grade.credits || 0;
-        
-        // Only fetch course data if credits are missing and courseId exists
-        if (!credits && grade.courseId) {
-          try {
-            const courseData = (courseDetails.find(c => c.id === grade.courseId) || 
-                               (await getDoc(doc(db, 'courses', grade.courseId))).data()) as any;
-            credits = courseData?.credits || 0;
-          } catch (e) {
-            console.error('Error fetching course data for grade:', grade.courseId, e);
-          }
-        }
-        
-        totalGradePoints += (grade.gradePoints || 0) * credits;
-        totalCredits += credits;
+      const [attendanceSnap, gradesSnap, appsSnap, submissionsSnap] = await Promise.all(corePromises);
+
+      // 3. Process Courses (Enrolled + Graded)
+      // Collect unique course IDs from both enrollments and grades
+      const gradeCourseIds = gradesSnap.docs.map((doc: any) => doc.data().courseId).filter((id: any) => id);
+      const allCourseIds = Array.from(new Set([...enrolledCourseIds, ...gradeCourseIds]));
+
+      // 4. Fetch Secondary Data (Courses, Assignments, Timetable)
+      const secondaryPromises = [];
+      
+      // Fetch Courses
+      if (allCourseIds.length > 0) {
+          secondaryPromises.push(Promise.all(allCourseIds.map(id => getDoc(doc(db, 'courses', id)))));
+      } else {
+          secondaryPromises.push(Promise.resolve([])); 
+      }
+
+      // Fetch Assignments (only for enrolled)
+      if (enrolledCourseIds.length > 0) {
+          // Chunking 'in' query if needed, but safe slice for now
+          const assignmentQuery = query(
+                collection(db, 'assignments'),
+                where('courseId', 'in', enrolledCourseIds.slice(0, 30))
+          );
+          secondaryPromises.push(getDocs(assignmentQuery));
+      } else {
+          secondaryPromises.push(Promise.resolve({ docs: [] }));
       }
       
-      const cgpa = totalCredits > 0 ? Math.round((totalGradePoints / totalCredits) * 100) / 100 : 0;
+      // Fetch Timetable
+      if (profile.department && profile.semester) {
+          const timetableQuery = query(
+            collection(db, 'timetable'),
+            where('department', '==', profile.department),
+            where('semester', '==', profile.semester)
+          );
+          secondaryPromises.push(getDocs(timetableQuery));
+      } else {
+          secondaryPromises.push(Promise.resolve({ docs: [] }));
+      }
 
-      // Fetch assignments
-      const assignmentsQuery = query(collection(db, 'assignments'));
-      const assignmentsSnapshot = await getDocs(assignmentsQuery);
-      const allAssignments = assignmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const [coursesResult, assignmentsSnap, timetableSnap] = await Promise.all(secondaryPromises);
+
+      // --- Process Attendance ---
+      const attendanceRecords = attendanceSnap.docs.map((d: any) => d.data());
+      const present = attendanceRecords.filter((r: any) => r.status === 'present' || r.status === 'late').length;
+      const totalAttendance = attendanceRecords.length;
+      const attendancePercentage = totalAttendance > 0 ? Math.round((present / totalAttendance) * 100) : 0;
+
+      // --- Process Courses ---
+      let allCoursesData: Course[] = [];
+      if (Array.isArray(coursesResult)) { 
+          allCoursesData = coursesResult
+            .filter(d => d.exists())
+            .map((d: any) => ({ id: d.id, ...d.data() } as Course));
+      }
+      // Filter for enrolled list display
+      setEnrolledCoursesList(allCoursesData.filter(c => enrolledCourseIds.includes(c.id)));
+
+      // --- Process Grades & CGPA ---
+      // --- Process Grades & CGPA ---
+      const grades = gradesSnap.docs.map((d: any) => d.data());
       
-      // Filter for enrolled courses
-      const myAssignments = allAssignments.filter((a: any) => enrolledCourseIds.includes(a.courseId));
+      // Helper to parse grades safely
+      const parsedGrades = grades.map((g: any) => ({
+          ...g,
+          semester: Number(g.semester) || 0,
+          credits: Number(g.credits) || 3, // Default to 3 credits if missing to prevent 0-height bars
+          gradePoints: Number(g.gradePoints) || 0
+      }));
+
+      // Calculate stats per semester first
+      const semStats: Record<number, {points: number, credits: number}> = {};
       
-      // Get submissions
-      const submissionsQuery = query(
-        collection(db, 'submissions'),
-        where('studentId', '==', userId)
-      );
-      const submissionsSnapshot = await getDocs(submissionsQuery);
-      const submittedIds = submissionsSnapshot.docs.map(doc => doc.data().assignmentId);
+      parsedGrades.forEach((grade: any) => {
+           // Fallback semester from course if 0 (though we defaulted credits, semester is crucial)
+           let sem = grade.semester;
+           if (sem === 0 && grade.courseId) {
+                const c = allCoursesData.find(course => course.id === grade.courseId);
+                if (c) sem = c.semester;
+           }
+           
+           if (sem > 0) {
+               if (!semStats[sem]) semStats[sem] = { points: 0, credits: 0 };
+               semStats[sem].points += (grade.gradePoints * grade.credits);
+               semStats[sem].credits += grade.credits;
+           }
+      });
+
+      // Calculate Cumulative GPA (CGPA) trend
+      let runningPoints = 0;
+      let runningCredits = 0;
       
-      const pending = myAssignments.filter((a: any) => !submittedIds.includes(a.id));
+      const semData = Object.keys(semStats)
+        .map(Number)
+        .sort((a, b) => a - b)
+        .map(sem => {
+            const current = semStats[sem];
+            
+            // For trend line/bar, user wants Cumulative Performance
+            runningPoints += current.points;
+            runningCredits += current.credits;
+            
+            const sgpa = current.credits > 0 ? (current.points / current.credits) : 0;
+            const cgpa = runningCredits > 0 ? (runningPoints / runningCredits) : 0;
+
+            return {
+                semester: `S${sem}`, // Short label S1, S2
+                sgpa: Number(sgpa.toFixed(2)),
+                cgpa: Number(cgpa.toFixed(2)), // We will plot this
+                displayValue: Number(cgpa.toFixed(2)) // Universal key for the render
+            };
+        });
+        
+      setSemesterGrades(semData as any);
+
+      // --- Process Assignments ---
+      const submissions = submissionsSnap.docs.map((d: any) => d.data().assignmentId);
+      const allAssignments = assignmentsSnap.docs ? assignmentsSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })) : [];
+      
+      const pending = allAssignments.filter((a: any) => !submissions.includes(a.id));
       const pendingCount = pending.length;
-      
-      // Sort by due date and get top 3
+
+      // Sort Assignments
       const upcoming = pending
         .sort((a: any, b: any) => {
           const dateA = a.dueDate?.toDate?.() || new Date(a.dueDate);
           const dateB = b.dueDate?.toDate?.() || new Date(b.dueDate);
           return dateA.getTime() - dateB.getTime();
         })
-        .slice(0, 3);
-      
-      // Add course names to assignments
-      const upcomingWithCourses = upcoming.map((assignment: any) => {
-        const courseData = courseDetails.find(c => c.id === assignment.courseId) as any;
-        return {
-          ...assignment,
-          courseCode: courseData?.code || 'N/A',
-          courseName: courseData?.name || 'Unknown',
-        };
-      });
+        .slice(0, 3)
+        .map((a: any) => {
+            const course = allCoursesData.find(c => c.id === a.courseId);
+            return {
+                ...a,
+                courseCode: course?.code || 'N/A',
+                courseName: course?.name || 'Unknown'
+            };
+        });
+      setUpcomingAssignments(upcoming);
 
-      // Fetch applications
-      const appsQuery = query(
-        collection(db, 'applications'),
-        where('studentId', '==', userId)
-      );
-      const appsSnapshot = await getDocs(appsQuery);
-      setApplications(appsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      // --- Process Applications ---
+      setApplications(appsSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
 
-      // Fetch today's schedule from centralized timetable
-      if (pData?.department && pData?.semester) {
-        const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-        const timetableQuery = query(
-          collection(db, 'timetable'),
-          where('department', '==', pData.department),
-          where('semester', '==', pData.semester)
-        );
-        const timetableSnapshot = await getDocs(timetableQuery);
-        const todaySchedule = timetableSnapshot.docs
-          .map(doc => doc.data())
-          .filter((item: any) => item.day === today)
-          .map((item: any) => ({
-            ...item,
-            startTime: item.timeSlot?.split('-')[0] || '09:00',
-            endTime: item.timeSlot?.split('-')[1] || '10:00',
-          }));
-        
-        todaySchedule.sort((a: any, b: any) => a.startTime.localeCompare(b.startTime));
-        setTodayClasses(todaySchedule);
+      // --- Process Timetable (Smart Schedule) ---
+      if (timetableSnap && timetableSnap.docs) {
+          const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+          const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+          
+          let scheduleItems = timetableSnap.docs.map(d => d.data());
+          let activeDay = todayStr;
+          let displayLabel = "Today";
+          
+          // Helper to get formatted schedule for a specific day
+          const getScheduleForDay = (dayName: string) => {
+             return scheduleItems
+                .filter((item: any) => item.day === dayName)
+                .map((item: any) => {
+                    const course = allCoursesData.find(c => c.code === item.courseCode);
+                    return {
+                        ...item,
+                        courseName: course?.name || 'Unknown Course',
+                        instructor: course?.instructor || 'TBA',
+                        startTime: item.timeSlot?.split('-')[0] || '09:00',
+                        endTime: item.timeSlot?.split('-')[1] || '10:00',
+                    };
+                })
+                .sort((a: any, b: any) => a.startTime.localeCompare(b.startTime));
+          };
+
+          let activeSchedule = getScheduleForDay(todayStr);
+
+          // If no classes today, find next working day
+          if (activeSchedule.length === 0) {
+             const todayIndex = daysOfWeek.indexOf(todayStr);
+             for (let i = 1; i < 7; i++) {
+                const nextDayIndex = (todayIndex + i) % 7;
+                const nextDay = daysOfWeek[nextDayIndex];
+                const nextSchedule = getScheduleForDay(nextDay);
+                
+                if (nextSchedule.length > 0) {
+                   activeSchedule = nextSchedule;
+                   activeDay = nextDay;
+                   displayLabel = i === 1 ? "Tomorrow" : nextDay;
+                   break;
+                }
+             }
+          }
+          
+          setTodayClasses(activeSchedule);
+          setScheduleDay(displayLabel);
       }
 
+      // Update Stats State
+      const latestCGPA = semData.length > 0 ? semData[semData.length - 1].cgpa : 0;
       setStats({
         attendancePercentage,
-        cgpa,
+        cgpa: latestCGPA,
         enrolledCourses: enrolledCount,
         pendingAssignments: pendingCount,
       });
-      setUpcomingAssignments(upcomingWithCourses);
 
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -231,16 +346,24 @@ export function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
+       <div className="space-y-6">
+          <div className="flex justify-between items-center">
+             <div className="space-y-2">
+                <div className="h-8 w-64 bg-muted animate-pulse rounded-md" />
+                <div className="h-4 w-48 bg-muted animate-pulse rounded-md" />
+             </div>
+             <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+             {[1,2,3,4].map(i => <div key={i} className="h-24 bg-muted animate-pulse rounded-xl" />)}
+          </div>
+          <div className="grid gap-6 lg:grid-cols-3">
+             <div className="lg:col-span-2 h-64 bg-muted animate-pulse rounded-xl" />
+             <div className="h-64 bg-muted animate-pulse rounded-xl" />
+          </div>
+       </div>
     );
   }
-
-  const firstName = userData?.fullName?.split(' ')[0] || 'Student';
 
   return (
     <div className="space-y-6">
@@ -275,7 +398,11 @@ export function StudentDashboard() {
         animate="show"
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
-        <motion.div variants={item} className="card-elevated p-5">
+        <motion.div 
+            variants={item} 
+            className="card-elevated p-5 cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/examinations` : '/examinations')}
+        >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-foreground/10">
               <TrendingUp className="w-5 h-5 text-foreground" />
@@ -287,7 +414,11 @@ export function StudentDashboard() {
           </div>
         </motion.div>
 
-        <motion.div variants={item} className="card-elevated p-5">
+        <motion.div 
+            variants={item} 
+            className="card-elevated p-5 cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/attendance` : '/attendance')}
+        >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-success/10">
               <ClipboardCheck className="w-5 h-5 text-success" />
@@ -299,7 +430,11 @@ export function StudentDashboard() {
           </div>
         </motion.div>
 
-        <motion.div variants={item} className="card-elevated p-5">
+        <motion.div 
+            variants={item} 
+            className="card-elevated p-5 cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/courses` : '/courses')}
+        >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-foreground/10">
               <BookOpen className="w-5 h-5 text-foreground" />
@@ -311,7 +446,11 @@ export function StudentDashboard() {
           </div>
         </motion.div>
 
-        <motion.div variants={item} className="card-elevated p-5">
+        <motion.div 
+            variants={item} 
+            className="card-elevated p-5 cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/assignments` : '/assignments')}
+        >
           <div className="flex items-center gap-3">
             <div className={`p-2.5 rounded-xl ${stats.pendingAssignments > 0 ? 'bg-warning/10' : 'bg-muted'}`}>
               <FileText className={`w-5 h-5 ${stats.pendingAssignments > 0 ? 'text-warning' : 'text-muted-foreground'}`} />
@@ -332,7 +471,7 @@ export function StudentDashboard() {
               <BookOpen className="w-5 h-5 text-accent" />
               My Enrolled Courses
             </h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(orgSlug ? `/${orgSlug}/courses` : '/courses')}>
               View All
               <ArrowUpRight className="w-4 h-4 ml-1" />
             </Button>
@@ -341,20 +480,32 @@ export function StudentDashboard() {
             {enrolledCoursesList.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8 col-span-2">No active enrollments</p>
             ) : (
-              enrolledCoursesList.map((course, idx) => (
-                <div key={idx} className="p-4 rounded-xl border border-border hover:bg-primary transition-all group cursor-pointer">
-                  <div className="flex items-start justify-between">
+              enrolledCoursesList.slice(0, 4).map((course, idx) => (
+                <div 
+                    key={idx} 
+                    className="p-4 rounded-xl border border-border bg-card/50 hover:bg-accent/50 hover:border-accent transition-all group cursor-pointer relative overflow-hidden"
+                    onClick={() => navigate(orgSlug ? `/${orgSlug}/courses/${course.id}` : `/courses/${course.id}`)}
+                >
+                  <div className="flex items-start justify-between relative z-10">
                     <div>
-                      <p className="text-xs font-bold text-foreground group-hover:text-primary-foreground mb-1">{course.code}</p>
-                      <p className="font-semibold text-foreground group-hover:text-primary-foreground transition-colors line-clamp-1">{course.name}</p>
+                      <Badge variant="outline" className="mb-2 bg-background/50 backdrop-blur-sm">{course.code}</Badge>
+                      <p className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">{course.name}</p>
                     </div>
                   </div>
-                  <div className="mt-4 flex items-center justify-between text-[10px] text-muted-foreground group-hover:text-primary-foreground/80 font-medium uppercase tracking-wider transition-colors">
+                  <div className="mt-4 flex items-center justify-between text-[10px] text-muted-foreground font-medium uppercase tracking-wider relative z-10">
                     <span>{course.credits} Credits</span>
-                    <Badge variant="secondary" className="text-[9px] px-1.5 py-0 group-hover:bg-primary-foreground group-hover:text-primary border-none">Semester {course.semester}</Badge>
+                    <span className="group-hover:text-primary transition-colors">Sem {course.semester}</span>
                   </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               ))
+            )}
+            {enrolledCoursesList.length > 4 && (
+                <div className="col-span-2 flex justify-center mt-2">
+                    <Button variant="link" size="sm" onClick={() => navigate(orgSlug ? `/${orgSlug}/courses` : '/courses')} className="text-xs text-muted-foreground">
+                        +{enrolledCoursesList.length - 4} more courses
+                    </Button>
+                </div>
             )}
           </div>
         </motion.div>
@@ -363,25 +514,38 @@ export function StudentDashboard() {
         <motion.div variants={item} className="card-elevated p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Today's Schedule
+              <Calendar className="w-5 h-5 text-primary" />
+              {scheduleDay}'s Schedule
             </h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/timetable')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(orgSlug ? `/${orgSlug}/timetable` : '/timetable')}>
               Full
               <ArrowUpRight className="w-4 h-4 ml-1" />
             </Button>
           </div>
           <div className="space-y-3">
             {todayClasses.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No classes today</p>
+              <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground">No classes scheduled</p>
+              </div>
             ) : (
               todayClasses.map((cls, idx) => (
                 <div key={idx} className="p-3 rounded-lg border border-border bg-secondary/10">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-bold text-foreground">{cls.courseCode}</span>
-                    <Badge variant="outline" className="text-[10px] bg-background">{cls.startTime} - {cls.endTime}</Badge>
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-foreground">{cls.courseCode}</span>
+                            <span className="text-xs text-muted-foreground line-clamp-1 border-l border-border pl-2">{cls.courseName}</span>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                            <User className="w-3 h-3" /> {cls.instructor}
+                        </p>
+                    </div>
+                    <Badge variant="outline" className="text-[10px] bg-background whitespace-nowrap">{cls.startTime} - {cls.endTime}</Badge>
                   </div>
-                  <p className="text-[11px] text-muted-foreground font-medium mt-1 uppercase">{cls.room}</p>
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                    <MapPin className="w-3 h-3" />
+                    {cls.room}
+                  </div>
                 </div>
               ))
             )}
@@ -395,7 +559,7 @@ export function StudentDashboard() {
               <Briefcase className="w-5 h-5 text-foreground" />
               Applications
             </h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/placement')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(orgSlug ? `/${orgSlug}/placements` : '/placement')}>
               Browse
               <ArrowUpRight className="w-4 h-4 ml-1" />
             </Button>
@@ -404,15 +568,22 @@ export function StudentDashboard() {
             {applications.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">No active applications</p>
             ) : (
-              applications.map((app) => (
-                <div key={app.id} className="p-3 rounded-lg border border-border">
+              applications.slice(0, 3).map((app) => (
+                <div key={app.id} className="p-3 rounded-lg border border-border bg-card/50 hover:bg-accent/30 transition-colors">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-foreground line-clamp-1">{app.jobTitle}</span>
-                    <Badge variant={app.status === 'offered' ? 'success' : app.status === 'rejected' ? 'destructive' : 'secondary'} className="text-[9px] capitalize">
+                    <span className="text-sm font-semibold text-foreground line-clamp-1">{app.jobTitle}</span>
+                    <Badge variant="outline" className={
+                        app.status === 'offered' ? 'text-success border-success/30 bg-success/10' :
+                        app.status === 'rejected' ? 'text-destructive border-destructive/30 bg-destructive/10' :
+                        'text-primary border-primary/30 bg-primary/10'
+                    }>
                       {app.status}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{app.companyName}</p>
+                  <p className="text-xs text-muted-foreground font-medium flex items-center gap-1">
+                     <Briefcase className="w-3 h-3" />
+                     {app.companyName}
+                  </p>
                 </div>
               ))
             )}
@@ -426,7 +597,7 @@ export function StudentDashboard() {
               <Clock className="w-5 h-5" />
               Upcoming Deadlines
             </h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/assignments')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(orgSlug ? `/${orgSlug}/assignments` : '/assignments')}>
               View All
               <ArrowUpRight className="w-4 h-4 ml-1" />
             </Button>
@@ -442,7 +613,11 @@ export function StudentDashboard() {
                   const isUrgent = daysLeft <= 2;
 
                   return (
-                    <div key={assignment.id} className="p-3 rounded-xl border border-border group hover:border-warning/30 transition-colors">
+                    <div 
+                        key={assignment.id} 
+                        className="p-3 rounded-xl border border-border group hover:border-warning/30 transition-colors cursor-pointer"
+                        onClick={() => navigate(orgSlug ? `/${orgSlug}/assignments` : '/assignments')}
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[10px] font-bold text-warning uppercase">{assignment.courseCode}</span>
                         <Badge variant={isUrgent ? 'destructive' : 'secondary'} className="text-[9px]">
@@ -460,31 +635,105 @@ export function StudentDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <motion.div variants={item} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Button variant="outline" className="h-20" onClick={() => navigate('/courses')}>
-          <div className="flex flex-col items-center gap-2">
-            <BookOpen className="w-5 h-5" />
-            <span className="text-sm">My Courses</span>
-          </div>
-        </Button>
-        <Button variant="outline" className="h-20" onClick={() => navigate('/attendance')}>
-          <div className="flex flex-col items-center gap-2">
-            <ClipboardCheck className="w-5 h-5" />
-            <span className="text-sm">Attendance</span>
-          </div>
-        </Button>
-        <Button variant="outline" className="h-20" onClick={() => navigate('/examinations')}>
-          <div className="flex flex-col items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            <span className="text-sm">Grades</span>
-          </div>
-        </Button>
-        <Button variant="outline" className="h-20" onClick={() => navigate('/assignments')}>
-          <div className="flex flex-col items-center gap-2">
-            <FileText className="w-5 h-5" />
-            <span className="text-sm">Assignments</span>
-          </div>
-        </Button>
+
+      
+      {/* Analytics Section (New) */}
+      <motion.div variants={item} className="grid gap-6 lg:grid-cols-2">
+         {/* Grades History */}
+         <div 
+            className="card-elevated p-6 cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/examinations` : '/examinations')}
+         >
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+               <TrendingUp className="w-5 h-5 text-primary" />
+               Performance History
+            </h2>
+            {semesterGrades.length > 0 ? (
+                <div style={{ width: '100%', height: 250 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                            data={semesterGrades}
+                            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                        >
+                            <defs>
+                                <linearGradient id="colorCgpa" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
+                            <XAxis 
+                                dataKey="semester" 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                                dy={10}
+                            />
+                            <YAxis 
+                                domain={[0, 10]} 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                            />
+                            <Tooltip 
+                                contentStyle={{ 
+                                    backgroundColor: 'hsl(var(--popover))', 
+                                    border: '1px solid hsl(var(--border))',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                                }}
+                                formatter={(value: number) => [value, 'CGPA']}
+                                labelStyle={{ color: 'hsl(var(--muted-foreground))', marginBottom: '0.25rem' }}
+                            />
+                            <Area 
+                                type="monotone" 
+                                dataKey="cgpa" 
+                                stroke="hsl(var(--primary))" 
+                                strokeWidth={2}
+                                fillOpacity={1} 
+                                fill="url(#colorCgpa)" 
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            ) : (
+                <div className="h-48 flex items-center justify-center text-muted-foreground text-sm">
+                   No grade history data
+                </div>
+            )}
+         </div>
+         
+         {/* Attendance Overview (Quick Graph) */}
+         <div 
+            className="card-elevated p-6 cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/attendance` : '/attendance')}
+         >
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+               <ClipboardCheck className="w-5 h-5 text-success" />
+               Attendance Overview
+            </h2>
+            <div className="flex items-center justify-center h-48">
+               <div className="relative w-32 h-32 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90">
+                     <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-muted/20" />
+                     <circle 
+                        cx="64" cy="64" r="56" 
+                        stroke="currentColor" 
+                        strokeWidth="12" 
+                        fill="transparent" 
+                        strokeDasharray={351.86} 
+                        strokeDashoffset={351.86 - (351.86 * stats.attendancePercentage) / 100}
+                        className={`transition-all duration-1000 ease-out ${stats.attendancePercentage >= 75 ? 'text-success' : stats.attendancePercentage >= 60 ? 'text-warning' : 'text-destructive'}`}
+                        strokeLinecap="round"
+                     />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                     <span className="text-3xl font-bold">{stats.attendancePercentage}%</span>
+                     <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Present</span>
+                  </div>
+               </div>
+            </div>
+         </div>
       </motion.div>
 
       {/* QR Attendance Scanner Modal */}
@@ -497,8 +746,8 @@ export function StudentDashboard() {
             onSuccess={() => {
               setShowQRScanner(false);
               // Refresh attendance data
-              if (userData) {
-                fetchStudentStats(userData.uid, profileData);
+              if (auth.currentUser && profileData) {
+                fetchStudentStats(auth.currentUser.uid, profileData);
               }
             }}
             onClose={() => setShowQRScanner(false)}

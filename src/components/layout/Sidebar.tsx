@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation, Link } from "react-router-dom";
+import { NavLink, useLocation, Link, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -24,9 +24,21 @@ import {
   Wrench,
   HelpCircle,
   Activity,
+  Map,
+  User,
+  Target,
+  BarChart3,
+  Search,
+  Gift,
+  Cog,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCollegeSettings } from "@/hooks/useCollegeSettings";
+import { Input } from "@/components/ui/input"; // Import Input
+import ThemeToggler from "@/components/ThemeToggler"; // Import ThemeToggler
+import { LandingColorTheme } from "@/components/LandingColorTheme"; // Import Accent Picker
+import { GoogleTranslate } from "@/components/GoogleTranslate"; // Import Translate
 import type { UserRole } from "@/types";
 
 interface SidebarProps {
@@ -146,38 +158,14 @@ const navItems: NavItem[] = [
   },
   {
     icon: Briefcase,
-    label: "Job Board",
-    path: "/placements/jobs",
-    roles: ["student", "placement_officer", "recruiter"],
-  },
-  {
-    icon: Calendar,
-    label: "Placement Drives",
-    path: "/placements/drives",
-    roles: ["student", "placement_officer", "recruiter", "faculty"],
-  },
-  {
-    icon: Users,
-    label: "Applications",
-    path: "/placements/applications",
-    roles: ["recruiter", "placement_officer"],
-  },
-  {
-    icon: Building2,
-    label: "Recruiters",
-    path: "/placements/recruiters",
-    roles: ["placement_officer"],
+    label: "Career Portal",
+    path: "/career",
+    roles: ["student", "faculty", "placement_officer", "recruiter", "college_admin"],
   },
   {
     icon: FileText,
     label: "Resume Builder",
     path: "/resume-builder",
-    roles: ["student"],
-  },
-  {
-    icon: FileText,
-    label: "AI Analyzer",
-    path: "/resume-analyzer",
     roles: ["student"],
   },
   {
@@ -193,6 +181,12 @@ const navItems: NavItem[] = [
     roles: ["student"],
   },
   {
+    icon: Map,
+    label: "Campus Map",
+    path: "/campus-map",
+    roles: ["student", "faculty", "college_admin", "placement_officer"],
+  },
+  {
     icon: UtensilsCrossed,
     label: "Canteen Manager",
     path: "/admin/canteen",
@@ -202,6 +196,13 @@ const navItems: NavItem[] = [
     icon: Wrench,
     label: "Manage Hostel",
     path: "/admin/hostel",
+    roles: ["college_admin"],
+  },
+
+  {
+    icon: TrendingUp,
+    label: "Placement Insights",
+    path: "/admin/placement-insights",
     roles: ["college_admin"],
   },
   {
@@ -241,6 +242,7 @@ export function Sidebar({
   onMobileClose 
 }: SidebarProps) {
   const location = useLocation();
+  const { orgSlug } = useParams<{ orgSlug: string }>();
   const { settings } = useCollegeSettings();
   const filteredItems = navItems.filter((item) => item.roles.includes(role));
 
@@ -249,6 +251,8 @@ export function Sidebar({
       window.open(settings.website, '_blank');
     }
   };
+
+
 
   return (
     <>
@@ -260,14 +264,14 @@ export function Sidebar({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onMobileClose}
-          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-[90] bg-background/80 backdrop-blur-sm lg:hidden"
         />
       )}
     </AnimatePresence>
 
     <aside
       className={cn(
-        "fixed left-0 top-0 z-50 h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col",
+        "fixed left-0 top-0 z-[100] h-screen bg-sidebar/80 backdrop-blur-xl border-r border-sidebar-border transition-all duration-300 flex flex-col",
         collapsed ? "w-16" : "w-64",
         isMobile && !mobileMenuOpen && "-translate-x-full",
         isMobile && mobileMenuOpen && "translate-x-0 w-64 shadow-2xl"
@@ -336,42 +340,50 @@ export function Sidebar({
         )}
       </div>
 
+
+
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         <ul className="space-y-1">
           {filteredItems.map((item) => {
+            // Normalize pathname by removing orgSlug prefix for comparison
+            const currentPath = orgSlug && location.pathname.startsWith(`/${orgSlug}`)
+              ? location.pathname.slice(`/${orgSlug}`.length) || '/'
+              : location.pathname;
+            
             // Smart path matching for different route types
             let isActive = false;
             
             if (item.path === '/finance') {
               // Finance includes payment settings and other finance routes
-              isActive = location.pathname === item.path || 
-                        location.pathname.startsWith('/finance/') ||
-                        location.pathname === '/admin/payment-settings';
+              isActive = currentPath === item.path || 
+                        currentPath.startsWith('/finance/') ||
+                        currentPath === '/admin/payment-settings';
             } else if (item.path === '/settings') {
               // Settings includes college settings admin page
-              isActive = location.pathname === item.path || 
-                        location.pathname === '/admin/college-settings' ||
-                        location.pathname === '/admin/hostel';
+              isActive = currentPath === item.path || 
+                        currentPath === '/admin/college-settings' ||
+                        currentPath === '/admin/hostel';
             } else if (item.path === '/departments') {
               // Departments
-              isActive = location.pathname === item.path || 
-                        location.pathname.startsWith('/departments/');
+              isActive = currentPath === item.path || 
+                        currentPath.startsWith('/departments/');
             } else if (item.path === '/faculty') {
               // Faculty
-              isActive = location.pathname === item.path || 
-                        location.pathname.startsWith('/faculty/');
+              isActive = currentPath === item.path || 
+                        currentPath.startsWith('/faculty/');
             } else {
               // Default matching for other routes
-              isActive = location.pathname === item.path || 
-                        location.pathname.startsWith(item.path + '/') ||
-                        (item.path !== '/' && location.pathname.startsWith(item.path));
+              isActive = currentPath === item.path || 
+                        currentPath.startsWith(item.path + '/') ||
+                        (item.path !== '/' && currentPath.startsWith(item.path));
             }
+            
             
             return (
               <li key={item.path}>
                 <NavLink
-                  to={item.path}
+                  to={orgSlug ? `/${orgSlug}${item.path}` : item.path}
                   className={cn(
                     "sidebar-item",
                     isActive && "sidebar-item-active"
@@ -400,7 +412,21 @@ export function Sidebar({
             );
           })}
         </ul>
+
       </nav>
+
+      {/* Mobile Fixed Bottom Controls */}
+      {!collapsed && (
+        <div className="lg:hidden mt-auto px-4 py-4 border-t border-sidebar-border bg-sidebar-accent/5">
+            <div className="flex items-center justify-between gap-3">
+                 <div className="scale-90 origin-left"><ThemeToggler /></div>
+                 <div className="h-6 w-[1px] bg-border" />
+                 <div className="scale-90"><LandingColorTheme /></div>
+                 <div className="h-6 w-[1px] bg-border" />
+                 <div className="flex-1 min-w-0 overflow-hidden"><GoogleTranslate containerId="google_translate_sidebar" /></div>
+            </div>
+        </div>
+      )}
     </aside>
     </>
   );

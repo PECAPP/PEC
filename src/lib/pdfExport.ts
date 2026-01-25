@@ -777,7 +777,7 @@ export function exportRoomSchedule(
   const doc = new jsPDF('landscape');
   
   const title = `Room Schedule - ${roomName}`;
-  let yPos = addPDFHeader(doc, title);
+  const yPos = addPDFHeader(doc, title);
   
   // Group by day
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

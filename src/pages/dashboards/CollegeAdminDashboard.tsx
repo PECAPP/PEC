@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const container = {
   hidden: { opacity: 0 },
@@ -94,233 +95,274 @@ export function CollegeAdminDashboard() {
       </motion.div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Department Overview */}
-          <motion.div variants={item} className="card-elevated p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Department Overview</h2>
-              <Link to="/departments">
-                <Button variant="ghost" size="sm">
-                  View All
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </Button>
-              </Link>
-            </div>
-            <div className="space-y-3">
-              <DepartmentRow
-                name="Computer Science & Engineering"
-                students={1850}
-                faculty={48}
-                attendance={86}
-              />
-              <DepartmentRow
-                name="Electronics & Communication"
-                students={1420}
-                faculty={38}
-                attendance={82}
-              />
-              <DepartmentRow
-                name="Mechanical Engineering"
-                students={1180}
-                faculty={35}
-                attendance={79}
-              />
-              <DepartmentRow
-                name="Civil Engineering"
-                students={920}
-                faculty={28}
-                attendance={84}
-              />
-            </div>
-          </motion.div>
-
-          {/* Fee Analytics */}
-          <motion.div variants={item} className="card-elevated p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Fee Collection Status</h2>
-              <Link to="/financial-report">
-                <Button variant="ghost" size="sm">
-                  Financial Report
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </Button>
-              </Link>
-            </div>
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="text-center p-4 rounded-lg bg-success/10">
-                <p className="text-2xl font-bold text-success">78%</p>
-                <p className="text-sm text-muted-foreground">Collected</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-warning/10">
-                <p className="text-2xl font-bold text-warning">15%</p>
-                <p className="text-sm text-muted-foreground">Pending</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-destructive/10">
-                <p className="text-2xl font-bold text-destructive">7%</p>
-                <p className="text-sm text-muted-foreground">Overdue</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Collection Progress</span>
-                <span className="font-medium">₹4.2Cr / ₹5.4Cr</span>
-              </div>
-              <Progress value={78} className="h-2" />
-            </div>
-          </motion.div>
-
-          {/* Recent Admissions */}
-          <motion.div variants={item} className="card-elevated p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Recent Admissions</h2>
-              <Link to="/admissions">
-                <Button variant="ghost" size="sm">
-                  View All
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </Button>
-              </Link>
-            </div>
-            <div className="space-y-3">
-              <AdmissionRow
-                name="Priya Sharma"
-                department="Computer Science"
-                date="Dec 28, 2024"
-                status="approved"
-              />
-              <AdmissionRow
-                name="Rahul Verma"
-                department="Electronics"
-                date="Dec 27, 2024"
-                status="pending"
-              />
-              <AdmissionRow
-                name="Ananya Singh"
-                department="Mechanical"
-                date="Dec 26, 2024"
-                status="approved"
-              />
-            </div>
-          </motion.div>
+      <Tabs defaultValue="courses" className="space-y-6">
+        <div className="flex justify-between items-center">
+            <TabsList>
+                <TabsTrigger value="courses">Courses</TabsTrigger>
+                <TabsTrigger value="users">Users</TabsTrigger>
+                <TabsTrigger value="fees">Fees</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            </TabsList>
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-6">
-          {/* Alerts */}
-          <motion.div variants={item} className="p-4 rounded-xl bg-warning/10 border border-warning/20">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-warning mt-0.5" />
-              <div>
-                <h3 className="font-medium text-foreground">Action Required</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  12 faculty leave requests pending approval
-                </p>
-              </div>
+        {/* COURSES TAB */}
+        <TabsContent value="courses" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Department Overview */}
+                    <motion.div variants={item} className="card-elevated p-6">
+                        <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-foreground">Department Overview</h2>
+                        <Link to="/departments">
+                            <Button variant="ghost" size="sm">
+                            View All
+                            <ArrowUpRight className="w-3.5 h-3.5" />
+                            </Button>
+                        </Link>
+                        </div>
+                        <div className="space-y-3">
+                        <DepartmentRow
+                            name="Computer Science & Engineering"
+                            students={1850}
+                            faculty={48}
+                            attendance={86}
+                        />
+                        <DepartmentRow
+                            name="Electronics & Communication"
+                            students={1420}
+                            faculty={38}
+                            attendance={82}
+                        />
+                        <DepartmentRow
+                            name="Mechanical Engineering"
+                            students={1180}
+                            faculty={35}
+                            attendance={79}
+                        />
+                        <DepartmentRow
+                            name="Civil Engineering"
+                            students={920}
+                            faculty={28}
+                            attendance={84}
+                        />
+                        </div>
+                    </motion.div>
+                </div>
+                <div className="space-y-6">
+                     <motion.div variants={item} className="card-elevated p-6">
+                         <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
+                         <Link to="/courses/add">
+                             <Button variant="outline" size="sm" className="justify-start w-full">
+                                 <BookOpen className="w-4 h-4 mr-2" />
+                                 New Course
+                             </Button>
+                         </Link>
+                         <Link to="/college-schedule" className="mt-2 block">
+                             <Button variant="outline" size="sm" className="justify-start w-full">
+                                 <Calendar className="w-4 h-4 mr-2" />
+                                 Schedule
+                             </Button>
+                         </Link>
+                     </motion.div>
+                </div>
             </div>
-          </motion.div>
+        </TabsContent>
 
-          {/* Attendance Summary */}
-          <motion.div variants={item} className="card-elevated p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Attendance Summary</h2>
-            <div className="space-y-4">
-              <div className="text-center">
-                <div className="relative w-24 h-24 mx-auto">
-                  <svg className="w-24 h-24 transform -rotate-90">
-                    <circle
-                      cx="48"
-                      cy="48"
-                      r="40"
-                      className="stroke-secondary"
-                      strokeWidth="8"
-                      fill="none"
-                    />
-                    <circle
-                      cx="48"
-                      cy="48"
-                      r="40"
-                      className="stroke-accent"
-                      strokeWidth="8"
-                      fill="none"
-                      strokeDasharray={`${83 * 2.51} 251`}
-                    />
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-xl font-bold">
-                    83%
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Average Attendance</p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Present Today</span>
-                  <span className="font-medium text-success">7,245</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Absent Today</span>
-                  <span className="font-medium text-destructive">1,175</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">On Leave</span>
-                  <span className="font-medium text-warning">320</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+        {/* USERS TAB */}
+        <TabsContent value="users" className="space-y-6">
+             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                 <div className="lg:col-span-2 space-y-6">
+                    {/* Recent Admissions */}
+                    <motion.div variants={item} className="card-elevated p-6">
+                        <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-foreground">Recent Admissions</h2>
+                        <Link to="/admissions">
+                            <Button variant="ghost" size="sm">
+                            View All
+                            <ArrowUpRight className="w-3.5 h-3.5" />
+                            </Button>
+                        </Link>
+                        </div>
+                        <div className="space-y-3">
+                        <AdmissionRow
+                            name="Priya Sharma"
+                            department="Computer Science"
+                            date="Dec 28, 2024"
+                            status="approved"
+                        />
+                        <AdmissionRow
+                            name="Rahul Verma"
+                            department="Electronics"
+                            date="Dec 27, 2024"
+                            status="pending"
+                        />
+                        <AdmissionRow
+                            name="Ananya Singh"
+                            department="Mechanical"
+                            date="Dec 26, 2024"
+                            status="approved"
+                        />
+                        </div>
+                    </motion.div>
+                 </div>
+                 <div className="space-y-6">
+                    <motion.div variants={item} className="p-4 rounded-xl bg-warning/10 border border-warning/20">
+                        <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-warning mt-0.5" />
+                        <div>
+                            <h3 className="font-medium text-foreground">Action Required</h3>
+                            <p className="text-sm text-muted-foreground mt-1">
+                            12 faculty leave requests pending approval
+                            </p>
+                            <Link to="/approvals">
+                                <Button size="sm" variant="link" className="px-0 h-auto mt-2 text-warning">Review</Button>
+                            </Link>
+                        </div>
+                        </div>
+                    </motion.div>
+                    <motion.div variants={item} className="card-elevated p-6">
+                         <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
+                         <Link to="/faculty/add">
+                             <Button variant="outline" size="sm" className="justify-start w-full">
+                                 <Users className="w-4 h-4 mr-2" />
+                                 Add Faculty
+                             </Button>
+                         </Link>
+                     </motion.div>
+                 </div>
+             </div>
+        </TabsContent>
 
-          {/* Upcoming Events */}
-          <motion.div variants={item} className="card-elevated p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Upcoming Events</h2>
-            <div className="space-y-3">
-              <EventItem
-                title="Semester Exams Begin"
-                date="Jan 10, 2025"
-                type="exam"
-              />
-              <EventItem
-                title="Annual Day Celebration"
-                date="Jan 26, 2025"
-                type="event"
-              />
-              <EventItem
-                title="Placement Drive - TCS"
-                date="Feb 5, 2025"
-                type="placement"
-              />
+        {/* FEES TAB */}
+        <TabsContent value="fees" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                 <div className="lg:col-span-2 space-y-6">
+                      {/* Fee Analytics */}
+                      <motion.div variants={item} className="card-elevated p-6">
+                        <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-foreground">Fee Collection Status</h2>
+                        <Link to="/financial-report">
+                            <Button variant="ghost" size="sm">
+                            Financial Report
+                            <ArrowUpRight className="w-3.5 h-3.5" />
+                            </Button>
+                        </Link>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div className="text-center p-4 rounded-lg bg-success/10">
+                            <p className="text-2xl font-bold text-success">78%</p>
+                            <p className="text-sm text-muted-foreground">Collected</p>
+                        </div>
+                        <div className="text-center p-4 rounded-lg bg-warning/10">
+                            <p className="text-2xl font-bold text-warning">15%</p>
+                            <p className="text-sm text-muted-foreground">Pending</p>
+                        </div>
+                        <div className="text-center p-4 rounded-lg bg-destructive/10">
+                            <p className="text-2xl font-bold text-destructive">7%</p>
+                            <p className="text-sm text-muted-foreground">Overdue</p>
+                        </div>
+                        </div>
+                        <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Collection Progress</span>
+                            <span className="font-medium">₹4.2Cr / ₹5.4Cr</span>
+                        </div>
+                        <Progress value={78} className="h-2" />
+                        </div>
+                    </motion.div>
+                 </div>
+                 <div className="space-y-6">
+                     <motion.div variants={item} className="card-elevated p-6">
+                         <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
+                         <Link to="/fee-setup">
+                             <Button variant="outline" size="sm" className="justify-start w-full">
+                                 <CreditCard className="w-4 h-4 mr-2" />
+                                 Fee Setup
+                             </Button>
+                         </Link>
+                     </motion.div>
+                 </div>
             </div>
-          </motion.div>
+        </TabsContent>
 
-          {/* Quick Actions */}
-          <motion.div variants={item} className="card-elevated p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 gap-2">
-              <Link to="/faculty/add">
-                <Button variant="outline" size="sm" className="justify-start w-full">
-                  <Users className="w-4 h-4" />
-                  Add Faculty
-                </Button>
-              </Link>
-              <Link to="/courses/add">
-                <Button variant="outline" size="sm" className="justify-start w-full">
-                  <BookOpen className="w-4 h-4" />
-                  New Course
-                </Button>
-              </Link>
-              <Link to="/college-schedule">
-                <Button variant="outline" size="sm" className="justify-start w-full">
-                  <Calendar className="w-4 h-4" />
-                  Schedule
-                </Button>
-              </Link>
-              <Link to="/fee-setup">
-                <Button variant="outline" size="sm" className="justify-start w-full">
-                  <CreditCard className="w-4 h-4" />
-                  Fee Setup
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </div>
+        {/* ANALYTICS TAB */}
+        <TabsContent value="analytics" className="space-y-6">
+             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                 <div className="lg:col-span-2">
+                    {/* Attendance Summary */}
+                    <motion.div variants={item} className="card-elevated p-6">
+                        <h2 className="text-lg font-semibold text-foreground mb-4">Attendance Summary</h2>
+                        <div className="flex flex-col md:flex-row items-center gap-8">
+                            <div className="text-center">
+                                <div className="relative w-32 h-32 mx-auto">
+                                <svg className="w-32 h-32 transform -rotate-90">
+                                    <circle
+                                    cx="64"
+                                    cy="64"
+                                    r="56"
+                                    className="stroke-secondary"
+                                    strokeWidth="12"
+                                    fill="none"
+                                    />
+                                    <circle
+                                    cx="64"
+                                    cy="64"
+                                    r="56"
+                                    className="stroke-accent"
+                                    strokeWidth="12"
+                                    fill="none"
+                                    strokeDasharray={`${83 * 3.51} 351`}
+                                    />
+                                </svg>
+                                <span className="absolute inset-0 flex items-center justify-center text-3xl font-bold">
+                                    83%
+                                </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground mt-2">Overall Average</p>
+                            </div>
+                            <div className="flex-1 w-full space-y-4">
+                                <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                                    <span className="text-muted-foreground">Present Today</span>
+                                    <span className="font-bold text-success text-lg">7,245</span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                                    <span className="text-muted-foreground">Absent Today</span>
+                                    <span className="font-bold text-destructive text-lg">1,175</span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-secondary/30 rounded-lg">
+                                    <span className="text-muted-foreground">On Leave</span>
+                                    <span className="font-bold text-warning text-lg">320</span>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                 </div>
+                 <div>
+                    {/* Upcoming Events */}
+                    <motion.div variants={item} className="card-elevated p-6">
+                        <h2 className="text-lg font-semibold text-foreground mb-4">Upcoming Events</h2>
+                        <div className="space-y-3">
+                        <EventItem
+                            title="Semester Exams Begin"
+                            date="Jan 10, 2025"
+                            type="exam"
+                        />
+                        <EventItem
+                            title="Annual Day Celebration"
+                            date="Jan 26, 2025"
+                            type="event"
+                        />
+                        <EventItem
+                            title="Placement Drive - TCS"
+                            date="Feb 5, 2025"
+                            type="placement"
+                        />
+                        </div>
+                    </motion.div>
+                 </div>
+             </div>
+        </TabsContent>
+      </Tabs>
     </motion.div>
   );
 }

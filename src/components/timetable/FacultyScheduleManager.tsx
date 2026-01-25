@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
-import { collection, addDoc, updateDoc, doc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, query, where, getDocs, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db, auth } from '@/config/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, Clock, MapPin, Plus, Edit, Bell } from 'lucide-react';
@@ -84,8 +84,40 @@ export function FacultyScheduleManager({ courses, onScheduleAdded }: FacultySche
         createdAt: serverTimestamp(),
       });
 
-      // TODO: Send notifications to enrolled students
-      // This would require fetching enrolled students and creating notification records
+      // Send notifications to enrolled students
+      const batch = writeBatch(db);
+      
+      // Find students in this course's department and semester
+      // Note: This is a simplified logic. In a real app, you'd check specific course enrollment.
+      if (course.department && course.semester) {
+        const studentsQuery = query(
+          collection(db, 'users'),
+          where('role', '==', 'student'),
+          where('department', '==', course.department),
+          where('semester', '==', course.semester)
+        );
+        
+        const studentsSnap = await getDocs(studentsQuery);
+        
+        studentsSnap.forEach((studentDoc) => {
+          const notifRef = doc(collection(db, 'notifications'));
+          batch.set(notifRef, {
+            userId: studentDoc.id,
+            title: `${formData.type === 'extra' ? 'Extra Class' : 'Makeup Class'} Scheduled`,
+            message: `${course.name}: ${formData.type === 'extra' ? 'Extra' : 'Makeup'} class on ${new Date(formData.date).toLocaleDateString()} at ${formData.startTime}`,
+            type: 'agenda', // or 'info'
+            read: false,
+            createdAt: serverTimestamp(),
+            relatedId: formData.courseId
+          });
+        });
+        
+        await batch.commit();
+        toast({
+            title: "Notifications Sent",
+            description: `Notified ${studentsSnap.size} students.`,
+        });
+      }
 
       toast({
         title: 'Class Added',

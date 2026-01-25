@@ -1,16 +1,20 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCcsupbQB5vNlZGfTFXUxq5q7SKBry5ntM",
-  authDomain: "omniflow-8933a.firebaseapp.com",
-  projectId: "omniflow-8933a",
-  storageBucket: "omniflow-8933a.firebasestorage.app",
-  messagingSenderId: "250987767866",
-  appId: "1:250987767866:web:a746b33b2eea130a772d03",
-  measurementId: "G-04S0V5GJ4N"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
@@ -21,7 +25,7 @@ export const auth = getAuth(app);
 
 // Set persistence to local (survives page refresh)
 setPersistence(auth, browserLocalPersistence).catch((error) => {
-  console.log("Persistence error:", error);
+  console.error("Firebase persistence error:", error);
 });
 
 // Initialize Firestore

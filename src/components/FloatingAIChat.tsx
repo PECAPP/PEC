@@ -108,7 +108,7 @@ const FloatingAIChat = () => {
           <motion.button
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+            className="fixed bottom-20 lg:bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
           >
             <Bot className="h-6 w-6" />
           </motion.button>
@@ -120,9 +120,10 @@ const FloatingAIChat = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            exit={{ opacity: 0, scale: 0.95, y: 0 }}
             // Increased size: Width from 360px to 440px, Height from 500px to 650px
-            className="fixed bottom-6 right-6 z-50 w-[440px] max-w-[calc(100vw-2rem)] h-[650px] max-h-[calc(100vh-4rem)] flex flex-col rounded-2xl border bg-card shadow-2xl overflow-hidden"
+            // Mobile: bottom-20 to clear nav
+            className="fixed bottom-20 lg:bottom-6 right-6 z-50 w-[440px] max-w-[calc(100vw-2rem)] h-[650px] max-h-[calc(100vh-8rem)] flex flex-col rounded-2xl border bg-card shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="p-4 border-b flex items-center justify-between bg-background/50 backdrop-blur-md">

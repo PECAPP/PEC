@@ -14,6 +14,9 @@ import {
   LogOut,
   ChevronRight,
   Loader2,
+  Palette,
+  Check,
+  Copy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +37,11 @@ import { auth, db } from '@/config/firebase';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
+// Admin Settings
+import CollegeSettings from './admin/CollegeSettings';
+import PaymentSettings from './admin/PaymentSettings';
+import PlacementSettingsPage from './admin/PlacementSettings';
+import { Building2, CreditCard, Cog } from 'lucide-react';
 
 interface ConnectedAccount {
   id: string;
@@ -72,6 +80,29 @@ export default function Settings() {
     showPhone: false,
     allowRecruiterContact: true,
   });
+
+  // Accent color themes
+  const accentColors = [
+    { id: 'obsidian', name: 'Obsidian', color: '#18181B' },
+    { id: 'emerald', name: 'Emerald', color: '#10B981' },
+    { id: 'sapphire', name: 'Sapphire', color: '#3B82F6' },
+    { id: 'amethyst', name: 'Amethyst', color: '#8B5CF6' },
+    { id: 'coral', name: 'Coral', color: '#F97316' },
+  ];
+
+  const [accentColor, setAccentColor] = useState(() => {
+    return localStorage.getItem('accent-color') || 'obsidian';
+  });
+
+  // Apply accent color to body class
+  useEffect(() => {
+    const root = document.documentElement;
+    // Remove all existing accent classes
+    accentColors.forEach(({ id }) => root.classList.remove(`accent-${id}`));
+    // Add the new accent class
+    root.classList.add(`accent-${accentColor}`);
+    localStorage.setItem('accent-color', accentColor);
+  }, [accentColor]);
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
@@ -139,6 +170,10 @@ export default function Settings() {
             <User className="w-4 h-4" />
             Profile
           </TabsTrigger>
+          <TabsTrigger value="appearance" className="gap-2">
+            <Palette className="w-4 h-4" />
+            Appearance
+          </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2">
             <Bell className="w-4 h-4" />
             Notifications
@@ -155,6 +190,24 @@ export default function Settings() {
             <Shield className="w-4 h-4" />
             Security
           </TabsTrigger>
+          
+          {/* Admin Settings Tabs */}
+          {user?.role === 'college_admin' && (
+            <>
+              <TabsTrigger value="college" className="gap-2">
+                <Building2 className="w-4 h-4" />
+                College
+              </TabsTrigger>
+              <TabsTrigger value="payment" className="gap-2">
+                <CreditCard className="w-4 h-4" />
+                Payment
+              </TabsTrigger>
+              <TabsTrigger value="placement" className="gap-2">
+                <Cog className="w-4 h-4" />
+                Placement
+              </TabsTrigger>
+            </>
+          )}
         </TabsList>
 
         {/* Profile Tab */}
@@ -237,6 +290,57 @@ export default function Settings() {
           </motion.div>
         </TabsContent>
 
+        {/* Appearance Tab */}
+        <TabsContent value="appearance">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <div className="card-elevated p-6">
+              <h3 className="font-semibold text-foreground mb-2">Accent Color</h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Choose your preferred accent color for buttons, links, and highlights.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {accentColors.map((color) => (
+                  <button
+                    key={color.id}
+                    onClick={() => setAccentColor(color.id)}
+                    className={cn(
+                      "relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200",
+                      accentColor === color.id
+                        ? "border-primary bg-primary/5 shadow-md"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                    )}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full shadow-lg ring-2 ring-white/20"
+                      style={{ background: color.color }}
+                    />
+                    <span className="text-sm font-medium text-foreground">
+                      {color.name}
+                    </span>
+                    {accentColor === color.id && (
+                      <div className="absolute top-2 right-2">
+                        <Check className="w-4 h-4 text-primary" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="card-elevated p-6">
+              <h3 className="font-semibold text-foreground mb-2">Theme</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Light and dark modes are automatically managed by your system preferences.
+              </p>
+              <Badge variant="outline">System Preference</Badge>
+            </div>
+          </motion.div>
+        </TabsContent>
+
         {/* Notifications Tab */}
         <TabsContent value="notifications">
           <motion.div
@@ -309,8 +413,43 @@ export default function Settings() {
           >
             <h3 className="font-semibold text-foreground mb-6">Privacy Settings</h3>
             <div className="space-y-4">
+              <div className="flex items-center justify-between py-3 border-b border-border last:border-0">
+                <div>
+                  <p className="font-medium text-foreground">Public Profile</p>
+                  <p className="text-sm text-muted-foreground">Allow others to view your profile via shareable link</p>
+                  {profileData?.isPublic !== false && (
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/student/${user?.uid}`);
+                        toast.success('Link copied');
+                      }}
+                      className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                    >
+                      Copy Link <Copy className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+                <Switch
+                  checked={profileData?.isPublic !== false}
+                  onCheckedChange={async (checked) => {
+                    try {
+                      const collectionName = userData?.role === 'student' ? 'studentProfiles' : 
+                                            userData?.role === 'faculty' ? 'facultyProfiles' : 'users'; // Fallback
+                      
+                      await updateDoc(doc(db, collectionName, user!.uid), {
+                        isPublic: checked
+                      });
+                      
+                      setProfileData({ ...profileData, isPublic: checked });
+                      toast.success(`Profile is now ${checked ? 'Public' : 'Private'}`);
+                    } catch (error) {
+                      toast.error('Failed to update privacy');
+                    }
+                  }}
+                />
+              </div>
+
               {[
-                { key: 'profileVisible', label: 'Public Profile', description: 'Allow others to view your profile' },
                 { key: 'showEmail', label: 'Show Email', description: 'Display email on public profile' },
                 { key: 'showPhone', label: 'Show Phone', description: 'Display phone on public profile' },
                 { key: 'allowRecruiterContact', label: 'Recruiter Contact', description: 'Allow recruiters to contact you directly' },
@@ -552,6 +691,20 @@ export default function Settings() {
             </div>
           </motion.div>
         </TabsContent>
+        {/* Admin Tabs Content */}
+        {user?.role === 'college_admin' && (
+          <>
+            <TabsContent value="college">
+              <CollegeSettings embedded={true} />
+            </TabsContent>
+            <TabsContent value="payment">
+              <PaymentSettings embedded={true} />
+            </TabsContent>
+            <TabsContent value="placement">
+              <PlacementSettingsPage embedded={true} />
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </div>
   );

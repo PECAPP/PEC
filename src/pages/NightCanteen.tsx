@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { ImageWithBlur } from '@/components/ui/image-with-blur';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CanteenItem {
   id: string;
@@ -221,7 +223,17 @@ export function NightCanteen() {
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="h-48 rounded-xl bg-muted animate-pulse" />
+                   <div key={i} className="rounded-2xl border border-border bg-card overflow-hidden">
+                      <Skeleton className="h-48 w-full" />
+                      <div className="p-4 space-y-3">
+                         <div className="flex justify-between">
+                            <Skeleton className="h-6 w-3/4" />
+                            <Skeleton className="h-6 w-12" />
+                         </div>
+                         <Skeleton className="h-4 w-full" />
+                         <Skeleton className="h-10 w-full rounded-md" />
+                      </div>
+                   </div>
                 ))}
               </div>
             ) : filteredItems.length > 0 ? (
@@ -232,12 +244,14 @@ export function NightCanteen() {
                     key={item.id}
                     className="group relative overflow-hidden rounded-2xl border border-border bg-card hover:border-primary/50 transition-all card-shadow"
                   >
-                    <div className="aspect-[16/9] overflow-hidden">
-                      <img 
+                    <div className="aspect-[16/9] overflow-hidden bg-muted relative">
+                      <ImageWithBlur 
                         src={item.image} 
                         alt={item.name} 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fallbackColor="bg-muted"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                     <div className="p-4">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
@@ -249,7 +263,7 @@ export function NightCanteen() {
                       </p>
                       <Button 
                         onClick={() => addToCart(item)}
-                        className="w-full group-hover:bg-primary"
+                        className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm"
                         variant="secondary"
                       >
                         <Plus className="w-4 h-4 mr-2" />
@@ -287,11 +301,13 @@ export function NightCanteen() {
                   <div className="space-y-4 mb-8 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
                     {cart.map((item) => (
                       <div key={item.id} className="flex gap-3">
-                        <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="w-16 h-16 rounded-lg object-cover bg-muted" 
-                        />
+                        <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-border">
+                          <ImageWithBlur 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-full h-full object-cover" 
+                          /> 
+                        </div>
                         <div className="flex-1">
                           <h4 className="font-medium text-sm">{item.name}</h4>
                           <p className="text-primary text-sm">₹{item.price}</p>

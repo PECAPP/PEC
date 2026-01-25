@@ -10,13 +10,11 @@ import {
   Loader2,
   UserPlus,
   Shield,
-  Mail,
-  Phone,
-  Key,
   Upload,
   Download,
+  Key,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -36,17 +34,19 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { onAuthStateChanged } from 'firebase/auth';
-import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
   deleteDoc,
   doc,
   getDoc,
   serverTimestamp,
   query,
   where,
+  limit,
+  writeBatch,
 } from 'firebase/firestore';
 import { auth, db } from '@/config/firebase';
 import { toast } from 'sonner';
@@ -55,7 +55,6 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
 import BulkUpload from '@/components/BulkUpload';
 import * as XLSX from 'xlsx';
-import { useParams } from 'react-router-dom';
 
 export default function Users() {
   const navigate = useNavigate();
@@ -66,7 +65,7 @@ export default function Users() {
   const [users, setUsers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
-  
+
   const [showDialog, setShowDialog] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
@@ -85,8 +84,8 @@ export default function Users() {
   });
 
   useEffect(() => {
-    if (authLoading) return; // Wait for auth to load
-    
+    if (authLoading) return;
+
     if (!user) {
       navigate('/auth');
       return;
@@ -111,70 +110,79 @@ export default function Users() {
     };
 
     loadUsers();
-  }, [user, isAdmin, isFaculty, isPlacementOfficer, navigate]);
+  }, [user, isAdmin, isFaculty, isPlacementOfficer, navigate, authLoading, orgSlug]);
 
   const fetchUsers = async () => {
     try {
       let usersData: any[] = [];
+      let usersQuery;
 
       // Super admin or no orgSlug: show all users
       if (!orgSlug || user?.role === 'super_admin') {
-        const usersSnapshot = await getDocs(collection(db, 'users'));
-        usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+         // Optimization: Limit global fetch to 100 to prevent browser crash
+         // TODO: Implement proper server-side pagination for super admins
+         usersQuery = query(collection(db, 'users'), limit(100));
       } else {
-        // Get organization ID from slug
-        const orgsSnapshot = await getDocs(collection(db, 'organizations'));
-        const org = orgsSnapshot.docs.find(doc => doc.data().slug === orgSlug);
-        
-        if (!org) {
+        // Optimized: Query organization by slug instead of fetching ALL organizations
+        const orgQuery = query(collection(db, 'organizations'), where('slug', '==', orgSlug), limit(1));
+        const orgSnapshot = await getDocs(orgQuery);
+
+        if (orgSnapshot.empty) {
           toast.error('Organization not found');
           return;
         }
 
-        // Query users by organizationId
-        const usersQuery = query(
+        const orgId = orgSnapshot.docs[0].id;
+
+        usersQuery = query(
           collection(db, 'users'),
-          where('organizationId', '==', org.id)
+          where('organizationId', '==', orgId)
+          // Removing limit here as an org might want to see all their users,
+          // but strictly we should paginate. For now, assuming org size < 500 is okay-ish.
         );
-        const usersSnapshot = await getDocs(usersQuery);
-        usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       }
-      
-      // Apply department filtering for faculty
+
+      const usersSnapshot = await getDocs(usersQuery);
+      usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+
+      // Apply department filtering client-side for faculty (security rule handles server side)
       usersData = filterByDepartment(usersData);
-      
+
       setUsers(usersData);
     } catch (error) {
       console.error('Error fetching users:', error);
+      toast.error('Failed to fetch users');
     }
   };
 
   const handleCreate = async () => {
     try {
-      // Get current organization ID
       let currentOrgId = null;
       if (orgSlug) {
-        const orgsSnapshot = await getDocs(collection(db, 'organizations'));
-        const org = orgsSnapshot.docs.find(doc => doc.data().slug === orgSlug);
-        if (org) {
-          currentOrgId = org.id;
-        }
+        const orgQuery = query(collection(db, 'organizations'), where('slug', '==', orgSlug), limit(1));
+        const orgSnapshot = await getDocs(orgQuery);
+        if (!orgSnapshot.empty) currentOrgId = orgSnapshot.docs[0].id;
       }
 
-      const userRef = await addDoc(collection(db, 'users'), {
+      // Batch Write for Atomicity
+      const batch = writeBatch(db);
+      const userRef = doc(collection(db, 'users'));
+
+      batch.set(userRef, {
         fullName: userForm.fullName,
         email: userForm.email,
         role: userForm.role,
-        organizationId: currentOrgId, // Set organization
+        organizationId: currentOrgId,
         profileComplete: false,
         status: 'active',
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
 
-      // Create role-specific profile
       if (userForm.role === 'student') {
-        await addDoc(collection(db, 'studentProfiles'), {
+        const linkedProfileRef = doc(db, 'studentProfiles', userRef.id);
+
+        batch.set(linkedProfileRef, {
           uid: userRef.id,
           fullName: userForm.fullName,
           email: userForm.email,
@@ -186,7 +194,8 @@ export default function Users() {
           createdAt: serverTimestamp(),
         });
       } else if (userForm.role === 'faculty') {
-        await addDoc(collection(db, 'facultyProfiles'), {
+         const linkedProfileRef = doc(db, 'facultyProfiles', userRef.id);
+         batch.set(linkedProfileRef, {
           uid: userRef.id,
           fullName: userForm.fullName,
           email: userForm.email,
@@ -198,6 +207,8 @@ export default function Users() {
           createdAt: serverTimestamp(),
         });
       }
+
+      await batch.commit();
 
       toast.success('User created successfully!');
       setShowDialog(false);
@@ -293,65 +304,75 @@ export default function Users() {
   };
 
   const handleBulkImport = async (data: any[]) => {
+    let currentOrgId = null;
+    if (orgSlug) {
+        const orgQuery = query(collection(db, 'organizations'), where('slug', '==', orgSlug), limit(1));
+        const orgSnapshot = await getDocs(orgQuery);
+        if (!orgSnapshot.empty) currentOrgId = orgSnapshot.docs[0].id;
+    }
+
+    // Process in chunks of 250 (max 500 ops per batch, assuming 2 ops per user)
+    const CHUNK_SIZE = 250;
     let successCount = 0;
     let failCount = 0;
     const errors: string[] = [];
 
-    // Get current organization ID
-    let currentOrgId = null;
-    if (orgSlug) {
-      const orgsSnapshot = await getDocs(collection(db, 'organizations'));
-      const org = orgsSnapshot.docs.find(doc => doc.data().slug === orgSlug);
-      if (org) {
-        currentOrgId = org.id;
-      }
-    }
+    // Simple validation before batching could go here
 
-    for (const row of data) {
-      try {
-        const userRef = await addDoc(collection(db, 'users'), {
-          fullName: row.fullName || row.name,
-          email: row.email,
-          role: row.role || 'student',
-          organizationId: currentOrgId, // Set organization
-          profileComplete: false,
-          status: 'active',
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
+    for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+        const chunk = data.slice(i, i + CHUNK_SIZE);
+        const batch = writeBatch(db);
+
+        chunk.forEach((row) => {
+            const userRef = doc(collection(db, 'users'));
+            batch.set(userRef, {
+                fullName: row.fullName || row.name,
+                email: row.email,
+                role: row.role || 'student',
+                organizationId: currentOrgId,
+                profileComplete: false,
+                status: 'active',
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            });
+
+            if (row.role === 'student' || !row.role) {
+                const profileRef = doc(db, 'studentProfiles', userRef.id);
+                batch.set(profileRef, {
+                    uid: userRef.id,
+                    fullName: row.fullName || row.name,
+                    email: row.email,
+                    enrollmentNumber: row.enrollmentNumber || '',
+                    department: row.department || '',
+                    semester: parseInt(row.semester) || 1,
+                    phone: row.phone || '',
+                    dateOfBirth: row.dateOfBirth || '',
+                    createdAt: serverTimestamp(),
+                });
+            } else if (row.role === 'faculty') {
+                 const profileRef = doc(db, 'facultyProfiles', userRef.id);
+                 batch.set(profileRef, {
+                    uid: userRef.id,
+                    fullName: row.fullName || row.name,
+                    email: row.email,
+                    employeeId: row.employeeId || '',
+                    department: row.department || '',
+                    designation: row.designation || '',
+                    specialization: row.specialization || '',
+                    phone: row.phone || '',
+                    createdAt: serverTimestamp(),
+                });
+            }
         });
 
-        // Create profile based on role
-        if (row.role === 'student' || !row.role) {
-          await addDoc(collection(db, 'studentProfiles'), {
-            uid: userRef.id,
-            fullName: row.fullName || row.name,
-            email: row.email,
-            enrollmentNumber: row.enrollmentNumber || '',
-            department: row.department || '',
-            semester: parseInt(row.semester) || 1,
-            phone: row.phone || '',
-            dateOfBirth: row.dateOfBirth || '',
-            createdAt: serverTimestamp(),
-          });
-        } else if (row.role === 'faculty') {
-          await addDoc(collection(db, 'facultyProfiles'), {
-            uid: userRef.id,
-            fullName: row.fullName || row.name,
-            email: row.email,
-            employeeId: row.employeeId || '',
-            department: row.department || '',
-            designation: row.designation || '',
-            specialization: row.specialization || '',
-            phone: row.phone || '',
-            createdAt: serverTimestamp(),
-          });
+        try {
+            await batch.commit();
+            successCount += chunk.length;
+        } catch (error) {
+            console.error("Batch commit failed", error);
+            failCount += chunk.length;
+            errors.push(`Batch ${i/CHUNK_SIZE + 1} failed: ${(error as Error).message}`);
         }
-
-        successCount++;
-      } catch (error) {
-        failCount++;
-        errors.push(`${row.email}: ${(error as Error).message}`);
-      }
     }
 
     await fetchUsers();
@@ -410,7 +431,7 @@ export default function Users() {
 
   const filteredUsers = users.filter(u => {
     if (u.status === 'deleted') return false;
-    
+
     // Non-admins can only see students
     if (!isAdmin && u.role !== 'student') {
       return false;
@@ -605,8 +626,8 @@ export default function Users() {
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr 
-                    key={user.id} 
+                  <tr
+                    key={user.id}
                     className="hover:bg-muted/20 cursor-pointer transition-colors"
                     onClick={() => navigate(`/users/${user.id}`)}
                   >
@@ -651,8 +672,8 @@ export default function Users() {
           <DialogHeader>
             <DialogTitle>{editingUser ? 'Edit User' : 'Add New User'}</DialogTitle>
             <DialogDescription>
-              {editingUser 
-                ? 'Make changes to the user profile here. Click save when you\'re done.' 
+              {editingUser
+                ? 'Make changes to the user profile here. Click save when you\'re done.'
                 : 'Fill in the details below to create a new user account.'}
             </DialogDescription>
           </DialogHeader>

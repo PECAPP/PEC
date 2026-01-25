@@ -16,10 +16,12 @@ import {
   XCircle,
   AlertCircle,
   Loader2,
-  ChevronRight,
   Target,
   FileText,
+  Download,
+  ChevronRight,
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -142,6 +144,25 @@ export default function PlacementDrives() {
     }
   };
 
+  const exportDrives = () => {
+    const data = filteredDrives.map(drive => ({
+      Company: drive.companyName,
+      Role: drive.role,
+      Date: drive.date?.toDate ? drive.date.toDate().toLocaleDateString() : '',
+      Venue: drive.venue,
+      Eligibility: drive.eligibility,
+      Batch: drive.batch,
+      Status: drive.status,
+      'Registered Count': drive.registeredCount
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Drives');
+    XLSX.writeFile(workbook, `Placement_Drives_${new Date().toISOString().split('T')[0]}.xlsx`);
+    toast.success('Drives exported successfully');
+  };
+
   const resetForm = () => {
     setFormData({
       companyName: '',
@@ -179,6 +200,11 @@ export default function PlacementDrives() {
           <h1 className="text-2xl font-bold">Placement Drives</h1>
           <p className="text-muted-foreground">Monitor and manage campus recruitment events</p>
         </div>
+        <div className="flex gap-2">
+           <Button variant="outline" onClick={exportDrives}>
+             <Download className="w-4 h-4 mr-2" />
+             Export Excel
+           </Button>
         {(isPlacementOfficer || isAdmin) && (
           <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
@@ -256,6 +282,7 @@ export default function PlacementDrives() {
             </DialogContent>
           </Dialog>
         )}
+        </div>
       </div>
 
       <div className="card-elevated p-4">

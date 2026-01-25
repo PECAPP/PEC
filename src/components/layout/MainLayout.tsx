@@ -8,20 +8,21 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import type { User } from '@/types';
 import FloatingAIChat from '../FloatingAIChat';
+import { BottomNav } from './BottomNav';
 
-// Mock user for demo - in real app, this would come from auth context
-const mockUser: User = {
-  id: '1',
-  name: 'Alex Johnson',
-  email: 'alex.johnson@university.edu',
-  role: 'student',
-};
+
 
 export function MainLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, isAuthenticated } = useAuth();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
+  // Initialize from localStorage, default to false
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
+  
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -38,6 +39,11 @@ export function MainLayout() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Persist sidebar state
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(sidebarCollapsed));
+  }, [sidebarCollapsed]);
 
   useEffect(() => {
     if (!loading && (!isAuthenticated || !user)) {
@@ -76,9 +82,16 @@ export function MainLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-x-hidden">
+      {/* Atmosphere Mesh Gradient */}
+      <div className="mesh-gradient-bg">
+        <div className="mesh-gradient-item mesh-1" />
+        <div className="mesh-gradient-item mesh-2" />
+        <div className="mesh-gradient-item mesh-3" />
+      </div>
+
       <Sidebar
-        role={user?.role || mockUser.role}
+        role={user.role}
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         isMobile={isMobile}
@@ -86,14 +99,14 @@ export function MainLayout() {
         onMobileClose={() => setMobileMenuOpen(false)}
       />
       <Header 
-        user={user ? {
+        user={{
           id: user.uid,
           name: user.fullName || 'User',
           email: user.email || '',
           role: user.role,
           avatar: user.avatar || undefined,
           profileComplete: user.profileComplete
-        } : mockUser} 
+        }} 
         sidebarCollapsed={sidebarCollapsed} 
         isMobile={isMobile}
         onMenuClick={() => setMobileMenuOpen(true)}
@@ -101,14 +114,16 @@ export function MainLayout() {
       <main
         className={cn(
           'pt-16 min-h-screen transition-all duration-300',
-          isMobile ? 'pl-0' : (sidebarCollapsed ? 'pl-16' : 'pl-64')
+          isMobile ? 'pl-0' : (sidebarCollapsed ? 'pl-16' : 'pl-64'),
+          isMobile && user.role === 'student' && 'pb-16'
         )}
       >
-        <div className="p-4 lg:p-6">
+        <div className={location.pathname.endsWith("/chat") ? "p-0" : "p-4 lg:p-6"}>
           <Outlet />
-          {location.pathname!=="/chat" && <FloatingAIChat />}
+          {!location.pathname.endsWith("/chat") && <FloatingAIChat />}
         </div>
       </main>
+      {isMobile && user.role === 'student' && <BottomNav />}
     </div>
   );
 }

@@ -378,15 +378,3 @@ For help and support:
 
 **Built with ❤️ for educational institutions**
 
-*Last Updated: January 2026*
-
-- [ ] Mobile native applications (iOS/Android)
-- [ ] Advanced analytics and data visualization
-- [ ] Third-party integrations
-- [ ] Multi-language support
-- [ ] Real-time collaboration features
-- [ ] Enhanced reporting capabilities
-
----
-
-**Built with ❤️ for educational institutions**

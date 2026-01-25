@@ -16,7 +16,20 @@ import {
 import { cn } from '@/lib/utils';
 import ThemeToggler from "../../components/ThemeToggler";
 import { LandingColorTheme } from '@/components/LandingColorTheme';
+import { GoogleTranslate } from '@/components/GoogleTranslate';
 import type { User as UserType } from '@/types';
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command";
+import { searchableRoutes } from '@/utils/searchableRoutes';
+import { useEffect } from 'react';
 
 interface HeaderProps {
   user: UserType;
@@ -52,8 +65,8 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick }: Header
   return (
     <header
       className={cn(
-        'fixed top-0 right-0 h-16 bg-card border-b border-border z-30 transition-all duration-300',
-        isMobile ? 'left-0' : (sidebarCollapsed ? 'left-16' : 'left-64')
+        "fixed top-0 right-0 z-40 h-16 border-b border-sidebar-border bg-background/60 backdrop-blur-md transition-all duration-300",
+        isMobile ? "left-0" : (sidebarCollapsed ? "left-16" : "left-64")
       )}
     >
       <div className="h-full px-4 md:px-6 flex items-center justify-between">
@@ -69,18 +82,15 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick }: Header
           </Button>
         )}
         {/* Search */}
-        <div className="relative w-80 hidden md:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search students, courses, documents..."
-            className="pl-10 bg-secondary/50 border-0 focus-visible:bg-background"
-          />
+        <div className="relative flex-1 max-w-md mx-2 md:w-80 md:flex-none group z-50">
+           <CommandMenu navigate={navigate} />
         </div>
 
         {/* Right Section */}
         <div className="flex items-center gap-3 ml-auto">
-          <LandingColorTheme />
-          <ThemeToggler/>
+          <div className="hidden md:block scale-90 sm:scale-100"><GoogleTranslate /></div>
+          <div className="hidden md:block"><LandingColorTheme /></div>
+          <div className="hidden md:block"><ThemeToggler/></div>
           {/* Notifications */}
           <Button 
             variant="ghost" 
@@ -139,5 +149,91 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick }: Header
         </div>
       </div>
     </header>
+  );
+}
+
+function CommandMenu({ navigate }: { navigate: any }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
+  return (
+    <>
+      <div 
+        className="relative" 
+        onClick={() => setOpen(true)}
+      >
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Search... (Ctrl+K)"
+          className="pl-10 bg-background border border-input shadow-sm focus-visible:ring-1 focus-visible:ring-primary cursor-pointer text-foreground placeholder:text-muted-foreground"
+          readOnly
+        />
+      </div>
+      
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="Type to search pages, students, or data..." value={query} onValueChange={setQuery} />
+        <CommandList>
+          <CommandEmpty>
+             <div className="py-2 px-4 text-sm">
+                No results found. 
+                <Button 
+                  variant="link" 
+                  className="px-1 h-auto font-normal text-primary" 
+                  onClick={() => {
+                    setOpen(false);
+                    navigate(`/search?q=${encodeURIComponent(query)}`);
+                  }}
+                >
+                  Search for "{query}"
+                </Button>
+             </div>
+          </CommandEmpty>
+          
+          <CommandGroup heading="Pages">
+            {searchableRoutes.filter(route => 
+               route.title.toLowerCase().includes(query.toLowerCase()) || 
+               route.keywords.some(k => k.includes(query.toLowerCase()))
+            ).slice(0, 5).map((route) => (
+              <CommandItem
+                key={route.path}
+                onSelect={() => {
+                  setOpen(false);
+                  navigate(route.path);
+                }}
+              >
+                <route.icon className="mr-2 h-4 w-4" />
+                <span>{route.title}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          
+          <CommandSeparator />
+          
+          <CommandGroup heading="Actions">
+             <CommandItem
+                onSelect={() => {
+                  setOpen(false);
+                  navigate(`/search?q=${encodeURIComponent(query)}`);
+                }}
+              >
+                <Search className="mr-2 h-4 w-4" />
+                <span>Search all for "{query}"</span>
+                <CommandShortcut>↵</CommandShortcut>
+              </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </>
   );
 }

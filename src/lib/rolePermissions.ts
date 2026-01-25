@@ -13,7 +13,7 @@ export interface RolePermissions {
   canAccessAdmin: boolean;
   canAccessReports: boolean;
   canManageInstitution: boolean;
-  canManageRecuiters: boolean;
+  canManageRecruiters: boolean;
 }
 
 export const getRolePermissions = (role: UserRole): RolePermissions => {
@@ -30,7 +30,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
     canAccessAdmin: false,
     canAccessReports: false,
     canManageInstitution: false,
-    canManageRecuiters: false,
+    canManageRecruiters: false,
   };
 
   switch (role) {
@@ -62,7 +62,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessPlacements: true,
         canManagePlacements: true,
         canAccessReports: true,
-        canManageRecuiters: true,
+        canManageRecruiters: true,
       };
 
     case 'recruiter':
@@ -86,7 +86,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessAdmin: true,
         canAccessReports: true,
         canManageInstitution: true,
-        canManageRecuiters: true,
+        canManageRecruiters: true,
       };
 
     case 'super_admin':
@@ -104,7 +104,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessAdmin: true,
         canAccessReports: true,
         canManageInstitution: true,
-        canManageRecuiters: true,
+        canManageRecruiters: true,
       };
 
     default:
