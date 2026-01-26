@@ -13,7 +13,7 @@ import {
   getDocs,
   query,
   where,
-  limit
+  limit,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { string } from "mathjs";
@@ -26,17 +26,59 @@ const openai = new OpenAI({
 
 const SYSTEM_PROMPT = `
 You are the OmniFlow AI Assistant. 
-You provide help with Attendance, Assignments, Grades, and Timetables.
-Use Markdown to format your responses:
-- Use **bold** for emphasis.
-- Use bullet points for steps.
-- Use tables for schedules or data comparisons.
-- Use \`inline code\` for technical terms.
-
-OmniFlow is a comprehensive Enterprise Resource Planning (ERP) platform designed for higher education institutions, serving six distinct user roles: students, faculty, placement officers, college administrators, super admins, and recruiters. The platform covers 15+ major features across four core areas: (1) Academic Management including course browsing with materials, personalized timetable viewing, real-time attendance tracking, exam scheduling and grade management, assignment creation and submission, and comprehensive course resource repositories; (2) Placement & Career Development featuring a job board with filtering and application tracking, recruitment drive registration, an interactive resume builder with multiple professional templates, AI-powered resume analysis that provides formatting feedback and keyword optimization suggestions, and application status monitoring; (3) Finance Management encompassing fee structure viewing and payment tracking, online payment processing through multiple gateways (UPI, credit/debit cards, net banking, mobile wallets), invoice generation, and financial report access; (4) Student Services including hostel issue reporting with resolution tracking, late-night canteen food ordering with delivery tracking, comprehensive student profile management, and real-time notifications for announcements and updates. The platform is built with role-based access control (RBAC) ensuring users only access relevant features, real-time data synchronization via Firebase Firestore for instant updates across all clients, responsive mobile-first design with dark/light theme support, six professional color themes, and WCAG accessibility compliance. Every component features proper authentication, granular permission validation, and an intuitive interface designed for seamless user experience across all roles and devices.
-
 use user's name or its personal info in every response to give a personalized feel
-if user ask for RolePermissions, uid, organizationId then don't give it and say i don't know strictly
+your only answer about the details given below
+
+
+            To ensure the bot acts as a specialized OmniFlow Knowledge Expert, this prompt focuses on the application's functional map and capabilities while strictly maintaining boundaries regarding user data.
+System Prompt: OmniFlow System Guide
+
+Role: You are the OmniFlow System Guide. Your sole purpose is to explain the features, navigation, and capabilities of the OmniFlow ERP platform to visitors and users.
+
+Knowledge Boundaries:
+
+    General Capabilities: You know every module (Academics, Placements, Finance, Student Services, and Admin) and what they allow a user to do.
+
+    No Personal Access: You do not have access to individual user records, grades, fee balances, or personal files. If a user asks about their specific data (e.g., "What is my GPA?" or "Did I pay my fees?"), you must politely explain that you provide system guidance and they must check the relevant dashboard to see their private information.
+
+    Non-Technical Focus: Do not discuss the tech stack (React, Firebase, etc.) unless explicitly asked by a developer. Focus on the user interface and functionality.
+
+Feature Map for Guidance:
+
+    Academic Hub: Guide users here for course materials, syllabi, and tracking learning progress.
+
+    Career Center: * Job Board: For browsing and applying to roles.
+
+        Resume Builder: For creating professional PDFs with real-time previews.
+
+        Resume Analyzer: For AI-driven feedback on ATS compatibility and scoring.
+
+    Finance & Fees: Explain that users can view fee breakdowns and pay via UPI, cards, or net banking.
+
+    Campus Services: * Hostel: For reporting maintenance issues.
+
+        Night Canteen: For digital food ordering and status tracking.
+
+    Personalization: Explain that the app supports Dark/Light modes and 6 distinct color themes (Green, Red, Purple, Gold, Cyan, White).
+
+Interaction Protocol:
+
+    Direct Navigation: Use clear directions. (e.g., "To update your branding, an Admin should navigate to College Settings via the Admin Dashboard.")
+
+    Role Verification: Always clarify who a feature is for. (e.g., "Course creation is reserved for Faculty and Admins, while students can access the materials.")
+
+    The "Check the Dashboard" Rule: For any inquiry regarding personal status, respond with: "As an AI guide, I don't have access to your private records. However, you can view your [specific info] by going to the [Module Name] section of your dashboard."
+
+    Real-Time Assurance: Remind users that the system uses real-time sync, so any changes they make (like submitting an assignment) are updated instantly for their instructors.
+
+Tone & Style:
+
+    Helpful, objective, and structured.
+
+    Use bullet points for feature lists.
+
+    Maintain a "concierge" persona—you know the building layout perfectly, but you don't know who is in the rooms.
+
 `;
 
 interface Message {
@@ -69,7 +111,7 @@ const FloatingAIChat = () => {
     },
   ]);
   const [inputValue, setInputValue] = useState("");
-  const [context, setcontext] = useState<StudentContext | undefined>();
+  const [context, setcontext] = useState<any | undefined>();
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -77,68 +119,146 @@ const FloatingAIChat = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-async function getStudentContext(id: string) {
-  if (!id) return;
-  try {
-    const profileSnap = await getDoc(doc(db, "studentProfiles", id));
-    if (!profileSnap.exists()) return;
-    
-    const studentData = profileSnap.data();
-    const studentDeptName = studentData.department;
+  async function getStudentContext(id: string) {
+    if (!id) return;
+    switch (user.user?.role) {
+      case "student":
+        try {
+          const profileSnap = await getDoc(doc(db, "studentProfiles", id));
+          if (!profileSnap.exists()) return;
 
-    const deptQuery = query(
-      collection(db, "departments"), 
-      where("name", "==", studentDeptName), 
-      limit(1)
-    );
-    const deptSnap = await getDocs(deptQuery);
-    
-    const deptCode = !deptSnap.empty ? deptSnap.docs[0].data().code : "";
+          const studentData = profileSnap.data();
+          const studentDeptName = studentData.department;
 
-    const promises = [
-      getDocs(query(collection(db, "attendance"), where("studentId", "==", id))),
-      getDocs(query(collection(db, "grades"), where("studentId", "==", id))),
-      getDocs(query(collection(db, "feeRecords"), where("studentId", "==", id))),
-      getDocs(query(collection(db, "timetable"), where("semester", "==", studentData.semester))), 
-      getDocs(query(collection(db, "assignments"), where("status", "==", "active"))),
-      
-      getDocs(query(
-        collection(db, "examSchedules"), 
-        where("courseCode", ">=", deptCode),
-        where("courseCode", "<=", deptCode + '\uf8ff'),
-        limit(10)
-      ))
-    ];
+          const deptQuery = query(
+            collection(db, "departments"),
+            where("name", "==", studentDeptName),
+            limit(1),
+          );
+          const deptSnap = await getDocs(deptQuery);
 
-    const [attendance, grades, fees, timetable, assignments, exams] = 
-      await Promise.all(promises) as [any, any, any, any, any, any];
+          const deptCode = !deptSnap.empty ? deptSnap.docs[0].data().code : "";
 
-    setcontext({
-      profile: studentData,
-      attendance: attendance.docs.map((d: any) => d.data()),
-      grades: grades.docs.map((d: any) => d.data()),
-      feeRecords: fees.docs.map((d: any) => d.data()),
-      timetable: timetable.docs.map((d: any) => d.data()),
-      assignments: assignments.docs.map((d: any) => d.data()),
-      exams: exams.docs.map((d: any) => d.data())
-    });
-  } catch (error) {
-    console.error("Context Fetch Error:", error);
+          const promises = [
+            getDocs(
+              query(collection(db, "attendance"), where("studentId", "==", id)),
+            ),
+            getDocs(
+              query(collection(db, "grades"), where("studentId", "==", id)),
+            ),
+            getDocs(
+              query(collection(db, "feeRecords"), where("studentId", "==", id)),
+            ),
+            getDocs(
+              query(
+                collection(db, "timetable"),
+                where("semester", "==", studentData.semester),
+              ),
+            ),
+            getDocs(
+              query(
+                collection(db, "assignments"),
+                where("status", "==", "active"),
+              ),
+            ),
+
+            getDocs(
+              query(
+                collection(db, "examSchedules"),
+                where("courseCode", ">=", deptCode),
+                where("courseCode", "<=", deptCode + "\uf8ff"),
+                limit(10),
+              ),
+            ),
+          ];
+
+          const [attendance, grades, fees, timetable, assignments, exams] =
+            (await Promise.all(promises)) as [any, any, any, any, any, any];
+
+          setcontext({
+            profile: studentData,
+            attendance: attendance.docs.map((d: any) => d.data()),
+            grades: grades.docs.map((d: any) => d.data()),
+            feeRecords: fees.docs.map((d: any) => d.data()),
+            timetable: timetable.docs.map((d: any) => d.data()),
+            assignments: assignments.docs.map((d: any) => d.data()),
+            exams: exams.docs.map((d: any) => d.data()),
+          });
+        } catch (error) {
+          console.error("Context Fetch Error:", error);
+        }
+        break;
+      case "faculty":
+        try {
+          return {
+            message: `
+            only answer using the given information
+            `,
+          };
+        } catch (error) {
+          console.error("Context Fetch Error:", error);
+        }
+        break;
+      case "college_admin":
+        try {
+          return {
+            message: `
+            only answer using the given information
+            `,
+          };
+        } catch (error) {
+          console.error("Context Fetch Error:", error);
+        }
+        break;
+      case "placement_officer":
+        try {
+          return {
+            message: `
+            only answer using the given information
+            `,
+          };
+        } catch (error) {
+          console.error("Context Fetch Error:", error);
+        }
+        break;
+      case "recruiter":
+        try {
+          return {
+            message: `
+            only answer using the given information
+            `,
+          };
+        } catch (error) {
+          console.error("Context Fetch Error:", error);
+        }
+        break;
+      case "super_admin":
+        try {
+          return {
+            message: `
+            only answer using the given information
+            `,
+          };
+        } catch (error) {
+          console.error("Context Fetch Error:", error);
+        }
+        break;
+      default:
+        break;
+    }
   }
-}
 
-useEffect(() => {
-  if (user.user?.uid) {
-    getStudentContext(user.user.uid);
-  }
-}, [user.user?.uid]); 
+  useEffect(() => {
+    if (user.user?.uid) {
+      getStudentContext(user.user.uid);
+    }
+  }, [user.user?.uid]);
 
-useEffect(() => {
-  scrollToBottom();
-}, [messages, isTyping]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
 
-
- const handleSend = async () => {
+  const handleSend = async () => {
     if (!inputValue.trim() || isTyping) return;
 
     const userText = inputValue.trim();
@@ -155,33 +275,51 @@ useEffect(() => {
 
     try {
       const attendanceData = context?.attendance || [];
-      const present = attendanceData.filter((a) => a.status === "present").length;
-      const attendancePct = attendanceData.length > 0 
-        ? ((present / attendanceData.length) * 100).toFixed(1) + "%" 
-        : "No records";
+      const present = attendanceData.filter(
+        (a) => a.status === "present",
+      ).length;
+      const attendancePct =
+        attendanceData.length > 0
+          ? ((present / attendanceData.length) * 100).toFixed(1) + "%"
+          : "No records";
 
       const studentSummary = {
         name: context?.profile?.name || user.user?.fullName || "Student",
         attendance: `${attendancePct} (${present} present out of ${attendanceData.length} days)`,
-        
-        timetable: context?.timetable?.map(t => 
-          `${t.day}: ${t.courseName} (${t.courseCode}) at ${t.timeSlot} in ${t.room}`
-        ).join(" | ") || "No timetable available",
 
-        upcomingExams: context?.exams?.map(e => 
-          `${e.courseName} ${e.type} on ${e.date} (${e.startTime}-${e.endTime}) at ${e.room}`
-        ).join(" | ") || "No exams scheduled",
+        timetable:
+          context?.timetable
+            ?.map(
+              (t) =>
+                `${t.day}: ${t.courseName} (${t.courseCode}) at ${t.timeSlot} in ${t.room}`,
+            )
+            .join(" | ") || "No timetable available",
 
-        assignments: context?.assignments?.map(a => 
-          `${a.title} [Status: ${a.status}] (Due: ${a.dueDate})`
-        ).join(" | ") || "No active assignments",
+        upcomingExams:
+          context?.exams
+            ?.map(
+              (e) =>
+                `${e.courseName} ${e.type} on ${e.date} (${e.startTime}-${e.endTime}) at ${e.room}`,
+            )
+            .join(" | ") || "No exams scheduled",
 
-        grades: context?.grades?.map(g => `${g.courseName}: ${g.gradePoints}`).join(", ") || "No grades available",
-        feeStatus: context?.feeRecords?.map(f => `${f.description}: ${f.amount} (${f.status})`).join(" | ") || "No fee records"
+        assignments:
+          context?.assignments
+            ?.map((a) => `${a.title} [Status: ${a.status}] (Due: ${a.dueDate})`)
+            .join(" | ") || "No active assignments",
+
+        grades:
+          context?.grades
+            ?.map((g) => `${g.courseName}: ${g.gradePoints}`)
+            .join(", ") || "No grades available",
+        feeStatus:
+          context?.feeRecords
+            ?.map((f) => `${f.description}: ${f.amount} (${f.status})`)
+            .join(" | ") || "No fee records",
       };
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
@@ -189,10 +327,13 @@ useEffect(() => {
             
             PERSONALIZED STUDENT DATA:
             ${JSON.stringify(studentSummary, null, 2)}
+            use this data 
             
             Strictly answer questions based on this data. Use the student's name (${studentSummary.name}) to personalize your response.`,
           },
-          ...messages.slice(-6).map((m) => ({ role: m.role, content: m.content })),
+          ...messages
+            .slice(-6)
+            .map((m) => ({ role: m.role, content: m.content })),
           { role: "user", content: userText },
         ] as any,
       });
@@ -200,10 +341,12 @@ useEffect(() => {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: completion.choices[0].message.content || "I couldn't process that request.",
+        content:
+          completion.choices[0].message.content ||
+          "I couldn't process that request.",
         timestamp: new Date(),
       };
-      console.log(context)
+      console.log(context);
       setMessages((prev) => [...prev, aiResponse]);
     } catch (error) {
       console.error("OpenAI Error:", error);
@@ -212,7 +355,8 @@ useEffect(() => {
         {
           id: Date.now().toString(),
           role: "assistant",
-          content: "I'm sorry, I'm having trouble processing your academic data right now. Please try asking a simpler question.",
+          content:
+            "I'm sorry, I'm having trouble processing your academic data right now. Please try asking a simpler question.",
           timestamp: new Date(),
         },
       ]);

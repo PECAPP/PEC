@@ -72,6 +72,7 @@
     "next-themes": "^0.3.0",
     "openai": "^6.16.0",
     "papaparse": "^5.5.3",
+    "pdfjs-dist": "^5.4.530",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
