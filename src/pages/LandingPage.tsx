@@ -48,7 +48,6 @@ import { WobbleCard } from "@/components/ui/wobble-card";
 import GradualBlur from "@/components/ui/GradualBlur";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import DemoDashboard from './DemoDashboard';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
@@ -413,9 +412,9 @@ export function LandingPage() {
                 size="sm"
                 asChild
                 className="rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300"
-                aria-label="Get started with free trial"
+                aria-label="Get started with test credentials"
               >
-                <Link to="/onboarding">Get Started</Link>
+                <Link to="/auth">Get Started</Link>
               </Button>
             </motion.div>
           </div>
@@ -500,9 +499,9 @@ export function LandingPage() {
               size="lg"
               asChild
               className="magnetic-btn group rounded-full bg-accent hover:bg-accent/90 text-white dark:text-black font-bold shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 text-base"
-              aria-label="Start your free trial of OmniFlow"
+              aria-label="View test credentials and start trial"
             >
-              <Link to="/onboarding" className="flex items-center gap-3">
+              <Link to="/auth" className="flex items-center gap-3">
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -548,9 +547,12 @@ export function LandingPage() {
                   display: none;
                 }
               `}</style>
-              <div className="rounded-xl w-full h-[800px] overflow-hidden border border-border/30 bg-background">
-                <DemoDashboard />
-              </div>
+              <iframe
+                src="/demo-dashboard"
+                className="rounded-xl w-full h-[800px] border-0 bg-background"
+                title="OmniFlow Dashboard Demo"
+                scrolling="no"
+              />
               <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-card/100 to-transparent pointer-events-none" />
             </div>
           </div>

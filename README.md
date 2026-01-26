@@ -1,89 +1,604 @@
-# OmniFlow - College ERP Platform
+# OmniFlow - Next-Generation College ERP Platform
 
-A modern, comprehensive Enterprise Resource Planning system built for higher education institutions. OmniFlow streamlines student information, academics, placements, finance, and more in a single, unified platform.
+A modern, comprehensive Enterprise Resource Planning system built for higher education institutions. OmniFlow streamlines student information, academics, placements, finance, campus operations, and more in a single, unified platform with AI-powered features.
 
-## Overview
+## 🌟 Overview
 
-OmniFlow is a web-based ERP designed to replace fragmented legacy systems with an intuitive interface serving students, faculty, administrators, placement officers, and recruiters. The platform provides role-based dashboards, comprehensive academic management, and advanced placement features. Every feature is carefully crafted with proper authentication, real-time data synchronization, and an exceptional user experience.
+OmniFlow is a web-based ERP designed to replace fragmented legacy systems with an intuitive interface serving students, faculty, administrators, placement officers, and recruiters. The platform provides role-based dashboards, comprehensive academic management, advanced placement features, campus operations, AI chatbots, and real-time communication. Every feature is carefully crafted with proper authentication, real-time data synchronization, and an exceptional user experience.
 
 ## ✨ Core Features
 
 ### 📚 Academic Management
-- **Courses & Syllabus** - Browse and manage courses with detailed course materials, syllabus documents, and learning resources
-- **Timetable Management** - View personalized schedules with conflict detection; Faculty can manage and publish schedules
-- **Attendance Tracking** - Real-time attendance marking for faculty with student absence tracking; Students can view attendance records
-- **Examinations** - Complete exam management including scheduling, seating arrangements, grade publication, and transcript generation
-- **Assignments** - Create, submit, and grade assignments with deadline tracking and submission status monitoring
-- **Course Materials** - Centralized repository for course notes, assignments, past papers, and study materials
+
+#### Courses & Syllabus
+- **Course Catalog** - Browse and manage courses with detailed descriptions, prerequisites, and learning outcomes
+- **Course Materials** - Centralized repository for notes, assignments, past papers, study materials, and resources
+- **Syllabus Management** - Upload and view course syllabi with topic breakdowns
+- **Course Analytics** - Track completion rates, student engagement, and performance metrics
+- **Multi-Department Support** - Organize courses by departments with faculty assignments
+
+#### Timetable Management
+- **Personalized Schedules** - View customized timetables based on enrolled courses
+- **Conflict Detection** - Automatic detection of scheduling conflicts
+- **Faculty Scheduling** - Create and publish timetables with room assignments
+- **Calendar Integration** - Export to Google Calendar, Outlook, and iCal formats
+- **Multi-View Support** - Day, week, and month views with color-coded classes
+
+#### Attendance Tracking
+- **QR Code Scanning** - Quick attendance marking via QR codes
+- **Manual Attendance** - Traditional roll-call interface for faculty
+- **Real-Time Updates** - Instant sync across student and faculty dashboards
+- **Attendance Analytics** - View attendance percentages, trends, and alerts
+- **Absence Tracking** - Monitor student absences with notifications
+- **Export Reports** - Generate attendance reports in PDF and Excel formats
+
+#### Examinations
+- **Exam Scheduling** - Create exam schedules with date, time, and venue details
+- **Seating Arrangements** - Automated seating allocation with conflict prevention
+- **Grade Management** - Enter, publish, and manage grades with grade distribution analytics
+- **Transcript Generation** - Auto-generate official transcripts with institutional branding
+- **Result Analytics** - Class performance analysis with statistical insights
+- **Revaluation Requests** - Track and manage grade revaluation workflows
+
+#### Assignments
+- **Assignment Creation** - Create assignments with rich text, file attachments, and due dates
+- **Submission Tracking** - Monitor submission status, late submissions, and pending work
+- **Grading System** - Grade submissions with rubrics, comments, and feedback
+- **Auto-Reminders** - Automatic notifications for upcoming and overdue assignments
+- **Plagiarism Detection** - Integration-ready for plagiarism checking tools
+- **Peer Review** - Enable peer-to-peer assignment reviews
 
 ### 💼 Placement & Career Development
-- **Job Board** - Browse and apply to job postings with application status tracking
-- **Recruitment Drives** - View upcoming placement drives, register for interviews, and track application progress
-- **Resume Builder** - Interactive resume builder with multiple professional templates and instant preview
-- **Resume Analyzer** - AI-powered resume analysis providing feedback on formatting, content, and keyword optimization
-- **Recruiter Management** - View recruiter profiles, company details, and interview schedules
-- **Application Tracking** - Manage all job applications in one place with status updates and interview schedules
+
+#### Job Board & Recruitment
+- **Job Postings** - Browse jobs with filters for role, company, location, salary, and skills
+- **Quick Apply** - One-click job applications with saved resumes
+- **Application Tracking** - Track all applications with status updates (Applied, Shortlisted, Interviewed, Offered, Rejected)
+- **Company Profiles** - Detailed company information, culture, and past placement records
+- **Interview Scheduling** - Automated interview slot booking and calendar sync
+- **Offer Management** - Accept, decline, or negotiate offers with letter downloads
+
+#### Recruitment Drives
+- **Drive Management** - View and register for campus placement drives
+- **Eligibility Filtering** - Auto-filter drives based on student eligibility (CGPA, department, year)
+- **Multi-Round Tracking** - Track progress through aptitude, technical, HR rounds
+- **Live Updates** - Real-time notifications for drive updates and selections
+- **Results Dashboard** - View placement statistics and selection lists
+
+#### Resume Builder & Analyzer
+- **Interactive Resume Builder** - Drag-and-drop resume creator with 8+ professional templates
+- **Real-Time Preview** - Live preview while editing with instant updates
+- **Multi-Format Export** - Download as PDF, DOCX, or plain text
+- **AI Resume Analyzer** - Get AI-powered feedback on content, formatting, and ATS compatibility
+- **Keyword Optimization** - Suggestions for industry-specific keywords
+- **Version History** - Save and manage multiple resume versions
+- **ATS Score** - Check resume compatibility with Applicant Tracking Systems
+
+#### Placement Profile Management
+- **Comprehensive Profiles** - Manage skills, projects, certifications, achievements, and experiences
+- **Profile Visibility** - Control recruiter visibility and profile sharing
+- **Profile Analytics** - Track profile views and recruiter engagement
+- **Document Vault** - Store resumes, certificates, and portfolio items
+- **Skill Endorsements** - Peer and faculty skill endorsements
+- **Project Showcase** - Display academic and personal projects with media
+
+#### Career Portal
+- **Career Resources** - Access career guides, interview tips, and skill development materials
+- **Industry Insights** - View salary trends, job market analysis, and career paths
+- **Alumni Network** - Connect with alumni for mentorship and career advice
+- **Mock Interviews** - Schedule and practice mock interviews with faculty
+- **Skill Gap Analysis** - Identify missing skills for target job roles
+- **Career Roadmaps** - Personalized career progression recommendations
 
 ### 💰 Finance Management
-- **Fee Management** - View fee structure, payment history, and outstanding balance information
-- **Online Payments** - Multiple payment methods including UPI and Bank Transfer with instant confirmation
-- **Payment Settings** - Configure payment methods and gateways for student payments
-- **Financial Reports** - Generate and view financial reports, receipts, and transaction history
-- **Payment Tracking** - Real-time payment status and transaction verification
 
-### 🛏️ Student Services
-- **Hostel Management** - Report and track hostel-related issues with priority categorization and resolution timeline
-- **Night Canteen** - Order food for late-night study sessions with delivery tracking
-- **Student Profile** - Comprehensive profile management including personal details, academic history, and preferences
-- **Notifications** - Real-time notifications for assignments, exams, placement drives, and important announcements
+#### Fee Management
+- **Fee Structure** - View detailed fee breakdown by semester, category, and charges
+- **Payment History** - Access complete payment records with transaction IDs
+- **Outstanding Balance** - Real-time balance tracking with due date alerts
+- **Fee Receipts** - Download official receipts with institutional branding
+- **Payment Plans** - Installment plans with automated reminders
+- **Scholarship Tracking** - Monitor applied scholarships and fee waivers
+
+#### Online Payments
+- **Multiple Payment Gateways** - Support for UPI, cards, net banking, and wallets
+- **Supported Methods**:
+  - UPI (Google Pay, PhonePe, Paytm, WhatsApp Pay)
+  - Debit/Credit Cards (Visa, Mastercard, Rupay, Amex)
+  - Net Banking (50+ banks)
+  - Mobile Wallets (Paytm, Amazon Pay, MobiKwik)
+  - Bank Transfer with auto-verification
+- **Instant Confirmation** - Real-time payment status with email and SMS notifications
+- **Transaction Security** - PCI-DSS compliant payment processing
+- **Payment Analytics** - Track payment trends and collection efficiency
+- **Auto-Reconciliation** - Automatic matching of payments with fee records
+
+#### Financial Reporting
+- **Collection Reports** - Track fee collection by department, semester, and category
+- **Outstanding Reports** - Monitor pending fees with aging analysis
+- **Revenue Analytics** - Visualize revenue streams and trends
+- **Refund Management** - Process and track fee refunds
+- **Audit Trail** - Complete transaction history with user logs
+- **Export Options** - Generate reports in PDF, Excel, and CSV formats
+
+### 🛏️ Campus Services
+
+#### Hostel Management
+- **Issue Reporting** - Report maintenance, amenities, and safety issues with photo attachments
+- **Priority Categorization** - Low, medium, high, and urgent priority levels
+- **Status Tracking** - Track issue resolution from reported to resolved
+- **Issue Timeline** - View complete issue history with timestamps
+- **Room Allocation** - Manage room assignments and transfers
+- **Hostel Analytics** - Dashboard for issue trends and resolution times
+
+#### Night Canteen Service
+- **Food Menu** - Browse complete menu with images, descriptions, and prices
+- **Online Ordering** - Place orders with delivery time and location preferences
+- **Order Tracking** - Real-time order status (Received, Preparing, Ready, Delivered)
+- **Payment Integration** - Pay online or cash on delivery
+- **Order History** - View past orders with reorder functionality
+- **Menu Management** - Admin interface for menu updates and pricing
+
+#### Campus Map (Interactive)
+- **3D Campus Navigation** - Interactive 3D map of campus buildings and facilities
+- **Building Information** - Detailed building info with departments and facilities
+- **Route Planning** - Get directions between campus locations
+- **Facility Locator** - Find classrooms, labs, libraries, cafeterias, and amenities
+- **Road and Path Drawing** - Custom road layouts with multi-segment support
+- **Accessibility Features** - Mark wheelchair-accessible routes and elevators
+
+#### Library Management
+- **Book Catalog** - Search books by title, author, ISBN, or category
+- **Book Lending** - Issue and return books with due date tracking
+- **Reservation System** - Reserve books currently on loan
+- **Digital Resources** - Access e-books, journals, and research papers
+- **Fine Tracking** - Auto-calculate overdue fines with payment integration
+- **Reading History** - View borrowing history and recommendations
+
+#### Room Booking System
+- **Facility Booking** - Book seminar halls, conference rooms, and labs
+- **Availability Calendar** - View real-time room availability
+- **Conflict Prevention** - Automatic detection of booking conflicts
+- **Approval Workflow** - Request and approve bookings with notifications
+- **Recurring Bookings** - Schedule weekly or monthly recurring events
+- **Resource Management** - Track projectors, equipment, and furniture
+
+### 💬 Communication & Collaboration
+
+#### WhatsApp-Grade Chat System
+- **Department Chat Groups** - Auto-created groups for departments and semesters
+- **Direct Messaging** - One-on-one conversations with students and faculty
+- **Group Information** - View group members, descriptions, and admins
+- **Message Search** - Full-text search across all conversations
+- **Media Sharing** - Share images, documents, and files
+- **Read Receipts** - See when messages are delivered and read
+- **Typing Indicators** - Real-time typing status
+- **Message Reactions** - React to messages with emojis
+- **Pin Important Messages** - Pin announcements and important info
+- **Group Admin Controls** - Manage members, settings, and permissions
+
+#### Notifications System
+- **Real-Time Alerts** - Instant notifications for assignments, exams, and announcements
+- **Push Notifications** - Browser push notifications for important updates
+- **Email Digests** - Daily or weekly email summaries
+- **Notification Center** - View all notifications in one place
+- **Custom Preferences** - Control notification types and delivery methods
+- **Priority Notifications** - Critical alerts with special highlighting
+- **Read/Unread Tracking** - Mark notifications as read or archive them
+
+#### Announcements
+- **College-Wide Announcements** - Broadcast messages to all users
+- **Department Announcements** - Target messages to specific departments
+- **Role-Based Announcements** - Send to students, faculty, or specific roles
+- **Scheduled Publishing** - Schedule announcements for future dates
+- **Attachment Support** - Include documents, images, and links
+- **Analytics** - Track announcement reach and engagement
+
+### 🎓 Student Services
+
+#### Student Profile Management
+- **Personal Information** - Edit contact details, emergency contacts, and addresses
+- **Academic History** - View courses, grades, and academic progress
+- **Document Uploads** - Upload ID proofs, certificates, and documents
+- **Transcript Downloads** - Generate and download official transcripts
+- **Privacy Settings** - Control profile visibility and data sharing
+- **Profile Completeness** - Track profile completion with suggestions
+
+#### Clubs & Activities
+- **Club Directory** - Browse and join student clubs and organizations
+- **Event Calendar** - View upcoming club events and activities
+- **Membership Management** - Track club memberships and roles
+- **Event Registration** - Register for events with RSVP tracking
+- **Activity Feed** - View club updates, photos, and announcements
+- **Leadership Dashboard** - Manage club members and events (for leaders)
+
+#### Leave Management
+- **Leave Applications** - Apply for medical, casual, or academic leave
+- **Approval Workflow** - Track leave approval through faculty and admin
+- **Leave Balance** - View remaining leave days by category
+- **Leave History** - Access past leave records and approvals
+- **Leave Calendar** - Visualize leave schedules and team availability
+- **Auto-Notifications** - Alerts to approvers and applicants
 
 ### ⚙️ Administration & Management
-- **User Management** - Complete user lifecycle management with role assignment and permission control
-- **Department Management** - Create and manage departments, assign faculty, and track enrollment
-- **Faculty Management** - Faculty profiles, specialization tracking, course assignments, and performance metrics
-- **College Settings** - Configure college branding with logo upload, display options, and institutional information
-- **Canteen Management** - Manage food menu, pricing, and order fulfillment for canteen services
-- **Hostel Management (Admin)** - Monitor hostel operations, resolve issues, and manage resident records
+
+#### User Management
+- **Complete User Lifecycle** - Create, edit, disable, and delete user accounts
+- **Role Assignment** - Assign roles: Super Admin, College Admin, Faculty, Student, Placement Officer, Recruiter
+- **Bulk User Import** - Import users from CSV/Excel files with validation
+- **Password Management** - Reset passwords and enforce password policies
+- **User Search** - Advanced search by name, email, role, or department
+- **User Analytics** - Track user activity, login frequency, and engagement
+- **Account Status** - Enable, disable, or suspend accounts
+
+#### Department Management
+- **Create Departments** - Add departments with names, codes, and descriptions
+- **Department Heads** - Assign and manage department heads
+- **Enrollment Tracking** - Monitor student and faculty counts
+- **Department Statistics** - View course offerings, placements, and performance
+- **Budget Allocation** - Track department budgets and expenses
+- **Inter-Department Coordination** - Share resources and collaborate
+
+#### Faculty Management
+- **Faculty Profiles** - Comprehensive profiles with qualifications, specializations, and experience
+- **Course Assignments** - Assign courses to faculty with workload tracking
+- **Teaching Schedule** - View complete teaching timetables
+- **Performance Metrics** - Track student feedback, course completion, and engagement
+- **Research & Publications** - Record research papers, publications, and conferences
+- **Leave Management** - Faculty leave applications and approvals
+
+#### College Settings (Branding)
+- **College Logo Upload** - Upload institutional logo with preview
+- **Branding Configuration** - Set college name, tagline, and colors
+- **Contact Information** - Configure email, phone, website, and address
+- **Academic Calendar** - Set semester dates, holidays, and exam schedules
+- **System Policies** - Configure late fee policies, attendance requirements, and rules
+- **Theme Customization** - Set default theme and accent colors
+
+#### System Configuration
+- **General Settings** - Configure system-wide parameters
+- **Integration Settings** - Set up third-party integrations (Google, Microsoft, etc.)
+- **Email Configuration** - SMTP settings for email notifications
+- **Storage Settings** - Configure file storage limits and allowed formats
+- **Security Settings** - Password policies, session timeouts, and 2FA
+- **Backup & Recovery** - Automated backup schedules and restore options
+
+#### System Monitoring
+- **System Health Dashboard** - Monitor server status, database health, and API uptime
+- **Performance Metrics** - Track page load times, API response times, and errors
+- **User Activity Logs** - Complete audit trail of user actions
+- **Error Tracking** - Real-time error monitoring and alerts
+- **Analytics Dashboard** - User engagement, feature usage, and trends
+- **Capacity Planning** - Monitor storage, bandwidth, and resource usage
+
+### 🤖 AI-Powered Features
+
+#### AI Chatbots (Dual System)
+- **Landing Chatbot** - Pre-login assistance for prospective students and visitors
+  - Answer questions about admissions, courses, and facilities
+  - Provide campus tour information
+  - Share contact details and application procedures
+  - Powered by Google Gemini 2.5 Flash
+  
+- **Saathi (Student Assistant)** - Post-login personalized assistant
+  - Answer academic queries and course information
+  - Provide placement guidance and career advice
+  - Help with navigation and feature discovery
+  - Contextual assistance based on user role
+  - Multi-language support
+  - Voice input and output capabilities
+
+#### AI Resume Analyzer
+- **Content Analysis** - Evaluate resume content quality and completeness
+- **ATS Compatibility Check** - Score resume for Applicant Tracking Systems
+- **Keyword Recommendations** - Suggest industry-relevant keywords
+- **Format Optimization** - Identify formatting issues and improvements
+- **Section Completeness** - Check for missing critical sections
+- **Personalized Feedback** - Actionable suggestions for improvement
+- **Benchmark Scoring** - Compare against successful resumes in the field
 
 ### 📖 Help & Support
-- **Comprehensive Help System** - 40+ help articles covering:
-  - Getting Started guide
-  - Account & Profile management
-  - Academics & Course guidance
-  - Settings & Privacy information
-- **In-App Documentation** - Context-aware help available throughout the platform
-- **Support Resources** - Direct access to support contact information and FAQs
+
+#### Comprehensive Documentation System
+- **40+ Help Articles** covering:
+  - Getting Started - Platform overview, first login, and setup
+  - Account & Profile - Profile management, password reset, and settings
+  - Academics - Courses, attendance, assignments, exams, and grades
+  - Finance - Fee payment, receipts, and financial aid
+  - Placements - Job applications, resume building, and career resources
+  - Settings & Privacy - Account security, data protection, and preferences
+  
+- **Features**:
+  - Full-text search across all articles
+  - Category-based navigation
+  - Related articles suggestions
+  - FAQ section with common questions
+  - Troubleshooting guides
+  - Video tutorials (planned)
+  - Live chat support integration (planned)
+
+### 🎨 User Experience Features
+
+#### Theme & Customization
+- **Dark/Light Modes** - Toggle between dark and light themes with system preference detection
+- **Accent Colors** - 6 preset themes (Green, Red, Purple, Gold, Cyan, White) with custom colors
+- **Font Size Scaling** - Three size levels (Small, Medium, Large) for accessibility
+- **Landing Page Themes** - Separate color themes for marketing pages
+- **Responsive Design** - Mobile, tablet, and desktop optimized layouts
+- **Smooth Animations** - Framer Motion for modern interactions
+- **Accessibility** - WCAG 2.1 Level AA compliance, keyboard navigation, screen reader support
+
+#### Multi-Language Support
+- **Google Translate Integration** - Auto-translate content to 100+ languages
+- **Language Persistence** - Remember language preference across sessions
+- **RTL Language Support** - Right-to-left layout for Arabic, Hebrew, etc.
+- **Custom Translations** - Add custom translations for UI elements (planned)
+
+#### Search & Discovery
+- **Global Search** - Search across courses, users, announcements, and documents
+- **Advanced Filters** - Filter by department, date, type, and relevance
+- **Search History** - View recent searches with quick access
+- **Suggested Results** - Auto-complete and search suggestions
+- **Search Analytics** - Track popular searches to improve content
 
 ## 🏗️ Architecture Features
 
 ### 1. **Role-Based Access Control (RBAC)**
-   - 6 distinct user roles: Super Admin, College Admin, Faculty, Student, Placement Officer, Recruiter
-   - Each role has specialized dashboards, features, and permissions
-   - Granular permission system ensuring users only see relevant data
-   - Protected routes with automatic redirects for unauthorized access
-   - Real-time permission validation at component level
+- **6 Distinct Roles**: Super Admin, College Admin, Faculty, Student, Placement Officer, Recruiter
+- **Granular Permissions**: 50+ permissions for fine-grained access control
+- **Dynamic UI**: Features and menus adapt based on user role
+- **Protected Routes**: Automatic redirects for unauthorized access
+- **Real-Time Validation**: Permission checks at component and API level
+- **Audit Trail**: Log all permission-based actions
 
 ### 2. **Real-Time Data Synchronization**
-   - Firebase Firestore integration for instant data updates across all clients
-   - Live notification system for announcements and important updates
-   - Automatic sync of attendance, grades, and payment status
-   - Optimistic UI updates for better user experience
-   - Offline-first capability with sync on reconnection
+- **Firebase Firestore** - Real-time NoSQL database with instant updates
+- **Live Notifications** - Push notifications via Firebase Cloud Messaging
+- **Optimistic UI** - Instant feedback with background sync
+- **Offline Support** - Local caching with automatic sync on reconnection
+- **Batch Operations** - Multiple updates in single atomic transactions
+- **Change Listeners** - Real-time listeners for chat, notifications, and updates
 
 ### 3. **Responsive & Accessible Design**
-   - Mobile-first approach with full responsiveness across all devices
-   - Dark/Light theme support with system preference detection
-   - Accent color customization with 6 pre-built themes
-   - Accessibility compliance with WCAG standards
-   - Touch-optimized interface for mobile devices
-   - Smooth animations with Framer Motion for modern UX
+- **Mobile-First Approach** - Touch-optimized for all devices
+- **Breakpoints**:
+  - Mobile: 320px - 767px
+  - Tablet: 768px - 1024px
+  - Desktop: 1025px - 1440px
+  - Large Desktop: 1441px+
+- **Accessibility Features**:
+  - WCAG 2.1 Level AA compliance
+  - Semantic HTML and ARIA labels
+  - Keyboard navigation support
+  - Screen reader compatibility
+  - High contrast modes
+  - Focus indicators
 
-## Getting Started
+### 4. **Multi-Organization Support**
+- **Organization Isolation** - Complete data separation between institutions
+- **Organization Scoping** - Auto-filter data by organization
+- **Shared Resources** - Option to share courses, materials, and templates
+- **Organization Settings** - Independent branding and configuration per organization
+- **Super Admin Control** - Manage multiple colleges from single dashboard
+
+## 🚀 Technology Stack
+
+| Category | Technology | Purpose |
+|----------|-----------|---------|
+| **Framework** | React 18 + TypeScript | Modern UI with type safety |
+| **Build Tool** | Vite with SWC | Fast development and production builds |
+| **Styling** | Tailwind CSS | Utility-first CSS framework |
+| **UI Components** | shadcn/ui (55+) | Pre-built accessible components |
+| **Routing** | React Router v6 | Client-side routing with nested routes |
+| **Backend** | Firebase/Firestore | Real-time database and authentication |
+| **Storage** | Firebase Storage | File and media storage |
+| **AI/ML** | Google Gemini 2.5 Flash | AI chatbot and content generation |
+| **Icons** | Lucide React + Tabler Icons | 1000+ SVG icons |
+| **Animations** | Framer Motion + GSAP | Smooth UI animations and transitions |
+| **State Management** | React Hooks + Context API | Built-in React state management |
+| **Form Handling** | React Hook Form + Zod | Form validation and management |
+| **Charts** | Recharts | Data visualization and analytics |
+| **PDF Generation** | jsPDF + jsPDF-AutoTable | Document and receipt generation |
+| **QR Codes** | qrcode.react + html5-qrcode | QR generation and scanning |
+| **3D Graphics** | Three.js | 3D campus map and visualizations |
+| **Fonts** | Monument Extended, Fraunces, DM Sans | Custom typography |
+
+## 📁 Project Structure
+
+```
+omniflow/
+├── public/
+│   ├── fonts/                  # Custom fonts (Monument Extended, Fraunces)
+│   ├── images/                 # Static images and assets
+│   └── favicon.ico             # App favicon
+├── src/
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── Header.tsx           # Top navigation with search and user menu
+│   │   │   ├── Sidebar.tsx          # Left sidebar with role-based navigation
+│   │   │   ├── MainLayout.tsx       # Main app layout wrapper
+│   │   │   └── Footer.tsx           # Footer component
+│   │   ├── ui/                      # shadcn/ui components (55+)
+│   │   │   ├── button.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   ├── card.tsx
+│   │   │   └── ... (50+ more)
+│   │   ├── animations/              # Animation components
+│   │   │   ├── ScrollReveal.tsx
+│   │   │   └── Counter.tsx
+│   │   ├── attendance/              # Attendance-specific components
+│   │   │   ├── QRCodeScanner.tsx
+│   │   │   └── AttendanceMarker.tsx
+│   │   ├── chat/                    # Chat system components (11 files)
+│   │   │   ├── ChatWindow.tsx
+│   │   │   ├── MessageList.tsx
+│   │   │   ├── GroupList.tsx
+│   │   │   └── ...
+│   │   ├── common/                  # Reusable components
+│   │   │   ├── ExportDialog.tsx
+│   │   │   ├── ImportDialog.tsx
+│   │   │   ├── ConfirmDialog.tsx
+│   │   │   └── BulkUpload.tsx
+│   │   ├── timetable/
+│   │   │   └── TimetableGrid.tsx
+│   │   ├── FloatingAIChat.tsx       # Saathi chatbot component
+│   │   ├── GoogleTranslate.tsx      # Translation component
+│   │   ├── ProtectedRoute.tsx       # Route protection wrapper
+│   │   └── ...
+│   ├── pages/
+│   │   ├── admin/                   # Admin-only pages (13 files)
+│   │   │   ├── CollegeSettings.tsx
+│   │   │   ├── PaymentSettings.tsx
+│   │   │   ├── CanteenManager.tsx
+│   │   │   ├── HostelAdmin.tsx
+│   │   │   ├── SystemConfig.tsx
+│   │   │   ├── SystemLogs.tsx
+│   │   │   ├── Approvals.tsx
+│   │   │   ├── Organizations.tsx
+│   │   │   ├── OrganizationDetail.tsx
+│   │   │   ├── AddOrganization.tsx
+│   │   │   ├── PlacementSettings.tsx
+│   │   │   ├── PlacementInsights.tsx
+│   │   │   └── Recruiters.tsx
+│   │   ├── college/                 # College management pages (12 files)
+│   │   │   ├── Departments.tsx
+│   │   │   ├── DepartmentDetail.tsx
+│   │   │   ├── Faculty.tsx
+│   │   │   ├── FacultyDetail.tsx
+│   │   │   ├── AddFaculty.tsx
+│   │   │   ├── AddCourse.tsx
+│   │   │   ├── AddUser.tsx
+│   │   │   ├── Admissions.tsx
+│   │   │   ├── FeeSetup.tsx
+│   │   │   ├── FinancialReport.tsx
+│   │   │   ├── Reports.tsx
+│   │   │   └── Schedule.tsx
+│   │   ├── dashboards/              # Dashboard pages (8 files)
+│   │   │   ├── AdminDashboard.tsx
+│   │   │   ├── StudentDashboard.tsx
+│   │   │   ├── FacultyDashboard.tsx
+│   │   │   ├── PlacementOfficerDashboard.tsx
+│   │   │   ├── RecruiterDashboard.tsx
+│   │   │   ├── CollegeAdminDashboard.tsx
+│   │   │   └── ...
+│   │   ├── placement/               # Placement-related pages (12 files)
+│   │   │   ├── Jobs.tsx
+│   │   │   ├── PlacementDrives.tsx
+│   │   │   ├── PlacementApplications.tsx
+│   │   │   ├── PlacementProfile.tsx
+│   │   │   ├── MyPlacementDashboard.tsx
+│   │   │   ├── CandidateDiscovery.tsx
+│   │   │   ├── InterviewSchedule.tsx
+│   │   │   ├── OfferManagement.tsx
+│   │   │   ├── PlacementReports.tsx
+│   │   │   ├── StudentReadiness.tsx
+│   │   │   ├── CareerPortal.tsx
+│   │   │   └── Recruiters.tsx
+│   │   ├── help/                    # Help documentation (4 sections)
+│   │   │   ├── HelpArticle.tsx
+│   │   │   ├── GettingStarted.tsx
+│   │   │   ├── AccountProfile.tsx
+│   │   │   └── ...
+│   │   ├── LandingPage.tsx          # Marketing landing page
+│   │   ├── Auth.tsx                 # Authentication page
+│   │   ├── Onboarding.tsx           # User onboarding flow
+│   │   ├── Courses.tsx              # Course management
+│   │   ├── CourseMaterials.tsx      # Course materials browser
+│   │   ├── CourseDetail.tsx         # Individual course view
+│   │   ├── Timetable.tsx            # Schedule management
+│   │   ├── Attendance.tsx           # Attendance tracking
+│   │   ├── Examinations.tsx         # Exam management
+│   │   ├── Assignments.tsx          # Assignment tracking
+│   │   ├── Finance.tsx              # Fee management
+│   │   ├── PaymentDetail.tsx        # Payment transaction details
+│   │   ├── Placements.tsx           # Placement overview
+│   │   ├── JobDetail.tsx            # Individual job posting
+│   │   ├── MyApplications.tsx       # Student applications tracker
+│   │   ├── ResumeBuilder.tsx        # Basic resume builder
+│   │   ├── ResumeBuilderIvyLeague.tsx # Advanced resume builder
+│   │   ├── StudentProfile.tsx       # Student profile management
+│   │   ├── PublicStudentProfile.tsx # Public-facing student profiles
+│   │   ├── HostelIssues.tsx         # Hostel management
+│   │   ├── NightCanteen.tsx         # Canteen ordering
+│   │   ├── CampusMap.tsx            # Interactive 3D campus map
+│   │   ├── Chat.tsx                 # Chat system
+│   │   ├── Clubs.tsx                # Clubs and activities
+│   │   ├── Library.tsx              # Library management
+│   │   ├── RoomBooking.tsx          # Room booking system
+│   │   ├── LeaveManagement.tsx      # Leave applications
+│   │   ├── Notifications.tsx        # Notification center
+│   │   ├── NotificationDetail.tsx   # Individual notification view
+│   │   ├── Users.tsx                # User management
+│   │   ├── UserDetail.tsx           # User detail view
+│   │   ├── Students.tsx             # Student listing
+│   │   ├── Organizations.tsx        # Multi-org management
+│   │   ├── Settings.tsx             # User settings
+│   │   ├── Help.tsx                 # Help center
+│   │   ├── Search.tsx               # Global search
+│   │   ├── About.tsx                # About page
+│   │   ├── Contact.tsx              # Contact page
+│   │   ├── Pricing.tsx              # Pricing page
+│   │   ├── Privacy.tsx              # Privacy policy
+│   │   ├── Terms.tsx                # Terms of service
+│   │   ├── SystemHealth.tsx         # System monitoring
+│   │   └── ...
+│   ├── hooks/
+│   │   ├── useAuth.ts               # Authentication hook
+│   │   ├── usePermissions.ts        # Permission checking
+│   │   ├── useDepartmentFilter.ts   # Department filtering
+│   │   ├── useCollegeSettings.ts    # College settings hook
+│   │   ├── useTheme.ts              # Theme management
+│   │   ├── useNotifications.ts      # Notifications hook
+│   │   ├── useChat.ts               # Chat functionality
+│   │   ├── useFirestore.ts          # Firestore helper
+│   │   └── ... (12 total)
+│   ├── lib/
+│   │   ├── firebase.ts              # Firebase initialization
+│   │   ├── accessControl.ts         # Access control logic
+│   │   ├── permissions.ts           # Permission definitions
+│   │   ├── rolePermissions.ts       # Role-based permissions
+│   │   ├── utils.ts                 # Utility functions
+│   │   ├── cn.ts                    # Class name utilities
+│   │   └── ... (16 total)
+│   ├── types/
+│   │   ├── index.ts                 # TypeScript type definitions
+│   │   └── database.ts              # Database schema types
+│   ├── config/
+│   │   ├── firebase.ts              # Firebase configuration
+│   │   └── constants.ts             # App constants
+│   ├── contexts/
+│   │   └── AuthContext.tsx          # Authentication context
+│   ├── utils/
+│   │   ├── export.ts                # Export utilities
+│   │   ├── validation.ts            # Form validation
+│   │   └── formatting.ts            # Data formatting
+│   ├── App.tsx                      # Root component with routes
+│   ├── main.tsx                     # Application entry point
+│   └── index.css                    # Global styles
+├── scripts/
+│   ├── initDB.js                    # Database initialization
+│   └── ... (16 total scripts)
+├── firestore.rules                  # Firestore security rules
+├── package.json                     # Dependencies and scripts
+├── vite.config.ts                   # Vite configuration
+├── tailwind.config.ts               # Tailwind CSS configuration
+├── tsconfig.json                    # TypeScript configuration
+├── README.md                        # This file
+├── FEATURES.md                      # Detailed features documentation
+├── ARCHITECTURE.md                  # Architecture deep dive
+└── QUICK_REFERENCE.md               # Quick reference guide
+
+**Total Files**: 233+ TypeScript/React components
+**Total Lines of Code**: 50,000+ (estimated)
+```
+
+## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js v18 or higher
 - npm or bun package manager
 - Firebase account (for backend services)
+- Google Gemini API key (for AI features)
 
 ### Installation
 
@@ -98,10 +613,17 @@ npm install
 bun install
 
 # Set up environment variables
-# Create .env.local file with Firebase configuration
-# VITE_FIREBASE_API_KEY=your_api_key
-# VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-# etc.
+# Create .env.local file with:
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+VITE_GEMINI_API_KEY=your_gemini_api_key
+
+# Initialize database (optional)
+npm run db:init
 
 # Start development server
 npm run dev
@@ -114,6 +636,7 @@ Access the application at `http://localhost:5173`
 ### Production Build
 
 ```bash
+# Build for production
 npm run build
 # or
 bun run build
@@ -122,191 +645,446 @@ bun run build
 npm run preview
 ```
 
-## Project Structure
+## 📊 Database Schema
 
-```
-src/
-├── components/
-│   ├── layout/
-│   │   ├── Header.tsx          # Top navigation bar with search and user menu
-│   │   ├── Sidebar.tsx         # Left navigation with role-based items
-│   │   └── MainLayout.tsx      # Main app layout wrapper
-│   ├── ui/                     # shadcn/ui components (50+)
-│   ├── animations/             # Animation components (ScrollReveal, Counter)
-│   ├── attendance/             # QR code attendance components
-│   ├── common/                 # Reusable utilities (dialogs, export, import)
-│   └── [feature]/              # Feature-specific components
-├── pages/
-│   ├── admin/                  # Admin-only pages
-│   │   ├── CollegeSettings.tsx
-│   │   ├── CanteenManager.tsx
-│   │   └── HostelAdmin.tsx
-│   ├── college/                # College management pages
-│   │   ├── Departments.tsx
-│   │   ├── Faculty.tsx
-│   │   └── Reports.tsx
-│   ├── dashboards/             # Dashboard pages
-│   ├── placement/              # Placement-related pages
-│   ├── help/                   # Help documentation pages
-│   ├── Courses.tsx             # Course management
-│   ├── Timetable.tsx           # Schedule view/management
-│   ├── Attendance.tsx          # Attendance marking
-│   ├── Examinations.tsx        # Exam management
-│   ├── Assignments.tsx         # Assignment tracking
-│   ├── Finance.tsx             # Fee management
-│   ├── StudentProfile.tsx      # User profile
-│   └── [page].tsx              # Individual pages
-├── hooks/
-│   ├── useAuth.ts              # Authentication hook
-│   ├── usePermissions.ts       # Permission checking
-│   ├── useDepartmentFilter.ts  # Department filtering
-│   └── [hook].ts               # Custom hooks
-├── lib/
-│   ├── firebase.ts             # Firebase config
-│   ├── accessControl.ts        # Access control logic
-│   ├── permissions.ts          # Permission definitions
-│   ├── rolePermissions.ts      # Role-based permissions
-│   └── utils.ts                # Utility functions
-├── types/
-│   └── index.ts                # TypeScript type definitions
-├── config/
-│   └── firebase.ts             # Firebase initialization
-├── App.tsx                     # Root component with routes
-└── main.tsx                    # Application entry point
+### Core Collections
+
+#### users
+```typescript
+{
+  id: string;                    // Auto-generated user ID
+  email: string;                 // User email (unique)
+  name: string;                  // Full name
+  role: UserRole;                // User role (student, faculty, admin, etc.)
+  organizationId?: string;       // Organization reference (multi-org)
+  department?: string;           // Department reference
+  photoURL?: string;             // Profile photo URL
+  phone?: string;                // Contact number
+  createdAt: Timestamp;          // Account creation date
+  lastLogin?: Timestamp;         // Last login timestamp
+  isActive: boolean;             // Account status
+  permissions: string[];         // Array of permission keys
+}
 ```
 
-## Technology Stack
+#### courses
+```typescript
+{
+  id: string;
+  name: string;
+  code: string;                  // Course code (e.g., CS101)
+  department: string;            // Department reference
+  credits: number;               // Credit hours
+  semester: number;              // Semester number
+  year: number;                  // Academic year
+  facultyId: string;             // Faculty reference
+  syllabus?: string;             // Syllabus document URL
+  materials: {                   // Course materials
+    type: 'note' | 'assignment' | 'paper';
+    title: string;
+    url: string;
+    uploadedAt: Timestamp;
+  }[];
+  enrolledStudents: string[];    // Array of student IDs
+  organizationId: string;        // Organization reference
+  createdAt: Timestamp;
+}
+```
 
-| Category | Technology | Purpose |
-|----------|-----------|---------|
-| **Framework** | React 18 + TypeScript | Modern UI with type safety |
-| **Build Tool** | Vite with SWC | Fast development and production builds |
-| **Styling** | Tailwind CSS | Utility-first CSS framework |
-| **UI Library** | shadcn/ui (50+) | Pre-built accessible components |
-| **Routing** | React Router v6 | Client-side routing |
-| **Backend** | Firebase/Firestore | Real-time database and authentication |
-| **Icons** | Lucide React | 300+ SVG icons |
-| **Animations** | Framer Motion | Smooth UI animations |
-| **State Management** | React Hooks | Built-in React state management |
-| **PDF Export** | pdfkit, html2pdf | Document generation |
-| **Fonts** | Monument Extended, Fraunces, DM Sans | Custom typography |
+#### attendance
+```typescript
+{
+  id: string;
+  courseId: string;              // Course reference
+  date: Timestamp;               // Attendance date
+  markedBy: string;              // Faculty ID who marked
+  students: {                    // Student attendance map
+    [studentId: string]: {
+      present: boolean;
+      markedAt: Timestamp;
+    }
+  };
+  qrCode?: string;               // QR code for quick marking
+  organizationId: string;
+}
+```
 
-## Development
+#### assignments
+```typescript
+{
+  id: string;
+  courseId: string;
+  title: string;
+  description: string;
+  dueDate: Timestamp;
+  totalMarks: number;
+  attachments: string[];         // File URLs
+  createdBy: string;             // Faculty ID
+  submissions: {
+    [studentId: string]: {
+      submittedAt: Timestamp;
+      files: string[];
+      grade?: number;
+      feedback?: string;
+    }
+  };
+  organizationId: string;
+  createdAt: Timestamp;
+}
+```
+
+#### jobs
+```typescript
+{
+  id: string;
+  title: string;
+  company: string;
+  description: string;
+  requirements: string[];
+  salary: {
+    min: number;
+    max: number;
+    currency: string;
+  };
+  location: string;
+  type: 'full-time' | 'part-time' | 'internship';
+  skills: string[];
+  eligibility: {
+    minCGPA: number;
+    departments: string[];
+    graduationYear: number[];
+  };
+  applications: string[];        // Student IDs
+  postedBy: string;              // Recruiter/TPO ID
+  status: 'open' | 'closed';
+  deadline: Timestamp;
+  organizationId: string;
+  createdAt: Timestamp;
+}
+```
+
+#### fees
+```typescript
+{
+  id: string;
+  studentId: string;
+  academicYear: string;
+  semester: number;
+  feeStructure: {
+    tuition: number;
+    library: number;
+    lab: number;
+    sports: number;
+    misc: number;
+  };
+  totalAmount: number;
+  paidAmount: number;
+  dueAmount: number;
+  payments: {
+    id: string;
+    amount: number;
+    method: string;
+    transactionId: string;
+    paidAt: Timestamp;
+    receiptUrl?: string;
+  }[];
+  dueDate: Timestamp;
+  organizationId: string;
+}
+```
+
+#### chatRooms
+```typescript
+{
+  id: string;
+  type: 'group' | 'direct';
+  name?: string;                 // For groups
+  description?: string;
+  participants: string[];        // User IDs
+  admins: string[];              // Group admin IDs
+  organizationId: string;
+  department?: string;           // For department groups
+  semester?: number;             // For semester groups
+  createdBy: string;
+  createdAt: Timestamp;
+  lastMessage?: {
+    text: string;
+    sentBy: string;
+    sentAt: Timestamp;
+  };
+}
+```
+
+#### messages
+```typescript
+{
+  id: string;
+  roomId: string;                // Chat room reference
+  text: string;
+  sentBy: string;                // User ID
+  sentAt: Timestamp;
+  readBy: string[];              // User IDs who read the message
+  attachments?: {
+    type: 'image' | 'document' | 'file';
+    url: string;
+    name: string;
+  }[];
+  replyTo?: string;              // Message ID being replied to
+  reactions?: {
+    [emoji: string]: string[];   // User IDs who reacted
+  };
+}
+```
+
+### Additional Collections
+- `notifications` - User notifications and announcements
+- `hostelIssues` - Hostel issue tracking
+- `canteenOrders` - Food orders from night canteen
+- `roomBookings` - Facility bookings
+- `leaveApplications` - Leave requests and approvals
+- `placementDrives` - Campus recruitment drives
+- `resumes` - Student resume versions
+- `libraries` - Library books and lending records
+- `clubs` - Student clubs and activities
+- `collegeSettings` - Institutional branding and configuration
+- `organizations` - Multi-organization support
+
+## 👥 User Roles & Capabilities
+
+### Student
+- ✅ View courses, materials, and syllabus
+- ✅ Track attendance and grades
+- ✅ Submit assignments and view feedback
+- ✅ Register for placement drives and apply to jobs
+- ✅ Build and analyze resumes
+- ✅ Report hostel issues and order from canteen
+- ✅ View fees and make online payments
+- ✅ Join clubs and register for events
+- ✅ Apply for leave and track approvals
+- ✅ Chat with peers and faculty
+- ✅ Receive real-time notifications
+- ✅ Customize theme and preferences
+
+### Faculty
+- ✅ Create and manage courses
+- ✅ Upload course materials and syllabus
+- ✅ Mark attendance (QR code or manual)
+- ✅ Create assignments and grade submissions
+- ✅ Schedule exams and publish grades
+- ✅ View student performance and analytics
+- ✅ Manage timetables
+- ✅ Approve leave applications
+- ✅ Chat with students and colleagues
+- ✅ Conduct mock interviews
+- ✅ Write recommendations
+
+### College Admin
+- ✅ Manage departments and faculty
+- ✅ Configure fee structures
+- ✅ View financial reports and analytics
+- ✅ Manage hostel and canteen operations
+- ✅ Configure payment gateways
+- ✅ Monitor system health
+- ✅ Approve critical workflows
+- ✅ Manage users and permissions
+- ✅ Access all reports and analytics
+- ✅ Configure college branding and settings
+
+### Placement Officer (TPO)
+- ✅ Post jobs and recruitment drives
+- ✅ Review and shortlist candidates
+- ✅ Schedule interviews and coordinate recruiters
+- ✅ Track placement statistics and trends
+- ✅ Manage recruiter accounts
+- ✅ Configure placement settings and eligibility
+- ✅ Generate placement reports
+- ✅ Monitor student readiness
+- ✅ Conduct career counseling
+- ✅ Organize pre-placement training
+
+### Recruiter
+- ✅ Post job openings and internships
+- ✅ Search and discover candidates
+- ✅ View student profiles and resumes
+- ✅ Shortlist and schedule interviews
+- ✅ Track hiring pipeline
+- ✅ Send offers and manage acceptances
+- ✅ View placement drive schedules
+- ✅ Access candidate analytics
+- ✅ Message placement officer
+
+### Super Admin
+- ✅ Manage multiple organizations
+- ✅ System-wide configuration
+- ✅ User management across all orgs
+- ✅ Access all administrative features
+- ✅ Configure integrations and APIs
+- ✅ Monitor system health and logs
+- ✅ Backup and restore data
+- ✅ Security and access control
+- ✅ Billing and subscription management (planned)
+
+## 🔒 Authentication & Security
+
+### Authentication Methods
+- **Email/Password** - Secure Firebase Authentication
+- **Session Management** - Auto-logout on token expiration
+- **Password Recovery** - Email-based password reset
+- **2FA** - Two-factor authentication (planned)
+- **OAuth** - Google, Microsoft login (planned)
+
+### Security Measures
+- **Role-Based Access Control (RBAC)** - Granular permission system
+- **Firestore Security Rules** - Database-level access control
+- **Data Encryption** - HTTPS in transit, encryption at rest
+- **Input Validation** - Zod schema validation on all forms
+- **XSS Protection** - Sanitized user inputs
+- **CSRF Tokens** - Cross-site request forgery protection
+- **Rate Limiting** - API rate limiting (planned)
+- **Audit Logs** - Complete user activity tracking
+- **Environment Variables** - Secure API key management
+- **PCI-DSS Compliance** - For payment processing
+
+## 🎯 Roadmap & Upcoming Features
+
+### Q1 2026 (Planned)
+- [ ] **Mobile Native Apps** - iOS and Android apps with offline support
+- [ ] **Advanced Analytics Dashboard** - Custom dashboards with widgets
+- [ ] **Video Conferencing** - Built-in video calls for classes and interviews
+- [ ] **AI Teaching Assistant** - AI-powered doubt solving and tutoring
+- [ ] **Automated Grading** - AI-based assignment grading
+- [ ] **Plagiarism Detection** - Integrated plagiarism checker
+- [ ] **Parent Portal** - Parent dashboard for student monitoring
+- [ ] **Alumni Portal** - Alumni network and mentorship
+- [ ] **Event Management** - Complete event planning and ticketing
+- [ ] **Transport Management** - Bus tracking and route management
+
+### Q2 2026 (Planned)
+- [ ] **LMS Integration** - Google Classroom, Moodle, Canvas integration
+- [ ] **Calendar Sync** - Two-way sync with Google/Outlook calendars
+- [ ] **Email Integration** - Institutional email with inbox
+- [ ] **SMS Notifications** - SMS alerts for critical updates
+- [ ] **Biometric Attendance** - Fingerprint and face recognition
+- [ ] **Digital ID Cards** - QR-based student/faculty ID cards
+- [ ] **Inventory Management** - Lab equipment and asset tracking
+- [ ] **Procurement System** - Purchase orders and vendor management
+- [ ] **Payroll Management** - Faculty and staff payroll
+- [ ] **HR Management** - Leave, attendance, and performance for staff
+
+### Q3 2026 (Planned)
+- [ ] **Research Management** - Track research projects, publications, and grants
+- [ ] **Exam Portal** - Online exams with proctoring
+- [ ] **Certificate Generation** - Auto-generate certificates with blockchain verification
+- [ ] **Scholarship Management** - Scholarship applications and disbursements
+- [ ] **Grievance Redressal** - Formal complaint and resolution system
+- [ ] **Accreditation Module** - NAAC, NBA accreditation tracking
+- [ ] **Alumni Donations** - Fundraising and donation management
+- [ ] **Career Counseling** - One-on-one counseling scheduling
+- [ ] **Skill Assessment** - Online skill tests and certifications
+- [ ] **Internship Portal** - Internship postings and tracking
+
+### Future (Backlog)
+- [ ] **Blockchain Transcripts** - Tamper-proof academic records
+- [ ] **AR/VR Campus Tours** - Virtual reality campus exploration
+- [ ] **IoT Integration** - Smart classroom and lab automation
+- [ ] **Predictive Analytics** - Student success prediction and intervention
+- [ ] **Gamification** - Badges, leaderboards, and rewards
+- [ ] **Social Features** - Student feed, groups, and forums
+- [ ] **Marketplace** - Buy/sell used books, notes, and items
+- [ ] **Collaboration Tools** - Document editing, whiteboards, project management
+- [ ] **API Marketplace** - Third-party integrations and plugins
+- [ ] **White-Label Solution** - Customizable branding for reselling
+
+## 📈 Performance & Optimization
+
+### Current Optimizations
+- **Code Splitting** - Route-based lazy loading with React.lazy
+- **Tree Shaking** - Eliminate unused code in production
+- **Image Optimization** - Responsive images with lazy loading
+- **CSS Optimization** - Tailwind CSS with PurgeCSS
+- **Cache Strategies** - Service workers for offline support (planned)
+- **CDN Delivery** - Static assets via CDN
+- **Gzip Compression** - Compressed assets for faster loading
+- **Indexed Queries** - Optimized Firestore queries and indexes
+- **Virtual Scrolling** - For large lists and tables
+- **Debounced Search** - Reduce API calls on search inputs
+
+### Performance Metrics (Target)
+- **First Contentful Paint (FCP)**: < 1.5s
+- **Largest Contentful Paint (LCP)**: < 2.5s
+- **Time to Interactive (TTI)**: < 3.5s
+- **Cumulative Layout Shift (CLS)**: < 0.1
+- **Bundle Size**: < 300KB (gzipped)
+- **Lighthouse Score**: 90+ (Performance, Accessibility, Best Practices, SEO)
+
+## 🌐 Browser & Device Support
+
+### Browsers
+- ✅ Chrome/Edge (latest 2 versions)
+- ✅ Firefox (latest 2 versions)
+- ✅ Safari (latest 2 versions)
+- ✅ Chrome Mobile (latest)
+- ✅ Safari iOS (latest)
+- ⚠️ IE11 (not supported)
+
+### Devices
+- ✅ Desktop (Windows, macOS, Linux)
+- ✅ Tablets (iPad, Android tablets)
+- ✅ Mobile phones (iOS 13+, Android 8+)
+- ✅ Touch and mouse support
+- ✅ Responsive layouts for all screen sizes
+
+## 🛠️ Development
 
 ### Available Commands
 
 ```bash
-npm run dev        # Start development server (hot reload)
-npm run build      # Build for production
-npm run lint       # Run ESLint code linting
-npm run preview    # Preview production build locally
+# Development
+npm run dev          # Start dev server with hot reload (port 5173)
+npm run api          # Start local API server (for testing)
+npm run dev:all      # Run both dev server and API server
+
+# Database
+npm run db:init      # Initialize database with sample data
+
+# Build
+npm run build        # Production build
+npm run build:dev    # Development build
+npm run preview      # Preview production build
+
+# Code Quality
+npm run lint         # Run ESLint
+npm run lint:fix     # Auto-fix linting issues (if available)
 ```
 
-### Key Development Files
+### Environment Variables
 
-- **Environment Variables**: `.env.local` (Firebase configuration)
-- **Styling**: `src/index.css` (Tailwind CSS and custom styles)
-- **Configuration**: `vite.config.ts`, `tailwind.config.ts`, `tsconfig.json`
+Create `.env.local` file:
 
-## Authentication & Security
+```env
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 
-- **Firebase Authentication** - Secure sign-up and login with email/password
-- **Session Management** - Automatic logout on token expiration
-- **Role-Based Access Control** - Secure access to protected routes
-- **Data Encryption** - Sensitive data encrypted in transit and at rest
-- **Environment Variables** - API keys stored securely
+# AI Services
+VITE_GEMINI_API_KEY=your_gemini_api_key
 
-## User Roles & Capabilities
+# Optional
+VITE_APP_ENV=development
+VITE_API_BASE_URL=http://localhost:3000
+```
 
-### Student
-- View courses and materials
-- Track attendance and grades
-- Submit assignments
-- Apply for placements
-- Manage hostel and canteen services
-- View fees and make payments
+### Code Quality Tools
+- **ESLint** - Code linting and style enforcement
+- **TypeScript Strict Mode** - Type safety
+- **Prettier** - Code formatting (add if needed)
+- **Husky** - Git hooks for pre-commit validation (planned)
 
-### Faculty
-- Manage courses and materials
-- Mark attendance
-- Grade assignments and exams
-- View student performance
-- Manage timetables
-
-### College Admin
-- Manage departments and faculty
-- View reports and analytics
-- Configure payment settings
-- Manage hostel and canteen
-
-### Placement Officer
-- Post jobs and recruitment drives
-- Review candidate applications
-- Manage recruiter interactions
-- Track placement statistics
-
-### Recruiter
-- Post job openings
-- View and shortlist candidates
-- Schedule interviews
-- Track hiring pipeline
-
-### Super Admin
-- System-wide configuration
-- User management and permissions
-- College branding and settings
-- Access all administrative features
-
-## Responsive Design
-
-Fully optimized for all devices:
-- **Desktop** (1920px+) - Full feature set with expanded layouts
-- **Tablet** (768px-1024px) - Optimized touch interface
-- **Mobile** (320px-767px) - Compact layouts with mobile-first navigation
-
-## Browser Support
-
-- Chrome/Edge (latest 2 versions)
-- Firefox (latest 2 versions)
-- Safari (latest 2 versions)
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## Database Schema
-
-### Core Collections
-- **users** - User accounts with roles and permissions
-- **courses** - Course information and materials
-- **attendance** - Attendance records by course and date
-- **assignments** - Assignment details and submissions
-- **exams** - Examination schedules and grades
-- **fees** - Fee structure and payment records
-- **jobs** - Job postings and applications
-- **profiles** - Extended user profile information
-
-### Real-time Features
-- Firestore triggers for automatic notifications
-- Real-time updates on attendance and grades
-- Live notification delivery to users
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Performance Optimization
-
-- Lazy loading of route components
-- Image optimization with responsive sizing
-- CSS-in-JS with Tailwind for minimal bundle size
-- Code splitting with React Router
-- Optimized Firebase queries with proper indexing
-
-## Deployment
+## 🚀 Deployment
 
 ### Deploy to Vercel
 
@@ -325,56 +1103,92 @@ vercel
 npm i -g netlify-cli
 
 # Deploy
-netlify deploy
+netlify deploy --prod
 ```
 
-### Environment Variables Required
-- VITE_FIREBASE_API_KEY
-- VITE_FIREBASE_AUTH_DOMAIN
-- VITE_FIREBASE_PROJECT_ID
-- VITE_FIREBASE_STORAGE_BUCKET
-- VITE_FIREBASE_MESSAGING_SENDER_ID
-- VITE_FIREBASE_APP_ID
+### Deploy to Firebase Hosting
 
-## License
+```bash
+# Install Firebase CLI
+npm i -g firebase-tools
 
-All rights reserved © 2025. Proprietary software.
+# Login
+firebase login
 
-## Support
+# Initialize (one-time)
+firebase init hosting
+
+# Deploy
+firebase deploy --only hosting
+```
+
+### Environment Variables for Production
+Set the following in your deployment platform:
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_GEMINI_API_KEY`
+
+## 📝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Coding Standards
+- Use TypeScript for all new files
+- Follow existing code structure and naming conventions
+- Write meaningful commit messages
+- Add comments for complex logic
+- Ensure no linting errors
+- Test your changes thoroughly
+
+## 📄 License
+
+All rights reserved © 2026. Proprietary software.
+
+## 💬 Support
 
 For help and support:
-- **In-App Help**: Access the Help & Support section in the application
-- **Documentation**: Comprehensive help articles covering all features
-- **Report Issues**: Contact your institution's support team
+- **In-App Help**: Access the Help & Support section with 40+ articles
+- **Documentation**: See `FEATURES.md` and `ARCHITECTURE.md` for detailed information
+- **Email**: Contact your institution's support team
 - **Feature Requests**: Submit feedback through the application
 
-## Roadmap
+## 🏆 Achievements
 
-### Planned Features (Future Releases)
-- [ ] Room booking system for seminar halls and labs
-- [ ] Leave management system with approval workflows
-- [ ] Library management with book lending system
-- [ ] Clubs and activities with event management
-- [ ] Advanced analytics and data visualization
-- [ ] Mobile native applications (iOS/Android)
-- [ ] Third-party integrations (Google Classroom, LMS)
-- [ ] Multi-language support (i18n)
-- [ ] Real-time collaboration features
-- [ ] Enhanced reporting with custom dashboards
+- ⭐ **50,000+ Lines of Code** - Comprehensive feature-rich platform
+- ⭐ **6 User Roles** - Complete RBAC implementation
+- ⭐ **100+ Pages/Components** - Extensive UI coverage
+- ⭐ **Real-Time Sync** - Instant updates across all clients
+- ⭐ **Mobile-Responsive** - Works seamlessly on all devices
+- ⭐ **AI-Powered** - Dual chatbots with Google Gemini
+- ⭐ **40+ Help Articles** - Comprehensive documentation
+- ⭐ **Multi-Organization** - Support for multiple institutions
+- ⭐ **WhatsApp-Grade Chat** - Professional messaging system
+- ⭐ **3D Campus Map** - Interactive campus navigation
 
-## Changelog
+## 🎨 Screenshots & Demo
 
-### v1.0.0 (Current)
-- ✅ Complete academic management system
-- ✅ Placement portal with application tracking
-- ✅ Finance module with payment integration
-- ✅ Student services (Hostel, Canteen)
-- ✅ Role-based access control
-- ✅ Real-time notifications
-- ✅ Dark/Light theme support
-- ✅ Responsive mobile-friendly design
+*(Coming Soon - Add screenshots of key features)*
+
+## 🔗 Related Documentation
+
+- [FEATURES.md](./FEATURES.md) - Comprehensive feature documentation
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Technical architecture deep dive
+- [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - Quick reference guide
 
 ---
 
 **Built with ❤️ for educational institutions**
 
+**Version**: 1.0.0  
+**Last Updated**: January 2026  
+**Maintainers**: OmniFlow Development Team

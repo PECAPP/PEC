@@ -16,7 +16,7 @@ import {
   BarChart3,
   Building
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 const container = {
   hidden: { opacity: 0 },
@@ -45,6 +45,8 @@ const navItems = [
 ];
 
 export default function DemoDashboard() {
+  const [activeTab, setActiveTab] = useState('Dashboard');
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
@@ -55,18 +57,18 @@ export default function DemoDashboard() {
         </div>
         <nav className="flex-1 px-3 space-y-1">
           {navItems.map((item) => (
-            <Link
+            <button
               key={item.label}
-              to={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                item.active
+              onClick={() => setActiveTab(item.label)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === item.label
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
               }`}
             >
               <item.icon className="w-4 h-4" />
               {item.label}
-            </Link>
+            </button>
           ))}
         </nav>
       </aside>
@@ -75,11 +77,14 @@ export default function DemoDashboard() {
       <div className="flex-1 overflow-auto">
         <div className="p-4 sm:p-6 lg:p-8">
           <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
             className="space-y-6 max-w-7xl mx-auto"
           >
+        {activeTab === 'Dashboard' && (
+          <>
         {/* Mock Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -220,6 +225,116 @@ export default function DemoDashboard() {
             </motion.div>
           </div>
         </div>
+        </>
+        )}
+
+        {activeTab === 'Assignments' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Assignments</h1>
+            <div className="grid gap-4">
+              {[
+                { title: 'Data Structures Assignment 3', due: 'Due in 2 days', status: 'pending' },
+                { title: 'Web Development Project', due: 'Due in 5 days', status: 'pending' },
+                { title: 'Database Lab Report', due: 'Submitted', status: 'completed' },
+              ].map((assignment, i) => (
+                <div key={i} className="card-elevated p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold">{assignment.title}</h3>
+                      <p className="text-sm text-muted-foreground">{assignment.due}</p>
+                    </div>
+                    <span className={`status-badge ${assignment.status === 'completed' ? 'status-verified' : 'status-pending'}`}>
+                      {assignment.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Timetable' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Weekly Timetable</h1>
+            <div className="card-elevated p-6">
+              <p className="text-muted-foreground">Your weekly schedule will appear here</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Courses' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">My Courses</h1>
+            <div className="grid gap-4">
+              {['Data Structures', 'Web Development', 'Database Systems', 'Computer Networks'].map((course, i) => (
+                <div key={i} className="card-elevated p-6">
+                  <h3 className="font-semibold mb-2">{course}</h3>
+                  <p className="text-sm text-muted-foreground">Semester 4 • Core Subject</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Attendance' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Attendance Overview</h1>
+            <div className="card-elevated p-6">
+              <div className="text-center">
+                <div className="text-5xl font-bold text-success mb-2">94%</div>
+                <p className="text-muted-foreground">Overall Attendance</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Performance' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Academic Performance</h1>
+            <div className="card-elevated p-6">
+              <div className="text-center">
+                <div className="text-5xl font-bold text-accent mb-2">8.92</div>
+                <p className="text-muted-foreground">Current CGPA</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Finance' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Fee Management</h1>
+            <div className="card-elevated p-6">
+              <p className="text-muted-foreground">No pending payments</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Chat' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Messages</h1>
+            <div className="card-elevated p-6">
+              <p className="text-muted-foreground">Start a conversation</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Placements' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Placement Portal</h1>
+            <div className="card-elevated p-6">
+              <p className="text-muted-foreground">Upcoming drives and opportunities</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Settings' && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Settings</h1>
+            <div className="card-elevated p-6">
+              <p className="text-muted-foreground">Account preferences</p>
+            </div>
+          </div>
+        )}
       </motion.div>
         </div>
       </div>

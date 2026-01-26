@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { GraduationCap, Mail, Lock, User, Eye, EyeOff, ArrowRight, Chrome } from 'lucide-react';
+import { GraduationCap, Mail, Lock, User, Eye, EyeOff, ArrowRight, Chrome, Shield, X, Lightbulb, Briefcase, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,8 +33,11 @@ export default function Auth() {
   // Signup form state
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
+  const [signupPassword, setSignupPassword] = useState('' );
   const [signupRole, setSignupRole] = useState<UserRole>('student');
+  
+  // Credentials modal state
+  const [showCredentialsModal, setShowCredentialsModal] = useState(true);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,6 +197,159 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      {/* Test Credentials Modal */}
+      {showCredentialsModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-card border border-border rounded-2xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden"
+          >
+            {/* Modal Header */}
+            <div className="bg-accent/10 border-b border-border px-6 py-5 flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 mb-2">
+                  <Shield className="w-7 h-7 text-accent" />
+                  Test Credentials
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Click any role below to auto-fill login credentials
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCredentialsModal(false)}
+                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-accent/10"
+                aria-label="Close credentials modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="space-y-3">
+                {/* Student Credentials - Arjun Patel */}
+                <button
+                  onClick={() => {
+                    setLoginEmail('arjun.patel@pec.edu');
+                    setLoginPassword('Student@123');
+                    setLoginRole('student');
+                    setShowCredentialsModal(false);
+                  }}
+                  className="w-full bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4 hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-all cursor-pointer text-left"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0">
+                      <GraduationCap className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-foreground mb-1">Student - Arjun Patel</h3>
+                      <p className="text-xs text-muted-foreground mb-2">CSE, Semester 6</p>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground w-16">Email:</span>
+                          <code className="text-xs font-mono bg-card px-2 py-0.5 rounded border border-border">arjun.patel@pec.edu</code>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground w-16">Password:</span>
+                          <code className="text-xs font-mono bg-card px-2 py-0.5 rounded border border-border">Student@123</code>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Faculty Credentials - Dr. Priya Sharma */}
+                <button
+                  onClick={() => {
+                    setLoginEmail('priya.cse@pec.edu');
+                    setLoginPassword('Faculty@123');
+                    setLoginRole('faculty');
+                    setShowCredentialsModal(false);
+                  }}
+                  className="w-full bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-xl p-4 hover:bg-purple-100 dark:hover:bg-purple-950/50 transition-all cursor-pointer text-left"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center flex-shrink-0">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-foreground mb-1">Faculty - Dr. Priya Sharma</h3>
+                      <p className="text-xs text-muted-foreground mb-2">CSE Department, AI & ML Specialist</p>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground w-16">Email:</span>
+                          <code className="text-xs font-mono bg-card px-2 py-0.5 rounded border border-border">priya.cse@pec.edu</code>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground w-16">Password:</span>
+                          <code className="text-xs font-mono bg-card px-2 py-0.5 rounded border border-border">Faculty@123</code>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Super Admin Credentials */}
+                <button
+                  onClick={() => {
+                    setLoginEmail('admin@pec.edu');
+                    setLoginPassword('Admin@123');
+                    setLoginRole('super_admin');
+                    setShowCredentialsModal(false);
+                  }}
+                  className="w-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-4 hover:bg-red-100 dark:hover:bg-red-950/50 transition-all cursor-pointer text-left"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-foreground mb-1">Super Admin</h3>
+                      <p className="text-xs text-muted-foreground mb-2">System Administrator</p>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground w-16">Email:</span>
+                          <code className="text-xs font-mono bg-card px-2 py-0.5 rounded border border-border">admin@pec.edu</code>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground w-16">Password:</span>
+                          <code className="text-xs font-mono bg-card px-2 py-0.5 rounded border border-border">Admin@123</code>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Info Banner */}
+              <div className="mt-4 bg-accent/10 border border-accent/30 rounded-xl p-3 flex items-start gap-3">
+                <Lightbulb className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs text-foreground/90 font-medium mb-1">
+                    Demo Environment
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Click any role card above to automatically fill in the login form with test credentials.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-accent/5 border-t border-border px-6 py-3 flex items-center justify-end">
+              <button
+                onClick={() => setShowCredentialsModal(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                I'll enter my own credentials
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
         <div className="absolute inset-0 bg-primary" />
