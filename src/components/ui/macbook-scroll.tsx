@@ -38,28 +38,28 @@ export const MacbookScroll: React.FC<MacbookScrollProps> = ({
         <div className="relative mx-auto w-full max-w-5xl">
           {/* Macbook container */}
           <div className="relative">
-            {/* MacBook body - Silver/Gray */}
-            <div className="bg-gradient-to-b from-gray-200 via-gray-300 to-gray-400 rounded-3xl shadow-2xl">
+            {/* MacBook body - Stylized Brutalist */}
+            <div className="bg-gray-200 border-2 border-foreground rounded-none neo-brutal-shadow-lg p-1">
               {/* MacBook lid and screen bezel */}
-              <div className="bg-black/90 rounded-t-3xl p-2">
+              <div className="bg-black border border-black rounded-none p-2">
                 {/* Notch */}
-                <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-40 h-7 bg-black rounded-b-2xl shadow-inner z-10" />
+                <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-40 h-7 bg-black border border-gray-800 rounded-none z-10" />
 
                 {/* Screen content */}
-                <div className="relative bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl overflow-hidden shadow-inner">
+                <div className="relative bg-white rounded-none overflow-hidden border border-gray-800">
                   <img
                     src={src}
                     alt="MacBook Screen"
                     className="w-full h-auto object-cover"
                   />
                   {showGradient && (
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/5 pointer-events-none" />
+                    <div className="absolute inset-0 bg-transparent pointer-events-none" />
                   )}
                 </div>
               </div>
 
-              {/* Keyboard area */}
-              <div className="bg-gradient-to-b from-gray-300 to-gray-500 rounded-b-3xl px-4 py-2 h-16" />
+              {/* Keyboard area - minimal */}
+              <div className="bg-gray-300 border-t-2 border-foreground rounded-none px-4 py-2 h-4 mt-1" />
             </div>
 
             {/* Title positioned above */}

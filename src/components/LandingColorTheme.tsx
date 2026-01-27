@@ -48,7 +48,7 @@ export function LandingColorTheme() {
           <span className="sr-only">Change accent color</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
+      <DropdownMenuContent align="end" className="w-44 rounded-none strict-sharp-corners neo-brutal-card">
         {accentThemes.map((theme) => (
           <DropdownMenuItem
             key={theme.id}
@@ -57,7 +57,7 @@ export function LandingColorTheme() {
           >
             <div className="flex items-center gap-3 w-full">
               <div
-                className="w-5 h-5 rounded-full ring-2 ring-white/20 shadow-sm"
+                className="w-5 h-5 rounded-none border border-foreground shadow-sm"
                 style={{ background: theme.color }}
               />
               <span className="flex-1">{theme.name}</span>

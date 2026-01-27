@@ -41,11 +41,10 @@ import { Input } from "@/components/ui/input";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 import { MacbookScroll } from "@/components/ui/macbook-scroll";
-import ThemeToggler from "@/components/ThemeToggler";
-import { LandingColorTheme } from "@/components/LandingColorTheme";
 import React, { useRef, useEffect, useState } from "react";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import GradualBlur from "@/components/ui/GradualBlur";
+import { NeoBrutalGraphics } from "@/components/NeoBrutalGraphics";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -121,7 +120,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-card/50 border border-border rounded-xl overflow-hidden hover:border-accent/40 transition-all duration-300"
+      className="bg-card/50 border-2 border-border border-l-4 rounded-none overflow-hidden hover:border-foreground transition-all duration-300 neo-brutal-shadow"
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -146,7 +145,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
           opacity: isOpen ? 1 : 0,
         }}
         transition={{ duration: 0.3 }}
-        className="overflow-hidden border-t border-border"
+        className="overflow-hidden border-t-2 border-border"
       >
         <p className="p-6 text-muted-foreground text-sm leading-relaxed">
           {answer}
@@ -230,6 +229,7 @@ const FloatingParticles = () => {
 };
 
 export function LandingPage() {
+  const [activeFAQIndex, setActiveFAQIndex] = useState<number | null>(null);
   const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
@@ -283,100 +283,32 @@ export function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden relative">
-      {/* Animated Meshy Gradient Background - Full Page */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        {/* Base gradient background - theme aware */}
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/3 via-background to-primary/3" />
-        
-        {/* Mesh Gradient Blobs - Subtle and elegant, theme-aware */}
-        <motion.div
-          animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-0 left-0 w-[600px] h-[600px] bg-accent rounded-full blur-3xl opacity-10 dark:opacity-20"
-        />
-        <motion.div
-          animate={{
-            x: [0, -80, 0],
-            y: [0, 100, 0],
-            scale: [1, 1.3, 1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-3xl opacity-8 dark:opacity-18"
-        />
-        <motion.div
-          animate={{
-            x: [0, 60, 0],
-            y: [0, -80, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute bottom-0 left-1/4 w-[550px] h-[550px] bg-accent rounded-full blur-3xl opacity-12 dark:opacity-25"
-        />
-        <motion.div
-          animate={{
-            x: [0, -100, 0],
-            y: [0, 50, 0],
-            scale: [1, 1.25, 1],
-          }}
-          transition={{
-            duration: 22,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-primary rounded-full blur-3xl opacity-10 dark:opacity-20"
-        />
-        <motion.div
-          animate={{
-            x: [0, 50, 0],
-            y: [0, -60, 0],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{
-            duration: 28,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-accent rounded-full blur-3xl opacity-20"
-        />
+    <div className="min-h-screen bg-background overflow-x-hidden overflow-y-scroll relative strict-sharp-corners snap-y snap-mandatory">
+      <NeoBrutalGraphics />
+      {/* Flat Grid Background - Neo-Brutalist */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-background">
+        <div className="absolute inset-0 bg-grid-pattern opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,black_90%,transparent_100%)]" />
       </div>
 
-      {/* Navigation */}
+      {/* Navigation - Glassmorphic */}
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/40"
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/10 border-b border-white/20 shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/">
               <motion.div
                 whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-3 cursor-pointer"
               >
-                <span className="text-xl font-bold text-foreground">
-                  OmniFlow
-                </span>
+                <img src="/logo.png" alt="OmniFlow" className="h-12 w-auto" />
               </motion.div>
             </Link>
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-2">
               {["Features", "How it Works", "Testimonials"].map((link, i) => (
                 <motion.a
                   key={link}
@@ -384,10 +316,10 @@ export function LandingPage() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 + 0.3 }}
-                  className="text-sm font-semibold text-foreground/90 hover:text-foreground transition-all duration-300 relative group"
+                  whileHover={{ y: -2 }}
+                  className="text-sm font-semibold text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-200"
                 >
                   {link}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300" />
                 </motion.a>
               ))}
             </div>
@@ -395,23 +327,11 @@ export function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="flex items-center gap-3"
             >
-              <LandingColorTheme />
-              <ThemeToggler />
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="rounded-full hover:bg-accent/10 transition-all duration-300"
-                aria-label="Sign in to your account"
-              >
-                <Link to="/onboarding">Sign In</Link>
-              </Button>
               <Button
                 size="sm"
                 asChild
-                className="rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300"
+                className="rounded-lg bg-white/20 text-white hover:bg-white/30 font-semibold px-6 backdrop-blur-sm border border-white/30 transition-all duration-200"
                 aria-label="Get started with test credentials"
               >
                 <Link to="/auth">Get Started</Link>
@@ -426,46 +346,32 @@ export function LandingPage() {
         ref={heroRef}
         className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
       >
-        {/* Hero Local Gradient Background */}
-        <div className="absolute inset-0 -z-0 overflow-hidden">
-          {/* Grid Background with Mask */}
-          <div className="absolute inset-0 bg-grid-pattern opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,black_90%,transparent_100%)]" />
-          
-          {/* Large animated blob 1 - Top Left */}
-          <motion.div
-            animate={{
-              x: [0, 80, 0],
-              y: [0, -60, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -top-1/4 -left-1/4 w-[800px] h-[800px] bg-accent rounded-full blur-3xl opacity-40"
-          />
-          
-          {/* Large animated blob 2 - Bottom Right */}
-          <motion.div
-            animate={{
-              x: [0, -100, 0],
-              y: [0, 80, 0],
-              scale: [1, 1.3, 1],
-            }}
-            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-            className="absolute -bottom-1/4 -right-1/4 w-[700px] h-[700px] bg-primary rounded-full blur-3xl opacity-35"
-          />
-          
-          {/* Center accent blob */}
-          <motion.div
-            animate={{
-              x: [0, 40, 0],
-              y: [0, -40, 0],
-              scale: [1, 1.15, 1],
-            }}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent rounded-full blur-3xl opacity-30"
+        {/* Hero Background Image */}
+        <div className="absolute inset-0 -z-0">
+          <img 
+            src="/image.png" 
+            alt="Background" 
+            className="w-full h-full object-cover"
           />
         </div>
 
         {/* Hero Content */}
+        {/* Y2K Hero Decor */}
+         <div className="absolute top-1/4 left-10 hidden lg:block pointer-events-none opacity-40">
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" stroke="white" strokeWidth="0.5">
+               <circle cx="50" cy="50" r="40"/>
+               <circle cx="50" cy="50" r="30"/>
+               <circle cx="50" cy="50" r="20"/>
+               <line x1="0" y1="50" x2="100" y2="50"/>
+               <line x1="50" y1="0" x2="50" y2="100"/>
+            </svg>
+         </div>
+         <div className="absolute bottom-1/3 right-20 hidden lg:block pointer-events-none opacity-40">
+             <div className="flex gap-1">
+                {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-12 bg-white/50"/>)}
+             </div>
+         </div>
+
         <motion.div
           variants={container}
           initial="hidden"
@@ -475,17 +381,24 @@ export function LandingPage() {
           {/* Main Heading */}
           <motion.h1
             variants={item}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mt-16 max-w-4xl mx-auto mb-8"
+            initial={{ opacity: 0, filter: "blur(10px)", y: 30 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mt-16 max-w-4xl mx-auto mb-8"
             style={{ fontFamily: "'Monument Extended', serif", fontWeight: 900 }}
           >
-            Powerful Dashboard,{" "}
-            <span className="text-accent">Beautifully Designed</span>
+            <span className="bg-gradient-to-r from-orange-900 to-orange-800 bg-clip-text text-transparent drop-shadow-[4px_4px_0px_rgba(0,0,0,0.25)]">
+              Powerful Dashboard, Beautifully Designed
+            </span>
           </motion.h1>
 
           {/* Subtitle */}
           <motion.p
             variants={item}
-            className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-12"
+            initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-lg sm:text-xl text-white/90 font-medium max-w-2xl mx-auto mb-12"
           >
             Manage everything from one intuitive interface. Built for modern educational institutions.
           </motion.p>
@@ -498,7 +411,7 @@ export function LandingPage() {
             <Button
               size="lg"
               asChild
-              className="magnetic-btn group rounded-full bg-accent hover:bg-accent/90 text-white dark:text-black font-bold shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 text-base"
+              className="neo-brutal-btn group bg-white text-black px-8 py-6 text-base border-2 border-black"
               aria-label="View test credentials and start trial"
             >
               <Link to="/auth" className="flex items-center gap-3">
@@ -510,7 +423,7 @@ export function LandingPage() {
               size="lg"
               variant="outline"
               asChild
-              className="magnetic-btn group rounded-full border-2 border-foreground/20 hover:border-accent hover:bg-accent/10 transition-all duration-300 px-8 py-6 text-base font-semibold text-foreground"
+              className="neo-brutal-btn group bg-transparent border-2 border-white hover:bg-white/10 px-8 py-6 text-base font-bold text-white hover:text-white"
               aria-label="Apply to onboard your institution"
             >
               <Link to="/apply-institution" className="flex items-center gap-3">
@@ -523,21 +436,18 @@ export function LandingPage() {
 
         {/* Dashboard Preview */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          style={{
-            scale: useTransform(scrollYProgress, [0, 0.3], [1.15, 0.75]),
-            opacity: useTransform(scrollYProgress, [0, 0.3], [1, 0.7]),
-          }}
+          initial={{ opacity: 0, y: 40, filter: "blur(20px)", scale: 0.95 }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-100px" }}
           className="mt-40 w-full overflow-x-auto"
         >
-          <div className="min-w-[1440px] mx-auto max-w-7xl">
-            <div className="relative rounded-2xl border border-border bg-card p-2 shadow-xl overflow-hidden">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border shadow-lg z-10">
-                <div className="w-3 h-3 rounded-full bg-destructive" />
-                <div className="w-3 h-3 rounded-full bg-warning" />
-                <div className="w-3 h-3 rounded-full bg-success" />
+          <div className="max-w-5xl mx-auto">
+            <div className="relative rounded-none border-4 border-black bg-black p-2 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-none bg-red-500 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-10">
+                <div className="w-4 h-4 rounded-none bg-black" />
+                <div className="w-4 h-4 rounded-none bg-yellow-400 border-2 border-black" />
+                <div className="w-4 h-4 rounded-none bg-green-400 border-2 border-black" />
               </div>
               <style>{`
                 iframe {
@@ -549,115 +459,122 @@ export function LandingPage() {
               `}</style>
               <iframe
                 src="/demo-dashboard"
-                className="rounded-xl w-full h-[800px] border-0 bg-background"
+                className="rounded-none w-full h-[700px] border-4 border-black bg-neutral-900"
                 title="OmniFlow Dashboard Demo"
                 scrolling="no"
               />
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-card/100 to-transparent pointer-events-none" />
+
+              <div className="absolute inset-0 rounded-none bg-transparent pointer-events-none" />
+              {/* Gradient Overlay - Fades to Dark to match dashboard bg */}
+              <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-neutral-900 via-neutral-900/80 to-transparent z-20 pointer-events-none" />
             </div>
           </div>
         </motion.div>
-      </section>
 
-      {/* Social Proof - Client Logos & Recently Adopted */}
-      {/* Integrations - Light Accent BG */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/5 dark:bg-accent/10 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              Trusted by Leading Institutions
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              From tier-1 universities to emerging colleges, institutions worldwide rely on OmniFlow
-            </p>
-          </motion.div>
-
-          {/* Infinite Scrolling Marquee */}
-          <div className="relative overflow-hidden">
-            <style>{`
-              @keyframes marquee {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(-50%); }
-              }
-              .marquee-container:hover .marquee-content {
-                animation-play-state: paused;
-              }
-            `}</style>
-            
-            <div className="marquee-container py-4">
-              <div className="marquee-content flex gap-12 animate-[marquee_30s_linear_infinite]">
-                {/* First set of logos */}
-                {[
-                  { name: "PEC", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/PEC_LOGO_EN.png?20241031120621" },
-                  { name: "IIT Kanpur", logo: "https://upload.wikimedia.org/wikipedia/en/a/a3/IIT_Kanpur_Logo.svg" },
-                  { name: "IIT Bombay", logo: "https://upload.wikimedia.org/wikipedia/en/1/1d/Indian_Institute_of_Technology_Bombay_Logo.svg" },
-                  { name: "DTU", logo: "https://upload.wikimedia.org/wikipedia/en/b/b5/DTU%2C_Delhi_official_logo.png" },
-                  { name: "Chandigarh University", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b0/Chandigarh_University_Seal.png" },
-                  { name: "CSJMU", logo: "https://upload.wikimedia.org/wikipedia/en/5/5a/Chhatrapati_Shahu_Ji_Maharaj_University_logo.png" },
-                  { name: "AIIMS Delhi", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/All_India_Institute_of_Medical_Sciences%2C_Delhi.svg/960px-All_India_Institute_of_Medical_Sciences%2C_Delhi.svg.png" },
-                ].map((client, idx) => (
-                  <div
-                    key={`first-${idx}`}
-                    className="flex-shrink-0 w-40 h-32 rounded-xl bg-card/50 border border-border/50 flex items-center justify-center p-6 hover:border-accent/40 dark:hover:bg-white transition-all duration-300 group"
-                  >
-                    <div className="text-center w-full h-full flex flex-col items-center justify-center gap-3">
-                      <div className="w-16 h-16 relative flex items-center justify-center">
-                        <img 
-                          src={client.logo} 
-                          alt={`${client.name} logo`}
-                          className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 dark:invert dark:group-hover:invert-0 dark:mix-blend-screen dark:group-hover:mix-blend-normal transition-all duration-300"
-                        />
-                      </div>
-                      <p className="text-xs font-medium text-foreground/80 group-hover:text-foreground dark:group-hover:text-black transition-colors">
-                        {client.name}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                
-                {/* Duplicate set for seamless loop */}
-                {[
-                  { name: "PEC", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/PEC_LOGO_EN.png?20241031120621" },
-                  { name: "IIT Kanpur", logo: "https://upload.wikimedia.org/wikipedia/en/a/a3/IIT_Kanpur_Logo.svg" },
-                  { name: "IIT Bombay", logo: "https://upload.wikimedia.org/wikipedia/en/1/1d/Indian_Institute_of_Technology_Bombay_Logo.svg" },
-                  { name: "DTU", logo: "https://upload.wikimedia.org/wikipedia/en/b/b5/DTU%2C_Delhi_official_logo.png" },
-                  { name: "Chandigarh University", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b0/Chandigarh_University_Seal.png" },
-                  { name: "CSJMU", logo: "https://upload.wikimedia.org/wikipedia/en/5/5a/Chhatrapati_Shahu_Ji_Maharaj_University_logo.png" },
-                  { name: "AIIMS Delhi", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/All_India_Institute_of_Medical_Sciences%2C_Delhi.svg/960px-All_India_Institute_of_Medical_Sciences%2C_Delhi.svg.png" },
-                ].map((client, idx) => (
-                  <div
-                    key={`second-${idx}`}
-                    className="flex-shrink-0 w-40 h-32 rounded-xl bg-card/50 border border-border/50 flex items-center justify-center p-6 hover:border-accent/40 dark:hover:bg-white transition-all duration-300 group"
-                  >
-                    <div className="text-center w-full h-full flex flex-col items-center justify-center gap-3">
-                      <div className="w-16 h-16 relative flex items-center justify-center">
-                        <img 
-                          src={client.logo} 
-                          alt={`${client.name} logo`}
-                          className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 dark:invert dark:group-hover:invert-0 dark:mix-blend-screen dark:group-hover:mix-blend-normal transition-all duration-300"
-                        />
-                      </div>
-                      <p className="text-xs font-medium text-foreground/80 group-hover:text-foreground dark:group-hover:text-black transition-colors">
-                        {client.name}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+        {/* Social Proof - Merged into Hero - Transparent Parent with White Cards */}
+        <div className="mt-20 max-w-7xl mx-auto relative z-10 w-full">
+           
+           <div className="text-center mb-16">
+             <motion.div
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+             >
+               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 uppercase tracking-wider font-monument">
+                 Trusted by 500+ Institutions
+               </h2>
+             </motion.div>
+           </div>
+   
+             {/* Infinite Scrolling Marquee */}
+             <div className="relative overflow-hidden w-full">
+               <style>{`
+                 @keyframes marquee {
+                   0% { transform: translateX(0); }
+                   100% { transform: translateX(-50%); }
+                 }
+                 .marquee-container:hover .marquee-content {
+                   animation-play-state: paused;
+                 }
+               `}</style>
+               
+               <div className="marquee-container py-4">
+                 {/* Mobile: 15s (Faster), Desktop: 40s (Slower) */}
+                 <div className="marquee-content flex gap-8 md:gap-12 animate-[marquee_20s_linear_infinite] md:animate-[marquee_40s_linear_infinite] w-max">
+                   {/* First set of logos */}
+                   {[
+                     { name: "PEC", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/PEC_LOGO_EN.png?20241031120621" },
+                     { name: "IIT Kanpur", logo: "https://upload.wikimedia.org/wikipedia/en/a/a3/IIT_Kanpur_Logo.svg" },
+                     { name: "IIT Bombay", logo: "https://upload.wikimedia.org/wikipedia/en/1/1d/Indian_Institute_of_Technology_Bombay_Logo.svg" },
+                     { name: "DTU", logo: "https://upload.wikimedia.org/wikipedia/en/b/b5/DTU%2C_Delhi_official_logo.png" },
+                     { name: "Chandigarh University", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b0/Chandigarh_University_Seal.png" },
+                     { name: "CSJMU", logo: "https://upload.wikimedia.org/wikipedia/en/5/5a/Chhatrapati_Shahu_Ji_Maharaj_University_logo.png" },
+                     { name: "AIIMS Delhi", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/All_India_Institute_of_Medical_Sciences%2C_Delhi.svg/960px-All_India_Institute_of_Medical_Sciences%2C_Delhi.svg.png" },
+                   ].map((client, idx) => (
+                     <div
+                       key={`first-${idx}`}
+                       className="flex-shrink-0 w-32 md:w-40 h-24 md:h-32 rounded-none bg-white border border-white/20 flex items-center justify-center p-4 md:p-6 neo-brutal-shadow transition-all duration-300 group hover:scale-105"
+                     >
+                       <div className="text-center w-full h-full flex flex-col items-center justify-center gap-2 md:gap-3">
+                         <div className="w-12 h-12 md:w-16 md:h-16 relative flex items-center justify-center px-2">
+                           {/* ORIGINAL LOGO COLORS */}
+                           <img 
+                             src={client.logo} 
+                             alt={`${client.name} logo`}
+                             className="max-w-full max-h-full object-contain"
+                           />
+                         </div>
+                         <p className="text-[10px] md:text-xs font-medium text-black group-hover:text-black/70 transition-colors">
+                           {client.name}
+                         </p>
+                       </div>
+                     </div>
+                   ))}
+                   
+                   {/* Duplicate set for seamless loop */}
+                   {[
+                     { name: "PEC", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/PEC_LOGO_EN.png?20241031120621" },
+                     { name: "IIT Kanpur", logo: "https://upload.wikimedia.org/wikipedia/en/a/a3/IIT_Kanpur_Logo.svg" },
+                     { name: "IIT Bombay", logo: "https://upload.wikimedia.org/wikipedia/en/1/1d/Indian_Institute_of_Technology_Bombay_Logo.svg" },
+                     { name: "DTU", logo: "https://upload.wikimedia.org/wikipedia/en/b/b5/DTU%2C_Delhi_official_logo.png" },
+                     { name: "Chandigarh University", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b0/Chandigarh_University_Seal.png" },
+                     { name: "CSJMU", logo: "https://upload.wikimedia.org/wikipedia/en/5/5a/Chhatrapati_Shahu_Ji_Maharaj_University_logo.png" },
+                     { name: "AIIMS Delhi", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/All_India_Institute_of_Medical_Sciences%2C_Delhi.svg/960px-All_India_Institute_of_Medical_Sciences%2C_Delhi.svg.png" },
+                   ].map((client, idx) => (
+                     <div
+                       key={`second-${idx}`}
+                       className="flex-shrink-0 w-32 md:w-40 h-24 md:h-32 rounded-none bg-white border border-white/20 flex items-center justify-center p-4 md:p-6 neo-brutal-shadow transition-all duration-300 group hover:scale-105"
+                     >
+                       <div className="text-center w-full h-full flex flex-col items-center justify-center gap-2 md:gap-3">
+                         <div className="w-12 h-12 md:w-16 md:h-16 relative flex items-center justify-center px-2">
+                            {/* ORIGINAL LOGO COLORS */}
+                           <img 
+                             src={client.logo} 
+                             alt={`${client.name} logo`}
+                             className="max-w-full max-h-full object-contain"
+                           />
+                         </div>
+                         <p className="text-[10px] md:text-xs font-medium text-black group-hover:text-black/70 transition-colors">
+                           {client.name}
+                         </p>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             </div>
         </div>
       </section>
 
-      {/* Key Benefits Section - Minimal Design */}
-      {/* Why OmniFlow - Light Accent BG */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-accent/5 dark:bg-accent/10">
-        <div className="max-w-6xl mx-auto">
+
+
+      {/* Logo Scroll - Dark BG with Image */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden min-h-[50vh] flex items-center snap-start">
+        <div className="absolute inset-0 z-0 bg-orange-600">
+        </div>
+
+        {/* Content - Layer 10 */}
+        <div className="max-w-6xl mx-auto relative z-10 w-full">
           {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -665,17 +582,18 @@ export function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
               Why{" "}
-              <span className="text-accent">OmniFlow</span>
+              <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">OmniFlow</span>
             </h2>
-            <p className="text-xl text-foreground/80 max-w-2xl mx-auto">
+            <p className="text-xl text-white/90 font-medium max-w-2xl mx-auto">
               The all-in-one platform trusted by leading institutions
             </p>
           </motion.div>
 
           {/* Features Grid */}
-          <div className="grid md:grid-cols-2 gap-6 mt-12">
+          <div className="grid md:grid-cols-2 gap-6 mt-12 relative">
+
             {[
               {
                 icon: Zap,
@@ -704,17 +622,21 @@ export function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="group p-8 rounded-2xl border border-border hover:border-accent/50 bg-card hover:bg-accent/5 transition-all duration-300 hover:shadow-lg"
+                className="group p-8 rounded-none border border-white/20 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-300 relative overflow-hidden"
               >
-                <div className="flex items-start gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 group-hover:scale-105 transition-all">
-                    <feature.icon className="w-7 h-7 text-accent" />
+                {/* Corner Accents */}
+                <div className="absolute top-2 right-2 w-3 h-3 border-t border-r border-white/30" />
+                <div className="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-white/30" />
+                
+                <div className="flex items-start gap-5 relative z-10">
+                  <div className="w-14 h-14 rounded-none border border-white/20 bg-black/50 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-all">
+                    <feature.icon className="w-7 h-7 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-foreground mb-3">
+                    <h3 className="text-xl font-bold text-white mb-3">
                       {feature.title}
                     </h3>
-                    <p className="text-foreground/70 leading-relaxed">
+                    <p className="text-white/80 leading-relaxed">
                       {feature.desc}
                     </p>
                   </div>
@@ -725,24 +647,32 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Features Bento Grid - Normal BG */}
-      <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-accent/5 to-background -z-10" />
+      {/* Features Bento Grid - Dark BG with Image */}
+      <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden min-h-screen flex items-center snap-start">
+        {/* Background Image - Layer 0 */}
+        <div className="absolute inset-0 z-0 bg-black">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed opacity-50"
+            style={{ backgroundImage: `url('/bg-5.png')` }}
+          />
+          {/* Blue Tint */}
+          <div className="absolute inset-0 bg-blue-900/30 mix-blend-overlay" />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
         
-        <div className="max-w-7xl mx-auto">
+        {/* Content - Layer 10 */}
+        <div className="max-w-7xl mx-auto relative z-10 w-full">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
-              Everything You Need to{" "}
-              <span className="text-gradient">
-                Manage Education
-              </span>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">Everything You Need to Manage Education</span>
             </h2>
-            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+            <p className="text-lg text-white/90 font-medium max-w-2xl mx-auto">
               From admissions to placements, our platform covers every aspect of
               institutional management with cutting-edge technology.
             </p>
@@ -754,19 +684,31 @@ export function LandingPage() {
               
               {/* Student Information System - Large horizontal */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
                 onClick={() => navigate('/profile')}
-                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 md:row-span-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 sm:p-8 relative overflow-hidden group hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 md:row-span-2 bg-sky-900 border-2 border-sky-500 hover:bg-sky-800 rounded-none p-6 sm:p-8 relative overflow-hidden group transition-all duration-300 cursor-pointer"
               >
-                <div className="absolute top-8 right-8 w-32 h-32 bg-white/10 rounded-full" />
+                <div className="absolute top-8 right-8 w-32 h-32 bg-white/5 rounded-none transform rotate-45" />
+                
+                {/* Y2K Tech Decoration */}
+                <div className="absolute bottom-4 right-4 flex gap-1 items-end opacity-50">
+                   <div className="w-1 h-3 bg-white"></div>
+                   <div className="w-1 h-5 bg-white"></div>
+                   <div className="w-1 h-2 bg-white"></div>
+                   <div className="w-1 h-6 bg-white"></div>
+                </div>
+
                 <div className="relative z-10">
-                  <Users className="w-10 h-10 text-white/90 mb-4" />
+                  <div className="w-16 h-16 bg-black/50 border border-white/20 p-3 mb-6">
+                     <Users className="w-full h-full text-white" />
+                  </div>
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Monument Extended', serif" }}>
                     Student Information System
                   </h2>
-                  <p className="text-sm text-white/90">
+                  <p className="text-sm text-white/80 font-medium">
                     Comprehensive student profiles with academic history, documents, and real-time attendance tracking.
                   </p>
                 </div>
@@ -779,14 +721,16 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
                 onClick={() => navigate('/courses')}
-                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 sm:col-span-2 md:col-span-2 row-span-1 bg-indigo-900 border-2 border-indigo-600 rounded-none p-6 sm:p-8 flex flex-col justify-between group hover:shadow-none neo-brutal-shadow transition-all duration-300 cursor-pointer"
               >
-                <BookOpen className="w-10 h-10 text-white/90" />
+                <div className="w-14 h-14 bg-black border-2 border-indigo-600 p-3 neo-brutal-shadow">
+                  <BookOpen className="w-full h-full text-white" />
+                </div>
                 <div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic" }}>
+                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Syne', sans-serif", fontStyle: "italic" }}>
                     Academic Management
                   </h3>
-                  <p className="text-sm text-white/90">
+                  <p className="text-sm text-white/90 font-medium">
                     Complete academic core with catalog, scheduling, curriculum planning and examination management.
                   </p>
                 </div>
@@ -799,14 +743,16 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
                 onClick={() => navigate('/attendance')}
-                className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-emerald-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 md:row-span-2 bg-blue-900 border-2 border-blue-600 rounded-none p-6 flex flex-col justify-between group hover:shadow-none neo-brutal-shadow transition-all duration-300 cursor-pointer"
               >
-                <ClipboardCheck className="w-9 h-9 text-white/90" />
+                <div className="w-12 h-12 bg-black border-2 border-blue-600 p-2.5 neo-brutal-shadow">
+                   <ClipboardCheck className="w-full h-full text-white" />
+                </div>
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Monument Extended', serif" }}>
                     Attendance Tracking
                   </h3>
-                  <p className="text-sm text-white/90">
+                  <p className="text-sm text-white/90 font-medium">
                     Biometric & QR-based with alerts
                   </p>
                 </div>
@@ -819,14 +765,16 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
                 onClick={() => navigate('/placements')}
-                className="col-span-1 row-span-1 bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 bg-cyan-900 border-2 border-cyan-600 rounded-none p-6 flex flex-col justify-between group hover:shadow-none neo-brutal-shadow transition-all duration-300 cursor-pointer"
               >
-                <Briefcase className="w-8 h-8 text-white/80" />
+                <div className="w-12 h-12 bg-black border-2 border-cyan-600 p-2.5 neo-brutal-shadow">
+                  <Briefcase className="w-full h-full text-white" />
+                </div>
                 <div>
                   <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'Monument Extended', serif" }}>
                     Placements
                   </h3>
-                  <p className="text-xs text-white/80">AI Resume Analyzer</p>
+                  <p className="text-xs text-white/90 font-bold">AI Resume Analyzer</p>
                 </div>
               </motion.div>
 
@@ -837,14 +785,16 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
                 onClick={() => navigate('/examinations')}
-                className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-rose-500 to-rose-600 rounded-3xl p-6 sm:p-8 flex flex-col justify-between group hover:shadow-2xl hover:shadow-rose-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 md:row-span-2 bg-violet-900 border-2 border-violet-600 rounded-none p-6 sm:p-8 flex flex-col justify-between group hover:shadow-none neo-brutal-shadow transition-all duration-300 cursor-pointer"
               >
-                <BarChart3 className="w-10 h-10 text-white/80" />
+                <div className="w-14 h-14 bg-black border-2 border-violet-600 p-3 neo-brutal-shadow">
+                  <BarChart3 className="w-full h-full text-white" />
+                </div>
                 <div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic" }}>
+                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Syne', sans-serif", fontStyle: "italic" }}>
                     Examinations & Grades
                   </h3>
-                  <p className="text-sm text-white/90">
+                  <p className="text-sm text-white/90 font-medium">
                     Gradebook management, GPA calculations, and secure transcript generation with automated workflows.
                   </p>
                 </div>
@@ -857,16 +807,18 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.5 }}
                 onClick={() => navigate('/finance')}
-                className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-amber-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 md:row-span-2 bg-sky-900 border-2 border-sky-600 rounded-none p-6 flex flex-col justify-between group hover:shadow-none neo-brutal-shadow transition-all duration-300 cursor-pointer"
               >
-                <svg className="w-9 h-9 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <div className="w-12 h-12 bg-black border-2 border-sky-600 p-2.5 neo-brutal-shadow">
+                  <svg className="w-full h-full text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Monument Extended', serif" }}>
                     Finance
                   </h3>
-                  <p className="text-xs text-white/90">
+                  <p className="text-xs text-white/90 font-bold">
                     Fee collection & payment gateway
                   </p>
                 </div>
@@ -879,14 +831,16 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.6 }}
                 onClick={() => navigate('/resume-builder')}
-                className="col-span-1 row-span-1 md:row-span-2 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 row-span-1 md:row-span-2 bg-cyan-900 border-2 border-cyan-600 rounded-none p-6 flex flex-col justify-between group hover:shadow-none neo-brutal-shadow transition-all duration-300 cursor-pointer"
               >
-                <FileText className="w-9 h-9 text-white/80" />
+                <div className="w-12 h-12 bg-black border-2 border-cyan-600 p-2.5 neo-brutal-shadow">
+                  <FileText className="w-full h-full text-white" />
+                </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic" }}>
+                  <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Syne', sans-serif", fontStyle: "italic" }}>
                     Resume Builder
                   </h3>
-                  <p className="text-xs text-white/90">
+                  <p className="text-xs text-white/90 font-bold">
                     Auto-generate verified resumes with QR codes
                   </p>
                 </div>
@@ -899,14 +853,16 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.7 }}
                 onClick={() => navigate('/dashboard')}
-                className="col-span-1 md:col-span-1 row-span-1 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-3xl p-6 flex flex-col justify-between group hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-300 cursor-pointer"
+                className="col-span-1 md:col-span-1 row-span-1 bg-indigo-900 border-2 border-indigo-600 rounded-none p-6 flex flex-col justify-between group hover:shadow-none neo-brutal-shadow transition-all duration-300 cursor-pointer"
               >
-                <TrendingUp className="w-8 h-8 text-white/80" />
+                <div className="w-12 h-12 bg-black border-2 border-indigo-600 p-2.5 neo-brutal-shadow">
+                  <TrendingUp className="w-full h-full text-white" />
+                </div>
                 <div>
                   <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'Monument Extended', serif" }}>
                     Dashboard
                   </h3>
-                  <p className="text-xs text-white/80">Real-time insights</p>
+                  <p className="text-xs text-white/90 font-bold">Real-time insights</p>
                 </div>
               </motion.div>
             </div>
@@ -914,27 +870,33 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Role-Based Access - Light Accent BG */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative bg-accent/5 dark:bg-accent/10">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5" />
-        <div className="max-w-7xl mx-auto relative">
+      {/* Role-Based Access - Dark BG with Image */}
+      <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden min-h-screen flex items-center snap-start">
+         {/* Background Image - Layer 0 */}
+        <div className="absolute inset-0 z-0 bg-black">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed opacity-50"
+            style={{ backgroundImage: `url('/bg-15.png')` }}
+          />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+
+        {/* Content - Layer 10 */}
+        <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm mb-6">
-              <Users className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium text-accent">Role-Based Access</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border-2 border-emerald-600 mb-6 neo-brutal-shadow">
+              <Users className="w-4 h-4 text-white" />
+              <span className="text-sm font-bold text-white">Role-Based Access</span>
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
-              Tailored for{" "}
-              <span className="text-gradient">
-                Every User
-              </span>
+              <span className="bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">Tailored for Every User</span>
             </h2>
-            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+            <p className="text-lg text-white/90 font-medium max-w-2xl mx-auto">
               Each stakeholder gets a personalized dashboard with features relevant to their role.
             </p>
           </motion.div>
@@ -950,7 +912,8 @@ export function LandingPage() {
                   "Admission workflows",
                   "Institution-wide reports"
                 ],
-                gradient: "from-blue-500 to-blue-600"
+                bgColor: "bg-emerald-900",
+                borderColor: "border-emerald-600"
               },
               {
                 role: "Faculty Members",
@@ -961,7 +924,8 @@ export function LandingPage() {
                   "Course material management",
                   "Exam coordination"
                 ],
-                gradient: "from-purple-500 to-purple-600"
+                bgColor: "bg-green-900",
+                borderColor: "border-green-600"
               },
               {
                 role: "Students",
@@ -972,7 +936,8 @@ export function LandingPage() {
                   "Placement applications",
                   "Resume builder & analyzer"
                 ],
-                gradient: "from-emerald-500 to-emerald-600"
+                bgColor: "bg-teal-900",
+                borderColor: "border-teal-600"
               },
               {
                 role: "Recruiters",
@@ -983,7 +948,8 @@ export function LandingPage() {
                   "Interview scheduling",
                   "Hiring analytics"
                 ],
-                gradient: "from-orange-500 to-orange-600"
+                bgColor: "bg-cyan-900",
+                borderColor: "border-cyan-600"
               }
             ].map((roleData, index) => (
               <motion.div
@@ -993,16 +959,16 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
-                className={`bg-gradient-to-br ${roleData.gradient} backdrop-blur-sm rounded-2xl p-6 hover:shadow-2xl transition-all duration-300`}
+                className={`${roleData.bgColor} border-2 ${roleData.borderColor} rounded-none p-6 transition-all duration-300 hover:shadow-none neo-brutal-shadow group cursor-pointer`}
               >
-                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 shadow-lg">
+                <div className={`w-14 h-14 bg-black border-2 ${roleData.borderColor} rounded-none flex items-center justify-center mb-4 neo-brutal-shadow`}>
                   <roleData.icon className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-lg font-bold mb-4 text-white">{roleData.role}</h3>
                 <ul className="space-y-2.5">
                   {roleData.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm text-white/90">
-                      <CheckCircle className="w-4 h-4 text-white/90 flex-shrink-0 mt-0.5" />
+                    <li key={feature} className="flex items-start gap-2 text-sm text-white/80">
+                      <CheckCircle className="w-4 h-4 text-white flex-shrink-0 mt-0.5" />
                       {feature}
                     </li>
                   ))}
@@ -1013,32 +979,38 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* How it Works - Normal BG */}
+      {/* How it Works - Dark BG with Image */}
       <section
         id="how-it-works"
-        className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+        className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden min-h-screen flex items-center snap-start"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5" />
-        <div className="max-w-5xl mx-auto relative">
+         {/* Background Image - Layer 0 */}
+        <div className="absolute inset-0 z-0 bg-black">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed opacity-50"
+            style={{ backgroundImage: `url('/bg-10.png')` }}
+          />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+
+        {/* Content - Layer 10 */}
+        <div className="max-w-5xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 backdrop-blur-sm mb-6">
-              <Zap className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border-2 border-orange-600 mb-6 neo-brutal-shadow">
+              <Zap className="w-4 h-4 text-orange-400" />
+              <span className="text-sm font-medium text-orange-400">
                 Quick Setup
               </span>
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
-              Get Started in{" "}
-              <span className="bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent">
-                3 Easy Steps
-              </span>
+              <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">Get Started in 3 Easy Steps</span>
             </h2>
-            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+            <p className="text-lg text-white/90 max-w-2xl mx-auto">
               From signup to going live in under 10 minutes. No credit card required.
             </p>
           </motion.div>
@@ -1055,7 +1027,9 @@ export function LandingPage() {
                   title: "Sign Up & Verify",
                   description: "Create your account in 30 seconds. Verify your institution instantly through automated authentication.",
                   icon: Shield,
-                  gradient: "from-rose-500 to-rose-600",
+                  bgColor: "bg-orange-900",
+                  borderColor: "border-orange-600",
+                  iconColor: "text-orange-400",
                   highlights: ["Instant verification", "No paperwork", "Enterprise SSO"]
                 },
                 {
@@ -1063,7 +1037,9 @@ export function LandingPage() {
                   title: "Configure Your System",
                   description: "Import student data, set up departments, and configure user roles with our intelligent setup wizard.",
                   icon: Target,
-                  gradient: "from-amber-500 to-amber-600",
+                  bgColor: "bg-amber-900",
+                  borderColor: "border-amber-600",
+                  iconColor: "text-amber-400",
                   highlights: ["Smart data import", "Custom workflows", "Role templates"]
                 },
                 {
@@ -1071,7 +1047,9 @@ export function LandingPage() {
                   title: "Launch & Scale",
                   description: "Invite your team, activate modules, and start managing operations. Support available 24/7.",
                   icon: Zap,
-                  gradient: "from-cyan-500 to-cyan-600",
+                  bgColor: "bg-red-900",
+                  borderColor: "border-red-600",
+                  iconColor: "text-red-400",
                   highlights: ["One-click launch", "Live training", "Dedicated support"]
                 }
               ].map((step, i) => (
@@ -1087,9 +1065,9 @@ export function LandingPage() {
                   <div className="relative flex-shrink-0">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
-                      className={`w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br ${step.gradient} flex items-center justify-center shadow-lg relative z-10`}
+                      className={`w-12 h-12 md:w-16 md:h-16 rounded-none bg-white border-2 border-foreground flex items-center justify-center neo-brutal-shadow relative z-10 text-foreground`}
                     >
-                      <span className="text-xl md:text-2xl font-bold text-white">{step.step}</span>
+                      <span className="text-xl md:text-2xl font-bold text-foreground">{step.step}</span>
                     </motion.div>
                     {i < 2 && (
                       <div className="absolute top-12 md:top-16 left-1/2 -translate-x-1/2 w-0.5 h-4 md:h-8 bg-gradient-to-b from-accent/50 to-transparent md:block" />
@@ -1099,12 +1077,15 @@ export function LandingPage() {
                   {/* Content Card */}
                   <motion.div
                     whileHover={{ y: -5 }}
-                    className="flex-1 bg-card border border-border rounded-xl md:rounded-2xl p-4 md:p-8 hover:border-accent/40 hover:shadow-xl transition-all duration-300"
+                    className={`flex-1 ${step.bgColor} border-2 ${step.borderColor} rounded-none p-4 md:p-8 hover:shadow-none neo-brutal-shadow transition-all duration-300`}
                   >
                     <div className="flex items-start gap-4 mb-3 md:mb-4">
+                     <div className={`p-3 bg-black border-2 ${step.borderColor} neo-brutal-shadow`}>
+                        <step.icon className={`w-6 h-6 ${step.iconColor}`} />
+                      </div>
                       <div className="flex-1">
-                        <h3 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 text-foreground">{step.title}</h3>
-                        <p className="text-sm md:text-base text-foreground/70 leading-relaxed">
+                        <h3 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 text-white">{step.title}</h3>
+                        <p className="text-sm md:text-base text-white/80 leading-relaxed font-medium">
                           {step.description}
                         </p>
                       </div>
@@ -1148,23 +1129,40 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Integration Section */}
-      <section id="integrations" className="py-32 px-4 sm:px-6 lg:px-8 bg-secondary/20">
-        <div className="max-w-7xl mx-auto">
+      {/* Integration Section - Dark BG with Image */}
+      <section id="integrations" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden min-h-screen flex items-center snap-start">
+         {/* Background - Blue Gradient */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-sky-950 via-blue-950 to-slate-950" />
+        {/* Y2K Circuit Decor */}
+        <svg className="absolute top-0 right-0 w-64 h-64 opacity-20 pointer-events-none text-white z-0" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+           <path d="M100 0 L80 0 L80 20 L50 20 L50 50" strokeWidth="0.5"/>
+           <circle cx="50" cy="50" r="2" fill="currentColor"/>
+           <circle cx="80" cy="20" r="2" fill="currentColor"/>
+        </svg>
+        <div className="absolute top-10 left-10 opacity-20 z-0">
+           <div className="flex gap-2">
+              <div className="w-2 h-2 bg-white rounded-none"/>
+              <div className="w-2 h-2 bg-white rounded-none"/>
+              <div className="w-2 h-2 bg-transparent border border-white rounded-none"/>
+           </div>
+        </div>
+
+        {/* Content - Layer 10 */}
+        <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-sm mb-4">
-              <Code2 className="w-4 h-4 text-cyan-600" />
-              <span className="text-sm font-medium text-cyan-600">Integrations</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border-2 border-sky-600 mb-4 neo-brutal-shadow">
+              <Code2 className="w-4 h-4 text-sky-400" />
+              <span className="text-sm font-medium text-sky-400">Integrations</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
-              Connect With <span className="text-gradient">Your Tools</span>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
+              <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400 bg-clip-text text-transparent">Connect With Your Tools</span>
             </h2>
-            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+            <p className="text-lg text-white/80 max-w-2xl mx-auto">
               Seamlessly integrate with your existing systems and third-party services
             </p>
           </motion.div>
@@ -1172,14 +1170,14 @@ export function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             {[
               {
+                icon: Cloud,
                 title: "Google Workspace",
                 description: "Sync contacts, calendars, and documents automatically",
-                logo: "https://www.google.com/favicon.ico",
               },
               {
+                icon: Server,
                 title: "Microsoft 365",
                 description: "Native integration with Teams and OneDrive",
-                logo: "https://www.microsoft.com/favicon.ico",
               },
               {
                 icon: Cpu,
@@ -1194,26 +1192,30 @@ export function LandingPage() {
                 transition={{ delay: idx * 0.1 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -5, scale: 1.02 }}
-                className="bg-card/50 border border-border rounded-2xl p-8 hover:border-accent/40 transition-all duration-300 group cursor-default"
+                className={`${
+                  idx === 0 ? 'bg-blue-900/90 border-blue-400' :
+                  idx === 1 ? 'bg-sky-800/90 border-sky-400' :
+                  'bg-cyan-900/90 border-cyan-400'
+                } border-2 rounded-none p-8 hover:shadow-none neo-brutal-shadow transition-all duration-300 group cursor-default`}
               >
                 <motion.div
                   whileHover={{ rotate: 10, scale: 1.1 }}
-                  className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-all"
+                  className={`w-12 h-12 rounded-none ${
+                    idx === 0 ? 'bg-blue-950 border-blue-400' :
+                    idx === 1 ? 'bg-sky-950 border-sky-400' :
+                    'bg-cyan-950 border-cyan-400'
+                  } border-2 flex items-center justify-center mb-4 neo-brutal-shadow`}
                 >
-                  {item.logo ? (
-                    <img 
-                      src={item.logo} 
-                      alt={item.title}
-                      className="w-6 h-6"
-                    />
-                  ) : (
-                    <item.icon className="w-6 h-6 text-accent" />
-                  )}
+                  {item.icon && <item.icon className={`w-6 h-6 ${
+                    idx === 0 ? 'text-blue-300' :
+                    idx === 1 ? 'text-sky-300' :
+                    'text-cyan-300'
+                  }`} />}
                 </motion.div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   {item.title}
                 </h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sky-100 text-sm font-medium">
                   {item.description}
                 </p>
               </motion.div>
@@ -1241,70 +1243,278 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      {/* Testimonials - Normal BG */}
-      <section id="testimonials" className="py-20 bg-background relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
-             Real Results, <span className="text-accent">Real Time Saved</span>
-          </h2>
-          <p className="text-lg text-foreground/80">
-            See how institutions cut admin work by 80% in the first 3 months.
-          </p>
+      {/* Testimonials - Neo-Brutalist */}
+      <section id="testimonials" className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-black snap-start">
+        {/* Neo-Brutal Grid Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `repeating-linear-gradient(0deg, #fff 0px, #fff 2px, transparent 2px, transparent 40px),
+                             repeating-linear-gradient(90deg, #fff 0px, #fff 2px, transparent 2px, transparent 40px)`
+          }} />
         </div>
-        <AnimatedTestimonials testimonials={testimonials} autoplay={true} />
+
+        {/* Content */}
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-5xl sm:text-6xl font-black mb-6 uppercase" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+              <span className="bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">Real Results</span>
+            </h2>
+            <p className="text-2xl text-white font-bold max-w-3xl mx-auto uppercase tracking-wide">
+              80% Less Admin Work in 3 Months
+            </p>
+          </motion.div>
+          
+          {/* Testimonial Cards Loop */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            {testimonials.slice(0, 4).map((testimonial, idx) => {
+              const colors = [
+                { bg: 'bg-yellow-400', border: 'border-yellow-400', shadow: 'shadow-[8px_8px_0px_0px_rgba(239,68,68,1)]', text: 'text-black' },
+                { bg: 'bg-green-400', border: 'border-green-400', shadow: 'shadow-[8px_8px_0px_0px_rgba(59,130,246,1)]', text: 'text-black' },
+                { bg: 'bg-blue-500', border: 'border-blue-500', shadow: 'shadow-[8px_8px_0px_0px_rgba(234,179,8,1)]', text: 'text-white' },
+                { bg: 'bg-red-500', border: 'border-red-500', shadow: 'shadow-[8px_8px_0px_0px_rgba(34,197,94,1)]', text: 'text-white' }
+              ];
+              const color = colors[idx];
+              
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1, duration: 0.5 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -8, transition: { duration: 0.2 } }}
+                  className={`${color.bg} border-4 border-black rounded-none p-6 ${color.shadow} transition-all duration-200 cursor-pointer`}
+                >
+                  {/* Rating Stars */}
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-black" fill="black" />
+                    ))}
+                  </div>
+                  
+                  {/* Quote */}
+                  <p className={`${color.text} font-bold text-sm mb-6 leading-relaxed`}>
+                    "{testimonial.quote.slice(0, 150)}..."
+                  </p>
+                  
+                  {/* Saved Hours Badge */}
+                  <div className="inline-block px-3 py-2 bg-black border-2 border-black rounded-none mb-4">
+                    <span className="text-white font-black text-xs uppercase">{testimonial.savedHours}</span>
+                  </div>
+                  
+                  {/* Author */}
+                  <div className={`${color.text} border-t-4 border-black pt-4`}>
+                    <h4 className="font-black text-base mb-1">{testimonial.name}</h4>
+                    <p className="font-bold text-xs opacity-80">{testimonial.designation}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
       </section>
 
       {/* Pricing Section */}
-      {/* Pricing - Light Accent BG */}
-      <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative bg-accent/5 dark:bg-accent/10">
-        <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-primary/5 -z-10" />
-        
-        <div className="max-w-7xl mx-auto">
+      {/* Pricing - Dark Black BG */}
+      <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative border-t border-neutral-800 overflow-hidden min-h-screen flex items-center snap-start">
+        {/* Y2K Coin/Chip Decor */}
+        <div className="absolute top-10 right-10 opacity-10 animate-spin-slow z-0">
+           <svg width="120" height="120" viewBox="0 0 120 120" fill="none" stroke="white" strokeWidth="1">
+              <circle cx="60" cy="60" r="50" strokeDasharray="10 10"/>
+              <circle cx="60" cy="60" r="30"/>
+              <path d="M60 10 L60 110 M10 60 L110 60" opacity="0.5"/>
+           </svg>
+        </div>
+
+        {/* Flowing Gradient Background - SVG */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-950 via-green-950 to-emerald-950">
+          {/* SVG Gradient Blobs */}
+          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#065f46" stopOpacity="0.6" />
+                <stop offset="50%" stopColor="#047857" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#064e3b" stopOpacity="0.7" />
+              </linearGradient>
+              <linearGradient id="gradient2" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#0f766e" stopOpacity="0.5" />
+                <stop offset="50%" stopColor="#134e4a" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#042f2e" stopOpacity="0.6" />
+              </linearGradient>
+              <radialGradient id="gradient3">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+                <stop offset="50%" stopColor="#059669" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#047857" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            {/* Flowing blob shapes */}
+            <path d="M0 200 Q 300 100, 600 200 T 1200 200 L 1200 0 L 0 0 Z" fill="url(#gradient1)" />
+            <path d="M0 400 Q 400 300, 800 400 T 1600 400 L 1600 0 L 0 0 Z" fill="url(#gradient2)" opacity="0.8" />
+            <ellipse cx="30%" cy="40%" rx="500" ry="600" fill="url(#gradient3)" />
+            <ellipse cx="80%" cy="60%" rx="600" ry="500" fill="url(#gradient3)" />
+            <ellipse cx="50%" cy="80%" rx="700" ry="400" fill="url(#gradient3)" opacity="0.6" />
+            <path d="M1920 600 Q 1600 700, 1200 600 T 0 600 L 0 1080 L 1920 1080 Z" fill="url(#gradient1)" opacity="0.6" />
+          </svg>
+        </div>
+
+        {/* Content - Layer 10 */}
+        <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm mb-4">
-              <TrendingUp className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Transparent Pricing</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border-2 border-zinc-600 mb-4 neo-brutal-shadow">
+              <TrendingUp className="w-4 h-4 text-white" />
+              <span className="text-sm font-medium text-white">Transparent Pricing</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
-              Plans for Every Institution
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
+              <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">Plans for Every Institution</span>
             </h2>
-            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+            <p className="text-lg text-white/80 max-w-2xl mx-auto">
               Start free. Scale as you grow. No hidden fees, no surprises.
             </p>
           </motion.div>
 
-          {/* Mobile & Tablet Table View */}
-          <div className="xl:hidden max-w-7xl mx-auto mb-8">
-            <div className="overflow-x-auto -mx-4 px-4">
-              <table className="w-full min-w-[600px] border-collapse">
+          {/* Mobile Card View - Vertical Stack */}
+          <div className="lg:hidden max-w-2xl mx-auto mb-8 space-y-6 px-4">
+            {[
+              {
+                name: "Starter",
+                price: "Free",
+                period: "Forever",
+                gradient: "from-lime-700 to-emerald-700",
+                features: [
+                  { name: "Students", value: "500" },
+                  { name: "Storage", value: "5 GB" },
+                  { name: "Admin accounts", value: "2" },
+                  { name: "Student information", included: true },
+                  { name: "Attendance tracking", included: true },
+                  { name: "Grade management", included: true },
+                  { name: "Email support", included: true },
+                ]
+              },
+              {
+                name: "Professional",
+                price: "₹1,300",
+                period: "/month",
+                badge: "POPULAR",
+                gradient: "from-teal-600 to-cyan-600",
+                features: [
+                  { name: "Students", value: "10,000" },
+                  { name: "Storage", value: "500 GB" },
+                  { name: "Admin accounts", value: "10" },
+                  { name: "All Starter features", included: true },
+                  { name: "Placement portal", included: true },
+                  { name: "Resume builder", included: true },
+                  { name: "Finance management", included: true },
+                  { name: "Priority support", included: true },
+                  { name: "Custom integrations", included: true },
+                ]
+              },
+              {
+                name: "Enterprise",
+                price: "Custom",
+                period: "Contact sales",
+                gradient: "from-emerald-700 to-green-700",
+                features: [
+                  { name: "Students", value: "Unlimited" },
+                  { name: "Storage", value: "Unlimited" },
+                  { name: "Admin accounts", value: "Unlimited" },
+                  { name: "All features", included: true },
+                  { name: "Dedicated account manager", included: true },
+                  { name: "SLA guarantee (99.9%)", included: true },
+                  { name: "On-premise deployment", included: true },
+                  { name: "Advanced analytics", included: true },
+                ]
+              },
+            ].map((plan, idx) => (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                {plan.badge && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-yellow-400 text-black text-xs font-black rounded-full z-10">
+                    {plan.badge}
+                  </div>
+                )}
+                <div className={`bg-gradient-to-br ${plan.gradient} rounded-2xl p-6 shadow-2xl`}>
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                    <div className="text-4xl font-black text-white mb-1">{plan.price}</div>
+                    <div className="text-sm text-white/90 font-medium">{plan.period}</div>
+                  </div>
+                  
+                  <Button
+                    asChild
+                    size="lg"
+                    className="w-full mb-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-bold border-2 border-white/40 rounded-xl py-6"
+                  >
+                    <Link to="/onboarding" className="flex items-center justify-center gap-2">
+                      Get Started
+                      <ArrowRight className="w-5 h-5" />
+                    </Link>
+                  </Button>
+
+                  <div className="space-y-3">
+                    {plan.features.map((feature, i) => (
+                      <div key={i} className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
+                        <span className="text-sm font-semibold text-white">{feature.name}</span>
+                        {feature.value ? (
+                          <span className="text-sm font-black text-white">{feature.value}</span>
+                        ) : feature.included ? (
+                          <CheckCircle className="w-5 h-5 text-white flex-shrink-0" />
+                        ) : (
+                          <X className="w-5 h-5 text-white/40 flex-shrink-0" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Desktop Table View - Hidden on Mobile */}
+          <div className="hidden lg:block max-w-7xl mx-auto mb-8">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse shadow-lg rounded-xl overflow-hidden">
                 <thead>
-                  <tr className="border-b-2 border-border">
-                    <th className="text-left py-4 px-2 text-sm font-semibold text-foreground sticky left-0 bg-background z-10">Feature</th>
-                    <th className="py-4 px-2 text-center bg-gradient-to-br from-blue-500 to-blue-600 rounded-t-xl">
+                  <tr className="border-b-2 border-emerald-900/50">
+                    <th className="text-left py-5 px-4 text-sm font-bold text-white bg-gradient-to-br from-gray-950 via-green-950 to-emerald-950 border-r border-emerald-800/30">Feature</th>
+                    <th className="py-5 px-4 text-center bg-gradient-to-br from-lime-700 to-emerald-700 rounded-t-xl min-w-[140px]">
                       <div className="text-white">
-                        <div className="text-base font-bold mb-1">Starter</div>
-                        <div className="text-2xl font-bold">Free</div>
-                        <div className="text-xs opacity-80">Forever</div>
+                        <div className="text-sm font-bold mb-1">Starter</div>
+                        <div className="text-3xl font-black">Free</div>
+                        <div className="text-xs opacity-90 font-medium">Forever</div>
                       </div>
                     </th>
-                    <th className="py-4 px-2 text-center bg-gradient-to-br from-purple-500 to-purple-600 rounded-t-xl">
+                    <th className="py-5 px-4 text-center bg-gradient-to-br from-teal-600 to-cyan-600 rounded-t-xl min-w-[140px] relative">
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-yellow-400 text-black text-xs font-black rounded-full whitespace-nowrap">
+                        POPULAR
+                      </div>
                       <div className="text-white">
-                        <div className="text-base font-bold mb-1">Professional</div>
-                        <div className="text-2xl font-bold">₹1,300</div>
-                        <div className="text-xs opacity-80">/month</div>
+                        <div className="text-sm font-bold mb-1">Professional</div>
+                        <div className="text-3xl font-black">₹1,300</div>
+                        <div className="text-xs opacity-90 font-medium">/month</div>
                       </div>
                     </th>
-                    <th className="py-4 px-2 text-center bg-gradient-to-br from-orange-500 to-orange-600 rounded-t-xl">
+                    <th className="py-5 px-4 text-center bg-gradient-to-br from-emerald-700 to-green-700 rounded-t-xl min-w-[140px]">
                       <div className="text-white">
-                        <div className="text-base font-bold mb-1">Enterprise</div>
-                        <div className="text-2xl font-bold">Custom</div>
-                        <div className="text-xs opacity-80">Contact sales</div>
+                        <div className="text-sm font-bold mb-1">Enterprise</div>
+                        <div className="text-3xl font-black">Custom</div>
+                        <div className="text-xs opacity-90 font-medium">Contact sales</div>
                       </div>
                     </th>
                   </tr>
@@ -1328,72 +1538,72 @@ export function LandingPage() {
                     { name: "On-premise deployment", starter: false, pro: false, enterprise: true },
                     { name: "Advanced analytics", starter: false, pro: false, enterprise: true },
                   ].map((feature, idx) => (
-                    <tr key={feature.name} className={idx % 2 === 0 ? "bg-secondary/30" : ""}>
-                      <td className="py-3 px-3 text-xs text-foreground sticky left-0 bg-background z-10">{feature.name}</td>
-                      <td className="py-3 px-3 text-center">
+                    <tr key={feature.name} className={idx % 2 === 0 ? "bg-emerald-900/20" : "bg-emerald-950/40"}>
+                      <td className="py-4 px-4 text-sm font-semibold text-white border-r border-emerald-800/30">{feature.name}</td>
+                      <td className="py-4 px-4 text-center">
                         {typeof feature.starter === 'string' ? (
-                          <span className="text-xs font-semibold text-foreground">{feature.starter}</span>
+                          <span className="text-sm font-bold text-white">{feature.starter}</span>
                         ) : feature.starter ? (
-                          <CheckCircle className="w-5 h-5 text-emerald-500 mx-auto" />
+                          <CheckCircle className="w-6 h-6 text-emerald-400 mx-auto" />
                         ) : (
-                          <X className="w-5 h-5 text-muted-foreground/40 mx-auto" />
+                          <X className="w-6 h-6 text-gray-600 mx-auto" />
                         )}
                       </td>
-                      <td className="py-3 px-3 text-center">
+                      <td className="py-4 px-4 text-center">
                         {typeof feature.pro === 'string' ? (
-                          <span className="text-xs font-semibold text-foreground">{feature.pro}</span>
+                          <span className="text-sm font-bold text-white">{feature.pro}</span>
                         ) : feature.pro ? (
-                          <CheckCircle className="w-5 h-5 text-emerald-500 mx-auto" />
+                          <CheckCircle className="w-6 h-6 text-emerald-400 mx-auto" />
                         ) : (
-                          <X className="w-5 h-5 text-muted-foreground/40 mx-auto" />
+                          <X className="w-6 h-6 text-gray-600 mx-auto" />
                         )}
                       </td>
-                      <td className="py-3 px-3 text-center">
+                      <td className="py-4 px-4 text-center">
                         {typeof feature.enterprise === 'string' ? (
-                          <span className="text-xs font-semibold text-foreground">{feature.enterprise}</span>
+                          <span className="text-sm font-bold text-white">{feature.enterprise}</span>
                         ) : feature.enterprise ? (
-                          <CheckCircle className="w-5 h-5 text-emerald-500 mx-auto" />
+                          <CheckCircle className="w-6 h-6 text-emerald-400 mx-auto" />
                         ) : (
-                          <X className="w-5 h-5 text-muted-foreground/40 mx-auto" />
+                          <X className="w-6 h-6 text-gray-600 mx-auto" />
                         )}
                       </td>
                     </tr>
                   ))}
-                  <tr>
-                    <td className="py-4 px-3 sticky left-0 bg-background z-10"></td>
-                    <td className="py-4 px-3">
+                  <tr className="bg-emerald-950/60">
+                    <td className="py-5 px-4 bg-emerald-950/60 border-r border-emerald-800/30"></td>
+                    <td className="py-5 px-4">
                       <Button
                         asChild
-                        size="sm"
-                        className="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-xs"
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm py-6 rounded-lg"
                       >
-                        <Link to="/onboarding" className="flex items-center justify-center gap-1">
+                        <Link to="/onboarding" className="flex items-center justify-center gap-2">
                           Get Started
-                          <ArrowRight className="w-3 h-3" />
+                          <ArrowRight className="w-4 h-4" />
                         </Link>
                       </Button>
                     </td>
-                    <td className="py-4 px-3">
+                    <td className="py-5 px-4">
                       <Button
                         asChild
-                        size="sm"
-                        className="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-xs"
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold text-sm py-6 rounded-lg shadow-xl"
                       >
-                        <Link to="/onboarding" className="flex items-center justify-center gap-1">
+                        <Link to="/onboarding" className="flex items-center justify-center gap-2">
                           Get Started
-                          <ArrowRight className="w-3 h-3" />
+                          <ArrowRight className="w-4 h-4" />
                         </Link>
                       </Button>
                     </td>
-                    <td className="py-4 px-3">
+                    <td className="py-5 px-4">
                       <Button
                         asChild
-                        size="sm"
-                        className="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-xs"
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-sm py-6 rounded-lg"
                       >
-                        <Link to="/onboarding" className="flex items-center justify-center gap-1">
+                        <Link to="/onboarding" className="flex items-center justify-center gap-2">
                           Get Started
-                          <ArrowRight className="w-3 h-3" />
+                          <ArrowRight className="w-4 h-4" />
                         </Link>
                       </Button>
                     </td>
@@ -1401,138 +1611,6 @@ export function LandingPage() {
                 </tbody>
               </table>
             </div>
-          </div>
-
-          {/* Desktop Card View */}
-          <div className="hidden xl:grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                name: "Starter",
-                price: "Free",
-                
-                period: "Forever",
-                description: "Perfect for small institutions testing the platform",
-                features: [
-                  "Up to 500 students",
-                  "Basic student information",
-                  "Attendance tracking",
-                  "Grade management",
-                  "5 GB storage",
-                  "Email support",
-                ],
-                highlighted: false,
-              },
-              {
-                name: "Professional",
-                price: "₹1,300",
-                period: "/month",
-                badge: "Most Popular",
-                description: "Best for growing institutions",
-                features: [
-                  "Up to 10,000 students",
-                  "All Starter features",
-                  "Placement portal",
-                  "Resume builder",
-                  "Finance management",
-                  "500 GB storage",
-                  "Priority support",
-                  "Custom integrations",
-                ],
-                highlighted: true,
-              },
-              {
-                name: "Enterprise",
-                price: "Custom",
-                period: "Contact sales",
-                description: "For large universities & institutions",
-                features: [
-                  "Unlimited students",
-                  "All features",
-                  "Dedicated account manager",
-                  "Custom integrations",
-                  "Unlimited storage",
-                  "SLA guarantee (99.9%)",
-                  "On-premise deployment",
-                  "Advanced analytics",
-                ],
-                highlighted: false,
-              },
-            ].map((plan, idx) => (
-              <motion.div
-                key={plan.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -10 }}
-                className={`relative rounded-3xl transition-all duration-300 ${
-                  plan.highlighted
-                    ? "bg-secondary/50 border-2 border-primary shadow-2xl"
-                    : "bg-card/50 border border-border hover:border-primary/40"
-                }`}
-              >
-                {plan.badge && (
-                  <motion.div
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full"
-                  >
-                    {plan.badge}
-                  </motion.div>
-                )}
-
-                <div className="p-8 h-full flex flex-col">
-                  <h3 className="text-2xl font-bold text-foreground mb-2">
-                    {plan.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    {plan.description}
-                  </p>
-
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold text-foreground">
-                      {plan.price}
-                    </span>
-                    <span className="text-muted-foreground ml-2 text-sm">
-                      {plan.period}
-                    </span>
-                  </div>
-
-                  <Button
-                    size="lg"
-                    className={`w-full mb-8 rounded-lg font-semibold transition-all duration-300 ${
-                      plan.highlighted
-                        ? "bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 shadow-lg"
-                        : "bg-gray-900/10 dark:bg-white/10 hover:bg-gray-900/20 dark:hover:bg-white/20 text-gray-900 dark:text-white border border-gray-900/30 dark:border-white/30"
-                    }`}
-                    asChild
-                  >
-                    <Link to="/onboarding">
-                      Get Started
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Link>
-                  </Button>
-
-                  <div className="space-y-4 flex-1">
-                    {plan.features.map((feature, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        viewport={{ once: true }}
-                        className="flex items-start gap-3"
-                      >
-                        <CheckCircle className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">
-                          {feature}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
           </div>
 
           {/* Annual Discount Banner */}
@@ -1555,21 +1633,36 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ - Light Accent BG */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-accent/5 dark:bg-accent/10 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5 -z-10" />
+      {/* FAQ - Dark Blue BG */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 relative border-t-2 border-slate-700 overflow-hidden min-h-screen flex items-center snap-start">
+        {/* Y2K Question Mark Decor */}
+        <div className="absolute -left-10 bottom-0 opacity-5 pointer-events-none transform rotate-12 z-0">
+           <span className="text-[300px] font-bold font-mono text-white">?</span>
+        </div>
+
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5 z-0" />
         
-        <div className="max-w-4xl mx-auto">
+         {/* Background Image - Layer 0 */}
+        <div className="absolute inset-0 z-0 bg-black">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed opacity-50"
+            style={{ backgroundImage: `url('/bg-13.png')` }}
+          />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+
+        {/* Content - Layer 10 */}
+        <div className="max-w-4xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
-              Frequently Asked Questions
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
+              <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400 bg-clip-text text-transparent">Frequently Asked Questions</span>
             </h2>
-            <p className="text-lg text-foreground/80">
+            <p className="text-lg text-white/80">
               Everything you need to know about getting started with OmniFlow
             </p>
           </motion.div>
@@ -1601,29 +1694,106 @@ export function LandingPage() {
                 a: "We perform hourly backups with 30-day retention. Recovery time objective (RTO) is less than 1 hour.",
               },
             ].map((item, idx) => (
-              <FAQItem key={idx} question={item.q} answer={item.a} />
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                className={`border-2 rounded-none overflow-hidden transition-all duration-300 neo-brutal-shadow ${
+                  activeFAQIndex === idx 
+                    ? "bg-slate-800 border-cyan-500" 
+                    : "bg-slate-900 border-cyan-900 hover:border-cyan-700 hover:bg-slate-800"
+                }`}
+              >
+                <button
+                  onClick={() => setActiveFAQIndex(activeFAQIndex === idx ? null : idx)}
+                  className="w-full flex items-center justify-between p-6 text-left group"
+                  aria-expanded={activeFAQIndex === idx}
+                >
+                  <span className={`font-bold text-lg transition-colors ${
+                    activeFAQIndex === idx ? "text-cyan-400" : "text-white group-hover:text-cyan-200"
+                  }`}>
+                    {item.q}
+                  </span>
+                  <motion.div
+                    animate={{ rotate: activeFAQIndex === idx ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ChevronDown className={`w-5 h-5 transition-colors ${
+                      activeFAQIndex === idx ? "text-cyan-400" : "text-cyan-700 group-hover:text-cyan-400"
+                    }`} />
+                  </motion.div>
+                </button>
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{
+                    height: activeFAQIndex === idx ? "auto" : 0,
+                    opacity: activeFAQIndex === idx ? 1 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6 pt-0 border-t border-cyan-900/50">
+                    <p className="text-white/80 leading-relaxed font-medium">
+                      {item.a}
+                    </p>
+                  </div>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Final CTA - Normal BG */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-accent/10 via-transparent to-transparent -z-10" />
-        <FloatingParticles />
+      {/* Final CTA - Black with Animated Grid */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden flex items-center snap-start">
+        {/* Animated Green Grid on Mouse Move */}
+        <motion.div 
+          className="absolute inset-0 z-0 bg-black"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(16, 185, 129, 0.1) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(16, 185, 129, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+          }}
+          animate={{
+            backgroundPosition: ['0px 0px', '40px 40px'],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          onMouseMove={(e) => {
+            const { currentTarget, clientX, clientY } = e;
+            const rect = currentTarget.getBoundingClientRect();
+            const x = ((clientX - rect.left) / rect.width - 0.5) * 20;
+            const y = ((clientY - rect.top) / rect.height - 0.5) * 20;
+            currentTarget.style.transform = `translate(${x}px, ${y}px)`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translate(0px, 0px)';
+          }}
+        />
+
+        {/* Content - Layer 10 */}
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
-              Stop managing education{" "}
-              <span className="text-gradient" style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic" }}>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
+              <span className="bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+                Stop managing education{" "}
+              </span>
+              <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400 bg-clip-text text-transparent" style={{ fontFamily: "'Syne', sans-serif", fontStyle: "italic" }}>
                 on spreadsheets
               </span>
             </h2>
-            <p className="text-lg text-foreground/80 mb-10 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-lg text-white/80 mb-10 leading-relaxed max-w-2xl mx-auto">
               Join 500+ institutions saving 2000+ hours annually on admin work. No credit card needed. Free 14-day trial.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -1639,13 +1809,13 @@ export function LandingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border border-muted-foreground/30 hover:border-cyan-400/50 hover:bg-cyan-400/5 transition-all duration-300 px-10 py-6 text-base font-semibold rounded-lg"
+                className="bg-transparent border-2 border-emerald-500 text-white hover:bg-emerald-500/10 px-10 py-6 text-base font-semibold rounded-lg"
                 aria-label="Schedule a demo with our sales team"
               >
                 Schedule a Demo
               </Button>
             </div>
-            <p className="text-xs text-foreground/70 mt-6">
+            <p className="text-xs text-emerald-400/70 mt-6">
               14-day free trial. All features included. No credit card required.
             </p>
           </motion.div>
@@ -1653,8 +1823,26 @@ export function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-foreground text-background py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <footer className="relative text-white py-20 px-4 sm:px-6 lg:px-8 border-t border-white/10 overflow-hidden snap-start">
+        {/* Y2K Footer Grid */}
+        <div className="absolute bottom-0 left-0 w-full h-24 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-0"/>
+        
+         {/* Background Image - Layer 0 */}
+        <div className="absolute inset-0 z-0 bg-black">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed opacity-50"
+            style={{ backgroundImage: `url('/bg-20.png')` }}
+          />
+          <div className="absolute inset-0 bg-black/90" />
+        </div>
+
+        <div className="absolute bottom-10 right-10 opacity-30 flex gap-4">
+           <div className="w-16 h-1 bg-white"/>
+           <div className="w-16 h-1 bg-white/50"/>
+           <div className="w-16 h-1 bg-white/20"/>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
           {/* Footer Content */}
           <div className="grid md:grid-cols-4 gap-12 mb-16">
             <motion.div
@@ -1664,12 +1852,12 @@ export function LandingPage() {
             >
               <Link to="/">
                 <div className="flex items-center gap-3 mb-6 hover:opacity-80 transition-opacity">
-                  <span className="text-2xl font-bold text-background">
+                  <span className="text-2xl font-bold text-white">
                     OmniFlow
                   </span>
                 </div>
               </Link>
-              <p className="text-sm text-background/80 leading-relaxed max-w-xs">
+              <p className="text-sm text-white/70 leading-relaxed max-w-xs">
                 The complete ERP solution for modern educational institutions. Empowering education worldwide.
               </p>
             </motion.div>
@@ -1709,7 +1897,7 @@ export function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
               >
-                <h4 className="font-semibold text-background mb-6 text-base">
+                <h4 className="font-semibold text-white mb-6 text-base">
                   {col.title}
                 </h4>
                 <ul className="space-y-3">
@@ -1718,7 +1906,7 @@ export function LandingPage() {
                       <motion.a
                         href={link.href}
                         aria-label={link.aria}
-                        className="text-sm text-background/70 hover:text-background transition-all duration-300 inline-block"
+                        className="text-sm text-white/60 hover:text-white transition-all duration-300 inline-block"
                         whileHover={{ x: 4 }}
                       >
                         {link.label}
@@ -1735,9 +1923,9 @@ export function LandingPage() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="pt-8 border-t border-background/20 flex flex-col sm:flex-row items-center justify-between gap-6"
+            className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6"
           >
-            <p className="text-sm text-background/70">
+            <p className="text-sm text-white/50">
               © 2025 OmniFlow. All rights reserved.
             </p>
             <div className="flex items-center gap-6">

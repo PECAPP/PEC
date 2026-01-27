@@ -115,7 +115,15 @@ function ExaminationsManager({ userId, userRole }: { userId: string, userRole: s
   }, [activeTab, selectedCourse]);
 
   const fetchCourses = async () => {
-    const q = query(collection(db, 'courses'));
+    // Get user's organization from auth context
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    const userData = userDoc.data();
+    const orgId = userData?.organizationId;
+
+    // Fetch courses filtered by organization
+    const q = orgId
+      ? query(collection(db, 'courses'), where('organizationId', '==', orgId))
+      : query(collection(db, 'courses'));
     const snap = await getDocs(q);
     let data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     

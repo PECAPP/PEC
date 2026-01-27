@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
 
 // Initialize accent color from localStorage on page load
 const initAccentColor = () => {
-  const accent = localStorage.getItem('accent-color') || 'obsidian';
+  const accent = localStorage.getItem('accent-color') || 'sapphire';
   const root = document.documentElement;
   // Remove all existing accent classes
   root.classList.remove('accent-obsidian', 'accent-emerald', 'accent-sapphire', 'accent-amethyst', 'accent-coral');

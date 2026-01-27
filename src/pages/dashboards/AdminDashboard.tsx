@@ -52,7 +52,7 @@ import {
 import { auth, db } from '@/config/firebase';
 import { toast } from 'sonner';
 
-export function AdminDashboard() {
+export function AdminDashboard({ viewingOrgId }: { viewingOrgId?: string }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<any>(null);
@@ -134,18 +134,40 @@ export function AdminDashboard() {
     });
 
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, viewingOrgId]);
 
   const fetchAdminData = async () => {
     try {
-      // Fetch all courses
-      const coursesSnapshot = await getDocs(collection(db, 'courses'));
-      const coursesData = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+      // Determine which organization's data to fetch
+      const targetOrgId = viewingOrgId || userData?.organizationId;
+
+      if (!targetOrgId) {
+        toast.error('No organization selected');
+        return;
+      }
+
+      // Fetch courses - filter by organization using Firestore query
+      const coursesQuery = query(
+        collection(db, 'courses'),
+        where('organizationId', '==', targetOrgId)
+      );
+      const coursesSnapshot = await getDocs(coursesQuery);
+      const coursesData = coursesSnapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data() 
+      } as any));
       setCourses(coursesData);
 
-      // Fetch all users
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      const usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+      // Fetch users - filter by organization using Firestore query
+      const usersQuery = query(
+        collection(db, 'users'),
+        where('organizationId', '==', targetOrgId)
+      );
+      const usersSnapshot = await getDocs(usersQuery);
+      const usersData = usersSnapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data() 
+      } as any));
       setUsers(usersData);
 
       // Fetch fee records

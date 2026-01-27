@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
         monument: ['Monument Extended', 'serif'],
-        fraunces: ['Fraunces', 'serif']
+        trendy: ['Syne', 'sans-serif']
       },
       colors: {
         border: "hsl(var(--border) / <alpha-value>)",

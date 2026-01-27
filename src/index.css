@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap");
 
 @font-face {
   font-family: "Monument Extended";
@@ -24,8 +23,8 @@ html {
    SLEEK SCROLLBAR
    ==================================== */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -33,23 +32,34 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.25);
-  border-radius: 10px;
+  background: #333;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.4);
+  background: #555;
+  border: 1px solid transparent;
+  background-clip: content-box;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--muted-foreground) / 0.25) transparent;
+  scrollbar-color: #333 transparent;
 }
 
 /* ====================================
    BASE DESIGN TOKENS
    ==================================== */
 @layer base {
+  html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    height: 100vh;
+    overflow-y: scroll;
+  }
+
   :root {
     --font-sans: "DM Sans", system-ui, sans-serif;
     --radius: 0.75rem;
@@ -192,33 +202,43 @@ html {
      ACCENT COLOR THEMES
      ==================================== */
 
-  /* Theme 1: Obsidian (Default - Neutral) */
+  /* Theme 1: Obsidian (High Contrast Neo-Brutalist) */
   .accent-obsidian {
-    --accent-hue: 220;
-    --accent-sat: 10%;
+    --accent-hue: 48;
+    --accent-sat: 96%;
   }
 
   .accent-obsidian.dark {
-    --background: 220 16% 8%;
-    --card: 220 14% 11%;
-    --sidebar-background: 220 16% 6%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 220 16% 4%;
-    --accent: 220 70% 75%;
-    /* Bright blue accent for dark mode */
-    --accent-foreground: 220 16% 4%;
+    --background: 0 0% 0%;
+    /* Pure Black */
+    --card: 0 0% 5%;
+    --sidebar-background: 0 0% 3%;
+    --primary: 0 0% 100%;
+    /* Pure White */
+    --primary-foreground: 0 0% 0%;
+    --accent: 48 96% 53%;
+    /* Vibrant Yellow */
+    --accent-foreground: 0 0% 0%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 70%;
+    --border: 0 0% 20%;
+    --sidebar-border: 0 0% 20%;
   }
 
   .accent-obsidian:not(.dark) {
-    --background: 210 15% 98%;
+    --background: 0 0% 100%;
+    /* Pure White */
     --card: 0 0% 100%;
-    --sidebar-background: 220 15% 96%;
-    --primary: 220 70% 40%;
-    /* Brighter, more visible in light mode */
+    --sidebar-background: 0 0% 98%;
+    --primary: 0 0% 0%;
+    /* Pure Black */
     --primary-foreground: 0 0% 100%;
-    --accent: 220 70% 50%;
-    /* Much more visible */
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 90%;
+    /* Light gray */
+    --accent-foreground: 0 0% 0%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+    --border: 0 0% 90%;
   }
 
   /* Theme 2: Emerald (Deep Green Tint) */
@@ -497,6 +517,45 @@ html {
 
   .tabs-list-scroll::-webkit-scrollbar {
     display: none;
+  }
+
+  /* ===== NEO-BRUTALIST UTILS (Landing Page) ===== */
+  .neo-brutal-shadow {
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+  }
+
+  .neo-brutal-shadow-lg {
+    box-shadow: 8px 8px 0px 0px hsl(var(--foreground));
+  }
+
+  .neo-brutal-border {
+    @apply border-2 border-foreground;
+  }
+
+  .neo-brutal-btn {
+    @apply rounded-none border-2 border-foreground font-bold uppercase tracking-wider transition-all duration-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+  }
+
+  .neo-brutal-btn:hover {
+    @apply -translate-y-1 -translate-x-1;
+    box-shadow: 6px 6px 0px 0px hsl(var(--foreground));
+  }
+
+  .neo-brutal-card {
+    @apply rounded-none border-2 border-foreground bg-card;
+    box-shadow: 6px 6px 0px 0px hsl(var(--foreground));
+  }
+
+  .neo-brutal-input {
+    @apply rounded-none border-2 border-foreground bg-background focus:ring-0 focus:outline-none focus:border-foreground;
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+  }
+
+  /* Nuclear option for stubborn rounded corners */
+  .strict-sharp-corners,
+  .strict-sharp-corners * {
+    border-radius: 0 !important;
   }
 }
 

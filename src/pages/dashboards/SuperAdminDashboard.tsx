@@ -41,6 +41,7 @@ interface Organization {
   type: string;
   totalUsers: number;
   status: 'active' | 'pending' | 'suspended';
+  slug?: string;
 }
 
 export function SuperAdminDashboard() {
@@ -125,6 +126,16 @@ export function SuperAdminDashboard() {
     } catch (error) {
       console.error('Error rejecting organization:', error);
       toast.error('Failed to reject organization');
+    }
+  };
+
+  const handleViewOrganization = (org: Organization) => {
+    // Open organization dashboard in new tab with super admin access
+    if (org.slug) {
+      window.open(`/${org.slug}/dashboard`, '_blank');
+      toast.success(`Opening ${org.name} dashboard`);
+    } else {
+      toast.error('Organization slug not found');
     }
   };
 
@@ -217,6 +228,8 @@ export function SuperAdminDashboard() {
                     type={org.type.charAt(0).toUpperCase() + org.type.slice(1)}
                     users={org.totalUsers || 0}
                     status={org.status}
+                    organization={org}
+                    onClick={handleViewOrganization}
                   />
                 ))
               )}
@@ -364,9 +377,11 @@ interface OrgRowProps {
   type: string;
   users: number;
   status: 'active' | 'pending' | 'suspended';
+  organization: Organization;
+  onClick?: (org: Organization) => void;
 }
 
-function OrgRow({ name, type, users, status }: OrgRowProps) {
+function OrgRow({ name, type, users, status, organization, onClick }: OrgRowProps) {
   const statusColors = {
     active: 'status-verified',
     pending: 'status-pending',
@@ -374,7 +389,10 @@ function OrgRow({ name, type, users, status }: OrgRowProps) {
   };
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors">
+    <div 
+      onClick={() => onClick?.(organization)}
+      className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors cursor-pointer"
+    >
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
           <Building2 className="w-5 h-5 text-primary" />

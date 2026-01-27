@@ -1,4 +1,10 @@
-export type UserRole = 'student' | 'faculty' | 'college_admin' | 'placement_officer' | 'recruiter' | 'super_admin';
+export type UserRole =
+  | "student"
+  | "faculty"
+  | "college_admin"
+  | "placement_officer"
+  | "recruiter"
+  | "super_admin";
 
 export interface RolePermissions {
   canViewDashboard: boolean;
@@ -34,7 +40,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
   };
 
   switch (role) {
-    case 'student':
+    case "student":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -44,7 +50,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessPlacements: true,
       };
 
-    case 'faculty':
+    case "faculty":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -54,7 +60,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessReports: true,
       };
 
-    case 'placement_officer':
+    case "placement_officer":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -65,7 +71,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageRecruiters: true,
       };
 
-    case 'recruiter':
+    case "recruiter":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -73,7 +79,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessPlacements: true,
       };
 
-    case 'college_admin':
+    case "college_admin":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -89,7 +95,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageRecruiters: true,
       };
 
-    case 'super_admin':
+    case "super_admin":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -105,6 +111,10 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessReports: true,
         canManageInstitution: true,
         canManageRecruiters: true,
+        // Super admin additional permissions
+        canSwitchOrganizations: true,
+        canViewAllOrganizations: true,
+        canManageSystemSettings: true,
       };
 
     default:
@@ -113,16 +123,25 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
 };
 
 // Utility to check if user has permission
-export const hasPermission = (userPermissions: RolePermissions, requiredPermission: keyof RolePermissions): boolean => {
+export const hasPermission = (
+  userPermissions: RolePermissions,
+  requiredPermission: keyof RolePermissions,
+): boolean => {
   return userPermissions[requiredPermission] === true;
 };
 
 // Utility to check multiple permissions (AND)
-export const hasAllPermissions = (userPermissions: RolePermissions, requiredPermissions: (keyof RolePermissions)[]): boolean => {
-  return requiredPermissions.every(perm => userPermissions[perm] === true);
+export const hasAllPermissions = (
+  userPermissions: RolePermissions,
+  requiredPermissions: (keyof RolePermissions)[],
+): boolean => {
+  return requiredPermissions.every((perm) => userPermissions[perm] === true);
 };
 
 // Utility to check multiple permissions (OR)
-export const hasAnyPermission = (userPermissions: RolePermissions, requiredPermissions: (keyof RolePermissions)[]): boolean => {
-  return requiredPermissions.some(perm => userPermissions[perm] === true);
+export const hasAnyPermission = (
+  userPermissions: RolePermissions,
+  requiredPermissions: (keyof RolePermissions)[],
+): boolean => {
+  return requiredPermissions.some((perm) => userPermissions[perm] === true);
 };

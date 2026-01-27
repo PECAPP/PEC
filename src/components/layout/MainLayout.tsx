@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { useLocation } from 'react-router-dom';
 import { Header } from './Header';
@@ -15,6 +15,7 @@ import { BottomNav } from './BottomNav';
 export function MainLayout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { orgSlug } = useParams<{ orgSlug: string }>();
   const { user, loading, isAuthenticated } = useAuth();
   
   // Initialize from localStorage, default to false
@@ -81,6 +82,10 @@ export function MainLayout() {
     return null;
   }
 
+  // Determine effective role for sidebar display
+  // If super admin is viewing a specific organization, show college_admin sidebar
+  const effectiveRole = (user.role === 'super_admin' && orgSlug) ? 'college_admin' : user.role;
+
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
       {/* Atmosphere Mesh Gradient */}
@@ -91,7 +96,7 @@ export function MainLayout() {
       </div>
 
       <Sidebar
-        role={user.role}
+        role={effectiveRole}
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         isMobile={isMobile}

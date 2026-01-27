@@ -305,23 +305,40 @@ export function Sidebar({
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer flex-1 min-w-0"
                 onClick={handleLogoClick}
               >
-                {(settings?.logoDisplayMode === 'logo-only' || settings?.logoDisplayMode === 'both') && settings?.logoUrl ? (
-                  <div className="flex-shrink-0 flex items-center justify-center">
+                {role === 'super_admin' ? (
+                  // Super Admin sees company logo
+                  <>
                     <img 
-                      src={settings.logoUrl} 
-                      alt={settings.collegeName}
+                      src="/logo.png" 
+                      alt="OmniFlow"
                       className="max-w-16 max-h-16 w-auto h-auto object-contain"
                     />
-                  </div>
+                    <span className="font-semibold text-sidebar-foreground truncate">
+                      OmniFlow
+                    </span>
+                  </>
                 ) : (
-                  <div className="w-12 h-12 flex-shrink-0 bg-primary rounded flex items-center justify-center">
-                    <GraduationCap className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                )}
-                {(settings?.logoDisplayMode === 'text-only' || settings?.logoDisplayMode === 'both') && (
-                  <span className="font-semibold text-sidebar-foreground truncate">
-                    {settings?.collegeShortName || 'OmniFlow'}
-                  </span>
+                  // Other roles see college logo
+                  <>
+                    {(settings?.logoDisplayMode === 'logo-only' || settings?.logoDisplayMode === 'both') && settings?.logoUrl ? (
+                      <div className="flex-shrink-0 flex items-center justify-center">
+                        <img 
+                          src={settings.logoUrl} 
+                          alt={settings.collegeName}
+                          className="max-w-16 max-h-16 w-auto h-auto object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 flex-shrink-0 bg-primary rounded flex items-center justify-center">
+                        <GraduationCap className="w-6 h-6 text-primary-foreground" />
+                      </div>
+                    )}
+                    {(settings?.logoDisplayMode === 'text-only' || settings?.logoDisplayMode === 'both') && (
+                      <span className="font-semibold text-sidebar-foreground truncate">
+                        {settings?.collegeShortName || 'OmniFlow'}
+                      </span>
+                    )}
+                  </>
                 )}
               </motion.div>
             </Link>

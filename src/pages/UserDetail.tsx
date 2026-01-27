@@ -78,15 +78,26 @@ export default function UserDetail() {
           const gradesData = await Promise.all(
             gradesSnap.docs.map(async (gradeDoc) => {
               const grade = { id: gradeDoc.id, ...gradeDoc.data() } as any;
-              if (grade.courseId) {
-                const courseDoc = await getDoc(doc(db, 'courses', grade.courseId));
-                return {
-                  ...grade,
-                  courseName: courseDoc.data()?.name || 'Unknown Course',
-                  courseCode: courseDoc.data()?.code || 'N/A',
-                };
+              // Use courseName and courseCode from grade if available
+              if (grade.courseName && grade.courseCode) {
+                return grade;
               }
-              return { ...grade, courseName: 'Unknown Course', courseCode: 'N/A' };
+              // Otherwise try to fetch from courses collection
+              if (grade.courseId) {
+                try {
+                  const courseDoc = await getDoc(doc(db, 'courses', grade.courseId));
+                  if (courseDoc.exists()) {
+                    return {
+                      ...grade,
+                      courseName: courseDoc.data()?.name || grade.courseName || 'Unknown Course',
+                      courseCode: courseDoc.data()?.code || grade.courseCode || 'N/A',
+                    };
+                  }
+                } catch (error) {
+                  console.error('Error fetching course:', error);
+                }
+              }
+              return { ...grade, courseName: grade.courseName || 'Unknown Course', courseCode: grade.courseCode || 'N/A' };
             })
           );
           setGrades(gradesData);

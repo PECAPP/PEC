@@ -48,26 +48,26 @@ export default function DemoDashboard() {
   const [activeTab, setActiveTab] = useState('Dashboard');
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card">
-        <div className="p-6">
-          <h2 className="text-lg font-bold">OmniFlow Demo</h2>
-          <p className="text-xs text-muted-foreground mt-1">Student Portal</p>
+    <div className="min-h-screen bg-black text-white flex">
+      {/* Sidebar - Always Visible */}
+      <aside className="flex flex-col w-48 md:w-56 lg:w-64 border-r border-white/10 bg-neutral-900 flex-shrink-0">
+        <div className="p-4 lg:p-6">
+          <h2 className="text-base lg:text-lg font-bold text-white">OmniFlow Demo</h2>
+          <p className="text-xs text-neutral-400 mt-1">Student Portal</p>
         </div>
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-2 lg:px-3 space-y-1">
           {navItems.map((item) => (
             <button
               key={item.label}
               onClick={() => setActiveTab(item.label)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`w-full flex items-center gap-2 lg:gap-3 px-2 lg:px-3 py-2 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium transition-colors ${
                 activeTab === item.label
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-violet-600 text-white'
+                  : 'text-neutral-400 hover:bg-white/5 hover:text-white'
               }`}
             >
-              <item.icon className="w-4 h-4" />
-              {item.label}
+              <item.icon className="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
+              <span className="truncate">{item.label}</span>
             </button>
           ))}
         </nav>
@@ -92,8 +92,8 @@ export default function DemoDashboard() {
               <span className="text-lg font-bold text-accent">JD</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold">Welcome back, John!</h1>
-              <p className="text-sm text-muted-foreground">Semester 4 • B.Tech Computer Science</p>
+              <h1 className="text-xl font-bold text-white">Welcome back, John!</h1>
+              <p className="text-sm text-neutral-400">Semester 4 • B.Tech Computer Science</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export default function DemoDashboard() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Upcoming Schedule */}
-            <motion.div variants={item} className="card-elevated p-6">
+            <motion.div variants={item} className="bg-neutral-900 rounded-xl border border-white/10 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Today's Schedule</h2>
                 <button className="text-accent text-sm font-medium hover:underline flex items-center gap-1">
@@ -170,7 +170,7 @@ export default function DemoDashboard() {
             </motion.div>
 
             {/* Performance Chart Simulation */}
-            <motion.div variants={item} className="card-elevated p-6 h-[200px] flex items-center justify-center relative overflow-hidden">
+            <motion.div variants={item} className="bg-neutral-900 rounded-xl border border-white/10 p-6 h-[200px] flex items-center justify-center relative overflow-hidden">
                <div className="absolute inset-0 bg-accent/5" />
                <div className="relative text-center">
                   <TrendingUp className="w-8 h-8 text-accent mx-auto mb-2 opacity-20" />
@@ -192,7 +192,7 @@ export default function DemoDashboard() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Recent Notifications */}
-            <motion.div variants={item} className="card-elevated p-6">
+            <motion.div variants={item} className="bg-neutral-900 rounded-xl border border-white/10 p-6">
               <h2 className="text-lg font-semibold mb-4">Recent Alerts</h2>
               <div className="space-y-4">
                 <NotificationItem
@@ -214,7 +214,7 @@ export default function DemoDashboard() {
             </motion.div>
 
             {/* Quick Actions */}
-            <motion.div variants={item} className="card-elevated p-6">
+            <motion.div variants={item} className="bg-neutral-900 rounded-xl border border-white/10 p-6">
                <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                <div className="grid grid-cols-2 gap-2">
                   <button className="p-3 bg-secondary rounded-lg text-xs font-semibold hover:bg-secondary/80">Apply Leave</button>
@@ -344,9 +344,9 @@ export default function DemoDashboard() {
 
 function StatCard({ icon: Icon, label, value, subtext, color }: any) {
   return (
-    <motion.div variants={item} className="card-elevated p-5">
+    <motion.div variants={item} className="bg-neutral-900 rounded-xl border border-white/10 p-5">
       <div className="flex items-start justify-between">
-        <div className={`w-10 h-10 rounded-lg bg-secondary flex items-center justify-center ${color}`}>
+        <div className={`w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center ${color}`}>
           <Icon className="w-5 h-5" />
         </div>
       </div>
@@ -361,7 +361,7 @@ function StatCard({ icon: Icon, label, value, subtext, color }: any) {
 
 function ScheduleItem({ time, subject, room, faculty }: any) {
   return (
-    <div className="flex items-center gap-4 p-3 rounded-lg border border-border/50 hover:bg-accent/5 transition-colors">
+    <div className="flex items-center gap-4 p-3 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
       <div className="w-16 text-right">
         <p className="text-sm font-bold">{time.split(' ')[0]}</p>
         <p className="text-[10px] text-muted-foreground">{time.split(' ')[1]}</p>

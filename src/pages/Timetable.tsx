@@ -135,8 +135,12 @@ export default function Timetable() {
 
   const fetchData = async () => {
     try {
-      // Fetch courses
-      const coursesSnapshot = await getDocs(collection(db, "courses"));
+      // Fetch courses filtered by organization
+      const orgId = user?.organizationId;
+      const coursesQuery = orgId 
+        ? query(collection(db, "courses"), where("organizationId", "==", orgId))
+        : collection(db, "courses");
+      const coursesSnapshot = await getDocs(coursesQuery);
       let coursesData = coursesSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),

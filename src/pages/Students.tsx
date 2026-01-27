@@ -97,9 +97,15 @@ export default function Students() {
 
   const fetchStudents = async () => {
     try {
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      const allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
-      let studentUsers = allUsers.filter(u => u.role === 'student');
+      // Fetch users filtered by organization and role
+      const orgId = user?.organizationId;
+      const usersQuery = orgId
+        ? query(collection(db, 'users'), 
+                where('organizationId', '==', orgId),
+                where('role', '==', 'student'))
+        : query(collection(db, 'users'), where('role', '==', 'student'));
+      const usersSnapshot = await getDocs(usersQuery);
+      let studentUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
       
       // Apply department filtering for faculty
       studentUsers = filterByDepartment(studentUsers);

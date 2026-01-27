@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { auth, db } from '@/config/firebase';
 import { SuperAdminDashboard } from './dashboards/SuperAdminDashboard';
 import { AdminDashboard } from './dashboards/AdminDashboard';
@@ -14,8 +14,10 @@ import type { UserRole } from '@/types';
 
 export function Dashboard() {
   const navigate = useNavigate();
+  const { orgSlug } = useParams<{ orgSlug: string }>();
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [viewingOrgId, setViewingOrgId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -50,6 +52,15 @@ export function Dashboard() {
           return;
         }
 
+        // If super admin and viewing a specific org, get that org's ID
+        if (userData.role === 'super_admin' && orgSlug) {
+          const orgsSnapshot = await getDocs(collection(db, 'organizations'));
+          const org = orgsSnapshot.docs.find(doc => doc.data().slug === orgSlug);
+          if (org) {
+            setViewingOrgId(org.id);
+          }
+        }
+
         // Everything is good, set the role and show dashboard
         setUserRole(userData.role);
         setLoading(false);
@@ -61,7 +72,7 @@ export function Dashboard() {
     });
 
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, orgSlug]);
 
   if (loading || !userRole) {
     return (
@@ -77,6 +88,10 @@ export function Dashboard() {
   // Render role-based dashboard
   switch (userRole) {
     case 'super_admin':
+      // If viewing a specific org, show admin dashboard for that org
+      if (viewingOrgId) {
+        return <AdminDashboard viewingOrgId={viewingOrgId} />;
+      }
       return <SuperAdminDashboard />;
     case 'college_admin':
       return <AdminDashboard />;

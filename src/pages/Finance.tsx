@@ -174,9 +174,15 @@ export default function Finance() {
 
       // Fetch students for dropdown (only for admin)
       if (isAdmin) {
-        const usersSnapshot = await getDocs(collection(db, 'users'));
-        const allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const studentUsers = allUsers.filter((u: any) => u.role === 'student');
+        // Fetch students filtered by organization
+        const orgId = user?.organizationId;
+        const usersQuery = orgId
+          ? query(collection(db, 'users'),
+                  where('organizationId', '==', orgId),
+                  where('role', '==', 'student'))
+          : query(collection(db, 'users'), where('role', '==', 'student'));
+        const usersSnapshot = await getDocs(usersQuery);
+        const studentUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setStudents(studentUsers);
       }
     } catch (error) {

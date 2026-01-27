@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { exportTimetablePDF, exportAttendanceReport } from '@/lib/pdfExport';
 import PDFExportButton from '@/components/common/PDFExportButton';
 import {
@@ -24,6 +24,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import QRAttendanceGenerator from '@/components/attendance/QRAttendanceGenerator';
 import FacultyScheduleManager from '@/components/timetable/FacultyScheduleManager';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/config/firebase';
+import { toast } from 'sonner';
 
 const container = {
   hidden: { opacity: 0 },
@@ -42,14 +46,40 @@ export function FacultyDashboard() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [showScheduleManager, setShowScheduleManager] = useState(false);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState<any>(null);
 
-  // Mock courses data - in production, fetch from Firestore
-  const courses = [
-    { id: '1', name: 'Data Structures', code: 'CS201' },
-    { id: '2', name: 'Database Systems', code: 'CS301' },
-    { id: '3', name: 'Web Development', code: 'CS401' },
-    { id: '4', name: 'Machine Learning', code: 'CS501' },
-  ];
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userInfo = userDoc.data();
+        setUserData(userInfo);
+
+        // Fetch courses for this faculty's organization
+        const coursesQuery = query(
+          collection(db, 'courses'),
+          where('organizationId', '==', userInfo?.organizationId)
+        );
+        const coursesSnapshot = await getDocs(coursesQuery);
+        const coursesData = coursesSnapshot.docs.map(doc => ({ 
+          id: doc.id, 
+          ...doc.data() 
+        }));
+        setCourses(coursesData);
+      } catch (error) {
+        console.error('Error fetching faculty data:', error);
+        toast.error('Failed to load courses');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleGenerateQR = () => {
     if (!selectedCourse) {
