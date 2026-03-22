@@ -1,0 +1,79 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pec_postgres_dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "pec"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+
+  backend:
+    image: node:20-alpine
+    container_name: pec_backend_dev
+    working_dir: /app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      JWT_SECRET: "pec_secret_key_2026"
+      PORT: "3000"
+      NODE_ENV: "development"
+      CORS_ORIGINS: "http://localhost:5173"
+      DB_HOST: "postgres"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
+    volumes:
+      - ./server:/app
+      - backend_node_modules:/app/node_modules
+    command: >
+      sh -c "
+      npm install &&
+      npx prisma generate &&
+      npx prisma migrate deploy &&
+      npm run build &&
+      npm run start
+      "
+    depends_on:
+      - postgres
+
+  frontend:
+    image: node:20-alpine
+    container_name: pec_frontend_dev
+    working_dir: /app
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: "http://localhost:3000"
+      VITE_OPENAI_API_KEY: "${VITE_OPENAI_API_KEY:-}"
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./index.html:/app/index.html
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./vite.config.ts:/app/vite.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.app.json:/app/tsconfig.app.json
+      - ./tsconfig.node.json:/app/tsconfig.node.json
+      - ./tailwind.config.ts:/app/tailwind.config.ts
+      - ./postcss.config.js:/app/postcss.config.js
+      - ./components.json:/app/components.json
+      - frontend_node_modules:/app/node_modules
+    command: >
+      sh -c "
+      if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci --include=dev --legacy-peer-deps; fi &&
+      npm run dev -- --host 0.0.0.0 --port 5173
+      "
+    depends_on:
+      - backend
+
+volumes:
+  postgres_dev_data:
+  backend_node_modules:
+  frontend_node_modules:

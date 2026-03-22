@@ -1,0 +1,4 @@
+ALTER TABLE "User"
+  ADD COLUMN IF NOT EXISTS "githubUsername" TEXT,
+  ADD COLUMN IF NOT EXISTS "linkedinUsername" TEXT,
+  ADD COLUMN IF NOT EXISTS "isPublicProfile" BOOLEAN NOT NULL DEFAULT true;

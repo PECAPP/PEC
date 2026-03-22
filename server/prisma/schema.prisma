@@ -1,0 +1,461 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String          @id @default(uuid())
+  email           String          @unique
+  name            String
+  role            String?
+  avatar          String?
+  githubUsername  String?
+  linkedinUsername String?
+  isPublicProfile Boolean         @default(true)
+  profileComplete Boolean         @default(false)
+  password        String          @default("password")
+  emailVerified   Boolean         @default(false)
+  emailVerifiedAt DateTime?
+  passwordChangedAt DateTime?
+  sessionVersion  Int             @default(0)
+  failedLoginAttempts Int         @default(0)
+  lockedUntil     DateTime?
+  studentProfile  StudentProfile?
+  facultyProfile  FacultyProfile?
+  messages        Message[]       @relation("UserMessages")
+  chatRooms       UserChatRoom[]
+  attendances     Attendance[]    @relation("StudentAttendance")
+  feeRecords      FeeRecord[]
+  grades          Grade[]
+  bookBorrows     BookBorrow[]    @relation("UserBookBorrows")
+  enrollments     Enrollment[]    @relation("StudentEnrollments")
+  roles           UserRole[]
+  refreshTokens   RefreshToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([role])
+  @@index([emailVerified])
+  @@index([lockedUntil])
+}
+
+model Role {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  users     UserRole[]
+  createdAt DateTime   @default(now())
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([roleId])
+}
+
+model RefreshToken {
+  id                String   @id @default(uuid())
+  userId            String
+  tokenHash         String   @unique
+  familyId          String
+  createdAt         DateTime @default(now())
+  expiresAt         DateTime
+  revokedAt         DateTime?
+  replacedByTokenId String?
+  ipAddress         String?
+  userAgent         String?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([familyId])
+  @@index([revokedAt])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model StudentProfile {
+  id               String    @id @default(uuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrollmentNumber String    @unique
+  department       String
+  semester         Int
+  phone            String?
+  dob              DateTime?
+  address          String?
+  bio              String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([department, semester])
+}
+
+model FacultyProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeId     String   @unique
+  department     String
+  designation    String
+  phone          String?
+  specialization String?
+  qualifications String?
+  bio            String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([department, designation])
+}
+
+model Department {
+  id             String   @id @default(uuid())
+  code           String   @unique
+  name           String   @unique
+  hod            String?
+  description    String?
+  status         String   @default("active")
+  timetableLabel String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status, name])
+}
+
+model Course {
+  id               String       @id @default(uuid())
+  code             String       @unique
+  name             String
+  credits          Int
+  instructor       String
+  department       String
+  semester         Int
+  status           String
+  assignments      Assignment[] @relation("CourseAssignments")
+  examSchedules    ExamSchedule[]
+  grades           Grade[]
+  enrollments      Enrollment[] @relation("CourseEnrollments")
+  timetableEntries Timetable[]  @relation("CourseTimetable")
+  deletedAt        DateTime?
+
+  @@index([department, semester])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Enrollment {
+  id         String   @id @default(uuid())
+  studentId  String
+  student    User     @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
+  courseId   String
+  course     Course   @relation("CourseEnrollments", fields: [courseId], references: [id], onDelete: Cascade)
+  courseName String
+  courseCode String
+  semester   Int?
+  batch      String?
+  status     String   @default("active")
+  enrolledAt DateTime @default(now())
+
+  @@unique([studentId, courseId])
+  @@index([studentId, status])
+  @@index([courseId])
+  @@index([enrolledAt])
+}
+
+model FeeRecord {
+  id                     String   @id @default(uuid())
+  studentId              String
+  student                User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  amount                 Float
+  description            String
+  dueDate                DateTime
+  category               String
+  status                 String   @default("pending")
+  paidDate               DateTime?
+  pendingTransactionId   String?
+  paymentTransactionId   String?
+  lastPaymentAttempt     DateTime?
+  verificationSubmittedAt DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  deletedAt              DateTime?
+
+  @@index([studentId, status])
+  @@index([dueDate])
+  @@index([deletedAt])
+}
+
+model Timetable {
+  id          String   @id @default(uuid())
+  courseId    String?
+  course      Course?  @relation("CourseTimetable", fields: [courseId], references: [id])
+  courseName  String
+  courseCode  String
+  facultyId   String?
+  facultyName String?
+  day         String
+  startTime   String
+  endTime     String
+  room        String
+  department  String?
+  semester    Int?
+  batch       String?
+  createdAt   DateTime @default(now())
+
+  @@index([courseId])
+  @@index([department, semester, batch])
+  @@index([day, startTime])
+}
+
+model Book {
+  id              String       @id @default(uuid())
+  title           String
+  author          String
+  isbn            String       @unique
+  category        String
+  totalCopies     Int
+  availableCopies Int
+  location        String?
+  publisher       String?
+  year            Int?
+  borrows         BookBorrow[] @relation("BookBorrows")
+  deletedAt       DateTime?
+
+  @@index([category])
+  @@index([author])
+  @@index([deletedAt])
+}
+
+model Room {
+  id          String   @id @default(uuid())
+  name        String
+  type        String
+  capacity    Int
+  building    String
+  floor       Int
+  facilities  String // JSON array stored as string
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([building, floor])
+  @@index([type, isAvailable])
+}
+
+model ChatRoom {
+  id           String         @id @default(uuid())
+  name         String
+  isGroup      Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  messages     Message[]
+  participants UserChatRoom[]
+
+  @@index([createdAt])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  createdAt  DateTime @default(now())
+  senderId   String
+  sender     User     @relation("UserMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  chatRoomId String
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+
+  @@index([chatRoomId, createdAt])
+  @@index([senderId, createdAt])
+}
+
+model UserChatRoom {
+  userId     String
+  chatRoomId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+
+  @@id([userId, chatRoomId])
+  @@index([chatRoomId])
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  date      DateTime
+  status    String // "present" | "absent" | "late"
+  subject   String
+  studentId String
+  student   User     @relation("StudentAttendance", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date, subject])
+  @@index([date])
+  @@index([status])
+}
+
+model Assignment {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime
+  courseId    String
+  course      Course   @relation("CourseAssignments", fields: [courseId], references: [id], onDelete: Cascade)
+  deletedAt   DateTime?
+
+  @@index([courseId, dueDate])
+  @@index([deletedAt])
+}
+
+model ExamSchedule {
+  id        String   @id @default(uuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseName String
+  courseCode String
+  examType  String
+  date      DateTime
+  startTime String
+  endTime   String
+  room      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([courseId, date])
+  @@index([deletedAt])
+}
+
+model Grade {
+  id        String   @id @default(uuid())
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  midterm   Float?
+  final     Float?
+  total     Float?
+  grade     String?
+  credits   Int?
+  remarks   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, courseId])
+  @@index([courseId])
+  @@index([studentId])
+}
+
+model Job {
+  id         String   @id @default(uuid())
+  title      String
+  company    String
+  location   String
+  type       String
+  salary     String?
+  deadline   DateTime
+  matchScore Int?
+  deletedAt  DateTime?
+
+  @@index([deadline])
+  @@index([type, location])
+  @@index([company])
+  @@index([deletedAt, deadline])
+  @@index([deletedAt])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorUserId String?
+  actorRole   String?
+  action      String
+  entity      String
+  entityId    String?
+  method      String
+  path        String
+  ip          String?
+  statusCode  Int?
+  metadata    String?
+  createdAt   DateTime @default(now())
+
+  @@index([actorUserId, createdAt])
+  @@index([entity, entityId])
+  @@index([action, createdAt])
+  @@index([path, createdAt])
+  @@index([statusCode, createdAt])
+}
+
+model BookBorrow {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation("UserBookBorrows", fields: [userId], references: [id], onDelete: Cascade)
+  bookId     String
+  book       Book      @relation("BookBorrows", fields: [bookId], references: [id], onDelete: Cascade)
+  borrowDate DateTime  @default(now())
+  dueDate    DateTime
+  returnDate DateTime?
+  status     String // "borrowed" | "returned" | "overdue"
+  fine       Float?
+
+  @@index([userId, status])
+  @@index([bookId, status])
+  @@index([dueDate])
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  description String?
+  enabled     Boolean  @default(false)
+  payload     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled, updatedAt])
+}
+
+model BackgroundJob {
+  id           String   @id @default(uuid())
+  type         String
+  status       String   @default("pending")
+  payload      String?
+  dedupeKey    String?  @unique
+  runAt        DateTime @default(now())
+  availableAt  DateTime @default(now())
+  lockedAt     DateTime?
+  lockedBy     String?
+  attempts     Int      @default(0)
+  maxAttempts  Int      @default(5)
+  processedAt  DateTime?
+  failedAt     DateTime?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status, availableAt])
+  @@index([type, status, availableAt])
+  @@index([lockedAt])
+  @@index([processedAt])
+}

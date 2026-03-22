@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pec_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: "pec"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: pec_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      JWT_SECRET: "pec_secret_key_2026"
+      PORT: "3000"
+      NODE_ENV: "production"
+      CORS_ORIGINS: "http://localhost:5173"
+      DB_HOST: "postgres"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
+    command: >
+      sh -c "
+      npx prisma migrate deploy &&
+      npm run start:prod
+      "
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pec_frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: "http://localhost:3000"
+      VITE_OPENAI_API_KEY: "${VITE_OPENAI_API_KEY:-}"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

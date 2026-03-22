@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env.local
+.env.*.local
+dist
+build
+.DS_Store
+*.pem
+dev.db
+dev.db-shm
+dev.db-wal
+prisma/migrations
+.eslintrc.cjs
+scripts
