@@ -6,35 +6,33 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
-const StudentDashboard = dynamic(
-  () => import('./dashboards/StudentDashboard').then((mod) => mod.StudentDashboard),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    ),
-  }
+const dashboardLoader = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  </div>
 );
 
-const AdminDashboard = dynamic(
-  () => import('./dashboards/AdminDashboard').then((mod) => mod.AdminDashboard),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    ),
+const createRoleDashboard = (role: string) => {
+  if (role === 'student') {
+    return dynamic(
+      () => import('./dashboards/StudentDashboard').then((mod) => mod.StudentDashboard),
+      { ssr: false, loading: dashboardLoader }
+    );
   }
-);
+
+  return dynamic(
+    () => import('./dashboards/AdminDashboard').then((mod) => mod.AdminDashboard),
+    { ssr: false, loading: dashboardLoader }
+  );
+};
 
 export default function Dashboard() {
   const router = useRouter();
   const { user, loading, isAuthenticated } = useAuth();
 
   const role = useMemo(() => user?.role ?? null, [user?.role]);
+  const resolvedRole = role ?? 'student';
+  const ResolvedDashboard = useMemo(() => createRoleDashboard(resolvedRole), [resolvedRole]);
 
   useEffect(() => {
     if (loading) return;
@@ -66,10 +64,5 @@ export default function Dashboard() {
     return null;
   }
 
-  if (role === 'student') return <StudentDashboard />;
-  if (role === 'faculty' || role === 'college_admin' || role === 'admin' || role === 'moderator') {
-    return <AdminDashboard />;
-  }
-
-  return <StudentDashboard />;
+  return <ResolvedDashboard />;
 }

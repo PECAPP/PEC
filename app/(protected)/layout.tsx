@@ -1,14 +1,40 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { Header } from '@/components/layout/Header';
-import FloatingAIChat from '@/components/FloatingAIChat';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+
+const Sidebar = dynamic(
+  () => import('@/components/layout/Sidebar').then((mod) => mod.Sidebar),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
+
+const Header = dynamic(
+  () => import('@/components/layout/Header').then((mod) => mod.Header),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
+
+const FloatingAIChat = dynamic(() => import('@/components/FloatingAIChat'), {
+  ssr: false,
+  loading: () => null,
+});
+
+const BottomNav = dynamic(
+  () => import('@/components/layout/BottomNav').then((mod) => mod.BottomNav),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 
 export default function ProtectedLayout({
   children,

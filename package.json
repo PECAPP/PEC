@@ -10,6 +10,8 @@
     "api": "cd server && npm run start:dev",
     "dev:all": "concurrently \"npm run api\" \"npm run dev\"",
     "dev:docker": "docker compose -f docker-compose.dev.yml up -d",
+    "dev:docker:backend": "docker compose -f docker-compose.dev.yml up -d postgres backend",
+    "dev:docker:frontend": "docker compose -f docker-compose.dev.yml --profile frontend up -d frontend",
     "dev:docker:down": "docker compose -f docker-compose.dev.yml down",
     "dev:docker:logs": "docker compose -f docker-compose.dev.yml logs -f --tail=100",
     "dev:docker:restart": "docker compose -f docker-compose.dev.yml restart",

@@ -53,15 +53,46 @@ class AuthClient {
   private accessToken: string | null = null;
   private refreshToken: string | null = null;
   private isRefreshing = false;
-  private refreshSubscribers: ((token: string) => void)[] = [];
+  private refreshSubscribers: Array<{
+    resolve: (token: string) => void;
+    reject: (error: Error) => void;
+  }> = [];
 
-  private subscribeToRefresh(callback: (token: string) => void): void {
-    this.refreshSubscribers.push(callback);
+  private clearSession(): void {
+    this.accessToken = null;
+    this.refreshToken = null;
+  }
+
+  private waitForRefresh(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.refreshSubscribers.push({ resolve, reject });
+    });
   }
 
   private notifyRefreshSubscribers(token: string): void {
-    this.refreshSubscribers.forEach((cb) => cb(token));
+    this.refreshSubscribers.forEach(({ resolve }) => resolve(token));
     this.refreshSubscribers = [];
+  }
+
+  private notifyRefreshSubscribersError(error: Error): void {
+    this.refreshSubscribers.forEach(({ reject }) => reject(error));
+    this.refreshSubscribers = [];
+  }
+
+  private async parseErrorMessage(
+    response: Response,
+    fallback: string,
+  ): Promise<string> {
+    try {
+      const body = await response.json();
+      if (body && typeof body.message === "string") {
+        return body.message;
+      }
+    } catch {
+      // Response body may be empty or non-JSON.
+    }
+
+    return fallback;
   }
 
   async login(credentials: AuthCredentials): Promise<AuthResponse> {
@@ -73,8 +104,8 @@ class AuthClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Login failed");
+      const message = await this.parseErrorMessage(response, "Login failed");
+      throw new Error(message);
     }
 
     const data: AuthResponse = await response.json();
@@ -98,8 +129,8 @@ class AuthClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Signup failed");
+      const message = await this.parseErrorMessage(response, "Signup failed");
+      throw new Error(message);
     }
 
     const data = await response.json();
@@ -114,9 +145,7 @@ class AuthClient {
 
   async refreshAccessToken(): Promise<string> {
     if (this.isRefreshing) {
-      return new Promise((resolve) => {
-        this.subscribeToRefresh((token) => resolve(token));
-      });
+      return this.waitForRefresh();
     }
 
     this.isRefreshing = true;
@@ -129,10 +158,24 @@ class AuthClient {
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          this.logout();
+        if (
+          response.status === 400 ||
+          response.status === 401 ||
+          response.status === 403
+        ) {
+          this.clearSession();
+          const message = await this.parseErrorMessage(
+            response,
+            "No active refresh session",
+          );
+          throw new Error(message);
         }
-        throw new Error("Token refresh failed");
+
+        const message = await this.parseErrorMessage(
+          response,
+          "Token refresh failed",
+        );
+        throw new Error(message);
       }
 
       const data: AuthResponse = await response.json();
@@ -142,13 +185,16 @@ class AuthClient {
         this.refreshToken = data.refresh_token;
       }
 
-      this.isRefreshing = false;
       this.notifyRefreshSubscribers(this.accessToken);
       return this.accessToken;
     } catch (error) {
+      const normalizedError =
+        error instanceof Error ? error : new Error("Token refresh failed");
+      this.clearSession();
+      this.notifyRefreshSubscribersError(normalizedError);
+      throw normalizedError;
+    } finally {
       this.isRefreshing = false;
-      this.logout();
-      throw error;
     }
   }
 
@@ -167,8 +213,7 @@ class AuthClient {
     } catch {
       // Log to service but don't fail logout
     } finally {
-      this.accessToken = null;
-      this.refreshToken = null;
+      this.clearSession();
     }
   }
 
@@ -181,8 +226,11 @@ class AuthClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Email verification failed");
+      const message = await this.parseErrorMessage(
+        response,
+        "Email verification failed",
+      );
+      throw new Error(message);
     }
 
     return response.json();
@@ -200,8 +248,11 @@ class AuthClient {
     );
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Password reset request failed");
+      const message = await this.parseErrorMessage(
+        response,
+        "Password reset request failed",
+      );
+      throw new Error(message);
     }
 
     return response.json();
@@ -218,8 +269,11 @@ class AuthClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Password reset failed");
+      const message = await this.parseErrorMessage(
+        response,
+        "Password reset failed",
+      );
+      throw new Error(message);
     }
 
     return response.json();
@@ -234,15 +288,19 @@ class AuthClient {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.accessToken}`,
       },
+      body: JSON.stringify(payload),
       credentials: "include",
     });
 
     if (!response.ok) {
       if (response.status === 401) {
-        this.logout();
+        this.clearSession();
       }
-      const error = await response.json();
-      throw new Error(error.message || "Password change failed");
+      const message = await this.parseErrorMessage(
+        response,
+        "Password change failed",
+      );
+      throw new Error(message);
     }
 
     return response.json();
@@ -266,6 +324,10 @@ class AuthClient {
 
   setRefreshToken(token: string): void {
     this.refreshToken = token;
+  }
+
+  resetSession(): void {
+    this.clearSession();
   }
 }
 

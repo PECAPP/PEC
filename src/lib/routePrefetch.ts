@@ -1,30 +1,28 @@
-const routeImportMap: Record<string, () => Promise<unknown>> = {
-  "/dashboard": () => import("@/pages/Dashboard"),
-  "/chat": () => import("@/pages/Chat"),
-  "/users": () => import("@/pages/Users"),
-  "/profile": () => import("@/pages/StudentProfile"),
-  "/courses": () => import("@/features/courses/pages/CoursesPage"),
-  "/course-materials": () =>
-    import("@/features/courses/pages/CourseMaterialsPage"),
-  "/timetable": () => import("@/pages/Timetable"),
-  "/attendance": () => import("@/pages/Attendance"),
-  "/examinations": () => import("@/pages/Examinations"),
-  "/resume-builder": () => import("@/pages/ResumeBuilderIvyLeague"),
-  "/hostel-issues": () => import("@/pages/HostelIssues"),
-  "/canteen": () => import("@/pages/NightCanteen"),
-  "/campus-map": () => import("@/pages/CampusMap"),
-  "/settings": () => import("@/pages/Settings"),
-  "/help": () => import("@/pages/Help"),
+const prefetched = new Set<string>();
+let routeImportMapPromise: Promise<
+  Record<string, () => Promise<unknown>>
+> | null = null;
+
+const loadRouteImportMap = async () => {
+  if (!routeImportMapPromise) {
+    routeImportMapPromise = import("./routePrefetchMap").then(
+      (mod) => mod.routeImportMap,
+    );
+  }
+  return routeImportMapPromise;
 };
 
-const prefetched = new Set<string>();
+export async function prefetchRoute(path: string) {
+  if (process.env.NODE_ENV !== "production" || prefetched.has(path)) {
+    return;
+  }
 
-export function prefetchRoute(path: string) {
+  const routeImportMap = await loadRouteImportMap();
   const importer = routeImportMap[path];
-  if (!importer || prefetched.has(path)) return;
+  if (!importer) return;
 
   prefetched.add(path);
-  importer().catch(() => {
+  await importer().catch(() => {
     prefetched.delete(path);
   });
 }

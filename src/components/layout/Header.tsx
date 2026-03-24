@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import {
   Bell,
@@ -26,23 +27,43 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import ThemeToggler from "../../components/ThemeToggler";
-import { LandingColorTheme } from '@/components/LandingColorTheme';
-import { GoogleTranslate } from '@/components/GoogleTranslate';
 import { authClient } from '@/lib/auth-client';
 import type { User as UserType } from '@/types';
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command";
-import { searchableRoutes } from '@/utils/searchableRoutes';
-import { useEffect } from 'react';
+
+const CommandMenu = dynamic(() => import('@/components/layout/CommandMenu'), {
+  ssr: false,
+  loading: () => (
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <Input
+        placeholder="Search... (Ctrl+K)"
+        className="pl-10 bg-background border border-input shadow-sm focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground"
+        readOnly
+      />
+    </div>
+  ),
+});
+
+const ThemeToggler = dynamic(() => import('../../components/ThemeToggler'), {
+  ssr: false,
+  loading: () => null,
+});
+
+const LandingColorTheme = dynamic(
+  () => import('@/components/LandingColorTheme').then((mod) => mod.LandingColorTheme),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
+
+const GoogleTranslate = dynamic(
+  () => import('@/components/GoogleTranslate').then((mod) => mod.GoogleTranslate),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 
 interface HeaderProps {
   user: UserType;
@@ -204,92 +225,5 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
         </div>
       </div>
     </header>
-  );
-}
-
-function CommandMenu() {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen((open) => !open);
-      }
-    };
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
-
-  return (
-    <>
-      <div 
-        className="relative" 
-        onClick={() => setOpen(true)}
-      >
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search... (Ctrl+K)"
-          className="pl-10 bg-background border border-input shadow-sm focus-visible:ring-1 focus-visible:ring-primary cursor-pointer text-foreground placeholder:text-muted-foreground"
-          readOnly
-        />
-      </div>
-      
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type to search pages, students, or data..." value={query} onValueChange={setQuery} />
-        <CommandList>
-          <CommandEmpty>
-             <div className="py-2 px-4 text-sm">
-                No results found. 
-                <Button 
-                  variant="link" 
-                  className="px-1 h-auto font-normal text-primary" 
-                  onClick={() => {
-                    setOpen(false);
-                    router.push(`/search?q=${encodeURIComponent(query)}`);
-                  }}
-                >
-                  Search for "{query}"
-                </Button>
-             </div>
-          </CommandEmpty>
-          
-          <CommandGroup heading="Pages">
-            {searchableRoutes.filter(route => 
-               route.title.toLowerCase().includes(query.toLowerCase()) || 
-               route.keywords.some(k => k.includes(query.toLowerCase()))
-            ).slice(0, 5).map((route) => (
-              <CommandItem
-                key={route.path}
-                onSelect={() => {
-                  setOpen(false);
-                  router.push(route.path);
-                }}
-              >
-                <route.icon className="mr-2 h-4 w-4" />
-                <span>{route.title}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-          
-          <CommandSeparator />
-          
-          <CommandGroup heading="Actions">
-             <CommandItem
-                onSelect={() => {
-                  setOpen(false);
-                  router.push(`/search?q=${encodeURIComponent(query)}`);
-                }}
-              >
-                <Search className="mr-2 h-4 w-4" />
-                <span>Search all for "{query}"</span>
-                <CommandShortcut>↵</CommandShortcut>
-              </CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </CommandDialog>
-    </>
   );
 }

@@ -632,6 +632,26 @@ bun run dev
 
 Access the application at `http://localhost:5173`
 
+### Fast Local Dev (Recommended)
+
+For faster Next.js cold compiles and HMR, run only backend services in Docker and run the frontend locally.
+
+```bash
+# Start only Postgres + backend containers
+npm run dev:docker:backend
+
+# Run Next frontend locally on host/WSL
+npm run dev -- --turbopack --hostname 0.0.0.0 --port 3001
+```
+
+Notes:
+- If you are on Windows, the biggest gain comes from opening the project in WSL2 (Linux filesystem) instead of a Windows bind mount.
+- The Docker frontend service is now optional and can be started only when needed:
+
+```bash
+npm run dev:docker:frontend
+```
+
 ### Production Build
 
 ```bash
@@ -1068,6 +1088,7 @@ VITE_STORAGE_PRESET=your_upload_preset
 
 # AI Services
 VITE_GEMINI_API_KEY=your_gemini_api_key
+GITHUB_AI_API_KEY=your_github_ai_api_key
 
 # Optional
 VITE_APP_ENV=development
@@ -1108,6 +1129,7 @@ Set the following in your deployment platform:
 - `VITE_STORAGE_CLOUD_NAME`
 - `VITE_STORAGE_PRESET`
 - `VITE_GEMINI_API_KEY`
+- `GITHUB_AI_API_KEY`
 
 ## 📝 Contributing
 

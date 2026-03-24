@@ -45,7 +45,7 @@ services:
       - "3001:3000"
     environment:
       NEXT_PUBLIC_API_URL: "http://localhost:3000"
-      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      GITHUB_AI_API_KEY: "${GITHUB_AI_API_KEY:-}"
       VITE_API_URL: "http://localhost:3000"
     depends_on:
       - backend

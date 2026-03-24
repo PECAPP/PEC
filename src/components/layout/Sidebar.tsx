@@ -271,8 +271,22 @@ export function Sidebar({
   };
 
   useEffect(() => {
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+    const isDataSaver = connection?.saveData === true;
+    const isSlowNetwork = connection?.effectiveType === '2g' || connection?.effectiveType === 'slow-2g';
+    if (isDataSaver || isSlowNetwork) {
+      return;
+    }
+
     const warmup = () => {
-      filteredItems.forEach((item) => prefetchRoute(item.path));
+      const criticalPaths = ['/dashboard', '/chat', '/profile'];
+      criticalPaths.forEach((path) => {
+        if (filteredItems.some((item) => item.path === path)) {
+          prefetchRoute(path);
+        }
+      });
     };
 
     if ("requestIdleCallback" in window) {

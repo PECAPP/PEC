@@ -1,67 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
-  User,
   Mail,
   Phone,
   MapPin,
-  Calendar,
-  BookOpen,
-  Award,
   FileText,
   Github,
-  Linkedin,
   Edit2,
   Download,
   QrCode,
-  ExternalLink,
   Loader2,
-  Briefcase,
-  GraduationCap,
-  MessageSquare,
-  Globe,
   Star,
-  CheckCircle2,
   ShieldCheck,
   Trophy,
-  Target,
-  Rocket,
   Code2,
-  Terminal,
-  Cpu,
-  Hash,
   Share2,
   Clock,
-  History,
-  Languages,
-  BadgeCheck,
   Zap,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useParams } from 'next/navigation';
-;
 import { toast } from 'sonner';
-
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-};
 
 export default function StudentProfile() {
   const { id } = useParams();
@@ -145,15 +110,10 @@ export default function StudentProfile() {
   }
 
   return (
-    <motion.div
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="container mx-auto max-w-7xl p-6"
-    >
+    <div className="container mx-auto max-w-7xl p-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Basic Info */}
-        <motion.div variants={item} className="lg:col-span-1 space-y-8">
+        <div className="lg:col-span-1 space-y-8">
           <Card className="overflow-hidden border-2 border-primary/10 shadow-xl bg-card/50 backdrop-blur-sm">
              <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20" />
              <div className="px-6 pb-6 -mt-16 text-center">
@@ -208,10 +168,10 @@ export default function StudentProfile() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Right Column: Detailed Info */}
-        <motion.div variants={item} className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 space-y-8">
            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
              <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-8">
                {['overview', 'academic', 'projects', 'achievements'].map((tab) => (
@@ -314,9 +274,9 @@ export default function StudentProfile() {
                 <Stub name="Academic Records" />
              </TabsContent>
            </Tabs>
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

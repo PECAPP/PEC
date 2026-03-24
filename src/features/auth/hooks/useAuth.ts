@@ -182,7 +182,7 @@ export function useAuth(): UseAuthResult {
         if (mounted) {
           setError(err instanceof Error ? err.message : "An error occurred");
         }
-        await authClient.logout();
+        authClient.resetSession();
         clearAuthCache();
         if (mounted) {
           setToken(null);
