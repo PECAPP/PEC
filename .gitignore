@@ -22,6 +22,7 @@ dist-ssr
 *.log
 npm-debug.log*
 yarn-debug.log*
+
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
@@ -81,3 +82,4 @@ index.html
 vite.config.ts
 tsconfig.app.json
 tsconfig.node.json
+PEC_ERP_Report.tex
