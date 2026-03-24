@@ -107,11 +107,16 @@ const buildDailyTargets = (totalSessions: number, seed: string) => {
 
   let remaining = totalSessions - guaranteed;
   let pointer = 0;
-  while (remaining > 0) {
+  let stagnantCycles = 0;
+  
+  while (remaining > 0 && stagnantCycles < weekdayOrder.length) {
     const day = weekdayOrder[pointer % weekdayOrder.length];
-    if (targets[day] < 5) {
+    if (targets[day] < SLOT_TIMES.length) {
       targets[day] += 1;
       remaining -= 1;
+      stagnantCycles = 0;
+    } else {
+      stagnantCycles += 1;
     }
     pointer += 1;
   }
@@ -301,7 +306,7 @@ export function generateTimetable(
 
     let scheduled = false;
     for (const day of candidateDays) {
-      if (dayCounts[day] >= 5) continue;
+      if (dayCounts[day] >= SLOT_TIMES.length) continue;
 
       scheduled = scheduleIntoDay(
         session,

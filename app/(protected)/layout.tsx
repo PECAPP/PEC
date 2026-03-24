@@ -195,7 +195,7 @@ export default function ProtectedLayout({
         className={cn(
           'pt-16 min-h-screen transition-all duration-150 relative overflow-hidden',
           isMobile ? 'pl-0' : (sidebarCollapsed ? 'pl-16' : 'pl-64'),
-          isMobile && user.role === 'student' && 'pb-16'
+          isMobile && 'pb-16'
         )}
       >
         <div className="mesh-content-overlay" aria-hidden="true" />
@@ -208,7 +208,7 @@ export default function ProtectedLayout({
           {!pathname?.endsWith("/chat") && <FloatingAIChat />}
         </div>
       </main>
-      {isMobile && user.role === 'student' && <BottomNav />}
+      {isMobile && <BottomNav />}
     </div>
   );
 }

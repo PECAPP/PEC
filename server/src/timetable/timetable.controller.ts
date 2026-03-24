@@ -17,13 +17,15 @@ import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { RateLimit } from '../common/decorators/rate-limit-options.decorator';
 
 @UseGuards(AuthGuard, RolesGuard)
+@RateLimit({ limit: 2000, windowMs: 60_000, banAfterExceeded: 5 })
 @Controller('timetable')
 export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get()
   async findAll(@Query() query: TimetableQueryDto) {
     const result = await this.timetableService.findAll(query);
@@ -34,21 +36,21 @@ export class TimetableController {
     });
   }
 
-  @Roles('faculty', 'college_admin')
+  @Roles('faculty', 'college_admin', 'admin')
   @Post()
   async create(@Body() body: CreateTimetableDto) {
     const data = await this.timetableService.create(body);
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin')
+  @Roles('faculty', 'college_admin', 'admin')
   @Patch(':id')
   async update(@Param('id') id: string, @Body() body: UpdateTimetableDto) {
     const data = await this.timetableService.update(id, body);
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin')
+  @Roles('faculty', 'college_admin', 'admin')
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const data = await this.timetableService.remove(id);
