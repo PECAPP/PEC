@@ -6,6 +6,7 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 export const api = axios.create({
   baseURL: apiBaseUrl,
   withCredentials: true,
+  timeout: 15000,
 });
 
 let isRefreshing = false;

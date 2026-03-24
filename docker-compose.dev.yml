@@ -43,13 +43,15 @@ services:
   frontend:
     image: node:20-alpine
     container_name: pec_frontend_dev
+    profiles:
+      - frontend
     working_dir: /app
     restart: unless-stopped
     ports:
       - "3001:3001"
     environment:
       NEXT_PUBLIC_API_URL: "http://localhost:3000"
-      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      GITHUB_AI_API_KEY: "${GITHUB_AI_API_KEY:-}"
       VITE_API_URL: "http://localhost:3000"
       NEXT_TELEMETRY_DISABLED: "1"
       CHOKIDAR_USEPOLLING: "true"

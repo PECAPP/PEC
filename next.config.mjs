@@ -23,6 +23,7 @@ const nextConfig = {
   },
   // Turbopack compatibility for packages that assume Node/canvas in browser context
   turbopack: {
+    root: __dirname,
     resolveAlias: {
       canvas: './src/lib/empty-module.ts',
       fs: './src/lib/empty-module.ts',

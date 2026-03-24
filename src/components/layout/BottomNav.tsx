@@ -1,5 +1,6 @@
 
-import { NavLink, usePathname, useParams } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname, useParams } from 'next/navigation';
 import { 
   LayoutDashboard, 
   MessageCircle, 
@@ -10,8 +11,9 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 export function BottomNav() {
-  const location = usePathname();
-  const { orgSlug } = useParams<{ orgSlug: string }>();
+  const pathname = usePathname() || '/';
+  const params = useParams<{ orgSlug?: string | string[] }>();
+  const orgSlug = typeof params?.orgSlug === 'string' ? params.orgSlug : null;
 
   const navItems = [
     {
@@ -40,17 +42,19 @@ export function BottomNav() {
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-t border-border lg:hidden pb-safe">
       <nav className="flex justify-around items-center h-16 px-1">
         {navItems.map((item) => {
-          const currentPath = orgSlug && location.pathname.startsWith(`/${orgSlug}`)
-              ? location.pathname.slice(`/${orgSlug}`.length) || '/'
-              : location.pathname;
+          const orgPrefix = orgSlug ? `/${orgSlug}` : '';
+          const currentPath = orgPrefix && pathname.startsWith(orgPrefix)
+              ? pathname.slice(orgPrefix.length) || '/'
+              : pathname;
               
-          const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
-          const finalPath = orgSlug ? `/${orgSlug}${item.path}` : item.path;
+          const itemPath = item.path || '/';
+          const isActive = currentPath === itemPath || currentPath.startsWith(itemPath + '/');
+          const finalPath = orgSlug ? `/${orgSlug}${itemPath}` : itemPath;
 
           return (
-            <NavLink
-              key={item.path}
-              to={finalPath}
+            <Link
+              key={itemPath}
+              href={finalPath}
               className={cn(
                 "flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform",
                 isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -66,7 +70,7 @@ export function BottomNav() {
                 )}
               </div>
               <span className="text-[10px] font-medium">{item.label}</span>
-            </NavLink>
+            </Link>
           );
         })}
       </nav>
