@@ -35,12 +35,7 @@ interface GoogleTranslateProps {
 const languageOptions = [
   { value: 'en', nativeLabel: 'English', flag: '🇬🇧' },
   { value: 'hi', nativeLabel: 'हिन्दी', flag: '🇮🇳' },
-  { value: 'fr', nativeLabel: 'Français', flag: '🇫🇷' },
-  { value: 'es', nativeLabel: 'Español', flag: '🇪🇸' },
-  { value: 'de', nativeLabel: 'Deutsch', flag: '🇩🇪' },
-  { value: 'zh-CN', nativeLabel: '简体中文', flag: '🇨🇳' },
-  { value: 'ja', nativeLabel: '日本語', flag: '🇯🇵' },
-  { value: 'ar', nativeLabel: 'العربية', flag: '🇸🇦' },
+  { value: 'pa', nativeLabel: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
 ];
 
 const LANGUAGE_STORAGE_KEY = 'ui.language';
@@ -235,53 +230,6 @@ export function GoogleTranslate({
         className="google-translate-container pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0" 
       />
       
-      <style>{`
-        /* Hide Google Translate UI chrome; we only want our custom picker */
-        .goog-te-banner-frame,
-        .goog-te-banner-frame.skiptranslate,
-        .goog-te-balloon-frame,
-        iframe.goog-te-banner-frame,
-        iframe.goog-te-banner-frame.skiptranslate,
-        iframe.goog-te-balloon-frame,
-        .VIpgJd-ZVi9od-ORHb-OEVmcd,
-        .VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
-        .VIpgJd-ZVi9od-l4eHX-hSRGPd {
-          display: none !important;
-          visibility: hidden !important;
-        }
-
-        .goog-logo-link {
-          display: none !important;
-        }
-
-        body { top: 0px !important; }
-        html { margin-top: 0 !important; }
-        
-        /* Keep Google widget hidden; we drive it from custom select */
-        .goog-te-gadget {
-          font-size: 0 !important;
-          color: transparent !important;
-          visibility: hidden !important;
-        }
-        
-        .goog-te-combo {
-          visibility: hidden !important;
-          height: 0 !important;
-          width: 0 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          border: 0 !important;
-        }
-
-        /* Hide all other Google clutter */
-        .goog-te-gadget span {
-          display: none !important;
-        }
-        
-        .goog-te-gadget-simple {
-          display: none !important;
-        }
-      `}</style>
     </div>
   );
 }

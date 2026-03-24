@@ -76,6 +76,7 @@
     "motion": "^12.23.26",
     "next": "^15.1.6",
     "next-themes": "^0.4.3",
+    "nextjs-toploader": "^3.9.17",
     "openai": "^6.16.0",
     "papaparse": "^5.5.3",
     "pdfjs-dist": "^3.11.174",

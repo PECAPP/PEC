@@ -32,8 +32,7 @@ import { useRouter } from 'next/navigation';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
 import BulkUpload from '@/components/BulkUpload';
-import { exportUserListPDF } from '@/lib/pdfExport';
-import PDFExportButton from '@/components/common/PDFExportButton';
+
 import { api } from '@/lib/api';
 
 interface CourseMaterial {

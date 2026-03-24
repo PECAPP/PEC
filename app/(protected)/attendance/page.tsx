@@ -41,7 +41,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
 import BulkUpload from '@/components/BulkUpload';
 import * as XLSX from 'xlsx';
-import { exportAttendanceReport } from '@/lib/pdfExport';
+
 import PDFExportButton from '@/components/common/PDFExportButton';
 import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
 import api from '@/lib/api';
@@ -324,6 +324,7 @@ function AttendanceManager({ userId, userRole }: { userId: string; userRole: str
                  toast.error('Please select a course first');
                  return;
                }
+               const { exportAttendanceReport } = await import('@/lib/pdfExport');
                const course = courses.find(c => c.id === selectedCourse);
                const attendanceData = students.map(s => ({
                  studentName: s.name,

@@ -12,7 +12,7 @@ interface AnimatedCounterProps {
   decimals?: number;
   className?: string;
 }
- /** Animated counter that counts up when scrolled into view
+ /** Animated counter that counts up when scrolled into view */
 export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   end,
   duration = 2,

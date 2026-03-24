@@ -15,7 +15,7 @@ import {
   Filter,
 } from "lucide-react";
 import BulkUpload from "@/components/BulkUpload";
-import { exportTimetablePDF } from "@/lib/pdfExport";
+
 import PDFExportButton from "@/components/common/PDFExportButton";
 import * as XLSX from "xlsx";
 import { useRouter } from 'next/navigation';
@@ -331,28 +331,41 @@ export default function Timetable() {
         departments
       );
 
-      const existingTimetable = await fetchAllPages<any>('/timetable');
-      const deletePromises = existingTimetable.map((item: any) => api.delete(`/timetable/${item.id}`));
-      await Promise.all(deletePromises);
+      const chunkArray = <T,>(array: T[], size: number): T[][] => {
+        const result = [];
+        for (let i = 0; i < array.length; i += size) {
+          result.push(array.slice(i, i + size));
+        }
+        return result;
+      };
 
-      const addPromises = entries.map((entry) => {
-        const { startTime, endTime } = parseTimeSlot(entry.timeSlot);
-        return api.post('/timetable', {
-          day: entry.day,
-          startTime,
-          endTime,
-          courseId: entry.courseId,
-          courseName: entry.courseName,
-          courseCode: entry.courseCode,
-          facultyId: entry.facultyId || undefined,
-          facultyName: entry.facultyName || undefined,
-          department: entry.department,
-          room: entry.room || 'TBD',
-          semester: entry.semester || undefined,
-          batch: entry.batch || undefined,
+      const existingTimetable = await fetchAllPages<any>('/timetable');
+      const deleteChunks = chunkArray(existingTimetable, 20);
+      for (const chunk of deleteChunks) {
+        await Promise.all(chunk.map((item: any) => api.delete(`/timetable/${item.id}`)));
+      }
+
+      const addChunks = chunkArray(entries, 20);
+      for (const chunk of addChunks) {
+        const addPromises = chunk.map((entry) => {
+          const { startTime, endTime } = parseTimeSlot(entry.timeSlot);
+          return api.post('/timetable', {
+            day: entry.day,
+            startTime,
+            endTime,
+            courseId: entry.courseId,
+            courseName: entry.courseName,
+            courseCode: entry.courseCode,
+            facultyId: entry.facultyId || undefined,
+            facultyName: entry.facultyName || undefined,
+            department: entry.department,
+            room: entry.room || 'TBD',
+            semester: entry.semester || undefined,
+            batch: entry.batch || undefined,
+          });
         });
-      });
-      await Promise.all(addPromises);
+        await Promise.all(addPromises);
+      }
 
       await fetchData(); // Refresh display
       toast.success(`Timetable generated! ${summary}`);
@@ -431,8 +444,8 @@ export default function Timetable() {
           courseId: draggedCourse.id,
           courseName: draggedCourse.name,
           courseCode: draggedCourse.code,
-          facultyId: draggedCourse.facultyId || "",
-          facultyName: draggedCourse.facultyName || "",
+          facultyId: draggedCourse.facultyId || undefined,
+          facultyName: draggedCourse.facultyName || undefined,
           department: draggedCourse.department,
           room: "TBD",
         });
@@ -504,8 +517,8 @@ export default function Timetable() {
           courseId: course.id,
           courseName: course.name,
           courseCode: course.code,
-          facultyId: course.facultyId || "",
-          facultyName: course.facultyName || "",
+          facultyId: course.facultyId || undefined,
+          facultyName: course.facultyName || undefined,
           department: course.department,
           room: slotForm.room,
         });
@@ -518,8 +531,8 @@ export default function Timetable() {
           courseId: course.id,
           courseName: course.name,
           courseCode: course.code,
-          facultyId: course.facultyId || "",
-          facultyName: course.facultyName || "",
+          facultyId: course.facultyId || undefined,
+          facultyName: course.facultyName || undefined,
           department: course.department,
           room: slotForm.room,
         });
@@ -571,6 +584,7 @@ export default function Timetable() {
         <div className="button-group">
           <PDFExportButton
             onExport={async () => {
+              const { exportTimetablePDF } = await import('@/lib/pdfExport');
               const timetableData = Object.entries(timetable).flatMap(
                 ([key, slots]: [string, any]) => {
                   const [day, timeSlot] = key.split("_");

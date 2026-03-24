@@ -42,12 +42,16 @@ import { useRouter } from 'next/navigation';
 ;
 import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
-import BulkUpload from '@/components/BulkUpload';
-import * as XLSX from 'xlsx';
-import { exportCourseListPDF } from '@/lib/pdfExport';
+import dynamic from 'next/dynamic';
+
 import PDFExportButton from '@/components/common/PDFExportButton';
 import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
 import api from '@/lib/api';
+
+const BulkUpload = dynamic(() => import('@/components/BulkUpload'), {
+  ssr: false,
+  loading: () => <div className="p-8 text-center text-muted-foreground animate-pulse">Loading uploader...</div>
+});
 
 interface Course {
   id: string;
@@ -137,7 +141,7 @@ export default function Courses() {
     return { success: successCount, failed: failCount, errors };
   };
 
-  const exportCourses = () => {
+  const exportCourses = async () => {
     const exportData = courses.map(c => ({
       code: c.code,
       name: c.name,
@@ -149,6 +153,7 @@ export default function Courses() {
       enrolledStudents: c.enrolledStudents
     }));
 
+    const XLSX = await import('xlsx');
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Courses');
@@ -518,6 +523,7 @@ export default function Courses() {
           <div className="flex flex-col sm:flex-row gap-2">
             <PDFExportButton
               onExport={async () => {
+                const { exportCourseListPDF } = await import('@/lib/pdfExport');
                 exportCourseListPDF(filteredCourses);
               }}
               label="Export PDF"

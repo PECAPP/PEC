@@ -2,8 +2,10 @@ import { useEffect, useRef, MutableRefObject } from 'react';
 import gsap from 'gsap';
 
 type GSAPCallback = (context: gsap.Context) => void | (() => void);
- /** Custom hook for GSAP animations with React 18 compatibility
- /** Provides proper cleanup and context management
+ /**
+  * Custom hook for GSAP animations with React 18 compatibility
+  * Provides proper cleanup and context management
+  */
 export const useGSAP = (
   callback: GSAPCallback,
   dependencies: any[] = []

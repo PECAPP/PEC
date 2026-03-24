@@ -19,13 +19,52 @@ html {
   scroll-behavior: smooth;
 }
 
-/* HIDE GOOGLE TRANSLATE BANNER FRAME */
-.goog-te-banner-frame {
+/* HIDE GOOGLE TRANSLATE BANNER FRAME GLOBALLY */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+.goog-te-balloon-frame,
+iframe.goog-te-banner-frame,
+iframe.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-balloon-frame,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+.VIpgJd-ZVi9od-l4eHX-hSRGPd,
+#goog-gt-tt,
+.skiptranslate > iframe.goog-te-banner-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.goog-logo-link {
   display: none !important;
 }
 
-body {
-  top: 0px !important;
+body { top: 0px !important; position: static !important; }
+html { margin-top: 0 !important; top: 0px !important; }
+
+/* Keep Google widget hidden */
+.goog-te-gadget {
+  font-size: 0 !important;
+  color: transparent !important;
+  visibility: hidden !important;
+}
+
+.goog-te-combo {
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* Hide all other Google clutter */
+.goog-te-gadget span {
+  display: none !important;
+}
+
+.goog-te-gadget-simple {
+  display: none !important;
 }
 
 /* ====================================

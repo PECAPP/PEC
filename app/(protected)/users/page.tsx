@@ -1,7 +1,7 @@
 'use client';
 
 import { useDeferredValue, useMemo, useState, useEffect } from 'react';
-import { exportUserListPDF } from '@/lib/pdfExport';
+
 import PDFExportButton from '@/components/common/PDFExportButton';
 import {
   Users as UsersIcon,
@@ -43,13 +43,17 @@ import {
 } from '@/lib/dataClient';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useDepartmentFilter } from '@/hooks/useDepartmentFilter';
-import BulkUpload from '@/components/BulkUpload';
-import * as XLSX from 'xlsx';
+import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
 import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
 import { VirtualList } from '@/components/ui/virtual-list';
 import api from '@/lib/api';
+
+const BulkUpload = dynamic(() => import('@/components/BulkUpload'), {
+  ssr: false,
+  loading: () => <div className="p-8 text-center text-muted-foreground animate-pulse">Loading uploader...</div>
+});
 
 export default function Users() {
   const router = useRouter();
@@ -106,7 +110,7 @@ export default function Users() {
     };
 
     loadUsers();
-  }, [user, isAdmin, isFaculty, navigate, authLoading, orgSlug]);
+  }, [user, isAdmin, isFaculty, router, authLoading, orgSlug]);
 
   const fetchUsers = async () => {
     try {
@@ -280,7 +284,7 @@ export default function Users() {
     return { success: successCount, failed: failCount, errors };
   };
 
-  const exportUsers = () => {
+  const exportUsers = async () => {
     const exportData = filteredUsers.map(user => ({
       fullName: user.fullName,
       email: user.email,
@@ -289,6 +293,7 @@ export default function Users() {
       createdAt: user.createdAt?.toDate?.()?.toLocaleDateString() || '',
     }));
 
+    const XLSX = await import('xlsx');
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
@@ -414,6 +419,7 @@ export default function Users() {
         <div className="button-group">
           <PDFExportButton
             onExport={async () => {
+              const { exportUserListPDF } = await import('@/lib/pdfExport');
               exportUserListPDF(filteredUsers, roleFilter === 'all' ? 'All Users' : roleFilter);
             }}
             label="Export PDF"

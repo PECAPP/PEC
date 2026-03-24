@@ -7,6 +7,33 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 
+// Use a separate component to isolate the timing effect 
+// It logs transition times automatically in dev mode.
+function RouteTimingHelper() {
+  const pathname = usePathname();
+  
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return;
+    
+    // Performance observer to catch the first paint after navigation
+    const start = performance.now();
+    let mounted = true;
+
+    requestAnimationFrame(() => {
+      // Wait for next frame to ensure React has rendered
+      setTimeout(() => {
+        if (!mounted) return;
+        const end = performance.now();
+        console.log(`[RouteTiming] ${pathname} rendered in ${Math.round(end - start)}ms`);
+      }, 0);
+    });
+
+    return () => { mounted = false; };
+  }, [pathname]);
+
+  return null;
+}
+
 const Sidebar = dynamic(
   () => import('@/components/layout/Sidebar').then((mod) => mod.Sidebar),
   {
@@ -172,7 +199,11 @@ export default function ProtectedLayout({
         )}
       >
         <div className="mesh-content-overlay" aria-hidden="true" />
-        <div className={cn(pathname?.endsWith("/chat") ? "p-0" : "p-4 md:p-5 lg:p-6 ui-section-gap", "relative z-10")}>
+        <div className={cn(
+          (pathname?.endsWith("/chat") || pathname?.includes("/resume-builder")) ? "p-0" : "p-4 md:p-5 lg:p-6 ui-section-gap", 
+          "relative z-10"
+        )}>
+          {process.env.NODE_ENV === 'development' && <RouteTimingHelper />}
           {children}
           {!pathname?.endsWith("/chat") && <FloatingAIChat />}
         </div>

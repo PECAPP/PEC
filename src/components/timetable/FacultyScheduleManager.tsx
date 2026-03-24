@@ -82,41 +82,47 @@ export function FacultyScheduleManager({ courses, onScheduleAdded }: FacultySche
         reason: formData.reason,
         notificationSent: false,
         createdAt: serverTimestamp(),
+        department: course.department || "General",
+        semester: course.semester || 1,
       });
 
-      // Send notifications to enrolled students
-      const batch = writeBatch(({} as any));
-      
-      // Find students in this course's department and semester
-      // Note: This is a simplified logic. In a real app, you'd check specific course enrollment.
-      if (course.department && course.semester) {
-        const studentsQuery = query(
-          collection(({} as any), 'users'),
-          where('role', '==', 'student'),
-          where('department', '==', course.department),
-          where('semester', '==', course.semester)
-        );
+      // Try to send notifications, but ignore if the backend doesn't support it yet
+      try {
+        const batch = writeBatch();
         
-        const studentsSnap = await getDocs(studentsQuery);
-        
-        studentsSnap.forEach((studentDoc) => {
-          const notifRef = doc(collection(({} as any), 'notifications'));
-          batch.set(notifRef, {
-            userId: studentDoc.id,
-            title: `${formData.type === 'extra' ? 'Extra Class' : 'Makeup Class'} Scheduled`,
-            message: `${course.name}: ${formData.type === 'extra' ? 'Extra' : 'Makeup'} class on ${new Date(formData.date).toLocaleDateString()} at ${formData.startTime}`,
-            type: 'agenda', // or 'info'
-            read: false,
-            createdAt: serverTimestamp(),
-            relatedId: formData.courseId
-          });
-        });
-        
-        await batch.commit();
-        toast({
-            title: "Notifications Sent",
-            description: `Notified ${studentsSnap.size} students.`,
-        });
+        if (course.department && course.semester) {
+          const studentsQuery = query(
+            collection(({} as any), 'users'),
+            where('role', '==', 'student'),
+            where('department', '==', course.department),
+            where('semester', '==', course.semester)
+          );
+          
+          const studentsSnap = await getDocs(studentsQuery);
+          
+          if (!studentsSnap.empty) {
+            studentsSnap.docs.forEach((item: any) => {
+              const studentDoc = typeof item.data === 'function' ? item.data() : item;
+              const notifRef = doc(collection(({} as any), 'notifications'));
+              batch.set(notifRef, {
+                userId: studentDoc.id || item.id,
+                title: `${formData.type === 'extra' ? 'Extra Class' : 'Makeup Class'} Scheduled`,
+                message: `${course.name}: ${formData.type === 'extra' ? 'Extra' : 'Makeup'} class on ${new Date(formData.date).toLocaleDateString()} at ${formData.startTime}`,
+                type: 'agenda',
+                read: false,
+                createdAt: serverTimestamp(),
+                relatedId: formData.courseId
+              });
+            });
+            await batch.commit();
+            toast({
+                title: "Notifications Sent",
+                description: `Notified ${studentsSnap.size} students.`,
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("Notifications not supported or failed", err);
       }
 
       toast({

@@ -229,7 +229,7 @@ export default function ResumeBuilderIvyLeague() {
               email: user.email || prev.personalInfo.email,
               phone: profile.phone || prev.personalInfo.phone,
               location:
-                `${profile.city || ""}, ${profile.state || ""}`.trim() ||
+                [profile.city, profile.state].filter(Boolean).join(", ") ||
                 prev.personalInfo.location,
               linkedin: profile.linkedinUsername
                 ? `linkedin.com/in/${profile.linkedinUsername}`
@@ -1087,9 +1087,9 @@ const handleAnalyze = async (customFile?: File) => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className={cn(
-                "xl:col-span-6 sticky top-24",
+                "xl:col-span-6",
                 preview
-                  ? "xl:col-span-12 relative top-0 mx-auto max-w-4xl"
+                  ? "xl:col-span-12 relative mx-auto max-w-4xl"
                   : "",
               )}
             >
@@ -1099,14 +1099,14 @@ const handleAnalyze = async (customFile?: File) => {
                   width: "8.5in",
                   minHeight: "11in",
                   transform: preview ? "none" : `scale(${zoom})`,
-                  transformOrigin: "top center",
-                  margin: preview ? "0 auto" : "0 auto",
+                  transformOrigin: preview ? "top center" : "top left",
+                  margin: preview ? "0 auto" : "0",
                 }}
               >
-                <div className="p-[0.75in]">
+                <div className="p-[0.4in]">
                   {/* Resume Header */}
                   <div className="text-center border-b-2 border-black pb-4 mb-4">
-                    <h1 className="text-3xl font-bold tracking-widest mb-3">
+                    <h1 className="text-3xl font-bold text-black tracking-widest mb-3">
                       {resumeData.personalInfo.name.toUpperCase()}
                     </h1>
                     <div className="text-xs flex flex-wrap justify-center gap-x-2 text-gray-800">
@@ -1136,7 +1136,7 @@ const handleAnalyze = async (customFile?: File) => {
                   <div className="space-y-5">
                     {/* Education */}
                     <section>
-                      <h2 className="text-xs font-bold border-b border-black mb-2 uppercase tracking-wider pb-0.5">
+                      <h2 className="text-xs font-bold text-black border-b border-black mb-2 uppercase tracking-wider pb-0.5">
                         Education
                       </h2>
                       {resumeData.education.map((edu, i) => (
@@ -1168,7 +1168,7 @@ const handleAnalyze = async (customFile?: File) => {
                     {/* Experience */}
                     {resumeData.experience.length > 0 && (
                       <section>
-                        <h2 className="text-xs font-bold border-b border-black mb-2 uppercase tracking-wider pb-0.5">
+                        <h2 className="text-xs font-bold text-black border-b border-black mb-2 uppercase tracking-wider pb-0.5">
                           Work Experience
                         </h2>
                         {resumeData.experience.map((exp, i) => (
@@ -1194,7 +1194,7 @@ const handleAnalyze = async (customFile?: File) => {
                     {/* Projects */}
                     {resumeData.projects.length > 0 && (
                       <section>
-                        <h2 className="text-xs font-bold border-b border-black mb-2 uppercase tracking-wider pb-0.5">
+                        <h2 className="text-xs font-bold text-black border-b border-black mb-2 uppercase tracking-wider pb-0.5">
                           Projects
                         </h2>
                         {resumeData.projects.map((proj, i) => (
@@ -1215,7 +1215,7 @@ const handleAnalyze = async (customFile?: File) => {
 
                     {/* Skills */}
                     <section>
-                      <h2 className="text-xs font-bold border-b border-black mb-2 uppercase tracking-wider pb-0.5">
+                      <h2 className="text-xs font-bold text-black border-b border-black mb-2 uppercase tracking-wider pb-0.5">
                         Skills & Interests
                       </h2>
                       <div className="text-xs space-y-1.5 leading-normal">

@@ -1,9 +1,9 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { useRouter, Link } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { exportTimetablePDF, exportAttendanceReport } from '@/lib/pdfExport';
-import PDFExportButton from '@/components/common/PDFExportButton';
+
 import {
   BookOpen,
   Users,
@@ -44,7 +44,7 @@ const item = {
 };
 
 export function FacultyDashboard() {
-  const navigate = useRouter();
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [showQRModal, setShowQRModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);

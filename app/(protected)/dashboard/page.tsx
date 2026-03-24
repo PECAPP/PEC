@@ -20,6 +20,13 @@ const createRoleDashboard = (role: string) => {
     );
   }
 
+  if (role === 'faculty') {
+    return dynamic(
+      () => import('./dashboards/FacultyDashboard').then((mod) => mod.FacultyDashboard),
+      { ssr: false, loading: dashboardLoader }
+    );
+  }
+
   return dynamic(
     () => import('./dashboards/AdminDashboard').then((mod) => mod.AdminDashboard),
     { ssr: false, loading: dashboardLoader }

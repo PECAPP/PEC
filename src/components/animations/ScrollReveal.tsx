@@ -15,7 +15,7 @@ interface ScrollRevealProps {
   stagger?: number;
   once?: boolean;
 }
- /** Reusable scroll reveal component with GSAP ScrollTrigger
+ /** Reusable scroll reveal component with GSAP ScrollTrigger */
 export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   children,
   direction = 'up',

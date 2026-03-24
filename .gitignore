@@ -83,3 +83,7 @@ vite.config.ts
 tsconfig.app.json
 tsconfig.node.json
 PEC_ERP_Report.tex
+.claude/
+.agents/
+.qoder/
+skills-lock.json
