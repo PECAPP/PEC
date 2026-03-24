@@ -1,15 +1,19 @@
 const prefetched = new Set<string>();
-let routeImportMapPromise: Promise<Record<string, () => Promise<unknown>>> | null = null;
+let routeImportMapPromise: Promise<
+  Record<string, () => Promise<unknown>>
+> | null = null;
 
 const loadRouteImportMap = async () => {
   if (!routeImportMapPromise) {
-    routeImportMapPromise = import('./routePrefetchMap').then((mod) => mod.routeImportMap);
+    routeImportMapPromise = import("./routePrefetchMap").then(
+      (mod) => mod.routeImportMap,
+    );
   }
   return routeImportMapPromise;
 };
 
 export async function prefetchRoute(path: string) {
-  if (process.env.NODE_ENV !== 'production' || prefetched.has(path)) {
+  if (process.env.NODE_ENV !== "production" || prefetched.has(path)) {
     return;
   }
 
