@@ -1,4 +1,5 @@
 export type UserRole =
+  | "admin"
   | "college_admin"
   | "faculty"
   | "student";

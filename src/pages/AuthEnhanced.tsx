@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Mail, Lock, User, Eye, EyeOff, Loader, AlertCircle, CheckCircle, Shield, X, Lightbulb, GraduationCap, Users, Building2 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
-type UserRole = 'student' | 'faculty' | 'college_admin';
+type UserRole = 'student' | 'faculty' | 'college_admin' | 'admin';
 
 interface AuthFormData {
   email: string;
@@ -73,7 +73,7 @@ export default function AuthEnhanced() {
     return () => {
       active = false;
     };
-  }, [navigate]);
+  }, [router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -129,7 +129,7 @@ export default function AuthEnhanced() {
         name: formData.fullName,
         email: formData.email,
         password: formData.password,
-        role: "student", // defaulting to student until role selection logic is built or handled
+        role: "student" as 'student', // defaulting to student until role selection logic is built or handled
       };
 
       await authClient.signup(payload);

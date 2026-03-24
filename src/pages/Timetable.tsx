@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Calendar,
   Clock,
@@ -10,7 +10,8 @@ import {
   GripVertical,
   Upload,
   Download,
-  Filter,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import BulkUpload from "@/components/BulkUpload";
 import { exportTimetablePDF } from "@/lib/pdfExport";
@@ -42,6 +43,7 @@ import {
   type CourseSchedule,
 } from "@/lib/timetableGenerator";
 import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
+import TimetableFilters, { type TimetableFilterValues } from "@/components/timetable/TimetableFilters";
 
 const DAYS = [
   "Monday",
@@ -75,6 +77,34 @@ const parseTimeSlot = (timeSlot: string) => {
   const [startTime, endTime] = timeSlot.split("-");
   return { startTime, endTime };
 };
+
+const getAcademicYearFromSemester = (semester: unknown) => {
+  const numericSemester = Number(semester);
+  if (!Number.isFinite(numericSemester) || numericSemester <= 0) return null;
+  return Math.ceil(numericSemester / 2);
+};
+
+const UUID_V4_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const getValidUuid = (value: unknown): string | undefined => {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return UUID_V4_PATTERN.test(trimmed) ? trimmed : undefined;
+};
+
+const getFacultyPayload = (course: any) => {
+  const facultyId = getValidUuid(course?.facultyId ?? course?.instructor);
+  const instructorName =
+    typeof course?.instructor === "string" ? course.instructor : "";
+  const facultyName =
+    course?.facultyName || course?.instructorName || instructorName || undefined;
+
+  return { facultyId, facultyName };
+};
+
+const isAxiosStatus = (error: unknown, status: number) =>
+  (error as any)?.response?.status === status;
 
 const fetchAllPages = async <T,>(
   path: string,
@@ -111,7 +141,13 @@ const fetchAllPages = async <T,>(
 
 export default function Timetable() {
   const router = useRouter();
-  const { isAdmin, isFaculty, user, loading: authLoading } = usePermissions();
+  const { isFaculty, user, loading: authLoading } = usePermissions();
+  const userRole = user?.role || "";
+  const isCollegeAdmin = userRole === "admin" || userRole === "college_admin" || userRole === "moderator";
+  const canAutoGenerate = isCollegeAdmin;
+  const canManageAllTimetable = isCollegeAdmin;
+  const canScheduleExtraClass = userRole === "faculty";
+  const facultyDisplayName = ((user as any)?.fullName || (user as any)?.name || "").trim();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<any[]>([]);
   const [timetable, setTimetable] = useState<any>({});
@@ -124,13 +160,30 @@ export default function Timetable() {
   const [selectedDay, setSelectedDay] = useState(initialDay);
 
   const [generating, setGenerating] = useState(false);
-  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [filterValues, setFilterValues] = useState<TimetableFilterValues>({
+    department: "all",
+    academicYear: "all",
+    batch: "all",
+    courseQuery: "",
+    facultyQuery: "",
+    roomQuery: "",
+  });
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
   const [slotForm, setSlotForm] = useState({
     courseId: "",
     room: "",
   });
   const [showBulkUpload, setShowBulkUpload] = useState(false);
+  const [showExtraClassDialog, setShowExtraClassDialog] = useState(false);
+  const [extraClassForm, setExtraClassForm] = useState({
+    courseId: "",
+    slotKey: "",
+    room: "",
+  });
+  const [coursesWrapperOpen, setCoursesWrapperOpen] = useState(true);
+  const [facultyDepartment, setFacultyDepartment] = useState("");
+  const [availableDepartments, setAvailableDepartments] = useState<string[]>([]);
+  const [availableBatches, setAvailableBatches] = useState<string[]>([]);
 
   const [studentEnrollments, setStudentEnrollments] = useState<string[]>([]);
 
@@ -162,39 +215,73 @@ export default function Timetable() {
     };
 
     loadData();
-  }, [authLoading, user, navigate]);
+  }, [authLoading, user, router]);
 
   const fetchData = async () => {
     try {
-      let coursesData = await fetchAllPages<any>('/courses');
+      const allCourses = await fetchAllPages<any>('/courses');
+      const facultyOwnedCourses =
+        isFaculty && user?.uid
+          ? allCourses.filter(
+              (course: any) =>
+                course.instructor === user.uid || course.facultyId === user.uid,
+            )
+          : [];
+      const resolvedFacultyDepartment = (
+        user?.department ||
+        facultyOwnedCourses[0]?.department ||
+        ""
+      ).trim();
 
-      if (isFaculty && user?.uid) {
-        coursesData = coursesData.filter(
-          (course: any) => course.instructor === user.uid || course.facultyId === user.uid
-        );
+      if (isFaculty) {
+        setFacultyDepartment(resolvedFacultyDepartment);
+      } else {
+        setFacultyDepartment("");
       }
 
+      const coursesData = isFaculty ? facultyOwnedCourses : allCourses;
       setCourses(coursesData);
 
       const timetableItems = await fetchAllPages<any>('/timetable');
       const timetableData: any = {};
 
-      const allowedCourseIds = coursesData.map((c) => c.id);
-
       timetableItems.forEach((item: any) => {
-        if (allowedCourseIds.includes(item.courseId)) {
-          const timeSlot = item.timeSlot || `${item.startTime}-${item.endTime}`;
-          const key = `${item.day}-${timeSlot}`;
-          if (!timetableData[key]) {
-            timetableData[key] = [];
-          }
-          timetableData[key].push({
-            ...item,
-            timeSlot,
-          });
+        if (
+          isFaculty &&
+          resolvedFacultyDepartment &&
+          item.department !== resolvedFacultyDepartment
+        ) {
+          return;
         }
+
+        const timeSlot = item.timeSlot || `${item.startTime}-${item.endTime}`;
+        const key = `${item.day}-${timeSlot}`;
+        if (!timetableData[key]) {
+          timetableData[key] = [];
+        }
+        timetableData[key].push({
+          ...item,
+          timeSlot,
+        });
       });
 
+      const departmentsFromData = Array.from(
+        new Set(
+          [...allCourses, ...timetableItems]
+            .map((item: any) => String(item?.department || "").trim())
+            .filter(Boolean),
+        ),
+      ).sort();
+      const batchesFromData = Array.from(
+        new Set(
+          timetableItems
+            .map((item: any) => String(item?.batch || "").trim())
+            .filter(Boolean),
+        ),
+      ).sort();
+
+      setAvailableDepartments(departmentsFromData);
+      setAvailableBatches(batchesFromData);
       setTimetable(timetableData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -232,6 +319,7 @@ export default function Timetable() {
               room: row.room || "TBD",
             });
           } else {
+            const { facultyId, facultyName } = getFacultyPayload(course);
             await api.post('/timetable', {
               day: row.day,
               startTime,
@@ -239,14 +327,15 @@ export default function Timetable() {
               courseId: course.id,
               courseName: course.name,
               courseCode: course.code,
-              facultyId: course.facultyId || course.instructor || undefined,
-              facultyName: course.facultyName || course.instructorName || undefined,
+              facultyId,
+              facultyName,
               room: row.room || "TBD",
               department: course.department,
             });
           }
         } else {
           const { startTime, endTime } = parseTimeSlot(row.timeSlot);
+          const { facultyId, facultyName } = getFacultyPayload(course);
           await api.post('/timetable', {
             day: row.day,
             startTime,
@@ -254,8 +343,8 @@ export default function Timetable() {
             courseId: course.id,
             courseName: course.name,
             courseCode: course.code,
-            facultyId: course.facultyId || course.instructor || undefined,
-            facultyName: course.facultyName || course.instructorName || undefined,
+            facultyId,
+            facultyName,
             room: row.room || "TBD",
             department: course.department,
           });
@@ -272,13 +361,15 @@ export default function Timetable() {
   };
 
   const exportTimetable = () => {
-    const exportData = Object.values(timetable).map((slot: any) => ({
-      day: slot.day,
-      timeSlot: slot.timeSlot,
-      courseCode: slot.courseCode,
-      courseName: slot.courseName,
-      room: slot.room,
-    }));
+    const exportData = Object.values(timetable).flatMap((slotGroup: any) =>
+      (Array.isArray(slotGroup) ? slotGroup : [slotGroup]).map((slot: any) => ({
+        day: slot.day,
+        timeSlot: slot.timeSlot,
+        courseCode: slot.courseCode,
+        courseName: slot.courseName,
+        room: slot.room,
+      })),
+    );
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
@@ -298,24 +389,27 @@ export default function Timetable() {
   ];
 
   const handleAutoGenerate = async () => {
-    if (!isAdmin) {
-      toast.error("Only admins can auto-generate timetables");
+    if (!canAutoGenerate) {
+      toast.error("Only college admins can auto-generate timetables");
       return;
     }
 
     setGenerating(true);
     try {
       const allCoursesRaw = await fetchAllPages<any>('/courses');
-      const allCourses: CourseSchedule[] = allCoursesRaw.map((course: any) => ({
-        courseId: course.id,
-        courseName: course.name,
-        courseCode: course.code,
-        facultyId: course.facultyId || course.instructor || "",
-        facultyName: course.facultyName || course.instructorName || course.instructor || "",
-        department: (course.department || "").trim(),
-        semester: course.semester || 1,
-        credits: course.credits || 3,
-      }));
+      const allCourses: CourseSchedule[] = allCoursesRaw.map((course: any) => {
+        const { facultyId, facultyName } = getFacultyPayload(course);
+        return {
+          courseId: course.id,
+          courseName: course.name,
+          courseCode: course.code,
+          facultyId: facultyId || "",
+          facultyName: facultyName || "",
+          department: (course.department || "").trim(),
+          semester: course.semester || 1,
+          credits: course.credits || 3,
+        };
+      });
 
       // Get all unique departments
       const departments = [
@@ -329,8 +423,17 @@ export default function Timetable() {
       );
 
       const existingTimetable = await fetchAllPages<any>('/timetable');
-      const deletePromises = existingTimetable.map((item: any) => api.delete(`/timetable/${item.id}`));
-      await Promise.all(deletePromises);
+      const deleteResults = await Promise.allSettled(
+        existingTimetable.map((item: any) => api.delete(`/timetable/${item.id}`)),
+      );
+      const fatalDeleteErrors = deleteResults
+        .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+        .map((result) => result.reason)
+        .filter((error) => !isAxiosStatus(error, 404));
+
+      if (fatalDeleteErrors.length > 0) {
+        throw fatalDeleteErrors[0];
+      }
 
       const addPromises = entries.map((entry) => {
         const { startTime, endTime } = parseTimeSlot(entry.timeSlot);
@@ -341,7 +444,7 @@ export default function Timetable() {
           courseId: entry.courseId,
           courseName: entry.courseName,
           courseCode: entry.courseCode,
-          facultyId: entry.facultyId || undefined,
+          facultyId: getValidUuid(entry.facultyId),
           facultyName: entry.facultyName || undefined,
           department: entry.department,
           room: entry.room || 'TBD',
@@ -355,6 +458,11 @@ export default function Timetable() {
       toast.success(`Timetable generated! ${summary}`);
     } catch (error) {
       console.error("Error generating timetable:", error);
+      if (isAxiosStatus(error, 401)) {
+        toast.error("Session expired. Please login again.");
+        router.replace("/auth");
+        return;
+      }
       toast.error("Failed to generate timetable");
     } finally {
       setGenerating(false);
@@ -362,7 +470,7 @@ export default function Timetable() {
   };
 
   const handleDragStart = (e: React.DragEvent, course: any) => {
-    if (!isAdmin) return;
+    if (!canManageAllTimetable) return;
     setDraggedCourse(course);
     e.dataTransfer!.effectAllowed = "copy";
     e.dataTransfer!.setData("text/plain", JSON.stringify(course));
@@ -371,7 +479,7 @@ export default function Timetable() {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isAdmin) return;
+    if (!canManageAllTimetable) return;
     e.dataTransfer!.dropEffect = "copy";
     
     // Auto-scroll when dragging near edges
@@ -421,6 +529,7 @@ export default function Timetable() {
         });
       } else {
         const { startTime, endTime } = parseTimeSlot(timeSlot);
+        const { facultyId, facultyName } = getFacultyPayload(draggedCourse);
         await api.post('/timetable', {
           day,
           startTime,
@@ -428,8 +537,8 @@ export default function Timetable() {
           courseId: draggedCourse.id,
           courseName: draggedCourse.name,
           courseCode: draggedCourse.code,
-          facultyId: draggedCourse.facultyId || "",
-          facultyName: draggedCourse.facultyName || "",
+          facultyId,
+          facultyName,
           department: draggedCourse.department,
           room: "TBD",
         });
@@ -492,6 +601,7 @@ export default function Timetable() {
     }
 
     try {
+      const { facultyId, facultyName } = getFacultyPayload(course);
       if (selectedSlot.id) {
         const { startTime, endTime } = parseTimeSlot(selectedSlot.timeSlot);
         await api.patch(`/timetable/${selectedSlot.id}`, {
@@ -501,8 +611,8 @@ export default function Timetable() {
           courseId: course.id,
           courseName: course.name,
           courseCode: course.code,
-          facultyId: course.facultyId || "",
-          facultyName: course.facultyName || "",
+          facultyId,
+          facultyName,
           department: course.department,
           room: slotForm.room,
         });
@@ -515,8 +625,8 @@ export default function Timetable() {
           courseId: course.id,
           courseName: course.name,
           courseCode: course.code,
-          facultyId: course.facultyId || "",
-          facultyName: course.facultyName || "",
+          facultyId,
+          facultyName,
           department: course.department,
           room: slotForm.room,
         });
@@ -528,6 +638,89 @@ export default function Timetable() {
     } catch (error) {
       console.error("Error saving slot:", error);
       toast.error("Failed to save slot");
+    }
+  };
+
+  const isSlotOwnedByFaculty = (slot: any) => {
+    if (!canScheduleExtraClass || !user?.uid) return false;
+    return (
+      slot?.facultyId === user.uid ||
+      (!!facultyDisplayName && slot?.facultyName === facultyDisplayName)
+    );
+  };
+
+  const availableFacultySlots = DAYS
+    .flatMap((day) =>
+      TIME_SLOTS.filter((timeSlot) => timeSlot !== "13:00-14:00").map((timeSlot) => {
+        const key = `${day}-${timeSlot}`;
+        const slots = timetable[key] || [];
+        const hasFacultyClass = slots.some((slot: any) => isSlotOwnedByFaculty(slot));
+        return hasFacultyClass ? null : { key, label: `${day} ${timeSlot}` };
+      }),
+    )
+    .filter(Boolean) as Array<{ key: string; label: string }>;
+
+  const handleScheduleExtraClass = async () => {
+    if (!canScheduleExtraClass) return;
+
+    const course = courses.find((item) => item.id === extraClassForm.courseId);
+    if (!course) {
+      toast.error("Please select your course");
+      return;
+    }
+    if (!extraClassForm.slotKey) {
+      toast.error("Please select a free slot");
+      return;
+    }
+
+    const [day, ...timeSlotParts] = extraClassForm.slotKey.split("-");
+    const timeSlot = timeSlotParts.join("-");
+    const { startTime, endTime } = parseTimeSlot(timeSlot);
+    const slotsAtTime = timetable[extraClassForm.slotKey] || [];
+
+    const hasFacultyClash = slotsAtTime.some((slot: any) => isSlotOwnedByFaculty(slot));
+    if (hasFacultyClash) {
+      toast.error("You already have a class in this slot");
+      return;
+    }
+
+    const room = extraClassForm.room.trim() || "TBD";
+    const roomOccupied = slotsAtTime.some(
+      (slot: any) => String(slot.room || "").toLowerCase() === room.toLowerCase(),
+    );
+    if (roomOccupied) {
+      toast.error("Selected room is occupied in this slot");
+      return;
+    }
+
+    try {
+      const { facultyId, facultyName } = getFacultyPayload({
+        ...course,
+        facultyId: user.uid,
+        facultyName: facultyDisplayName || course.facultyName,
+      });
+
+      await api.post("/timetable", {
+        day,
+        startTime,
+        endTime,
+        courseId: course.id,
+        courseName: course.name,
+        courseCode: course.code,
+        facultyId,
+        facultyName,
+        department: course.department || undefined,
+        semester: course.semester || undefined,
+        room,
+      });
+
+      toast.success("Extra class scheduled");
+      setShowExtraClassDialog(false);
+      setExtraClassForm({ courseId: "", slotKey: "", room: "" });
+      await fetchData();
+    } catch (error) {
+      console.error("Error scheduling extra class:", error);
+      toast.error("Failed to schedule extra class");
     }
   };
 
@@ -547,6 +740,78 @@ export default function Timetable() {
       return "upcoming";
   };
 
+  const handleFilterChange = (next: Partial<TimetableFilterValues>) => {
+    setFilterValues((previous) => ({ ...previous, ...next }));
+  };
+
+  const applySlotFilters = (slots: any[]) => {
+    let filteredSlots = slots || [];
+
+    if (user.role === "student") {
+      filteredSlots = filteredSlots.filter((slot: any) =>
+        studentEnrollments.includes(slot.courseId),
+      );
+    }
+
+    if (user.role === "faculty" && facultyDepartment) {
+      filteredSlots = filteredSlots.filter(
+        (slot: any) => slot.department === facultyDepartment,
+      );
+    }
+
+    if (
+      canManageAllTimetable &&
+      filterValues.department !== "all" &&
+      filteredSlots.length > 0
+    ) {
+      filteredSlots = filteredSlots.filter(
+        (slot: any) => slot.department === filterValues.department,
+      );
+    }
+
+    if (filterValues.academicYear !== "all" && filteredSlots.length > 0) {
+      filteredSlots = filteredSlots.filter((slot: any) => {
+        const year = getAcademicYearFromSemester(slot.semester);
+        return year !== null && year === Number(filterValues.academicYear);
+      });
+    }
+
+    if (
+      canManageAllTimetable &&
+      filterValues.batch !== "all" &&
+      filteredSlots.length > 0
+    ) {
+      filteredSlots = filteredSlots.filter(
+        (slot: any) => String(slot.batch || "").trim() === filterValues.batch,
+      );
+    }
+
+    const courseQuery = filterValues.courseQuery.trim().toLowerCase();
+    if (canManageAllTimetable && courseQuery && filteredSlots.length > 0) {
+      filteredSlots = filteredSlots.filter((slot: any) =>
+        `${slot.courseCode || ""} ${slot.courseName || ""}`
+          .toLowerCase()
+          .includes(courseQuery),
+      );
+    }
+
+    const facultyQuery = filterValues.facultyQuery.trim().toLowerCase();
+    if (canManageAllTimetable && facultyQuery && filteredSlots.length > 0) {
+      filteredSlots = filteredSlots.filter((slot: any) =>
+        String(slot.facultyName || "").toLowerCase().includes(facultyQuery),
+      );
+    }
+
+    const roomQuery = filterValues.roomQuery.trim().toLowerCase();
+    if (canManageAllTimetable && roomQuery && filteredSlots.length > 0) {
+      filteredSlots = filteredSlots.filter((slot: any) =>
+        String(slot.room || "").toLowerCase().includes(roomQuery),
+      );
+    }
+
+    return filteredSlots;
+  };
+
   if (loading) {
     return (
       <div className="space-y-6 md:space-y-8">
@@ -562,7 +827,11 @@ export default function Timetable() {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Timetable</h1>
           <p className="text-muted-foreground mt-1">
-            {isAdmin ? "Manage course schedule" : "View class schedule"}
+            {canManageAllTimetable
+              ? "Manage course schedule"
+              : canScheduleExtraClass
+              ? "View and schedule your classes"
+              : "View class schedule"}
           </p>
         </div>
         <div className="button-group">
@@ -570,7 +839,8 @@ export default function Timetable() {
             onExport={async () => {
               const timetableData = Object.entries(timetable).flatMap(
                 ([key, slots]: [string, any]) => {
-                  const [day, timeSlot] = key.split("_");
+                  const [day, ...timeSlotParts] = key.split("-");
+                  const timeSlot = timeSlotParts.join("-");
                   return (Array.isArray(slots) ? slots : [slots]).map(
                     (slot: any) => ({
                       day,
@@ -588,7 +858,7 @@ export default function Timetable() {
             label="Export PDF"
             variant="outline"
           />
-          {isAdmin && (
+          {canManageAllTimetable && (
             <>
               <Button
                 onClick={handleAutoGenerate}
@@ -613,6 +883,12 @@ export default function Timetable() {
               </Button>
             </>
           )}
+          {canScheduleExtraClass && (
+            <Button variant="outline" onClick={() => setShowExtraClassDialog(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Schedule Extra Class
+            </Button>
+          )}
           <Button variant="outline" onClick={exportTimetable}>
             <Download className="w-4 h-4 mr-2" />
             Export
@@ -621,98 +897,86 @@ export default function Timetable() {
       </div>
 
       {/* Available Courses (Admin Only) */}
-      {isAdmin && (
+      {canManageAllTimetable && (
         <div className="card-elevated ui-card-pad">
-          <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center gap-2">
-            <GripVertical className="w-5 h-5" />
-            Available Courses (Drag to Schedule)
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {courses.map((course) => (
-              <div
-                key={course.id}
-                draggable
-                onDragStart={(e) => handleDragStart(e, course)}
-                onDragEnd={handleDragEnd}
-                className="px-4 py-3 bg-primary/10 border-2 border-primary/20 rounded-lg cursor-move hover:bg-primary/20 active:bg-primary/30 transition-all select-none md:hover:shadow-md md:hover:border-primary/40 opacity-100 hover:opacity-95"
-              >
-                <div className="flex items-center gap-3">
-                  <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {course.code}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {course.name}
-                    </p>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+              <GripVertical className="w-5 h-5" />
+              Available Courses (Drag to Schedule)
+            </h3>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setCoursesWrapperOpen((previous) => !previous)}
+              className="gap-2"
+            >
+              {coursesWrapperOpen ? (
+                <>
+                  <ChevronUp className="w-4 h-4" />
+                  Collapse
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-4 h-4" />
+                  Expand
+                </>
+              )}
+            </Button>
+          </div>
+          <div
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              coursesWrapperOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+            }`}
+          >
+          <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
+            <div className="available-courses-wrapper rounded-lg border border-border/40 bg-background/30 p-3">
+              <div className="flex flex-wrap gap-3">
+                {courses.map((course) => (
+                  <div
+                    key={course.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, course)}
+                    onDragEnd={handleDragEnd}
+                    className="px-4 py-3 bg-primary/10 border-2 border-primary/20 rounded-lg cursor-move hover:bg-primary/20 active:bg-primary/30 transition-all select-none md:hover:shadow-md md:hover:border-primary/40 opacity-100 hover:opacity-95"
+                  >
+                    <div className="flex items-center gap-3">
+                      <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {course.code}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {course.name}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
+          </div>
           </div>
         </div>
       )}
 
-      {/* Department Filter (Role-Based) - Hidden on Mobile for Students */}
-      <div className={`card-elevated ui-card-pad ${user?.role === 'student' ? 'hidden md:block' : ''}`}>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <Filter className="w-4 h-4 text-primary" />
-              {isAdmin
-                ? "Institutional View"
-                : isFaculty
-                ? "Teaching Schedule"
-                : "Enrolled Schedule"}
-            </h3>
-            {isAdmin && (
-              <Badge
-                variant="outline"
-                className="text-[10px] uppercase font-bold"
-              >
-                Admin Override
-              </Badge>
-            )}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={departmentFilter === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDepartmentFilter("all")}
-              className="rounded-full px-4"
-            >
-              All
-            </Button>
-            {[
-              "Computer Science & Engineering",
-              "Electronics & Communication Engineering",
-              "Electrical Engineering",
-              "Mechanical Engineering",
-              "Civil Engineering",
-              "Production & Industrial Engineering",
-            ].map((dept) => {
-              let label = dept.split(' Engineering')[0];
-
-              if (label.endsWith(" &")) {
-                label = label.replace(/ &$/, "");
-              }
-
-              return (
-                <Button
-                  key={dept}
-                  variant={departmentFilter === dept ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setDepartmentFilter(dept)}
-                  className="rounded-full px-4"
-                >
-                  {label}
-                </Button>
-              );
-            })}
-          </div>
+      {isFaculty && facultyDepartment && (
+        <div className="card-elevated ui-card-pad">
+          <p className="text-sm font-medium text-foreground">
+            Showing branch timetable: <span className="text-primary">{facultyDepartment}</span>
+          </p>
         </div>
-      </div>
+      )}
+
+      <TimetableFilters
+        canManageAllTimetable={canManageAllTimetable}
+        isFaculty={isFaculty}
+        facultyDepartment={facultyDepartment}
+        departmentOptions={availableDepartments}
+        batchOptions={availableBatches}
+        values={filterValues}
+        onChange={handleFilterChange}
+      />
 
       {/* Mobile View (Cards) - "Shoe Type Shi" Design */}
       <div className="md:hidden space-y-5">
@@ -741,16 +1005,7 @@ export default function Timetable() {
             const isLunch = timeSlot === "13:00-14:00";
             const status = getTimeStatus(timeSlot, selectedDay);
             
-            // Filter logic reused from table
-            let filteredSlots = slotData || [];
-            if (user.role === "faculty") {
-               filteredSlots = filteredSlots.filter((s:any) => s.facultyId === user.uid || s.facultyName === (user as any).fullName);
-            } else if (user.role === "student") {
-               filteredSlots = filteredSlots.filter((s:any) => studentEnrollments.includes(s.courseId));
-            }
-            if (departmentFilter !== "all" && filteredSlots.length > 0) {
-                filteredSlots = filteredSlots.filter((s:any) => s.department === departmentFilter);
-            }
+            const filteredSlots = applySlotFilters(slotData || []);
 
             if (isLunch) {
                 return (
@@ -811,7 +1066,7 @@ export default function Timetable() {
                               ${!isLive && !isCompleted ? 'bg-card border-l-primary shadow-sm hover:shadow-md' : ''}
                               ${isCompleted ? 'bg-muted/10 border-l-muted-foreground/30 shadow-none' : ''}
                           `}
-                          onClick={() => isAdmin && openSlotDialog(selectedDay, timeSlot)}
+                          onClick={() => canManageAllTimetable && openSlotDialog(selectedDay, timeSlot)}
                         >
                              {isLive && (
                                  <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-primary/10 px-2 py-1 rounded-full">
@@ -901,59 +1156,36 @@ export default function Timetable() {
                     <td
                       key={`${day}-${timeSlot}`}
                       className={`border border-border p-2 relative group transition-colors min-h-[80px] ${
-                        isAdmin ? "hover:bg-muted/10 cursor-pointer" : ""
+                        canManageAllTimetable ? "hover:bg-muted/10 cursor-pointer" : ""
                       } ${draggedCourse ? "drag-target" : ""}`}
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, day, timeSlot)}
                       onDragEnd={handleDragEnd}
-                      onClick={() => isAdmin && openSlotDialog(day, timeSlot)}
+                      onClick={() => canManageAllTimetable && openSlotDialog(day, timeSlot)}
                     >
                       {(() => {
                         if (!slotData || slotData.length === 0) {
                           return (
                             <div className="text-xs text-muted-foreground/30 text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              {isAdmin && "Drop here"}
+                              {canManageAllTimetable && "Drop here"}
                             </div>
                           );
                         }
 
-                        // 1. Role-based filtering
-                        let roleFilteredSlots = slotData;
+                        const scopedSlots = applySlotFilters(slotData);
 
-                        // Faculty: show only their own classes
-                        if (user.role === "faculty") {
-                          const facultyName = (user as any)?.fullName || "";
-                          roleFilteredSlots = slotData.filter(
-                            (s: any) =>
-                              s.facultyId === user.uid ||
-                              s.facultyName === facultyName
-                          );
-                        } else if (user.role === "student") {
-                          roleFilteredSlots = slotData.filter((s: any) =>
-                            studentEnrollments.includes(s.courseId)
-                          );
-                        }
-
-                        // 2. Department filtering (mostly for admins)
-                        const filteredSlots =
-                          departmentFilter === "all"
-                            ? roleFilteredSlots
-                            : roleFilteredSlots.filter(
-                                (s: any) => s.department === departmentFilter
-                              );
-
-                        if (filteredSlots.length === 0) {
+                        if (scopedSlots.length === 0) {
                           return (
                             <div className="text-xs text-muted-foreground/30 text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              {isAdmin && "Drop here"}
+                              {canManageAllTimetable && "Drop here"}
                             </div>
                           );
                         }
 
                         return (
                           <div className="space-y-1">
-                            {filteredSlots.map((slot: any, idx: number) => (
+                            {scopedSlots.map((slot: any, idx: number) => (
                               <div
                                 key={idx}
                                 className="p-2 bg-primary/10 rounded-lg border border-primary/20 relative"
@@ -967,13 +1199,13 @@ export default function Timetable() {
                                 <div className="text-xs text-muted-foreground">
                                   Room: {slot.room}
                                 </div>
-                                {departmentFilter === "all" && (
+                                {(user.role === "student" || filterValues.department === "all") && (
                                   <div className="text-xs text-primary mt-1 font-medium">
                                     {slot.department}
                                   </div>
                                 )}
                                 
-                                {isAdmin && (
+                                {canManageAllTimetable && (
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -1051,6 +1283,77 @@ export default function Timetable() {
         </DialogContent>
       </Dialog>
 
+      {/* Faculty Extra Class Dialog */}
+      <Dialog open={showExtraClassDialog} onOpenChange={setShowExtraClassDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Schedule Extra Class</DialogTitle>
+            <DialogDescription>
+              Pick one of your courses and a free slot.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Course</label>
+              <Select
+                value={extraClassForm.courseId}
+                onValueChange={(value) =>
+                  setExtraClassForm((prev) => ({ ...prev, courseId: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your course" />
+                </SelectTrigger>
+                <SelectContent>
+                  {courses.map((course) => (
+                    <SelectItem key={course.id} value={course.id}>
+                      {course.code} - {course.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Free Slot</label>
+              <Select
+                value={extraClassForm.slotKey}
+                onValueChange={(value) =>
+                  setExtraClassForm((prev) => ({ ...prev, slotKey: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select free day and time" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableFacultySlots.map((slot) => (
+                    <SelectItem key={slot.key} value={slot.key}>
+                      {slot.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Room</label>
+              <Input
+                placeholder="e.g. L-10"
+                value={extraClassForm.room}
+                onChange={(e) =>
+                  setExtraClassForm((prev) => ({ ...prev, room: e.target.value }))
+                }
+              />
+            </div>
+
+            <Button onClick={handleScheduleExtraClass} className="w-full">
+              <Calendar className="w-4 h-4 mr-2" />
+              Schedule
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Bulk Upload Dialog */}
       <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
         <DialogContent className="max-w-2xl">
@@ -1072,3 +1375,5 @@ export default function Timetable() {
     </div>
   );
 }
+
+

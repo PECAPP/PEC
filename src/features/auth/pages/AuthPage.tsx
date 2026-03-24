@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { getRolePermissions } from '@/features/auth/lib/rolePermissions';
@@ -13,7 +13,7 @@ import { Mail, Lock, User, Eye, EyeOff, Loader, AlertCircle, CheckCircle, X, Lig
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-type UserRole = 'student' | 'faculty' | 'college_admin';
+type UserRole = 'student' | 'faculty' | 'college_admin' | 'admin';
 
 interface AuthFormData {
   email: string;
@@ -64,7 +64,7 @@ export default function AuthEnhanced() {
       
       router.replace(redirectPath);
     }
-  }, [authLoading, isAuthenticated, user, navigate]);
+  }, [authLoading, isAuthenticated, user, router]);
 
   // Close modal and redirect after successful auth
   useEffect(() => {
