@@ -15,7 +15,7 @@ node_modules
 /build
 dist
 dist-ssr
-
+PEC_ERP_Report.tex
 # Misc
 .DS_Store
 *.pem
