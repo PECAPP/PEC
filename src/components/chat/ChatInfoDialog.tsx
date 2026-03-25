@@ -54,7 +54,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
   const isDM = room?.type === "dm";
   const userRole = user?.role as string;
   const isAdmin = room?.admins?.includes(user?.uid || "") || userRole === "admin" || userRole === "college_admin";
-  const canDeleteRoom = !!room && (isDM || (room.type === "group" && !room.isSystem));
+  const canDeleteRoom = !!room && (isDM || (room.type === "group" && !room.isSystem && isAdmin));
 
   useEffect(() => {
     if (room && open && !isDM) {
@@ -168,12 +168,13 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
   };
 
   const handleDeleteRoom = async () => {
-    if (!room) return;
+    if (!room || isLoading) return;
 
     const label = isDM ? "this direct message" : "this group";
     const confirmed = window.confirm(`Delete ${label}? This action cannot be undone.`);
     if (!confirmed) return;
 
+    setIsLoading(true);
     try {
       await deleteChatRoom(room.id);
       window.dispatchEvent(new Event("chat-rooms-updated"));
@@ -181,6 +182,8 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
       onOpenChange(false);
     } catch (error: any) {
       toast.error(error?.message || "Failed to delete room");
+    } finally {
+      setIsLoading(false);
     }
   };
 

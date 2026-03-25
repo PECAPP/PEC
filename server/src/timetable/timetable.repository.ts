@@ -47,21 +47,21 @@ export class TimetableRepository extends BaseRepository {
       data: {
         ...data,
         ...(data.courseId !== undefined
-          ? { courseId: data.courseId || null }
+          ? { courseId: data.courseId ?? null }
           : {}),
         ...(data.facultyId !== undefined
-          ? { facultyId: data.facultyId || null }
+          ? { facultyId: data.facultyId ?? null }
           : {}),
         ...(data.facultyName !== undefined
-          ? { facultyName: data.facultyName || null }
+          ? { facultyName: data.facultyName ?? null }
           : {}),
         ...(data.department !== undefined
-          ? { department: data.department || null }
+          ? { department: data.department ?? null }
           : {}),
         ...(data.semester !== undefined
           ? { semester: data.semester ?? null }
           : {}),
-        ...(data.batch !== undefined ? { batch: data.batch || null } : {}),
+        ...(data.batch !== undefined ? { batch: data.batch ?? null } : {}),
       },
     });
   }

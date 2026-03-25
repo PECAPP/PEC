@@ -230,6 +230,8 @@ export default function Timetable() {
                 course.instructor === user.uid || course.facultyId === user.uid,
             )
           : [];
+      
+      // Resolve faculty department from owned courses, or fall back to user's department
       const resolvedFacultyDepartment = (
         user?.department ||
         facultyOwnedCourses[0]?.department ||
@@ -242,7 +244,26 @@ export default function Timetable() {
         setFacultyDepartment("");
       }
 
-      const coursesData = isFaculty ? facultyOwnedCourses : allCourses;
+      // For faculty: show owned courses; if none, fall back to department courses
+      let coursesData: any[] = [];
+      if (isFaculty) {
+        if (facultyOwnedCourses.length > 0) {
+          coursesData = facultyOwnedCourses;
+        } else if (resolvedFacultyDepartment) {
+          // Fall back to all courses in faculty's department
+          coursesData = allCourses.filter(
+            (course: any) => 
+              (course.department || "").trim() === resolvedFacultyDepartment
+          );
+        } else {
+          // Last resort: show all courses
+          coursesData = allCourses;
+        }
+      } else {
+        // Non-faculty sees all courses
+        coursesData = allCourses;
+      }
+      
       setCourses(coursesData);
 
       const timetableItems = await fetchAllPages<any>('/timetable');
@@ -683,13 +704,15 @@ export default function Timetable() {
   const handleScheduleExtraClass = async () => {
     if (!canScheduleExtraClass) return;
 
+    // Use selected course from form
     const course = courses.find((item) => item.id === extraClassForm.courseId);
     if (!course) {
-      toast.error("Please select your course");
+      toast.error("Please select a course");
       return;
     }
-    if (!extraClassForm.slotKey) {
-      toast.error("Please select a free slot");
+    
+    if (!extraClassForm.slotKey || extraClassForm.slotKey.endsWith("-")) {
+      toast.error("Please select a time slot");
       return;
     }
 
@@ -1306,71 +1329,169 @@ export default function Timetable() {
 
       {/* Faculty Extra Class Dialog */}
       <Dialog open={showExtraClassDialog} onOpenChange={setShowExtraClassDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Schedule Extra Class</DialogTitle>
             <DialogDescription>
-              Pick one of your courses and a free slot.
+              Add an extra class session to your timetable
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Course Selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Course</label>
+              <label className="text-sm font-medium">Course *</label>
               <Select
                 value={extraClassForm.courseId}
                 onValueChange={(value) =>
-                  setExtraClassForm((prev) => ({ ...prev, courseId: value }))
+                  setExtraClassForm((prev) => ({ 
+                    ...prev, 
+                    courseId: value,
+                    slotKey: "" // Reset slot when course changes
+                  }))
                 }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select your course" />
                 </SelectTrigger>
                 <SelectContent>
-                  {courses.map((course) => (
-                    <SelectItem key={course.id} value={course.id}>
-                      {course.code} - {course.name}
-                    </SelectItem>
-                  ))}
+                  {courses.length > 0 ? (
+                    courses.map((course) => (
+                      <SelectItem key={course.id} value={course.id}>
+                        {course.code} - {course.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      No courses assigned
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Free Slot</label>
-              <Select
-                value={extraClassForm.slotKey}
-                onValueChange={(value) =>
-                  setExtraClassForm((prev) => ({ ...prev, slotKey: value }))
+            {/* Day Selection */}
+            {extraClassForm.courseId && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Day *</label>
+                <Select
+                  value={extraClassForm.slotKey?.split("-")[0] || ""}
+                  onValueChange={(day) => {
+                    setExtraClassForm((prev) => ({
+                      ...prev,
+                      slotKey: `${day}-`, // Placeholder for time selection
+                    }));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a day" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DAYS.map((day) => (
+                      <SelectItem key={day} value={day}>
+                        {day}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Time Slot Selection */}
+            {extraClassForm.courseId && extraClassForm.slotKey?.split("-")[0] && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Time Slot *</label>
+                <Select
+                  value={extraClassForm.slotKey || ""}
+                  onValueChange={(value) =>
+                    setExtraClassForm((prev) => ({ ...prev, slotKey: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select available time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIME_SLOTS.filter((t) => t !== "13:00-14:00").map((timeSlot) => {
+                      const selectedDay = extraClassForm.slotKey?.split("-")[0];
+                      const key = `${selectedDay}-${timeSlot}`;
+                      const slots = timetable[key] || [];
+                      const hasFacultyClass = slots.some((slot: any) => isSlotOwnedByFaculty(slot));
+                      const isAvailable = !hasFacultyClass;
+
+                      return (
+                        <SelectItem key={key} value={key} disabled={!isAvailable}>
+                          <span>
+                            {timeSlot}
+                            {!isAvailable && " (Busy)"}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Room Input */}
+            {extraClassForm.courseId && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Room</label>
+                <Input
+                  placeholder="e.g. L-10, Lab 2, or leave blank for TBD"
+                  value={extraClassForm.room}
+                  onChange={(e) =>
+                    setExtraClassForm((prev) => ({ ...prev, room: e.target.value }))
+                  }
+                />
+              </div>
+            )}
+
+            {/* Auto-populated Fields Info */}
+            {extraClassForm.courseId && extraClassForm.slotKey && !extraClassForm.slotKey.endsWith("-") && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg space-y-2 text-sm">
+                <p className="font-medium text-blue-900">Auto-populated from course:</p>
+                <div className="text-xs text-blue-800 space-y-1">
+                  {(() => {
+                    const course = courses.find(c => c.id === extraClassForm.courseId);
+                    return (
+                      <>
+                        <div>• <strong>Program:</strong> {course?.department || "N/A"}</div>
+                        <div>• <strong>Semester:</strong> {course?.semester || "N/A"}</div>
+                        {course?.batch && <div>• <strong>Batch:</strong> {course.batch}</div>}
+                        <div>• <strong>Slot:</strong> {extraClassForm.slotKey.replace("-", " at ")}</div>
+                        <div>• <strong>Room:</strong> {extraClassForm.room || "TBD"}</div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowExtraClassDialog(false);
+                  setExtraClassForm({ courseId: "", slotKey: "", room: "" });
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleScheduleExtraClass} 
+                className="flex-1"
+                disabled={
+                  !extraClassForm.courseId || 
+                  !extraClassForm.slotKey || 
+                  extraClassForm.slotKey.endsWith("-") ||
+                  courses.length === 0
                 }
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select free day and time" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableFacultySlots.map((slot) => (
-                    <SelectItem key={slot.key} value={slot.key}>
-                      {slot.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Calendar className="w-4 h-4 mr-2" />
+                Schedule
+              </Button>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Room</label>
-              <Input
-                placeholder="e.g. L-10"
-                value={extraClassForm.room}
-                onChange={(e) =>
-                  setExtraClassForm((prev) => ({ ...prev, room: e.target.value }))
-                }
-              />
-            </div>
-
-            <Button onClick={handleScheduleExtraClass} className="w-full">
-              <Calendar className="w-4 h-4 mr-2" />
-              Schedule
-            </Button>
           </div>
         </DialogContent>
       </Dialog>

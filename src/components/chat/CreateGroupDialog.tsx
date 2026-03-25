@@ -55,8 +55,8 @@ export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, currentU
       const usersList = (await fetchChatUsers())
         .map((u) => ({
           uid: u.uid,
-          fullName: u.fullName,
-          email: u.email,
+          fullName: u.fullName || "",
+          email: u.email || "",
           role: u.role || "user",
         }))
         .filter((u) => u.uid !== currentUser.uid); // Exclude self

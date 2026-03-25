@@ -43,6 +43,7 @@ let cachedToken: string | null = null;
 let cachedUser: CurrentUser | null = null;
 let cachedAt = 0;
 let inFlightRequest: Promise<CurrentUser | null> | null = null;
+let refreshAttemptedWithoutToken = false;
 
 const isAllowedRole = (role: string | null | undefined): role is UserRole => {
   return [
@@ -154,12 +155,17 @@ export function useAuth(): UseAuthResult {
       try {
         let currentToken = authClient.getAccessToken();
 
-        if (!currentToken) {
+        if (!currentToken && (force || !refreshAttemptedWithoutToken)) {
+          refreshAttemptedWithoutToken = true;
           try {
             currentToken = await authClient.refreshAccessToken();
           } catch {
             currentToken = null;
           }
+        }
+
+        if (currentToken) {
+          refreshAttemptedWithoutToken = false;
         }
         setToken(currentToken);
 
@@ -198,11 +204,13 @@ export function useAuth(): UseAuthResult {
     syncUser();
 
     const onAuthChange = () => {
+      refreshAttemptedWithoutToken = false;
       setLoading(true);
       syncUser(true);
     };
 
     const onAuthFailed = () => {
+      refreshAttemptedWithoutToken = true;
       clearAuthCache();
       setUser(null);
       setToken(null);
@@ -220,6 +228,7 @@ export function useAuth(): UseAuthResult {
 
   const logout = async () => {
     await authClient.logout();
+    refreshAttemptedWithoutToken = true;
     clearAuthCache();
     setUser(null);
     setToken(null);
@@ -230,6 +239,7 @@ export function useAuth(): UseAuthResult {
     setLoading(true);
     try {
       await authClient.login({ email, password });
+      refreshAttemptedWithoutToken = false;
       const currentToken = authClient.getAccessToken();
       setToken(currentToken);
       window.dispatchEvent(new Event("auth-change"));

@@ -1,4 +1,5 @@
 ﻿import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -146,13 +147,35 @@ export class ChatService {
     });
 
     if (!communityRoom) {
-      communityRoom = await this.prisma.chatRoom.create({
-        data: {
-          name: ChatService.COMMUNITY_ROOM_NAME,
-          isGroup: true,
-        },
-        select: { id: true },
-      });
+      try {
+        communityRoom = await this.prisma.chatRoom.create({
+          data: {
+            name: ChatService.COMMUNITY_ROOM_NAME,
+            isGroup: true,
+          },
+          select: { id: true },
+        });
+      } catch (error) {
+        const isUniqueViolation =
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002';
+
+        if (!isUniqueViolation) {
+          throw error;
+        }
+
+        communityRoom = await this.prisma.chatRoom.findFirst({
+          where: {
+            isGroup: true,
+            name: ChatService.COMMUNITY_ROOM_NAME,
+          },
+          select: { id: true },
+        });
+      }
+    }
+
+    if (!communityRoom) {
+      throw new Error('Unable to ensure community room');
     }
 
     await this.prisma.userChatRoom.upsert({

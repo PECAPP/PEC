@@ -6,7 +6,7 @@ interface UseFacultyPermissionsProps {
   resourceType: 'course' | 'assignment' | 'attendance' | 'material' | 'grade' | 'exam';
   resourceData?: any;
 }
- /** Hook to get faculty permissions for a resource
+// Hook to get faculty permissions for a resource.
 export function useFacultyPermissions({
   facultyId,
   resourceType,

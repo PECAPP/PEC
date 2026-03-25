@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
-;
 import { MessageCircle, ArrowLeft, Info } from "lucide-react";
 
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
@@ -36,7 +35,7 @@ export default function ChatPage() {
       return;
     }
 
-    if (selectedRoomId && !rooms.some((room) => room.id === selectedRoomId)) {
+    if (!roomsLoading && selectedRoomId && !rooms.some((room) => room.id === selectedRoomId)) {
       setSelectedRoomId(rooms.length > 0 ? rooms[0].id : null);
       return;
     }
@@ -44,7 +43,7 @@ export default function ChatPage() {
     if (!selectedRoomId && rooms.length > 0) {
       setSelectedRoomId(rooms[0].id);
     }
-  }, [roomFromUrl, rooms, selectedRoomId]);
+  }, [roomFromUrl, rooms, roomsLoading, selectedRoomId]);
 
   const {
     messages,

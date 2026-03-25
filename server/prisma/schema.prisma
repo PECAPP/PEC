@@ -277,6 +277,7 @@ model ChatRoom {
   messages     Message[]
   participants UserChatRoom[]
 
+  @@unique([name, isGroup])
   @@index([createdAt])
 }
 

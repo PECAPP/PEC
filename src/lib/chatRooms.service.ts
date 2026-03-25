@@ -55,16 +55,22 @@ const mapRoom = (room: ApiRoom, currentUserId: string): ChatRoom => {
   }, {});
 
   const isDm = !room.isGroup && participants.length <= 2;
+  const isCommunityRoom = room.isGroup && SYSTEM_ROOM_NAMES.has(room.name);
   const dmOtherId = isDm
     ? participants.find((id) => id !== currentUserId)
     : undefined;
   const dmTitle = dmOtherId ? participantNames[dmOtherId] : "Direct Message";
+  const roomType: ChatRoom["type"] = isDm
+    ? "dm"
+    : isCommunityRoom
+      ? "general"
+      : "group";
 
   return {
     id: room.id,
-    type: isDm ? "dm" : "group",
+    type: roomType,
     title: isDm ? dmTitle : room.name,
-    isSystem: room.isGroup && SYSTEM_ROOM_NAMES.has(room.name),
+    isSystem: isCommunityRoom,
     organizationId: "",
     participants,
     participantNames,
@@ -125,12 +131,12 @@ export async function createOrFindDMRoom(
   otherUserId: string,
   orgId: string,
 ) {
-  const res = await api.post<ApiRoom>("/chat/room", {
+  const res = await api.post<ApiRoom | ApiSuccess<ApiRoom>>("/chat/room", {
     name: "DM",
     isGroup: false,
     userIds: [otherUserId],
   });
-  return mapRoom(res.data, currentUserId);
+  return mapRoom(unwrap(res.data), currentUserId);
 }
 
 export async function createGroupRoom(options: {
@@ -142,12 +148,12 @@ export async function createGroupRoom(options: {
   admins: string[];
 }) {
   const memberIds = Array.from(new Set(options.members.filter(Boolean)));
-  const res = await api.post<ApiRoom>("/chat/room", {
+  const res = await api.post<ApiRoom | ApiSuccess<ApiRoom>>("/chat/room", {
     name: options.title,
     isGroup: true,
     userIds: memberIds,
   });
-  return mapRoom(res.data, options.creatorId);
+  return mapRoom(unwrap(res.data), options.creatorId);
 }
 
 export async function updateGroupRoom(
@@ -159,10 +165,13 @@ export async function updateGroupRoom(
   });
 }
 
-export async function deleteGroupRoom(roomId: string) {
+export async function deleteChatRoom(roomId: string) {
   await api.delete(`/chat/room/${roomId}`);
 }
 
-export async function deleteChatRoom(roomId: string) {
-  await api.delete(`/chat/room/${roomId}`);
+/**
+ * @deprecated Use deleteChatRoom instead.
+ */
+export async function deleteGroupRoom(roomId: string) {
+  return deleteChatRoom(roomId);
 }
