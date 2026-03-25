@@ -22,7 +22,7 @@ import { Roles } from '../auth/roles.decorator';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Post('room')
   createRoom(@Request() req: any, @Body() body: CreateRoomDto) {
     // ensure requester is a participant
@@ -34,25 +34,25 @@ export class ChatController {
     );
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('rooms')
   getRooms(@Request() req: any) {
     return this.chatService.getRoomsForUser(req.user.sub);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('users')
   getChatUsers(@Request() req: any, @Query('q') q?: string) {
     return this.chatService.getChatUsers(req.user.sub, q);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('room/:roomId/participants')
   getRoomParticipants(@Request() req: any, @Param('roomId') roomId: string) {
     return this.chatService.getRoomParticipants(roomId, req.user.sub);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Patch('room/:roomId')
   updateRoom(
     @Request() req: any,
@@ -62,7 +62,13 @@ export class ChatController {
     return this.chatService.updateRoom(roomId, req.user.sub, body);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @Delete('room/:roomId')
+  deleteRoom(@Request() req: any, @Param('roomId') roomId: string) {
+    return this.chatService.deleteRoom(roomId, req.user.sub);
+  }
+
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Post('room/:roomId/participants')
   addParticipant(
     @Request() req: any,
@@ -72,7 +78,7 @@ export class ChatController {
     return this.chatService.addParticipant(roomId, req.user.sub, body.userId);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Delete('room/:roomId/participants/:userId')
   removeParticipant(
     @Request() req: any,
@@ -82,7 +88,7 @@ export class ChatController {
     return this.chatService.removeParticipant(roomId, req.user.sub, userId);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Post('message')
   sendMessage(@Request() req: any, @Body() body: SendMessageDto) {
     return this.chatService.sendMessage(
@@ -92,7 +98,7 @@ export class ChatController {
     );
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('messages/:roomId')
   getMessages(
     @Request() req: any,
@@ -103,7 +109,7 @@ export class ChatController {
     return this.chatService.getMessages(roomId, req.user.sub, parsedLimit);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Delete('message/:messageId')
   deleteMessage(@Request() req: any, @Param('messageId') messageId: string) {
     return this.chatService.deleteMessage(messageId, req.user.sub);

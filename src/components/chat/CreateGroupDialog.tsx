@@ -13,9 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, Users, X } from "lucide-react";
-import { collection, getDocs, query, where } from '@/lib/dataClient';
 
-import { createGroupRoom } from "@/lib/chatRooms.service";
+import { createGroupRoom, fetchChatUsers } from "@/lib/chatRooms.service";
 import { toast } from "sonner";
 
 interface User {
@@ -53,12 +52,14 @@ export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, currentU
   const fetchUsers = async () => {
     setFetchingUsers(true);
     try {
-      const usersRef = collection(({} as any), "users");
-      const q = query(usersRef, where("organizationId", "==", currentUser.organizationId));
-      const snap = await getDocs(q);
-      const usersList = snap.docs
-        .map(doc => ({ uid: doc.id, ...doc.data() } as User))
-        .filter(u => u.uid !== currentUser.uid); // Exclude self
+      const usersList = (await fetchChatUsers())
+        .map((u) => ({
+          uid: u.uid,
+          fullName: u.fullName,
+          email: u.email,
+          role: u.role || "user",
+        }))
+        .filter((u) => u.uid !== currentUser.uid); // Exclude self
       setAllUsers(usersList);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -98,6 +99,7 @@ export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, currentU
       
       toast.success("Group created successfully");
       onGroupCreated(room.id);
+      window.dispatchEvent(new Event("chat-rooms-updated"));
       onOpenChange(false);
       // Reset state
       setTitle("");

@@ -62,7 +62,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           path: request?.url,
           statusCode: status,
           message:
-            exception instanceof Error ? exception.message : 'Unknown exception',
+            exception instanceof Error
+              ? exception.message
+              : 'Unknown exception',
           stack:
             !isProduction && exception instanceof Error
               ? exception.stack

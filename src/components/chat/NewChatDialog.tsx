@@ -56,6 +56,7 @@ export function NewChatDialog({ open, onOpenChange, onRoomCreated }: Props) {
 
       toast.success(`Chat with ${foundUser.fullName || email} opened!`);
       onRoomCreated(dmRoom.id);
+      window.dispatchEvent(new Event("chat-rooms-updated"));
       onOpenChange(false);
       setEmail("");
     } catch (error) {

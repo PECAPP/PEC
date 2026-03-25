@@ -48,10 +48,7 @@ export class UsersController {
 
   @Roles('college_admin', 'admin', 'moderator', 'faculty')
   @Get()
-  async findMany(
-    @Request() req: any,
-    @Query() query: UserQueryDto,
-  ) {
+  async findMany(@Request() req: any, @Query() query: UserQueryDto) {
     const userRoles = Array.isArray(req.user?.roles)
       ? req.user.roles
       : req.user?.role

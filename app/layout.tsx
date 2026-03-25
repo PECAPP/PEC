@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Providers } from './providers';
+import { RouteTransitionLoader } from '@/components/layout/RouteTransitionLoader';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -10,15 +11,13 @@ export const metadata: Metadata = {
   },
 };
 
-import NextTopLoader from 'nextjs-toploader';
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Syne:wght@400..800&display=swap"
@@ -70,17 +69,7 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        <NextTopLoader
-          color="hsl(var(--primary))"
-          initialPosition={0.08}
-          crawlSpeed={200}
-          height={3}
-          crawl={true}
-          showSpinner={false}
-          easing="ease"
-          speed={200}
-          shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
-        />
+        <RouteTransitionLoader />
         <Providers>{children}</Providers>
       </body>
     </html>

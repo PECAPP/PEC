@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ChatService {
+  private static readonly COMMUNITY_ROOM_NAME = 'Campus Community';
+
   constructor(private prisma: PrismaService) {}
 
   async getChatUsers(requesterId: string, q?: string) {
@@ -99,6 +101,8 @@ export class ChatService {
   }
 
   async getRoomsForUser(userId: string) {
+    await this.ensureCommunityRoomForUser(userId);
+
     return this.prisma.chatRoom.findMany({
       where: {
         participants: {
@@ -129,6 +133,40 @@ export class ChatService {
         },
       },
       orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  private async ensureCommunityRoomForUser(userId: string) {
+    let communityRoom = await this.prisma.chatRoom.findFirst({
+      where: {
+        isGroup: true,
+        name: ChatService.COMMUNITY_ROOM_NAME,
+      },
+      select: { id: true },
+    });
+
+    if (!communityRoom) {
+      communityRoom = await this.prisma.chatRoom.create({
+        data: {
+          name: ChatService.COMMUNITY_ROOM_NAME,
+          isGroup: true,
+        },
+        select: { id: true },
+      });
+    }
+
+    await this.prisma.userChatRoom.upsert({
+      where: {
+        userId_chatRoomId: {
+          userId,
+          chatRoomId: communityRoom.id,
+        },
+      },
+      update: {},
+      create: {
+        userId,
+        chatRoomId: communityRoom.id,
+      },
     });
   }
 
@@ -173,6 +211,33 @@ export class ChatService {
         name: body.name?.trim() || undefined,
       },
     });
+  }
+
+  async deleteRoom(roomId: string, requesterId: string) {
+    await this.ensureRoomParticipant(roomId, requesterId);
+
+    const room = await this.prisma.chatRoom.findUnique({
+      where: { id: roomId },
+      select: {
+        id: true,
+        isGroup: true,
+        name: true,
+      },
+    });
+
+    if (!room) {
+      return { success: true };
+    }
+
+    if (room.isGroup && room.name === ChatService.COMMUNITY_ROOM_NAME) {
+      throw new Error('Default community group cannot be deleted');
+    }
+
+    await this.prisma.chatRoom.delete({
+      where: { id: roomId },
+    });
+
+    return { success: true };
   }
 
   async addParticipant(roomId: string, requesterId: string, userId: string) {

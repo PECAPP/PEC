@@ -3,7 +3,6 @@ import { Send, Paperclip, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MediaUpload } from '@/components/chat/MediaUpload';
-import { collection, getDocs, query, where } from '@/lib/dataClient';
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
 import { uploadToCloudinary } from '@/lib/cloudinaryManager';
 import { sendMediaMessage } from '@/lib/messages.service';
+import { fetchChatUsers } from '@/lib/chatRooms.service';
 
 // Generate consistent color for user based on their ID
 const getUserColor = (userId: string) => {
@@ -62,21 +62,13 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
   }));
 
   useEffect(() => {
-    if (user?.organizationId) {
-      fetchUsers();
-    }
-  }, [user?.organizationId]);
+    if (!user?.uid) return;
+    fetchUsers();
+  }, [user?.uid]);
 
   const fetchUsers = async () => {
     try {
-      const q = query(collection(({} as any), "users"), where("organizationId", "==", user?.organizationId));
-      const snap = await getDocs(q);
-      const users = snap.docs
-        .map(doc => ({ 
-          uid: doc.id, 
-          fullName: doc.data().fullName || doc.data().name || doc.data().email || 'Unknown User'
-        }))
-        .filter(u => u.uid !== user?.uid); // Exclude current user
+      const users = (await fetchChatUsers()).filter((u) => u.uid !== user?.uid);
       console.log('Fetched users for mentions:', users.length);
       setAllUsers(users);
     } catch (error) {

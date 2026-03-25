@@ -223,7 +223,7 @@ export function useAuth(): UseAuthResult {
     clearAuthCache();
     setUser(null);
     setToken(null);
-    window.dispatchEvent(new Event("auth-change"));
+    window.dispatchEvent(new Event("auth-failed"));
   };
 
   const login = async (email: string, password: string) => {

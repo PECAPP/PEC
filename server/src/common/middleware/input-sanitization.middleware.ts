@@ -9,7 +9,11 @@ import sanitizeHtml from 'sanitize-html';
 @Injectable()
 export class InputSanitizationMiddleware implements NestMiddleware {
   use(req: any, _res: any, next: () => void): void {
-    this.assignSanitizedValue(req, 'body', this.sanitizePayload(req.body, 'body'));
+    this.assignSanitizedValue(
+      req,
+      'body',
+      this.sanitizePayload(req.body, 'body'),
+    );
     this.assignSanitizedValue(
       req,
       'query',
@@ -30,8 +34,15 @@ export class InputSanitizationMiddleware implements NestMiddleware {
   ): void {
     const current = req[key];
 
-    if (current && typeof current === 'object' && value && typeof value === 'object') {
-      for (const existingKey of Object.keys(current as Record<string, unknown>)) {
+    if (
+      current &&
+      typeof current === 'object' &&
+      value &&
+      typeof value === 'object'
+    ) {
+      for (const existingKey of Object.keys(
+        current as Record<string, unknown>,
+      )) {
         delete (current as Record<string, unknown>)[existingKey];
       }
 

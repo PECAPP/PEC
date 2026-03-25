@@ -83,7 +83,7 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
   const handleSignOut = async () => {
     try {
       await authClient.logout();
-      window.dispatchEvent(new Event('auth-change'));
+      window.dispatchEvent(new Event('auth-failed'));
       toast.success('Signed out successfully');
       router.push('/auth');
     } catch (error) {

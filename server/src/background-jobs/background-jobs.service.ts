@@ -24,7 +24,9 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly prisma: PrismaService) {
     this.handlers.set('audit-log.prune', async (payload) => {
-      const config = payload ? (JSON.parse(payload) as { retentionDays?: number }) : {};
+      const config = payload
+        ? (JSON.parse(payload) as { retentionDays?: number })
+        : {};
       const retentionDays = Math.max(1, Number(config.retentionDays ?? 30));
       const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
 
@@ -125,7 +127,10 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
           availableAt: {
             lte: new Date(),
           },
-          OR: [{ lockedAt: null }, { lockedAt: { lt: new Date(Date.now() - this.staleLockMs) } }],
+          OR: [
+            { lockedAt: null },
+            { lockedAt: { lt: new Date(Date.now() - this.staleLockMs) } },
+          ],
         },
         orderBy: [{ availableAt: 'asc' }, { createdAt: 'asc' }],
       });
@@ -137,7 +142,10 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
       const lockResult = await this.prisma.backgroundJob.updateMany({
         where: {
           id: candidate.id,
-          OR: [{ lockedAt: null }, { lockedAt: { lt: new Date(Date.now() - this.staleLockMs) } }],
+          OR: [
+            { lockedAt: null },
+            { lockedAt: { lt: new Date(Date.now() - this.staleLockMs) } },
+          ],
         },
         data: {
           lockedAt: new Date(),
@@ -168,7 +176,10 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
     const handler = this.handlers.get(job.type);
 
     if (!handler) {
-      await this.failJob(job, `No handler registered for job type "${job.type}"`);
+      await this.failJob(
+        job,
+        `No handler registered for job type "${job.type}"`,
+      );
       return;
     }
 
@@ -185,7 +196,10 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
         },
       });
     } catch (error) {
-      await this.failJob(job, error instanceof Error ? error.message : 'Unknown job failure');
+      await this.failJob(
+        job,
+        error instanceof Error ? error.message : 'Unknown job failure',
+      );
     }
   }
 
@@ -210,7 +224,9 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
         status: exhausted ? 'failed' : 'retrying',
         failedAt: exhausted ? new Date() : null,
         errorMessage: errorMessage.slice(0, 1000),
-        availableAt: exhausted ? new Date() : new Date(Date.now() + retryDelayMs),
+        availableAt: exhausted
+          ? new Date()
+          : new Date(Date.now() + retryDelayMs),
         lockedAt: null,
         lockedBy: null,
       },

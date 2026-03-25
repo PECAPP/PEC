@@ -25,6 +25,23 @@ type ApiMessage = {
   sender?: { id: string; name?: string | null };
 };
 
+type ApiSuccess<T> = {
+  success: true;
+  data: T;
+};
+
+const unwrap = <T>(payload: T | ApiSuccess<T>): T => {
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "success" in (payload as Record<string, unknown>) &&
+    "data" in (payload as Record<string, unknown>)
+  ) {
+    return (payload as ApiSuccess<T>).data;
+  }
+  return payload as T;
+};
+
 const toChatMessage = (message: ApiMessage): ChatMessage => {
   const parsedPayload = (() => {
     try {
@@ -71,11 +88,15 @@ export function subscribeToMessages(
 
   const load = async () => {
     try {
-      const res = await api.get<ApiMessage[]>(`/chat/messages/${roomId}`, {
+      const res = await api.get<ApiMessage[] | ApiSuccess<ApiMessage[]>>(
+        `/chat/messages/${roomId}`,
+        {
         params: { limit },
-      });
+        },
+      );
       if (!active) return;
-      const mapped = Array.isArray(res.data) ? res.data.map(toChatMessage) : [];
+      const data = unwrap(res.data);
+      const mapped = Array.isArray(data) ? data.map(toChatMessage) : [];
       onChange(mapped);
     } catch {
       if (!active) return;
@@ -84,7 +105,7 @@ export function subscribeToMessages(
   };
 
   void load();
-  const timer = window.setInterval(load, 4000);
+  const timer = window.setInterval(load, 2000);
 
   return () => {
     active = false;

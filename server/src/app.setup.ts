@@ -56,14 +56,13 @@ export const configureApp = (app: INestApplication): void => {
         },
       },
       frameguard: { action: 'deny' },
-      hsts:
-        isProduction()
-          ? {
-              maxAge: 31_536_000,
-              includeSubDomains: true,
-              preload: true,
-            }
-          : false,
+      hsts: isProduction()
+        ? {
+            maxAge: 31_536_000,
+            includeSubDomains: true,
+            preload: true,
+          }
+        : false,
       noSniff: true,
       referrerPolicy: { policy: 'no-referrer' },
     }),

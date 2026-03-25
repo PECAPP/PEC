@@ -15,7 +15,9 @@ type CachedFlag = {
 @Injectable()
 export class FeatureFlagsService {
   private readonly cache = new Map<string, CachedFlag>();
-  private readonly ttlMs = Number(process.env.FEATURE_FLAG_CACHE_TTL_MS ?? '30000');
+  private readonly ttlMs = Number(
+    process.env.FEATURE_FLAG_CACHE_TTL_MS ?? '30000',
+  );
 
   constructor(private readonly prisma: PrismaService) {}
 

@@ -32,7 +32,7 @@ import {
   removeUserAdmin,
   updateGroupInfo
 } from "@/lib/chatManagement.service";
-import { createOrFindDMRoom } from "@/lib/chatRooms.service";
+import { createOrFindDMRoom, deleteChatRoom } from "@/lib/chatRooms.service";
 import { toast } from "sonner";
 
 interface Props {
@@ -54,6 +54,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
   const isDM = room?.type === "dm";
   const userRole = user?.role as string;
   const isAdmin = room?.admins?.includes(user?.uid || "") || userRole === "admin" || userRole === "college_admin";
+  const canDeleteRoom = !!room && (isDM || (room.type === "group" && !room.isSystem));
 
   useEffect(() => {
     if (room && open && !isDM) {
@@ -166,6 +167,23 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
     }
   };
 
+  const handleDeleteRoom = async () => {
+    if (!room) return;
+
+    const label = isDM ? "this direct message" : "this group";
+    const confirmed = window.confirm(`Delete ${label}? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      await deleteChatRoom(room.id);
+      window.dispatchEvent(new Event("chat-rooms-updated"));
+      toast.success(isDM ? "Direct message deleted" : "Group deleted");
+      onOpenChange(false);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete room");
+    }
+  };
+
   if (!room) return null;
 
   const getRoomIcon = () => {
@@ -228,6 +246,11 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
                 This is a private conversation between you and another user.
               </p>
             </div>
+            {canDeleteRoom && (
+              <Button variant="destructive" className="w-full" onClick={handleDeleteRoom}>
+                Delete Chat
+              </Button>
+            )}
           </div>
         ) : (
           // Group Info & Management
@@ -361,6 +384,11 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
                     </Button>
                   </div>
                 </div>
+                {canDeleteRoom && (
+                  <Button variant="destructive" className="w-full" onClick={handleDeleteRoom}>
+                    Delete Group
+                  </Button>
+                )}
               </TabsContent>
             )}
           </Tabs>

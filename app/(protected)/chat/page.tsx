@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
-import { usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 ;
 import { MessageCircle, ArrowLeft, Info } from "lucide-react";
 
@@ -24,9 +24,8 @@ export default function ChatPage() {
 
   const { rooms, loading: roomsLoading } = useChatRooms(user);
 
-  const { search } = usePathname();
-  const queryParams = new URLSearchParams(search);
-  const roomFromUrl = queryParams.get('room');
+  const searchParams = useSearchParams();
+  const roomFromUrl = searchParams.get('room');
 
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(roomFromUrl || null);
   const [replyingTo, setReplyingTo] = useState<{ id: string; text: string; senderName: string } | null>(null);
@@ -34,6 +33,11 @@ export default function ChatPage() {
   useEffect(() => {
     if (roomFromUrl) {
       setSelectedRoomId(roomFromUrl);
+      return;
+    }
+
+    if (selectedRoomId && !rooms.some((room) => room.id === selectedRoomId)) {
+      setSelectedRoomId(rooms.length > 0 ? rooms[0].id : null);
       return;
     }
 
@@ -121,7 +125,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-7rem)] bg-background md:rounded-md md:border md:border-border overflow-hidden">
+    <div className="flex h-[calc(100vh-8rem)] lg:h-[calc(100vh-4rem)] bg-background md:rounded-md md:border md:border-border overflow-hidden">
       <div className={`${showChatOnMobile ? 'hidden lg:block' : 'block'} lg:block w-full lg:w-auto`}>
         <ChatSidebar
           rooms={rooms}

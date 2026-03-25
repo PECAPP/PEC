@@ -40,7 +40,10 @@ export class UsersService {
         email: data.email,
         role: data.role,
         profileComplete: true,
-        lockedUntil: data.status === 'suspended' ? new Date('2099-01-01T00:00:00.000Z') : null,
+        lockedUntil:
+          data.status === 'suspended'
+            ? new Date('2099-01-01T00:00:00.000Z')
+            : null,
       },
       include: {
         roles: {

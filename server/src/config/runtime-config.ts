@@ -5,7 +5,10 @@ const LOCAL_DEV_ORIGINS = [
   'http://127.0.0.1:4173',
 ];
 
-const parseBoolean = (value: string | undefined, fallback: boolean): boolean => {
+const parseBoolean = (
+  value: string | undefined,
+  fallback: boolean,
+): boolean => {
   if (value == null || value.trim() === '') {
     return fallback;
   }
@@ -45,11 +48,16 @@ export const getCorsConfig = () => {
 
   return {
     origins,
-    allowCredentials: parseBoolean(
-      process.env.CORS_ALLOW_CREDENTIALS,
-      true,
-    ),
-    allowedMethods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowCredentials: parseBoolean(process.env.CORS_ALLOW_CREDENTIALS, true),
+    allowedMethods: [
+      'GET',
+      'HEAD',
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+      'OPTIONS',
+    ],
     allowedHeaders: [
       'Accept',
       'Authorization',
