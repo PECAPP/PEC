@@ -9,17 +9,12 @@ export interface UserPermissions {
   canViewDashboard: boolean;
   canAccessCourses: boolean;
   canAccessFinance: boolean;
-  canAccessPlacements: boolean;
   canAccessReports: boolean;
   canAccessAdmin: boolean;
-
-  // Manage permissions
   canEditProfile: boolean;
   canManageCourses: boolean;
   canManageUsers: boolean;
   canManageFinance: boolean;
-  canManagePlacements: boolean;
-  canManageRecruiters: boolean;
   canManageInstitution: boolean;
 }
 
@@ -48,15 +43,12 @@ function getDefaultPermissions(): UserPermissions {
     canViewDashboard: false,
     canAccessCourses: false,
     canAccessFinance: false,
-    canAccessPlacements: false,
     canAccessReports: false,
     canAccessAdmin: false,
     canEditProfile: false,
     canManageCourses: false,
     canManageUsers: false,
     canManageFinance: false,
-    canManagePlacements: false,
-    canManageRecruiters: false,
     canManageInstitution: false,
   };
 }
@@ -70,21 +62,17 @@ export function getRolePermissions(role: string): UserPermissions {
   switch (role) {
     case "college_admin":
     case "admin":
-    case "moderator":
       return {
         ...basePermissions,
         canViewDashboard: true,
         canAccessCourses: true,
         canAccessFinance: true,
-        canAccessPlacements: true,
         canAccessReports: true,
         canAccessAdmin: true,
         canEditProfile: true,
         canManageCourses: true,
         canManageUsers: true,
         canManageFinance: true,
-        canManagePlacements: true,
-        canManageRecruiters: true,
         canManageInstitution: true,
       };
 
@@ -94,15 +82,12 @@ export function getRolePermissions(role: string): UserPermissions {
         canViewDashboard: true,
         canAccessCourses: true,
         canAccessFinance: true,
-        canAccessPlacements: true,
         canAccessReports: true,
         canAccessAdmin: true,
         canEditProfile: true,
         canManageCourses: true,
         canManageUsers: true,
         canManageFinance: true,
-        canManagePlacements: true,
-        canManageRecruiters: true,
         canManageInstitution: true,
       };
 
@@ -112,7 +97,6 @@ export function getRolePermissions(role: string): UserPermissions {
         canViewDashboard: true,
         canAccessCourses: true,
         canAccessFinance: true,
-        canAccessPlacements: true,
         canEditProfile: true,
       };
 
@@ -125,7 +109,7 @@ export function getRolePermissions(role: string): UserPermissions {
  * Check if user is admin
  */
 export function isAdmin(user: User | null): boolean {
-  return ["college_admin", "admin", "moderator", "faculty"].includes(
+  return ["college_admin", "admin", "faculty"].includes(
     user?.role || "",
   );
 }

@@ -26,11 +26,6 @@ export function BottomNav() {
       path: '/chat'
     },
     {
-      label: 'Order',
-      icon: UtensilsCrossed,
-      path: '/canteen'
-    },
-    {
       label: 'Profile',
       icon: User,
       path: '/profile'

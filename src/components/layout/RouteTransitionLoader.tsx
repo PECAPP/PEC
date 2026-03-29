@@ -1,12 +1,12 @@
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState, Suspense } from 'react';
 
 const isModifiedEvent = (event: MouseEvent | ReactMouseEvent) =>
   event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
 
-export function RouteTransitionLoader() {
+function RouteTransitionLoaderInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -147,5 +147,13 @@ export function RouteTransitionLoader() {
         <p className="text-sm font-medium text-foreground/80">Loading page...</p>
       </div>
     </div>
+  );
+}
+
+export function RouteTransitionLoader() {
+  return (
+    <Suspense fallback={null}>
+      <RouteTransitionLoaderInner />
+    </Suspense>
   );
 }

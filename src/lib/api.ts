@@ -46,6 +46,9 @@ api.interceptors.response.use(
 
     // If not a 401, reject immediately
     if (error.response?.status !== 401) {
+      if (error.response?.status === 404) {
+        console.error(`[API 404] ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
+      }
       return Promise.reject(error);
     }
 

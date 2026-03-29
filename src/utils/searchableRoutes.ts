@@ -36,12 +36,7 @@ export const searchableRoutes = [
     icon: Settings,
     keywords: ["config", "preferences", "security", "admin"],
   },
-  {
-    title: "Notifications",
-    path: "/notifications",
-    icon: Bell,
-    keywords: ["alerts", "messages"],
-  },
+
 
   // Academics
   {
@@ -62,38 +57,9 @@ export const searchableRoutes = [
     icon: Calendar,
     keywords: ["present", "absent"],
   },
-  {
-    title: "Examinations",
-    path: "/examinations",
-    icon: FileText,
-    keywords: ["exams", "results", "marks"],
-  },
 
-  // Placement
-  {
-    title: "Placements Dashboard",
-    path: "/placements/my-dashboard",
-    icon: Briefcase,
-    keywords: ["placements", "drives", "hiring"],
-  },
-  {
-    title: "Placement Drives",
-    path: "/placements/drives",
-    icon: Building2,
-    keywords: ["interviews", "companies", "events"],
-  },
-  {
-    title: "Resume Builder",
-    path: "/resume-builder",
-    icon: FileText,
-    keywords: ["cv", "maker", "templates"],
-  },
-  {
-    title: "Placement Reports",
-    path: "/placements/reports",
-    icon: FileText,
-    keywords: ["stats", "analytics", "data"],
-  },
+
+
 
   // Admin
   {

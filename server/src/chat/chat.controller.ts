@@ -1,117 +1,67 @@
-﻿import {
-  Body,
+import {
   Controller,
-  Delete,
   Get,
-  Patch,
-  Param,
   Post,
+  Delete,
+  Body,
+  Param,
   Query,
-  Request,
   UseGuards,
+  Request,
+  ParseUUIDPipe,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { SendMessageDto } from './dto/send-message.dto';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard)
 @Controller('chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Post('room')
-  createRoom(@Request() req: any, @Body() body: CreateRoomDto) {
-    // ensure requester is a participant
-    const participants = Array.from(new Set([...body.userIds, req.user.sub]));
-    return this.chatService.createRoom(
-      body.name,
-      body.isGroup ?? true,
-      participants,
-    );
-  }
-
-  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('rooms')
-  getRooms(@Request() req: any) {
-    return this.chatService.getRoomsForUser(req.user.sub);
+  async findAll(@Request() req: any) {
+    const data = await this.chatService.findAllRooms(req.user.sub);
+    return { success: true, data };
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Get('users')
-  getChatUsers(@Request() req: any, @Query('q') q?: string) {
-    return this.chatService.getChatUsers(req.user.sub, q);
-  }
-
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Get('room/:roomId/participants')
-  getRoomParticipants(@Request() req: any, @Param('roomId') roomId: string) {
-    return this.chatService.getRoomParticipants(roomId, req.user.sub);
-  }
-
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Patch('room/:roomId')
-  updateRoom(
-    @Request() req: any,
-    @Param('roomId') roomId: string,
-    @Body() body: { name?: string },
-  ) {
-    return this.chatService.updateRoom(roomId, req.user.sub, body);
-  }
-
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Delete('room/:roomId')
-  deleteRoom(@Request() req: any, @Param('roomId') roomId: string) {
-    return this.chatService.deleteRoom(roomId, req.user.sub);
-  }
-
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Post('room/:roomId/participants')
-  addParticipant(
-    @Request() req: any,
-    @Param('roomId') roomId: string,
-    @Body() body: { userId: string },
-  ) {
-    return this.chatService.addParticipant(roomId, req.user.sub, body.userId);
-  }
-
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Delete('room/:roomId/participants/:userId')
-  removeParticipant(
-    @Request() req: any,
-    @Param('roomId') roomId: string,
-    @Param('userId') userId: string,
-  ) {
-    return this.chatService.removeParticipant(roomId, req.user.sub, userId);
-  }
-
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Post('message')
-  sendMessage(@Request() req: any, @Body() body: SendMessageDto) {
-    return this.chatService.sendMessage(
-      req.user.sub,
-      body.chatRoomId,
-      body.content,
-    );
-  }
-
-  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('messages/:roomId')
-  getMessages(
+  async findMessages(
     @Request() req: any,
-    @Param('roomId') roomId: string,
-    @Query('limit') limit?: string,
+    @Param('roomId', new ParseUUIDPipe({ version: '4' })) roomId: string,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
   ) {
-    const parsedLimit = limit ? Number(limit) : undefined;
-    return this.chatService.getMessages(roomId, req.user.sub, parsedLimit);
+    const data = await this.chatService.findMessages(roomId, req.user.sub, limit);
+    return { success: true, data };
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
-  @Delete('message/:messageId')
-  deleteMessage(@Request() req: any, @Param('messageId') messageId: string) {
-    return this.chatService.deleteMessage(messageId, req.user.sub);
+  @Get('users')
+  async getChatUsers(@Query('q') query: string) {
+    const data = await this.chatService.getChatUsers(query);
+    return { success: true, data };
+  }
+
+  @Post('room')
+  async createRoom(@Request() req: any, @Body() createRoomDto: CreateRoomDto) {
+    const data = await this.chatService.createRoom(createRoomDto, req.user.sub);
+    return { success: true, data };
+  }
+
+  @Post('message')
+  async sendMessage(@Request() req: any, @Body() sendMessageDto: SendMessageDto) {
+    const data = await this.chatService.sendMessage(sendMessageDto, req.user.sub);
+    return { success: true, data };
+  }
+
+  @Delete('message/:id')
+  async removeMessage(
+    @Request() req: any,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    const data = await this.chatService.deleteMessage(id, req.user.sub);
+    return { success: true, data };
   }
 }

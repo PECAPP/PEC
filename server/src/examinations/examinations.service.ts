@@ -1,9 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateExamScheduleDto } from './dto/create-exam-schedule.dto';
-import { CreateGradeDto } from './dto/create-grade.dto';
 import { ExamQueryDto } from './dto/exam-query.dto';
-import { GradeQueryDto } from './dto/grade-query.dto';
 
 @Injectable()
 export class ExaminationsService {
@@ -61,53 +59,5 @@ export class ExaminationsService {
     });
   }
 
-  async upsertGrade(dto: CreateGradeDto) {
-    return this.prisma.grade.upsert({
-      where: {
-        studentId_courseId: {
-          studentId: dto.studentId,
-          courseId: dto.courseId,
-        },
-      },
-      update: {
-        midterm: dto.midterm,
-        final: dto.final,
-        total: dto.total,
-        grade: dto.grade,
-        credits: dto.credits,
-        remarks: dto.remarks,
-      },
-      create: {
-        studentId: dto.studentId,
-        courseId: dto.courseId,
-        midterm: dto.midterm,
-        final: dto.final,
-        total: dto.total,
-        grade: dto.grade,
-        credits: dto.credits,
-        remarks: dto.remarks,
-      },
-    });
-  }
 
-  async listGrades(query: GradeQueryDto) {
-    const limit = Math.min(Math.max(query.limit ?? 200, 1), 500);
-    const offset = Math.max(query.offset ?? 0, 0);
-    const where = {
-      ...(query.courseId ? { courseId: query.courseId } : {}),
-      ...(query.studentId ? { studentId: query.studentId } : {}),
-    };
-
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.grade.findMany({
-        where,
-        take: limit,
-        skip: offset,
-        orderBy: { updatedAt: 'desc' },
-      }),
-      this.prisma.grade.count({ where }),
-    ]);
-
-    return { items, total, limit, offset };
-  }
 }

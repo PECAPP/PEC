@@ -1,204 +1,186 @@
 import { useState, useEffect } from "react";
+import { Search, Loader2, X, Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Users, X } from "lucide-react";
-
-import { createGroupRoom, fetchChatUsers } from "@/lib/chatRooms.service";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import api from "@/lib/api";
+import { createGroupRoom } from "@/lib/chatRooms.service";
 import { toast } from "sonner";
-
-interface User {
-  uid: string;
-  fullName: string;
-  email: string;
-  role: string;
-}
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onGroupCreated: (roomId: string) => void;
-  currentUser: {
-    uid: string;
-    organizationId: string;
-  };
+  currentUser: { uid: string; organizationId: string };
 }
 
 export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, currentUser }: Props) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [fetchingUsers, setFetchingUsers] = useState(false);
+  const [name, setName] = useState("");
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      fetchUsers();
+    const searchUsers = async () => {
+      if (search.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const res = await api.get("/chat/users", { params: { q: search } });
+        setSearchResults(res.data?.data || res.data || []);
+      } catch (error) {
+        console.error("Search error:", error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timer = setTimeout(searchUsers, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const handleToggleUser = (user: any) => {
+    if (selectedUsers.find((u) => u.id === user.id)) {
+      setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
+    } else {
+      setSelectedUsers([...selectedUsers, user]);
     }
-  }, [open]);
-
-  const fetchUsers = async () => {
-    setFetchingUsers(true);
-    try {
-      const usersList = (await fetchChatUsers())
-        .map((u) => ({
-          uid: u.uid,
-          fullName: u.fullName || "",
-          email: u.email || "",
-          role: u.role || "user",
-        }))
-        .filter((u) => u.uid !== currentUser.uid); // Exclude self
-      setAllUsers(usersList);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      toast.error("Failed to load users");
-    } finally {
-      setFetchingUsers(false);
-    }
-  };
-
-  const filteredUsers = allUsers.filter(u => 
-    u.fullName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    u.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const toggleUser = (userId: string) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
-    );
   };
 
   const handleCreate = async () => {
-    if (!title.trim()) {
-      toast.error("Group title is required");
+    if (!name.trim()) {
+      toast.error("Please enter a group name");
       return;
     }
 
-    setLoading(true);
+    if (selectedUsers.length === 0) {
+      toast.error("Please select at least one participant");
+      return;
+    }
+
+    setIsCreating(true);
     try {
-      const room = await createGroupRoom({
-        title,
-        description,
-        organizationId: currentUser.organizationId,
-        creatorId: currentUser.uid,
-        members: [...selectedUsers, currentUser.uid],
-        admins: [currentUser.uid]
-      });
-      
-      toast.success("Group created successfully");
+      const room = await createGroupRoom(
+        name.trim(),
+        selectedUsers.map((u) => u.id)
+      );
+      toast.success(`Group "${name}" created!`);
       onGroupCreated(room.id);
       window.dispatchEvent(new Event("chat-rooms-updated"));
       onOpenChange(false);
-      // Reset state
-      setTitle("");
-      setDescription("");
-      setSelectedUsers([]);
-      setSearchQuery("");
+      reset();
     } catch (error) {
-      console.error("Error creating group:", error);
       toast.error("Failed to create group");
+      console.error(error);
     } finally {
-      setLoading(false);
+      setIsCreating(false);
     }
+  };
+
+  const reset = () => {
+    setName("");
+    setSearch("");
+    setSelectedUsers([]);
+    setSearchResults([]);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] h-[600px] flex flex-col">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-primary" />
-            Create New Group
-          </DialogTitle>
+          <DialogTitle>Create New Group</DialogTitle>
+          <DialogDescription>
+            Create a private space for your team or project.
+          </DialogDescription>
         </DialogHeader>
-
-        <div className="flex-1 space-y-4 py-4 overflow-hidden flex flex-col">
+        <div className="flex flex-col gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Group Title</Label>
-            <Input 
-              id="title" 
-              placeholder="e.g. Project Alpha Team" 
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea 
-              id="description" 
-              placeholder="What is this group about?" 
-              className="resize-none h-20"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+            <label className="text-sm font-medium">Group Name</label>
+            <Input
+              placeholder="e.g. Project Alpha"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isCreating}
             />
           </div>
 
-          <div className="space-y-2 flex-1 flex flex-col">
-            <Label>Add Members ({selectedUsers.length} selected)</Label>
-            <div className="relative mb-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Add Participants</label>
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search users..." 
+              <Input
+                placeholder="Search by name or email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                disabled={isCreating}
               />
             </div>
-            
-            <ScrollArea className="h-[280px] border rounded-md">
-              <div className="p-2">
-                {fetchingUsers ? (
-                  <div className="flex items-center justify-center p-8 text-sm text-muted-foreground">
-                    Loading users...
-                  </div>
-                ) : filteredUsers.length === 0 ? (
-                  <div className="flex items-center justify-center p-8 text-sm text-muted-foreground">
-                    No users found
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                  {filteredUsers.map(user => (
-                    <div 
-                      key={user.uid} 
-                      className="flex items-center space-x-3 p-2 hover:bg-secondary/50 rounded-md cursor-pointer transition-colors"
-                      onClick={() => toggleUser(user.uid)}
-                    >
-                      <Checkbox 
-                        checked={selectedUsers.includes(user.uid)} 
-                        onCheckedChange={() => toggleUser(user.uid)}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium leading-none truncate">{user.fullName}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                      </div>
-                    </div>
-                  ))}
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleCreate} disabled={loading}>
-            {loading ? "Creating..." : "Create Group"}
+            {selectedUsers.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {selectedUsers.map((u) => (
+                  <Badge key={u.id} variant="secondary" className="gap-1">
+                    {u.name || u.email}
+                    <X
+                      className="w-3 h-3 cursor-pointer hover:text-destructive"
+                      onClick={() => handleToggleUser(u)}
+                    />
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="max-h-40 overflow-y-auto border rounded-md mt-2">
+              {isSearching ? (
+                <div className="p-4 flex justify-center">
+                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                </div>
+              ) : searchResults.length > 0 ? (
+                searchResults.map((user) => (
+                  <button
+                    key={user.id}
+                    className="w-full flex items-center justify-between px-3 py-2 hover:bg-secondary text-sm transition-colors"
+                    onClick={() => handleToggleUser(user)}
+                  >
+                    <div className="text-left">
+                      <p className="font-medium">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                    {selectedUsers.find((u) => u.id === user.id) && (
+                      <Check className="w-4 h-4 text-primary" />
+                    )}
+                  </button>
+                ))
+              ) : search.length >= 2 ? (
+                <p className="p-4 text-center text-xs text-muted-foreground">No users found</p>
+              ) : null}
+            </div>
+          </div>
+
+          <Button onClick={handleCreate} disabled={isCreating || !name.trim() || selectedUsers.length === 0}>
+            {isCreating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              "Create Group"
+            )}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -1,54 +1,59 @@
-import { useEffect, useState } from "react";
-import {
-  ChatMessage,
-  subscribeToMessages,
-  sendMessage
-} from "@/lib/messages.service";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ChatMessage, subscribeToMessages, sendMessage as apiSendMessage, sendMediaMessage as apiSendMedia } from '@/lib/messages.service';
 
 export function useChatMessages(roomId: string | null) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [limitCount, setLimitCount] = useState(20);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [limit, setLimit] = useState(20);
+  const lastRoomId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!roomId) {
+      setMessages([]);
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
-    // When room changes, reset limit
-    setLimitCount(20);
-
-    const unsub = subscribeToMessages(roomId, msgs => {
-      setMessages(msgs);
-      setLoading(false);
-    }, 20); // Initial subscription with default limit
-
-    return () => unsub();
-  }, [roomId]);
-
-  // Handle limit updates separately to avoid resetting loading state too aggressively
-  useEffect(() => {
-    if (!roomId) return;
     
-    // If limit is practically 20 (initial), handled by above effect. 
-    // This effect handles upgrades.
-    if (limitCount === 20) return;
+    // Subscribe to messages (polling)
+    const unsubscribe = subscribeToMessages(roomId, (newMessages) => {
+      setMessages(newMessages);
+      setLoading(false);
+      // If we got fewer than the limit, there are no more messages (simplistic check for polling)
+      if (newMessages.length < limit) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
+    }, limit);
 
-    const unsub = subscribeToMessages(roomId, msgs => {
-      setMessages(msgs);
-    }, limitCount);
+    return () => {
+      unsubscribe();
+    };
+  }, [roomId, limit]);
 
-    return () => unsub();
-  }, [roomId, limitCount]);
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      setLimit(prev => prev + 20);
+    }
+  }, [loading, hasMore]);
 
-  const loadMore = () => {
-    setLimitCount(prev => prev + 20);
-  };
+  const sendMessage = useCallback(async (roomId: string, text: string, metadata?: any) => {
+    await apiSendMessage(roomId, text, metadata);
+  }, []);
+
+  const sendMedia = useCallback(async (roomId: string, mediaUrl: string, type: any, options?: any) => {
+    await apiSendMedia(roomId, mediaUrl, type, options);
+  }, []);
 
   return {
     messages,
     loading,
-    sendMessage,
+    hasMore,
     loadMore,
-    hasMore: messages.length >= limitCount // Heuristic: if we got less than requested, we reached end
+    sendMessage,
+    sendMedia,
   };
 }

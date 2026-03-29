@@ -1,5 +1,5 @@
 export * from './auth';
 export * from './academic';
-export * from './placement';
+// Placement types removed as part of decommissioning
 export * from './admin';
 export * from './common';
