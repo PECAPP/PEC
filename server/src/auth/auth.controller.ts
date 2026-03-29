@@ -183,21 +183,21 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator', 'user')
+  @Roles('student', 'faculty', 'admin')
   @Get('profile')
   getProfile(@Request() req: any) {
     return this.authService.getProfile(req.user.sub);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator', 'user')
+  @Roles('student', 'faculty', 'admin')
   @Post('complete-profile')
   completeProfile(@Request() req: any, @Body() body: Record<string, any>) {
     return this.authService.completeProfile(req.user.sub, body);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator', 'user')
+  @Roles('student', 'faculty', 'admin')
   @HttpCode(HttpStatus.OK)
   @Post('change-password')
   async changePassword(
@@ -217,7 +217,7 @@ export class AuthController {
 
   @Post('set-role')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('college_admin', 'admin')
+  @Roles('admin')
   @RateLimit({ limit: 20, windowMs: 60_000, banAfterExceeded: 8 })
   async setRole(
     @Request() req: any,

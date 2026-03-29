@@ -23,7 +23,7 @@ import { UserQueryDto } from './dto/user-query.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('admin', 'faculty')
   @Post()
   async create(
     @Body()
@@ -46,7 +46,7 @@ export class UsersController {
     return { success: true, data };
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('admin', 'faculty')
   @Get()
   async findMany(@Request() req: any, @Query() query: UserQueryDto) {
     const userRoles = Array.isArray(req.user?.roles)
@@ -78,7 +78,7 @@ export class UsersController {
     };
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('admin', 'faculty')
   @Get('search')
   async search(@Query('email') email: string) {
     const user = await this.usersService.findOne(email);
@@ -86,14 +86,14 @@ export class UsersController {
     return this.usersService.toPublicUserRecord(user as any);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator', 'user')
+  @Roles('student', 'faculty', 'admin')
   @Get(':id')
   async findOne(
     @Request() req: any,
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
     const isOwner = req.user?.sub === id;
-    const elevatedRoles = new Set(['college_admin', 'admin', 'moderator']);
+    const elevatedRoles = new Set(['admin']);
     const userRoles = Array.isArray(req.user?.roles)
       ? req.user.roles
       : req.user?.role
@@ -115,7 +115,7 @@ export class UsersController {
     return this.usersService.toPublicUserRecord(user as any);
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('admin', 'faculty')
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,

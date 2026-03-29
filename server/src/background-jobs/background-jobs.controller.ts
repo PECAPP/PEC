@@ -7,7 +7,7 @@ import { BackgroundJobsService } from './background-jobs.service';
 import { CreateBackgroundJobDto } from './dto/create-background-job.dto';
 
 @UseGuards(AuthGuard, RolesGuard)
-@Roles('admin', 'college_admin', 'moderator')
+@Roles('admin')
 @Controller('background-jobs')
 export class BackgroundJobsController {
   constructor(private readonly backgroundJobsService: BackgroundJobsService) {}

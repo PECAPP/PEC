@@ -7,6 +7,17 @@ const API = axios.create({
   baseURL: API_BASE_URL,
 });
 
+const timestampWrapper = (value: string | Date | undefined) => {
+  const date = value ? new Date(value) : new Date();
+  const ms = date.getTime();
+  const seconds = Number.isFinite(ms) ? Math.floor(ms / 1000) : 0;
+  return {
+    toDate: () => date,
+    seconds,
+    nanoseconds: 0,
+  };
+};
+
 API.interceptors.request.use((config) => {
   const token = authClient.getAccessToken();
   if (token) {
@@ -48,12 +59,22 @@ const unwrapSuccess = <T = any>(payload: any): T => {
 const normalizeCollectionName = (collectionName: string) => {
   if (collectionName === "feeRecords") return "fee-records";
   if (collectionName === "placement_drives") return "jobs";
+  if (collectionName === "courseMaterials") return "course-materials";
+  if (collectionName === "campusMapRegions") return "campusMapRegions";
+  if (collectionName === "campusMapRoads") return "campusMapRoads";
+  if (collectionName === "hostelIssues") return "hostelIssues";
   return collectionName;
 };
 
 const routeForCollection = (collectionName: string) => {
   const normalized = normalizeCollectionName(collectionName);
+  if (normalized === "canteenItems") return "/night-canteen/items";
+  if (normalized === "canteenOrders") return "/night-canteen/orders";
   if (normalized === "books") return "/library/books";
+  if (normalized === "course-materials") return "/course-materials";
+  if (normalized === "campusMapRegions") return "/campusMapRegions";
+  if (normalized === "campusMapRoads") return "/campusMapRoads";
+  if (normalized === "hostelIssues") return "/hostelIssues";
   return `/${normalized}`;
 };
 
@@ -101,6 +122,22 @@ const toIsoDate = (value: any) => {
 export const getDoc = async (docRef: string) => {
   try {
     let value: any;
+
+    if (docRef.startsWith("canteenItems/")) {
+      const [, id] = docRef.split("/");
+      const { data } = await API.get(`/night-canteen/items/${id}`);
+      value = unwrapSuccess(data);
+    } else if (docRef.startsWith("canteenOrders/")) {
+      const [, id] = docRef.split("/");
+      const { data } = await API.get(`/night-canteen/orders/${id}`);
+      const order = unwrapSuccess<any>(data);
+      value = order
+        ? {
+            ...order,
+            timestamp: timestampWrapper(order.timestamp),
+          }
+        : null;
+    } else
 
     if (
       docRef.startsWith("studentProfiles/") ||
@@ -336,6 +373,30 @@ export const getDocs = async (q: any) => {
     const normalizedItems =
       col === "timetable" && Array.isArray(items)
         ? items.map((item) => toTimetableShape(item))
+        : col === "hostelIssues" && Array.isArray(items)
+          ? items.map((item) => ({
+              ...item,
+              createdAt: timestampWrapper(item?.createdAt),
+              updatedAt: timestampWrapper(item?.updatedAt),
+              responses: Array.isArray(item?.responses)
+                ? item.responses.map((entry: any) => ({
+                    ...entry,
+                    timestamp: timestampWrapper(entry?.timestamp),
+                  }))
+                : [],
+            }))
+        : col === "courseMaterials" && Array.isArray(items)
+          ? items.map((item) => ({
+              ...item,
+              uploadedAt: timestampWrapper(item?.uploadedAt),
+              createdAt: timestampWrapper(item?.createdAt),
+              updatedAt: timestampWrapper(item?.updatedAt),
+            }))
+        : col === "canteenOrders" && Array.isArray(items)
+          ? items.map((item) => ({
+              ...item,
+              timestamp: timestampWrapper(item?.timestamp),
+            }))
         : items;
 
     if (col === "attendance" && Array.isArray(normalizedItems)) {
@@ -502,6 +563,9 @@ export const query = (col: string, ...args: any[]) => {
     .reduce((acc, curr) => {
       if (curr.op === "in" && Array.isArray(curr.value)) {
         return { ...acc, [curr.field]: curr.value };
+      }
+      if (curr.op === "!=") {
+        return { ...acc, [`${curr.field}__ne`]: curr.value };
       }
       return { ...acc, [curr.field]: curr.value };
     }, {});

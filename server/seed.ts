@@ -80,6 +80,64 @@ const JOB_COMPANIES = [
   'Airbus',
 ];
 
+const NIGHT_CANTEEN_ITEMS = [
+  {
+    id: 'night_maggi',
+    name: 'Masala Maggi',
+    price: 55,
+    category: 'Meals',
+    description: 'Hot masala maggi with veggies for late-night hunger.',
+    image:
+      'https://images.unsplash.com/photo-1617093727343-374698b1b08d?auto=format&fit=crop&w=1200&q=80',
+    isAvailable: true,
+    stock: 120,
+  },
+  {
+    id: 'paneer_roll',
+    name: 'Paneer Tikka Roll',
+    price: 85,
+    category: 'Snacks',
+    description: 'Soft roll stuffed with paneer tikka and mint mayo.',
+    image:
+      'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80',
+    isAvailable: true,
+    stock: 75,
+  },
+  {
+    id: 'cold_coffee',
+    name: 'Cold Coffee',
+    price: 60,
+    category: 'Drinks',
+    description: 'Chilled cold coffee with ice cream froth.',
+    image:
+      'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=1200&q=80',
+    isAvailable: true,
+    stock: 90,
+  },
+  {
+    id: 'veg_biryani_bowl',
+    name: 'Veg Biryani Bowl',
+    price: 110,
+    category: 'Meals',
+    description: 'Aromatic biryani bowl served with raita.',
+    image:
+      'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=1200&q=80',
+    isAvailable: true,
+    stock: 60,
+  },
+  {
+    id: 'choco_brownie',
+    name: 'Choco Brownie',
+    price: 45,
+    category: 'Desserts',
+    description: 'Warm chocolate brownie for midnight cravings.',
+    image:
+      'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=1200&q=80',
+    isAvailable: true,
+    stock: 80,
+  },
+];
+
 const ROOM_FEATURES = [
   JSON.stringify(['Projector', 'WiFi', 'Whiteboard']),
   JSON.stringify(['Smart Display', 'WiFi', 'AC']),
@@ -654,6 +712,12 @@ async function clearDatabase() {
   await prisma.auditLog.deleteMany();
   await prismaAny.backgroundJob.deleteMany();
   await prismaAny.featureFlag.deleteMany();
+  await prismaAny.canteenOrder.deleteMany();
+  await prismaAny.canteenItem.deleteMany();
+  await prismaAny.hostelIssue.deleteMany();
+  await prismaAny.campusMapRoad.deleteMany();
+  await prismaAny.campusMapRegion.deleteMany();
+  await prismaAny.courseMaterial.deleteMany();
   await prisma.bookBorrow.deleteMany();
   await prisma.attendance.deleteMany();
   await prisma.message.deleteMany();
@@ -676,6 +740,48 @@ async function clearDatabase() {
   await prisma.userRole.deleteMany();
   await prisma.role.deleteMany();
   await prisma.user.deleteMany();
+}
+
+async function seedNightCanteen() {
+  await prisma.canteenItem.createMany({ data: NIGHT_CANTEEN_ITEMS });
+
+  const student = await prisma.user.findUnique({
+    where: { email: 'student@pec.edu' },
+    select: { id: true, name: true },
+  });
+
+  if (!student) return;
+
+  const now = new Date();
+  await prisma.canteenOrder.createMany({
+    data: [
+      {
+        studentId: student.id,
+        studentName: student.name,
+        hostelRoom: 'H4-302',
+        items: [
+          { itemId: 'night_maggi', name: 'Masala Maggi', quantity: 1, price: 55 },
+          { itemId: 'cold_coffee', name: 'Cold Coffee', quantity: 1, price: 60 },
+        ],
+        totalAmount: 115,
+        status: 'Delivered',
+        timestamp: new Date(now.getTime() - 60 * 60 * 1000),
+      },
+      {
+        studentId: student.id,
+        studentName: student.name,
+        hostelRoom: 'H4-302',
+        items: [
+          { itemId: 'paneer_roll', name: 'Paneer Tikka Roll', quantity: 2, price: 85 },
+        ],
+        totalAmount: 170,
+        status: 'Pending',
+        timestamp: new Date(now.getTime() - 12 * 60 * 1000),
+      },
+    ],
+  });
+
+  console.log(`Created ${NIGHT_CANTEEN_ITEMS.length} canteen items and 2 demo orders`);
 }
 
 async function ensureRole(name: string) {
@@ -737,29 +843,8 @@ async function seedDepartments() {
 async function seedUsers(passwordHash: string) {
   const admin = await createUserWithRole({
     email: 'admin@pec.edu',
-    name: 'PEC College Admin',
-    role: 'college_admin',
-    password: passwordHash,
-  });
-
-  await createUserWithRole({
-    email: 'ops.admin@pec.edu',
-    name: 'Operations Admin',
+    name: 'PEC Admin',
     role: 'admin',
-    password: passwordHash,
-  });
-
-  await createUserWithRole({
-    email: 'moderator@pec.edu',
-    name: 'Platform Moderator',
-    role: 'moderator',
-    password: passwordHash,
-  });
-
-  await createUserWithRole({
-    email: 'guest.user@pec.edu',
-    name: 'Generic Campus User',
-    role: 'user',
     password: passwordHash,
   });
 
@@ -1440,6 +1525,308 @@ async function seedJobs() {
   console.log(`Created ${jobs.length} jobs`);
 }
 
+async function seedHostelIssues(students: StudentSeed[]) {
+  const prismaAny = prisma as any;
+  const hostelIssuesData = [];
+  const categories = [
+    'electrical',
+    'plumbing',
+    'internet',
+    'maintenance',
+    'hvac',
+  ] as const;
+  const statuses = ['open', 'in-progress', 'resolved', 'archived'] as const;
+  const priorities = ['low', 'medium', 'high', 'urgent'] as const;
+  const organizationId = 'pec-main-campus';
+
+  // Sample hostel students only
+  const hostelStudents = students.slice(0, 20);
+
+  for (let index = 0; index < 15; index += 1) {
+    const student = hostelStudents[index % hostelStudents.length];
+    const category = categories[index % categories.length];
+    const status = statuses[index % statuses.length];
+    const priority = priorities[index % priorities.length];
+    const roomNumbers = [
+      'H1-101',
+      'H1-102',
+      'H2-201',
+      'H2-202',
+      'H3-301',
+      'H4-401',
+    ];
+
+    hostelIssuesData.push({
+      title: `${category.charAt(0).toUpperCase() + category.slice(1)} Issue - ${index + 1}`,
+      description: `Issue reported in hostel room: Maintenance needed for ${category} system. This is a test issue for demonstration.`,
+      category,
+      priority,
+      roomNumber: roomNumbers[index % roomNumbers.length],
+      studentId: student.id,
+      studentName: student.name,
+      status,
+      organizationId,
+      responses:
+        status === 'resolved' || status === 'in-progress'
+          ? [
+              {
+                from: 'admin@pec.edu',
+                message: 'We have received your issue and will address it soon.',
+                timestamp: daysAgo(index + 2),
+              },
+              {
+                from: student.name,
+                message: 'Thank you, please let me know when it will be fixed.',
+                timestamp: daysAgo(index + 1),
+              },
+              ...(status === 'resolved'
+                ? [
+                    {
+                      from: 'admin@pec.edu',
+                      message: 'The issue has been resolved. Please verify.',
+                      timestamp: daysAgo(index),
+                    },
+                  ]
+                : []),
+            ]
+          : [],
+      createdAt: daysAgo(index + 5),
+      updatedAt: daysAgo(index),
+    });
+  }
+
+  if (hostelIssuesData.length > 0) {
+    await prismaAny.hostelIssue.createMany({ data: hostelIssuesData });
+  }
+
+  console.log(`Created ${hostelIssuesData.length} hostel issues`);
+}
+
+async function seedCampusMap() {
+  const prismaAny = prisma as any;
+  const organizationId = 'pec-main-campus';
+
+  // Create Campus Map Regions (Buildings)
+  const regionCategories = ['academic', 'hostel', 'sports', 'food', 'admin'] as const;
+  const regionsData = [
+    {
+      name: 'Computer Science Block',
+      description: 'Main building for CSE, MNC, and AI departments',
+      category: 'academic' as const,
+      x: 10,
+      y: 20,
+      width: 15,
+      height: 12,
+      organizationId,
+      link: '/buildings/cse-block',
+    },
+    {
+      name: 'Electrical Engineering Block',
+      description: 'Building for EE, ECE, and VLSI departments',
+      category: 'academic' as const,
+      x: 35,
+      y: 20,
+      width: 15,
+      height: 12,
+      organizationId,
+      link: '/buildings/ee-block',
+    },
+    {
+      name: 'Mechanical Engineering Block',
+      description: 'Building for MECH, PROD, and AERO departments',
+      category: 'academic' as const,
+      x: 60,
+      y: 20,
+      width: 15,
+      height: 12,
+      organizationId,
+      link: '/buildings/mech-block',
+    },
+    {
+      name: 'Civil & Metallurgy Block',
+      description: 'Building for CIVIL, META, and DS departments',
+      category: 'academic' as const,
+      x: 10,
+      y: 45,
+      width: 15,
+      height: 12,
+      organizationId,
+      link: '/buildings/civil-meta-block',
+    },
+    {
+      name: 'Hostel Block A',
+      description: 'Student accommodation',
+      category: 'hostel' as const,
+      x: 40,
+      y: 50,
+      width: 10,
+      height: 15,
+      organizationId,
+      link: '/buildings/hostel-a',
+    },
+    {
+      name: 'Sports Complex',
+      description: 'Cricket field, gymnasium, badminton courts',
+      category: 'sports' as const,
+      x: 65,
+      y: 45,
+      width: 20,
+      height: 18,
+      organizationId,
+      link: '/buildings/sports-complex',
+    },
+    {
+      name: 'Canteen Area',
+      description: 'Food court and night canteen',
+      category: 'food' as const,
+      x: 35,
+      y: 70,
+      width: 8,
+      height: 8,
+      organizationId,
+      link: '/buildings/canteen',
+    },
+    {
+      name: 'Administration Building',
+      description: 'Office of Principal, Finance, Registrar',
+      category: 'admin' as const,
+      x: 10,
+      y: 70,
+      width: 12,
+      height: 10,
+      organizationId,
+      link: '/buildings/admin',
+    },
+  ];
+
+  // Create Roads connecting regions
+  const roadsData = [
+    {
+      width: 2,
+      organizationId,
+      points: JSON.stringify([
+        { x: 5, y: 35 },
+        { x: 25, y: 35 },
+        { x: 50, y: 35 },
+        { x: 75, y: 35 },
+        { x: 75, y: 60 },
+      ]),
+    },
+    {
+      width: 1.5,
+      organizationId,
+      points: JSON.stringify([
+        { x: 16, y: 60 },
+        { x: 16, y: 80 },
+      ]),
+    },
+    {
+      width: 2,
+      organizationId,
+      points: JSON.stringify([
+        { x: 30, y: 35 },
+        { x: 45, y: 50 },
+      ]),
+    },
+    {
+      width: 1.5,
+      organizationId,
+      points: JSON.stringify([
+        { x: 50, y: 35 },
+        { x: 75, y: 45 },
+      ]),
+    },
+    {
+      width: 1,
+      organizationId,
+      points: JSON.stringify([
+        { x: 85, y: 20 },
+        { x: 85, y: 80 },
+      ]),
+    },
+  ];
+
+  for (const region of regionsData) {
+    await prismaAny.campusMapRegion.create({ data: region });
+  }
+
+  for (const road of roadsData) {
+    await prismaAny.campusMapRoad.create({ data: road });
+  }
+
+  console.log(
+    `Created ${regionsData.length} campus regions and ${roadsData.length} roads`,
+  );
+}
+
+async function seedCourseMaterials(faculties: FacultySeed[], courses: CourseSeed[]) {
+  const prismaAny = prisma as any;
+  const materialTypes = [
+    'lecture-notes',
+    'reference',
+    'assignment',
+    'video',
+    'other',
+  ] as const;
+
+  const materialsData = [];
+
+  // Create 2-3 materials per course
+  for (let index = 0; index < courses.length; index += 1) {
+    const course = courses[index];
+    const materialCount = 2 + (index % 2);
+
+    for (let matIndex = 0; matIndex < materialCount; matIndex += 1) {
+      const type = materialTypes[matIndex % materialTypes.length];
+      const titles: Record<(typeof materialTypes)[number], string[]> = {
+        'lecture-notes': [
+          `${course.code} - Lecture Notes ${matIndex + 1}`,
+          `${course.code} - Chapter ${matIndex + 1} Overview`,
+          `${course.code} - Unit ${matIndex + 1} Summary`,
+        ],
+        reference: [
+          `${course.code} - Reference Material Set ${matIndex + 1}`,
+          `${course.code} - Additional Reading ${matIndex + 1}`,
+          `${course.code} - Research Paper Collection`,
+        ],
+        assignment: [
+          `${course.code} - Assignment ${matIndex + 1}`,
+          `${course.code} - Problem Set ${matIndex + 1}`,
+          `${course.code} - Tutorial Questions`,
+        ],
+        video: [
+          `${course.code} - Lecture Recording ${matIndex + 1}`,
+          `${course.code} - Concept Explanation Video`,
+          `${course.code} - Lab Demonstration Video`,
+        ],
+        other: [
+          `${course.code} - Resource ${matIndex + 1}`,
+          `${course.code} - Supplementary Material`,
+          `${course.code} - Additional Resources`,
+        ],
+      };
+
+      materialsData.push({
+        title: titles[type][matIndex % titles[type].length],
+        description: `${type === 'lecture-notes' ? 'Comprehensive lecture notes covering key concepts' : type === 'reference' ? 'Reference material for deeper understanding' : type === 'assignment' ? 'Assignment for practice and evaluation' : type === 'video' ? 'Video lecture for visual learning' : 'Supporting material for the course'} for ${course.name}`,
+        courseId: course.id,
+        courseName: course.name,
+        courseCode: course.code,
+        type,
+        fileURL: `https://cdn.example.com/materials/${course.code}/${type}/${matIndex + 1}.pdf`,
+        uploadedBy: course.facultyId,
+        uploadedAt: daysAgo(index + matIndex + 3),
+      });
+    }
+  }
+
+  if (materialsData.length > 0) {
+    await prismaAny.courseMaterial.createMany({ data: materialsData });
+  }
+
+  console.log(`Created ${materialsData.length} course materials`);
+}
+
 async function seedChatAndActivity(
   adminId: string,
   faculties: FacultySeed[],
@@ -1597,7 +1984,13 @@ async function main() {
   await seedExamSchedulesAndGrades(students, courses);
   await seedLibraryAndRooms(students);
   await seedJobs();
+  await seedNightCanteen();
   await seedChatAndActivity(admin.id, faculties, students, courses);
+
+  // Seed new features
+  await seedHostelIssues(students);
+  await seedCampusMap();
+  await seedCourseMaterials(faculties, courses);
 
   console.log('');
   console.log('Seed completed successfully.');
@@ -1610,9 +2003,7 @@ async function main() {
   console.log('Demo credentials:');
   console.log('Student      student@pec.edu / password123');
   console.log('Faculty      faculty@pec.edu / password123');
-  console.log('CollegeAdmin admin@pec.edu / password123');
-  console.log('Admin        ops.admin@pec.edu / password123');
-  console.log('Moderator    moderator@pec.edu / password123');
+  console.log('Admin        admin@pec.edu / password123');
 }
 
 main()

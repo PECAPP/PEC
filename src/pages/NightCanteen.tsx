@@ -422,7 +422,7 @@ export function NightCanteen() {
                     <div className="flex flex-wrap gap-2">
                       {order.items.map((item: any, idx: number) => (
                         <Badge key={idx} variant="secondary">
-                          {item.quantity}x {item.name}
+                          {Math.max(1, Number(item?.quantity) || 0)}x {String(item?.name || 'Item')}
                         </Badge>
                       ))}
                     </div>

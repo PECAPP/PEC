@@ -10,18 +10,19 @@ import {
   AlertCircle,
   MessageSquare,
   Send,
-  Filter,
   Wrench,
   Zap,
   Droplets,
   Wifi,
   ThermometerSun,
+  Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -40,35 +41,25 @@ import {
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
-import { 
-  collection, 
-  query, 
-  onSnapshot, 
-  addDoc, 
-  serverTimestamp, 
-  where, 
-  doc, 
-  updateDoc, 
-  arrayUnion,
-  orderBy
-} from '@/lib/dataClient';
+import api from '@/lib/api';
 
 interface HostelIssue {
   id: string;
   title: string;
   description: string;
-  category: 'electrical' | 'plumbing' | 'internet' | 'maintenance' | 'hvac';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  category: string;
+  priority: string;
+  status: string;
   roomNumber: string;
   studentId: string;
   studentName: string;
-  createdAt: any;
-  updatedAt: any;
-  responses?: { from: string; message: string; timestamp: any }[];
+  organizationId?: string;
+  createdAt: string;
+  updatedAt: string;
+  responses?: { from: string; message: string; timestamp: string }[];
 }
 
-const categoryIcons = {
+const categoryIcons: Record<string, any> = {
   electrical: Zap,
   plumbing: Droplets,
   internet: Wifi,
@@ -76,123 +67,185 @@ const categoryIcons = {
   hvac: ThermometerSun,
 };
 
-export default function HostelIssues() {
+const getStatusConfig = (status: string) => {
+  switch (status) {
+    case 'open': return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Open' };
+    case 'in_progress': return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'In Progress' };
+    case 'resolved': return { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Resolved' };
+    case 'closed': return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Closed' };
+    default: return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
+  }
+};
+
+const getPriorityConfig = (priority: string) => {
+  switch (priority) {
+    case 'urgent': return { color: 'text-red-500', bg: 'bg-red-500/10' };
+    case 'high': return { color: 'text-orange-500', bg: 'bg-orange-500/10' };
+    case 'medium': return { color: 'text-blue-500', bg: 'bg-blue-500/10' };
+    default: return { color: 'text-green-500', bg: 'bg-green-500/10' };
+  }
+};
+
+export default function HostelIssuesPage() {
   const { user } = usePermissions();
+
   const [issues, setIssues] = useState<HostelIssue[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [authFailed, setAuthFailed] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
-  const [newIssue, setNewIssue] = useState({ title: '', description: '', category: '', priority: 'medium', roomNumber: '' });
   const [selectedIssue, setSelectedIssue] = useState<HostelIssue | null>(null);
   const [newMessage, setNewMessage] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: 'electrical',
+    priority: 'medium',
+    roomNumber: '',
+  });
 
-  useEffect(() => {
-    if (!user) return;
+  const formatDate = (value: unknown) => {
+    if (!value) return 'N/A';
+    const date = new Date(String(value));
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleDateString();
+  };
 
-    // Show personal issues AND seeded issues for demo purposes
-    const seededIds = ['25111001', '25111002'];
-    // Use a simple query without orderBy to avoid composite index requirement
-    const q = query(
-      collection(({} as any), 'hostelIssues'), 
-      where('studentId', 'in', [user.uid, ...seededIds])
-    );
+  const formatTime = (value: unknown) => {
+    if (!value) return 'N/A';
+    const date = new Date(String(value));
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleTimeString();
+  };
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const issuesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as HostelIssue[];
-      
-      // Sort on client side to avoid index requirement
-      const sortedIssues = issuesData.sort((a, b) => {
-        const timeA = a.createdAt?.seconds || 0;
-        const timeB = b.createdAt?.seconds || 0;
-        return timeB - timeA;
+  const fetchIssues = async () => {
+    if (!user?.uid) return;
+
+    try {
+      setLoading(true);
+      const response = await api.get('/hostelIssues', {
+        params: { studentId: user.uid, limit: 200, offset: 0 },
       });
 
-      setIssues(sortedIssues);
-      setLoading(false);
-      
-      if (selectedIssue) {
-        const updated = sortedIssues.find(i => i.id === selectedIssue.id);
-        if (updated) setSelectedIssue(updated);
+      const data = response.data?.data || [];
+      setIssues(Array.isArray(data) ? data : []);
+      setAuthFailed(false);
+    } catch (error: any) {
+      if (error?.response?.status === 401) {
+        setAuthFailed(true);
+        return;
       }
-    }, (error) => {
-      console.error("Error fetching hostel issues:", error);
+      console.error('Error fetching issues:', error);
+      toast.error('Failed to load issues');
+    } finally {
       setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [selectedIssue, user]);
-
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case 'open': return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Open' };
-      case 'in_progress': return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'In Progress' };
-      case 'resolved': return { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Resolved' };
-      case 'closed': return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Closed' };
-      default: return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
     }
   };
 
-  const getPriorityConfig = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return { color: 'text-red-500', bg: 'bg-red-500/10' };
-      case 'high': return { color: 'text-orange-500', bg: 'bg-orange-500/10' };
-      case 'medium': return { color: 'text-blue-500', bg: 'bg-blue-500/10' };
-      default: return { color: 'text-muted-foreground', bg: 'bg-muted' };
-    }
-  };
+  useEffect(() => {
+    if (!user?.uid || authFailed) return;
+
+    fetchIssues();
+    const interval = setInterval(fetchIssues, 5000);
+    return () => clearInterval(interval);
+  }, [user?.uid, authFailed]);
 
   const handleSubmitIssue = async () => {
-    if (!newIssue.title || !newIssue.description || !newIssue.category || !newIssue.roomNumber) {
+    if (!formData.title || !formData.description || !formData.category || !formData.roomNumber) {
       toast.error('Please fill in all required fields');
       return;
     }
 
-    try {
-      await addDoc(collection(({} as any), 'hostelIssues'), {
-        title: newIssue.title,
-        description: newIssue.description,
-        category: newIssue.category,
-        priority: newIssue.priority,
-        status: 'open',
-        roomNumber: newIssue.roomNumber,
-        studentId: user?.uid,
-        studentName: user?.fullName || user?.name || user?.email?.split('@')[0],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        responses: []
-      });
+    if (!user?.uid) {
+      toast.error('User information not available');
+      return;
+    }
 
-      setNewIssue({ title: '', description: '', category: '', priority: 'medium', roomNumber: '' });
-      setDialogOpen(false);
-      toast.success('Issue submitted successfully');
-    } catch (error) {
-      console.error("Error submitting issue:", error);
-      toast.error('Failed to submit issue');
+    setSubmitting(true);
+    try {
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        priority: formData.priority,
+        roomNumber: formData.roomNumber,
+        studentId: user.uid,
+        studentName: user.fullName || user.name || user.email?.split('@')[0] || 'Student',
+        status: 'open',
+      };
+
+      const response = await api.post('/hostelIssues', payload);
+
+      if (response.data?.data?.id) {
+        setFormData({
+          title: '',
+          description: '',
+          category: 'electrical',
+          priority: 'medium',
+          roomNumber: '',
+        });
+        setDialogOpen(false);
+        toast.success('Issue reported successfully!');
+        await fetchIssues();
+      }
+    } catch (error: any) {
+      console.error('Error submitting issue:', error);
+      toast.error(error.response?.data?.message || 'Failed to submit issue');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleAddResponse = async () => {
     if (!newMessage.trim() || !selectedIssue) return;
 
+    setSendingMessage(true);
     try {
-      const issueRef = doc(({} as any), 'hostelIssues', selectedIssue.id);
-      await updateDoc(issueRef, {
-        responses: arrayUnion({
-          from: 'Student',
-          message: newMessage,
-          timestamp: new Date()
-        }),
-        updatedAt: serverTimestamp()
-      });
+      const response = await api.patch(
+        `/hostelIssues/${selectedIssue.id}`,
+        {
+          responses: {
+            _op: 'arrayUnion',
+            val: {
+              from: 'Student',
+              message: newMessage,
+              timestamp: new Date().toISOString(),
+            },
+          },
+        }
+      );
 
-      setNewMessage('');
-      toast.success('Message sent');
-    } catch (error) {
-      console.error("Error sending message:", error);
-      toast.error('Failed to send message');
+      if (response.data?.data) {
+        setSelectedIssue(response.data.data);
+        setNewMessage('');
+        toast.success('Message sent!');
+        await fetchIssues();
+      }
+    } catch (error: any) {
+      console.error('Error sending message:', error);
+      toast.error(error.response?.data?.message || 'Failed to send message');
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  const handleStatusUpdate = async (newStatus: string) => {
+    if (!selectedIssue) return;
+
+    try {
+      const response = await api.patch(`/hostelIssues/${selectedIssue.id}`, { status: newStatus });
+
+      if (response.data?.data) {
+        setSelectedIssue(response.data.data);
+        toast.success(`Status updated to ${newStatus}`);
+        await fetchIssues();
+      }
+    } catch (error: any) {
+      console.error('Error updating status:', error);
+      toast.error(error.response?.data?.message || 'Failed to update status');
     }
   };
 
@@ -208,6 +261,17 @@ export default function HostelIssues() {
     resolved: issues.filter(i => i.status === 'resolved' || i.status === 'closed').length,
   };
 
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-muted-foreground mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -217,87 +281,105 @@ export default function HostelIssues() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Hostel Issue Inbox</h1>
+          <h1 className="text-2xl font-bold text-foreground">Hostel Issues</h1>
           <p className="text-muted-foreground">Report and track maintenance issues</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Report Issue
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Report New Issue</DialogTitle>
-              <DialogDescription>Describe the issue you're facing in your hostel room</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div>
-                <label className="text-sm font-medium text-foreground">Issue Title *</label>
-                <Input
-                  placeholder="Brief description of the issue"
-                  value={newIssue.title}
-                  onChange={(e) => setNewIssue(prev => ({ ...prev, title: e.target.value }))}
-                  className="mt-1"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchIssues}
+            disabled={loading}
+          >
+            <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
+            Refresh
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Report Issue
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Report New Issue</DialogTitle>
+                <DialogDescription>Describe the issue you're facing in your hostel room</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground">Room Number *</label>
+                  <label className="text-sm font-medium text-foreground">Title *</label>
                   <Input
-                    placeholder="e.g. A-204"
-                    value={newIssue.roomNumber}
-                    onChange={(e) => setNewIssue(prev => ({ ...prev, roomNumber: e.target.value }))}
+                    placeholder="e.g., Light bulb not working"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     className="mt-1"
                   />
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground">Room Number *</label>
+                    <Input
+                      placeholder="e.g., A-204"
+                      value={formData.roomNumber}
+                      onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground">Category *</label>
+                    <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="electrical">Electrical</SelectItem>
+                        <SelectItem value="plumbing">Plumbing</SelectItem>
+                        <SelectItem value="internet">Internet/WiFi</SelectItem>
+                        <SelectItem value="hvac">AC/Heating</SelectItem>
+                        <SelectItem value="maintenance">General Maintenance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground">Category *</label>
-                  <Select value={newIssue.category} onValueChange={(v) => setNewIssue(prev => ({ ...prev, category: v }))}>
+                  <label className="text-sm font-medium text-foreground">Priority</label>
+                  <Select value={formData.priority} onValueChange={(v) => setFormData({ ...formData, priority: v })}>
                     <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="electrical">Electrical</SelectItem>
-                      <SelectItem value="plumbing">Plumbing</SelectItem>
-                      <SelectItem value="internet">Internet/WiFi</SelectItem>
-                      <SelectItem value="hvac">AC/Heating</SelectItem>
-                      <SelectItem value="maintenance">General Maintenance</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground">Description *</label>
+                  <Textarea
+                    placeholder="Provide details about the issue..."
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="mt-1"
+                    rows={4}
+                  />
+                </div>
+                <Button className="w-full" onClick={handleSubmitIssue} disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Issue'
+                  )}
+                </Button>
               </div>
-              <div>
-                <label className="text-sm font-medium text-foreground">Priority</label>
-                <Select value={newIssue.priority} onValueChange={(v) => setNewIssue(prev => ({ ...prev, priority: v }))}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground">Description *</label>
-                <Textarea
-                  placeholder="Provide details about the issue..."
-                  value={newIssue.description}
-                  onChange={(e) => setNewIssue(prev => ({ ...prev, description: e.target.value }))}
-                  className="mt-1"
-                  rows={4}
-                />
-              </div>
-              <Button className="w-full" onClick={handleSubmitIssue}>
-                Submit Issue
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Stats */}
@@ -348,10 +430,11 @@ export default function HostelIssues() {
         </div>
       </div>
 
-      {/* Issues List */}
+      {/* Main Content */}
       <div className="grid gap-6 lg:grid-cols-5">
+        {/* Issues List */}
         <div className="lg:col-span-2">
-          <div className="card-elevated">
+          <div className="card-elevated overflow-hidden">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <div className="p-4 border-b border-border">
                 <TabsList className="w-full">
@@ -363,7 +446,11 @@ export default function HostelIssues() {
               </div>
 
               <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
-                {filteredIssues.length === 0 ? (
+                {loading ? (
+                  <div className="text-center py-8">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+                  </div>
+                ) : filteredIssues.length === 0 ? (
                   <div className="text-center py-12">
                     <Home className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
                     <p className="text-muted-foreground">No issues found</p>
@@ -372,8 +459,8 @@ export default function HostelIssues() {
                   filteredIssues.map((issue) => {
                     const statusConfig = getStatusConfig(issue.status);
                     const priorityConfig = getPriorityConfig(issue.priority);
-                    const CategoryIcon = categoryIcons[issue.category];
-                    
+                    const CategoryIcon = categoryIcons[issue.category] || Wrench;
+
                     return (
                       <div
                         key={issue.id}
@@ -397,7 +484,7 @@ export default function HostelIssues() {
                                 {statusConfig.label}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
-                                {issue.createdAt?.toDate ? issue.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                                {formatDate(issue.createdAt)}
                               </span>
                             </div>
                           </div>
@@ -417,13 +504,13 @@ export default function HostelIssues() {
           </div>
         </div>
 
-        {/* Issue Detail */}
+        {/* Issue Details */}
         <div className="lg:col-span-3">
           {selectedIssue ? (
             <div className="card-elevated h-full flex flex-col">
               <div className="p-6 border-b border-border">
-                <div className="flex items-start justify-between">
-                  <div>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
                     <h2 className="text-lg font-semibold text-foreground">{selectedIssue.title}</h2>
                     <p className="text-sm text-muted-foreground mt-1">Room: {selectedIssue.roomNumber}</p>
                   </div>
@@ -431,10 +518,11 @@ export default function HostelIssues() {
                     {getStatusConfig(selectedIssue.status).label}
                   </Badge>
                 </div>
-                <p className="mt-4 text-muted-foreground">{selectedIssue.description}</p>
-                <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
-                  <span>Created: {selectedIssue.createdAt?.toDate ? selectedIssue.createdAt.toDate().toLocaleDateString() : 'Just now'}</span>
-                  <span>Updated: {selectedIssue.updatedAt?.toDate ? selectedIssue.updatedAt.toDate().toLocaleDateString() : 'Just now'}</span>
+                <p className="mt-4 text-muted-foreground text-sm">{selectedIssue.description}</p>
+                <div className="flex gap-4 mt-4 text-xs text-muted-foreground">
+                  <span>Created: {formatDate(selectedIssue.createdAt)}</span>
+                  <span>Category: {selectedIssue.category}</span>
+                  <span>Priority: {selectedIssue.priority}</span>
                 </div>
               </div>
 
@@ -447,13 +535,13 @@ export default function HostelIssues() {
                         key={i}
                         className={cn(
                           'p-4 rounded-lg max-w-[80%]',
-                          response.from === 'You' ? 'ml-auto bg-primary/10' : 'bg-muted'
+                          response.from === 'Student' ? 'ml-auto bg-primary/10' : 'bg-muted'
                         )}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium text-foreground">{response.from}</span>
                           <span className="text-xs text-muted-foreground">
-                            {response.timestamp?.toDate ? response.timestamp.toDate().toLocaleTimeString() : 'Just now'}
+                            {formatTime(response.timestamp)}
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground">{response.message}</p>
@@ -466,16 +554,21 @@ export default function HostelIssues() {
               </div>
 
               {selectedIssue.status !== 'closed' && (
-                <div className="p-4 border-t border-border">
+                <div className="border-t border-border space-y-4 p-4">
                   <div className="flex gap-2">
                     <Input
                       placeholder="Type a message..."
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddResponse()}
+                      disabled={sendingMessage}
                     />
-                    <Button onClick={handleSendMessage}>
-                      <Send className="w-4 h-4" />
+                    <Button onClick={handleAddResponse} disabled={sendingMessage}>
+                      {sendingMessage ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
                 </div>

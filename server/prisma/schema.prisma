@@ -32,6 +32,7 @@ model User {
   feeRecords      FeeRecord[]
   grades          Grade[]
   bookBorrows     BookBorrow[]    @relation("UserBookBorrows")
+  canteenOrders   CanteenOrder[]
   enrollments     Enrollment[]    @relation("StudentEnrollments")
   roles           UserRole[]
   refreshTokens   RefreshToken[]
@@ -41,6 +42,105 @@ model User {
   @@index([role])
   @@index([emailVerified])
   @@index([lockedUntil])
+}
+
+model CanteenItem {
+  id          String   @id @default(uuid())
+  name        String
+  price       Float
+  category    String
+  description String   @default("")
+  image       String   @default("")
+  isAvailable Boolean  @default(true)
+  stock       Int      @default(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category, isAvailable])
+  @@index([updatedAt])
+}
+
+model CanteenOrder {
+  id          String   @id @default(uuid())
+  studentId   String?
+  student     User?    @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  studentName String
+  hostelRoom  String
+  items       Json
+  totalAmount Float
+  status      String   @default("Pending")
+  timestamp   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([studentId, status])
+  @@index([timestamp])
+}
+
+model HostelIssue {
+  id             String   @id @default(uuid())
+  title          String
+  description    String
+  category       String
+  priority       String
+  status         String   @default("open")
+  roomNumber     String
+  studentId      String?
+  studentName    String
+  organizationId String?
+  responses      Json     @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([studentId, status])
+  @@index([organizationId])
+  @@index([createdAt])
+}
+
+model CampusMapRegion {
+  id             String   @id @default(uuid())
+  name           String
+  description    String
+  x              Float
+  y              Float
+  width          Float
+  height         Float
+  category       String
+  link           String?
+  organizationId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId, category])
+}
+
+model CampusMapRoad {
+  id             String   @id @default(uuid())
+  points         Json
+  width          Float
+  organizationId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+}
+
+model CourseMaterial {
+  id          String   @id @default(uuid())
+  courseId    String
+  courseName  String
+  courseCode  String
+  title       String
+  description String   @default("")
+  fileURL     String
+  type        String   @default("other")
+  uploadedBy  String
+  uploadedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId, type])
+  @@index([uploadedBy])
 }
 
 model Role {

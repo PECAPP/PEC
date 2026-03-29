@@ -14,6 +14,10 @@ import { ExaminationsModule } from './examinations/examinations.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { BackgroundJobsModule } from './background-jobs/background-jobs.module';
+import { NightCanteenModule } from './night-canteen/night-canteen.module';
+import { HostelIssuesModule } from './hostel-issues/hostel-issues.module';
+import { CampusMapModule } from './campus-map/campus-map.module';
+import { CourseMaterialsModule } from './course-materials/course-materials.module';
 
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
@@ -34,6 +38,10 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
     DepartmentsModule,
     FeatureFlagsModule,
     BackgroundJobsModule,
+    NightCanteenModule,
+    HostelIssuesModule,
+    CampusMapModule,
+    CourseMaterialsModule,
   ],
   controllers: [AppController],
   providers: [
