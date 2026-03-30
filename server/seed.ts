@@ -7,6 +7,7 @@ import { seedStudents } from './seeds/students';
 import { seedCourses } from './seeds/courses';
 import { seedAcademicRecords } from './seeds/academic_records';
 import { seedTimetable } from './seeds/timetable';
+import { seedNoticeboard } from './seeds/noticeboard';
 import { seedCommunicationAndActivity } from './seeds/communication';
 
 async function main() {
@@ -39,10 +40,10 @@ async function main() {
     console.log('8. Generating complex timetable...');
     await seedTimetable(courses);
 
+    console.log('9. Seeding noticeboard...');
+    await seedNoticeboard(admin.id, faculties);
 
-
-
-    console.log('12. Seeding communication systems (Chat, Audit, Flags)...');
+    console.log('10. Seeding communication systems (Chat, Audit, Flags)...');
     await seedCommunicationAndActivity(admin.id, faculties, students, courses);
 
     console.log('--- Seeding Completed Successfully ---');
