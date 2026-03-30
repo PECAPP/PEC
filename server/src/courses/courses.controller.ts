@@ -24,14 +24,14 @@ import { Roles } from '../auth/roles.decorator';
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
-  @Roles('faculty', 'admin')
+  @Roles('faculty', 'college_admin', 'admin')
   @Post()
   async create(@Body() createCourseDto: CreateCourseDto) {
     const data = await this.coursesService.create(createCourseDto);
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get()
   async findAll(@Query() query: CourseQueryDto) {
     const result = await this.coursesService.findAll(query);
@@ -42,14 +42,14 @@ export class CoursesController {
     });
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.coursesService.findOne(id);
     return ok(data);
   }
 
-  @Roles('faculty', 'admin')
+  @Roles('faculty', 'college_admin', 'admin')
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -59,7 +59,7 @@ export class CoursesController {
     return ok(data);
   }
 
-  @Roles('faculty', 'admin')
+  @Roles('faculty', 'college_admin', 'admin')
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.coursesService.remove(id);

@@ -1,4 +1,8 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { SendMessageDto } from './dto/send-message.dto';
@@ -115,7 +119,7 @@ export class ChatService {
 
   async getChatUsers(query: string) {
     if (!query) return [];
-    
+
     return this.prisma.user.findMany({
       where: {
         OR: [

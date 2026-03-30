@@ -108,7 +108,7 @@ export class NightCanteenRepository {
         studentId: data.studentId,
         studentName: data.studentName ?? 'Student',
         hostelRoom: data.hostelRoom ?? 'Hostel',
-        items: ((data.items ?? []) as unknown) as Prisma.JsonArray,
+        items: (data.items ?? []) as unknown as Prisma.JsonArray,
         totalAmount: data.totalAmount,
         status: data.status ?? 'Pending',
         timestamp: data.timestamp ? new Date(data.timestamp) : new Date(),
@@ -126,7 +126,7 @@ export class NightCanteenRepository {
           ? { totalAmount: data.totalAmount }
           : {}),
         ...(data.items
-          ? { items: (data.items as unknown) as Prisma.JsonArray }
+          ? { items: data.items as unknown as Prisma.JsonArray }
           : {}),
       },
     });

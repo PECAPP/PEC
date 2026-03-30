@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   BookOpen,
@@ -16,7 +16,6 @@ import {
   Upload,
   Download,
   Clock,
-  MapPin,
 } from 'lucide-react';
 import { ImageWithBlur, CourseSkeleton } from '@/components/ui/image-with-blur';
 import { Button } from '@/components/ui/button';
@@ -39,7 +38,6 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-;
 import { usePermissions } from '@/hooks/usePermissions';
 import dynamic from 'next/dynamic';
 
@@ -70,6 +68,12 @@ interface Course {
     room: string;
   }[];
   description: string;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  meta?: any;
 }
 
 export default function Courses() {
@@ -245,41 +249,8 @@ export default function Courses() {
     }
   };
 
-  useEffect(() => {
-    if (authLoading) return;
-    
-    if (!user) {
-      router.replace('/auth');
-      return;
-    }
-
-    const loadData = async () => {
-      try {
-        await fetchCourses();
-
-        // Fetch enrollments for students
-        if (isStudent && user.uid) {
-          type ApiResponse<T> = { success: boolean; data: T; meta?: any };
-          const enrollmentsResponse = await api.get<ApiResponse<any[]>>('/enrollments', {
-            params: { limit: 100, offset: 0, studentId: user.uid, status: 'active' },
-          });
-          const enrolledIds = (enrollmentsResponse.data.data || []).map((item: any) => item.courseId);
-          setEnrolledCourseIds(enrolledIds);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        toast.error('Failed to load data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [user, isStudent, router]);
-
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
-      type ApiResponse<T> = { success: boolean; data: T; meta?: any };
       const response = await api.get<ApiResponse<any[]>>('/courses', {
         params: { limit: 200, offset: 0 },
       });
@@ -309,7 +280,38 @@ export default function Courses() {
       console.error('Error fetching courses:', error);
       toast.error('Failed to load courses');
     }
-  };
+  }, [isFaculty, user?.uid, user?.fullName]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    
+    if (!user) {
+      router.replace('/auth');
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        await fetchCourses();
+
+        // Fetch enrollments for students
+        if (isStudent && user.uid) {
+          const enrollmentsResponse = await api.get<ApiResponse<any[]>>('/enrollments', {
+            params: { limit: 100, offset: 0, studentId: user.uid, status: 'active' },
+          });
+          const enrolledIds = (enrollmentsResponse.data.data || []).map((item: any) => item.courseId);
+          setEnrolledCourseIds(enrolledIds);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [authLoading, user, isStudent, router, fetchCourses]);
 
   const handleEditCourse = (course: Course) => {
     // Faculty can only edit courses in their department
@@ -345,7 +347,7 @@ export default function Courses() {
       toast.success('Course created successfully!');
       setShowCourseDialog(false);
       resetCourseForm();
-      fetchCourses();
+      await fetchCourses();
     } catch (error) {
       console.error('Error creating course:', error);
       toast.error('Failed to create course');
@@ -367,7 +369,7 @@ export default function Courses() {
       setShowCourseDialog(false);
       setEditingCourse(null);
       resetCourseForm();
-      fetchCourses();
+      await fetchCourses();
     } catch (error) {
       console.error('Error updating course:', error);
       toast.error('Failed to update course');
@@ -379,7 +381,7 @@ export default function Courses() {
     try {
       await api.delete(`/courses/${courseId}`);
       toast.success('Course deleted successfully!');
-      fetchCourses();
+      await fetchCourses();
     } catch (error) {
       console.error('Error deleting course:', error);
       toast.error('Failed to delete course');
@@ -441,7 +443,7 @@ export default function Courses() {
         status: 'active',
       });
 
-      setEnrolledCourseIds([...enrolledCourseIds, course.id]);
+      setEnrolledCourseIds((prev) => [...prev, course.id]);
       await fetchCourses();
       toast.success(`Enrolled in ${course.code} successfully!`);
       setShowDetailsDialog(false);
@@ -473,7 +475,7 @@ export default function Courses() {
         status: 'dropped',
       });
 
-      setEnrolledCourseIds(enrolledCourseIds.filter(id => id !== courseId));
+      setEnrolledCourseIds((prev) => prev.filter((id) => id !== courseId));
       await fetchCourses();
       toast.success('Course dropped successfully');
     } catch (error) {
@@ -994,7 +996,7 @@ function CourseCard({
           </div>
           <div className="flex items-center gap-2">
             <GraduationCap className="w-3.5 h-3.5 text-primary/70" />
-            {course.credits} Credits • Sem {course.semester}
+            {course.credits} Credits | Sem {course.semester}
           </div>
            <div className="flex items-center gap-2">
              <div className="w-3.5 h-3.5 flex items-center justify-center">

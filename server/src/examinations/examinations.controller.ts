@@ -48,6 +48,4 @@ export class ExaminationsController {
     const data = await this.service.deleteSchedule(id);
     return ok(data);
   }
-
-
 }

@@ -58,4 +58,10 @@ export class EnrollmentsRepository extends BaseRepository {
       data,
     });
   }
+
+  findById(id: string) {
+    return this.prisma.enrollment.findUnique({
+      where: { id },
+    });
+  }
 }

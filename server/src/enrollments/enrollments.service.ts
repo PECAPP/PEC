@@ -19,4 +19,8 @@ export class EnrollmentsService {
   update(id: string, data: UpdateEnrollmentDto) {
     return this.repo.update(id, data);
   }
+
+  findById(id: string) {
+    return this.repo.findById(id);
+  }
 }

@@ -34,7 +34,11 @@ export class ChatController {
     @Param('roomId', new ParseUUIDPipe({ version: '4' })) roomId: string,
     @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
   ) {
-    const data = await this.chatService.findMessages(roomId, req.user.sub, limit);
+    const data = await this.chatService.findMessages(
+      roomId,
+      req.user.sub,
+      limit,
+    );
     return { success: true, data };
   }
 
@@ -51,8 +55,14 @@ export class ChatController {
   }
 
   @Post('message')
-  async sendMessage(@Request() req: any, @Body() sendMessageDto: SendMessageDto) {
-    const data = await this.chatService.sendMessage(sendMessageDto, req.user.sub);
+  async sendMessage(
+    @Request() req: any,
+    @Body() sendMessageDto: SendMessageDto,
+  ) {
+    const data = await this.chatService.sendMessage(
+      sendMessageDto,
+      req.user.sub,
+    );
     return { success: true, data };
   }
 

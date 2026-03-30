@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TrendingUp, ClipboardCheck, BookOpen } from 'lucide-react';
+import { ClipboardCheck, BookOpen } from 'lucide-react';
 
 interface StatsProps {
   stats: {

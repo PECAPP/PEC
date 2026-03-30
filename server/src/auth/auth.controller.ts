@@ -183,21 +183,21 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('profile')
   getProfile(@Request() req: any) {
     return this.authService.getProfile(req.user.sub);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Post('complete-profile')
   completeProfile(@Request() req: any, @Body() body: Record<string, any>) {
     return this.authService.completeProfile(req.user.sub, body);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @HttpCode(HttpStatus.OK)
   @Post('change-password')
   async changePassword(

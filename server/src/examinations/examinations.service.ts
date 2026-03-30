@@ -58,6 +58,4 @@ export class ExaminationsService {
       data: { deletedAt: new Date() },
     });
   }
-
-
 }
