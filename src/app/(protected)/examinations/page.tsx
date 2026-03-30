@@ -2,69 +2,70 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, FileText, Loader2, Plus, Save, Trash2 } from 'lucide-react';
+import { Calendar, Loader2, Plus, Trash2, Upload } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import BulkUpload from '@/components/BulkUpload';
+
 import api from '@/lib/api';
-import { usePermissions } from '@/hooks/usePermissions';
-import { useRouter } from 'next/navigation';
-;
+import { fetchAllPages } from '@/lib/fetchAllPages';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
-type ApiResponse<T> = { success: boolean; data: T; meta?: { total?: number } };
+type Course = {
+  id: string;
+  code: string;
+  name: string;
+  department?: string | null;
+};
 
-type Course = { id: string; code: string; name: string };
-type Enrollment = { id: string; studentId: string; courseId: string; status: string };
+type Department = {
+  id: string;
+  name: string;
+};
+
 type ExamSchedule = {
   id: string;
   courseId: string;
   courseName: string;
   courseCode: string;
+  department?: string | null;
   examType: string;
   date: string;
   startTime: string;
   endTime: string;
   room: string;
 };
-type Grade = {
-  id: string;
-  studentId: string;
-  courseId: string;
-  midterm?: number;
-  final?: number;
-  total?: number;
-  grade?: string;
-  credits?: number;
-  remarks?: string;
-};
 
 const examTypeOptions = ['Midterm', 'Final', 'Practical', 'Quiz'];
-const GRADES_ENDPOINT_DISABLED_KEY = 'api.examinations.grades.disabled';
 
-const isGradesEndpointDisabled = () =>
-  typeof window !== 'undefined' && sessionStorage.getItem(GRADES_ENDPOINT_DISABLED_KEY) === '1';
-
-const disableGradesEndpoint = () => {
-  if (typeof window !== 'undefined') {
-    sessionStorage.setItem(GRADES_ENDPOINT_DISABLED_KEY, '1');
-  }
+const formatDate = (value: string) => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString();
 };
 
-const isNotFoundError = (error: unknown) =>
-  !!(error as any)?.response && (error as any).response.status === 404;
+const isUpcoming = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  return date.getTime() >= startOfToday.getTime();
+};
 
-export default function Examinations() {
+export default function ExaminationsPage() {
   const router = useRouter();
-  const { isAdmin, isFaculty, user, loading: authLoading } = usePermissions();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) {
-      router.replace('/auth');
-    }
+    if (!user) router.replace('/auth');
   }, [authLoading, user, router]);
 
   if (authLoading || !user) {
@@ -75,21 +76,39 @@ export default function Examinations() {
     );
   }
 
-  if (isAdmin || isFaculty) {
-    return <ExaminationsManager />;
+  const role = user.role;
+  const isCollegeAdmin = ['college_admin', 'admin', 'moderator'].includes(role || '');
+
+  if (isCollegeAdmin) {
+    return <CollegeAdminExaminations />;
   }
 
-  return <StudentExaminationsView userId={user.uid} />;
+  if (role === 'faculty' || role === 'student') {
+    return (
+      <DepartmentUpcomingExams
+        role={role}
+        department={user.department || null}
+      />
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-muted-foreground">Access denied</p>
+    </div>
+  );
 }
 
-function ExaminationsManager() {
-  const [activeTab, setActiveTab] = useState<'schedule' | 'grades'>('schedule');
-  const [loading, setLoading] = useState(false);
-  const [courses, setCourses] = useState<Course[]>([]);
+function CollegeAdminExaminations() {
+  const [loading, setLoading] = useState(true);
   const [schedules, setSchedules] = useState<ExamSchedule[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState('');
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
-  const [gradesMap, setGradesMap] = useState<Record<string, Partial<Grade>>>({});
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
+
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [examTypeFilter, setExamTypeFilter] = useState('all');
+  const [dateScope, setDateScope] = useState<'all' | 'upcoming'>('all');
 
   const [scheduleForm, setScheduleForm] = useState({
     courseId: '',
@@ -100,76 +119,57 @@ function ExaminationsManager() {
     room: '',
   });
 
-  const enrolledStudents = useMemo(
-    () => enrollments.filter((e) => e.status === 'active' && e.courseId === selectedCourse),
-    [enrollments, selectedCourse],
+  const selectedCourse = useMemo(
+    () => courses.find((c) => c.id === scheduleForm.courseId),
+    [courses, scheduleForm.courseId],
   );
+
+  const loadSchedules = async () => {
+    const params: Record<string, unknown> = {
+      ...(departmentFilter !== 'all' ? { department: departmentFilter } : {}),
+      ...(dateScope === 'upcoming' ? { upcoming: true } : {}),
+    };
+    const rows = await fetchAllPages<ExamSchedule>('/examinations/schedules', params);
+    setSchedules(rows);
+  };
+
+  const bootstrap = async () => {
+    try {
+      setLoading(true);
+      const [allCourses, allDepartments] = await Promise.all([
+        fetchAllPages<Course>('/courses'),
+        fetchAllPages<Department>('/departments'),
+      ]);
+      setCourses(allCourses);
+      setDepartments(allDepartments);
+      await loadSchedules();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to load examinations data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     void bootstrap();
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'grades' && selectedCourse) {
-      void loadGradesForCourse(selectedCourse);
-    }
-  }, [activeTab, selectedCourse]);
+    if (loading) return;
+    void loadSchedules();
+  }, [departmentFilter, dateScope]);
 
-  const bootstrap = async () => {
-    try {
-      setLoading(true);
-      const [coursesRes, schedulesRes, enrollmentsRes] = await Promise.all([
-        api.get<ApiResponse<Course[]>>('/courses', { params: { limit: 200, offset: 0 } }),
-        api.get<ApiResponse<ExamSchedule[]>>('/examinations/schedules', { params: { limit: 200, offset: 0 } }),
-        api.get<ApiResponse<Enrollment[]>>('/enrollments', { params: { limit: 200, offset: 0, status: 'active' } }),
-      ]);
-
-      const loadedCourses = coursesRes.data.data || [];
-      setCourses(loadedCourses);
-      setSchedules(schedulesRes.data.data || []);
-      setEnrollments(enrollmentsRes.data.data || []);
-
-      if (loadedCourses.length > 0) {
-        setSelectedCourse(loadedCourses[0].id);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to load examination data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadGradesForCourse = async (courseId: string) => {
-    if (isGradesEndpointDisabled()) {
-      setGradesMap({});
-      return;
-    }
-
-    try {
-      const gradesRes = await api.get<ApiResponse<Grade[]>>('/examinations/grades', {
-        params: { limit: 200, offset: 0, courseId },
-      });
-      const existing = gradesRes.data.data || [];
-      const next: Record<string, Partial<Grade>> = {};
-      existing.forEach((grade) => {
-        next[grade.studentId] = grade;
-      });
-      setGradesMap(next);
-    } catch (error) {
-      if (isNotFoundError(error)) {
-        disableGradesEndpoint();
-        setGradesMap({});
-        return;
-      }
-      console.error(error);
-      toast.error('Failed to load grades');
-    }
-  };
+  const filteredSchedules = useMemo(() => {
+    return schedules.filter((schedule) => {
+      const typeOk = examTypeFilter === 'all' || schedule.examType === examTypeFilter;
+      return typeOk;
+    });
+  }, [schedules, examTypeFilter]);
 
   const handleAddSchedule = async () => {
     if (!scheduleForm.courseId || !scheduleForm.date || !scheduleForm.startTime || !scheduleForm.endTime || !scheduleForm.room) {
-      toast.error('Fill all schedule fields');
+      toast.error('Please complete all schedule fields');
       return;
     }
 
@@ -184,7 +184,7 @@ function ExaminationsManager() {
         endTime: '',
         room: '',
       });
-      await bootstrap();
+      await loadSchedules();
     } catch (error) {
       console.error(error);
       toast.error('Failed to add schedule');
@@ -192,81 +192,71 @@ function ExaminationsManager() {
   };
 
   const handleDeleteSchedule = async (id: string) => {
-    if (!confirm('Delete schedule?')) return;
+    if (!confirm('Delete this schedule?')) return;
     try {
       await api.delete(`/examinations/schedules/${id}`);
       toast.success('Schedule deleted');
-      await bootstrap();
+      await loadSchedules();
     } catch (error) {
       console.error(error);
       toast.error('Failed to delete schedule');
     }
   };
 
-  const handleGradeChange = (studentId: string, field: keyof Grade, value: string) => {
-    setGradesMap((prev) => ({
-      ...prev,
-      [studentId]: {
-        ...prev[studentId],
-        [field]: ['grade', 'remarks'].includes(field) ? value : Number(value || 0),
-      },
-    }));
-  };
+  const handleBulkImport = async (rows: any[]) => {
+    let success = 0;
+    let failed = 0;
+    const errors: string[] = [];
 
-  const saveGrades = async () => {
-    if (!selectedCourse) {
-      toast.error('Select a course first');
-      return;
+    for (const row of rows) {
+      try {
+        const course = courses.find(
+          (c) => String(c.code || '').toLowerCase() === String(row.courseCode || '').toLowerCase(),
+        );
+
+        if (!course) {
+          throw new Error(`Course not found for code: ${row.courseCode}`);
+        }
+
+        await api.post('/examinations/schedules', {
+          courseId: course.id,
+          examType: row.examType || 'Final',
+          date: row.date,
+          startTime: row.startTime,
+          endTime: row.endTime,
+          room: row.room,
+        });
+
+        success += 1;
+      } catch (error) {
+        failed += 1;
+        errors.push((error as Error).message);
+      }
     }
 
-    try {
-      setLoading(true);
-      await Promise.all(
-        enrolledStudents.map(async (student) => {
-          const payload = gradesMap[student.studentId] || {};
-          const midterm = Number(payload.midterm || 0);
-          const final = Number(payload.final || 0);
-          const total = Number(payload.total || midterm + final);
-          const grade = String(payload.grade || '').trim();
-
-          if (!grade && total === 0 && midterm === 0 && final === 0) {
-            return;
-          }
-
-          await api.post('/examinations/grades', {
-            studentId: student.studentId,
-            courseId: selectedCourse,
-            midterm,
-            final,
-            total,
-            grade,
-            credits: Number(payload.credits || 3),
-            remarks: payload.remarks || '',
-          });
-        }),
-      );
-
-      toast.success('Grades saved');
-      await loadGradesForCourse(selectedCourse);
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to save grades');
-    } finally {
-      setLoading(false);
-    }
+    await loadSchedules();
+    return { success, failed, errors };
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Examinations</h1>
-        <p className="text-muted-foreground">Manage exam schedules and student grades</p>
+        <p className="text-muted-foreground">Manage schedules for all departments</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'schedule' | 'grades')}>
+      <Tabs defaultValue="schedule" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="schedule">Exam Schedule</TabsTrigger>
-          <TabsTrigger value="grades">Grades</TabsTrigger>
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          <TabsTrigger value="upload">Bulk Upload</TabsTrigger>
         </TabsList>
 
         <TabsContent value="schedule" className="space-y-4">
@@ -275,15 +265,19 @@ function ExaminationsManager() {
               <SelectTrigger className="md:col-span-2"><SelectValue placeholder="Course" /></SelectTrigger>
               <SelectContent>
                 {courses.map((course) => (
-                  <SelectItem key={course.id} value={course.id}>{course.code} - {course.name}</SelectItem>
+                  <SelectItem key={course.id} value={course.id}>
+                    {course.code} - {course.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
             <Select value={scheduleForm.examType} onValueChange={(value) => setScheduleForm((p) => ({ ...p, examType: value }))}>
-              <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Exam type" /></SelectTrigger>
               <SelectContent>
-                {examTypeOptions.map((type) => <SelectItem key={type} value={type}>{type}</SelectItem>)}
+                {examTypeOptions.map((type) => (
+                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -293,19 +287,62 @@ function ExaminationsManager() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
-            <Input className="md:col-span-5" placeholder="Room" value={scheduleForm.room} onChange={(e) => setScheduleForm((p) => ({ ...p, room: e.target.value }))} />
-            <Button onClick={handleAddSchedule}><Plus className="w-4 h-4 mr-2" />Add</Button>
+            <Input
+              className="md:col-span-4"
+              placeholder="Room"
+              value={scheduleForm.room}
+              onChange={(e) => setScheduleForm((p) => ({ ...p, room: e.target.value }))}
+            />
+            <Input className="md:col-span-2" value={selectedCourse?.department || ''} disabled placeholder="Department" />
+          </div>
+
+          <div className="flex justify-end">
+            <Button onClick={handleAddSchedule}><Plus className="w-4 h-4 mr-2" />Add Schedule</Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger><SelectValue placeholder="Department filter" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map((department) => (
+                  <SelectItem key={department.id} value={department.name}>{department.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={examTypeFilter} onValueChange={setExamTypeFilter}>
+              <SelectTrigger><SelectValue placeholder="Exam type" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {examTypeOptions.map((type) => (
+                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={dateScope} onValueChange={(value) => setDateScope(value as 'all' | 'upcoming')}>
+              <SelectTrigger><SelectValue placeholder="Date scope" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Exams</SelectItem>
+                <SelectItem value="upcoming">Upcoming Only</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
-            {schedules.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No exam schedules yet</p>
+            {filteredSchedules.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No schedules found for selected filters.</p>
             ) : (
-              schedules.map((schedule) => (
+              filteredSchedules.map((schedule) => (
                 <div key={schedule.id} className="border rounded-lg p-3 flex items-center justify-between">
                   <div className="space-y-1">
-                    <div className="font-medium text-foreground">{schedule.courseCode} • {schedule.courseName}</div>
-                    <div className="text-sm text-muted-foreground">{new Date(schedule.date).toLocaleDateString()} • {schedule.startTime}-{schedule.endTime} • {schedule.room}</div>
+                    <div className="font-medium text-foreground">
+                      {schedule.courseCode} - {schedule.courseName}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {schedule.department || 'N/A'} - {formatDate(schedule.date)} - {schedule.startTime}-{schedule.endTime} - {schedule.room}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{schedule.examType}</Badge>
@@ -319,82 +356,80 @@ function ExaminationsManager() {
           </div>
         </TabsContent>
 
-        <TabsContent value="grades" className="space-y-4">
-          <div className="flex gap-3">
-            <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-              <SelectTrigger className="max-w-md"><SelectValue placeholder="Select course" /></SelectTrigger>
-              <SelectContent>
-                {courses.map((course) => (
-                  <SelectItem key={course.id} value={course.id}>{course.code} - {course.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button onClick={saveGrades} disabled={loading}><Save className="w-4 h-4 mr-2" />Save Grades</Button>
+        <TabsContent value="upload" className="space-y-3">
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Open Bulk Upload
+            </Button>
           </div>
-
-          <div className="space-y-2">
-            {enrolledStudents.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No active enrollments for selected course</p>
-            ) : (
-              enrolledStudents.map((student) => {
-                const grade = gradesMap[student.studentId] || {};
-                return (
-                  <div key={student.id} className="grid grid-cols-1 md:grid-cols-6 gap-2 border rounded-lg p-3">
-                    <Input value={student.studentId} readOnly className="md:col-span-2" />
-                    <Input type="number" placeholder="Midterm" value={grade.midterm ?? ''} onChange={(e) => handleGradeChange(student.studentId, 'midterm', e.target.value)} />
-                    <Input type="number" placeholder="Final" value={grade.final ?? ''} onChange={(e) => handleGradeChange(student.studentId, 'final', e.target.value)} />
-                    <Input type="number" placeholder="Total" value={grade.total ?? ''} onChange={(e) => handleGradeChange(student.studentId, 'total', e.target.value)} />
-                    <Input placeholder="Grade (A/B/C)" value={grade.grade ?? ''} onChange={(e) => handleGradeChange(student.studentId, 'grade', e.target.value)} />
-                  </div>
-                );
-              })
-            )}
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Upload exam schedules in bulk using `courseCode`, `examType`, `date`, `startTime`, `endTime`, `room`.
+          </p>
         </TabsContent>
       </Tabs>
 
-      {loading && (
-        <div className="flex items-center justify-center py-4">
-          <Loader2 className="w-5 h-5 animate-spin text-primary" />
-        </div>
-      )}
+      <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Bulk Upload Exam Schedules</DialogTitle>
+            <DialogDescription>Upload CSV/Excel schedules for multiple departments at once.</DialogDescription>
+          </DialogHeader>
+          <BulkUpload
+            entityType="exams"
+            onImport={handleBulkImport}
+            templateColumns={['courseCode', 'examType', 'date', 'startTime', 'endTime', 'room']}
+            sampleData={[
+              {
+                courseCode: 'CS301',
+                examType: 'Final',
+                date: '2026-04-20',
+                startTime: '10:00',
+                endTime: '13:00',
+                room: 'Hall A',
+              },
+            ]}
+          />
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
 
-function StudentExaminationsView({ userId }: { userId: string }) {
+function DepartmentUpcomingExams({
+  role,
+  department,
+}: {
+  role: 'student' | 'faculty';
+  department: string | null;
+}) {
   const [loading, setLoading] = useState(true);
   const [schedules, setSchedules] = useState<ExamSchedule[]>([]);
-  const [grades, setGrades] = useState<Grade[]>([]);
+  const [examTypeFilter, setExamTypeFilter] = useState('all');
 
   useEffect(() => {
     void (async () => {
       try {
-        const schedulePromise = api.get<ApiResponse<ExamSchedule[]>>('/examinations/schedules', {
-          params: { limit: 200, offset: 0 },
+        setLoading(true);
+        const rows = await fetchAllPages<ExamSchedule>('/examinations/schedules', {
+          upcoming: true,
         });
-        const gradesPromise = isGradesEndpointDisabled()
-          ? Promise.resolve({ data: { success: true, data: [] as Grade[] } })
-          : api.get<ApiResponse<Grade[]>>('/examinations/grades', {
-              params: { limit: 200, offset: 0, studentId: userId },
-            });
-
-        const [scheduleRes, gradesRes] = await Promise.all([schedulePromise, gradesPromise]);
-        setSchedules(scheduleRes.data.data || []);
-        setGrades(gradesRes.data.data || []);
+        setSchedules(rows);
       } catch (error) {
-        if (isNotFoundError(error)) {
-          disableGradesEndpoint();
-          setGrades([]);
-          return;
-        }
         console.error(error);
-        toast.error('Failed to load examination data');
+        toast.error('Failed to load upcoming exams');
       } finally {
         setLoading(false);
       }
     })();
-  }, [userId]);
+  }, []);
+
+  const filtered = useMemo(() => {
+    return schedules
+      .filter((schedule) => isUpcoming(schedule.date))
+      .filter((schedule) => examTypeFilter === 'all' || schedule.examType === examTypeFilter)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [schedules, examTypeFilter]);
 
   if (loading) {
     return (
@@ -407,41 +442,44 @@ function StudentExaminationsView({ userId }: { userId: string }) {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Examinations & Grades</h1>
-        <p className="text-muted-foreground">Your exam schedule and posted grades</p>
+        <h1 className="text-2xl font-bold text-foreground">Upcoming Exams</h1>
+        <p className="text-muted-foreground">
+          {role === 'faculty' ? 'Faculty' : 'Student'} view for department: {department || 'Not set'}
+        </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="card-elevated p-5 space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2"><Calendar className="w-5 h-5" />Upcoming Exams</h2>
-          {schedules.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No upcoming exams</p>
-          ) : (
-            schedules.map((schedule) => (
-              <div key={schedule.id} className="border rounded-lg p-3">
-                <div className="font-medium">{schedule.courseCode} • {schedule.examType}</div>
-                <div className="text-sm text-muted-foreground">{new Date(schedule.date).toLocaleDateString()} • {schedule.startTime}-{schedule.endTime} • {schedule.room}</div>
-              </div>
-            ))
-          )}
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <Input value={department || ''} disabled placeholder="Department" />
+        <Select value={examTypeFilter} onValueChange={setExamTypeFilter}>
+          <SelectTrigger><SelectValue placeholder="Exam type" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            {examTypeOptions.map((type) => (
+              <SelectItem key={type} value={type}>{type}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input value="Upcoming only" disabled />
+      </div>
 
-        <div className="card-elevated p-5 space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2"><FileText className="w-5 h-5" />My Grades</h2>
-          {grades.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No grades published yet</p>
-          ) : (
-            grades.map((grade) => (
-              <div key={grade.id} className="border rounded-lg p-3 flex items-center justify-between">
+      <div className="space-y-2">
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No upcoming exams for your department.</p>
+        ) : (
+          filtered.map((schedule) => (
+            <div key={schedule.id} className="border rounded-lg p-3">
+              <div className="flex items-center justify-between gap-3">
                 <div>
-                  <div className="font-medium">Course ID: {grade.courseId}</div>
-                  <div className="text-sm text-muted-foreground">Midterm: {grade.midterm ?? '-'} • Final: {grade.final ?? '-'} • Total: {grade.total ?? '-'}</div>
+                  <p className="font-medium text-foreground">{schedule.courseCode} - {schedule.courseName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatDate(schedule.date)} - {schedule.startTime}-{schedule.endTime} - {schedule.room}
+                  </p>
                 </div>
-                <Badge>{grade.grade || 'N/A'}</Badge>
+                <Badge variant="outline">{schedule.examType}</Badge>
               </div>
-            ))
-          )}
-        </div>
+            </div>
+          ))
+        )}
       </div>
     </motion.div>
   );

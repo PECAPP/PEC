@@ -72,7 +72,7 @@ export default function Search() {
         >
           {!hasResults ? (
             <div className="text-center py-12 text-muted-foreground">
-              No results found for "{initialQuery}"
+              No results found for &quot;{initialQuery}&quot;
             </div>
           ) : (
             <Tabs defaultValue="all" className="w-full">

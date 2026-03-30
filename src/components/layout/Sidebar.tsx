@@ -20,6 +20,7 @@ import {
   IconTool,
   IconSettings,
   IconHelpCircle,
+  IconBell,
 } from "@tabler/icons-react";
 import {
   ChevronLeft,
@@ -54,32 +55,44 @@ const navItems: NavItem[] = [
     icon: IconLayoutDashboard,
     label: "Dashboard",
     path: "/dashboard",
-    roles: ["student", "faculty", "college_admin", "admin"],
+    roles: ["student", "faculty", "college_admin"],
   },
   {
     icon: IconUsers,
     label: "Users",
     path: "/users",
-    roles: ["college_admin", "admin", "faculty"],
+    roles: ["college_admin", "faculty"],
   },
   {
     icon: IconMessageCircle,
     label: "Chat",
     path: "/chat",
-    roles: ["student", "faculty", "college_admin", "admin"],
+    roles: ["student", "faculty", "college_admin"],
+  },
+  {
+    icon: IconBell,
+    label: "Noticeboard",
+    path: "/noticeboard",
+    roles: ["student", "faculty", "college_admin"],
+  },
+  {
+    icon: IconUsers,
+    label: "Clubs",
+    path: "/clubs",
+    roles: ["student", "college_admin"],
   },
 
   {
     icon: IconBuilding,
     label: "Departments",
     path: "/departments",
-    roles: ["college_admin", "admin"],
+    roles: ["college_admin"],
   },
   {
     icon: IconUserCog,
     label: "Faculty",
     path: "/faculty",
-    roles: ["college_admin", "admin"],
+    roles: ["college_admin"],
   },
   {
     icon: IconUserCircle,
@@ -91,13 +104,19 @@ const navItems: NavItem[] = [
     icon: IconBook,
     label: "Courses",
     path: "/courses",
-    roles: ["student", "faculty", "college_admin", "admin"],
+    roles: ["student", "faculty", "college_admin"],
   },
   {
     icon: IconCalendar,
     label: "Timetable",
     path: "/timetable",
-    roles: ["student", "faculty", "college_admin", "admin"],
+    roles: ["student", "faculty", "college_admin"],
+  },
+  {
+    icon: IconChartBar,
+    label: "Examinations",
+    path: "/examinations",
+    roles: ["student", "faculty", "college_admin"],
   },
   {
     icon: IconClipboardCheck,
@@ -109,7 +128,7 @@ const navItems: NavItem[] = [
     icon: IconBook,
     label: "Course Materials",
     path: "/course-materials",
-    roles: ["student", "faculty", "college_admin", "admin"],
+    roles: ["student", "faculty", "college_admin"],
   },
   {
     icon: IconFileText,
@@ -134,31 +153,31 @@ const navItems: NavItem[] = [
     icon: IconMapPin,
     label: "Campus Map",
     path: "/campus-map",
-    roles: ["student", "faculty", "college_admin", "admin"],
+    roles: ["student", "faculty", "college_admin"],
   },
   {
     icon: IconChefHat,
     label: "Canteen Manager",
     path: "/admin/canteen",
-    roles: ["college_admin", "admin"],
+    roles: ["college_admin"],
   },
   {
     icon: IconTool,
     label: "Manage Hostel",
     path: "/admin/hostel",
-    roles: ["college_admin", "admin"],
+    roles: ["college_admin"],
   },
   {
     icon: IconSettings,
     label: "Settings",
     path: "/settings",
-    roles: ["student", "faculty", "college_admin", "admin"],
+    roles: ["student", "faculty", "college_admin"],
   },
   {
     icon: IconHelpCircle,
     label: "Help & Support",
     path: "/help",
-    roles: ["student", "faculty", "college_admin", "admin"],
+    roles: ["student", "faculty", "college_admin"],
   },
 ];
 
@@ -176,11 +195,11 @@ export function Sidebar({
   const sectionConfig: Array<{ title: string; paths: string[] }> = [
     {
       title: 'Core',
-      paths: ['/dashboard', '/profile', '/chat', '/users', '/departments', '/faculty'],
+      paths: ['/dashboard', '/profile', '/chat', '/noticeboard', '/clubs', '/users', '/departments', '/faculty'],
     },
     {
       title: 'Academics',
-      paths: ['/courses', '/timetable', '/attendance', '/course-materials', '/resume-builder'],
+      paths: ['/courses', '/timetable', '/examinations', '/attendance', '/course-materials', '/resume-builder'],
     },
     {
       title: 'Campus',

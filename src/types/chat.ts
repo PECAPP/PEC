@@ -1,4 +1,4 @@
-export type ChatRoomType = "general" | "semester" | "department" | "dm" | "group";
+export type ChatRoomType = "general" | "semester" | "department" | "dm" | "group" | "club";
 
 // in @/types/chat.ts
 export interface ChatRoom {
@@ -6,7 +6,7 @@ export interface ChatRoom {
   type: ChatRoomType;
   title: string;
   isSystem?: boolean;
-  organizationId?: string;
+  organizationId: string;
   semester?: number;
   department?: string;
   participants?: string[]; // For DM rooms

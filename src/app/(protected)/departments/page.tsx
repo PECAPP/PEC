@@ -30,6 +30,7 @@ import BulkUpload from '@/components/BulkUpload';
 import * as XLSX from 'xlsx';
 import { usePermissions } from '@/hooks/usePermissions';
 import api from '@/lib/api';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 
 export default function Departments() {
   const router = useRouter();
@@ -76,11 +77,7 @@ export default function Departments() {
 
   const fetchDepartments = async () => {
     try {
-      type ApiResponse<T> = { success: boolean; data: T; meta?: any };
-      const response = await api.get<ApiResponse<any[]>>('/departments', {
-        params: { limit: 200, offset: 0 },
-      });
-      const deptsData = response.data.data || [];
+      const deptsData = await fetchAllPages<any>('/departments');
       setDepartments(deptsData);
     } catch (error) {
       console.error('Error fetching departments:', error);

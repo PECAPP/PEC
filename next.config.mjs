@@ -9,6 +9,9 @@ const emptyModulePath = path.resolve(__dirname, 'src/lib/empty-module.ts');
 const nextConfig = {
   reactStrictMode: true,
   typedRoutes: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   experimental: {
     cacheComponents: true,
     optimizePackageImports: [

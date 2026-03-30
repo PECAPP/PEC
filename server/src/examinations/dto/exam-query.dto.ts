@@ -17,4 +17,17 @@ export class ExamQueryDto {
   @IsOptional()
   @IsString()
   courseId?: string;
+
+  @IsOptional()
+  @IsString()
+  department?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === undefined) return undefined;
+    if (typeof value === 'boolean') return value;
+    const normalized = String(value).toLowerCase().trim();
+    return normalized === 'true' || normalized === '1';
+  })
+  upcoming?: boolean;
 }

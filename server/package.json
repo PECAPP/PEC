@@ -18,6 +18,8 @@
     "db:backup:dry": "node scripts/db-backup.js --dry-run",
     "db:restore": "node scripts/db-restore.js",
     "db:restore:dry": "node scripts/db-restore.js --dry-run --file backup.dump",
+    "db:clean": "node scripts/db-clean.js --force",
+    "db:clean:confirm": "node scripts/db-clean.js",
     "db:migrate-sqlite": "node scripts/migrate-sqlite-to-postgres.js",
     "start": "nest start",
     "start:dev": "nest start --watch",

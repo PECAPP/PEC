@@ -19,12 +19,28 @@ export class EnrollmentsRepository extends BaseRepository {
       ...(query.semester ? { semester: query.semester } : {}),
     };
 
-    return this.findManyWithCount(this.prisma.enrollment, {
-      query,
-      defaultLimit: 20,
-      where,
-      orderBy: { enrolledAt: 'desc' },
-    });
+    const { take, skip } = this.resolvePagination(query, 20, 200);
+
+    const [items, total] = await Promise.all([
+      this.prisma.enrollment.findMany({
+        where,
+        take,
+        skip,
+        orderBy: { enrolledAt: 'desc' },
+        include: {
+          student: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      }),
+      this.prisma.enrollment.count({ where }),
+    ]);
+
+    return { items, total, limit: take, offset: skip };
   }
 
   create(data: CreateEnrollmentDto) {
@@ -87,6 +103,12 @@ export class EnrollmentsRepository extends BaseRepository {
         ...(studentId ? { studentId } : {}),
         courseId,
       },
+    });
+  }
+
+  findById(id: string) {
+    return this.prisma.enrollment.findUnique({
+      where: { id },
     });
   }
 }

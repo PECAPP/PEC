@@ -94,7 +94,7 @@ export default function CommandMenu() {
                   router.push(`/search?q=${encodeURIComponent(query)}`);
                 }}
               >
-                Search for "{query}"
+                Search for &quot;{query}&quot;
               </Button>
             </div>
           </CommandEmpty>
@@ -124,7 +124,7 @@ export default function CommandMenu() {
               }}
             >
               <Search className="mr-2 h-4 w-4" />
-              <span>Search all for "{query}"</span>
+              <span>Search all for &quot;{query}&quot;</span>
               <CommandShortcut>↵</CommandShortcut>
             </CommandItem>
           </CommandGroup>

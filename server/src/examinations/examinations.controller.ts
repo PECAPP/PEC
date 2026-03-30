@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { ExaminationsService } from './examinations.service';
@@ -22,7 +23,7 @@ import { ExamQueryDto } from './dto/exam-query.dto';
 export class ExaminationsController {
   constructor(private readonly service: ExaminationsService) {}
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('college_admin', 'admin', 'moderator')
   @Post('schedules')
   async createSchedule(@Body() body: CreateExamScheduleDto) {
     const data = await this.service.createSchedule(body);
@@ -31,8 +32,16 @@ export class ExaminationsController {
 
   @Roles('college_admin', 'admin', 'moderator', 'faculty', 'student')
   @Get('schedules')
-  async listSchedules(@Query() query: ExamQueryDto) {
-    const result = await this.service.listSchedules(query);
+  async listSchedules(@Request() req: any, @Query() query: ExamQueryDto) {
+    const userRoles = Array.isArray(req.user?.roles)
+      ? req.user.roles
+      : req.user?.role
+        ? [req.user.role]
+        : [];
+    const result = await this.service.listSchedules(query, {
+      userId: req.user?.sub,
+      roles: userRoles,
+    });
     return ok(result.items, {
       total: result.total,
       limit: result.limit,
@@ -40,7 +49,7 @@ export class ExaminationsController {
     });
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('college_admin', 'admin', 'moderator')
   @Delete('schedules/:id')
   async deleteSchedule(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -48,6 +57,4 @@ export class ExaminationsController {
     const data = await this.service.deleteSchedule(id);
     return ok(data);
   }
-
-
 }

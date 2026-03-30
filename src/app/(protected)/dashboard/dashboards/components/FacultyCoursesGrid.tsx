@@ -6,6 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 
 interface Props {
+  courses: {
+    id: string;
+    code: string;
+    name: string;
+    students: number;
+    progress: number;
+    avgAttendance: number;
+  }[];
   onManage: () => void;
 }
 
@@ -14,7 +22,7 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
-export function FacultyCoursesGrid({ onManage }: Props) {
+export function FacultyCoursesGrid({ courses, onManage }: Props) {
   return (
     <motion.div variants={item} className="card-elevated p-6">
       <div className="flex items-center justify-between mb-4">
@@ -25,34 +33,22 @@ export function FacultyCoursesGrid({ onManage }: Props) {
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <CourseCard
-          code="CS201"
-          name="Data Structures & Algorithms"
-          students={187}
-          progress={65}
-          avgAttendance={86}
-        />
-        <CourseCard
-          code="CS301"
-          name="Database Management Systems"
-          students={116}
-          progress={58}
-          avgAttendance={82}
-        />
-        <CourseCard
-          code="CS401"
-          name="Machine Learning"
-          students={94}
-          progress={42}
-          avgAttendance={78}
-        />
-        <CourseCard
-          code="CS202"
-          name="Object Oriented Programming"
-          students={148}
-          progress={70}
-          avgAttendance={84}
-        />
+        {courses.length === 0 ? (
+          <p className="text-sm text-muted-foreground md:col-span-2">
+            No faculty courses found.
+          </p>
+        ) : (
+          courses.map((course) => (
+            <CourseCard
+              key={course.id}
+              code={course.code}
+              name={course.name}
+              students={course.students}
+              progress={course.progress}
+              avgAttendance={course.avgAttendance}
+            />
+          ))
+        )}
       </div>
     </motion.div>
   );

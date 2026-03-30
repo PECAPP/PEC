@@ -200,7 +200,7 @@ export default function AuthEnhanced() {
             <CardTitle>Already Authenticated</CardTitle>
           </CardHeader>
           <CardContent className="text-center text-muted-foreground">
-            <p>You're already signed in. Redirecting to dashboard...</p>
+            <p>You&apos;re already signed in. Redirecting to dashboard...</p>
           </CardContent>
         </Card>
       </div>
@@ -341,7 +341,7 @@ export default function AuthEnhanced() {
                 onClick={() => setShowCredentialsModal(false)}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                I'll enter my own credentials
+                I&apos;ll enter my own credentials
               </button>
             </div>
           </motion.div>
@@ -461,7 +461,7 @@ export default function AuthEnhanced() {
                       Looking to Join?
                     </h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Individual user accounts are created by your institution's admin.
+                      Individual user accounts are created by your institution&apos;s admin.
                     </p>
                   </div>
 
@@ -496,7 +496,7 @@ export default function AuthEnhanced() {
               <TabsContent value="forgot" className="space-y-4 mt-4">
                 <form onSubmit={handleForgotPassword} className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    Enter your email and we'll send you a link to reset your password.
+                    Enter your email and we&apos;ll send you a link to reset your password.
                   </p>
 
                   <div>

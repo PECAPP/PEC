@@ -41,6 +41,7 @@ import { toast } from 'sonner';
 import BulkUpload from '@/components/BulkUpload';
 import * as XLSX from 'xlsx';
 import api from '@/lib/api';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 import { usePermissions } from '@/hooks/usePermissions';
 
 export default function Faculty() {
@@ -166,16 +167,8 @@ export default function Faculty() {
 
   const fetchFaculty = async () => {
     try {
-      type ApiResponse<T> = { success: boolean; data: T; meta?: any };
-      const response = await api.get<ApiResponse<any[]>>('/users', {
-        params: {
-          limit: 200,
-          offset: 0,
-          role: 'faculty',
-        },
-      });
-
-      setFaculty(response.data.data || []);
+      const allFaculty = await fetchAllPages<any>('/users', { role: 'faculty' });
+      setFaculty(allFaculty);
     } catch (error) {
       console.error('Error fetching faculty:', error);
     }
@@ -258,12 +251,8 @@ export default function Faculty() {
         phone: fac.phone || undefined,
       });
 
-      type ApiResponse<T> = { success: boolean; data: T; meta?: any };
-      const deptResponse = await api.get<ApiResponse<any[]>>('/departments', {
-        params: { limit: 200, offset: 0, search: fac.department },
-      });
-
-      const match = (deptResponse.data.data || []).find(
+      const allDepartments = await fetchAllPages<any>('/departments');
+      const match = allDepartments.find(
         (department: any) => department?.name?.toLowerCase() === String(fac.department).toLowerCase(),
       );
 

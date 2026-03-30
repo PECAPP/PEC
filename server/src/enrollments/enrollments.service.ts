@@ -30,4 +30,8 @@ export class EnrollmentsService {
   remove(studentId: string, courseId: string) {
     return this.repo.removeByStudentAndCourse(studentId, courseId);
   }
+
+  findById(id: string) {
+    return this.repo.findById(id);
+  }
 }

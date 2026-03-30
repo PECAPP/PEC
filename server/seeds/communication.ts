@@ -22,6 +22,8 @@ export async function seedCommunicationAndActivity(
     await prisma.userChatRoom.create({ data: { userId, chatRoomId: globalRoom.id } });
   }
 
+  const prismaAny = prisma as any;
+
   for (const department of DEPARTMENTS) {
     const departmentRoom = await prisma.chatRoom.create({
       data: { name: department.timetableLabel, isGroup: true },
@@ -79,7 +81,82 @@ export async function seedCommunicationAndActivity(
     }
   }
 
-  const prismaAny = prisma as any;
+  const clubNames = ['Robotics Club', 'Coding Club', 'Photography Club'];
+  for (let index = 0; index < clubNames.length; index += 1) {
+    const clubName = clubNames[index];
+    const clubRoom = await prisma.chatRoom.create({
+      data: { name: `CLUB::${clubName}`, isGroup: true },
+    });
+    const club = await prisma.club.create({
+      data: {
+        name: clubName,
+        chatRoomId: clubRoom.id,
+        createdById: adminId,
+      },
+    });
+
+    // Admin is always part of club chats.
+    await prisma.userChatRoom.create({
+      data: { userId: adminId, chatRoomId: clubRoom.id },
+    });
+
+    // Seed join request lifecycle samples.
+    const pendingRequester = students[index % students.length];
+    const approvedRequester = students[(index + 3) % students.length];
+    const rejectedRequester = faculties[index % faculties.length];
+
+    await prisma.clubJoinRequest.create({
+      data: {
+        clubId: club.id,
+        requesterId: pendingRequester.id,
+        proposalText: `I want to join ${clubName} to contribute consistently and participate in activities.`,
+        mediaJson: JSON.stringify([
+          {
+            url: `https://example.com/proposals/${pendingRequester.id}/intent.pdf`,
+            kind: 'file',
+            name: 'intent.pdf',
+            mimeType: 'application/pdf',
+          },
+        ]),
+        status: 'pending',
+      },
+    });
+
+    await prisma.clubJoinRequest.create({
+      data: {
+        clubId: club.id,
+        requesterId: approvedRequester.id,
+        proposalText: `I can contribute to ${clubName} events and execution teams.`,
+        status: 'approved',
+        reviewNote: 'Strong proposal and active participation history.',
+        reviewedById: adminId,
+        reviewedAt: daysAgo(2),
+      },
+    });
+    await prisma.userChatRoom.create({
+      data: { userId: approvedRequester.id, chatRoomId: clubRoom.id },
+    });
+
+    await prisma.clubJoinRequest.create({
+      data: {
+        clubId: club.id,
+        requesterId: rejectedRequester.id,
+        proposalText: `Requesting to join ${clubName} with limited time availability this term.`,
+        status: 'rejected',
+        reviewNote: 'Please re-apply with availability and concrete contribution plan.',
+        reviewedById: adminId,
+        reviewedAt: daysAgo(1),
+      },
+    });
+
+    await prisma.message.create({
+      data: {
+        chatRoomId: clubRoom.id,
+        senderId: adminId,
+        content: `Welcome to ${clubName}. Share updates and announcements here.`,
+      },
+    });
+  }
   await prismaAny.featureFlag.createMany({
     data: [
       { key: 'timetable.auto_generation', description: 'Enable auto timetable.', enabled: true, payload: JSON.stringify({ activeSemesters: ACTIVE_SEMESTERS }) },

@@ -146,7 +146,7 @@ export default function Timetable() {
   const router = useRouter();
   const { isFaculty, user, loading: authLoading } = usePermissions();
   const userRole = user?.role || "";
-  const isCollegeAdmin = userRole === "admin" || userRole === "college_admin" || userRole === "moderator";
+  const isCollegeAdmin = userRole === "college_admin";
   const canAutoGenerate = isCollegeAdmin;
   const canManageAllTimetable = isCollegeAdmin;
   const canScheduleExtraClass = userRole === "faculty";

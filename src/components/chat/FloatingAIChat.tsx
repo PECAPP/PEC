@@ -205,39 +205,6 @@ const FloatingAIChat = () => {
           console.error("Context Fetch Error:", error);
         }
         break;
-      case "placement_officer":
-        try {
-          return {
-            message: `
-            only answer using the given information
-            `,
-          };
-        } catch (error) {
-          console.error("Context Fetch Error:", error);
-        }
-        break;
-      case "recruiter":
-        try {
-          return {
-            message: `
-            only answer using the given information
-            `,
-          };
-        } catch (error) {
-          console.error("Context Fetch Error:", error);
-        }
-        break;
-      case "super_admin":
-        try {
-          return {
-            message: `
-            only answer using the given information
-            `,
-          };
-        } catch (error) {
-          console.error("Context Fetch Error:", error);
-        }
-        break;
       default:
         break;
     }

@@ -26,8 +26,9 @@ const container = {
 export function FacultyDashboard() {
   const {
     loading,
-    user,
     courses,
+    courseCards,
+    todaySchedule,
     stats,
     selectedCourse,
     setSelectedCourse,
@@ -66,12 +67,18 @@ export function FacultyDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <FacultyTodaySchedule onViewFull={() => router.push('/timetable')} />
-          <FacultyCoursesGrid onManage={() => router.push('/courses')} />
+          <FacultyTodaySchedule
+            schedule={todaySchedule}
+            onViewFull={() => router.push('/timetable')}
+          />
+          <FacultyCoursesGrid courses={courseCards} onManage={() => router.push('/courses')} />
         </div>
 
         <div className="space-y-6">
-          <LowAttendanceAlert />
+          <LowAttendanceAlert
+            lowAttendanceCount={stats.lowAttendanceCount}
+            onViewStudents={() => router.push('/attendance')}
+          />
           <FacultyQuickActions onAction={(path) => router.push(path)} />
         </div>
       </div>

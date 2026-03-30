@@ -26,7 +26,7 @@ import { BadRequestException } from '@nestjs/common';
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('summary')
   async getSummary(@Request() req: any, @Query('studentId') studentId?: string) {
     const targetId = req.user?.role === 'student' ? req.user.sub : studentId;
@@ -35,14 +35,14 @@ export class AttendanceController {
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin')
+  @Roles('faculty', 'college_admin', 'admin')
   @Post()
   async create(@Body() createAttendanceDto: CreateAttendanceDto) {
     const data = await this.attendanceService.create(createAttendanceDto);
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @Roles('student', 'faculty', 'admin')
   @Get()
   async findAll(@Request() req: any, @Query() query: AttendanceQueryDto) {
     const effectiveQuery = { ...query };
@@ -58,14 +58,14 @@ export class AttendanceController {
     });
   }
 
-  @Roles('faculty', 'college_admin')
+  @Roles('faculty', 'admin')
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.attendanceService.findOne(id);
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin')
+  @Roles('faculty', 'admin')
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -75,7 +75,7 @@ export class AttendanceController {
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin')
+  @Roles('faculty', 'admin')
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.attendanceService.remove(id);

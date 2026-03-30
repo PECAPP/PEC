@@ -2,15 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 import { searchableRoutes } from '@/utils/searchableRoutes';
-
-const extractData = <T,>(payload: any): T => {
-  if (payload && typeof payload === 'object' && 'success' in payload && 'data' in payload) {
-    return payload.data as T;
-  }
-  return payload as T;
-};
 
 export function useSearchPage() {
   const router = useRouter();
@@ -32,23 +25,23 @@ export function useSearchPage() {
 
     try {
       const [usersRes, jobsRes, subjectsRes] = await Promise.allSettled([
-        api.get('/users', { params: { limit: 200, offset: 0 } }),
-        api.get('/jobs', { params: { limit: 200, offset: 0 } }),
-        api.get('/courses', { params: { limit: 200, offset: 0 } }),
+        fetchAllPages<any>('/users'),
+        fetchAllPages<any>('/jobs'),
+        fetchAllPages<any>('/courses'),
       ]);
 
       const lowerTerm = term.trim().toLowerCase();
       const users =
         usersRes.status === 'fulfilled'
-          ? extractData<any[]>(usersRes.value.data) || []
+          ? usersRes.value || []
           : [];
       const jobs =
         jobsRes.status === 'fulfilled'
-          ? extractData<any[]>(jobsRes.value.data) || []
+          ? jobsRes.value || []
           : [];
       const subjects =
         subjectsRes.status === 'fulfilled'
-          ? extractData<any[]>(subjectsRes.value.data) || []
+          ? subjectsRes.value || []
           : [];
 
       const filteredUsers = users

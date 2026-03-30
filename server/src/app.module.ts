@@ -14,6 +14,11 @@ import { ExaminationsModule } from './examinations/examinations.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { BackgroundJobsModule } from './background-jobs/background-jobs.module';
+import { NightCanteenModule } from './night-canteen/night-canteen.module';
+import { HostelIssuesModule } from './hostel-issues/hostel-issues.module';
+import { CampusMapModule } from './campus-map/campus-map.module';
+import { CourseMaterialsModule } from './course-materials/course-materials.module';
+import { NoticeboardModule } from './noticeboard/noticeboard.module';
 
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
@@ -38,6 +43,11 @@ import { HostelModule } from './hostel/hostel.module';
     BackgroundJobsModule,
     CanteenModule,
     HostelModule,
+    NightCanteenModule,
+    HostelIssuesModule,
+    CampusMapModule,
+    CourseMaterialsModule,
+    NoticeboardModule,
   ],
   controllers: [AppController],
   providers: [

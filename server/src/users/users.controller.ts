@@ -86,7 +86,7 @@ export class UsersController {
     return this.usersService.toPublicUserRecord(user as any);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator', 'user')
+  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator')
   @Get(':id')
   async findOne(
     @Request() req: any,

@@ -570,7 +570,7 @@ export default function PaymentSettings({ embedded }: Props) {
                 <li>Students will see the configured method on payment page</li>
                 <li>Keep your credentials secure</li>
                 {method === 'razorpay' && <li>Razorpay will verify payments automatically</li>}
-                {method === 'upi' && <li>You'll need to verify UPI payments in your bank</li>}
+                {method === 'upi' && <li>You&apos;ll need to verify UPI payments in your bank</li>}
               </ul>
             </div>
           </div>

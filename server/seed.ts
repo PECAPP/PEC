@@ -7,6 +7,7 @@ import { seedStudents } from './seeds/students';
 import { seedCourses } from './seeds/courses';
 import { seedAcademicRecords } from './seeds/academic_records';
 import { seedTimetable } from './seeds/timetable';
+import { seedNoticeboard } from './seeds/noticeboard';
 import { seedCommunicationAndActivity } from './seeds/communication';
 import { seedCampusFacilities } from './seeds/campus_facilities';
 
@@ -22,7 +23,7 @@ async function main() {
 
     const passwordHash = await bcrypt.hash('password123', 12);
 
-    console.log('3. Seeding core users (Admin, Moderator, Guest)...');
+    console.log('3. Seeding core users (College Admins)...');
     const admin = await seedCoreUsers(passwordHash);
 
     console.log('4. Seeding faculty and profiles...');
@@ -43,7 +44,10 @@ async function main() {
     console.log('9. Seeding campus facilities (Canteen & Hostel)...');
     await seedCampusFacilities(students);
 
-    console.log('12. Seeding communication systems (Chat, Audit, Flags)...');
+    console.log('10. Seeding noticeboard...');
+    await seedNoticeboard(admin.id, faculties);
+
+    console.log('11. Seeding communication systems (Chat, Audit, Flags)...');
     await seedCommunicationAndActivity(admin.id, faculties, students, courses);
 
     console.log('--- Seeding Completed Successfully ---');

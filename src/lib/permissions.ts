@@ -61,7 +61,6 @@ export function getRolePermissions(role: string): UserPermissions {
 
   switch (role) {
     case "college_admin":
-    case "admin":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -109,9 +108,7 @@ export function getRolePermissions(role: string): UserPermissions {
  * Check if user is admin
  */
 export function isAdmin(user: User | null): boolean {
-  return ["college_admin", "admin", "faculty"].includes(
-    user?.role || "",
-  );
+  return ["college_admin", "faculty"].includes(user?.role || "");
 }
 
 /**

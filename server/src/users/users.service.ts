@@ -1,6 +1,7 @@
-﻿import { Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import {
   decryptField,
   encryptField,
@@ -34,24 +35,39 @@ export class UsersService {
     specialization?: string;
     phone?: string;
   }) {
-    const created = await this.prisma.user.create({
-      data: {
-        name: data.fullName,
-        email: data.email,
-        role: data.role,
-        profileComplete: true,
-        lockedUntil:
-          data.status === 'suspended'
-            ? new Date('2099-01-01T00:00:00.000Z')
-            : null,
-      },
-      include: {
-        roles: {
-          include: { role: true },
+    const defaultPassword = process.env.DEFAULT_USER_PASSWORD ?? 'password123';
+    const passwordHash = await bcrypt.hash(defaultPassword, 12);
+
+    const created = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name: data.fullName,
+          email: data.email,
+          role: data.role,
+          password: passwordHash,
+          passwordChangedAt: new Date(),
+          profileComplete: true,
+          lockedUntil:
+            data.status === 'suspended'
+              ? new Date('2099-01-01T00:00:00.000Z')
+              : null,
         },
-        studentProfile: true,
-        facultyProfile: true,
-      },
+      });
+
+      const roleRecord = await tx.role.upsert({
+        where: { name: data.role },
+        update: {},
+        create: { name: data.role },
+      });
+
+      await tx.userRole.create({
+        data: {
+          userId: user.id,
+          roleId: roleRecord.id,
+        },
+      });
+
+      return user;
     });
 
     if (data.role === 'student' && data.department && data.enrollmentNumber) {
@@ -95,21 +111,39 @@ export class UsersService {
       phone?: string;
     },
   ) {
-    await this.prisma.user.update({
-      where: { id },
-      data: {
-        ...(data.fullName ? { name: data.fullName } : {}),
-        ...(data.email ? { email: data.email } : {}),
-        ...(data.role ? { role: data.role } : {}),
-        ...(data.status
-          ? {
-              lockedUntil:
-                data.status === 'suspended'
-                  ? new Date('2099-01-01T00:00:00.000Z')
-                  : null,
-            }
-          : {}),
-      },
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id },
+        data: {
+          ...(data.fullName ? { name: data.fullName } : {}),
+          ...(data.email ? { email: data.email } : {}),
+          ...(data.role ? { role: data.role } : {}),
+          ...(data.status
+            ? {
+                lockedUntil:
+                  data.status === 'suspended'
+                    ? new Date('2099-01-01T00:00:00.000Z')
+                    : null,
+              }
+            : {}),
+        },
+      });
+
+      if (data.role) {
+        const roleRecord = await tx.role.upsert({
+          where: { name: data.role },
+          update: {},
+          create: { name: data.role },
+        });
+
+        await tx.userRole.deleteMany({ where: { userId: id } });
+        await tx.userRole.create({
+          data: {
+            userId: id,
+            roleId: roleRecord.id,
+          },
+        });
+      }
     });
 
     if (data.role === 'student' && data.department && data.enrollmentNumber) {
@@ -342,3 +376,4 @@ export class UsersService {
     };
   }
 }
+

@@ -31,6 +31,7 @@ import { useRouter } from 'next/navigation';
 ;
 import { usePermissions } from '@/hooks/usePermissions';
 import BulkUpload from '@/components/BulkUpload';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 
 import { api } from '@/lib/api';
 
@@ -120,8 +121,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
   const fetchCourses = async () => {
     try {
-      const response = await api.get('/courses', { params: { limit: 100, offset: 0 } });
-      const allCourses = Array.isArray(response.data) ? response.data : [];
+      const allCourses = await fetchAllPages<any>('/courses');
       const scopedCourses = isAdmin
         ? allCourses
         : allCourses.filter((course: any) => course.instructor === userId || course.facultyId === userId);
@@ -136,8 +136,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
       const courseIds = selectedCourse ? [selectedCourse] : courses.map(c => c.id);
       if (courseIds.length === 0) return;
 
-      const response = await api.get('/course-materials');
-      const materialsData = (Array.isArray(response.data) ? response.data : [])
+      const materialsData = (await fetchAllPages<CourseMaterial>('/course-materials'))
         .filter((m: CourseMaterial) => courseIds.includes(m.courseId));
       
       setMaterials(materialsData);
@@ -426,11 +425,14 @@ function StudentMaterialsView({ userId }: { userId: string }) {
     try {
       let enrollmentsResponse;
       try {
-        enrollmentsResponse = await api.get('/enrollments', {
-          params: { studentId: userId, status: 'active' },
+        const scopedEnrollments = await fetchAllPages<any>('/enrollments', {
+          studentId: userId,
+          status: 'active',
         });
+        enrollmentsResponse = { data: scopedEnrollments };
       } catch {
-        enrollmentsResponse = await api.get('/enrollments');
+        const allEnrollments = await fetchAllPages<any>('/enrollments');
+        enrollmentsResponse = { data: allEnrollments };
       }
       const enrolledCourseIds = (Array.isArray(enrollmentsResponse.data) ? enrollmentsResponse.data : [])
         .filter((enrollment: any) => enrollment.studentId === userId && (enrollment.status ?? 'active') === 'active')
@@ -441,14 +443,12 @@ function StudentMaterialsView({ userId }: { userId: string }) {
         return;
       }
 
-      const coursesResponse = await api.get('/courses');
-      const coursesData = (Array.isArray(coursesResponse.data) ? coursesResponse.data : [])
+      const coursesData = (await fetchAllPages<any>('/courses'))
         .filter((course: any) => enrolledCourseIds.includes(course.id));
       setCourses(coursesData);
 
       try {
-        const materialsResponse = await api.get('/course-materials', { params: { limit: 100, offset: 0 } });
-        const materialsData = (Array.isArray(materialsResponse.data) ? materialsResponse.data : [])
+        const materialsData = (await fetchAllPages<CourseMaterial>('/course-materials'))
           .filter((m: CourseMaterial) => enrolledCourseIds.includes(m.courseId));
         
         setMaterials(materialsData);

@@ -32,15 +32,119 @@ model User {
   feeRecords      FeeRecord[]
   grades          Grade[]
   bookBorrows     BookBorrow[]    @relation("UserBookBorrows")
+  canteenOrders   CanteenOrder[]
   enrollments     Enrollment[]    @relation("StudentEnrollments")
   roles           UserRole[]
   refreshTokens   RefreshToken[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens PasswordResetToken[]
+  clubJoinRequests ClubJoinRequest[] @relation("ClubJoinRequester")
+  reviewedClubJoinRequests ClubJoinRequest[] @relation("ClubJoinReviewer")
+  createdClubs Club[] @relation("ClubCreator")
+  notices Notice[] @relation("NoticeAuthor")
 
   @@index([role])
   @@index([emailVerified])
   @@index([lockedUntil])
+}
+
+model CanteenItem {
+  id          String   @id @default(uuid())
+  name        String
+  price       Float
+  category    String
+  description String   @default("")
+  image       String   @default("")
+  isAvailable Boolean  @default(true)
+  stock       Int      @default(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category, isAvailable])
+  @@index([updatedAt])
+}
+
+model CanteenOrder {
+  id          String   @id @default(uuid())
+  studentId   String?
+  student     User?    @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  studentName String
+  hostelRoom  String
+  items       Json
+  totalAmount Float
+  status      String   @default("Pending")
+  timestamp   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([studentId, status])
+  @@index([timestamp])
+}
+
+model HostelIssue {
+  id             String   @id @default(uuid())
+  title          String
+  description    String
+  category       String
+  priority       String
+  status         String   @default("open")
+  roomNumber     String
+  studentId      String?
+  studentName    String
+  organizationId String?
+  responses      Json     @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([studentId, status])
+  @@index([organizationId])
+  @@index([createdAt])
+}
+
+model CampusMapRegion {
+  id             String   @id @default(uuid())
+  name           String
+  description    String
+  x              Float
+  y              Float
+  width          Float
+  height         Float
+  category       String
+  link           String?
+  organizationId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId, category])
+}
+
+model CampusMapRoad {
+  id             String   @id @default(uuid())
+  points         Json
+  width          Float
+  organizationId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+}
+
+model CourseMaterial {
+  id          String   @id @default(uuid())
+  courseId    String
+  courseName  String
+  courseCode  String
+  title       String
+  description String   @default("")
+  fileURL     String
+  type        String   @default("other")
+  uploadedBy  String
+  uploadedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId, type])
+  @@index([uploadedBy])
 }
 
 model Role {
@@ -277,9 +381,69 @@ model ChatRoom {
   createdAt    DateTime       @default(now())
   messages     Message[]
   participants UserChatRoom[]
+  club Club?
 
   @@unique([name, isGroup])
   @@index([createdAt])
+}
+
+model Notice {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  category    String   @default("update")
+  important   Boolean  @default(false)
+  pinned      Boolean  @default(false)
+  mediaJson   String?
+  authorId    String?
+  author      User?    @relation("NoticeAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@index([pinned, publishedAt])
+  @@index([category, publishedAt])
+  @@index([authorId])
+  @@index([deletedAt, publishedAt])
+}
+
+model Club {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  chatRoomId  String   @unique
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  chatRoom      ChatRoom           @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  createdBy     User?              @relation("ClubCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  joinRequests  ClubJoinRequest[]
+
+  @@index([createdById])
+}
+
+model ClubJoinRequest {
+  id           String   @id @default(uuid())
+  clubId       String
+  requesterId  String
+  proposalText String
+  mediaJson    String?
+  status       String   @default("pending")
+  reviewNote   String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  club      Club    @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  requester  User     @relation("ClubJoinRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  reviewedBy User?    @relation("ClubJoinReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@unique([clubId, requesterId])
+  @@index([clubId, status])
+  @@index([requesterId, status])
+  @@index([status, createdAt])
 }
 
 model Message {

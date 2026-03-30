@@ -53,11 +53,16 @@ export function ChatSidebar({
     getRoomDisplayTitle(room).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const generalRooms = filteredRooms.filter((r) => r.type === "general");
-  const semesterRooms = filteredRooms.filter((r) => r.type === "semester");
-  const departmentRooms = filteredRooms.filter((r) => r.type === "department");
   const dmRooms = filteredRooms.filter((r) => r.type === "dm");
-  const groupRooms = filteredRooms.filter((r) => r.type === "group");
+  const communityRooms = filteredRooms.filter((r) => r.type === "general");
+  const departmentRooms = filteredRooms.filter((r) => r.type === "department");
+  const clubRooms =
+    userRole === "faculty"
+      ? []
+      : filteredRooms.filter((r) => r.type === "club");
+  const groupRooms = filteredRooms.filter(
+    (r) => r.type === "group" || r.type === "semester"
+  );
 
   const handleRoomClick = (roomId: string) => {
     onRoomChange(roomId);
@@ -101,22 +106,26 @@ export function ChatSidebar({
                 className="pl-10"
               />
             </div>
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => setIsCreateGroupOpen(true)}
-              title="Create new group"
-            >
-              <Users className="w-4 h-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="default"
-              onClick={() => setIsNewChatOpen(true)}
-              title="Start new DM"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
+            {!isChatAdmin && (
+              <>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={() => setIsCreateGroupOpen(true)}
+                  title="Create new group"
+                >
+                  <Users className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="default"
+                  onClick={() => setIsNewChatOpen(true)}
+                  title="Start new DM"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -155,55 +164,13 @@ export function ChatSidebar({
                 </div>
               )}
 
-              {/* Group Rooms */}
-              {groupRooms.length > 0 && (
-                <div className="mb-4">
-                  <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
-                    Groups
-                  </div>
-                  {groupRooms.map((room) => {
-                    const Icon = getRoomIcon(room.type);
-                    return (
-                      <button
-                        key={room.id}
-                        onClick={() => handleRoomClick(room.id)}
-                        className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
-                          selectedRoom === room.id
-                            ? "bg-primary text-primary-foreground font-medium shadow-md shadow-primary/20"
-                            : "text-foreground/70 hover:text-foreground hover:bg-secondary"
-                        )}
-                      >
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center bg-primary/10",
-                          selectedRoom === room.id && "bg-white/20"
-                        )}>
-                          <Icon className="w-4 h-4 shrink-0" />
-                        </div>
-                        <div className="flex-1 min-w-0 ml-1">
-                          <p className="truncate text-sm font-medium">{room.title}</p>
-                          {room.description && (
-                            <p className={cn(
-                              "truncate text-[10px]",
-                              selectedRoom === room.id ? "text-primary-foreground/70" : "text-muted-foreground"
-                            )}>
-                              {room.description}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* General Rooms */}
-              {generalRooms.length > 0 && (
+              {/* Community */}
+              {communityRooms.length > 0 && (
                 <div className="mb-4">
                   <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
                     Community
                   </div>
-                  {generalRooms.map((room) => {
+                  {communityRooms.map((room) => {
                     const Icon = getRoomIcon(room.type);
                     return (
                       <button
@@ -224,11 +191,11 @@ export function ChatSidebar({
                 </div>
               )}
 
-              {/* Department Rooms */}
+              {/* Department Groups */}
               {departmentRooms.length > 0 && (
                 <div className="mb-4">
                   <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
-                    {isChatAdmin ? "All Departments" : "Your Department"}
+                    Department Groups
                   </div>
                   {departmentRooms.map((room) => {
                     const Icon = getRoomIcon(room.type);
@@ -243,23 +210,21 @@ export function ChatSidebar({
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
                         )}
                       >
-                        <Icon className="w-4 h-4 shrink-0" />
-                        <span className="truncate text-sm">
-                          {room.department || room.title}
-                        </span>
+                          <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate text-sm">{room.title}</span>
                       </button>
                     );
                   })}
                 </div>
               )}
 
-              {/* Semester Rooms */}
-              {semesterRooms.length > 0 && (
+              {/* Club Groups */}
+              {clubRooms.length > 0 && (
                 <div className="mb-4">
                   <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
-                    {isChatAdmin ? "All Semesters" : "Your Semester"}
+                    Club Groups
                   </div>
-                  {semesterRooms.map((room) => {
+                  {clubRooms.map((room) => {
                     const Icon = getRoomIcon(room.type);
                     return (
                       <button
@@ -269,6 +234,33 @@ export function ChatSidebar({
                           "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
+                            : "text-foreground/70 hover:text-foreground hover:bg-secondary"
+                        )}
+                      >
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate text-sm">{room.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Groups */}
+              {groupRooms.length > 0 && (
+                <div className="mb-4">
+                  <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
+                    Groups
+                  </div>
+                  {groupRooms.map((room) => {
+                    const Icon = getRoomIcon(room.type);
+                    return (
+                      <button
+                        key={room.id}
+                        onClick={() => handleRoomClick(room.id)}
+                        className={cn(
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          selectedRoom === room.id
+                            ? "bg-primary text-primary-foreground font-medium shadow-md shadow-primary/20"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
                         )}
                       >

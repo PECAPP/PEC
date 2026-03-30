@@ -7,6 +7,8 @@ interface Props {
   stats: {
     activeCount: number;
     studentCount: number;
+    avgAttendance?: number;
+    pendingReviews?: number;
   };
 }
 
@@ -33,14 +35,14 @@ export function FacultyStatsGrid({ stats }: Props) {
       <StatCard
         icon={ClipboardCheck}
         label="Avg Attendance"
-        value="84%"
+        value={`${Math.max(0, Math.min(100, Number(stats.avgAttendance || 0)))}%`}
         subtext="This month"
         iconColor="text-success"
       />
       <StatCard
         icon={FileText}
         label="Pending Reviews"
-        value="18"
+        value={String(stats.pendingReviews || 0)}
         subtext="Assignments to grade"
         iconColor="text-warning"
       />

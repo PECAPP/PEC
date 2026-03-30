@@ -7,6 +7,8 @@ export function useChatRooms(user: any) {
   const [loading, setLoading] = useState(true);
   const requestIdRef = useRef(0);
 
+  const userId = user?.uid;
+
   const loadRooms = useCallback(async (expectedUserId?: string) => {
     const userId = expectedUserId ?? user?.uid;
     const requestId = ++requestIdRef.current;
@@ -20,8 +22,11 @@ export function useChatRooms(user: any) {
     setLoading(true);
     try {
       const nextRooms = await fetchChatRooms(user);
+      const uniqueRooms = nextRooms.filter(
+        (room, index, arr) => arr.findIndex((candidate) => candidate.id === room.id) === index,
+      );
       if (requestIdRef.current === requestId && user?.uid === userId) {
-        setRooms(nextRooms);
+        setRooms(uniqueRooms);
       }
     } finally {
       if (requestIdRef.current === requestId) {
@@ -31,13 +36,12 @@ export function useChatRooms(user: any) {
   }, [user]);
 
   useEffect(() => {
-    const currentUserId = user?.uid;
-    void loadRooms(currentUserId);
+    void loadRooms(userId);
 
     return () => {
       requestIdRef.current += 1;
     };
-  }, [loadRooms]);
+  }, [loadRooms, userId]);
 
   useEffect(() => {
     const handleRoomsUpdated = () => {

@@ -7,6 +7,17 @@ const API = axios.create({
   baseURL: API_BASE_URL,
 });
 
+const timestampWrapper = (value: string | Date | undefined) => {
+  const date = value ? new Date(value) : new Date();
+  const ms = date.getTime();
+  const seconds = Number.isFinite(ms) ? Math.floor(ms / 1000) : 0;
+  return {
+    toDate: () => date,
+    seconds,
+    nanoseconds: 0,
+  };
+};
+
 API.interceptors.request.use((config) => {
   const token = authClient.getAccessToken();
   if (token) {
@@ -45,16 +56,103 @@ const unwrapSuccess = <T = any>(payload: any): T => {
   return payload as T;
 };
 
+const extractMetaTotal = (payload: any): number | null => {
+  if (
+    payload &&
+    typeof payload === "object" &&
+    payload.meta &&
+    typeof payload.meta.total === "number"
+  ) {
+    return payload.meta.total;
+  }
+  return null;
+};
+
+const fetchAllViaApi = async <T = any>(
+  route: string,
+  params: Record<string, any> = {},
+  pageSize = 200,
+): Promise<T[]> => {
+  if (params.limit !== undefined || params.offset !== undefined) {
+    const res = await API.get(route, { params });
+    const rows = unwrapSuccess<T[]>(res.data);
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  const baseParams = { ...params };
+  delete baseParams.limit;
+  delete baseParams.offset;
+
+  const first = await API.get(route, {
+    params: { ...baseParams, limit: pageSize, offset: 0 },
+  });
+  const firstRows = unwrapSuccess<T[]>(first.data);
+  const firstData = Array.isArray(firstRows) ? firstRows : [];
+  const total = extractMetaTotal(first.data);
+
+  if (typeof total === "number") {
+    if (total <= firstData.length) {
+      return firstData;
+    }
+    const remainingOffsets: number[] = [];
+    for (let offset = firstData.length; offset < total; offset += pageSize) {
+      remainingOffsets.push(offset);
+    }
+    const remaining = await Promise.all(
+      remainingOffsets.map((offset) =>
+        API.get(route, {
+          params: { ...baseParams, limit: pageSize, offset },
+        }),
+      ),
+    );
+    return [
+      ...firstData,
+      ...remaining.flatMap((res) => {
+        const rows = unwrapSuccess<T[]>(res.data);
+        return Array.isArray(rows) ? rows : [];
+      }),
+    ];
+  }
+
+  const all = [...firstData];
+  let offset = firstData.length;
+  let lastCount = firstData.length;
+
+  while (lastCount === pageSize) {
+    const next = await API.get(route, {
+      params: { ...baseParams, limit: pageSize, offset },
+    });
+    const rows = unwrapSuccess<T[]>(next.data);
+    const batch = Array.isArray(rows) ? rows : [];
+    if (batch.length === 0) break;
+    all.push(...batch);
+    offset += batch.length;
+    lastCount = batch.length;
+  }
+
+  return all;
+};
+
 const normalizeCollectionName = (collectionName: string) => {
   if (collectionName === "feeRecords") return "fee-records";
   if (collectionName === "placement_drives") return "jobs";
   if (collectionName === "canteenOrders") return "canteenOrders";
+  if (collectionName === "courseMaterials") return "course-materials";
+  if (collectionName === "campusMapRegions") return "campusMapRegions";
+  if (collectionName === "campusMapRoads") return "campusMapRoads";
+  if (collectionName === "hostelIssues") return "hostelIssues";
   return collectionName;
 };
 
 const routeForCollection = (collectionName: string) => {
   const normalized = normalizeCollectionName(collectionName);
+  if (normalized === "canteenItems") return "/night-canteen/items";
+  if (normalized === "canteenOrders") return "/night-canteen/orders";
   if (normalized === "books") return "/library/books";
+  if (normalized === "course-materials") return "/course-materials";
+  if (normalized === "campusMapRegions") return "/campusMapRegions";
+  if (normalized === "campusMapRoads") return "/campusMapRoads";
+  if (normalized === "hostelIssues") return "/hostelIssues";
   return `/${normalized}`;
 };
 
@@ -102,6 +200,22 @@ const toIsoDate = (value: any) => {
 export const getDoc = async (docRef: string) => {
   try {
     let value: any;
+
+    if (docRef.startsWith("canteenItems/")) {
+      const [, id] = docRef.split("/");
+      const { data } = await API.get(`/night-canteen/items/${id}`);
+      value = unwrapSuccess(data);
+    } else if (docRef.startsWith("canteenOrders/")) {
+      const [, id] = docRef.split("/");
+      const { data } = await API.get(`/night-canteen/orders/${id}`);
+      const order = unwrapSuccess<any>(data);
+      value = order
+        ? {
+            ...order,
+            timestamp: timestampWrapper(order.timestamp),
+          }
+        : null;
+    } else
 
     if (
       docRef.startsWith("studentProfiles/") ||
@@ -166,15 +280,10 @@ export const getDocs = async (q: any) => {
     }
 
     if (col === "grades" && params.studentId) {
-      const { data } = await API.get("/enrollments", {
-        params: {
-          studentId: params.studentId,
-          status: "active",
-          limit: 200,
-          offset: 0,
-        },
+      const enrollments = await fetchAllViaApi<any>("/enrollments", {
+        studentId: params.studentId,
+        status: "active",
       });
-      const enrollments = unwrapSuccess<any[]>(data);
       const gradeRows = (Array.isArray(enrollments) ? enrollments : []).map(
         (enrollment, index) => ({
           id: `grade-${enrollment.id}`,
@@ -218,24 +327,18 @@ export const getDocs = async (q: any) => {
     }
 
     if (col === "submissions" && params.studentId) {
-      const { data } = await API.get("/enrollments", {
-        params: {
-          studentId: params.studentId,
-          status: "active",
-          limit: 200,
-          offset: 0,
-        },
+      const enrollments = await fetchAllViaApi<any>("/enrollments", {
+        studentId: params.studentId,
+        status: "active",
       });
-      const enrollments = unwrapSuccess<any[]>(data);
 
       const submissionRows: any[] = [];
       if (Array.isArray(enrollments)) {
         for (const enrollment of enrollments) {
           try {
-            const assignmentsRes = await API.get("/assignments", {
-              params: { courseId: enrollment.courseId, limit: 200, offset: 0 },
+            const assignments = await fetchAllViaApi<any>("/assignments", {
+              courseId: enrollment.courseId,
             });
-            const assignments = unwrapSuccess<any[]>(assignmentsRes.data);
             if (Array.isArray(assignments) && assignments.length > 0) {
               submissionRows.push({
                 id: `submission-${assignments[0].id}`,
@@ -299,17 +402,13 @@ export const getDocs = async (q: any) => {
     }
 
     if (col === "users") {
-      const { data } = await API.get("/users", {
-        params: {
-          role: params.role,
-          department: params.department,
-          semester: params.semester,
-          limit: params.limit || 200,
-          offset: params.offset || 0,
-        },
+      const users = await fetchAllViaApi<any>("/users", {
+        role: params.role,
+        department: params.department,
+        semester: params.semester,
+        ...(params.limit ? { limit: params.limit } : {}),
+        ...(params.offset ? { offset: params.offset } : {}),
       });
-
-      const users = unwrapSuccess<any[]>(data);
       const normalizedUsers = Array.isArray(users)
         ? users.map((user) => ({
             uid: user.id,
@@ -337,16 +436,37 @@ export const getDocs = async (q: any) => {
     const normalizedItems =
       col === "timetable" && Array.isArray(items)
         ? items.map((item) => toTimetableShape(item))
+        : col === "hostelIssues" && Array.isArray(items)
+          ? items.map((item) => ({
+              ...item,
+              createdAt: timestampWrapper(item?.createdAt),
+              updatedAt: timestampWrapper(item?.updatedAt),
+              responses: Array.isArray(item?.responses)
+                ? item.responses.map((entry: any) => ({
+                    ...entry,
+                    timestamp: timestampWrapper(entry?.timestamp),
+                  }))
+                : [],
+            }))
+        : col === "courseMaterials" && Array.isArray(items)
+          ? items.map((item) => ({
+              ...item,
+              uploadedAt: timestampWrapper(item?.uploadedAt),
+              createdAt: timestampWrapper(item?.createdAt),
+              updatedAt: timestampWrapper(item?.updatedAt),
+            }))
+        : col === "canteenOrders" && Array.isArray(items)
+          ? items.map((item) => ({
+              ...item,
+              timestamp: timestampWrapper(item?.timestamp),
+            }))
         : items;
 
     if (col === "attendance" && Array.isArray(normalizedItems)) {
       let codeToId = new Map<string, string>();
 
       try {
-        const coursesRes = await API.get("/courses", {
-          params: { limit: 200, offset: 0 },
-        });
-        const courses = unwrapSuccess<any[]>(coursesRes.data);
+        const courses = await fetchAllViaApi<any>("/courses");
         if (Array.isArray(courses)) {
           codeToId = new Map(
             courses
@@ -508,6 +628,9 @@ export const query = (col: string, ...args: any[]) => {
     .reduce((acc, curr) => {
       if (curr.op === "in" && Array.isArray(curr.value)) {
         return { ...acc, [curr.field]: curr.value };
+      }
+      if (curr.op === "!=") {
+        return { ...acc, [`${curr.field}__ne`]: curr.value };
       }
       return { ...acc, [curr.field]: curr.value };
     }, {});
