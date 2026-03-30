@@ -17,7 +17,7 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull }: Pro
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <Calendar className="w-5 h-5 text-primary" />
-          {scheduleDay}'s Schedule
+          {scheduleDay}&apos;s Schedule
         </h2>
         <Button variant="ghost" size="sm" onClick={onViewFull}>
           Full

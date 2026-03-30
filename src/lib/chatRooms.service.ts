@@ -1,4 +1,5 @@
 import api from "@/lib/api";
+import { ChatRoom } from "@/types/chat";
 
 export async function findUserByEmail(email: string) {
   try {
@@ -55,15 +56,15 @@ export async function fetchChatUsers() {
   }
 }
 
-export async function fetchChatRooms(user: any) {
+export async function fetchChatRooms(user: any): Promise<ChatRoom[]> {
   try {
     const res = await api.get("/chat/rooms");
     const rooms = res.data?.data || res.data || [];
     
     // Map backend rooms to frontend ChatRoom type if needed
-    return rooms.map((room: any) => ({
+    return rooms.map((room: any): ChatRoom => ({
       id: room.id,
-      title: room.name,
+      title: room.name || "",
       type: room.isGroup ? "group" : "dm",
       description: room.description || "",
       participants: room.participants?.map((p: any) => p.userId || p) || [],
@@ -71,9 +72,8 @@ export async function fetchChatRooms(user: any) {
         if (p.user) acc[p.userId] = p.user.name;
         return acc;
       }, {}) || {},
-      createdAt: room.createdAt,
-      lastMessage: room.messages?.[0]?.content || "",
-      unreadCount: 0
+      createdAt: room.createdAt || new Date(),
+      organizationId: room.organizationId || ""
     }));
   } catch (error) {
     console.error("Error fetching chat rooms:", error);

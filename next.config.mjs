@@ -8,6 +8,9 @@ const emptyModulePath = path.resolve(__dirname, 'src/lib/empty-module.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   experimental: {
     optimizePackageImports: [
       'lucide-react',

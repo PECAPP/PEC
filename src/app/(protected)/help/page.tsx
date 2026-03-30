@@ -198,7 +198,7 @@ export default function Help() {
           <Card>
             <CardHeader>
               <CardTitle>Contact Support</CardTitle>
-              <CardDescription>Can't find what you're looking for?</CardDescription>
+              <CardDescription>Can&apos;t find what you&apos;re looking for?</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary">
