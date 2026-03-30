@@ -35,7 +35,7 @@ async function main() {
     console.log('6. Seeding courses...');
     const courses = await seedCourses(faculties);
 
-    console.log('7. Seeding academic records (Enrollments, Attendance, Assignments, Exams, Grades)...');
+    console.log('7. Seeding academic records (Enrollments, Attendance, Exams)...');
     await seedAcademicRecords(students, courses);
 
     console.log('8. Generating complex timetable...');

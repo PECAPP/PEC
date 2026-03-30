@@ -6,10 +6,18 @@ interface PageProps {
   params: Promise<{ userId: string }>;
 }
 
-async function getUserData(userId: string) {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+async function getUserData(userId: string, token: string) {
+  const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+  
   try {
-     const userRes = await fetch(`${API_URL}/users/${userId}`, { next: { revalidate: 60 } });
+     const userRes = await fetch(`${base}/users/${userId}`, { 
+        headers: {
+           'Authorization': `Bearer ${token}`,
+           'Content-Type': 'application/json'
+        },
+        next: { revalidate: 60 } 
+     });
      if (!userRes.ok) return null;
      const data = await userRes.json();
      return data.data || data;
@@ -19,13 +27,15 @@ async function getUserData(userId: string) {
   }
 }
 
-async function getStudentStats(userId: string) {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+async function getStudentStats(userId: string, token: string) {
+  const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+
   try {
      const [enrollmentsRes, gradesRes, attendanceRes] = await Promise.all([
-        fetch(`${API_URL}/enrollments?studentId=${userId}`, { next: { revalidate: 60 } }),
-        fetch(`${API_URL}/examinations/grades?studentId=${userId}`, { next: { revalidate: 60 } }),
-        fetch(`${API_URL}/attendance?studentId=${userId}`, { next: { revalidate: 60 } }),
+        fetch(`${base}/enrollments?studentId=${userId}`, { headers: { 'Authorization': `Bearer ${token}` }, next: { revalidate: 60 } }),
+        fetch(`${base}/examinations/grades?studentId=${userId}`, { headers: { 'Authorization': `Bearer ${token}` }, next: { revalidate: 60 } }),
+        fetch(`${base}/attendance?studentId=${userId}`, { headers: { 'Authorization': `Bearer ${token}` }, next: { revalidate: 60 } }),
      ]);
 
      const enrollmentsData = enrollmentsRes.ok ? (await enrollmentsRes.json()).data : [];
@@ -53,12 +63,12 @@ export default async function UserDetailPage({ params }: PageProps) {
     redirect('/dashboard');
   }
 
-  const user = await getUserData(userId);
+  const user = await getUserData(userId, session.token);
   if (!user) notFound();
 
   let studentData = { enrollments: [], grades: [], attendance: [] };
-  if (user.role === 'student') {
-     studentData = await getStudentStats(userId);
+  if (user.role === 'student' || user.role === 'user') {
+     studentData = await getStudentStats(userId, session.token);
   }
 
   return (

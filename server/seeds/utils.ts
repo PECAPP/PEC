@@ -53,7 +53,6 @@ export async function clearDatabase() {
   await prisma.auditLog.deleteMany();
   await prismaAny.backgroundJob.deleteMany();
   await prismaAny.featureFlag.deleteMany();
-  await prisma.bookBorrow.deleteMany();
   await prisma.attendance.deleteMany();
   await prisma.message.deleteMany();
   await prismaAny.notice.deleteMany();
@@ -61,12 +60,10 @@ export async function clearDatabase() {
   await prisma.club.deleteMany();
   await prisma.userChatRoom.deleteMany();
   await prisma.chatRoom.deleteMany();
-  await prisma.assignment.deleteMany();
   await prisma.enrollment.deleteMany();
   await prisma.timetable.deleteMany();
   await prisma.course.deleteMany();
   await prisma.job.deleteMany();
-  await prisma.book.deleteMany();
   await prisma.room.deleteMany();
   await prismaAny.department.deleteMany();
   await (prisma as any).feeRecord.deleteMany();

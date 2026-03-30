@@ -73,25 +73,5 @@ export async function seedAcademicRecords(
       ],
     });
 
-    // Seed Grades for previous years' students or senior students
-    const enrollmentMatches = students.filter(s => s.departmentCode === course.departmentCode && s.semester > course.semester);
-    for (const student of enrollmentMatches) {
-        await prisma.grade.upsert({
-            where: { studentId_courseId: { studentId: student.id, courseId: course.id } },
-            create: {
-                studentId: student.id,
-                courseId: course.id,
-                midterm: 70 + (Math.random() * 20),
-                final: 65 + (Math.random() * 30),
-                total: 75 + (Math.random() * 20),
-                grade: ['A+', 'A', 'B+', 'B'][Math.floor(Math.random() * 4)],
-                credits: course.credits,
-                remarks: 'Good participation',
-            },
-            update: {}
-        });
-    }
   }
-
-
 }

@@ -1,5 +1,5 @@
-import { PageLoader } from "@/components/loading/PageLoader";
+import { Loader } from "@/components/ui/Loader";
 
 export default function Loading() {
-  return <PageLoader />;
+  return <Loader fullScreen={false} />;
 }

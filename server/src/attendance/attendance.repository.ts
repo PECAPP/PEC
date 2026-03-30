@@ -34,6 +34,34 @@ export class AttendanceRepository extends BaseRepository {
     });
   }
 
+  async getFacultyStats(facultyId: string) {
+    const [courses, stats] = await Promise.all([
+      this.prisma.course.findMany({
+        where: { facultyId, deletedAt: null },
+        include: { _count: { select: { enrollments: true } } }
+      }),
+      this.prisma.attendance.groupBy({
+        by: ['status'],
+        where: { subject: { in: (await this.prisma.course.findMany({ where: { facultyId, deletedAt: null }, select: { id: true } })).map(c => c.id) } },
+        _count: { _all: true }
+      })
+    ]);
+
+    const activeCount = courses.length;
+    const studentCount = courses.reduce((acc, curr) => acc + curr._count.enrollments, 0);
+
+    return {
+      activeCount,
+      studentCount,
+      courses: courses.map(c => ({
+        id: c.id,
+        code: c.code,
+        name: c.name,
+        students: c._count.enrollments
+      }))
+    };
+  }
+
   async getStudentSummary(studentId: string) {
     const [enrollments, aggregates] = await Promise.all([
       this.prisma.enrollment.findMany({

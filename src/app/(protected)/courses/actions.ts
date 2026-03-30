@@ -31,7 +31,7 @@ export async function enrollInCourseAction(prevState: any, formData: FormData) {
     return { success: false, error: 'Invalid form data' };
   }
 
-  const API_URL = process.env.API_URL || "http://localhost:3000";
+  const API_URL = process.env.INTERNAL_API_URL || process.env.API_URL || "http://localhost:8000";
 
   try {
      const response = await fetch(`${API_URL}/enrollments`, {
@@ -66,7 +66,7 @@ export async function dropCourseAction(courseId: string) {
   const session = await getServerSession();
   if (!session) return { success: false, error: 'Not authenticated' };
 
-  const API_URL = process.env.API_URL || "http://localhost:3000";
+  const API_URL = process.env.INTERNAL_API_URL || process.env.API_URL || "http://localhost:8000";
 
   try {
      const response = await fetch(`${API_URL}/enrollments?studentId=${session.uid}&courseId=${courseId}`, {

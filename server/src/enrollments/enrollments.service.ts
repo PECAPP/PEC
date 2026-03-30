@@ -13,7 +13,13 @@ export class EnrollmentsService {
   }
 
   async create(data: CreateEnrollmentDto) {
-    // 1. Check for schedule conflicts
+    // 1. Check Capacity & Prerequisites
+    const blocker = await this.repo.findEnrollmentBlockers(data.studentId, data.courseId);
+    if (blocker.blocked) {
+      throw new BadRequestException(blocker.reason);
+    }
+
+    // 2. Check for schedule conflicts
     const conflicts = await this.repo.findConflicts(data.studentId, data.courseId);
     if (conflicts.length > 0) {
       const details = conflicts.map(c => `${c.day} at ${c.time} with ${c.withCourse}`).join(', ');

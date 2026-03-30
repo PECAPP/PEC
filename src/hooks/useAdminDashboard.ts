@@ -7,13 +7,14 @@ import api from '@/lib/api';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import { toast } from 'sonner';
 
-export function useAdminDashboard() {
+export function useAdminDashboard(initialData?: any) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [courses, setCourses] = useState<any[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
-  const [stats, setStats] = useState({
+  
+  const [loading, setLoading] = useState(!initialData);
+  const [courses, setCourses] = useState<any[]>(initialData?.courses || []);
+  const [users, setUsers] = useState<any[]>(initialData?.users || []);
+  const [stats, setStats] = useState(initialData?.stats || {
     totalStudents: 0,
     totalFaculty: 0,
     totalCourses: 0,
@@ -85,6 +86,12 @@ export function useAdminDashboard() {
       return;
     }
 
+    // Skip initial fetch if we already have server data
+    if (initialData && courses.length > 0) {
+      setLoading(false);
+      return;
+    }
+
     void (async () => {
       try {
         await fetchAdminData();
@@ -94,7 +101,7 @@ export function useAdminDashboard() {
         setLoading(false);
       }
     })();
-  }, [authLoading, user, isAdmin, router, fetchAdminData]);
+  }, [authLoading, user, isAdmin, router, fetchAdminData, initialData]);
 
   const resetCourseForm = () => {
     setCourseForm({

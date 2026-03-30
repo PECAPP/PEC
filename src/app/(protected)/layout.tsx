@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
 import { ProtectedLayoutClient } from './ProtectedLayoutClient';
-import { PageLoader } from '@/components/loading/PageLoader';
+import { Loader } from '@/components/ui/Loader';
 
 // 1. Separate the dynamic auth part from the static layout entry
 async function AuthGate({ children }: { children: React.ReactNode }) {
@@ -23,7 +23,7 @@ function LayoutLoading() {
       
       {/* Branded Loading Content */}
       <div className="pt-24 lg:pl-64 p-6 flex items-center justify-center">
-        <PageLoader />
+        <Loader fullScreen={false} />
       </div>
     </div>
   );

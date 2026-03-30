@@ -18,6 +18,17 @@ export function UsersTable({
   onEditUser, 
   onDeleteUser 
 }: UsersTableProps) {
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'student': return 'default';
+      case 'faculty': return 'secondary';
+      case 'college_admin': return 'destructive';
+      case 'admin': return 'destructive';
+      case 'super_admin': return 'destructive';
+      default: return 'outline';
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -48,7 +59,9 @@ export function UsersTable({
                     <td className="p-4 font-medium text-foreground">{user.fullName}</td>
                     <td className="p-4 text-muted-foreground">{user.email}</td>
                     <td className="p-4">
-                      <Badge variant="outline">{user.role?.replace('_', ' ') || 'No Role'}</Badge>
+                      <Badge variant={getRoleBadgeColor(user.role)}>
+                        {user.role?.replace('_', ' ') || 'No Role'}
+                      </Badge>
                     </td>
                     <td className="p-4 text-center">
                       <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>{user.status || 'active'}</Badge>

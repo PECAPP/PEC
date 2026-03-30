@@ -7,7 +7,6 @@ import api from '@/lib/api';
 import type { 
   StudentProfile, 
   Course, 
-  AttendanceRecord
 } from '@/types';
 import { extractData } from '@/lib/utils';
 
@@ -16,102 +15,50 @@ interface StudentStats {
   enrolledCourses: number;
 }
 
-interface GradeRecord {
-  id: string;
-  studentId: string;
-  courseId: string;
-  total?: number;
-  grade?: string;
-  credits?: number;
-}
-
-const GRADES_ENDPOINT_DISABLED_KEY = 'api.examinations.grades.disabled';
-
-const isGradesEndpointDisabled = () =>
-  typeof window !== 'undefined' && sessionStorage.getItem(GRADES_ENDPOINT_DISABLED_KEY) === '1';
-
-const disableGradesEndpoint = () => {
-  if (typeof window !== 'undefined') {
-    sessionStorage.setItem(GRADES_ENDPOINT_DISABLED_KEY, '1');
-  }
-};
-
-const isNotFoundError = (error: unknown) =>
-  !!(error as any)?.response && (error as any).response.status === 404;
-
-export function useStudentDashboard() {
+export function useStudentDashboard(initialData?: any, initialUser?: any) {
   const router = useRouter();
   const { orgSlug } = useParams<{ orgSlug: string }>();
   const { user, loading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [firstName, setFirstName] = useState('Student');
-  const [profileData, setProfileData] = useState<StudentProfile | null>(null);
+  
+  // Use SSR data if provided, otherwise show loading
+  const [loading, setLoading] = useState(!initialData);
+  const [firstName, setFirstName] = useState(initialUser?.fullName?.split(' ')[0] || 'Student');
+  const [profileData, setProfileData] = useState<StudentProfile | null>(initialUser ? {
+    department: initialUser.department,
+    semester: initialUser.semester,
+    enrollmentNumber: initialUser.enrollmentNumber,
+  } as any : null);
+  
   const [showQRScanner, setShowQRScanner] = useState(false);
   
   const [stats, setStats] = useState<StudentStats>({
-    attendancePercentage: 0,
-    enrolledCourses: 0,
+    attendancePercentage: initialData?.summary?.totalSummary?.percentage || 0,
+    enrolledCourses: initialData?.summary?.courses?.length || 0,
   });
   
   const [todayClasses, setTodayClasses] = useState<any[]>([]);
   const [scheduleDay, setScheduleDay] = useState<string>('Today');
-  const [enrolledCoursesList, setEnrolledCoursesList] = useState<Course[]>([]);
+  const [enrolledCoursesList, setEnrolledCoursesList] = useState<Course[]>(initialData?.summary?.courses || []);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const fetchStudentStats = useCallback(async () => {
-    if (!user) return;
-    try {
-      setLoadError(null);
-      type ApiResponse<T> = { success: boolean; data: T; meta?: any };
-      const department = user.department;
-      const semester = user.semester;
-
-      // 1. Fetch Summary + Courses + Timetable in Parallel
-      const [summaryRes, coursesRes, timetableRes] = await Promise.all([
-        api.get<ApiResponse<any>>('/attendance/summary'),
-        api.get<ApiResponse<Course[]>>('/courses', {
-          params: {
-            limit: 1000,
-            offset: 0,
-            ...(department ? { department } : {}),
-            ...(semester ? { semester } : {}),
-          },
-        }),
-        api.get<ApiResponse<any>>('/timetable', {
-          params: {
-            limit: 500,
-            offset: 0,
-            ...(department ? { department } : {}),
-            ...(semester ? { semester } : {}),
-          },
-        }),
-      ]);
-
-      const summary = extractData<any>(summaryRes);
-      const allCourses = extractData<Course[]>(coursesRes) || [];
-      const rawTimetable = extractData<any>(timetableRes);
-      const timetableData = Array.isArray(rawTimetable) ? rawTimetable : [];
-
-      if (summary && typeof summary === 'object') {
-        const statsObj = summary.totalSummary || {};
-        const coursesArr = Array.isArray(summary.courses) ? summary.courses : [];
-        
-        setEnrolledCoursesList(coursesArr);
-        setStats({
-          attendancePercentage: typeof statsObj.percentage === 'number' ? statsObj.percentage : 0,
-          enrolledCourses: coursesArr.length,
-        });
-      }
-
-      // --- Process Timetable ---
-      const enrollList = (summary && typeof summary === 'object' && Array.isArray(summary.courses)) 
-                        ? summary.courses 
-                        : [];
-      const enrolledCourseIds = new Set(enrollList.map((c: any) => c.courseId));
+  const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[]) => {
+    if (summary && typeof summary === 'object') {
+      const statsObj = summary.totalSummary || {};
+      const coursesArr = Array.isArray(summary.courses) ? summary.courses : [];
+      
+      setEnrolledCoursesList(coursesArr);
+      setStats({
+        attendancePercentage: typeof statsObj.percentage === 'number' ? statsObj.percentage : 0,
+        enrolledCourses: coursesArr.length,
+      });
+      
+      const enrolledCourseIds = new Set(coursesArr.map((c: any) => c.courseId || c.id));
       const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long' });
       
-      let scheduleItems = (timetableData || [])
+      const safeTimetable = Array.isArray(timetableData) ? timetableData : [];
+      
+      let scheduleItems = safeTimetable
         .filter((t: any) => enrolledCourseIds.has(t.courseId))
         .map((t: any) => ({
           ...t,
@@ -126,7 +73,6 @@ export function useStudentDashboard() {
       };
 
       let activeSchedule = getScheduleForDay(todayStr);
-      let activeDay = todayStr;
       let displayLabel = 'Today';
 
       if (activeSchedule.length === 0) {
@@ -138,7 +84,6 @@ export function useStudentDashboard() {
           
           if (nextSchedule.length > 0) {
             activeSchedule = nextSchedule;
-            activeDay = nextDay;
             displayLabel = i === 1 ? 'Tomorrow' : nextDay;
             break;
           }
@@ -147,12 +92,46 @@ export function useStudentDashboard() {
 
       setTodayClasses(activeSchedule);
       setScheduleDay(displayLabel);
+    }
+  }, []);
+
+  const fetchStudentStats = useCallback(async () => {
+    if (!user) return;
+    try {
+      setLoadError(null);
+      type ApiResponse<T> = { success: boolean; data: T; meta?: any };
+
+      const [summaryRes, coursesRes, timetableRes] = await Promise.all([
+        api.get<ApiResponse<any>>('/attendance/summary'),
+        api.get<ApiResponse<Course[]>>('/courses'),
+        api.get<ApiResponse<any>>('/timetable'),
+      ]);
+
+      processDashboardData(
+        extractData<any>(summaryRes),
+        extractData<Course[]>(coursesRes) || [],
+        extractData<any>(timetableRes) || []
+      );
 
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
       setLoadError('Unable to refresh dashboard data.');
+    } finally {
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, processDashboardData]);
+
+  // Handle hydration or manual refresh
+  useEffect(() => {
+    if (initialData) {
+      processDashboardData(
+        initialData.summary,
+        initialData.courses || [],
+        initialData.timetable || []
+      );
+      setLoading(false);
+    }
+  }, [initialData, processDashboardData]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -167,23 +146,10 @@ export function useStudentDashboard() {
       return;
     }
 
-    void (async () => {
-      try {
-        setLoadError(null);
-        setFirstName(user.fullName?.split(' ')[0] || 'Student');
-        setProfileData({
-          department: user.department,
-          semester: user.semester,
-          enrollmentNumber: user.enrollmentNumber,
-        } as any);
-        await fetchStudentStats();
-      } catch (error) {
-        setLoadError('Unable to load dashboard data.');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [authLoading, user, router, fetchStudentStats]);
+    if (!initialData) {
+      void fetchStudentStats();
+    }
+  }, [authLoading, user, router, fetchStudentStats, initialData]);
 
   const handleQRSuccess = () => {
     setStats((prev) => ({

@@ -16,6 +16,12 @@ export class HostelService {
     });
   }
 
+  findAll() {
+    return this.prismaAny.hostelIssue.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   create(data: any) {
     return this.prismaAny.hostelIssue.create({
       data: {

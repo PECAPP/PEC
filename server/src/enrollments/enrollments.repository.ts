@@ -59,6 +59,39 @@ export class EnrollmentsRepository extends BaseRepository {
     });
   }
 
+  async findEnrollmentBlockers(studentId: string, courseId: string) {
+    const course = await this.prisma.course.findUnique({
+      where: { id: courseId },
+      include: {
+        _count: {
+          select: { enrollments: { where: { status: 'active' } } }
+        }
+      }
+    });
+
+    if (!course) return { blocked: true, reason: 'Course not found' };
+
+    // 1. Capacity Check
+    if (course._count.enrollments >= (course as any).capacity) {
+      return { blocked: true, reason: 'Capacity full' };
+    }
+
+    // 2. Prerequisites Check
+    if ((course as any).prerequisiteIds && (course as any).prerequisiteIds.length > 0) {
+      const studentHistory = await this.prisma.enrollment.findMany({
+        where: { studentId, status: 'active' }, // In a real system we'd check for status 'completed'
+        select: { courseCode: true }
+      });
+      const historicalCodes = studentHistory.map(h => h.courseCode);
+      const missing = (course as any).prerequisiteIds.filter((pid: string) => !historicalCodes.includes(pid));
+      if (missing.length > 0) {
+        return { blocked: true, reason: `Missing prerequisites: ${missing.join(', ')}` };
+      }
+    }
+
+    return { blocked: false };
+  }
+
   async findConflicts(studentId: string, targetCourseId: string) {
     const [currentEnrollments, newCourseSlots] = await Promise.all([
       this.prisma.enrollment.findMany({

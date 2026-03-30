@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState, Suspense } from 'react';
-import PECLoader from '../loading/PECLoader';
+import { Loader } from '../ui/Loader';
 
 const isModifiedEvent = (event: MouseEvent | ReactMouseEvent) =>
   event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
@@ -143,7 +143,7 @@ function RouteTransitionLoaderInner() {
 
   return (
     <div role="status" aria-live="polite" aria-label="Loading page">
-      <PECLoader />
+      <Loader />
     </div>
   );
 }

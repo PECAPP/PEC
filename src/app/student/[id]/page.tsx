@@ -2,23 +2,30 @@ import { StudentProfileView } from './ProfileView';
 import { User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { getServerSession } from '@/lib/server-auth';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-async function getStudentData(id: string) {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+async function getStudentData(id: string, token?: string) {
+  const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
   
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   try {
-    // In a real app, use a dedicated server-side utility that handles 
-    // internal DNS or secure service-to-service auth.
-    const userRes = await fetch(`${API_URL}/users/${id}`, { next: { revalidate: 60 } });
+    const userRes = await fetch(`${base}/users/${id}`, { headers, next: { revalidate: 60 } });
     if (!userRes.ok) return null;
     const userData = (await userRes.json()).data;
 
     // Student profile might be separate
-    const profileRes = await fetch(`${API_URL}/student-profiles/${id}`, { next: { revalidate: 60 } });
+    const profileRes = await fetch(`${base}/student-profiles/${id}`, { headers, next: { revalidate: 60 } });
     const profileData = profileRes.ok ? (await profileRes.json()).data : null;
 
     return { userData, profileData };
@@ -50,7 +57,8 @@ async function getGithubStats(username: string) {
 
 export default async function PublicStudentProfilePage({ params }: PageProps) {
   const { id } = await params;
-  const data = await getStudentData(id);
+  const session = await getServerSession();
+  const data = await getStudentData(id, session?.token);
 
   if (!data || !data.userData) {
     return (

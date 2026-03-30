@@ -12,8 +12,12 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  // ─── Experimental ────────────────────────────────────────────────────────────
   experimental: {
-    cacheComponents: true,
+    // Enable Partial Prerendering — pages opt-in via `export const experimental_ppr = true`
+    ppr: 'incremental',
+    // Tree-shake large icon libraries at import time
     optimizePackageImports: [
       'lucide-react',
       '@tabler/icons-react',
@@ -22,54 +26,63 @@ const nextConfig = {
       'framer-motion',
     ],
   },
+
+  // ─── Images ──────────────────────────────────────────────────────────────────
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'upload.wikimedia.org',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'upload.wikimedia.org' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
     unoptimized: false,
   },
-  // Turbopack compatibility for packages that assume Node/canvas in browser context
+
+  // ─── Turbopack alias (dev) ────────────────────────────────────────────────────
   turbopack: {
-    root: __dirname,
     resolveAlias: {
-      canvas: './src/lib/empty-module.ts',
-      fs: './src/lib/empty-module.ts',
-      net: './src/lib/empty-module.ts',
-      tls: './src/lib/empty-module.ts',
+      canvas: emptyModulePath,
+      fs: emptyModulePath,
+      net: emptyModulePath,
+      tls: emptyModulePath,
     },
   },
-  // Keep server-side canvas as external to avoid bundling native deps
-  serverExternalPackages: ['canvas'],
-  webpack: (config) => {
-    config.resolve = config.resolve || {};
+
+  // ─── Webpack alias (build / test) ────────────────────────────────────────────
+  webpack(config) {
+    config.resolve = config.resolve ?? {};
     config.resolve.alias = {
-      ...(config.resolve.alias || {}),
+      ...(config.resolve.alias ?? {}),
       canvas: emptyModulePath,
       fs: emptyModulePath,
       net: emptyModulePath,
       tls: emptyModulePath,
     };
     config.resolve.fallback = {
-      ...(config.resolve.fallback || {}),
+      ...(config.resolve.fallback ?? {}),
       fs: false,
       net: false,
       tls: false,
     };
     return config;
   },
-  // Support for markdown and other extensions
+
+  // ─── Keep native packages server-side only ───────────────────────────────────
+  serverExternalPackages: ['canvas'],
+
+  // ─── Page extensions ─────────────────────────────────────────────────────────
   pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
+
+  // ─── API Proxy ───────────────────────────────────────────────────────────────
+  // All client-side calls to /api/* are forwarded to the NestJS backend.
+  // SSR calls use INTERNAL_API_URL (localhost:8000) directly for speed.
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') ?? 'http://localhost:8000'}/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

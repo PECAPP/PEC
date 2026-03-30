@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ErrorState, LoadingGrid } from '@/components/common/AsyncState';
 import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
@@ -19,8 +18,12 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
-export function StudentDashboard() {
-  const router = useRouter();
+interface StudentDashboardProps {
+  initialData?: any;
+  user?: any;
+}
+
+export function StudentDashboard({ initialData, user: initialUser }: StudentDashboardProps) {
   const {
     loading,
     firstName,
@@ -36,7 +39,7 @@ export function StudentDashboard() {
     fetchStudentStats,
     handleQRSuccess,
     orgSlug,
-  } = useStudentDashboard();
+  } = useStudentDashboard(initialData, initialUser);
 
   if (loading) {
     return (
@@ -71,8 +74,11 @@ export function StudentDashboard() {
     );
   }
 
+  const navigateTo = (path: string) => {
+    // This is handled by the cards themselves now or via the hook
+  };
+
   const getFullUrl = (path: string) => orgSlug ? `/${orgSlug}${path}` : path;
-  const navigateTo = (path: string) => router.push(getFullUrl(path));
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -85,29 +91,29 @@ export function StudentDashboard() {
       <StudentStatsCards 
         stats={stats} 
         onStatClick={(type) => {
-          if (type === 'attendance') navigateTo('/attendance');
-          if (type === 'courses') navigateTo('/courses');
+          if (type === 'attendance') window.location.href = getFullUrl('/attendance');
+          if (type === 'courses') window.location.href = getFullUrl('/courses');
         }}
       />
 
       <div className="grid gap-5 md:gap-6 xl:grid-cols-3">
         <EnrolledCoursesCard 
           enrolledCoursesList={enrolledCoursesList} 
-          onViewAll={() => navigateTo('/courses')}
-          onCourseClick={(id) => navigateTo(`/courses/${id}`)}
+          onViewAll={() => window.location.href = getFullUrl('/courses')}
+          onCourseClick={(id) => window.location.href = getFullUrl(`/courses/${id}`)}
         />
 
         <TodayScheduleCard 
           scheduleDay={scheduleDay} 
           todayClasses={todayClasses} 
-          onViewFull={() => navigateTo('/timetable')}
+          onViewFull={() => window.location.href = getFullUrl('/timetable')}
         />
       </div>
 
       <motion.div variants={item} className="grid gap-6">
         <AttendanceOverviewCard 
           attendancePercentage={stats.attendancePercentage}
-          onClick={() => navigateTo('/attendance')}
+          onClick={() => window.location.href = getFullUrl('/attendance')}
         />
       </motion.div>
 

@@ -12,11 +12,29 @@ export class TimetableService {
     return this.repo.findMany(query);
   }
 
-  create(data: CreateTimetableDto) {
+  async create(data: CreateTimetableDto) {
+    const conflict = await this.repo.findConflicts(data.room, data.day, data.startTime, data.endTime);
+    if (conflict) {
+      throw new Error(`Room conflict: ${data.room} is already occupied by ${conflict.courseCode} on ${data.day} ${data.startTime}-${data.endTime}`);
+    }
     return this.repo.create(data);
   }
 
-  update(id: string, data: UpdateTimetableDto) {
+  async update(id: string, data: UpdateTimetableDto) {
+    const current = await this.repo.findById(id);
+    if (!current) throw new Error('Timetable entry not found');
+
+    if (data.room || data.day || data.startTime || data.endTime) {
+       const room = data.room || current.room;
+       const day = data.day || current.day;
+       const start = data.startTime || current.startTime;
+       const end = data.endTime || current.endTime;
+       
+       const conflict = await this.repo.findConflicts(room, day, start, end, id);
+       if (conflict) {
+         throw new Error(`Room conflict during reschedule: ${room} is already occupied by ${conflict.courseCode} on ${day} ${start}-${end}`);
+       }
+    }
     return this.repo.update(id, data);
   }
 

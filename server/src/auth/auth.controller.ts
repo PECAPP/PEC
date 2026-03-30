@@ -71,6 +71,8 @@ export class AuthController {
       },
     );
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
+    this.setAccessTokenCookie(res, auth.access_token);
+    this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
 
     const { refresh_token, ...response } = auth;
     return response;
@@ -102,6 +104,8 @@ export class AuthController {
     );
 
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
+    this.setAccessTokenCookie(res, auth.access_token);
+    this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
     const { refresh_token, ...response } = auth;
     return response;
   }
@@ -132,6 +136,8 @@ export class AuthController {
     });
 
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
+    this.setAccessTokenCookie(res, auth.access_token);
+    this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
     const { refresh_token, ...response } = auth;
     return response;
   }
@@ -257,7 +263,24 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/auth',
+      path: '/',
+      expires,
+    });
+  }
+
+  private setIdentityCookies(res: ExpressResponse, user: { uid: string, role: string }): void {
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    res.cookie('user_id', user.uid, { path: '/', expires });
+    res.cookie('user_role', user.role, { path: '/', expires });
+  }
+
+  private setAccessTokenCookie(res: ExpressResponse, token: string): void {
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour (longer than typical JWT to avoid frequent flips)
+    res.cookie('access_token', token, {
+      httpOnly: false, // Accessible by Next.js client-side libraries IF needed, but mainly for SSR
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
       expires,
     });
   }
@@ -267,8 +290,11 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/auth',
+      path: '/',
     });
+    res.clearCookie('access_token', { path: '/' });
+    res.clearCookie('user_id', { path: '/' });
+    res.clearCookie('user_role', { path: '/' });
   }
 
   private getIp(req: ExpressRequest): string | null {

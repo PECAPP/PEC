@@ -1,0 +1,189 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { ArrowLeft, Info } from "lucide-react";
+
+import { ChatSidebar } from "@/components/chat/ChatSidebar";
+import { ChatMessage } from "@/components/chat/ChatMessage";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { ChatInfoDialog } from "@/components/chat/ChatInfoDialog";
+import { Button } from "@/components/ui/button";
+import { EmptyState, StatePanel } from "@/components/common/AsyncState";
+
+import { useChatRooms } from "@/hooks/use-chat-rooms";
+import { useChatMessages } from "@/hooks/useChatMessages";
+
+interface ChatViewProps {
+  user: any;
+  initialRooms: any[];
+}
+
+export function ChatView({ user, initialRooms }: ChatViewProps) {
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [showChatOnMobile, setShowChatOnMobile] = useState(false);
+  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
+
+  const searchParams = useSearchParams();
+  const roomFromUrl = searchParams.get('room');
+
+  const { rooms, loading: roomsLoading } = useChatRooms(user, initialRooms);
+  
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(roomFromUrl || (rooms.length > 0 ? rooms[0].id : null));
+  const [replyingTo, setReplyingTo] = useState<{ id: string; text: string; senderName: string } | null>(null);
+
+  useEffect(() => {
+    if (roomFromUrl) {
+      setSelectedRoomId(roomFromUrl);
+      setShowChatOnMobile(true);
+      return;
+    }
+
+    if (!selectedRoomId && rooms.length > 0) {
+      setSelectedRoomId(rooms[0].id);
+    }
+  }, [roomFromUrl, rooms, selectedRoomId]);
+
+  const {
+    messages,
+    loading: messagesLoading,
+    sendMessage,
+    loadMore,
+    hasMore,
+  } = useChatMessages(selectedRoomId);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const inputRef = useRef<any>(null);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(false);
+
+  useEffect(() => {
+    const behavior = messagesLoading ? "auto" : "smooth";
+    if (!isAutoScrolling) {
+      messagesEndRef.current?.scrollIntoView({ behavior, block: "end" });
+    }
+  }, [messages, messagesLoading, isAutoScrolling]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop } = e.currentTarget;
+    if (scrollTop === 0 && hasMore && !messagesLoading) {
+      setIsAutoScrolling(true);
+      loadMore();
+    } else {
+      setIsAutoScrolling(false);
+    }
+  };
+
+  const scrollToMessage = (messageId: string) => {
+    const element = messageRefs.current[messageId];
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  if (!user) return null;
+
+  const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
+
+  const handleRoomSelect = (roomId: string) => {
+    setSelectedRoomId(roomId);
+    setShowChatOnMobile(true);
+  };
+
+  return (
+    <div className="flex h-[calc(100vh-7rem)] bg-background md:rounded-md md:border md:border-border overflow-hidden">
+      <div className={`${showChatOnMobile ? 'hidden lg:block' : 'block'} lg:block w-full lg:w-auto`}>
+        <ChatSidebar
+          rooms={rooms}
+          selectedRoom={selectedRoomId ?? ""}
+          onRoomChange={handleRoomSelect}
+          userRole={(user.role as any) || 'student'}
+          userId={user.uid}
+          loading={roomsLoading}
+          isMobileOpen={isMobileSidebarOpen}
+          onMobileClose={() => setIsMobileSidebarOpen(false)}
+        />
+      </div>
+
+      <div className={`${showChatOnMobile ? 'flex' : 'hidden lg:flex'} flex-1 flex-col chat-main`}>
+        <div className="chat-navbar px-4 py-3 border-b flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-1 overflow-hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setShowChatOnMobile(false)}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+
+            {selectedRoom && (
+              <button
+                onClick={() => setIsInfoDialogOpen(true)}
+                className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-lg transition-colors overflow-hidden max-w-full text-left"
+              >
+                <div className="flex-1 overflow-hidden">
+                  <h2 className="text-base font-semibold truncate">{selectedRoom.title}</h2>
+                  <span className="text-xs text-muted-foreground hidden sm:inline">
+                      {selectedRoom.type} Chat
+                  </span>
+                </div>
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="chat-messages flex-1 overflow-y-auto bg-background/50" onScroll={handleScroll}>
+          {messagesLoading && messages.length === 0 ? (
+            <div className="h-full flex items-center justify-center p-4">
+              <StatePanel title="Loading messages" description="Fetching history…" />
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="h-full flex items-center justify-center p-4">
+               <EmptyState title="No messages" description="Start a conversation!" />
+            </div>
+          ) : (
+            <div className="py-4">
+              {messages.map((msg) => (
+                <div key={msg.id} ref={(el) => { messageRefs.current[msg.id] = el; }}>
+                  <ChatMessage
+                    message={{
+                        id: msg.id,
+                        content: msg.text,
+                        senderId: msg.senderId,
+                        senderName: msg.senderId === user.uid ? "You" : (msg.senderName || "Unknown"),
+                        timestamp: msg.createdAt?.toDate?.() ?? new Date(),
+                        isOwn: msg.senderId === user.uid,
+                    }}
+                    onReply={() => {}}
+                    onReplyClick={() => {}}
+                  />
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {selectedRoomId && (
+          <div className="p-4 border-t bg-background">
+            <ChatInput
+              onSend={(text, metadata) => sendMessage(selectedRoomId, text, metadata)}
+              placeholder={`Message #${selectedRoom?.title ?? "chat"}...`}
+              roomId={selectedRoomId}
+              replyingTo={replyingTo}
+              onCancelReply={() => setReplyingTo(null)}
+            />
+          </div>
+        )}
+      </div>
+
+      <ChatInfoDialog
+        open={isInfoDialogOpen}
+        onOpenChange={setIsInfoDialogOpen}
+        room={selectedRoom || null}
+        onRoomSelect={handleRoomSelect}
+      />
+    </div>
+  );
+}

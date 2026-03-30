@@ -28,7 +28,11 @@ const AdminAnalyticsCharts = dynamic(
   }
 );
 
-export function AdminDashboard() {
+export interface AdminDashboardProps {
+  initialData?: any;
+}
+
+export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
   const router = useRouter();
   const {
     loading,
@@ -57,7 +61,7 @@ export function AdminDashboard() {
     resetUserForm,
     setEditingCourse,
     setEditingUser,
-  } = useAdminDashboard();
+  } = useAdminDashboard(initialData);
 
   if (loading) {
     return (

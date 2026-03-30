@@ -110,23 +110,39 @@ export function UserManagementView({ initialUsers, isAdmin, isFaculty }: UserMan
           <table className="w-full">
             <thead className="bg-muted/30 border-b border-border">
               <tr>
-                <th className="p-4 text-left">Name</th>
-                <th className="p-4 text-left">Email</th>
-                <th className="p-4 text-left">Role</th>
-                <th className="p-4 text-right">Actions</th>
+                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Name</th>
+                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Email</th>
+                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Role</th>
+                <th className="text-center p-4 text-sm font-medium text-muted-foreground">Status</th>
+                <th className="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {filteredUsers.map((user: any) => (
                 <tr key={user.id} className="hover:bg-muted/20">
-                  <td className="p-4 font-medium">{user.fullName}</td>
+                  <td className="p-4 font-medium text-foreground">{user.fullName}</td>
                   <td className="p-4 text-muted-foreground">{user.email}</td>
                   <td className="p-4">
-                     <Badge variant={getRoleBadgeColor(user.role)}>{user.role}</Badge>
+                    <Badge variant={getRoleBadgeColor(user.role)}>
+                      {user.role?.replace('_', ' ') || 'No Role'}
+                    </Badge>
                   </td>
-                  <td className="p-4 text-right">
-                    <Button variant="ghost" size="sm"><Edit className="w-4 h-4" /></Button>
-                    {isAdmin && <Button variant="ghost" size="sm"><Trash2 className="w-4 h-4 text-destructive" /></Button>}
+                  <td className="p-4 text-center">
+                    <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
+                      {user.status || 'active'}
+                    </Badge>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end gap-2 text-right">
+                      <Button variant="ghost" size="sm">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      {isAdmin && (
+                        <Button variant="ghost" size="sm">
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -26,6 +26,7 @@ import { InputSanitizationMiddleware } from './common/middleware/input-sanitizat
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
 import { CanteenModule } from './canteen/canteen.module';
 import { HostelModule } from './hostel/hostel.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { HostelModule } from './hostel/hostel.module';
     CampusMapModule,
     CourseMaterialsModule,
     NoticeboardModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

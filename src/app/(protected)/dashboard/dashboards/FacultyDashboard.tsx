@@ -23,7 +23,12 @@ const container = {
   }
 };
 
-export function FacultyDashboard() {
+export interface FacultyDashboardProps {
+  initialData?: any;
+  user?: any;
+}
+
+export function FacultyDashboard({ initialData, user: serverUser }: FacultyDashboardProps = {}) {
   const {
     loading,
     courses,
@@ -38,7 +43,7 @@ export function FacultyDashboard() {
     setShowScheduleManager,
     handleGenerateQR,
     router,
-  } = useFacultyDashboard();
+  } = useFacultyDashboard(initialData, serverUser);
 
   if (loading) {
     return (

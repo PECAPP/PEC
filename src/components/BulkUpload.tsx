@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog';
 
 interface BulkUploadProps {
-  entityType: 'users' | 'courses' | 'departments' | 'fees' | 'timetable' | 'attendance' | 'grades' | 'exams' | 'assignments' | 'materials' | 'jobs';
+  entityType: 'users' | 'courses' | 'departments' | 'faculty' | 'fees' | 'timetable' | 'attendance' | 'grades' | 'exams' | 'assignments' | 'materials' | 'jobs';
   onImport: (data: any[]) => Promise<{ success: number; failed: number; errors: string[] }>;
   templateColumns: string[];
   sampleData?: any[];

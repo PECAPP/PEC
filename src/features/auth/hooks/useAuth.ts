@@ -6,7 +6,7 @@ import {
 } from "@/features/auth/lib/rolePermissions";
 import { authClient } from "@/lib/auth-client";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export interface CurrentUser {
   id: string;
