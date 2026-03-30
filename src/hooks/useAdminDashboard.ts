@@ -45,7 +45,7 @@ export function useAdminDashboard() {
     semester: 1,
   });
 
-  const isAdmin = ['college_admin', 'super_admin', 'admin', 'moderator'].includes(user?.role || '');
+  const isAdmin = ['college_admin'].includes(user?.role || '');
 
   const fetchAdminData = useCallback(async () => {
     try {

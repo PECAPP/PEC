@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GraduationCap, Users, Building2, Loader2, CheckCircle2, Shield, ShieldAlert } from 'lucide-react';
+import { GraduationCap, Users, Building2, Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { UserRole } from '@/types';
 
@@ -58,18 +58,12 @@ const roleIcons: Record<UserRole, ElementType> = {
   student: GraduationCap,
   faculty: Users,
   college_admin: Building2,
-  admin: Shield,
-  user: Users,
-  moderator: ShieldAlert,
 };
 
 const roleLabels: Record<UserRole, string> = {
   student: 'Student',
   faculty: 'Faculty',
   college_admin: 'College Admin',
-  admin: 'System Admin',
-  user: 'Regular User',
-  moderator: 'Moderator',
 };
 
 export default function Onboarding() {

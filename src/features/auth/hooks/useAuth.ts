@@ -46,14 +46,7 @@ let inFlightRequest: Promise<CurrentUser | null> | null = null;
 let refreshAttemptedWithoutToken = false;
 
 const isAllowedRole = (role: string | null | undefined): role is UserRole => {
-  return [
-    "student",
-    "faculty",
-    "college_admin",
-    "admin",
-    "moderator",
-    "user",
-  ].includes(role as string);
+  return ["student", "faculty", "college_admin"].includes(role as string);
 };
 
 function clearAuthCache() {
@@ -120,7 +113,7 @@ async function fetchProfile(
       enrollmentNumber: payload.enrollmentNumber || undefined,
       semester:
         typeof payload.semester === "number" ? payload.semester : undefined,
-      permissions: getRolePermissions(role || "user"),
+      permissions: getRolePermissions(role || "student"),
       avatar: payload.avatar || null,
       verified: payload.verified || false,
       profileComplete: payload.profileComplete || false,

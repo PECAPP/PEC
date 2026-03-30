@@ -17,10 +17,7 @@ export interface SignUpCredentials {
   role?:
     | "student"
     | "faculty"
-    | "college_admin"
-    | "admin"
-    | "moderator"
-    | "user";
+    | "college_admin";
 }
 
 export interface AuthResponse {

@@ -118,7 +118,7 @@ const FloatingAIChat = () => {
           const profileSnap = await getDoc(doc(({} as any), "studentProfiles", id));
           if (!profileSnap.exists()) return;
 
-          const studentData = profileSnap.data();
+          const studentData = profileSnap.data() as any;
           const studentDeptName = studentData.department;
 
           const deptQuery = query(
@@ -191,39 +191,6 @@ const FloatingAIChat = () => {
         }
         break;
       case "college_admin":
-        try {
-          return {
-            message: `
-            only answer using the given information
-            `,
-          };
-        } catch (error) {
-          console.error("Context Fetch Error:", error);
-        }
-        break;
-      case "placement_officer":
-        try {
-          return {
-            message: `
-            only answer using the given information
-            `,
-          };
-        } catch (error) {
-          console.error("Context Fetch Error:", error);
-        }
-        break;
-      case "recruiter":
-        try {
-          return {
-            message: `
-            only answer using the given information
-            `,
-          };
-        } catch (error) {
-          console.error("Context Fetch Error:", error);
-        }
-        break;
-      case "super_admin":
         try {
           return {
             message: `

@@ -1,4 +1,4 @@
-export type ChatRoomType = "general" | "semester" | "department" | "dm" | "group";
+export type ChatRoomType = "general" | "semester" | "department" | "dm" | "group" | "club";
 
 // in @/types/chat.ts
 export interface ChatRoom {

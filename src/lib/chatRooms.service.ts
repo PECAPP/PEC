@@ -21,7 +21,7 @@ export async function createOrFindDMRoom(userId: string, otherUserId: string, or
     const res = await api.get("/chat/rooms");
     const rooms = res.data?.data || res.data || [];
     const existingDM = rooms.find((r: any) => 
-      r.type === "dm" && 
+      !r.isGroup &&
       r.participants?.includes(otherUserId) && 
       r.participants?.includes(userId)
     );
@@ -60,21 +60,48 @@ export async function fetchChatRooms(user: any): Promise<ChatRoom[]> {
   try {
     const res = await api.get("/chat/rooms");
     const rooms = res.data?.data || res.data || [];
+    const uniqueRooms = (Array.isArray(rooms) ? rooms : []).filter(
+      (room: any, index: number, arr: any[]) =>
+        room?.id && arr.findIndex((candidate: any) => candidate?.id === room.id) === index,
+    );
+
+    const isDepartmentRoom = (name: string) => /timetable$/i.test(name.trim());
+    const isCommunityRoom = (name: string) =>
+      name.trim().toLowerCase() === "pec global announcements";
     
     // Map backend rooms to frontend ChatRoom type if needed
-    return rooms.map((room: any): ChatRoom => ({
-      id: room.id,
-      title: room.name || "",
-      type: room.isGroup ? "group" : "dm",
-      description: room.description || "",
-      participants: room.participants?.map((p: any) => p.userId || p) || [],
-      participantNames: room.participants?.reduce((acc: any, p: any) => {
-        if (p.user) acc[p.userId] = p.user.name;
-        return acc;
-      }, {}) || {},
-      createdAt: room.createdAt || new Date(),
-      organizationId: room.organizationId || ""
-    }));
+    return uniqueRooms.map((room: any): ChatRoom => {
+      const roomName = String(room?.name || "").trim();
+      const isClub = roomName.startsWith("CLUB::");
+      const normalizedTitle = isClub
+        ? roomName.replace("CLUB::", "").trim()
+        : roomName;
+
+      const type = !room.isGroup
+        ? "dm"
+        : isClub
+          ? "club"
+          : isCommunityRoom(roomName)
+            ? "general"
+            : isDepartmentRoom(roomName)
+              ? "department"
+              : "group";
+
+      return {
+        id: room.id,
+        title: normalizedTitle,
+        type,
+        description: room.description || "",
+        participants: room.participants?.map((p: any) => p.userId || p) || [],
+        participantNames: room.participants?.reduce((acc: any, p: any) => {
+          if (p.user) acc[p.userId] = p.user.name;
+          return acc;
+        }, {}) || {},
+        department: type === "department" ? roomName.replace(/timetable$/i, "").trim() : undefined,
+        createdAt: room.createdAt || new Date(),
+        organizationId: room.organizationId || ""
+      };
+    });
   } catch (error) {
     console.error("Error fetching chat rooms:", error);
     return [];

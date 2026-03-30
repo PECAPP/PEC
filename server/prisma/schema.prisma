@@ -38,6 +38,9 @@ model User {
   refreshTokens   RefreshToken[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens PasswordResetToken[]
+  clubJoinRequests ClubJoinRequest[] @relation("ClubJoinRequester")
+  reviewedClubJoinRequests ClubJoinRequest[] @relation("ClubJoinReviewer")
+  createdClubs Club[] @relation("ClubCreator")
 
   @@index([role])
   @@index([emailVerified])
@@ -376,9 +379,48 @@ model ChatRoom {
   createdAt    DateTime       @default(now())
   messages     Message[]
   participants UserChatRoom[]
+  club Club?
 
   @@unique([name, isGroup])
   @@index([createdAt])
+}
+
+model Club {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  chatRoomId  String   @unique
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  chatRoom      ChatRoom           @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  createdBy     User?              @relation("ClubCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  joinRequests  ClubJoinRequest[]
+
+  @@index([createdById])
+}
+
+model ClubJoinRequest {
+  id           String   @id @default(uuid())
+  clubId       String
+  requesterId  String
+  proposalText String
+  mediaJson    String?
+  status       String   @default("pending")
+  reviewNote   String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  club      Club    @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  requester  User     @relation("ClubJoinRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  reviewedBy User?    @relation("ClubJoinReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@unique([clubId, requesterId])
+  @@index([clubId, status])
+  @@index([requesterId, status])
+  @@index([status, createdAt])
 }
 
 model Message {

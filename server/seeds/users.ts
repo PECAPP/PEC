@@ -53,21 +53,7 @@ export async function seedCoreUsers(passwordHash: string) {
   await createUserWithRole({
     email: 'ops.admin@pec.edu',
     name: 'Operations Admin',
-    role: 'admin',
-    passwordHash,
-  });
-
-  await createUserWithRole({
-    email: 'moderator@pec.edu',
-    name: 'Platform Moderator',
-    role: 'moderator',
-    passwordHash,
-  });
-
-  await createUserWithRole({
-    email: 'guest.user@pec.edu',
-    name: 'Generic Campus User',
-    role: 'user',
+    role: 'college_admin',
     passwordHash,
   });
 

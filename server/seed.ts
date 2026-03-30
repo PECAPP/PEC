@@ -21,7 +21,7 @@ async function main() {
 
     const passwordHash = await bcrypt.hash('password123', 12);
 
-    console.log('3. Seeding core users (Admin, Moderator, Guest)...');
+    console.log('3. Seeding core users (College Admins)...');
     const admin = await seedCoreUsers(passwordHash);
 
     console.log('4. Seeding faculty and profiles...');
