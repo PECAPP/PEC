@@ -32,7 +32,6 @@ import { cn } from "@/lib/utils";
 import ThemeToggler from "@/components/ThemeToggler"; // Import ThemeToggler
 import { LandingColorTheme } from "@/components/LandingColorTheme"; // Import Accent Picker
 import type { UserRole } from "@/types";
-import { prefetchRoute } from "@/lib/routePrefetch";
 
 interface SidebarProps {
   role: UserRole;
@@ -64,17 +63,12 @@ const navItems: NavItem[] = [
     roles: ["college_admin", "admin", "faculty"],
   },
   {
-    icon: IconChartBar,
-    label: "Reports",
-    path: "/college/reports",
-    roles: ["college_admin", "admin"],
-  },
-  {
     icon: IconMessageCircle,
     label: "Chat",
     path: "/chat",
     roles: ["student", "faculty", "college_admin", "admin"],
   },
+
   {
     icon: IconBuilding,
     label: "Departments",
@@ -112,12 +106,6 @@ const navItems: NavItem[] = [
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconFileText,
-    label: "Examinations",
-    path: "/examinations",
-    roles: ["student", "faculty", "college_admin", "admin"],
-  },
-  {
     icon: IconBook,
     label: "Course Materials",
     path: "/course-materials",
@@ -129,6 +117,7 @@ const navItems: NavItem[] = [
     path: "/resume-builder",
     roles: ["student"],
   },
+
   {
     icon: IconBuilding,
     label: "Hostel Issues",
@@ -187,11 +176,11 @@ export function Sidebar({
   const sectionConfig: Array<{ title: string; paths: string[] }> = [
     {
       title: 'Core',
-      paths: ['/dashboard', '/chat', '/profile', '/users', '/college/reports', '/departments', '/faculty'],
+      paths: ['/dashboard', '/profile', '/chat', '/users', '/departments', '/faculty'],
     },
     {
       title: 'Academics',
-      paths: ['/courses', '/timetable', '/attendance', '/examinations', '/course-materials', '/resume-builder'],
+      paths: ['/courses', '/timetable', '/attendance', '/course-materials', '/resume-builder'],
     },
     {
       title: 'Campus',
@@ -234,10 +223,6 @@ export function Sidebar({
       <li key={item.path} className={cn(!collapsed && "flex")}>
         <Link
           href={item.path}
-          onMouseEnter={() => prefetchRoute(item.path)}
-          onFocus={() => prefetchRoute(item.path)}
-          onPointerDown={() => prefetchRoute(item.path)}
-          onTouchStart={() => prefetchRoute(item.path)}
           className={cn(
             "sidebar-item",
             !collapsed && "w-full",
@@ -270,37 +255,7 @@ export function Sidebar({
     );
   };
 
-  useEffect(() => {
-    const connection = (navigator as Navigator & {
-      connection?: { saveData?: boolean; effectiveType?: string };
-    }).connection;
-    const isDataSaver = connection?.saveData === true;
-    const isSlowNetwork = connection?.effectiveType === '2g' || connection?.effectiveType === 'slow-2g';
-    if (isDataSaver || isSlowNetwork) {
-      return;
-    }
 
-    const warmup = () => {
-      const criticalPaths = ['/dashboard', '/chat', '/profile'];
-      criticalPaths.forEach((path) => {
-        if (filteredItems.some((item) => item.path === path)) {
-          prefetchRoute(path);
-        }
-      });
-    };
-
-    if ("requestIdleCallback" in window) {
-      const handle = (window as any).requestIdleCallback(warmup);
-      return () => {
-        if ("cancelIdleCallback" in window) {
-          (window as any).cancelIdleCallback(handle);
-        }
-      };
-    }
-
-    const timeout = globalThis.setTimeout(warmup, 120);
-    return () => globalThis.clearTimeout(timeout);
-  }, [filteredItems]);
 
   return (
     <>

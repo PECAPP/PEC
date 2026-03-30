@@ -1,4 +1,6 @@
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { authClient } from "@/lib/auth-client";
+import { User } from "@/types/auth";
 import {
   getUserPermissions,
   UserPermissions,
@@ -39,12 +41,10 @@ export function usePermissions() {
     isAdmin: isAdmin(user),
     isFaculty: isFaculty(user),
     isStudent: isStudent(user),
-    isPlacementOfficer: false,
-    isRecruiter: false,
     canManage: canManageContent(user),
 
     // User info
-    user,
+    user: user as unknown as User | null,
     role: user?.role || null,
 
     // Loading state

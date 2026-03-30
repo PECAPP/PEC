@@ -448,7 +448,7 @@ export const getDocs = async (q: any) => {
   }
 };
 
-export const setDoc = async (docRef: string, payload: any) => {
+export const setDoc = async (docRef: string, payload: any, options?: any) => {
   if (docRef === "paymentSettings/admin_config") {
     await API.post(`/feature-flags/payment-config`, {
       enabled: true,
@@ -460,7 +460,12 @@ export const setDoc = async (docRef: string, payload: any) => {
 
   const [col, id] = docRef.split("/");
   const route = routeForCollection(col);
-  await API.post(`${route}/${id}`, payload);
+  
+  if (options?.merge) {
+    await API.patch(`${route}/${id}`, payload);
+  } else {
+    await API.post(`${route}/${id}`, payload);
+  }
 };
 
 export const updateDoc = async (docRef: string, payload: any) => {

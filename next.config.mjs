@@ -18,7 +18,12 @@ const nextConfig = {
     ],
   },
   images: {
-    domains: ['res.cloudinary.com'], // Cloudinary image support
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+    ],
     unoptimized: false,
   },
   // Turbopack compatibility for packages that assume Node/canvas in browser context

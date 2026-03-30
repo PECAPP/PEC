@@ -2,15 +2,19 @@ export type UserRole =
   | "admin"
   | "college_admin"
   | "faculty"
-  | "student";
+  | "student"
+  | "moderator"
+  | "user";
 
 export interface User {
   id: string;
+  uid: string;
   name: string;
+  fullName: string;
   email: string;
   role: UserRole | null;
+  roles?: string[];
   avatar?: string;
-  organizationId?: string;
   profileComplete?: boolean;
 }
 

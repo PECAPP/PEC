@@ -6,7 +6,7 @@ export interface ChatRoom {
   type: ChatRoomType;
   title: string;
   isSystem?: boolean;
-  organizationId: string;
+  organizationId?: string;
   semester?: number;
   department?: string;
   participants?: string[]; // For DM rooms

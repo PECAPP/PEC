@@ -76,7 +76,7 @@ interface HeaderProps {
 
 export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityMode, onDensityModeChange }: HeaderProps) {
   const router = useRouter();
-  const [hasNotifications] = useState(true);
+
   const appLogoSrc = '/logo.png';
   const showNavbarLogo = Boolean(isMobile) || sidebarCollapsed;
 
@@ -165,18 +165,7 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
           <div className="scale-90 sm:scale-100"><GoogleTranslate containerId="google_translate_header" /></div>
           <div className="hidden md:block"><LandingColorTheme /></div>
           <div className="hidden md:block"><ThemeToggler/></div>
-          {/* Notifications */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="relative text-muted-foreground hover:text-foreground border border-transparent hover:border-border"
-            onClick={() => router.push('/notifications')}
-          >
-            <Bell className="w-5 h-5" />
-            {hasNotifications && (
-              <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full" />
-            )}
-          </Button>
+
 
           {/* User Menu */}
           <DropdownMenu>

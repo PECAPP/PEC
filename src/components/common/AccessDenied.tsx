@@ -39,7 +39,7 @@ export default function AccessDenied({
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button 
               variant="outline" 
-              onClick={() => router.push(-1)}
+              onClick={() => router.back()}
               className="gap-2"
             >
               <ArrowLeft className="w-4 h-4" />

@@ -21,43 +21,11 @@ export interface Student {
   enrollmentNumber: string;
   department: string;
   semester: number;
-  cgpa: number;
   attendancePercentage: number;
   status: "active" | "graduated" | "suspended";
 }
 
-export interface Assignment {
-  id: string;
-  courseId: string;
-  title: string;
-  description: string;
-  dueDate: any;
-  totalPoints: number;
-  status: 'active' | 'archived';
-  courseCode?: string;
-  courseName?: string;
-}
 
-export interface Submission {
-  id: string;
-  assignmentId: string;
-  studentId: string;
-  submittedAt: any;
-  content: string;
-  attachments?: string[];
-  grade?: number;
-  feedback?: string;
-  status: 'submitted' | 'graded' | 'late';
-}
-
-export interface Grade {
-  id: string;
-  studentId: string;
-  courseId: string;
-  gradePoints: number;
-  credits?: number;
-  type: 'midterm' | 'final' | 'assignment';
-}
 
 export interface Department {
   id: string;
