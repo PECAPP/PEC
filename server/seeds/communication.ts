@@ -24,38 +24,6 @@ export async function seedCommunicationAndActivity(
 
   const prismaAny = prisma as any;
 
-  await prismaAny.notice.createMany({
-    data: [
-      {
-        title: 'Semester Kickoff Orientation',
-        content:
-          'All students are requested to attend the semester orientation in the main auditorium at 10:00 AM on Monday.',
-        category: 'news',
-        important: true,
-        pinned: true,
-        authorId: adminId,
-      },
-      {
-        title: 'Department Lab Timings Updated',
-        content:
-          'Faculty and students should check revised lab slots before booking project sessions this week.',
-        category: 'update',
-        important: false,
-        pinned: false,
-        authorId: adminId,
-      },
-      {
-        title: 'Inter-Department Tech Event',
-        content:
-          'Registrations are open for the annual tech event. Teams can submit entries through their department coordinators.',
-        category: 'event',
-        important: false,
-        pinned: false,
-        authorId: adminId,
-      },
-    ],
-  });
-
   for (const department of DEPARTMENTS) {
     const departmentRoom = await prisma.chatRoom.create({
       data: { name: department.timetableLabel, isGroup: true },
