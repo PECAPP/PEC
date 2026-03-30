@@ -274,7 +274,7 @@ export default function CanteenManager() {
             <IndianRupee className="w-6 h-6 text-green-500" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Today's Sales</p>
+            <p className="text-sm text-muted-foreground">Today&apos;s Sales</p>
             <p className="text-2xl font-bold">₹{canteenStats.totalRevenue}</p>
           </div>
         </div>

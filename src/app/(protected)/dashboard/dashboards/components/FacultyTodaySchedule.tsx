@@ -26,7 +26,7 @@ export function FacultyTodaySchedule({ schedule, onViewFull }: Props) {
   return (
     <motion.div variants={item} className="card-elevated p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-foreground">Today's Schedule</h2>
+        <h2 className="text-lg font-semibold text-foreground">Today&apos;s Schedule</h2>
         <Button variant="ghost" size="sm" onClick={onViewFull}>
           Full Timetable
           <ArrowUpRight className="w-3.5 h-3.5 ml-2" />

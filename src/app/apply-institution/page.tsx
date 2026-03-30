@@ -126,7 +126,7 @@ export default function ApplyInstitution() {
           </p>
           <div className="bg-secondary/30 border border-border rounded-lg p-4 mb-8">
             <p className="text-sm text-muted-foreground">
-              You'll receive a confirmation email at <strong className="text-foreground">{formData.adminEmail}</strong> once your institution is approved.
+              You&apos;ll receive a confirmation email at <strong className="text-foreground">{formData.adminEmail}</strong> once your institution is approved.
             </p>
           </div>
           <Button

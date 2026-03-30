@@ -303,7 +303,7 @@ export default function HostelIssuesPage() {
             <DialogContent className="max-w-lg">
               <DialogHeader>
                 <DialogTitle>Report New Issue</DialogTitle>
-                <DialogDescription>Describe the issue you're facing in your hostel room</DialogDescription>
+                <DialogDescription>Describe the issue you&apos;re facing in your hostel room</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div>

@@ -341,7 +341,7 @@ export default function About() {
               </h2>
               <p className="text-muted-foreground mb-8">
                 Built by educators and technologists who understand the challenges
-                of running modern educational institutions. Here's what makes
+                of running modern educational institutions. Here&apos;s what makes
                 PEC different.
               </p>
 
@@ -562,7 +562,7 @@ export default function About() {
               Frequently Asked Questions
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Got questions? We've got answers. If you can't find what you're
+              Got questions? We&apos;ve got answers. If you can&apos;t find what you&apos;re
               looking for, feel free to reach out to our team.
             </p>
           </motion.div>

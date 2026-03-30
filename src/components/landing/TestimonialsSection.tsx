@@ -56,7 +56,7 @@ export function TestimonialsSection() {
                 </div>
                 
                 <p className={`${color.text} font-bold text-sm mb-6 leading-relaxed`}>
-                  "{testimonial.quote.slice(0, 150)}..."
+                  &quot;{testimonial.quote.slice(0, 150)}&quot;...
                 </p>
                 
                 <div className="inline-block px-3 py-2 bg-black border-2 border-black rounded-none mb-4">
