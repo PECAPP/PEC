@@ -1,17 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  TrendingUp,
   CheckCircle,
   XCircle,
   Clock,
-  BookOpen,
-  Loader2,
   Upload,
 } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -27,10 +23,9 @@ import {
   DialogContent,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { extractData } from '@/lib/utils';
-import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
+import { LoadingGrid } from '@/components/common/AsyncState';
 import PDFExportButton from '@/components/common/PDFExportButton';
 import BulkUpload from '@/components/BulkUpload';
 
@@ -50,17 +45,9 @@ interface AttendanceClientProps {
   initialData?: any;
 }
 
-const parseDateValue = (value: any): Date => {
-  if (!value) return new Date(NaN);
-  if (value?.toDate) return value.toDate();
-  return new Date(value);
-};
-
 export default function AttendanceClient({ session, initialData }: AttendanceClientProps) {
-  const router = useRouter();
   const isAdmin = session.role === 'college_admin';
   const isFaculty = session.role === 'faculty';
-  const isStudent = session.role === 'student';
 
   if (isAdmin || isFaculty) {
     return <AttendanceManager userId={session.uid} userRole={session.role} initialData={initialData} />;

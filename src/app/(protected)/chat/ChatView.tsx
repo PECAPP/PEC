@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, Info } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatMessage } from "@/components/chat/ChatMessage";
@@ -54,7 +54,6 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const inputRef = useRef<any>(null);
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
 
   useEffect(() => {
@@ -71,13 +70,6 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
       loadMore();
     } else {
       setIsAutoScrolling(false);
-    }
-  };
-
-  const scrollToMessage = (messageId: string) => {
-    const element = messageRefs.current[messageId];
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 

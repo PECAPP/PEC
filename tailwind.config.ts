@@ -16,7 +16,6 @@ export default {
       fontFamily: {
         sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
         monument: ['"Monument Extended"', 'sans-serif'],
-        trendy: ['"Monument Extended"', 'sans-serif']
       },
       colors: {
         border: "hsl(var(--border) / <alpha-value>)",

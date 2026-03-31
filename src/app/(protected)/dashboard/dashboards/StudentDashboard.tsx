@@ -80,10 +80,6 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
     );
   }
 
-  const navigateTo = (path: string) => {
-    // This is handled by the cards themselves now or via the hook
-  };
-
   const getFullUrl = (path: string) => orgSlug ? `/${orgSlug}${path}` : path;
 
   useEffect(() => {

@@ -32,8 +32,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   
   // Use SSR data if provided, otherwise show loading
   const [loading, setLoading] = useState(!initialData);
-  const [firstName, setFirstName] = useState(initialUser?.fullName?.split(' ')[0] || 'Student');
-  const [profileData, setProfileData] = useState<StudentProfile | null>(initialUser ? {
+  const firstName = initialUser?.fullName?.split(' ')[0] || 'Student';
+  const [profileData] = useState<StudentProfile | null>(initialUser ? {
     department: initialUser.department,
     semester: initialUser.semester,
     enrollmentNumber: initialUser.enrollmentNumber,

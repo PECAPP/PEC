@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, AlertTriangle, Calendar, BookOpen, UserCheck, UserX } from 'lucide-react';
+import { Calendar, BookOpen, UserCheck, UserX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import api from '@/lib/api';
 import { extractData } from '@/lib/utils';

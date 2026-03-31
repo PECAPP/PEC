@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   XCircle,
   Lightbulb,
-  ArrowRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';

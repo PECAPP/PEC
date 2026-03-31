@@ -1,11 +1,10 @@
 'use client';
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from "framer-motion";
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRef, useEffect, useState } from "react";
-import { ArrowRight, Building2, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const container = {

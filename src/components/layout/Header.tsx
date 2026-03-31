@@ -10,10 +10,7 @@ import {
   ChevronDown,
   LogOut,
   Settings,
-  HelpCircle,
   Menu,
-  Palette,
-  Building2,
 } from 'lucide-react';
 
 
@@ -105,8 +102,6 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
     recruiter: 'Recruiter',
     super_admin: 'Super Admin',
   };
-
-  const showNoticeboardButton = user.role === 'college_admin' || user.role === 'admin' || user.role === 'super_admin';
 
   return (
     <header

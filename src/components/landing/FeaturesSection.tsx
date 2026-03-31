@@ -1,13 +1,9 @@
 'use client';
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
-import { features, rolesData } from "@/data/landingData";
+import { rolesData } from "@/data/landingData";
 
 export function FeaturesSection() {
-  const [activeFeature, setActiveFeature] = useState(features[0]);
-
   return (
     <>
 
@@ -36,7 +32,7 @@ export function FeaturesSection() {
           </motion.div>
 
           <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-6">
-            {rolesData.map((role, index) => (
+            {rolesData.map((role) => (
               <motion.div
                 key={role.role}
                 initial={{ opacity: 0, y: 20 }}

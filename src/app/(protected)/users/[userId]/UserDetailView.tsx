@@ -5,21 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   ArrowLeft, 
-  Mail, 
-  Phone, 
   Building2, 
-  Calendar, 
   User, 
   BookOpen, 
-  ClipboardCheck, 
   Award, 
-  CreditCard, 
-  Receipt, 
-  Wrench, 
-  ShieldAlert, 
-  UtensilsCrossed 
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface UserDetailViewProps {
   user: any;
@@ -34,9 +24,6 @@ export function UserDetailView({
   user, 
   enrollments, 
   grades, 
-  attendance, 
-  payments, 
-  hostelIssues 
 }: UserDetailViewProps) {
   const router = useRouter();
 
