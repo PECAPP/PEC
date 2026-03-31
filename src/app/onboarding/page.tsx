@@ -1,3 +1,5 @@
+ 'use client';
+
 import { useEffect, useActionState, useOptimistic } from 'react';
 import type { ElementType } from 'react';
 import { useRouter } from 'next/navigation';

@@ -11,13 +11,12 @@ const nextConfig = {
   reactStrictMode: true,
   typedRoutes: true,
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: process.env.NEXT_DISABLE_TYPECHECK?.trim() === '1',
   },
 
   // ─── Experimental ────────────────────────────────────────────────────────────
   experimental: {
-    // Partial Prerendering is now enabled via cacheComponents
-    cacheComponents: true,
+    workerThreads: true,
     // Tree-shake large icon libraries at import time
     optimizePackageImports: [
       'lucide-react',

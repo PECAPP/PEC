@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import { ProtectedLayoutClient } from './ProtectedLayoutClient';
 import { Loader } from '@/components/ui/Loader';
 
+export const dynamic = 'force-dynamic';
+
 // 1. Separate the dynamic auth part from the static layout entry
 async function AuthGate({ children }: { children: React.ReactNode }) {
   const user = await getServerSession();

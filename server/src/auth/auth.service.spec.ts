@@ -5,6 +5,12 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
+jest.mock('bcrypt', () => ({
+  compare: jest.fn(),
+  hash: jest.fn(),
+  genSalt: jest.fn(),
+}));
+
 describe('AuthService', () => {
   let service: AuthService;
   let moduleRef: TestingModule;
@@ -109,7 +115,7 @@ describe('AuthService', () => {
     } as any;
 
     jest.spyOn(usersService, 'findOne').mockResolvedValue(user);
-    jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as any);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true as any);
     jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(user as any);
     jest.spyOn(prisma.refreshToken, 'create').mockResolvedValue({} as any);
     jest.spyOn(jwt, 'signAsync').mockResolvedValue('access-token' as any);
