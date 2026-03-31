@@ -242,6 +242,14 @@ export class AuthController {
       path: '/',
       expires,
     });
+    // Non-HttpOnly marker for client-side refresh heuristics.
+    res.cookie('refresh_present', '1', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      expires,
+    });
   }
 
   private setIdentityCookies(res: ExpressResponse, user: { uid: string, role: string }): void {
@@ -276,6 +284,12 @@ export class AuthController {
   private clearRefreshCookie(res: ExpressResponse): void {
     res.clearCookie(this.refreshCookieName, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+    res.clearCookie('refresh_present', {
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',

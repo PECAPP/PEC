@@ -20,6 +20,7 @@ import PDFExportButton from '@/components/common/PDFExportButton';
 import BulkUpload from '@/components/BulkUpload';
 import { markBulkAttendanceAction } from '../actions';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 
 export default function AttendanceManager({ userId, userRole, initialData }: any) {
   const router = useRouter();
@@ -61,14 +62,17 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
   const fetchStudentAttendance = async () => {
     setLoading(true);
     try {
+      const course = courses.find((c) => c.id === selectedCourse);
+      const subjectCode = course?.code || selectedCourse;
+
       const [enrollRes, usersRes, attRes] = await Promise.all([
-        api.get<any>('/enrollments', { params: { courseId: selectedCourse, status: 'active', limit: 100 } }),
-        api.get<any>('/users', { params: { role: 'student', limit: 1000 } }),
-        api.get<any>('/attendance', { params: { subject: selectedCourse, date: selectedDate } })
+        api.get<any>('/enrollments', { params: { courseId: selectedCourse, status: 'active', limit: 200 } }),
+        fetchAllPages<any>('/users', { role: 'student' }, 200),
+        api.get<any>('/attendance', { params: { subject: subjectCode, date: selectedDate } })
       ]);
 
       const enrolled = extractData<any[]>(enrollRes) || [];
-      const allUsers = extractData<any[]>(usersRes) || [];
+      const allUsers = Array.isArray(usersRes) ? usersRes : [];
       const records = extractData<any[]>(attRes) || [];
       
       const userMap = new Map(allUsers.map((u: any) => [u.id, u]));

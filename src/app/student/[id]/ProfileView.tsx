@@ -66,6 +66,16 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
   }
 
   const initials = userData.fullName?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+  const skills = Array.isArray(profileData?.skills)
+    ? profileData.skills
+        .map((skill: any) => (typeof skill === 'string' ? skill : skill?.name))
+        .filter(Boolean)
+    : [];
+  const documents = Array.isArray(profileData?.documents) ? profileData.documents : [];
+  const cgpaValue = typeof stats?.cgpa === 'number' ? stats.cgpa.toFixed(2) : 'N/A';
+  const attendanceValue = typeof stats?.attendance === 'number' ? `${stats.attendance}%` : 'N/A';
+  const creditsValue = stats?.credits ?? 'N/A';
+  const rankValue = stats?.rank ?? 'N/A';
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -85,7 +95,7 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
                 {userData.fullName}
                 <Badge variant="outline" className="text-[10px] h-5 px-1.5 uppercase tracking-wider bg-success/10 text-success border-success/20">Verified Student</Badge>
               </h1>
-              <p className="text-sm text-muted-foreground">{profileData.department} • Semester {profileData.semester}</p>
+              <p className="text-sm text-muted-foreground">{profileData.department || 'Department'} - Semester {profileData.semester ?? '-'}</p>
               <div className="flex items-center gap-3 mt-1.5">
                 {profileData.githubUsername && (
                   <a href={`https://github.com/${profileData.githubUsername}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -129,19 +139,19 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Academic Snapshot</h2>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-lg bg-secondary/30 border border-border">
-                  <p className="text-2xl font-bold text-foreground">{(stats?.cgpa || 0).toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-foreground">{cgpaValue}</p>
                   <p className="text-[10px] text-muted-foreground font-medium uppercase">CGPA</p>
                 </div>
                 <div className="p-3 rounded-lg bg-secondary/30 border border-border">
-                  <p className="text-2xl font-bold text-foreground">{stats?.attendance}%</p>
+                  <p className="text-2xl font-bold text-foreground">{attendanceValue}</p>
                   <p className="text-[10px] text-muted-foreground font-medium uppercase">Attendance</p>
                 </div>
                 <div className="p-3 rounded-lg bg-secondary/30 border border-border">
-                  <p className="text-2xl font-bold text-foreground">{stats?.credits}</p>
+                  <p className="text-2xl font-bold text-foreground">{creditsValue}</p>
                   <p className="text-[10px] text-muted-foreground font-medium uppercase">Credits</p>
                 </div>
                 <div className="p-3 rounded-lg bg-secondary/30 border border-border">
-                  <p className="text-2xl font-bold text-foreground">{stats?.rank}</p>
+                  <p className="text-2xl font-bold text-foreground">{rankValue}</p>
                   <p className="text-[10px] text-muted-foreground font-medium uppercase">Rank</p>
                 </div>
               </div>
@@ -180,40 +190,45 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
              <div className="card-elevated p-4">
                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">About</h2>
                <p className="text-sm text-foreground/80 leading-relaxed">
-                 {profileData.bio || "Computer Science student passionate about technology and innovation."}
+                 {profileData.bio || "No bio added yet."}
                </p>
              </div>
 
              <div className="card-elevated p-4">
                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Skills & Technologies</h2>
                <div className="flex flex-wrap gap-1.5">
-                 {['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Tailwind CSS'].map(skill => (
-                   <span key={skill} className="px-2.5 py-1 rounded-md bg-secondary text-secondary-foreground text-xs font-medium border border-border/50">
-                     {skill}
-                   </span>
-                 ))}
+                 {skills.length > 0 ? (
+                   skills.map((skill: string) => (
+                     <span key={skill} className="px-2.5 py-1 rounded-md bg-secondary text-secondary-foreground text-xs font-medium border border-border/50">
+                       {skill}
+                     </span>
+                   ))
+                 ) : (
+                   <span className="text-xs text-muted-foreground">No skills added yet.</span>
+                 )}
                </div>
              </div>
 
              <div className="card-elevated p-4">
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Verified Credentials</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                   {[
-                     { name: 'Semester 4 Marksheet', type: 'PDF', date: '2025' },
-                     { name: 'Bonafide Certificate', type: 'PDF', date: '2025' }
-                   ].map((doc, i) => (
-                     <div key={i} className="flex items-center justify-between p-2.5 rounded-lg border border-border">
-                       <div className="flex items-center gap-2.5 overflow-hidden">
-                         <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
-                           <FileText className="w-4 h-4 text-primary" />
-                         </div>
-                         <div className="min-w-0">
-                           <p className="text-xs font-medium truncate">{doc.name}</p>
-                           <span className="text-[10px] text-muted-foreground">{doc.date}</span>
+                   {documents.length > 0 ? (
+                     documents.map((doc: any, i: number) => (
+                       <div key={i} className="flex items-center justify-between p-2.5 rounded-lg border border-border">
+                         <div className="flex items-center gap-2.5 overflow-hidden">
+                           <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
+                             <FileText className="w-4 h-4 text-primary" />
+                           </div>
+                           <div className="min-w-0">
+                             <p className="text-xs font-medium truncate">{doc.name || 'Document'}</p>
+                             <span className="text-[10px] text-muted-foreground">{doc.date || 'N/A'}</span>
+                           </div>
                          </div>
                        </div>
-                     </div>
-                   ))}
+                     ))
+                   ) : (
+                     <div className="text-xs text-muted-foreground">No documents shared.</div>
+                   )}
                 </div>
              </div>
           </motion.div>

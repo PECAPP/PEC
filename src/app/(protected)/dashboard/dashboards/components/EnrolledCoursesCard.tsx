@@ -1,5 +1,6 @@
 'use client';
 
+import type { Ref } from 'react';
 import { BookOpen, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,11 +11,22 @@ interface Props {
   enrolledCoursesList: Course[];
   onViewAll: () => void;
   onCourseClick: (courseId: string) => void;
+  containerRef?: Ref<HTMLDivElement>;
+  className?: string;
 }
 
-export function EnrolledCoursesCard({ enrolledCoursesList, onViewAll, onCourseClick }: Props) {
+export function EnrolledCoursesCard({
+  enrolledCoursesList,
+  onViewAll,
+  onCourseClick,
+  containerRef,
+  className
+}: Props) {
   return (
-    <div className="xl:col-span-2 card-elevated ui-card-pad">
+    <div
+      ref={containerRef}
+      className={`xl:col-span-2 card-elevated ui-card-pad h-fit ${className ?? ''}`}
+    >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-accent" />

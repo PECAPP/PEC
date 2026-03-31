@@ -85,6 +85,15 @@ class AuthClient {
       if (body && typeof body.message === "string") {
         return body.message;
       }
+      if (Array.isArray(body?.message) && body.message.length > 0) {
+        return String(body.message[0]);
+      }
+      if (Array.isArray(body?.errors) && body.errors.length > 0) {
+        const first = body.errors[0];
+        if (first && typeof first.message === "string") {
+          return first.message;
+        }
+      }
     } catch {
       // Response body may be empty or non-JSON.
     }

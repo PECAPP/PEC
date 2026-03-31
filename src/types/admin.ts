@@ -19,6 +19,7 @@ export interface CollegeSettings {
   brandingColors?: string[];
   cloudinaryCloudName?: string;
   cloudinaryPreset?: string;
+  attendanceRequiredPercentage?: number;
   lastUpdated: any;
   updatedBy: string;
 }

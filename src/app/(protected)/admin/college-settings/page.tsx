@@ -64,6 +64,7 @@ export default function CollegeSettings({ embedded }: Props) {
   const [previewUrl, setPreviewUrl] = useState('');
   const [removingBackground, setRemovingBackground] = useState(false);
   const [removeBackground, setRemoveBackground] = useState(false);
+  const [attendanceRequiredPercentage, setAttendanceRequiredPercentage] = useState(75);
   
   // Logo display mode
   const [logoDisplayMode, setLogoDisplayMode] = useState<'logo-only' | 'text-only' | 'both'>('both');
@@ -114,13 +115,17 @@ export default function CollegeSettings({ embedded }: Props) {
         setWebsite(data.website);
         setTagline(data.tagline);
         setLogoUrl(data.logoUrl);
-        setLogoDisplayMode(data.logoDisplayMode || 'both');
-        setCloudinaryCloudName(data.cloudinaryCloudName || '');
-        setCloudinaryPreset(data.cloudinaryPreset || '');
-      } else {
-        setSettings(null);
-      }
-    } catch (error) {
+      setLogoDisplayMode(data.logoDisplayMode || 'both');
+      setCloudinaryCloudName(data.cloudinaryCloudName || '');
+      setCloudinaryPreset(data.cloudinaryPreset || '');
+      setAttendanceRequiredPercentage(
+        typeof data.attendanceRequiredPercentage === 'number' ? data.attendanceRequiredPercentage : 75
+      );
+    } else {
+      setSettings(null);
+      setAttendanceRequiredPercentage(75);
+    }
+  } catch (error) {
       console.error('Error fetching college settings:', error);
       toast.error('Failed to load college settings');
     } finally {
@@ -259,6 +264,7 @@ export default function CollegeSettings({ embedded }: Props) {
         logoDisplayMode: logoDisplayMode,
         cloudinaryCloudName: cloudinaryCloudName.trim() || '',
         cloudinaryPreset: cloudinaryPreset.trim() || '',
+        attendanceRequiredPercentage: Math.max(0, Math.min(100, Math.round(attendanceRequiredPercentage || 75))),
         lastUpdated: serverTimestamp(),
         updatedBy: user?.email || 'unknown',
       };
@@ -564,6 +570,31 @@ export default function CollegeSettings({ embedded }: Props) {
             />
             <p className="text-xs text-muted-foreground mt-1">
               Logo and college name will redirect to this link (if provided)
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Attendance Policy */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Attendance Policy</CardTitle>
+          <CardDescription>Set the minimum required attendance percentage for students</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-sm font-medium text-foreground block mb-2">
+              Required Attendance Percentage
+            </label>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={attendanceRequiredPercentage}
+              onChange={(e) => setAttendanceRequiredPercentage(Number(e.target.value))}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Default is 75%. This affects student dashboards and alerts.
             </p>
           </div>
         </CardContent>

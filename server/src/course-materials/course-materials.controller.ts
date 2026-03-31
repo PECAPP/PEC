@@ -20,19 +20,19 @@ import { CreateCourseMaterialDto } from './dto/create-course-material.dto';
 export class CourseMaterialsController {
   constructor(private readonly service: CourseMaterialsService) {}
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin', 'super_admin')
   @Get()
   findMany(@Query() query: CourseMaterialQueryDto) {
     return this.service.findMany(query);
   }
 
-  @Roles('faculty', 'admin')
+  @Roles('faculty', 'admin', 'moderator', 'college_admin', 'super_admin')
   @Post()
   create(@Body() body: CreateCourseMaterialDto) {
     return this.service.create(body);
   }
 
-  @Roles('faculty', 'admin')
+  @Roles('faculty', 'admin', 'moderator', 'college_admin', 'super_admin')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.delete(id);

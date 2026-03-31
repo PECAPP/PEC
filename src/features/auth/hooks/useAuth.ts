@@ -57,6 +57,13 @@ function clearAuthCache() {
   inFlightRequest = null;
 }
 
+function hasRefreshMarkerCookie(): boolean {
+  if (typeof document === "undefined") return false;
+  return document.cookie
+    .split(";")
+    .some((cookie) => cookie.trim().startsWith("refresh_present="));
+}
+
 async function fetchProfile(
   token: string,
   force = false,
@@ -149,7 +156,11 @@ export function useAuth(): UseAuthResult {
       try {
         let currentToken = authClient.getAccessToken();
 
-        if (!currentToken && (force || !refreshAttemptedWithoutToken)) {
+        if (
+          !currentToken &&
+          (force || !refreshAttemptedWithoutToken) &&
+          hasRefreshMarkerCookie()
+        ) {
           refreshAttemptedWithoutToken = true;
           try {
             currentToken = await authClient.refreshAccessToken();

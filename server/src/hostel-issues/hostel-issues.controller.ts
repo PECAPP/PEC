@@ -25,7 +25,7 @@ import { ok } from '../common/utils/api-response';
 export class HostelIssuesController {
   constructor(private readonly service: HostelIssuesService) {}
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
   @Get()
   async findMany(@Query() query: HostelIssueQueryDto) {
     const result = await this.service.findMany(query);
@@ -36,14 +36,14 @@ export class HostelIssuesController {
     });
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const data = await this.service.findById(id);
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
   @Post()
   async create(
     @Body(new ZodValidationPipe(hostelIssueSchema))
@@ -53,7 +53,7 @@ export class HostelIssuesController {
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -64,7 +64,7 @@ export class HostelIssuesController {
     return ok(data);
   }
 
-  @Roles('admin')
+  @Roles('admin', 'moderator', 'college_admin')
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const data = await this.service.delete(id);

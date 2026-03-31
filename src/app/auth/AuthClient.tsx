@@ -71,18 +71,29 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
     setError('');
     setSuccess('');
 
-    if (!formData.email.includes('@')) {
+    const email = formData.email.trim();
+    const password = formData.password;
+
+    if (!email) {
+      setError('Email is required');
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError('Please enter a valid email');
       return;
     }
-    if (!formData.password) {
+    if (!password) {
       setError('Password is required');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
       return;
     }
 
     try {
       setLoading(true);
-      await login(formData.email, formData.password);
+      await login(email, password);
       setSuccess('Signing in...');
     } catch (err: any) {
       setError(err.message || 'Failed to sign in');

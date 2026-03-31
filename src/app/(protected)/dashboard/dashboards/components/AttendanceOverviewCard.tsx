@@ -5,18 +5,21 @@ import { ClipboardCheck } from 'lucide-react';
 interface Props {
   attendancePercentage: number;
   onClick: () => void;
+  targetPercentage?: number;
 }
 
-export function AttendanceOverviewCard({ attendancePercentage, onClick }: Props) {
+export function AttendanceOverviewCard({ attendancePercentage, onClick, targetPercentage = 75 }: Props) {
   const strokeDasharray = 351.86;
   const strokeDashoffset = strokeDasharray - (strokeDasharray * attendancePercentage) / 100;
   const clampedPercentage = Math.max(0, Math.min(100, Math.round(attendancePercentage)));
-  const targetPercentage = 75;
-  const requiredToTarget = Math.max(0, targetPercentage - clampedPercentage);
-  const statusLabel = clampedPercentage >= 75 ? 'On Track' : clampedPercentage >= 60 ? 'Borderline' : 'At Risk';
+  const safeThreshold = Math.max(0, Math.min(100, Math.round(targetPercentage)));
+  const warningThreshold = Math.max(0, Math.min(100, safeThreshold - 15));
+  const greatThreshold = Math.max(0, Math.min(100, safeThreshold + 15));
+  const requiredToTarget = Math.max(0, safeThreshold - clampedPercentage);
+  const statusLabel = clampedPercentage >= safeThreshold ? 'On Track' : clampedPercentage >= warningThreshold ? 'Borderline' : 'At Risk';
   const statusTone =
-    clampedPercentage >= 75 ? 'text-success border-success/30 bg-success/10' :
-    clampedPercentage >= 60 ? 'text-warning border-warning/30 bg-warning/10' :
+    clampedPercentage >= safeThreshold ? 'text-success border-success/30 bg-success/10' :
+    clampedPercentage >= warningThreshold ? 'text-warning border-warning/30 bg-warning/10' :
     'text-destructive border-destructive/30 bg-destructive/10';
 
   return (
@@ -47,7 +50,7 @@ export function AttendanceOverviewCard({ attendancePercentage, onClick }: Props)
               fill="transparent" 
               strokeDasharray={strokeDasharray} 
               strokeDashoffset={strokeDashoffset}
-              className={`transition-all duration-1000 ease-out ${attendancePercentage >= 75 ? 'text-success' : attendancePercentage >= 60 ? 'text-warning' : 'text-destructive'}`}
+              className={`transition-all duration-1000 ease-out ${clampedPercentage >= safeThreshold ? 'text-success' : clampedPercentage >= warningThreshold ? 'text-warning' : 'text-destructive'}`}
               strokeLinecap="round"
             />
           </svg>
@@ -60,22 +63,22 @@ export function AttendanceOverviewCard({ attendancePercentage, onClick }: Props)
 
       <div className="mt-6">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2">
-          <span>Target {targetPercentage}%</span>
+          <span>Target {safeThreshold}%</span>
           <span>{requiredToTarget === 0 ? 'Goal Met' : `${requiredToTarget}% to go`}</span>
         </div>
         <div className="relative h-2 rounded-full bg-muted/60 overflow-hidden">
           <div 
-            className={`h-full transition-all duration-700 ${clampedPercentage >= 75 ? 'bg-success' : clampedPercentage >= 60 ? 'bg-warning' : 'bg-destructive'}`}
+            className={`h-full transition-all duration-700 ${clampedPercentage >= safeThreshold ? 'bg-success' : clampedPercentage >= warningThreshold ? 'bg-warning' : 'bg-destructive'}`}
             style={{ width: `${clampedPercentage}%` }}
           />
-          <span className="absolute left-[60%] -top-3 h-3 w-[2px] bg-warning/80" />
-          <span className="absolute left-[75%] -top-3 h-3 w-[2px] bg-success/80" />
-          <span className="absolute left-[90%] -top-3 h-3 w-[2px] bg-success/40" />
+          <span className="absolute -top-3 h-3 w-[2px] bg-warning/80" style={{ left: `${warningThreshold}%` }} />
+          <span className="absolute -top-3 h-3 w-[2px] bg-success/80" style={{ left: `${safeThreshold}%` }} />
+          <span className="absolute -top-3 h-3 w-[2px] bg-success/40" style={{ left: `${greatThreshold}%` }} />
         </div>
         <div className="flex items-center justify-between mt-3 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-          <span>60% Warning</span>
-          <span>75% Safe</span>
-          <span>90% Great</span>
+          <span>{warningThreshold}% Warning</span>
+          <span>{safeThreshold}% Safe</span>
+          <span>{greatThreshold}% Great</span>
         </div>
       </div>
 
@@ -90,7 +93,13 @@ export function AttendanceOverviewCard({ attendancePercentage, onClick }: Props)
         </div>
         <div className="rounded-lg border border-border bg-background/60 p-3">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Next Milestone</p>
-          <p className="text-sm font-semibold">{clampedPercentage >= 90 ? 'Maintain 90%+' : clampedPercentage >= 75 ? 'Reach 90%' : 'Reach 75%'}</p>
+          <p className="text-sm font-semibold">
+            {clampedPercentage >= greatThreshold
+              ? `Maintain ${greatThreshold}%+`
+              : clampedPercentage >= safeThreshold
+                ? `Reach ${greatThreshold}%`
+                : `Reach ${safeThreshold}%`}
+          </p>
         </div>
       </div>
     </div>

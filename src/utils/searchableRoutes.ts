@@ -57,6 +57,12 @@ export const searchableRoutes = [
     icon: Calendar,
     keywords: ["present", "absent"],
   },
+  {
+    title: "Score Sheet",
+    path: "/score-sheet",
+    icon: FileText,
+    keywords: ["marks", "grades", "results", "gpa"],
+  },
 
 
 

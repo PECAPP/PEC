@@ -20,15 +20,19 @@ async function getStudentData(id: string, token?: string) {
   }
 
   try {
-    const userRes = await fetch(`${base}/users/${id}`, { headers, next: { revalidate: 60 } });
+    const [userRes, profileRes, summaryRes] = await Promise.all([
+      fetch(`${base}/users/${id}`, { headers, next: { revalidate: 60 } }),
+      fetch(`${base}/student-profiles/${id}`, { headers, next: { revalidate: 60 } }),
+      token ? fetch(`${base}/attendance/summary?studentId=${id}`, { headers, next: { revalidate: 60 } }) : Promise.resolve(null),
+    ]);
+
     if (!userRes.ok) return null;
     const userData = (await userRes.json()).data;
 
-    // Student profile might be separate
-    const profileRes = await fetch(`${base}/student-profiles/${id}`, { headers, next: { revalidate: 60 } });
-    const profileData = profileRes.ok ? (await profileRes.json()).data : null;
+    const profileData = profileRes?.ok ? (await profileRes.json()).data : null;
+    const summaryData = summaryRes && summaryRes.ok ? (await summaryRes.json()).data : null;
 
-    return { userData, profileData };
+    return { userData, profileData, summaryData };
   } catch (error) {
     console.error('Error fetching student server-side:', error);
     return null;
@@ -79,13 +83,13 @@ export default async function PublicStudentProfilePage({ params }: PageProps) {
     ? await getGithubStats(data.profileData.githubUsername)
     : null;
 
-  // Mock academic stats for now as in original component
-  const stats = {
-    cgpa: 8.4,
-    attendance: 85,
-    credits: 88,
-    rank: 'Top 10%'
-  };
+  const summary = data.summaryData;
+  const stats = summary
+    ? {
+        attendance: summary.totalSummary?.percentage ?? null,
+        credits: Array.isArray(summary.courses) ? summary.courses.length : null,
+      }
+    : null;
 
   return (
     <StudentProfileView 

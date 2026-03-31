@@ -4,10 +4,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import api from '@/lib/api';
+import { doc, getDoc } from '@/lib/dataClient';
 import type { 
   StudentProfile, 
   Course, 
 } from '@/types';
+type NoticeboardItem = {
+  id: string;
+  title: string;
+  content: string;
+  category: 'news' | 'update' | 'event' | 'alert' | string;
+  important?: boolean;
+  pinned?: boolean;
+  authorName?: string;
+  publishedAt?: string;
+};
 
 interface StudentStats {
   attendancePercentage: number;
@@ -38,6 +49,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   const [todayClasses, setTodayClasses] = useState<any[]>([]);
   const [scheduleDay, setScheduleDay] = useState<string>('Today');
   const [enrolledCoursesList, setEnrolledCoursesList] = useState<Course[]>(initialData?.summary?.courses || []);
+  const [noticeboardItems, setNoticeboardItems] = useState<NoticeboardItem[]>(initialData?.noticeboard || []);
+  const [requiredAttendancePercentage, setRequiredAttendancePercentage] = useState<number>(75);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[]) => {
@@ -51,8 +64,6 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         const idToMatch = String(course.courseId || course.id || '');
         const matchById = fallbackCourses.find((c) => String(c.id) === idToMatch);
         const matchByCode = fallbackCourses.find(
-          (c) => c.code === course.courseCode || c.code === course.code
-        );
           (c) => c.code === course.courseCode || c.code === course.code
         );
         const matched = matchById ?? matchByCode;
@@ -130,6 +141,22 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     }
   }, []);
 
+  const fetchCollegeSettings = useCallback(async () => {
+    try {
+      const settingsRef = doc(null as any, 'collegeSettings', 'main');
+      const settingsSnap = await getDoc(settingsRef);
+      if (settingsSnap.exists()) {
+        const data = settingsSnap.data() as any;
+        const value = Number(data?.attendanceRequiredPercentage);
+        if (!Number.isNaN(value) && value > 0) {
+          setRequiredAttendancePercentage(Math.max(0, Math.min(100, Math.round(value))));
+        }
+      }
+    } catch {
+      // Ignore settings errors and use default threshold
+    }
+  }, []);
+
   const fetchStudentStats = useCallback(async () => {
     if (!user) return;
     try {
@@ -142,10 +169,11 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         return res;
       };
 
-      const [summaryRes, coursesRes, timetableRes] = await Promise.all([
+      const [summaryRes, coursesRes, timetableRes, noticeboardRes] = await Promise.all([
         api.get('/attendance/summary'),
         api.get('/courses'),
         api.get('/timetable'),
+        api.get('/noticeboard', { params: { limit: 4, offset: 0 } }),
       ]);
 
       processDashboardData(
@@ -154,13 +182,17 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         getData(timetableRes) || []
       );
 
+      const notices = getData(noticeboardRes);
+      setNoticeboardItems(Array.isArray(notices?.data) ? notices.data : Array.isArray(notices) ? notices : []);
+      void fetchCollegeSettings();
+
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
       setLoadError('Unable to refresh dashboard data.');
     } finally {
       setLoading(false);
     }
-  }, [user, processDashboardData]);
+  }, [user, processDashboardData, fetchCollegeSettings]);
 
   // Handle hydration or manual refresh
   useEffect(() => {
@@ -170,9 +202,23 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         initialData.courses || [],
         initialData.timetable || []
       );
+      void fetchCollegeSettings();
+      if (Array.isArray(initialData.noticeboard)) {
+        setNoticeboardItems(initialData.noticeboard);
+      } else {
+        void (async () => {
+          try {
+            const res = await api.get('/noticeboard', { params: { limit: 4, offset: 0 } });
+            const notices = res?.data?.success ? res.data.data : res?.data;
+            if (Array.isArray(notices)) setNoticeboardItems(notices);
+          } catch {
+            // Ignore noticeboard errors for dashboard render
+          }
+        })();
+      }
       setLoading(false);
     }
-  }, [initialData, processDashboardData]);
+  }, [initialData, processDashboardData, fetchCollegeSettings]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -189,8 +235,10 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
 
     if (!initialData) {
       void fetchStudentStats();
+    } else {
+      void fetchCollegeSettings();
     }
-  }, [authLoading, user, router, fetchStudentStats, initialData]);
+  }, [authLoading, user, router, fetchStudentStats, initialData, fetchCollegeSettings]);
 
   const handleQRSuccess = () => {
     setStats((prev) => ({
@@ -211,6 +259,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     todayClasses,
     scheduleDay,
     enrolledCoursesList,
+    noticeboardItems,
+    requiredAttendancePercentage,
     loadError,
     setLoading,
     fetchStudentStats,

@@ -472,6 +472,14 @@ html { margin-top: 0 !important; top: 0px !important; }
     line-height: 1.2;
   }
 
+  .protected-shell h1 {
+    @apply text-2xl font-bold tracking-tight text-foreground;
+  }
+
+  .protected-shell h1 + p {
+    @apply text-sm text-muted-foreground;
+  }
+
   p {
     @apply text-foreground/90;
     line-height: 1.5;

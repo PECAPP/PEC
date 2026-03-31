@@ -72,7 +72,7 @@ const navItems: NavItem[] = [
     icon: Bell,
     label: "Noticeboard",
     path: "/noticeboard",
-    roles: ["student", "faculty", "college_admin"],
+    roles: [],
   },
   {
     icon: Users2,
@@ -122,6 +122,12 @@ const navItems: NavItem[] = [
     label: "Attendance",
     path: "/attendance",
     roles: ["student", "faculty", "college_admin"],
+  },
+  {
+    icon: FileText,
+    label: "Score Sheet",
+    path: "/score-sheet",
+    roles: ["student"],
   },
   {
     icon: Book,
@@ -194,11 +200,11 @@ export function Sidebar({
   const sectionConfig: Array<{ title: string; paths: string[] }> = [
     {
       title: 'Core',
-      paths: ['/dashboard', '/profile', '/chat', '/noticeboard', '/clubs', '/users', '/departments', '/faculty'],
+      paths: ['/dashboard', '/profile', '/chat', '/clubs', '/users', '/departments', '/faculty'],
     },
     {
       title: 'Academics',
-      paths: ['/courses', '/timetable', '/examinations', '/attendance', '/course-materials', '/resume-builder'],
+      paths: ['/courses', '/timetable', '/examinations', '/attendance', '/score-sheet', '/course-materials', '/resume-builder'],
     },
     {
       title: 'Campus',

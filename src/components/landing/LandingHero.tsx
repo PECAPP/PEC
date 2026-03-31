@@ -53,6 +53,7 @@ export function LandingHero() {
                     src="/logo.png" 
                     alt="PEC Logo" 
                     fill 
+                    sizes="128px"
                     className="object-contain" 
                     priority 
                   />
@@ -103,6 +104,7 @@ export function LandingHero() {
             src="/image.png" 
             alt="Background" 
             fill
+            sizes="100vw"
             className="object-cover"
             priority
           />

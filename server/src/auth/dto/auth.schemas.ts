@@ -1,4 +1,12 @@
 import { z } from 'zod';
+import {
+  IsEmail,
+  IsIn,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 const appRoles = [
   'student',
@@ -81,59 +89,90 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SignInInput {
   @ApiProperty({ description: 'The registered email address', format: 'email', example: 'student@pec.edu' })
+  @IsEmail()
   email: string;
 
   @ApiProperty({ description: 'The password associated with the account', minLength: 8, example: 'P@ssw0rd123' })
+  @IsString()
+  @MinLength(8)
+  @MaxLength(128)
   password: string;
 }
 
 export class SignUpInput {
   @ApiProperty({ description: 'The registered email address', format: 'email' })
+  @IsEmail()
   email: string;
 
   @ApiProperty({ description: 'A strong password', minLength: 8 })
+  @IsString()
+  @MinLength(8)
+  @MaxLength(128)
   password: string;
 
   @ApiProperty({ description: 'Full Display Name', example: 'John Doe' })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(120)
   name: string;
 
   @ApiProperty({ description: 'User role', enum: appRoles, default: 'student', required: false })
+  @IsOptional()
+  @IsIn(appRoles)
   role?: (typeof appRoles)[number];
 }
 
 export class SetRoleInput {
   @ApiProperty({ description: 'Role to assign', enum: appRoles })
+  @IsIn(appRoles)
   role: (typeof appRoles)[number];
 }
 
 export class RefreshInput {
   @ApiProperty({ description: 'Refresh token string', required: false })
+  @IsOptional()
+  @IsString()
+  @MinLength(20)
   refreshToken?: string;
 }
 
 export class VerifyEmailInput {
   @ApiProperty({ description: 'Email verification token' })
+  @IsString()
+  @MinLength(20)
   token: string;
 }
 
 export class RequestPasswordResetInput {
   @ApiProperty({ description: 'Email address to send reset link' })
+  @IsEmail()
   email: string;
 }
 
 export class ResetPasswordInput {
   @ApiProperty({ description: 'Password reset token' })
+  @IsString()
+  @MinLength(20)
   token: string;
 
   @ApiProperty({ description: 'New password', minLength: 8 })
+  @IsString()
+  @MinLength(8)
+  @MaxLength(128)
   password: string;
 }
 
 export class ChangePasswordInput {
   @ApiProperty({ description: 'Current valid password' })
+  @IsString()
+  @MinLength(8)
+  @MaxLength(128)
   currentPassword: string;
 
   @ApiProperty({ description: 'New strong password', minLength: 8 })
+  @IsString()
+  @MinLength(8)
+  @MaxLength(128)
   newPassword: string;
 }
 

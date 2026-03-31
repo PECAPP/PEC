@@ -5,7 +5,7 @@ import { Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Props {
-  schedule: {
+  schedule?: {
     id: string;
     time: string;
     course: string;
@@ -23,6 +23,7 @@ const item = {
 };
 
 export function FacultyTodaySchedule({ schedule, onViewFull }: Props) {
+  const safeSchedule = Array.isArray(schedule) ? schedule : [];
   return (
     <motion.div variants={item} className="card-elevated p-6">
       <div className="flex items-center justify-between mb-4">
@@ -33,10 +34,10 @@ export function FacultyTodaySchedule({ schedule, onViewFull }: Props) {
         </Button>
       </div>
       <div className="space-y-3">
-        {schedule.length === 0 ? (
+        {safeSchedule.length === 0 ? (
           <p className="text-sm text-muted-foreground">No classes scheduled for today.</p>
         ) : (
-          schedule.map((slot) => (
+          safeSchedule.map((slot) => (
             <ScheduleItem
               key={slot.id}
               time={slot.time}

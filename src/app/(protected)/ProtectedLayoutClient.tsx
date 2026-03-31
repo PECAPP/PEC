@@ -55,7 +55,7 @@ export function ProtectedLayoutClient({ children, user }: ProtectedLayoutClientP
       />
       <main
         className={cn(
-          'pt-16 min-h-screen transition-all duration-150 relative overflow-hidden',
+          'protected-shell pt-16 min-h-screen transition-all duration-150 relative overflow-hidden',
           isMobile ? 'pl-0' : (sidebarCollapsed ? 'pl-16' : 'pl-64'),
           isMobile && 'pb-16'
         )}

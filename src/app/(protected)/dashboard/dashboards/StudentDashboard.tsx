@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ErrorState, LoadingGrid } from '@/components/common/AsyncState';
@@ -12,6 +13,7 @@ import { StudentStatsCards } from './components/StudentStatsCards';
 import { EnrolledCoursesCard } from './components/EnrolledCoursesCard';
 import { TodayScheduleCard } from './components/TodayScheduleCard';
 import { AttendanceOverviewCard } from './components/AttendanceOverviewCard';
+import { NoticeboardCard } from './components/NoticeboardCard';
 
 const item = {
   hidden: { opacity: 0, y: 12 },
@@ -24,6 +26,8 @@ interface StudentDashboardProps {
 }
 
 export function StudentDashboard({ initialData, user: initialUser }: StudentDashboardProps) {
+  const enrolledCardRef = useRef<HTMLDivElement | null>(null);
+  const [scheduleCardHeight, setScheduleCardHeight] = useState<number | null>(null);
   const {
     loading,
     firstName,
@@ -34,6 +38,8 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
     todayClasses,
     scheduleDay,
     enrolledCoursesList,
+    noticeboardItems,
+    requiredAttendancePercentage,
     loadError,
     setLoading,
     fetchStudentStats,
@@ -80,6 +86,27 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
 
   const getFullUrl = (path: string) => orgSlug ? `/${orgSlug}${path}` : path;
 
+  useEffect(() => {
+    const node = enrolledCardRef.current;
+    if (!node) return;
+
+    const updateHeight = () => {
+      const nextHeight = node.offsetHeight;
+      if (nextHeight > 0) setScheduleCardHeight(nextHeight);
+    };
+
+    updateHeight();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateHeight);
+      return () => window.removeEventListener('resize', updateHeight);
+    }
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="space-y-6 md:space-y-8">
       <StudentWelcomeHeader 
@@ -96,8 +123,10 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         }}
       />
 
-      <div className="grid gap-5 md:gap-6 xl:grid-cols-3">
+      <div className="grid items-start gap-5 md:gap-6 xl:grid-cols-3">
         <EnrolledCoursesCard 
+          containerRef={enrolledCardRef}
+          className="self-start"
           enrolledCoursesList={enrolledCoursesList} 
           onViewAll={() => window.location.href = getFullUrl('/courses')}
           onCourseClick={(id) => window.location.href = getFullUrl(`/courses/${id}`)}
@@ -107,14 +136,24 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
           scheduleDay={scheduleDay} 
           todayClasses={todayClasses} 
           onViewFull={() => window.location.href = getFullUrl('/timetable')}
+          containerHeight={scheduleCardHeight}
         />
       </div>
 
-      <motion.div variants={item} className="grid gap-6">
-        <AttendanceOverviewCard 
-          attendancePercentage={stats.attendancePercentage}
-          onClick={() => window.location.href = getFullUrl('/attendance')}
-        />
+      <motion.div variants={item} className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <AttendanceOverviewCard 
+            attendancePercentage={stats.attendancePercentage}
+            onClick={() => window.location.href = getFullUrl('/attendance')}
+            targetPercentage={requiredAttendancePercentage}
+          />
+        </div>
+        <div className="lg:col-span-2">
+          <NoticeboardCard
+            notices={noticeboardItems}
+            onViewAll={() => window.location.href = getFullUrl('/noticeboard')}
+          />
+        </div>
       </motion.div>
 
       <Dialog open={showQRScanner} onOpenChange={setShowQRScanner}>
