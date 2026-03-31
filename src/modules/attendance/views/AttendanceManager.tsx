@@ -40,7 +40,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
   });
 
   useEffect(() => {
-    if (!initialData?.courses) fetchCourses();
+    if (!initialData?.courses || initialData.courses.length === 0) fetchCourses();
   }, [userId, userRole]);
 
   useEffect(() => {
@@ -57,9 +57,22 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
       const response = await api.get<any>('/courses', { params: { facultyId: userId, limit: 200 } });
       data = extractData<any[]>(response) || [];
       if (!data.length) {
+        let facultyName = '';
+        try {
+          const profileRes = await api.get<any>('/auth/profile');
+          facultyName = profileRes?.data?.data?.fullName || profileRes?.data?.data?.name || profileRes?.data?.fullName || profileRes?.data?.name || '';
+        } catch {
+          facultyName = '';
+        }
         const fallback = await api.get<any>('/courses', { params: { limit: 200 } });
         const allCourses = extractData<any[]>(fallback) || [];
-        data = allCourses.filter((c: any) => c.facultyId === userId || c.instructorId === userId);
+        const name = facultyName.toLowerCase();
+        data = allCourses.filter((c: any) => {
+          if (c.facultyId === userId || c.instructorId === userId) return true;
+          if (!name) return false;
+          const instructor = String(c.instructor || c.facultyName || c.instructorName || '').toLowerCase();
+          return instructor.includes(name);
+        });
       }
     }
     setCourses(data);

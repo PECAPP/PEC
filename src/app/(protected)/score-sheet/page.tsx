@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileText, Plus, Trash2, Save, X } from 'lucide-react';
+import { FileText, Plus, Trash2, Save, X, Star, Gauge } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -133,33 +133,46 @@ export default function ScoreSheetPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1>Score Sheet</h1>
-        <p>Store and track your personal marks and grades in one place.</p>
+    <div className="space-y-8">
+      <div className="card-elevated ui-card-pad flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Academic Tracker</p>
+          <h1 className="text-3xl font-black tracking-tight text-foreground">Score Sheet</h1>
+          <p className="text-sm text-muted-foreground">Store and track your personal marks and grades in one place.</p>
+        </div>
+        <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground">
+          <FileText className="h-4 w-4 text-primary" />
+          Local-only. Saved in this browser.
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="card-elevated ui-card-pad">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Entries</p>
-          <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-        </div>
-        <div className="card-elevated ui-card-pad">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Average</p>
-          <p className="text-2xl font-bold text-foreground">{stats.average}%</p>
-        </div>
-        <div className="card-elevated ui-card-pad">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Best</p>
-          <p className="text-2xl font-bold text-foreground">{stats.best}%</p>
-        </div>
+        {[
+          { label: 'Entries', value: stats.total, icon: FileText },
+          { label: 'Average', value: `${stats.average}%`, icon: Gauge },
+          { label: 'Best', value: `${stats.best}%`, icon: Star },
+        ].map(({ label, value, icon: Icon }) => (
+          <div key={label} className="card-elevated ui-card-pad flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <Icon className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</p>
+              <p className="text-2xl font-black text-foreground">{value}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="card-elevated ui-card-pad space-y-4">
+      <div className="card-elevated ui-card-pad space-y-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            {editingId ? 'Edit Entry' : 'Add New Entry'}
-          </h2>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Entry Form</p>
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              {editingId ? 'Edit Entry' : 'Add New Entry'}
+            </h2>
+          </div>
           {editingId && (
             <Button variant="ghost" size="sm" onClick={resetForm}>
               <X className="h-4 w-4 mr-1" />
@@ -236,8 +249,8 @@ export default function ScoreSheetPage() {
               entry.maxMarks > 0 ? Math.round((entry.score / entry.maxMarks) * 100) : 0;
 
             return (
-              <div key={entry.id} className="card-elevated ui-card-pad space-y-2">
-                <div className="flex flex-wrap items-start justify-between gap-3">
+              <div key={entry.id} className="card-elevated ui-card-pad space-y-3">
+                <div className="grid gap-4 md:grid-cols-[1.6fr_0.8fr_0.8fr] md:items-center">
                   <div>
                     <h3 className="text-lg font-semibold text-foreground">
                       {entry.courseName}
@@ -245,29 +258,40 @@ export default function ScoreSheetPage() {
                     </h3>
                     <p className="text-xs text-muted-foreground">
                       {entry.term || 'Term not set'}
-                      {entry.examDate ? ` • ${new Date(entry.examDate).toLocaleDateString()}` : ''}
+                      {entry.examDate ? ` - ${new Date(entry.examDate).toLocaleDateString()}` : ''}
                     </p>
+                    {entry.notes && (
+                      <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
+                        {entry.notes}
+                      </p>
+                    )}
                   </div>
-                  <div className="text-right">
+                  <div className="space-y-1">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Score</p>
                     <p className="text-xl font-bold text-foreground">
                       {entry.score}/{entry.maxMarks}
                     </p>
+                    <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                     <p className="text-xs text-muted-foreground">{percentage}%</p>
                   </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                  {entry.grade && <span>Grade: {entry.grade}</span>}
-                  {entry.notes && <span className="line-clamp-1">Notes: {entry.notes}</span>}
-                </div>
-
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
-                    Edit
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDelete(entry.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center justify-between md:justify-end gap-2">
+                    {entry.grade && (
+                      <span className="text-xs font-semibold text-primary">Grade: {entry.grade}</span>
+                    )}
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
+                        Edit
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleDelete(entry.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -277,3 +301,4 @@ export default function ScoreSheetPage() {
     </div>
   );
 }
+

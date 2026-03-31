@@ -35,26 +35,35 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
 
     try {
       type ApiResponse<T> = { success: boolean; data: T; meta?: any };
-      const [coursesRes, enrollmentsRes, noticesRes, timetableRes] = await Promise.all([
+      const [coursesRes, noticesRes, timetableRes] = await Promise.all([
         api.get<ApiResponse<any>>('/courses', { params: { facultyId: user.uid, limit: 200, offset: 0 } }),
-        api.get<ApiResponse<any>>('/enrollments', { params: { limit: 200, offset: 0 } }),
         api.get<ApiResponse<any>>('/noticeboard', { params: { limit: 5 } }),
         api.get<ApiResponse<any>>('/timetable'),
       ]);
 
       let facultyCourses = coursesRes.data.data || [];
-      const allEnrollments = enrollmentsRes.data.data || [];
       const allNotices = noticesRes.data.data || [];
       const allTimetable = timetableRes.data.data || [];
 
       setNotices(allNotices);
 
-      if (!facultyCourses.length && user.fullName) {
+      if (!facultyCourses.length) {
+        let facultyName = user.fullName || user.name || '';
+        try {
+          const profileRes = await api.get<ApiResponse<any>>('/auth/profile');
+          const profile = profileRes?.data?.data || profileRes?.data;
+          facultyName = profile?.fullName || profile?.name || facultyName;
+        } catch {
+          // ignore profile fetch failure
+        }
+
         const allCoursesRes = await api.get<ApiResponse<any>>('/courses', { params: { limit: 200, offset: 0 } });
         const allCourses = allCoursesRes.data.data || [];
-        const name = user.fullName.toLowerCase();
+        const name = String(facultyName || '').toLowerCase();
         facultyCourses = allCourses.filter((c: any) => {
-          const instructor = (c.instructor || c.facultyName || '').toLowerCase();
+          if (c.facultyId === user.uid || c.instructorId === user.uid) return true;
+          if (!name) return false;
+          const instructor = (c.instructor || c.facultyName || c.instructorName || '').toLowerCase();
           return instructor.includes(name);
         });
       }
@@ -64,11 +73,16 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
       // Calculate Low Attendance Count
       const lowAttendanceCount = facultyCourses.length > 0 ? 0 : 0; // Placeholder or use actual logic if available
 
-      const uniqueStudents = new Set(
-        allEnrollments
-          .filter((e: any) => facultyCourses.some((c: any) => c.id === e.courseId))
-          .map((e: any) => e.studentId)
+      const enrollmentResponses = await Promise.all(
+        facultyCourses.map((course: any) =>
+          api.get<ApiResponse<any>>('/enrollments', {
+            params: { courseId: course.id, status: 'active', limit: 200, offset: 0 },
+          })
+        )
       );
+
+      const allEnrollments = enrollmentResponses.flatMap((res) => res.data.data || []);
+      const uniqueStudents = new Set(allEnrollments.map((e: any) => e.studentId));
 
       setStats({
         activeCount: facultyCourses.length,

@@ -26,7 +26,6 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
 import { CanteenModule } from './canteen/canteen.module';
-import { HostelModule } from './hostel/hostel.module';
 import { AdminModule } from './admin/admin.module';
 
 @Module({
@@ -44,7 +43,6 @@ import { AdminModule } from './admin/admin.module';
     FeatureFlagsModule,
     BackgroundJobsModule,
     CanteenModule,
-    HostelModule,
     NightCanteenModule,
     HostelIssuesModule,
     CampusMapModule,

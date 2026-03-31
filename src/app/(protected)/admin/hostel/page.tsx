@@ -115,10 +115,16 @@ export default function HostelAdmin() {
     }
   };
 
+  const normalizeStatus = (status: string) => {
+    if (status === 'open') return 'pending';
+    if (status === 'in_progress') return 'assigned';
+    return status;
+  };
+
   const getStatusConfig = (status: string) => {
-    switch (status) {
-      case 'open': return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Open' };
-      case 'in_progress': return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'In Progress' };
+    switch (normalizeStatus(status)) {
+      case 'pending': return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Pending' };
+      case 'assigned': return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Assigned' };
       case 'resolved': return { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Resolved' };
       case 'closed': return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Closed' };
       default: return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
@@ -128,14 +134,14 @@ export default function HostelAdmin() {
   const filteredIssues = issues.filter(issue => {
     const matchesSearch = issue.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          issue.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTab = activeTab === 'all' || issue.status === activeTab;
+    const matchesTab = activeTab === 'all' || normalizeStatus(issue.status) === activeTab;
     return matchesSearch && matchesTab;
   });
 
   const stats = {
-    open: issues.filter(i => i.status === 'open').length,
-    active: issues.filter(i => i.status === 'in_progress').length,
-    resolved: issues.filter(i => i.status === 'resolved').length
+    open: issues.filter(i => normalizeStatus(i.status) === 'pending').length,
+    active: issues.filter(i => normalizeStatus(i.status) === 'assigned').length,
+    resolved: issues.filter(i => normalizeStatus(i.status) === 'resolved').length
   };
 
   return (
@@ -196,8 +202,8 @@ export default function HostelAdmin() {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="w-full rounded-none border-b bg-muted/50">
                 <TabsTrigger value="all" className="flex-1">All</TabsTrigger>
-                <TabsTrigger value="open" className="flex-1 text-orange-500">New</TabsTrigger>
-                <TabsTrigger value="in_progress" className="flex-1 text-blue-500">Active</TabsTrigger>
+                <TabsTrigger value="pending" className="flex-1 text-orange-500">New</TabsTrigger>
+                <TabsTrigger value="assigned" className="flex-1 text-blue-500">Active</TabsTrigger>
                 <TabsTrigger value="resolved" className="flex-1 text-green-500">Fixed</TabsTrigger>
               </TabsList>
               
@@ -253,12 +259,12 @@ export default function HostelAdmin() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    {selectedIssue.status === 'open' && (
-                      <Button size="sm" onClick={() => updateStatus(selectedIssue.id, 'in_progress')}>
+                    {normalizeStatus(selectedIssue.status) === 'pending' && (
+                      <Button size="sm" onClick={() => updateStatus(selectedIssue.id, 'assigned')}>
                         Mark In Progress
                       </Button>
                     )}
-                    {selectedIssue.status === 'in_progress' && (
+                    {normalizeStatus(selectedIssue.status) === 'assigned' && (
                       <Button size="sm" variant="success" onClick={() => updateStatus(selectedIssue.id, 'resolved')}>
                         Mark Resolved
                       </Button>

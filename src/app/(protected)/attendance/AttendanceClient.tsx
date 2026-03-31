@@ -80,7 +80,7 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
   const isAdmin = userRole === 'college_admin';
 
   useEffect(() => {
-    if (!initialData?.courses) {
+    if (!initialData?.courses || initialData.courses.length === 0) {
        fetchCourses();
     }
   }, [userId, userRole, initialData]);

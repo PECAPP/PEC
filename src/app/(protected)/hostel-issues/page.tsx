@@ -68,10 +68,16 @@ const categoryIcons: Record<string, any> = {
   hvac: ThermometerSun,
 };
 
+const normalizeStatus = (status: string) => {
+  if (status === 'open') return 'pending';
+  if (status === 'in_progress') return 'assigned';
+  return status;
+};
+
 const getStatusConfig = (status: string) => {
-  switch (status) {
-    case 'open': return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Open' };
-    case 'in_progress': return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'In Progress' };
+  switch (normalizeStatus(status)) {
+    case 'pending': return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Pending' };
+    case 'assigned': return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Assigned' };
     case 'resolved': return { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Resolved' };
     case 'closed': return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Closed' };
     default: return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
@@ -80,7 +86,9 @@ const getStatusConfig = (status: string) => {
 
 const getPriorityConfig = (priority: string) => {
   switch (priority) {
-    case 'urgent': return { color: 'text-red-500', bg: 'bg-red-500/10' };
+    case 'emergency':
+    case 'urgent':
+      return { color: 'text-red-500', bg: 'bg-red-500/10' };
     case 'high': return { color: 'text-orange-500', bg: 'bg-orange-500/10' };
     case 'medium': return { color: 'text-blue-500', bg: 'bg-blue-500/10' };
     default: return { color: 'text-green-500', bg: 'bg-green-500/10' };
@@ -104,7 +112,7 @@ export default function HostelIssuesPage() {
     title: '',
     description: '',
     category: 'electrical',
-    priority: 'medium',
+      priority: 'medium',
     roomNumber: '',
   });
 
@@ -130,7 +138,7 @@ export default function HostelIssuesPage() {
       const data = await fetchAllPages<HostelIssue>('/hostelIssues', {
         studentId: user.uid,
       });
-      setIssues(Array.isArray(data) ? data : []);
+    setIssues(Array.isArray(data) ? data : []);
       setAuthFailed(false);
     } catch (error: any) {
       if (error?.response?.status === 401) {
@@ -173,7 +181,7 @@ export default function HostelIssuesPage() {
         roomNumber: formData.roomNumber,
         studentId: user.uid,
         studentName: user.fullName || user.name || user.email?.split('@')[0] || 'Student',
-        status: 'open',
+        status: 'pending',
       };
 
       const response = await api.post('/hostelIssues', payload);
@@ -233,14 +241,14 @@ export default function HostelIssuesPage() {
 
   const filteredIssues = issues.filter(issue => {
     if (activeTab === 'all') return true;
-    return issue.status === activeTab;
+    return normalizeStatus(issue.status) === activeTab;
   });
 
   const stats = {
     total: issues.length,
-    open: issues.filter(i => i.status === 'open').length,
-    inProgress: issues.filter(i => i.status === 'in_progress').length,
-    resolved: issues.filter(i => i.status === 'resolved' || i.status === 'closed').length,
+    open: issues.filter(i => normalizeStatus(i.status) === 'pending').length,
+    inProgress: issues.filter(i => normalizeStatus(i.status) === 'assigned').length,
+    resolved: issues.filter(i => ['resolved', 'closed'].includes(normalizeStatus(i.status))).length,
   };
 
   if (!user) {
@@ -334,7 +342,7 @@ export default function HostelIssuesPage() {
                       <SelectItem value="low">Low</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="urgent">Urgent</SelectItem>
+                      <SelectItem value="emergency">Emergency</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -383,7 +391,7 @@ export default function HostelIssuesPage() {
               <AlertCircle className="w-5 h-5 text-warning" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Open</p>
+              <p className="text-sm text-muted-foreground">Pending</p>
               <p className="text-2xl font-bold text-foreground">{stats.open}</p>
             </div>
           </div>
@@ -394,7 +402,7 @@ export default function HostelIssuesPage() {
               <Clock className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">In Progress</p>
+              <p className="text-sm text-muted-foreground">Assigned</p>
               <p className="text-2xl font-bold text-foreground">{stats.inProgress}</p>
             </div>
           </div>
@@ -421,8 +429,8 @@ export default function HostelIssuesPage() {
               <div className="p-4 border-b border-border">
                 <TabsList className="w-full">
                   <TabsTrigger value="all" className="flex-1">All</TabsTrigger>
-                  <TabsTrigger value="open" className="flex-1">Open</TabsTrigger>
-                  <TabsTrigger value="in_progress" className="flex-1">In Progress</TabsTrigger>
+                  <TabsTrigger value="pending" className="flex-1">Pending</TabsTrigger>
+                  <TabsTrigger value="assigned" className="flex-1">Assigned</TabsTrigger>
                   <TabsTrigger value="resolved" className="flex-1">Resolved</TabsTrigger>
                 </TabsList>
               </div>
