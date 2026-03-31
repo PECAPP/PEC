@@ -17,6 +17,8 @@ import { Roles } from '../auth/roles.decorator';
 import { ok } from '../common/utils/api-response';
 import { CreateExamScheduleDto } from './dto/create-exam-schedule.dto';
 import { ExamQueryDto } from './dto/exam-query.dto';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { examinationSchema } from '@shared/schemas/erp';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('examinations')
@@ -25,7 +27,10 @@ export class ExaminationsController {
 
   @Roles('college_admin', 'admin', 'moderator')
   @Post('schedules')
-  async createSchedule(@Body() body: CreateExamScheduleDto) {
+  async createSchedule(
+    @Body(new ZodValidationPipe(examinationSchema))
+    body: CreateExamScheduleDto,
+  ) {
     const data = await this.service.createSchedule(body);
     return ok(data);
   }

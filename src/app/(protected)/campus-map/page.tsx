@@ -169,7 +169,6 @@ export default function CampusMap() {
   const [newRegion, setNewRegion] = useState<Partial<MapRegion> | null>(null);
   const [newRoad, setNewRoad] = useState<Partial<MapRoad> | null>(null);
   const [zoom, setZoom] = useState(1);
-  const [loading, setLoading] = useState(true);
   
   // Resize and drag state
   const [resizing, setResizing] = useState<{region: MapRegion, handle: ResizeHandle} | null>(null);
@@ -217,8 +216,6 @@ export default function CampusMap() {
         console.error('Error fetching data:', error);
         setRegions(defaultRegions.map((r, i) => ({ ...r, id: `default-${i}`, organizationId: '' })));
         setRoads(defaultRoads.map((r, i) => ({ ...r, id: `road-${i}`, organizationId: '' })));
-      } finally {
-        setLoading(false);
       }
     };
     fetchData();

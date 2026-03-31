@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { 
-  Users, Upload, Download, CheckCircle, XCircle, Clock, 
-  Calendar, RotateCcw, Save, Loader2 
+  Upload, Save, Loader2 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +24,6 @@ import { fetchAllPages } from '@/lib/fetchAllPages';
 
 export default function AttendanceManager({ userId, userRole, initialData }: any) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const [courses, setCourses] = useState<any[]>(initialData?.courses || []);
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);

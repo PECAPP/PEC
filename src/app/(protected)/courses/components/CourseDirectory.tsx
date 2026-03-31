@@ -29,7 +29,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
-import { CourseSkeleton } from '@/components/ui/image-with-blur';
 import { CourseCard } from './CourseCard';
 import { toast } from 'sonner';
 import { enrollInCourseAction, dropCourseAction } from '../actions';

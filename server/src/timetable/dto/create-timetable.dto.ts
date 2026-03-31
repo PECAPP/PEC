@@ -1,47 +1,45 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, IsUUID } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { timetableSchema } from '@shared/schemas/erp';
 
 export class CreateTimetableDto {
-  @IsOptional()
-  @IsUUID('4')
+  @ApiPropertyOptional({ example: 'uuid-course-id' })
   courseId?: string;
 
-  @IsString()
+  @ApiProperty({ example: 'Introduction to AI' })
   courseName: string;
 
-  @IsString()
+  @ApiProperty({ example: 'CS101' })
   courseCode: string;
 
-  @IsOptional()
-  @IsUUID('4')
+  @ApiPropertyOptional({ example: 'uuid-faculty-id' })
   facultyId?: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ example: 'Dr. Jane Smith' })
   facultyName?: string;
 
-  @IsString()
+  @ApiProperty({ enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] })
   day: string;
 
-  @IsString()
+  @ApiProperty({ example: '09:00' })
   startTime: string;
 
-  @IsString()
+  @ApiProperty({ example: '10:00' })
   endTime: string;
 
-  @IsString()
+  @ApiProperty({ example: 'Room 302' })
   room: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ example: 'Computer Science' })
   department?: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
+  @ApiPropertyOptional({ example: 4 })
   semester?: number;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ example: '2024-25' })
   batch?: string;
+
+  static validate(data: unknown) {
+    return timetableSchema.parse(data);
+  }
 }
+

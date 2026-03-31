@@ -40,6 +40,9 @@ export const courseSchema = z.object({
   department: z.string().min(1, 'Department is required'),
   credits: z.number().min(1).max(20).default(4),
   instructorId: z.string().uuid().optional(),
+  instructor: z.string().optional(),
+  semester: z.number().int().min(1).max(8).optional(),
+  status: z.enum(['active', 'inactive', 'archived']).default('active'),
 });
 
 export const userSchema = z.object({
@@ -71,9 +74,55 @@ export const enrollmentSchema = z.object({
   enrolledAt: z.string().datetime().optional(),
 });
 
+export const hostelIssueSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(3, 'Title is too short'),
+  description: z.string().min(10, 'Description is too short'),
+  category: z.string().min(1, 'Category is required'),
+  priority: z.enum(['low', 'medium', 'high', 'emergency']),
+  status: z.enum(['pending', 'assigned', 'resolved', 'closed']).default('pending'),
+  roomNumber: z.string().min(1, 'Room number required'),
+  studentId: z.string().min(1, 'Student ID required'),
+  studentName: z.string().min(1, 'Student name required'),
+  organizationId: z.string().optional(),
+  responses: z.unknown().optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+});
+
+export const timetableSchema = z.object({
+  id: z.string().uuid().optional(),
+  courseId: z.string().uuid().optional(),
+  courseName: z.string().min(1, 'Course name required'),
+  courseCode: z.string().min(1, 'Course code required'),
+  facultyId: z.string().uuid().optional(),
+  facultyName: z.string().optional(),
+  day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid start time (HH:MM)'),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid end time (HH:MM)'),
+  room: z.string().min(1, 'Room required'),
+  department: z.string().optional(),
+  semester: z.number().int().min(1).max(8).optional(),
+  batch: z.string().optional(),
+});
+
+export const examinationSchema = z.object({
+  id: z.string().uuid().optional(),
+  courseId: z.string().uuid('Invalid course ID'),
+  examType: z.enum(['midterm', 'final', 'quiz', 'lab']),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid start time (HH:MM)'),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid end time (HH:MM)'),
+  room: z.string().min(1, 'Room required'),
+});
+
 export type DepartmentInput = z.infer<typeof departmentSchema>;
 export type FacultyInput = z.infer<typeof facultySchema>;
 export type AttendanceInput = z.infer<typeof attendanceSchema>;
 export type CourseInput = z.infer<typeof courseSchema>;
 export type UserInput = z.infer<typeof userSchema>;
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
+export type HostelIssueInput = z.infer<typeof hostelIssueSchema>;
+export type TimetableInput = z.infer<typeof timetableSchema>;
+export type ExaminationInput = z.infer<typeof examinationSchema>;
+

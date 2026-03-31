@@ -66,8 +66,6 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         const matchByCode = fallbackCourses.find(
           (c) => c.code === course.courseCode || c.code === course.code
         );
-          (c) => c.code === course.courseCode || c.code === course.code
-        );
         const matched = matchById ?? matchByCode;
 
         const resolvedId = idToMatch || matched?.id || `course-${index}`;
@@ -194,7 +192,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     } finally {
       setLoading(false);
     }
-  }, [user, processDashboardData]);
+  }, [user, processDashboardData, fetchCollegeSettings]);
 
   // Handle hydration or manual refresh
   useEffect(() => {

@@ -28,8 +28,8 @@ async function apiFetch(method: string, path: string, body?: object) {
 
 // 1. Create User
 export const createUserAction = actionClient
-  .schema(userSchema as any)
-  .action(async ({ parsedInput }: { parsedInput: any }) => {
+  .schema(userSchema)
+  .action(async ({ parsedInput }) => {
     const { ok, data } = await apiFetch('POST', 'users', parsedInput as object);
     if (!ok) throw new Error('Failed to create user account.');
     revalidateTag('users', 'default');
@@ -39,8 +39,8 @@ export const createUserAction = actionClient
 
 // 2. Update User
 export const updateUserAction = actionClient
-  .schema(userSchema as any)
-  .action(async ({ parsedInput }: { parsedInput: any }) => {
+  .schema(userSchema.partial())
+  .action(async ({ parsedInput }) => {
     if (!parsedInput.id) throw new Error('User ID required for updates.');
     const { ok } = await apiFetch('PATCH', `users/${parsedInput.id}`, parsedInput);
     if (!ok) throw new Error('Failed to update user.');
@@ -51,8 +51,8 @@ export const updateUserAction = actionClient
 
 // 3. Delete User
 export const deleteUserAction = actionClient
-  .schema(z.object({ id: z.string() }) as any)
-  .action(async ({ parsedInput }: { parsedInput: { id: string } }) => {
+  .schema(z.object({ id: z.string() }))
+  .action(async ({ parsedInput }) => {
     const { id } = parsedInput;
     const { ok } = await apiFetch('DELETE', `users/${id}`);
     if (!ok) throw new Error('Failed to delete user.');
@@ -63,8 +63,8 @@ export const deleteUserAction = actionClient
 
 // 4. Change User Status (suspend / activate)
 export const changeStatusAction = actionClient
-  .schema(z.object({ id: z.string(), status: z.enum(['active', 'inactive', 'suspended']) }) as any)
-  .action(async ({ parsedInput }: { parsedInput: any }) => {
+  .schema(z.object({ id: z.string(), status: z.enum(['active', 'inactive', 'suspended']) }))
+  .action(async ({ parsedInput }) => {
     const { id, status } = parsedInput;
     const { ok } = await apiFetch('PATCH', `users/${id}`, { status });
     if (!ok) throw new Error('Failed to update user status.');

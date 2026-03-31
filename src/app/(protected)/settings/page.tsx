@@ -1,35 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  User,
-  Bell,
-  Lock,
   Globe,
-  Shield,
-  Smartphone,
-  Mail,
-  Github,
-  Linkedin,
-  Save,
   LogOut,
-  ChevronRight,
-  Loader2,
   Palette,
   Check,
-  Copy,
-  Building2,
-  Database,
-  Terminal,
-  Cpu,
   RefreshCw,
+  Database,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -59,7 +42,6 @@ export default function Settings() {
   const { user, loading: authLoading } = usePermissions();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<any>(null);
-  const [profileData, setProfileData] = useState<any>(null);
 
   const accentColors = [
     { id: 'gold', name: 'PEC Gold', color: '#EAB308' },
@@ -94,9 +76,7 @@ export default function Settings() {
     const loadUserData = async () => {
       try {
         const profileRes = await api.get('/auth/profile');
-        const profile = extractData<any>(profileRes.data) || {};
-        setUserData(profile);
-        setProfileData(profile);
+        setUserData(extractData<any>(profileRes.data) || {});
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {

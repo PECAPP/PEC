@@ -30,7 +30,7 @@ import {
   resetPasswordSchema,
   changePasswordSchema,
 } from './dto/auth.schemas';
-import type {
+import {
   ChangePasswordInput,
   RefreshInput,
   RequestPasswordResetInput,

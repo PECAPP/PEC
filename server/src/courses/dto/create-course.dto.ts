@@ -1,30 +1,36 @@
-import { IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { courseSchema } from '@shared/schemas/erp';
 
 export class CreateCourseDto {
-  @IsString()
+  @ApiProperty({ example: 'CS101' })
   code: string;
 
-  @IsString()
+  @ApiProperty({ example: 'Introduction to AI' })
   name: string;
 
-  @IsInt()
-  @Min(1)
+  @ApiProperty({ example: 4, minimum: 1, maximum: 20 })
   credits: number;
 
-  @IsString()
-  instructor: string;
+  @ApiPropertyOptional({ example: 'Dr. Jane Smith' })
+  instructor?: string;
 
-  @IsString()
+  @ApiPropertyOptional({ example: 'uuid-instructor-id' })
+  instructorId?: string;
+
+  @ApiProperty({ example: 'Computer Science' })
   department: string;
 
-  @IsInt()
-  @Min(1)
+  @ApiProperty({ example: 4, minimum: 1, maximum: 8 })
   semester: number;
 
-  @IsString()
+  @ApiProperty({ enum: ['active', 'inactive', 'archived'], default: 'active' })
   status: string;
 
-  @IsOptional()
-  @IsUUID('4')
+  @ApiPropertyOptional()
   id?: string;
+
+  static validate(data: unknown) {
+    return courseSchema.parse(data);
+  }
 }
+
