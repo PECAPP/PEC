@@ -17,13 +17,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
-      - name: Install Institutional Dependencies
-        run: npm ci
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
 
-      - name: Perform Institutional Linting
+      - name: Perform Linting
         run: npm run lint
 
       - name: Build Platform Artifacts
