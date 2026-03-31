@@ -2,11 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileText, Plus, Trash2, Save, X, Star, Gauge } from 'lucide-react';
+import { FileText, Plus, Trash2, Save, X, Star, Gauge, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { usePermissions } from '@/hooks/usePermissions';
+import { toast } from 'sonner';
+import api from '@/lib/api';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 
 type ScoreEntry = {
   id: string;
@@ -38,11 +41,8 @@ export default function ScoreSheetPage() {
   const [entries, setEntries] = useState<ScoreEntry[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  const storageKey = useMemo(() => {
-    const id = (user as any)?.uid || (user as any)?.id || user?.email || 'anonymous';
-    return `scoreSheet:${id}`;
-  }, [user]);
+  const [saving, setSaving] = useState(false);
+  const [apiLoading, setApiLoading] = useState(true);
 
   useEffect(() => {
     if (loading) return;
@@ -50,22 +50,25 @@ export default function ScoreSheetPage() {
       router.replace('/dashboard');
       return;
     }
+    fetchEntries();
+  }, [loading, user, isStudent, router]);
 
-    const raw = window.localStorage.getItem(storageKey);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) setEntries(parsed);
-      } catch {
-        setEntries([]);
-      }
+  const fetchEntries = async () => {
+    try {
+      setApiLoading(true);
+      const data = await fetchAllPages<ScoreEntry>('/score-sheet');
+      setEntries(data.map((e: any) => ({
+        ...e,
+        examDate: e.examDate ? new Date(e.examDate).toISOString().split('T')[0] : '',
+        createdAt: new Date(e.createdAt).toISOString(),
+      })));
+    } catch (error) {
+      console.error('Error fetching score entries:', error);
+      toast.error('Failed to load score entries');
+    } finally {
+      setApiLoading(false);
     }
-  }, [loading, user, isStudent, router, storageKey]);
-
-  useEffect(() => {
-    if (!user || !isStudent) return;
-    window.localStorage.setItem(storageKey, JSON.stringify(entries));
-  }, [entries, user, isStudent, storageKey]);
+  };
 
   const stats = useMemo(() => {
     if (entries.length === 0) {
@@ -84,33 +87,40 @@ export default function ScoreSheetPage() {
     setEditingId(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmedName = form.courseName.trim();
     if (!trimmedName) return;
 
-    const nextEntry: ScoreEntry = {
-      id: editingId ?? crypto.randomUUID(),
-      courseName: trimmedName,
-      courseCode: form.courseCode.trim(),
-      term: form.term.trim(),
-      maxMarks: Number(form.maxMarks) || 0,
-      score: Number(form.score) || 0,
-      grade: form.grade.trim(),
-      examDate: form.examDate,
-      notes: form.notes.trim(),
-      createdAt: editingId
-        ? entries.find((item) => item.id === editingId)?.createdAt ?? new Date().toISOString()
-        : new Date().toISOString(),
-    };
+    setSaving(true);
+    try {
+      const payload = {
+        studentId: user?.uid,
+        courseName: trimmedName,
+        courseCode: form.courseCode.trim(),
+        term: form.term.trim(),
+        maxMarks: Number(form.maxMarks) || 100,
+        score: Number(form.score) || 0,
+        grade: form.grade.trim() || null,
+        examDate: form.examDate || null,
+        notes: form.notes.trim() || null,
+      };
 
-    setEntries((prev) => {
       if (editingId) {
-        return prev.map((item) => (item.id === editingId ? nextEntry : item));
+        await api.patch(`/score-sheet/${editingId}`, payload);
+        toast.success('Entry updated');
+      } else {
+        await api.post('/score-sheet', payload);
+        toast.success('Entry added');
       }
-      return [nextEntry, ...prev];
-    });
 
-    resetForm();
+      resetForm();
+      fetchEntries();
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error('Failed to save entry');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleEdit = (entry: ScoreEntry) => {
@@ -127,10 +137,26 @@ export default function ScoreSheetPage() {
     });
   };
 
-  const handleDelete = (id: string) => {
-    setEntries((prev) => prev.filter((item) => item.id !== id));
-    if (editingId === id) resetForm();
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this entry?')) return;
+    try {
+      await api.delete(`/score-sheet/${id}`);
+      toast.success('Entry deleted');
+      if (editingId === id) resetForm();
+      fetchEntries();
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Failed to delete entry');
+    }
   };
+
+  if (apiLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -142,7 +168,7 @@ export default function ScoreSheetPage() {
         </div>
         <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground">
           <FileText className="h-4 w-4 text-primary" />
-          Local-only. Saved in this browser.
+          Cloud-synced. Persisted to database.
         </div>
       </div>
 
@@ -231,9 +257,9 @@ export default function ScoreSheetPage() {
         />
 
         <div className="flex justify-end">
-          <Button onClick={handleSave} className="gap-2">
-            {editingId ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-            {editingId ? 'Update Entry' : 'Add Entry'}
+          <Button onClick={handleSave} disabled={saving} className="gap-2">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : editingId ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Add Entry'}
           </Button>
         </div>
       </div>
@@ -301,4 +327,3 @@ export default function ScoreSheetPage() {
     </div>
   );
 }
-

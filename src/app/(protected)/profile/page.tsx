@@ -65,8 +65,12 @@ export default function StudentProfile() {
     const fetchAllData = async () => {
       setLoading(true);
       try {
-        const profileRes = await api.get('/auth/profile');
+        const [profileRes, socialRes] = await Promise.all([
+          api.get('/auth/profile'),
+          api.get('/social-sync'),
+        ]);
         const profile = extractData<any>(profileRes.data) || {};
+        const socialData = socialRes.data || {};
         if (!active) return;
 
         const normalizedProfile = {
@@ -74,8 +78,8 @@ export default function StudentProfile() {
           fullName: profile.fullName || profile.name || user?.name || 'User',
           role: profile.role || user?.role || 'user',
           socials: {
-            github: profile.githubUsername || profile.socials?.github || null,
-            linkedin: profile.linkedinUsername || profile.socials?.linkedin || null,
+            github: profile.githubUsername || socialData.github?.username || profile.socials?.github || null,
+            linkedin: profile.linkedinUsername || socialData.linkedin?.username || profile.socials?.linkedin || null,
           },
           skills: Array.isArray(profile.skills) ? profile.skills : [],
           projects: Array.isArray(profile.projects) ? profile.projects : [],
@@ -92,39 +96,17 @@ export default function StudentProfile() {
           linkedinUsername: normalizedProfile.socials?.linkedin || '',
         });
 
-        const githubUsername = normalizedProfile.socials.github;
-        if (githubUsername) {
-          try {
-            setGithubLookupError(null);
-            const resp = await fetch(`https://api.github.com/users/${githubUsername.replace('@', '')}`);
-            if (resp.status === 404) {
-              if (active) {
-                setGithubStats(null);
-                setGithubLookupError('Username not found on GitHub.');
-              }
-              return;
-            }
-            if (!resp.ok) {
-              if (active) {
-                setGithubStats(null);
-                setGithubLookupError('GitHub lookup unavailable right now.');
-              }
-              return;
-            }
-            const data = await resp.json();
-            if (!active) return;
-            setGithubStats({
-              repos: data.public_repos,
-              followers: data.followers,
-              avatar: data.avatar_url,
-            });
-          } catch {
-            if (active) {
-              setGithubStats(null);
-              setGithubLookupError('GitHub lookup failed.');
-            }
-            // ignore github failures without blocking profile
-          }
+        const githubData = socialData.github;
+        if (githubData?.available && githubData?.data) {
+          setGithubStats({
+            repos: githubData.data.public_repos,
+            followers: githubData.data.followers,
+            avatar: githubData.data.avatar_url,
+          });
+          setGithubLookupError(null);
+        } else if (githubData?.available) {
+          setGithubStats(null);
+          setGithubLookupError('GitHub data unavailable right now.');
         } else {
           setGithubStats(null);
           setGithubLookupError(null);
@@ -164,33 +146,47 @@ export default function StudentProfile() {
   const handleSaveProfile = async () => {
     try {
       setSaving(true);
-      await api.post('/auth/complete-profile', {
-        fullName: editForm.fullName?.trim(),
-        phone: editForm.phone?.trim() || null,
-        address: editForm.address?.trim() || null,
-        bio: editForm.bio?.trim() || null,
-        githubUsername: editForm.githubUsername?.trim() || null,
-        linkedinUsername: editForm.linkedinUsername?.trim() || null,
-        role: profileData?.role || user?.role,
-      });
+      await Promise.all([
+        api.post('/auth/complete-profile', {
+          fullName: editForm.fullName?.trim(),
+          phone: editForm.phone?.trim() || null,
+          address: editForm.address?.trim() || null,
+          bio: editForm.bio?.trim() || null,
+          role: profileData?.role || user?.role,
+        }),
+        api.patch('/social-sync', {
+          githubUsername: editForm.githubUsername?.trim() || null,
+          linkedinUsername: editForm.linkedinUsername?.trim() || null,
+        }),
+      ]);
       toast.success('Profile updated');
       setEditOpen(false);
-      // Refresh profile data
-      const profileRes = await api.get('/auth/profile');
+      const [profileRes, socialRes] = await Promise.all([
+        api.get('/auth/profile'),
+        api.get('/social-sync'),
+      ]);
       const profile = extractData<any>(profileRes.data) || {};
+      const socialData = socialRes.data || {};
       setProfileData((prev: any) => ({
         ...prev,
         ...profile,
         fullName: profile.fullName || profile.name || user?.name || 'User',
         role: profile.role || user?.role || 'user',
         socials: {
-          github: profile.githubUsername || profile.socials?.github || null,
-          linkedin: profile.linkedinUsername || profile.socials?.linkedin || null,
+          github: profile.githubUsername || socialData.github?.username || profile.socials?.github || null,
+          linkedin: profile.linkedinUsername || socialData.linkedin?.username || profile.socials?.linkedin || null,
         },
         skills: Array.isArray(profile.skills) ? profile.skills : [],
         projects: Array.isArray(profile.projects) ? profile.projects : [],
         stats: profile.stats || null,
       }));
+      if (socialData.github?.available && socialData.github?.data) {
+        setGithubStats({
+          repos: socialData.github.data.public_repos,
+          followers: socialData.github.data.followers,
+          avatar: socialData.github.data.avatar_url,
+        });
+      }
     } catch (error) {
       toast.error('Failed to update profile');
     } finally {
