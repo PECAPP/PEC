@@ -16,6 +16,8 @@ import { AttendanceService } from './attendance.service';
 import { AttendanceQueryDto } from './dto/attendance-query.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { attendanceSchema } from '@shared/schemas/erp';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -57,7 +59,10 @@ export class AttendanceController {
 
   @Roles('faculty', 'college_admin', 'admin')
   @Post()
-  async create(@Body() createAttendanceDto: CreateAttendanceDto) {
+  async create(
+    @Body(new ZodValidationPipe(attendanceSchema))
+    createAttendanceDto: CreateAttendanceDto,
+  ) {
     const data = await this.attendanceService.create(createAttendanceDto);
     return ok(data);
   }
@@ -89,7 +94,8 @@ export class AttendanceController {
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Body() updateAttendanceDto: UpdateAttendanceDto,
+    @Body(new ZodValidationPipe(attendanceSchema.partial()))
+    updateAttendanceDto: UpdateAttendanceDto,
   ) {
     const data = await this.attendanceService.update(id, updateAttendanceDto);
     return ok(data);

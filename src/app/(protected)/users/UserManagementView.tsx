@@ -5,10 +5,7 @@ import {
   Users as UsersIcon,
   Search,
   UserPlus,
-  Shield,
-  Upload,
   Download,
-  Key,
   Edit,
   Trash2
 } from 'lucide-react';
@@ -22,13 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { EmptyState } from '@/components/common/AsyncState';
 import { VirtualList } from '@/components/ui/virtual-list';
 import { toast } from 'sonner';

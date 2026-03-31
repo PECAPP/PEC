@@ -9,14 +9,16 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { DepartmentQueryDto } from './dto/department-query.dto';
+import { DepartmentsService } from './departments.service';
+import { CreateDepartmentDto } from './dto/create-department.dto';
+import { UpdateDepartmentDto } from './dto/update-department.dto';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { departmentSchema } from '@shared/schemas/erp';
+import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { ok } from '../common/utils/api-response';
-import { DepartmentsService } from './departments.service';
-import { DepartmentQueryDto } from './dto/department-query.dto';
-import { CreateDepartmentDto } from './dto/create-department.dto';
-import { UpdateDepartmentDto } from './dto/update-department.dto';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('departments')
@@ -43,14 +45,21 @@ export class DepartmentsController {
 
   @Roles('faculty', 'college_admin', 'admin', 'moderator')
   @Post()
-  async create(@Body() body: CreateDepartmentDto) {
+  async create(
+    @Body(new ZodValidationPipe(departmentSchema))
+    body: CreateDepartmentDto,
+  ) {
     const data = await this.departmentsService.create(body);
     return ok(data);
   }
 
   @Roles('faculty', 'college_admin', 'admin', 'moderator')
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() body: UpdateDepartmentDto) {
+  async update(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(departmentSchema.partial()))
+    body: UpdateDepartmentDto,
+  ) {
     const data = await this.departmentsService.update(id, body);
     return ok(data);
   }

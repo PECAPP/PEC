@@ -17,6 +17,8 @@ import { EnrollmentsService } from './enrollments.service';
 import { EnrollmentQueryDto } from './dto/enrollment-query.dto';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
 import { UpdateEnrollmentDto } from './dto/update-enrollment.dto';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { enrollmentSchema } from '@shared/schemas/erp';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -53,7 +55,11 @@ export class EnrollmentsController {
 
   @Roles('student', 'faculty', 'college_admin', 'admin')
   @Post()
-  async create(@Request() req: AuthenticatedRequest, @Body() body: CreateEnrollmentDto) {
+  async create(
+    @Request() req: AuthenticatedRequest,
+    @Body(new ZodValidationPipe(enrollmentSchema))
+    body: CreateEnrollmentDto,
+  ) {
     const payload = { ...body };
     if (req.user?.role === 'student') {
       payload.studentId = req.user.sub;
@@ -69,7 +75,8 @@ export class EnrollmentsController {
   async update(
     @Request() req: AuthenticatedRequest,
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Body() body: UpdateEnrollmentDto,
+    @Body(new ZodValidationPipe(enrollmentSchema.partial()))
+    body: UpdateEnrollmentDto,
   ) {
     if (req.user?.role === 'student') {
       const existing = await this.enrollmentsService.findById(id);

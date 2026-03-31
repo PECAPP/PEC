@@ -12,11 +12,13 @@ import {
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { ok } from '../common/utils/api-response';
 import { HostelIssuesService } from './hostel-issues.service';
 import { HostelIssueQueryDto } from './dto/hostel-issue-query.dto';
 import { CreateHostelIssueDto } from './dto/create-hostel-issue.dto';
 import { UpdateHostelIssueDto } from './dto/update-hostel-issue.dto';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { hostelIssueSchema } from '@shared/schemas/erp';
+import { ok } from '../common/utils/api-response';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('hostelIssues')
@@ -43,14 +45,21 @@ export class HostelIssuesController {
 
   @Roles('student', 'faculty', 'admin')
   @Post()
-  async create(@Body() body: CreateHostelIssueDto) {
+  async create(
+    @Body(new ZodValidationPipe(hostelIssueSchema))
+    body: CreateHostelIssueDto,
+  ) {
     const data = await this.service.create(body);
     return ok(data);
   }
 
   @Roles('student', 'faculty', 'admin')
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() body: UpdateHostelIssueDto) {
+  async update(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(hostelIssueSchema.partial()))
+    body: UpdateHostelIssueDto,
+  ) {
     const data = await this.service.update(id, body);
     return ok(data);
   }

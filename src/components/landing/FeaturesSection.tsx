@@ -1,12 +1,12 @@
 'use client';
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from 'next/navigation';
 import { CheckCircle } from "lucide-react";
 import { features, rolesData } from "@/data/landingData";
 
 export function FeaturesSection() {
-  const router = useRouter();
+  const [activeFeature, setActiveFeature] = useState(features[0]);
 
   return (
     <>

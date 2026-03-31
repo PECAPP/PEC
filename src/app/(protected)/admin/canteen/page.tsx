@@ -3,21 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Menu, 
   ShoppingBag, 
   Trash2, 
   Edit2, 
   Plus, 
-  CheckCircle2, 
-  XCircle, 
   Clock, 
+  XCircle, 
   Loader2,
   Package,
   IndianRupee,
   Search,
-  Filter,
-  Check,
-  Ban,
   Truck,
   MapPin,
 } from 'lucide-react';

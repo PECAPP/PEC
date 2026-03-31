@@ -3,28 +3,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Calendar as CalendarIcon,
   TrendingUp,
-  AlertTriangle,
   CheckCircle,
   XCircle,
-  Calendar,
-  ChevronRight,
-  Filter,
-  Download,
-  Search,
-  MoreVertical,
   Clock,
-  Briefcase,
   BookOpen,
   Loader2,
-  Users,
-  Save,
   Upload,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -37,9 +25,6 @@ import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';

@@ -8,7 +8,6 @@ import type {
   StudentProfile, 
   Course, 
 } from '@/types';
-import { extractData } from '@/lib/utils';
 
 interface StudentStats {
   attendancePercentage: number;

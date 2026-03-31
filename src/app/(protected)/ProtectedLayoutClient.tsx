@@ -14,7 +14,6 @@ interface ProtectedLayoutClientProps {
 }
 
 export function ProtectedLayoutClient({ children, user }: ProtectedLayoutClientProps) {
-  const pathname = usePathname();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

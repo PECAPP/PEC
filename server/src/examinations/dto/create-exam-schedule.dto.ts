@@ -1,21 +1,27 @@
-import { IsDateString, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { examinationSchema } from '@shared/schemas/erp';
 
 export class CreateExamScheduleDto {
-  @IsString()
+  @ApiProperty({ example: 'uuid-course-id' })
   courseId: string;
 
-  @IsString()
+  @ApiProperty({ enum: ['midterm', 'final', 'quiz', 'lab'], default: 'final' })
   examType: string;
 
-  @IsDateString()
+  @ApiProperty({ example: '2024-05-15' })
   date: string;
 
-  @IsString()
+  @ApiProperty({ example: '09:00' })
   startTime: string;
 
-  @IsString()
+  @ApiProperty({ example: '12:00' })
   endTime: string;
 
-  @IsString()
+  @ApiProperty({ example: 'Auditorium 1' })
   room: string;
+
+  static validate(data: unknown) {
+    return examinationSchema.parse(data);
+  }
 }
+

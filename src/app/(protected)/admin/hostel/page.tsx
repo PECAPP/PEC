@@ -5,17 +5,14 @@ import { motion } from 'framer-motion';
 import { 
   AlertCircle, 
   CheckCircle2, 
-  Clock, 
   MessageSquare, 
   Search, 
-  Filter,
   Send,
   User,
   MapPin,
   RefreshCcw,
   ShieldCheck,
   Building2,
-  Settings2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -1,41 +1,45 @@
-import { IsOptional, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { hostelIssueSchema } from '@shared/schemas/erp';
 
 export class CreateHostelIssueDto {
-  @IsString()
+  @ApiProperty({ example: 'Broken Fan' })
   title: string;
 
-  @IsString()
+  @ApiProperty({ example: 'The fan in room 204 is making clicking noise' })
   description: string;
 
-  @IsString()
+  @ApiProperty({ example: 'Electrical' })
   category: string;
 
-  @IsString()
+  @ApiProperty({ enum: ['low', 'medium', 'high', 'emergency'], default: 'medium' })
   priority: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ enum: ['pending', 'assigned', 'resolved', 'closed'], default: 'pending' })
   status?: string;
 
-  @IsString()
+  @ApiProperty({ example: 'Room 204' })
   roomNumber: string;
 
-  @IsString()
+  @ApiProperty({ example: 'uuid-student-id' })
   studentId: string;
 
-  @IsString()
+  @ApiProperty({ example: 'John Doe' })
   studentName: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional()
   organizationId?: string;
 
-  @IsOptional()
+  @ApiPropertyOptional()
   responses?: unknown;
 
-  @IsOptional()
+  @ApiPropertyOptional()
   createdAt?: string;
 
-  @IsOptional()
+  @ApiPropertyOptional()
   updatedAt?: string;
+
+  static validate(data: unknown) {
+    return hostelIssueSchema.parse(data);
+  }
 }
+

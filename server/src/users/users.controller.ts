@@ -17,6 +17,9 @@ import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserQueryDto } from './dto/user-query.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { userSchema } from '@shared/schemas/erp';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('users')
@@ -26,21 +29,8 @@ export class UsersController {
   @Roles('college_admin', 'admin', 'moderator', 'faculty')
   @Post()
   async create(
-    @Body()
-    body: {
-      fullName: string;
-      email: string;
-      role: string;
-      status?: string;
-      department?: string;
-      enrollmentNumber?: string;
-      semester?: number;
-      dateOfBirth?: string;
-      employeeId?: string;
-      designation?: string;
-      specialization?: string;
-      phone?: string;
-    },
+    @Body(new ZodValidationPipe(userSchema))
+    body: CreateUserDto,
   ) {
     const data = await this.usersService.createAdminUser(body);
     return { success: true, data };
@@ -119,21 +109,8 @@ export class UsersController {
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Body()
-    body: {
-      fullName?: string;
-      email?: string;
-      role?: string;
-      status?: string;
-      department?: string;
-      enrollmentNumber?: string;
-      semester?: number;
-      dateOfBirth?: string;
-      employeeId?: string;
-      designation?: string;
-      specialization?: string;
-      phone?: string;
-    },
+    @Body(new ZodValidationPipe(userSchema.partial()))
+    body: Partial<CreateUserDto>,
   ) {
     const data = await this.usersService.updateAdminUser(id, body);
     return { success: true, data };

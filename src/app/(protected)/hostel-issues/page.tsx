@@ -231,23 +231,6 @@ export default function HostelIssuesPage() {
     }
   };
 
-  const handleStatusUpdate = async (newStatus: string) => {
-    if (!selectedIssue) return;
-
-    try {
-      const response = await api.patch(`/hostelIssues/${selectedIssue.id}`, { status: newStatus });
-
-      if (response.data?.data) {
-        setSelectedIssue(response.data.data);
-        toast.success(`Status updated to ${newStatus}`);
-        await fetchIssues();
-      }
-    } catch (error: any) {
-      console.error('Error updating status:', error);
-      toast.error(error.response?.data?.message || 'Failed to update status');
-    }
-  };
-
   const filteredIssues = issues.filter(issue => {
     if (activeTab === 'all') return true;
     return issue.status === activeTab;

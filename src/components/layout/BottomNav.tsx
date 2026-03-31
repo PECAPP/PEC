@@ -5,7 +5,6 @@ import { usePathname, useParams } from "next/navigation";
 import {
   LayoutDashboard,
   MessageCircle,
-  UtensilsCrossed,
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";

@@ -8,8 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   configureApp(app);
 
-  // Keep API docs disabled in development until zod-nestjs types are fixed
-  /*
+  // Enable API docs in development
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('PEC APP API')
@@ -21,7 +20,6 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
   }
-  */
 
   await app.listen(process.env.PORT ?? 4000);
 }

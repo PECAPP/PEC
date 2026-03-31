@@ -77,13 +77,63 @@ export const changePasswordSchema = z.object({
     ),
 });
 
-export type SignInInput = z.infer<typeof signInSchema>;
-export type SignUpInput = z.infer<typeof signUpSchema>;
-export type SetRoleInput = z.infer<typeof setRoleSchema>;
-export type RefreshInput = z.infer<typeof refreshSchema>;
-export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
-export type RequestPasswordResetInput = z.infer<
-  typeof requestPasswordResetSchema
->;
-export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
-export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+import { ApiProperty } from '@nestjs/swagger';
+
+export class SignInInput {
+  @ApiProperty({ description: 'The registered email address', format: 'email', example: 'student@pec.edu' })
+  email: string;
+
+  @ApiProperty({ description: 'The password associated with the account', minLength: 8, example: 'P@ssw0rd123' })
+  password: string;
+}
+
+export class SignUpInput {
+  @ApiProperty({ description: 'The registered email address', format: 'email' })
+  email: string;
+
+  @ApiProperty({ description: 'A strong password', minLength: 8 })
+  password: string;
+
+  @ApiProperty({ description: 'Full Display Name', example: 'John Doe' })
+  name: string;
+
+  @ApiProperty({ description: 'User role', enum: appRoles, default: 'student', required: false })
+  role?: (typeof appRoles)[number];
+}
+
+export class SetRoleInput {
+  @ApiProperty({ description: 'Role to assign', enum: appRoles })
+  role: (typeof appRoles)[number];
+}
+
+export class RefreshInput {
+  @ApiProperty({ description: 'Refresh token string', required: false })
+  refreshToken?: string;
+}
+
+export class VerifyEmailInput {
+  @ApiProperty({ description: 'Email verification token' })
+  token: string;
+}
+
+export class RequestPasswordResetInput {
+  @ApiProperty({ description: 'Email address to send reset link' })
+  email: string;
+}
+
+export class ResetPasswordInput {
+  @ApiProperty({ description: 'Password reset token' })
+  token: string;
+
+  @ApiProperty({ description: 'New password', minLength: 8 })
+  password: string;
+}
+
+export class ChangePasswordInput {
+  @ApiProperty({ description: 'Current valid password' })
+  currentPassword: string;
+
+  @ApiProperty({ description: 'New strong password', minLength: 8 })
+  newPassword: string;
+}
+
