@@ -1,0 +1,38 @@
+version: 2
+updates:
+  # 1. Main Frontend / Root Manifest
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    # Group related ecosystem updates into a single PR
+    groups:
+      nextjs-core:
+        patterns: ["next"]
+      formatting:
+        patterns: ["prettier", "eslint*"]
+
+  # 2. NestJS Backend Manifest
+  - package-ecosystem: "npm"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      nestjs-ecosystem:
+        patterns: ["@nestjs/*"]
+      database-orm:
+        patterns: ["@prisma/*", "prisma"]
+
+  # 3. Docker Updates (Root)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # 4. Docker Updates (Server Sub-directory)
+  - package-ecosystem: "docker"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
