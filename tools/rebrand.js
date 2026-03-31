@@ -32,12 +32,12 @@ files.forEach(file => {
         let content = fs.readFileSync(file, 'utf8');
         let changed = false;
 
-        if (content.includes('pec')) {
-            content = content.replace(/pec/g, 'pec');
+        if (content.includes('omnifow')) {
+            content = content.replace(/omnifow/g, 'pec');
             changed = true;
         }
-        if (content.includes('PEC')) {
-            content = content.replace(/PEC/g, 'PEC');
+        if (content.includes('OmniFlow')) {
+            content = content.replace(/OmniFlow/g, 'PEC');
             changed = true;
         }
 

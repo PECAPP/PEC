@@ -63,7 +63,11 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       const normalizedEnrolled: Course[] = summaryCourses.map((course: any, index: number) => {
         const idToMatch = String(course.courseId || course.id || '');
         const matchById = fallbackCourses.find((c) => String(c.id) === idToMatch);
-        const matchByCode = fallbackCourses.find((c) => c.code === course.courseCode || c.code === course.courseCode);
+        const matchByCode = fallbackCourses.find(
+          (c) => c.code === course.courseCode || c.code === course.code
+        );
+          (c) => c.code === course.courseCode || c.code === course.code
+        );
         const matched = matchById ?? matchByCode;
 
         const resolvedId = idToMatch || matched?.id || `course-${index}`;

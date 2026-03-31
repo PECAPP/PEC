@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 import { DepartmentsView } from '@/modules/departments/views/DepartmentsView';
 
 export const metadata = {
-  title: 'Departments | OmniFlow ERP',
-  description: 'Manage academic departments and faculty heads.',
+  title: 'Departments | PEC APP ERP',
+  description: 'Manage institutional academic departments and departmental leadership.',
 };
 
 export default async function DepartmentsPage() {

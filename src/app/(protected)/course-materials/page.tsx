@@ -50,7 +50,7 @@ interface CourseMaterial {
 
 const formatUploadedDate = (uploadedAt: unknown) => {
   if (!uploadedAt) return 'N/A';
-  if (typeof uploadedAt === 'object' && uploadedAt !== null && 'toDate' in uploadedAt) {
+  if (typeof uploadedAt === 'object' && uploadedAt && 'toDate' in uploadedAt) {
     const timestampObj = uploadedAt as { toDate?: () => Date };
     const converted = timestampObj.toDate?.();
     return converted ? converted.toLocaleDateString() : 'N/A';

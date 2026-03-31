@@ -6,8 +6,8 @@ import { FacultyDataSlot } from './slots/FacultyDataSlot';
 import { AdminDataSlot } from './slots/AdminDataSlot';
 
 export const metadata = {
-  title: 'Dashboard | OmniFlow ERP',
-  description: 'Your personalized campus command center.',
+  title: 'Dashboard | PEC APP ERP',
+  description: 'Your personalized institutional command center.',
 };
 
 // ─── Skeleton Fallbacks ────────────────────────────────────────────────────────

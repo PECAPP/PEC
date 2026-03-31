@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 /**
- * Professional Content-Shaped Skeletons for OmniFlow
+ * Professional Content-Shaped Skeletons for PEC APP
  * Eliminates Layout Shift (CLS) by mirroring actual component geometry.
  */
 

@@ -24,6 +24,6 @@ export default async function AuthPage() {
 
 // Metadata for SEO and appearance
 export const metadata = {
-  title: 'Authentication | Punjab Engineering College',
-  description: 'Sign in to your PEC account to access the OmniFlow campus governance platform.',
+  title: 'Identity Verification | Punjab Engineering College',
+  description: 'Secure institutional sign-in for the PEC APP ERP and academic orchestration platform.',
 };

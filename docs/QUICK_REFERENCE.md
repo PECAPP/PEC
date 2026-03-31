@@ -1,15 +1,15 @@
 # Quick Reference Guide
 
-Quick reference for common tasks and patterns in the PEC Campus ERP application.
+Quick reference for common tasks and patterns in the PEC APP Campus ERP application.
 
 ## Development Commands
 
-### Frontend (Next.js 15)
+### Frontend (Next.js 16)
 
 ```bash
-npm run dev          # Start development server
+npm run dev          # Start development server with Turbopack
 npm run build        # Production build
-npm run lint         # Run ESLint
+npm run lint         # Run ESLint for code quality
 npm run lint:fix     # Auto-fix linting issues
 ```
 
@@ -17,19 +17,19 @@ npm run lint:fix     # Auto-fix linting issues
 
 ```bash
 cd server
-npm run start:dev    # Start with hot reload
+npm run start:dev    # Start NestJS with hot reload
 npm run build        # Production build
 npm run prisma:generate  # Generate Prisma client
-npm run prisma:migrate   # Run migrations
-npm run seed         # Seed database
+npm run prisma:migrate   # Run database migrations
+npm run seed         # Seed database with initial data
 ```
 
-### Docker
+### Docker Integration
 
 ```bash
-npm run dev:docker:backend   # Start backend in Docker
-npm run dev:docker:frontend # Start frontend in Docker
-npm run prod:docker         # Production deployment
+npm run dev:docker:backend   # Start Postgres + Backend in Docker
+npm run dev:docker:frontend  # Start Frontend in Docker
+npm run prod:docker         # Full production deployment
 ```
 
 ## Common Patterns
@@ -42,50 +42,53 @@ npm run prod:docker         # Production deployment
 import { redirect } from 'next/navigation';
 
 export default async function ExamplePage() {
-  // Server component - can fetch data here
+  // Server component - perform direct data fetching or auth checks here
   return (
-    <div>
-      <h1>Example Page</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold">Example Page</h1>
     </div>
   );
 }
 ```
 
-2. Add navigation link to sidebar (if needed)
+2. The page will automatically be wrapped by the protected layout with navigation guards.
 
-### Client Component
+### Client Component Best Practices
 
 ```typescript
 // components/ExampleClient.tsx
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 export function ExampleClient() {
   const [count, setCount] = useState(0);
   
   return (
-    <button onClick={() => setCount(count + 1)}>
-      Count: {count}
-    </button>
+    <Button variant="outline" onClick={() => setCount(count + 1)}>
+      Interactions: {count}
+    </Button>
   );
 }
 ```
 
-### Data Fetching
+### Data Fetching Strategies
 
 ```typescript
-// Server-side
-async function getData() {
-  const res = await fetch('http://localhost:3001/courses');
-  if (!res.ok) throw new Error('Failed to fetch');
+// Server-side (Standard Fetch)
+async function getAcademicData() {
+  const res = await fetch('http://localhost:4000/courses', {
+    next: { revalidate: 3600 } // Cache for 1 hour
+  });
+  if (!res.ok) throw new Error('Query failure');
   return res.json();
 }
 
-// Client-side with TanStack Query
+// Client-side (TanStack Query)
 import { useQuery } from '@tanstack/react-query';
 
-function useCourses() {
+function useAcademicCourses() {
   return useQuery({
     queryKey: ['courses'],
     queryFn: async () => {
@@ -96,204 +99,178 @@ function useCourses() {
 }
 ```
 
-### Using Forms
+### Form Handling with Zod
 
 ```typescript
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-const schema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
+const formSchema = z.object({
+  name: z.string().min(2, "Name too short"),
+  email: z.string().email("Invalid institutional email"),
 });
 
-export function MyForm() {
+export function StudentForm() {
   const form = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(formSchema),
   });
 
   return (
-    <form onSubmit={form.handleSubmit((data) => console.log(data))}>
-      <input {...form.register('name')} />
-      <input {...form.register('email')} />
-      <button type="submit">Submit</button>
+    <form className="space-y-4" onSubmit={form.handleSubmit((data) => console.log(data))}>
+      <input {...form.register('name')} className="border p-2 rounded" />
+      <input {...form.register('email')} className="border p-2 rounded" />
+      <button type="submit">Submit Record</button>
     </form>
   );
 }
 ```
 
-### Protected Routes
-
-Routes in `app/(protected)/` are automatically protected by the layout. To add protection manually:
-
-```typescript
-import { useAuth } from '@/hooks/useAuth';
-
-export default function ProtectedPage() {
-  const { user, loading } = useAuth();
-  
-  if (loading) return <LoadingSpinner />;
-  if (!user) return redirect('/auth');
-  
-  return <Dashboard />;
-}
-```
-
-### Using UI Components
+### UI Components (shadcn/ui)
 
 ```typescript
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
-export function MyComponent() {
+export function UIExample() {
   return (
-    <Card>
-      <CardHeader>Title</CardHeader>
-      <CardContent>
-        <Input placeholder="Enter text" />
-        <Button>Submit</Button>
+    <Card className="shadow-lg">
+      <CardHeader>System Interface</CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <Input placeholder="Search records..." />
+        <Button variant="default">Execute Action</Button>
       </CardContent>
     </Card>
   );
 }
 ```
 
-## File Locations
+## Project Directory Map
 
-| What | Where |
-|------|-------|
-| Pages | `app/(protected)/[feature]/page.tsx` |
-| Components | `src/components/` |
-| Hooks | `src/hooks/` |
-| Types | `src/types/` |
-| Utils | `src/lib/` |
-| API Routes | `app/api/` |
-| Backend Routes | `server/src/[module]/` |
-| Database Schema | `server/prisma/schema.prisma` |
+| Resource | Primary Location |
+|------|-----------|
+| Protected Routes | `app/(protected)/[feature]/page.tsx` |
+| UI Components | `src/components/ui/` |
+| Business Hooks | `src/hooks/` |
+| Shared Types | `src/types/` |
+| API Utilities | `src/lib/` |
+| Rewrite Proxy | `app/api/` |
+| Backend Modules | `server/src/[module]/` |
+| Data Schema | `server/prisma/schema.prisma` |
 
-## Key Routes
+## Key Navigation Routes
 
 | Route | Purpose |
 |-------|---------|
-| `/` | Landing page |
-| `/auth` | Login/Register |
-| `/dashboard` | Main dashboard |
-| `/courses` | Course catalog |
-| `/attendance` | Attendance tracking |
-| `/timetable` | Schedule management |
-| `/examinations` | Exam management |
-| `/chat` | Messaging system |
-| `/canteen` | Night canteen |
-| `/hostel-issues` | Hostel issues |
-| `/resume-builder` | Resume builder |
-| `/profile` | User profile |
-| `/settings` | User settings |
-| `/admin/*` | Admin settings |
+| `/` | Institutional Landing Page |
+| `/auth` | Authentication Entry |
+| `/dashboard` | Role-Aware Command Center |
+| `/courses` | Academic Course Management |
+| `/attendance` | Real-Time Attendance Engine |
+| `/timetable` | Academic Scheduling |
+| `/chat` | Secure Messaging Interface |
+| `/canteen` | Night Canteen Ordering |
+| `/resume-builder` | AI Career Suite |
+| `/profile` | User Identity Management |
+| `/admin/*` | System Administration |
 
-## Environment Variables
+## Environment Configuration
 
 ### Frontend (.env.local)
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_GEMINI_API_KEY=your_key
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+BACKEND_API_URL=http://localhost:4000
+NEXT_PUBLIC_GEMINI_API_KEY=your_secure_key
 ```
 
 ### Backend (server/.env)
 
 ```env
-DATABASE_URL=postgresql://...
-JWT_SECRET=your_secret
-PORT=3001
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pec_db
+JWT_SECRET=institutional_encryption_secret
+PORT=4000
 ```
 
 ## Database Operations
 
 ```bash
-# Generate Prisma client
+# Refresh Prisma client types
 cd server && npm run prisma:generate
 
-# Create migration
-npm run prisma:migrate dev --name add_new_field
+# Synchronize schema and generate migration
+npm run prisma:migrate dev --name update_schema
 
-# Push schema changes
+# Direct schema push (development only)
 npm run prisma:push
 
-# Reset database
+# Reset database to seed state
 npm run prisma:migrate reset
 
-# Open Prisma Studio
+# Graphical database browser
 npm run prisma:studio
 ```
 
-## Troubleshooting
+## Performance and Maintenance
 
-### Clear Cache
+### Cache Management
 
 ```bash
-# Next.js cache
+# Clear Next.js build cache
 npm run clean:next
 
-# Node modules
+# Deep cleanup of dependencies
 rm -rf node_modules package-lock.json && npm install
 ```
 
-### Port Issues
+### Port Diagnostics
 
 ```bash
-# Check port usage
+# Windows: Identify process on Port 3000
 netstat -ano | findstr :3000
 
-# Kill process
+# Terminate process by PID
 taskkill /PID <PID> /F
 ```
 
-### Database Issues
-
-1. Check if PostgreSQL is running
-2. Verify DATABASE_URL in .env
-3. Run `npm run prisma:generate`
-4. Try `npm run prisma:push`
-
-## Styling with Tailwind
+## Styling and Responsiveness
 
 ```tsx
-// Using cn() utility for conditional classes
+// Conditional class management
 import { cn } from '@/lib/utils';
 
 <div className={cn(
-  "base classes",
-  isActive && "active classes",
+  "p-4 transition-colors",
+  isActive ? "bg-accent" : "bg-card",
   className
 )}>
 
-// Responsive design
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+// Responsive grid system
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 ```
 
-## Using TanStack Query
+## Data Synchronization (TanStack Query)
 
 ```typescript
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-// Query
-function useUsers() {
+// Data Fetching
+function useUserRecords() {
   return useQuery({
-    queryKey: ['users'],
+    queryKey: ['users', 'records'],
     queryFn: () => fetch('/api/users').then(res => res.json()),
   });
 }
 
-// Mutation
-function useCreateUser() {
+// Data Mutation
+function useAddUserRecord() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data) => fetch('/api/users', {
+    mutationFn: (payload) => fetch('/api/users', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -302,60 +279,26 @@ function useCreateUser() {
 }
 ```
 
-## API Request Example
+## Primary Infrastructure Dependencies
 
-```typescript
-const response = await fetch('http://localhost:3001/courses', {
-  method: 'GET',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  },
-});
-
-const data = await response.json();
-```
-
-## Key Dependencies
-
-| Package | Purpose |
+| Module | Implementation |
 |---------|---------|
-| `next` | React framework |
-| `react-hook-form` | Form handling |
-| `zod` | Schema validation |
-| `@tanstack/react-query` | Data fetching |
-| `framer-motion` | Animations |
-| `tailwindcss` | Styling |
-| `@radix-ui/*` | UI primitives |
-| `lucide-react` | Icons |
+| `next` | Next.js 16 Core |
+| `react-hook-form` | Enterprise Form Engine |
+| `zod` | Runtime Type Validation |
+| `@tanstack/react-query` | Server-State Management |
+| `framer-motion` | Motion Design System |
+| `tailwindcss` | Design Tokens and Layout |
+| `lucide-react` | Institutional Iconography |
 
-## Documentation Links
+## Internal Links
 
-- [Features](./FEATURES.md) - Complete feature documentation
-- [Architecture](./ARCHITECTURE.md) - System architecture
-- [Development](./DEVELOPMENT.md) - Setup guide
-- [README](../../README.md) - Project overview
-
-## Common Tasks
-
-### Add a New UI Component
-
-1. Create component in `src/components/ui/`
-2. Use shadcn/ui patterns
-3. Export from `components/ui`
-
-### Add a New API Endpoint
-
-1. Create controller in `server/src/[module]/[module].controller.ts`
-2. Add route in module
-3. Register in `app.module.ts`
-
-### Add a New Database Model
-
-1. Edit `server/prisma/schema.prisma`
-2. Run `npm run prisma:migrate dev`
-3. Generate types with `npm run prisma:generate`
+- [Features Deep Dive](./FEATURES.md)
+- [System Architecture](./ARCHITECTURE.md)
+- [Full Development Guide](./DEVELOPMENT.md)
+- [Root Overview](../../README.md)
 
 ---
 
-*Last Updated: March 2026*
+Last Updated: March 2026
+PEC Development Group

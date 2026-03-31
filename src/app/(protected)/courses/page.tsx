@@ -5,8 +5,8 @@ import { CourseManagement } from './components/CourseManagement';
 import { serverFetch } from '@/lib/server-data';
 
 export const metadata = {
-  title: 'Courses | OmniFlow',
-  description: 'Academic course directory and enrollment management.',
+  title: 'Academic Catalog | PEC APP',
+  description: 'Institutional course directory and enrollment management services.',
 };
 
 export default async function CoursesPage() {

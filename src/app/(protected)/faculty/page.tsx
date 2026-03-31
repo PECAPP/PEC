@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 import { FacultyView } from '@/modules/faculty/views/FacultyView';
 
 export const metadata = {
-  title: 'Faculty | OmniFlow ERP',
-  description: 'View and manage university faculty members and departments.',
+  title: 'Faculty Registry | PEC APP ERP',
+  description: 'Manage and discover institutional academic faculty and departmental leadership.',
 };
 
 export default async function FacultyPage() {

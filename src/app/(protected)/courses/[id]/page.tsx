@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageProps) {
   if (!course) return { title: 'Course Not Found' };
   
   return {
-     title: `${course.code}: ${course.name} | OmniFlow`,
+     title: `${course.code}: ${course.name} | PEC APP`,
      description: course.description,
   };
 }

@@ -12,8 +12,8 @@ async function bootstrap() {
   /*
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('OmniFlow API')
-      .setDescription('The OmniFlow API description')
+      .setTitle('PEC APP API')
+      .setDescription('The PEC APP ERP Institutional API Service')
       .setVersion('1.0')
       .addBearerAuth()
       .build();

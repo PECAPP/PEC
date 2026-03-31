@@ -67,7 +67,7 @@ export class HostelIssuesRepository {
   async update(id: string, data: UpdateHostelIssueDto) {
     const existing = await this.prisma.hostelIssue.findUnique({
       where: { id },
-    });
+    }) as any;
     const currentResponses = Array.isArray(existing?.responses)
       ? existing?.responses
       : [];
@@ -112,6 +112,7 @@ export class HostelIssuesRepository {
         ...(data.roomNumber ? { roomNumber: data.roomNumber } : {}),
         ...(data.studentId ? { studentId: data.studentId } : {}),
         ...(data.studentName ? { studentName: data.studentName } : {}),
+        ...(nextResponses !== undefined ? { responses: nextResponses } : {}),
         ...(this.toDate(data.updatedAt)
           ? { updatedAt: this.toDate(data.updatedAt) }
           : {}),

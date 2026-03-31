@@ -3,13 +3,13 @@ import { redirect } from 'next/navigation';
 import { UserManagementView } from '@/modules/users/views/UserManagementView';
 
 export const metadata = {
-  title: 'Users | OmniFlow ERP',
-  description: 'Manage all students, faculty and administrators.',
+  title: 'Identity Governance | PEC APP ERP',
+  description: 'Institutional management of students, faculty, and administrative personnel.',
 };
 
 
 async function getUsers(token: string) {
-  const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_URL = process.env.INTERNAL_API_URL || process.env.BACKEND_API_URL || "http://localhost:4000";
   // Strip trailing slash if present
   const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
   

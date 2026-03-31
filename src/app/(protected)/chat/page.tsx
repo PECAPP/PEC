@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 import { ChatView } from './ChatView';
 
 export const metadata = {
-  title: 'Messages | OmniFlow ERP',
-  description: 'Connect with faculty and peers across departments.',
+  title: 'Secure Messaging | PEC APP ERP',
+  description: 'Synchronized communication across the institutional ecosystem.',
 };
 
 export default async function ChatPage() {

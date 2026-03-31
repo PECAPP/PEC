@@ -246,8 +246,20 @@ export class AuthController {
 
   private setIdentityCookies(res: ExpressResponse, user: { uid: string, role: string }): void {
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-    res.cookie('user_id', user.uid, { path: '/', expires });
-    res.cookie('user_role', user.role, { path: '/', expires });
+    res.cookie('user_id', user.uid, { 
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/', 
+        expires 
+    });
+    res.cookie('user_role', user.role, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/', 
+        expires 
+    });
   }
 
   private setAccessTokenCookie(res: ExpressResponse, token: string): void {

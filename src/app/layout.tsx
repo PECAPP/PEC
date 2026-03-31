@@ -29,7 +29,7 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: 'PEC Campus ERP - Smart College Management System',
+  title: 'PEC App - Smart College Management System',
   description: 'Modern, intuitive campus management system for educational institutions',
   icons: {
     icon: '/logo.png',

@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Profile | OmniFlow ERP',
-  description: 'Manage your personal and academic profile.',
+  title: 'User Profile | PEC APP ERP',
+  description: 'Manage institutional identity and academic profile data.',
 };
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {

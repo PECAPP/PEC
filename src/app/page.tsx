@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import { LandingClient } from './LandingClient';
 
 export const metadata: Metadata = {
-  title: 'OmniFlow | Modern Campus ERP',
-  description: 'The all-in-one platform for modern education. Experience seamless campus management, real-time messaging, and student tracking.',
+  title: 'PEC APP | Institutional ERP Platform',
+  description: 'The definitive institutional ERP platform for modern higher education. Experience seamless campus management, secure institutional messaging, and advanced student life-cycle tracking.',
   openGraph: {
-    title: 'OmniFlow | Experience the Future of Campus Management',
-    description: 'The ultimate tool for colleges and universities.',
+    title: 'PEC APP | Institutional ERP and Academic Intelligence',
+    description: 'The ultimate orchestration platform for colleges and universities.',
     images: [{ url: '/og-image.jpg' }],
   },
 };

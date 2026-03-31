@@ -1,105 +1,91 @@
-# Documentation Index
+# PEC APP - Institutional Documentation Index
 
-Welcome to the PEC Campus ERP documentation. This folder contains comprehensive guides and references for developers and administrators.
+Comprehensive technical documentation and operational guides for the PEC APP ERP platform.
 
-## Core Documentation
+## Core Developmental Documentation
 
-### [Architecture](./ARCHITECTURE.md)
-Technical architecture of the PEC platform including:
-- Frontend architecture (Next.js 15 App Router)
-- Backend architecture (NestJS + Prisma)
-- Data flow and state management
-- Security and authentication
-- Performance optimizations
+### [System Architecture](./ARCHITECTURE.md)
+Detailed technical blueprint of the PEC platform including:
+- Frontend Architecture (Next.js 16.2.1 with Turbopack)
+- Backend Orchestration (NestJS 11.x + Prisma 6.x)
+- High-Concurrency Data Flow and State Management
+- Institutional Security and Role-Based Access Control
+- Sub-second Performance Optimization Strategies
 
-### [Development Guide](./DEVELOPMENT.md)
-Complete setup and development instructions:
-- Prerequisites and installation
-- Environment configuration
-- Database setup
-- Development commands
-- Deployment instructions
-- Troubleshooting guide
+### [Institutional Setup](./SETUP.md)
+Complete installation and operational reference for PEC APP:
+- System Requirements and Institutional Prerequisites
+- Integrated Installation Lifecycle (npm / Bun)
+- Secure Environment Configuration (.env.local / server/.env)
+- Database Engineering and High-Fidelity Seeding
+- Operational Execution (Ports 3000/4000)
 
-### [Features](./FEATURES.md)
-Comprehensive feature documentation:
-- Academic Management (Courses, Timetable, Attendance, Examinations)
-- Campus Services (Hostel, Canteen, Campus Map, Room Booking)
-- Communication (Chat, Notifications, Announcements)
-- Student Services (Profile, Resume Builder, Help)
-- Administration (User, Department, Faculty, Settings)
-- AI-Powered Features (Chatbots, Resume Analyzer)
-- User Experience (Themes, Multi-language, Search)
+### [Development and Operations](./DEVELOPMENT.md)
+Complete lifecycle management and environment setup:
+- Institutional Prerequisites and Dependencies
+- Secure Environment Configuration
+- High-Fidelity Database Engineering (PostgreSQL)
+- Accelerated Development Workflow (Ports 3000/4000)
+- Deployment and CI/CD Protocols
 
-### [Quick Reference](./QUICK_REFERENCE.md)
-Quick lookup guide for common tasks:
-- Development commands
-- Common code patterns
-- File locations
-- Key routes
-- Environment variables
-- Troubleshooting tips
+### [Platform Features](./FEATURES.md)
+Detailed functional specification of the institutional ecosystem:
+- Academic Governance (Courses, Timetables, Attendance, Grading)
+- Campus Services (Infrastructure Maintenance, Spatial Navigation, Canteen)
+- Communication Hub (Enterprise Messaging, Global Announcements)
+- Identity Services (Profile Management, AI Resume Analysis)
+- Administrative Oversight (User Governance, Financial Reporting)
 
-## Backend Documentation
+### [Quick Reference Guide](./QUICK_REFERENCE.md)
+Accelerated reference for developers and system operators:
+- Standardized Development Commands
+- Institutional Coding Patterns and DTOs
+- Critical Path and Module Locations
+- Environment Specification
+- Stability and Troubleshooting Logs
 
-### [Server README](./server/README.md)
-NestJS backend documentation including:
-- Framework setup
-- Module structure
-- API endpoints
-- Testing
-- Deployment
+### [Scaling and Infrastructure](./SCALING_AND_PLATFORM.md)
+Advanced infrastructure considerations for large-scale institutional deployments:
+- Database Indexing and Optimization
+- Edge-Runtime Caching Strategies
+- Institutional Security and WAF Configuration
+- Observability and Performance Monitoring
 
-### [Scaling & Platform](./server/SCALING_AND_PLATFORM.md)
-Production deployment considerations:
-- Database indexing
-- Caching strategies
-- Performance optimization
-- Monitoring and logging
-- Security recommendations
+## Developer Resources and Ecosystem
 
-## Additional Resources
-
-### Agent Skills
-The project includes specialized skills for Next.js development:
-- **nextjs15-performance** - Performance optimization patterns
-- **nextjs-app-router-patterns** - App Router best practices
-- **next-best-practices** - Next.js coding standards
-- **next-cache-components** - Cache optimization
-- **find-skills** - Discover available skills
-- **eraser-diagrams** - Architecture visualization
+### Institutional Agent Skills
+The project leverages specialized AI capabilities for accelerated development:
+- **Next.js 16 Performance**: Advanced React 19 optimization patterns.
+- **Enterprise App Router**: Complex routing and layout orchestration.
+- **Institutional Styling**: Sepia/Dark mode design system compliance.
+- **Data Integrity**: Zod-based validation across the full stack.
 
 Location: `.agents/skills/`
 
-### API Documentation
-For API endpoints and request/response formats, refer to:
-- Backend controllers in `server/src/`
-- API routes in `app/api/`
-- Schemas in `server/prisma/schema.prisma`
+### API Specification and Schema
+For detailed endpoint protocols and data models, refer to:
+- Backend Controllers in `server/src/`
+- Institutional Schema in `server/prisma/schema.prisma`
+- Frontend Data Bridge in `src/lib/postgres-bridge.ts`
 
-### Component Library
-UI components are built using shadcn/ui with Radix UI primitives. Documentation:
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Radix UI](https://www.radix-ui.com/)
+## Documentation Governance
 
-## Contributing to Documentation
+When contributing to the institutional knowledge base:
+1. Ensure documentation reflects the latest architectural version (3.2.0+).
+2. Maintain a professional, emoji-free aesthetic.
+3. Synchronize performance benchmarks with the Next.js 16 standard.
+4. Update the technical version history for all major architectural shifts.
 
-When updating features:
+## Technical Version History
 
-1. Update the relevant documentation file
-2. Add examples for new functionality
-3. Update code snippets to match current patterns
-4. Add troubleshooting notes if applicable
-5. Update the table of contents if adding new sections
-
-## Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 2.0.0 | March 2026 | Updated for Next.js 15, removed archived features |
-| 1.5.0 | January 2026 | Added AI features, improved architecture docs |
-| 1.0.0 | December 2025 | Initial documentation |
+| Institutional Version | Release Date | Architectural Highlights |
+|-----------------------|--------------|-------------------------|
+| 3.2.0 | March 2026 | Next.js 16.2.1, Turbopack, REST Synchronization |
+| 2.5.0 | February 2026 | NestJS 10 Migration, Role Consolidation |
+| 2.0.0 | January 2026 | Initial App Router Implementation |
 
 ---
 
-*For questions or contributions, please contact the development team.*
+Last Updated: March 2026
+PEC Documentation Governance Group
+Registry: PEC-DOC-001
