@@ -31,6 +31,26 @@ export const attendanceSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
   status: z.enum(['present', 'absent', 'late']),
   remarks: z.string().max(200).optional(),
+  sessionId: z.string().uuid().optional(),
+  markedAt: z.string().datetime().optional(),
+  method: z.enum(['qr', 'manual']).default('manual'),
+  courseId: z.string().optional(),
+  facultyId: z.string().uuid().optional(),
+});
+
+export const attendanceSessionSchema = z.object({
+  id: z.string().uuid().optional(),
+  facultyId: z.string().uuid('Invalid faculty ID'),
+  courseId: z.string().min(1, 'Course ID is required'),
+  courseName: z.string().min(1, 'Course name is required'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)(:([0-5]\d))?$/, 'Invalid start time (HH:MM or HH:MM:SS)'),
+  qrCode: z.string().min(1, 'QR code is required'),
+  active: z.boolean().default(true),
+  expiresAt: z.string().datetime(),
+  attendanceCount: z.number().int().min(0).default(0),
+  createdAt: z.string().datetime().optional(),
+  endedAt: z.string().datetime().optional(),
 });
 
 export const courseSchema = z.object({
@@ -119,6 +139,7 @@ export const examinationSchema = z.object({
 export type DepartmentInput = z.infer<typeof departmentSchema>;
 export type FacultyInput = z.infer<typeof facultySchema>;
 export type AttendanceInput = z.infer<typeof attendanceSchema>;
+export type AttendanceSessionInput = z.infer<typeof attendanceSessionSchema>;
 export type CourseInput = z.infer<typeof courseSchema>;
 export type UserInput = z.infer<typeof userSchema>;
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;

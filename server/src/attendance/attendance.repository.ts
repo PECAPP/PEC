@@ -35,17 +35,21 @@ export class AttendanceRepository extends BaseRepository {
   }
 
   async getFacultyStats(facultyId: string) {
-    const [courses, stats] = await Promise.all([
-      this.prisma.course.findMany({
-        where: { facultyId, deletedAt: null },
-        include: { _count: { select: { enrollments: true } } }
-      }),
-      this.prisma.attendance.groupBy({
-        by: ['status'],
-        where: { subject: { in: (await this.prisma.course.findMany({ where: { facultyId, deletedAt: null }, select: { id: true } })).map(c => c.id) } },
-        _count: { _all: true }
-      })
-    ]);
+    const courses = await this.prisma.course.findMany({
+      where: { facultyId, deletedAt: null },
+      include: { _count: { select: { enrollments: true } } }
+    });
+
+    const courseIds = courses.map(c => c.id);
+    
+    // Group attendance by status for all courses taught by this faculty
+    const statusCounts = await this.prisma.attendance.groupBy({
+      by: ['status'],
+      where: { 
+        courseId: { in: courseIds } 
+      },
+      _count: { _all: true }
+    });
 
     const activeCount = courses.length;
     const studentCount = courses.reduce((acc, curr) => acc + curr._count.enrollments, 0);
@@ -73,7 +77,7 @@ export class AttendanceRepository extends BaseRepository {
         }
       }),
       this.prisma.attendance.groupBy({
-        by: ['subject', 'status'],
+        by: ['courseId', 'status'],
         where: { studentId },
         _count: { _all: true }
       })
@@ -82,8 +86,10 @@ export class AttendanceRepository extends BaseRepository {
     const statsMap = new Map<string, { present: number; absent: number; late: number; total: number }>();
     
     aggregates.forEach(agg => {
-       const subject = agg.subject;
-       const current = statsMap.get(subject) || { present: 0, absent: 0, late: 0, total: 0 };
+       const courseId = agg.courseId;
+       if (!courseId) return;
+       
+       const current = statsMap.get(courseId) || { present: 0, absent: 0, late: 0, total: 0 };
        const count = agg._count._all;
        
        if (agg.status === 'present') current.present += count;
@@ -91,7 +97,7 @@ export class AttendanceRepository extends BaseRepository {
        else if (agg.status === 'late') current.late += count;
        
        current.total += count;
-       statsMap.set(subject, current);
+       statsMap.set(courseId, current);
     });
 
     const courses = enrollments.map(en => {
@@ -130,14 +136,6 @@ export class AttendanceRepository extends BaseRepository {
     return this.prisma.attendance.findUnique({ where: { id } });
   }
 
-  create(data: CreateAttendanceDto) {
-    return this.prisma.attendance.create({
-      data: {
-        ...data,
-        date: new Date(data.date),
-      },
-    });
-  }
 
   update(id: string, data: UpdateAttendanceDto) {
     return this.prisma.attendance.update({

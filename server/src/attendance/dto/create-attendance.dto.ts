@@ -19,6 +19,21 @@ export class CreateAttendanceDto {
   @ApiPropertyOptional({ example: 'Medical leave' })
   remarks?: string;
 
+  @ApiPropertyOptional({ description: 'Attendance Session UUID' })
+  sessionId?: string;
+
+  @ApiPropertyOptional({ description: 'ISO marked at timestamp' })
+  markedAt?: string;
+
+  @ApiPropertyOptional({ enum: ['qr', 'manual'], default: 'manual' })
+  method?: 'qr' | 'manual';
+
+  @ApiPropertyOptional({ description: 'Course UUID' })
+  courseId?: string;
+
+  @ApiPropertyOptional({ description: 'Faculty UUID' })
+  facultyId?: string;
+
   // Zod runtime validator available for services to call directly
   static validate(data: unknown): ReturnType<typeof attendanceSchema.parse> {
     return attendanceSchema.parse(data);

@@ -1,0 +1,74 @@
+# MISSING FEATURES - MUST BE ADDED
+# Core features that should be implemented for a complete system
+
+================================================================================
+## 1. Syllabus Management (HIGH PRIORITY)
+--------------------------------------------------------------------------------
+Description: Faculty-driven curriculum management with lesson plans and
+             objective tracking for accreditation readiness
+Modules Needed: Syllabus creation, lesson plan builder, topic tracking,
+                learning objectives mapping
+
+================================================================================
+## 2. Academic Calendar (HIGH PRIORITY)
+--------------------------------------------------------------------------------
+Description: Event scheduling, holiday management, semester planning
+Modules Needed: Calendar view, event creation, holiday list, semester
+                management, important date reminders
+
+================================================================================
+## 3. Assignment Submission (HIGH PRIORITY)
+--------------------------------------------------------------------------------
+Description: Student assignment upload, grading, late submission tracking
+Modules Needed: Assignment creation by faculty, file upload by students,
+                grading interface, plagiarism check integration, late
+                submission penalty calculation
+
+================================================================================
+## 4. Exam Results/Grades (HIGH PRIORITY)
+--------------------------------------------------------------------------------
+Description: Grade entry by faculty, transcript view for students
+Modules Needed: Grade submission, grade calculation (SGPA/CGPA), result
+                publication, transcript generation, grade appeals
+
+================================================================================
+## 5. Library Integration (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Book search, availability, borrowing records, due dates
+Modules Needed: Book catalog, search functionality, borrowing system,
+                return tracking, overdue notifications, fine calculation
+
+================================================================================
+## 6. Attendance Notifications (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Push notifications for low attendance warnings
+Modules Needed: Real-time notifications, attendance threshold alerts,
+                parent notification integration, email/SMS alerts
+
+================================================================================
+## 7. Leave Management (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Student/faculty leave applications and approval workflow
+Modules Needed: Leave request form, approval workflow, leave balance tracking,
+                holiday calendar integration, notification to approvers
+
+================================================================================
+## 8. Feedback System (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Course feedback, faculty evaluation, infrastructure rating
+Modules Needed: Feedback forms, anonymous submission, rating scales,
+                result analytics for admin, improvement suggestions
+
+================================================================================
+## 9. Student Profile Enhancements (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: GitHub portfolio, LinkedIn integration, skills showcase
+Modules Needed: GitHub API integration, LinkedIn import, skill tags,
+                portfolio/project showcase, resume download
+
+================================================================================
+## 10. Faculty Bio System (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Professional biography, achievements, publications
+Modules Needed: Bio editor, research publications, awards, conference
+                presentations, consultation history

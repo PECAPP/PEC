@@ -21,7 +21,7 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
   const [notices, setNotices] = useState<any[]>(initialData?.notices || []);
   const [courseCards, setCourseCards] = useState<any[]>(initialData?.courseCards || []);
   const [todaySchedule, setTodaySchedule] = useState<any[]>(initialData?.todaySchedule || []);
-  const [loading, setLoading] = useState(!initialData);
+  const [loading, setLoading] = useState(!initialData || (initialData?.courses?.length === 0));
   const [stats, setStats] = useState(initialData?.stats || { activeCount: 0, studentCount: 0, lowAttendanceCount: 0 });
 
   const fetchFacultyData = useCallback(async () => {
@@ -34,6 +34,7 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
     }
 
     try {
+      setLoading(true);
       type ApiResponse<T> = { success: boolean; data: T; meta?: any };
       const [coursesRes, noticesRes, timetableRes] = await Promise.all([
         api.get<ApiResponse<any>>('/courses', { params: { facultyId: user.uid, limit: 200, offset: 0 } }),

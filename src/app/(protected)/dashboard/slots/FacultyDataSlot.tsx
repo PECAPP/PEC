@@ -3,12 +3,21 @@ import { serverFetch } from '@/lib/server-data';
 import { FacultyDashboard } from '../dashboards/FacultyDashboard';
 
 export async function FacultyDataSlot({ session }: { session: any }) {
-  const [courses, stats, profile, notices] = await Promise.all([
-    serverFetch(`/courses?facultyId=${session.uid}&limit=20`),
-    serverFetch('/attendance/faculty-stats'),
-    serverFetch('/auth/profile'),
-    serverFetch('/noticeboard?limit=5'),
-  ]);
+  let courses = [];
+  let stats = null;
+  let profile = null;
+  let notices = [];
+
+  try {
+     [courses, stats, profile, notices] = await Promise.all([
+      serverFetch(`/courses?facultyId=${session.uid}&limit=20`),
+      serverFetch('/attendance/faculty-stats'),
+      serverFetch('/auth/profile'),
+      serverFetch('/noticeboard?limit=5'),
+    ]);
+  } catch (err) {
+    console.error('[FacultyDataSlot] SSR Fetch Error:', err);
+  }
 
   return (
     <FacultyDashboard

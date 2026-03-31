@@ -21,6 +21,7 @@ import { CampusMapModule } from './campus-map/campus-map.module';
 import { CourseMaterialsModule } from './course-materials/course-materials.module';
 import { NoticeboardModule } from './noticeboard/noticeboard.module';
 import { AiModule } from './ai/ai.module';
+import { AttendanceSessionModule } from './attendance-session/attendance-session.module';
 
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
@@ -50,6 +51,7 @@ import { AdminModule } from './admin/admin.module';
     NoticeboardModule,
     AdminModule,
     AiModule,
+    AttendanceSessionModule,
     ThrottlerModule.forRoot([{
       name: 'short',
       ttl: 60000,

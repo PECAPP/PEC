@@ -626,19 +626,6 @@ export const updateDoc = async (docRef: string, payload: any) => {
 };
 
 export const addDoc = async (col: string, payload: any) => {
-  if (col === "attendance") {
-    const subject =
-      payload?.subject || (await resolveCourseCode(payload?.courseId));
-    const body = {
-      studentId: payload?.studentId,
-      status: payload?.status,
-      date: toIsoDate(payload?.date),
-      subject,
-    };
-    const { data } = await API.post("/attendance", body);
-    const created = unwrapSuccess<any>(data);
-    return { id: created?.id };
-  }
 
   if (col === "books") {
     const { data } = await API.post("/library/books", payload);

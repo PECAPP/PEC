@@ -428,9 +428,38 @@ model Attendance {
   studentId String
   student   User     @relation("StudentAttendance", fields: [studentId], references: [id], onDelete: Cascade)
 
+  // QR Attendance fields
+  sessionId String?
+  session   AttendanceSession? @relation("SessionAttendance", fields: [sessionId], references: [id], onDelete: SetNull)
+  markedAt  DateTime? @default(now())
+  method    String?   @default("manual") // "manual" or "qr"
+  courseId  String?
+  facultyId String?
+
   @@unique([studentId, date, subject])
   @@index([date])
   @@index([status])
+  @@index([sessionId])
+}
+
+model AttendanceSession {
+  id              String   @id @default(uuid())
+  facultyId       String
+  courseId        String
+  courseName      String
+  date            String
+  startTime       String
+  qrCode          String   @unique
+  active          Boolean  @default(true)
+  expiresAt       String
+  attendanceCount Int      @default(0)
+  createdAt       DateTime @default(now())
+  endedAt         DateTime?
+  attendances     Attendance[] @relation("SessionAttendance")
+
+  @@index([facultyId])
+  @@index([courseId])
+  @@index([qrCode])
 }
 
 

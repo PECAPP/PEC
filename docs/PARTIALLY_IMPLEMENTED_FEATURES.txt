@@ -1,0 +1,88 @@
+# PARTIALLY IMPLEMENTED FEATURES
+# (Frontend exists but backend is missing/incomplete, or vice versa)
+
+================================================================================
+## 1. Course Materials
+--------------------------------------------------------------------------------
+Frontend: UI exists at /course-materials
+Backend: API exists but returns 404 "not available yet"
+Issue: Backend module incomplete
+
+================================================================================
+## 2. Score Sheet
+--------------------------------------------------------------------------------
+Frontend: Full UI at /score-sheet
+Backend: No backend API
+Issue: Only localStorage - not persisted to database
+
+================================================================================
+## 3. Resume Builder AI
+--------------------------------------------------------------------------------
+Frontend: UI exists with AI panel at /resume-builder
+Backend: No dedicated API endpoint
+Issue: AI integration incomplete
+
+================================================================================
+## 4. Room Management
+--------------------------------------------------------------------------------
+Frontend: No UI
+Backend: Room model exists but no API
+Issue: Not implemented
+
+================================================================================
+## 5. Faculty Bio
+--------------------------------------------------------------------------------
+Frontend: UI exists at /faculty/[id]
+Backend: No dedicated bio field API
+Issue: Shows "not available yet" message
+
+================================================================================
+## 6. GitHub/Social Info
+--------------------------------------------------------------------------------
+Frontend: UI exists in profile
+Backend: No API to sync GitHub data
+Issue: Shows "not available" for GitHub info
+
+================================================================================
+## 7. 3D Campus Map
+--------------------------------------------------------------------------------
+Frontend: README mentions Three.js 3D
+Backend: Only 2D map exists
+Issue: Three.js not implemented
+
+================================================================================
+## 8. AI Chat (FloatingAIChat)
+--------------------------------------------------------------------------------
+Frontend: Component exists at /components/chat/FloatingAIChat.tsx
+Backend: AI service configured but requires API key
+Issue: Needs API key configuration
+
+
+================================================================================
+## 9. Websockets for Real-time
+--------------------------------------------------------------------------------
+Frontend: Optimistic UI updates implemented
+Backend: README mentions Socket.io but no implementation found
+Issue: Only polling/REST - no WebSocket implementation
+
+
+================================================================================
+## 10. Remove.bg Integration
+--------------------------------------------------------------------------------
+Frontend: Used in logo processor
+Backend: N/A
+Issue: Remove.bg API key not configured - shows warning
+
+================================================================================
+## 11. Cloudinary Integration
+--------------------------------------------------------------------------------
+Frontend: Image uploads exist
+Backend: cloudinaryManager.ts exists but not configured
+Issue: Requires cloud name and upload preset configuration
+
+================================================================================
+## 12. Google Translate Widget
+--------------------------------------------------------------------------------
+Frontend: Component exists at /components/GoogleTranslate.tsx
+Backend: N/A
+Issue: Shows "Google Translate widget is not ready" when API key missing
