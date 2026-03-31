@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Sora, Fraunces, Syne } from 'next/font/google';
+import { Inter, Sora } from 'next/font/google';
 import { Providers } from './providers';
 import { RouteTransitionLoader } from '@/components/layout/RouteTransitionLoader';
 import './globals.css';
@@ -14,18 +14,6 @@ const sora = Sora({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-display',
-});
-
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-fraunces',
-});
-
-const syne = Syne({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-syne',
 });
 
 export const metadata: Metadata = {
@@ -46,7 +34,7 @@ export default function RootLayout({
       lang="en" 
       suppressHydrationWarning 
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${sora.variable} ${fraunces.variable} ${syne.variable}`}
+      className={`${inter.variable} ${sora.variable}`}
     >
       <head>
         <script

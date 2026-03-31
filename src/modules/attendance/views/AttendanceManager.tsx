@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  Upload, Save, Loader2 
+  Upload, Database, ShieldCheck, Loader2, Users, Calendar as CalendarIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import api from '@/lib/api';
 import { extractData } from '@/lib/utils';
@@ -22,7 +21,6 @@ import { markBulkAttendanceAction } from '../actions';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AttendanceManager({ userId, userRole, initialData }: any) {
-  const router = useRouter();
   const [courses, setCourses] = useState<any[]>(initialData?.courses || []);
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -34,10 +32,10 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
 
   const { execute: executeBulk, isPending: isSaving } = useAction(markBulkAttendanceAction, {
     onSuccess: () => {
-      toast.success('Professional session records saved.');
+      toast.success('Attendance records updated successfully.');
       fetchStudentAttendance();
     },
-    onError: ({ error }) => toast.error(error.serverError || 'Failed to sync with API.'),
+    onError: ({ error }) => toast.error(error.serverError || 'Failed to update records.'),
   });
 
   useEffect(() => {
@@ -50,12 +48,16 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
   }, [selectedCourse, selectedDate]);
 
   const fetchCourses = async () => {
-    const response = await api.get<any>('/courses', { params: { limit: 200 } });
-    let data = extractData<any[]>(response) || [];
-    if (!isAdmin) {
-      data = data.filter((c: any) => c.instructorId === userId || c.instructor === userId);
+    try {
+      const response = await api.get<any>('/courses', { params: { limit: 200 } });
+      let data = extractData<any[]>(response) || [];
+      if (!isAdmin) {
+        data = data.filter((c: any) => c.instructorId === userId || c.instructor === userId);
+      }
+      setCourses(data);
+    } catch (e) {
+      console.error(e);
     }
-    setCourses(data);
   };
 
   const fetchStudentAttendance = async () => {
@@ -79,14 +81,14 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
         const r = recordMap.get(en.studentId);
         return {
           id: en.studentId,
-          name: u?.fullName || 'Unknown',
+          name: u?.fullName || 'Unknown Student',
           email: u?.email || '',
           recordId: r?.id,
           status: r?.status || null
         };
       }));
     } catch (e) {
-      toast.error('Identity handshake failed.');
+      toast.error('Failed to load student list.');
     } finally {
       setLoading(false);
     }
@@ -107,114 +109,159 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
         status: s.status as 'present' | 'absent' | 'late'
       }));
     
-    if (records.length === 0) return toast.info('No pending record updates detected.');
+    if (records.length === 0) return toast.info('No changes to save.');
     executeBulk({ records });
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-      <div className="flex justify-between items-end">
+    <div className="space-y-6 pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-           <h1 className="text-3xl font-black font-monument uppercase tracking-tight">Manager Nexus</h1>
-           <p className="text-muted-foreground font-bold italic text-[11px] uppercase tracking-widest mt-1">Classroom Integrity Protocol</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Attendance Management</h1>
+          <p className="text-sm text-muted-foreground font-medium italic">Verify and update student presence for specific courses</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <PDFExportButton 
             onExport={async () => {
               if (!selectedCourse) {
-                  toast.error('Select a course first.');
-                  return;
+                toast.error('Please select a course.');
+                return;
               }
               const { exportAttendanceReport } = await import('@/lib/pdfExport');
               const course = courses.find(c => c.id === selectedCourse);
-              exportAttendanceReport(course?.name || 'Report', students, { start: selectedDate, end: selectedDate });
+              exportAttendanceReport(course?.name || 'Attendance_Report', students, { start: selectedDate, end: selectedDate });
             }} 
-            label="Report Gen"
+            label="Export Report"
           />
-          <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-11 border-2 font-bold px-6 rounded-sm">
-            <Upload className="w-4 h-4 mr-2" /> Injection
+          <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-9 px-4 font-bold text-xs">
+            <Upload className="w-4 h-4 mr-2" /> Import Data
           </Button>
         </div>
       </div>
 
-      <div className="card-elevated p-10 border-2 border-primary shadow-[10px_10px_0px_rgba(0,0,10,0.05)]">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="flex-1 space-y-2">
-             <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Domain Selection</label>
-             <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-                <SelectTrigger className="h-14 border-2 rounded-sm font-black text-lg bg-background/50">
-                   <SelectValue placeholder="Identify course cluster..." />
-                </SelectTrigger>
-                <SelectContent className="border-2 font-bold uppercase text-xs">
-                   {courses.map(c => <SelectItem key={c.id} value={c.id}>{c.code} :: {c.name}</SelectItem>)}
-                </SelectContent>
-             </Select>
+      <div className="card-elevated p-6 space-y-6 bg-card/50">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="md:col-span-8">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
+              <Database className="w-3 h-3 text-primary" /> Select Course
+            </label>
+            <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+              <SelectTrigger className="h-11 font-medium text-sm bg-muted/20 border-border/60">
+                <SelectValue placeholder="Chose course..." />
+              </SelectTrigger>
+              <SelectContent>
+                {courses.map(c => (
+                  <SelectItem key={c.id} value={c.id} className="font-medium py-2">
+                    <span className="font-bold text-primary mr-2">[{c.code}]</span> {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="w-full md:w-64 space-y-2">
-             <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Session Timestamp</label>
-             <Input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="h-14 border-2 rounded-sm font-bold font-mono text-center" />
+          <div className="md:col-span-4">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
+              <CalendarIcon className="w-3 h-3 text-primary" /> Select Date
+            </label>
+            <Input 
+              type="date" 
+              className="h-11 bg-muted/20 border-border/60 font-mono font-bold text-center"
+              value={selectedDate} 
+              onChange={(e) => setSelectedDate(e.target.value)} 
+            />
           </div>
         </div>
 
         <AnimatePresence mode="wait">
           {selectedCourse ? (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-10 border-t-2 border-border/50 mt-10">
-              {loading ? <LoadingGrid count={4} /> : (
-                <div className="space-y-8">
-                  <div className="overflow-x-auto border-2 rounded-sm overflow-hidden">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-6 border-t border-border/60">
+              {loading ? <LoadingGrid count={5} /> : (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-bold text-foreground">Enrolled Students ({students.length})</span>
+                  </div>
+                  
+                  <div className="border border-border/60 rounded-lg overflow-hidden bg-card/50 shadow-sm">
                     <table className="w-full">
-                       <thead className="bg-muted text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground">
-                         <tr><th className="p-5 text-left">Identity Profile</th><th className="p-5 text-center">Status Assignment</th></tr>
-                       </thead>
-                       <tbody className="divide-y divide-border">
-                         {students.map(s => (
-                           <tr key={s.id} className="hover:bg-muted/30 transition-all">
-                             <td className="p-5">
-                               <p className="font-black text-base">{s.name}</p>
-                               <p className="font-mono text-[9px] uppercase font-bold text-muted-foreground">{s.email}</p>
-                             </td>
-                             <td className="p-5">
+                      <thead>
+                        <tr className="bg-muted/40 border-b border-border/60">
+                          <th className="py-3 px-6 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Student Name</th>
+                          <th className="py-3 px-6 text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Attendance Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/40">
+                        {students.map(s => (
+                          <tr key={s.id} className="hover:bg-muted/10 transition-colors">
+                            <td className="py-3 px-6 text-sm">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-foreground uppercase">{s.name}</span>
+                                <span className="text-[10px] text-muted-foreground font-mono opacity-70">{s.email}</span>
+                              </div>
+                            </td>
+                            <td className="py-3 px-6">
                                <div className="flex justify-center gap-2">
-                                 {['present', 'absent', 'late'].map((st: any) => (
-                                   <Button
-                                      key={st} size="sm" 
-                                      variant={s.status === st ? 'default' : 'outline'}
-                                      onClick={() => handleMark(s.id, st)}
-                                      className={`h-10 px-6 font-black uppercase text-[10px] tracking-widest rounded-sm border-2 ${s.status === st ? 'bg-primary text-white' : 'hover:border-primary/50'}`}
-                                   >
-                                     {st[0]}
-                                   </Button>
-                                 ))}
+                                  {['present', 'absent', 'late'].map((status: any) => (
+                                    <Button
+                                      key={status}
+                                      size="sm"
+                                      variant={s.status === status ? 'default' : 'outline'}
+                                      className={`text-[10px] font-bold uppercase tracking-wider px-4 h-8 transition-all
+                                        ${s.status === status 
+                                          ? (status === 'present' ? 'bg-success hover:bg-success/90' : status === 'absent' ? 'bg-destructive hover:bg-destructive/90' : 'bg-warning hover:bg-warning/90')
+                                          : 'hover:border-primary/50'
+                                        }`}
+                                      onClick={() => handleMark(s.id, status)}
+                                    >
+                                      {status}
+                                    </Button>
+                                  ))}
                                </div>
-                             </td>
-                           </tr>
-                         ))}
-                       </tbody>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
                     </table>
                   </div>
-                  <div className="flex justify-end pt-6">
-                    <Button onClick={handleSave} disabled={isSaving} className="h-16 px-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-xl active:scale-[0.98] transition-all">
-                       {isSaving ? <Loader2 className="w-5 h-5 animate-spin mr-3" /> : <Save className="w-5 h-5 mr-3" />}
-                       Commit Session State
+                  <div className="flex justify-end pt-2">
+                    <Button 
+                      onClick={handleSave} 
+                      disabled={isSaving}
+                      className="bg-primary text-primary-foreground font-bold tracking-wider uppercase text-xs h-11 px-10"
+                    >
+                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
+                       Save Attendance
                     </Button>
                   </div>
                 </div>
               )}
             </motion.div>
           ) : (
-            <div className="p-20 text-center text-muted-foreground font-bold italic text-sm">Select a course cluster to initiate manager protocol.</div>
+            <div className="py-16 text-center border border-dashed border-border/40 rounded-lg bg-muted/5">
+              <p className="text-muted-foreground font-medium italic text-sm">Select a course to view and update student attendance.</p>
+            </div>
           )}
         </AnimatePresence>
       </div>
 
       <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-        <DialogContent className="max-w-4xl border-2 border-primary rounded-sm overflow-hidden p-0">
-           <DialogHeader className="bg-primary text-white p-10"><DialogTitle className="text-3xl font-black font-monument">MASS NODE INJECTION</DialogTitle></DialogHeader>
-           <div className="p-10">
-              <BulkUpload entityType="attendance" onImport={null as any} templateColumns={['studentEmail', 'courseCode', 'date', 'status']} sampleData={[{ studentEmail: 'identity@pec.edu', courseCode: 'CS101', date: '2024-03-31', status: 'present' }]} />
+        <DialogContent className="max-w-4xl bg-card border-border/60">
+           <div className="flex flex-col space-y-4">
+             <div className="space-y-1">
+                <h2 className="text-base font-bold tracking-tight text-foreground flex items-center gap-2">
+                  <Upload className="w-4 h-4 text-primary" /> Bulk Attendance Import
+                </h2>
+                <p className="text-xs text-muted-foreground">Upload a CSV or Excel file to update multiple records at once</p>
+             </div>
+             <BulkUpload 
+               entityType="attendance" 
+               onImport={null as any} 
+               templateColumns={['studentEmail', 'courseCode', 'date', 'status']} 
+               sampleData={[{ studentEmail: 'student@college.edu', courseCode: 'CS101', date: '2024-03-31', status: 'present' }]} 
+             />
            </div>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 }
+

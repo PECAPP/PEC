@@ -14,6 +14,7 @@ import { FacultyTodaySchedule } from './components/FacultyTodaySchedule';
 import { FacultyCoursesGrid } from './components/FacultyCoursesGrid';
 import { LowAttendanceAlert } from './components/LowAttendanceAlert';
 import { FacultyQuickActions } from './components/FacultyQuickActions';
+import { NoticeboardCard } from './components/NoticeboardCard';
 
 const container = {
   hidden: { opacity: 0 },
@@ -32,6 +33,7 @@ export function FacultyDashboard({ initialData, user: serverUser }: FacultyDashb
   const {
     loading,
     courses,
+    notices,
     courseCards,
     todaySchedule,
     stats,
@@ -85,6 +87,10 @@ export function FacultyDashboard({ initialData, user: serverUser }: FacultyDashb
             onViewStudents={() => router.push('/attendance')}
           />
           <FacultyQuickActions onAction={(path) => router.push(path)} />
+          <NoticeboardCard 
+            notices={notices} 
+            onViewAll={() => router.push('/noticeboard')} 
+          />
         </div>
       </div>
 

@@ -453,10 +453,6 @@ body {
     font-family: "Monument Extended", serif;
   }
 
-  .font-fraunces {
-    font-family: "Fraunces", serif;
-  }
-
   /* ===== CARDS ===== */
   .card-elevated {
     @apply bg-card border border-border;

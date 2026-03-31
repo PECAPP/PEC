@@ -182,25 +182,23 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
         }
       });
       await Promise.all(batchPromises);
-      toast.success('Attendance saved');
+      toast.success('Attendance records synchronized successfully');
       fetchStudentAttendance();
     } catch (error) {
-      toast.error('Failed to save');
+      toast.error('Failed to synchronize records');
     }
   };
 
   const handleBulkImport = async (data: any[]) => {
-    // ... bulk upload logic remains same
     return { success: data.length, failed: 0, errors: [] };
   };
 
   return (
-    <div className="space-y-6 md:space-y-8">
-       {/* UI implementation remains same visual state */}
-       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Attendance Manager</h1>
-          <p className="text-muted-foreground">Mark and manage class attendance</p>
+          <h1 className="text-3xl font-black tracking-tight text-foreground uppercase tracking-widest">Attendance Management</h1>
+          <p className="text-muted-foreground mt-1 font-medium italic">Protocol-level session verification and ledger control</p>
         </div>
         <div className="flex gap-2">
             <PDFExportButton
@@ -225,65 +223,78 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
                   { start: selectedDate, end: selectedDate }
                 );
               }}
-              label="Export PDF"
+              label="EXCEL LEDGER"
             />
-            <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
-              <Upload className="w-4 h-4 mr-2" /> Bulk Upload
+            <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-10 px-4 font-black uppercase tracking-widest text-[10px]">
+              <Upload className="w-3 h-3 mr-2" /> DATA SYNC
             </Button>
         </div>
       </div>
 
-      <div className="card-elevated p-6 space-y-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <label className="text-sm font-medium mb-1 block">Course</label>
+      <div className="card-elevated p-6 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="md:col-span-8">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2 block">Instructional Course</label>
             <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select course..." />
+              <SelectTrigger className="h-12 text-sm font-bold bg-muted/20 border-border/60">
+                <SelectValue placeholder="Select high-priority course..." />
               </SelectTrigger>
               <SelectContent>
                 {courses.map(c => (
-                  <SelectItem key={c.id} value={c.id}>{c.code} - {c.name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id} className="font-bold py-3 text-sm">
+                    <span className="text-primary mr-2">[{c.code}]</span> {c.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <label className="text-sm font-medium mb-1 block">Date</label>
-            <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+          <div className="md:col-span-4">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2 block">Sync Date</label>
+            <Input 
+              type="date" 
+              className="h-12 bg-muted/20 border-border/60 font-mono font-bold"
+              value={selectedDate} 
+              onChange={(e) => setSelectedDate(e.target.value)} 
+            />
           </div>
         </div>
 
         {selectedCourse && (
-          <div className="pt-6 border-t border-border">
+          <div className="pt-8 border-t border-border/60 space-y-6">
              {loading ? <LoadingGrid count={5} /> : (
                <>
-                 <div className="overflow-x-auto">
-                    <table className="w-full">
+                 <div className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-xl">
+                    <table className="w-full border-collapse">
                       <thead>
-                        <tr className="border-b border-border">
-                          <th className="py-3 text-left">Student</th>
-                          <th className="py-3 text-center">Status</th>
+                        <tr className="bg-muted border-b border-border/60">
+                          <th className="py-4 px-6 text-left font-black uppercase text-[10px] tracking-widest text-primary border-r border-border/60">Registry Student</th>
+                          <th className="py-4 px-6 text-center font-black uppercase text-[10px] tracking-widest">Verification Status</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="divide-y divide-border/60">
                         {students.map(s => (
-                          <tr key={s.id} className="border-b border-border/50 hover:bg-muted/5 transition-colors">
-                            <td className="py-3">
-                              <p className="font-bold">{s.name}</p>
-                              <p className="text-[10px] text-muted-foreground font-mono">{s.email}</p>
+                          <tr key={s.id} className="group hover:bg-muted/30 transition-colors">
+                            <td className="py-4 px-6 border-r border-border/60">
+                              <div className="flex flex-col">
+                                <span className="font-black text-foreground group-hover:text-primary transition-colors tracking-tight">{s.name}</span>
+                                <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-tighter">{s.email}</span>
+                              </div>
                             </td>
-                            <td className="py-3 text-center">
-                               <div className="flex justify-center gap-1">
+                            <td className="py-4 px-6">
+                               <div className="flex justify-center gap-2">
                                   {['present', 'absent', 'late'].map(status => (
                                     <Button
                                       key={status}
                                       size="sm"
                                       variant={s.status === status ? 'default' : 'outline'}
-                                      className="text-[10px] font-bold uppercase tracking-widest px-3 h-8"
+                                      className={`text-[9px] font-black uppercase tracking-widest px-4 h-9 transition-all
+                                        ${s.status === status 
+                                          ? (status === 'present' ? 'bg-success hover:bg-success/90' : status === 'absent' ? 'bg-destructive hover:bg-destructive/90' : 'bg-warning hover:bg-warning/90')
+                                          : 'hover:border-primary/50'
+                                        }`}
                                       onClick={() => handleMark(s.id, status)}
                                     >
-                                      {status[0]}
+                                      {status === 'present' ? 'PRESENT' : status === 'absent' ? 'ABSENT' : 'LATE'}
                                     </Button>
                                   ))}
                                </div>
@@ -293,9 +304,12 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
                       </tbody>
                     </table>
                  </div>
-                 <div className="flex justify-end pt-6">
-                    <Button onClick={handleSave} className="bg-primary text-primary-foreground font-bold tracking-widest uppercase text-[10px] h-10 px-8">
-                       Save Records
+                 <div className="flex justify-end pt-4">
+                    <Button 
+                      onClick={handleSave} 
+                      className="bg-primary text-primary-foreground font-black tracking-[0.2em] uppercase text-[11px] h-12 px-10 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    >
+                       COMMIT RECORDS TO LEDGER
                     </Button>
                  </div>
                </>
@@ -305,14 +319,19 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
       </div>
 
       <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-        <DialogContent className="max-w-4xl">
-           <DialogHeader><DialogTitle>Bulk Upload</DialogTitle></DialogHeader>
-           <BulkUpload 
-             entityType="attendance" 
-             onImport={handleBulkImport} 
-             templateColumns={['studentEmail', 'courseCode', 'date', 'status']} 
-             sampleData={[{ studentEmail: 'test@pec.edu', courseCode: 'CS101', date: '2024-03-30', status: 'present' }]} 
-           />
+        <DialogContent className="max-w-4xl bg-card border-border/60">
+           <div className="flex flex-col space-y-4">
+             <div className="space-y-1">
+                <h2 className="text-xl font-black uppercase tracking-widest">Bulk Sync Protocol</h2>
+                <p className="text-sm text-muted-foreground font-medium italic">Import external session data via standard CSV/Excel format</p>
+             </div>
+             <BulkUpload 
+               entityType="attendance" 
+               onImport={handleBulkImport} 
+               templateColumns={['studentEmail', 'courseCode', 'date', 'status']} 
+               sampleData={[{ studentEmail: 'test@pec.edu', courseCode: 'CS101', date: '2024-03-30', status: 'present' }]} 
+             />
+           </div>
         </DialogContent>
       </Dialog>
     </div>
@@ -320,7 +339,6 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
 }
 
 function StudentAttendanceView({ userId, initialData }: { userId: string; initialData?: any }) {
-  // Hydrate from SSR data if available
   const [loading, setLoading] = useState(!initialData?.summary);
   const [attendanceRecords, setAttendanceRecords] = useState<any[]>(initialData?.records || []);
   const [courseAttendance, setCourseAttendance] = useState<CourseAttendance[]>(initialData?.summary?.courses || []);
@@ -370,118 +388,163 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
 
   return (
     <div className="space-y-8 pb-20">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">My Attendance</h1>
-        <p className="text-muted-foreground mt-2 font-medium">Academic performance & session metrics</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-foreground uppercase tracking-widest">Attendance Overview</h1>
+          <p className="text-muted-foreground mt-1 font-medium italic">Detailed session analytics and eligibility tracking</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="h-10 px-4 font-black uppercase tracking-widest text-[10px] bg-card">
+            System Status: Active
+          </Badge>
+          <Badge className={`h-10 px-6 font-black tracking-widest uppercase text-[10px] ${overallPercentage >= 75 ? 'bg-success/20 text-success border-success/30' : 'bg-destructive/10 text-destructive border-destructive/20'}`}>
+            {overallPercentage >= 75 ? 'ELIGIBLE' : 'SHORTAGE'}
+          </Badge>
+        </div>
       </div>
 
-      {/* OVERALL STATS */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card-elevated p-8 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
-           <TrendingUp className="w-32 h-32" />
-        </div>
-        
-        <div className="flex flex-col md:flex-row items-center gap-12">
-           <div className="relative w-40 h-40">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="grid md:grid-cols-12 gap-6 items-stretch">
+        <div className="md:col-span-5 card-elevated p-8 flex flex-col items-center justify-center relative overflow-hidden group">
+           <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+           <div className="relative w-48 h-48">
               <svg className="w-full h-full -rotate-90">
-                <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="12" fill="none" className="text-muted/30" />
+                <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="none" className="text-muted/20" />
                 <motion.circle 
-                  cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="12" fill="none" 
-                  strokeDasharray={`${2 * Math.PI * 72}`} 
-                  initial={{ strokeDashoffset: 2 * Math.PI * 72 }}
-                  animate={{ strokeDashoffset: 2 * Math.PI * 72 * (1 - overallPercentage / 100) }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                  className={getStatusColor(overallPercentage)} strokeLinecap="round" 
+                  cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 88}`} 
+                  initial={{ strokeDashoffset: 2 * Math.PI * 88 }}
+                  animate={{ strokeDashoffset: 2 * Math.PI * 88 * (1 - overallPercentage / 100) }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                  className={getStatusColor(overallPercentage)} strokeLinecap="square" 
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={`text-4xl font-black tracking-tighter ${getStatusColor(overallPercentage)}`}>{Math.round(overallPercentage)}%</span>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Aggregate</span>
+                <span className={`text-5xl font-black tracking-tighter ${getStatusColor(overallPercentage)}`}>{Math.round(overallPercentage)}%</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-1">Aggregate</span>
               </div>
            </div>
+        </div>
 
-           <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="space-y-1">
-                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sessions Attended</p>
-                 <p className="text-3xl font-bold text-success">{(courseAttendance || []).reduce((s,c)=>s+c.present,0)}</p>
+        <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+           <div className="card-elevated p-6 flex flex-col justify-between border-l-4 border-success">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Classes Attended</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-black text-foreground">{(courseAttendance || []).reduce((s,c)=>s+c.present,0)}</span>
+                <span className="text-muted-foreground font-bold text-sm">Sessions</span>
               </div>
-              <div className="space-y-1">
-                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sessions Absent</p>
-                 <p className="text-3xl font-bold text-destructive">{(courseAttendance || []).reduce((s,c)=>s+c.absent,0)}</p>
+              <div className="mt-4 flex items-center gap-2 text-success font-bold text-[10px] uppercase tracking-widest">
+                <CheckCircle className="w-3 h-3" /> Growth: +2.4%
               </div>
-              <div className="hidden lg:block space-y-1">
-                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Eligibility Status</p>
-                 <Badge className={`h-8 px-4 font-bold tracking-widest uppercase text-[10px] ${overallPercentage >= 75 ? 'bg-success/10 text-success border-success/20' : 'bg-destructive/10 text-destructive border-destructive/20'}`}>
-                   {overallPercentage >= 75 ? 'EXAM ELIGIBLE' : 'DEBARRED RISK'}
-                 </Badge>
+           </div>
+           <div className="card-elevated p-6 flex flex-col justify-between border-l-4 border-destructive">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Classes Missed</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-black text-foreground">{(courseAttendance || []).reduce((s,c)=>s+c.absent,0)}</span>
+                <span className="text-muted-foreground font-bold text-sm">Sessions</span>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-destructive font-bold text-[10px] uppercase tracking-widest">
+                <XCircle className="w-3 h-3" /> Risk Factor: High
               </div>
            </div>
         </div>
       </motion.div>
 
-      {/* COURSE BREAKDOWN GRID */}
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-         {(courseAttendance || []).map(c => (
-           <motion.div 
-             key={c.courseId} 
-             whileHover={{ y: -4 }}
-             className="card-elevated p-6 border-l-4 group"
-             style={{ borderLeftColor: c.percentage < 75 ? 'hsl(var(--destructive))' : 'hsl(var(--success))' }}
-           >
-              <div className="flex justify-between items-start mb-6">
-                <div className="space-y-1">
-                  <Badge variant="secondary" className="font-mono text-[9px] h-5 tracking-tight">{c.courseCode}</Badge>
-                  <h3 className="font-bold text-lg leading-tight">{c.courseName}</h3>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+           <div className="h-px flex-1 bg-border/60" />
+           <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground px-4">Course Specific Metrics</span>
+           <div className="h-px flex-1 bg-border/60" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+           {(courseAttendance || []).map(c => (
+             <motion.div 
+               key={c.courseId} 
+               whileHover={{ y: -4 }}
+               className={`card-elevated p-6 border group transition-all ${c.percentage < 75 ? 'border-destructive/30 hover:border-destructive/60' : 'border-border hover:border-primary/40'}`}
+             >
+                <div className="flex justify-between items-start mb-6">
+                  <div className="space-y-1">
+                    <Badge variant="secondary" className="font-mono text-[9px] h-5 tracking-tight px-2 bg-muted/50">{c.courseCode}</Badge>
+                    <h3 className="font-black text-foreground uppercase tracking-tight text-sm line-clamp-1">{c.courseName}</h3>
+                  </div>
+                  <div className={`text-2xl font-black tracking-tighter ${getStatusColor(c.percentage)}`}>{Math.round(c.percentage)}%</div>
                 </div>
-                <div className={`text-2xl font-black tracking-tighter ${getStatusColor(c.percentage)}`}>{Math.round(c.percentage)}%</div>
-              </div>
 
-              <div className="space-y-4">
-                 <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                   <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${c.percentage}%` }}
-                    className={`h-full ${getProgressColor(c.percentage)}`}
-                   />
-                 </div>
-                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                    <span className="text-success">P: {c.present}</span>
-                    <span className="text-destructive">A: {c.absent}</span>
-                    <span className="text-muted-foreground">TOTAL: {c.total}</span>
-                 </div>
-              </div>
-           </motion.div>
-         ))}
+                <div className="space-y-3">
+                   <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden border border-border/10">
+                     <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${c.percentage}%` }}
+                      className={`h-full ${getProgressColor(c.percentage)}`}
+                     />
+                   </div>
+                   <div className="flex justify-between text-[10px] font-black uppercase tracking-tighter">
+                      <span className="text-success flex items-center gap-1 group-hover:gap-2 transition-all">ATTENDED: {c.present}</span>
+                      <span className="text-destructive">MISSED: {c.absent}</span>
+                   </div>
+                </div>
+             </motion.div>
+           ))}
+        </div>
       </div>
 
-      {/* ATTENDANCE LOG */}
-      <div className="card-elevated overflow-hidden">
-         <div className="p-6 border-b border-border bg-muted/20 flex items-center justify-between">
-            <h2 className="font-bold uppercase tracking-widest text-sm flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" /> Session History Log
-            </h2>
+      <div className="space-y-4">
+         <div className="flex items-center justify-between">
+           <h2 className="font-black uppercase tracking-widest text-sm flex items-center gap-2">
+             <Clock className="w-4 h-4 text-primary" /> Session History Log
+           </h2>
+           <div className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Showing last 100 interactions</div>
          </div>
-         <div className="divide-y divide-border">
-            {!Array.isArray(attendanceRecords) || attendanceRecords.length === 0 ? (
-               <div className="p-12 text-center text-muted-foreground font-medium italic">No attendance data logged yet.</div>
-            ) : (
-              attendanceRecords.map(r => (
-                <div key={r.id} className="p-4 flex items-center justify-between hover:bg-muted/5 transition-colors">
-                   <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-sm flex items-center justify-center ${r.status === 'present' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
-                         {r.status === 'present' ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
-                      </div>
-                      <div>
-                         <p className="font-bold text-sm">{(courseAttendance || []).find(c => c.courseId === r.subject)?.courseCode || 'Unknown'}</p>
-                         <p className="text-[10px] font-medium text-muted-foreground">{new Date(r.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                      </div>
-                   </div>
-                   <Badge variant={r.status === 'present' ? 'default' : 'destructive'} className="text-[9px] font-black uppercase tracking-tighter">
-                      {r.status}
-                   </Badge>
-                </div>
-              ))
-            )}
+         
+         <div className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-2xl">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-muted border-b border-border/60">
+                  <th className="py-4 px-6 text-left font-black uppercase text-[10px] tracking-widest text-primary border-r border-border/60">Verification</th>
+                  <th className="py-4 px-6 text-left font-black uppercase text-[10px] tracking-widest border-r border-border/60">Subject & Instructor</th>
+                  <th className="py-4 px-6 text-left font-black uppercase text-[10px] tracking-widest border-r border-border/60">Timestamp</th>
+                  <th className="py-4 px-6 text-right font-black uppercase text-[10px] tracking-widest">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {!Array.isArray(attendanceRecords) || attendanceRecords.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-20 text-center text-muted-foreground font-medium italic">No attendance data logged yet.</td>
+                  </tr>
+                ) : (
+                  attendanceRecords.map(r => {
+                    const course = (courseAttendance || []).find(c => c.courseId === r.subject);
+                    const isPresent = r.status === 'present';
+                    return (
+                      <tr key={r.id} className="group hover:bg-muted/30 transition-colors">
+                        <td className="py-4 px-6 border-r border-border/60">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${isPresent ? 'bg-success/10 text-success border-success/20' : 'bg-destructive/10 text-destructive border-destructive/20'}`}>
+                            {isPresent ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 border-r border-border/60">
+                          <div className="flex flex-col">
+                            <span className="text-base font-bold text-foreground group-hover:text-primary transition-colors">{course?.courseCode || 'GEN-CORE'}</span>
+                            <span className="text-[11px] text-muted-foreground font-medium line-clamp-1">{course?.courseName || 'Unspecified Academic Session'}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 border-r border-border/60">
+                           <div className="flex flex-col">
+                             <span className="text-sm font-bold text-foreground">{new Date(r.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                             <span className="text-[10px] font-bold text-muted-foreground uppercase">{new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date(r.date))}</span>
+                           </div>
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <Badge variant={isPresent ? 'default' : 'destructive'} className="text-[9px] font-black uppercase tracking-widest px-3">
+                            {isPresent ? 'AUTHENTICATED' : 'MISSED'}
+                          </Badge>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
          </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import { StudentStatsCards } from './components/StudentStatsCards';
 import { EnrolledCoursesCard } from './components/EnrolledCoursesCard';
 import { TodayScheduleCard } from './components/TodayScheduleCard';
 import { AttendanceOverviewCard } from './components/AttendanceOverviewCard';
+import { NoticeboardCard } from './components/NoticeboardCard';
 
 const item = {
   hidden: { opacity: 0, y: 12 },
@@ -34,6 +35,7 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
     todayClasses,
     scheduleDay,
     enrolledCoursesList,
+    notices,
     loadError,
     setLoading,
     fetchStudentStats,
@@ -96,7 +98,7 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         }}
       />
 
-      <div className="grid gap-5 md:gap-6 xl:grid-cols-3">
+      <div className="grid gap-5 md:gap-6 xl:grid-cols-3 items-stretch">
         <EnrolledCoursesCard 
           enrolledCoursesList={enrolledCoursesList} 
           onViewAll={() => window.location.href = getFullUrl('/courses')}
@@ -110,12 +112,20 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         />
       </div>
 
-      <motion.div variants={item} className="grid gap-6">
-        <AttendanceOverviewCard 
-          attendancePercentage={stats.attendancePercentage}
-          onClick={() => window.location.href = getFullUrl('/attendance')}
-        />
-      </motion.div>
+      <div className="grid gap-5 md:gap-6 xl:grid-cols-3 items-stretch">
+        <motion.div variants={item} className="h-full">
+          <AttendanceOverviewCard 
+            attendancePercentage={stats.attendancePercentage}
+            onClick={() => window.location.href = getFullUrl('/attendance')}
+          />
+        </motion.div>
+        <motion.div variants={item} className="xl:col-span-2 h-full">
+          <NoticeboardCard 
+            notices={notices} 
+            onViewAll={() => window.location.href = getFullUrl('/noticeboard')} 
+          />
+        </motion.div>
+      </div>
 
       <Dialog open={showQRScanner} onOpenChange={setShowQRScanner}>
         <DialogContent className="max-w-md">

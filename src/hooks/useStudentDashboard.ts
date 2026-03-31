@@ -38,9 +38,11 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   const [todayClasses, setTodayClasses] = useState<any[]>([]);
   const [scheduleDay, setScheduleDay] = useState<string>('Today');
   const [enrolledCoursesList, setEnrolledCoursesList] = useState<Course[]>(initialData?.summary?.courses || []);
+  const [notices, setNotices] = useState<any[]>(initialData?.notices || []);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[]) => {
+  const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[], noticesData: any[] = []) => {
+    setNotices(Array.isArray(noticesData) ? noticesData : []);
     if (summary && typeof summary === 'object') {
       const statsObj = summary.totalSummary || {};
       const summaryCourses = Array.isArray(summary.courses) ? summary.courses : [];
@@ -138,16 +140,18 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         return res;
       };
 
-      const [summaryRes, coursesRes, timetableRes] = await Promise.all([
+      const [summaryRes, coursesRes, timetableRes, noticesRes] = await Promise.all([
         api.get('/attendance/summary'),
         api.get('/courses'),
         api.get('/timetable'),
+        api.get('/noticeboard?limit=5'),
       ]);
 
       processDashboardData(
         getData(summaryRes),
         getData(coursesRes) || [],
-        getData(timetableRes) || []
+        getData(timetableRes) || [],
+        getData(noticesRes) || []
       );
 
     } catch (error) {
@@ -164,7 +168,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       processDashboardData(
         initialData.summary,
         initialData.courses || [],
-        initialData.timetable || []
+        initialData.timetable || [],
+        initialData.notices || []
       );
       setLoading(false);
     }
@@ -207,6 +212,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     todayClasses,
     scheduleDay,
     enrolledCoursesList,
+    notices,
     loadError,
     setLoading,
     fetchStudentStats,

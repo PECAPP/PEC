@@ -14,7 +14,7 @@ interface Props {
 
 export function EnrolledCoursesCard({ enrolledCoursesList, onViewAll, onCourseClick }: Props) {
   return (
-    <div className="xl:col-span-2 card-elevated ui-card-pad">
+    <div className="xl:col-span-2 card-elevated ui-card-pad h-full xl:max-h-[420px] overflow-hidden">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-accent" />

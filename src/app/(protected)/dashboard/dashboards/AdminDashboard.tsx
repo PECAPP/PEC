@@ -79,12 +79,24 @@ export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
     if (tabsTrigger instanceof HTMLElement) tabsTrigger.click();
   };
 
+  const getTimePeriod = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Complete control over your ERP system</p>
+      <div className="relative overflow-hidden p-6 rounded-2xl bg-card border border-border flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-sm">
+        <div className="z-10">
+          <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider mb-2">
+            System Administration
+          </div>
+          <h1 className="text-3xl font-bold text-foreground">
+            {getTimePeriod()}, Admin
+          </h1>
+          <p className="text-muted-foreground mt-1">Complete control over your institutional ERP system</p>
         </div>
         <div className="flex gap-2">
           <Button 
