@@ -54,6 +54,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         const matchByCode = fallbackCourses.find(
           (c) => c.code === course.courseCode || c.code === course.code
         );
+          (c) => c.code === course.courseCode || c.code === course.code
+        );
         const matched = matchById ?? matchByCode;
 
         const resolvedId = idToMatch || matched?.id || `course-${index}`;
