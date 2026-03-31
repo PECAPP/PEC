@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 
-import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { Settings, Loader2, BookOpen, Users, BarChart3 } from 'lucide-react';
 import { useRouter } from 'next/navigation';

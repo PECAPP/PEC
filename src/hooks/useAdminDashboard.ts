@@ -230,7 +230,7 @@ export function useAdminDashboard(initialData?: any) {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if(!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm('Are you sure you want to delete this user?')) return;
     try {
       await api.delete(`/users/${userId}`);
       toast.success('User deleted successfully!');

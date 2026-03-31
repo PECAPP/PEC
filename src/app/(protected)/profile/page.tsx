@@ -5,21 +5,15 @@ import {
   Mail,
   Phone,
   MapPin,
-  FileText,
   Github,
-  Edit2,
   Download,
   QrCode,
   Loader2,
   Star,
-  ShieldCheck,
   Trophy,
-  Code2,
-  Share2,
   Clock,
   Zap,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';

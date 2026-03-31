@@ -13,7 +13,6 @@ import {
   Video,
   File,
   ClipboardList,
-  Link as LinkIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +27,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-;
 import { usePermissions } from '@/hooks/usePermissions';
 import BulkUpload from '@/components/BulkUpload';
 import { fetchAllPages } from '@/lib/fetchAllPages';
@@ -50,7 +48,7 @@ interface CourseMaterial {
 
 const formatUploadedDate = (uploadedAt: unknown) => {
   if (!uploadedAt) return 'N/A';
-  if (typeof uploadedAt === 'object' && uploadedAt && 'toDate' in uploadedAt) {
+  if (typeof uploadedAt === 'object' && 'toDate' in uploadedAt) {
     const timestampObj = uploadedAt as { toDate?: () => Date };
     const converted = timestampObj.toDate?.();
     return converted ? converted.toLocaleDateString() : 'N/A';
@@ -61,7 +59,7 @@ const formatUploadedDate = (uploadedAt: unknown) => {
 
 export default function CourseMaterials() {
   const router = useRouter();
-  const { isAdmin, isFaculty, isStudent, user, loading: authLoading } = usePermissions();
+  const { isAdmin, isFaculty, user, loading: authLoading } = usePermissions();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

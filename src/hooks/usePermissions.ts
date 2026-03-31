@@ -1,5 +1,4 @@
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { authClient } from "@/lib/auth-client";
 import { User } from "@/types/auth";
 import {
   getUserPermissions,

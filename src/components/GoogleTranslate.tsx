@@ -86,23 +86,9 @@ export function GoogleTranslate({
     tryApply();
   };
 
-  const readLanguageFromCookie = () => {
-    const cookie = document.cookie
-      .split('; ')
-      .find((item) => item.startsWith('googtrans='));
-    if (!cookie) {
-      return 'en';
-    }
-
-    const value = decodeURIComponent(cookie.split('=')[1] || '');
-    const target = value.split('/').pop();
-    return target || 'en';
-  };
-
   const setGoogtransCookie = (language: string) => {
     const host = window.location.hostname;
     const isLocalhost = host === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(host);
-    const cookieDomain = !isLocalhost ? `;domain=.${host}` : '';
     const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
 
     if (language === 'en') {
