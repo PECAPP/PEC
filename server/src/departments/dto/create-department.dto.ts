@@ -1,25 +1,26 @@
-import { IsOptional, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { departmentSchema } from '@shared/schemas/erp';
 
 export class CreateDepartmentDto {
-  @IsString()
-  code!: string;
+  @ApiProperty({ example: 'Computer Science' })
+  name: string;
 
-  @IsString()
-  name!: string;
+  @ApiProperty({ example: 'CS' })
+  code: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ example: 'Dr. Smith' })
   hod?: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ example: 'Core CS department' })
   description?: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ example: 'active' })
   status?: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ example: 'CS-TT' })
   timetableLabel?: string;
+
+  static validate(data: unknown): ReturnType<typeof departmentSchema.parse> {
+    return departmentSchema.parse(data);
+  }
 }

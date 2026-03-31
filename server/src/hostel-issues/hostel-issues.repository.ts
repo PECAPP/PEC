@@ -28,13 +28,6 @@ export class HostelIssuesRepository {
       ...(query.status__ne ? { NOT: { status: query.status__ne } } : {}),
       ...(query.category ? { category: query.category } : {}),
       ...(query.priority ? { priority: query.priority } : {}),
-      ...(query.organizationId
-        ? {
-            organizationId: Array.isArray(query.organizationId)
-              ? { in: query.organizationId }
-              : query.organizationId,
-          }
-        : {}),
     };
 
     const total = await this.prisma.hostelIssue.count({ where });
@@ -55,64 +48,23 @@ export class HostelIssuesRepository {
   create(data: CreateHostelIssueDto) {
     return this.prisma.hostelIssue.create({
       data: {
-        title: data.title,
         description: data.description,
         category: data.category,
         priority: data.priority,
-        status: data.status ?? 'open',
+        status: data.status ?? 'Open',
         roomNumber: data.roomNumber,
         studentId: data.studentId,
         studentName: data.studentName,
-        organizationId: data.organizationId,
-        responses: Array.isArray(data.responses) ? data.responses : [],
+        hostelName: (data as any).hostelName || 'General',
         createdAt: this.toDate(data.createdAt),
-        updatedAt: this.toDate(data.updatedAt),
       },
     });
   }
 
   async update(id: string, data: UpdateHostelIssueDto) {
-    const existing = await this.prisma.hostelIssue.findUnique({
-      where: { id },
-    });
-    const currentResponses = Array.isArray(existing?.responses)
-      ? existing?.responses
-      : [];
-
-    let nextResponses: Prisma.JsonArray | undefined;
-    const responsePatch = data.responses as
-      | { _op?: string; val?: unknown }
-      | unknown[]
-      | undefined;
-
-    if (Array.isArray(responsePatch)) {
-      nextResponses = responsePatch as Prisma.JsonArray;
-    } else if (
-      responsePatch &&
-      typeof responsePatch === 'object' &&
-      (responsePatch as { _op?: string })._op === 'arrayUnion'
-    ) {
-      nextResponses = [
-        ...currentResponses,
-        (responsePatch as { val?: unknown }).val ?? null,
-      ] as Prisma.JsonArray;
-    } else if (
-      responsePatch &&
-      typeof responsePatch === 'object' &&
-      (responsePatch as { _op?: string })._op === 'arrayRemove'
-    ) {
-      const removeVal = JSON.stringify(
-        (responsePatch as { val?: unknown }).val ?? null,
-      );
-      nextResponses = currentResponses.filter(
-        (item) => JSON.stringify(item) !== removeVal,
-      ) as Prisma.JsonArray;
-    }
-
     return this.prisma.hostelIssue.update({
       where: { id },
       data: {
-        ...(data.title ? { title: data.title } : {}),
         ...(data.description ? { description: data.description } : {}),
         ...(data.category ? { category: data.category } : {}),
         ...(data.priority ? { priority: data.priority } : {}),
@@ -120,8 +72,6 @@ export class HostelIssuesRepository {
         ...(data.roomNumber ? { roomNumber: data.roomNumber } : {}),
         ...(data.studentId ? { studentId: data.studentId } : {}),
         ...(data.studentName ? { studentName: data.studentName } : {}),
-        ...(data.organizationId ? { organizationId: data.organizationId } : {}),
-        ...(nextResponses ? { responses: nextResponses } : {}),
         ...(this.toDate(data.updatedAt)
           ? { updatedAt: this.toDate(data.updatedAt) }
           : {}),

@@ -5,15 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRef, useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Register GSAP plugins
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 const container = {
   hidden: { opacity: 0 },
@@ -33,47 +26,9 @@ export function LandingHero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
 
-  // GSAP Scroll Animations
+  // Framer Motion handles the animations via whileHover/whileTap
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
-
-    const magneticButtons = document.querySelectorAll('.magnetic-btn');
-    magneticButtons.forEach((button) => {
-      const handleMouseMove = (e: MouseEvent) => {
-        const rect = (button as HTMLElement).getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-
-        gsap.to(button, {
-          x: x * 0.3,
-          y: y * 0.3,
-          duration: 0.3,
-          ease: 'power2.out',
-        });
-      };
-
-      const handleMouseLeave = () => {
-        gsap.to(button, {
-          x: 0,
-          y: 0,
-          duration: 0.5,
-          ease: 'elastic.out(1, 0.5)',
-        });
-      };
-
-      button.addEventListener('mousemove', handleMouseMove as EventListener);
-      button.addEventListener('mouseleave', handleMouseLeave);
-
-      return () => {
-        button.removeEventListener('mousemove', handleMouseMove as EventListener);
-        button.removeEventListener('mouseleave', handleMouseLeave);
-      };
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+    // No-op: GSAP logic removed to reduce bundle size and consolidate with Framer Motion.
   }, []);
 
   return (

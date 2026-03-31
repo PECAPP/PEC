@@ -1,7 +1,7 @@
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
 import { serverFetch } from '@/lib/server-data';
-import AttendanceClient from './AttendanceClient';
+import AttendanceView from '@/modules/attendance/views/AttendanceView';
 
 export const experimental_ppr = true;
 
@@ -32,7 +32,7 @@ export default async function AttendancePage() {
   }
 
   return (
-    <AttendanceClient 
+    <AttendanceView 
       session={session} 
       initialData={initialData} 
     />

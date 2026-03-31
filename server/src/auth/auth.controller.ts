@@ -18,7 +18,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
-import { RateLimit } from '../common/decorators/rate-limit-options.decorator';
+import { Throttle } from '@nestjs/throttler';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import {
   setRoleSchema,
@@ -50,13 +50,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  @RateLimit({
-    limit: 8,
-    windowMs: 60_000,
-    banAfterExceeded: 4,
-    banDurationMs: 60 * 60_000,
-    requireCaptchaAfterExceeded: 2,
-  })
+  @Throttle({ short: { limit: 5, ttl: 60000 } })
   async signIn(
     @Body(new ZodValidationPipe(signInSchema)) signInDto: SignInInput,
     @Request() req: ExpressRequest,
@@ -80,13 +74,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  @RateLimit({
-    limit: 5,
-    windowMs: 60_000,
-    banAfterExceeded: 4,
-    banDurationMs: 45 * 60_000,
-    requireCaptchaAfterExceeded: 2,
-  })
+  @Throttle({ short: { limit: 3, ttl: 60000 } })
   async signUp(
     @Body(new ZodValidationPipe(signUpSchema)) signUpDto: SignUpInput,
     @Request() req: ExpressRequest,
@@ -112,13 +100,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  @RateLimit({
-    limit: 20,
-    windowMs: 60_000,
-    banAfterExceeded: 6,
-    banDurationMs: 60 * 60_000,
-    requireCaptchaAfterExceeded: 3,
-  })
+  @Throttle({ short: { limit: 10, ttl: 60000 } })
   async refresh(
     @Body(new ZodValidationPipe(refreshSchema)) body: RefreshInput,
     @Request() req: ExpressRequest,
@@ -166,13 +148,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('request-password-reset')
-  @RateLimit({
-    limit: 6,
-    windowMs: 60_000,
-    banAfterExceeded: 4,
-    banDurationMs: 45 * 60_000,
-    requireCaptchaAfterExceeded: 2,
-  })
+  @Throttle({ short: { limit: 3, ttl: 60000 } })
   async requestPasswordReset(
     @Body(new ZodValidationPipe(requestPasswordResetSchema))
     body: RequestPasswordResetInput,
@@ -224,7 +200,7 @@ export class AuthController {
   @Post('set-role')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
-  @RateLimit({ limit: 20, windowMs: 60_000, banAfterExceeded: 8 })
+  @Throttle({ short: { limit: 10, ttl: 60000 } })
   async setRole(
     @Request() req: any,
     @Body(new ZodValidationPipe(setRoleSchema)) body: SetRoleInput,

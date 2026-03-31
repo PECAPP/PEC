@@ -1,6 +1,9 @@
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
+import { useState, useTransition, useEffect, useOptimistic } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { facultySchema, FacultyInput } from '@shared/schemas/erp';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -46,16 +49,43 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [editingFaculty, setEditingFaculty] = useState<any>(null);
-  const [form, setForm] = useState(emptyForm);
+
+  const {
+    register,
+    handleSubmit: formSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<FacultyInput>({
+    resolver: zodResolver(facultySchema),
+    defaultValues: emptyForm,
+  });
 
   useEffect(() => { setFaculty(initialFaculty); }, [initialFaculty]);
+  
+  const [optimisticFaculty, addOptimisticFaculty] = useOptimistic(
+    faculty,
+    (state, { type, payload }: { type: 'create' | 'update' | 'delete' | 'promote', payload: any }) => {
+      switch (type) {
+        case 'create':
+          return [{ ...payload, id: 'temp-' + Date.now(), status: 'active' }, ...state];
+        case 'update':
+          return state.map(f => f.id === payload.id ? { ...f, ...payload } : f);
+        case 'delete':
+          return state.filter(f => f.id !== payload.id);
+        case 'promote':
+          return state.map(f => f.id === payload.id ? { ...f, designation: 'Head of Department' } : f);
+        default:
+          return state;
+      }
+    }
+  );
 
   // Safe Action Hooks
   const { execute: executeCreate } = useAction(createFacultyAction, {
     onSuccess: () => {
       toast.success('Faculty created!');
       setShowDialog(false);
-      resetForm();
+      reset();
       router.refresh();
     },
     onError: ({ error }) => toast.error(error.serverError || 'Failed to create.'),
@@ -66,7 +96,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
       toast.success('Faculty updated!');
       setShowDialog(false);
       setEditingFaculty(null);
-      resetForm();
+      reset();
       router.refresh();
     },
     onError: ({ error }) => toast.error(error.serverError || 'Failed to update.'),
@@ -88,11 +118,11 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
     onError: ({ error }) => toast.error(error.serverError || 'Failed to promote.'),
   });
 
-  const resetForm = () => setForm(emptyForm);
+  const resetForm = () => reset(emptyForm);
 
   const openEditDialog = (fac: any) => {
     setEditingFaculty(fac);
-    setForm({
+    reset({
       fullName: fac.fullName, email: fac.email,
       employeeId: fac.employeeId || '', department: fac.department || '',
       designation: fac.designation || '', phone: fac.phone || '',
@@ -101,17 +131,24 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
     setShowDialog(true);
   };
 
-  const handleSubmit = () => {
-    if (editingFaculty) {
-      executeUpdate({ ...form, id: editingFaculty.id });
-    } else {
-      executeCreate(form);
-    }
+  const onSubmit = (data: FacultyInput) => {
+    startTransition(() => {
+      if (editingFaculty) {
+        addOptimisticFaculty({ type: 'update', payload: { ...data, id: editingFaculty.id } });
+        executeUpdate({ ...data, id: editingFaculty.id });
+      } else {
+        addOptimisticFaculty({ type: 'create', payload: data });
+        executeCreate(data);
+      }
+    });
   };
 
   const handleDelete = (id: string) => {
     if (!confirm('Are you sure you want to delete this faculty member?')) return;
-    executeDelete({ id });
+    startTransition(() => {
+      addOptimisticFaculty({ type: 'delete', payload: { id } });
+      executeDelete({ id });
+    });
   };
 
   const handlePromoteHOD = (fac: any) => {
@@ -119,7 +156,10 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
       toast.error('Department assignment required before HOD elevation.');
       return;
     }
-    executePromote({ ...fac, id: fac.id });
+    startTransition(() => {
+      addOptimisticFaculty({ type: 'promote', payload: { id: fac.id } });
+      executePromote({ ...fac, id: fac.id });
+    });
   };
 
   const exportFaculty = async () => {
@@ -140,6 +180,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
     let successCount = 0, failCount = 0;
     const errors: string[] = [];
 
+    // Separate from optimistic for bulk high-volume operations
     for (const row of data) {
       const result = await createFacultyAction({
         fullName: row.fullName,
@@ -163,7 +204,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
     return { success: successCount, failed: failCount, errors };
   };
 
-  const filtered = faculty.filter(f =>
+  const filtered = optimisticFaculty.filter(f =>
     f.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     f.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     f.employeeId?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -193,8 +234,8 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
 
       <div className="grid gap-4 md:grid-cols-2">
         {[
-          { icon: Users, label: 'Staff Count', value: faculty.length, color: 'primary' },
-          { icon: BookOpen, label: 'Domain Reach', value: new Set(faculty.map(f => f.department)).size, color: 'success' },
+          { icon: Users, label: 'Staff Count', value: optimisticFaculty.length, color: 'primary' },
+          { icon: BookOpen, label: 'Domain Reach', value: new Set(optimisticFaculty.filter(f => f.department).map(f => f.department)).size, color: 'success' },
         ].map(({ icon: Icon, label, value, color }) => (
           <div key={label} className="card-elevated p-6 border-b-4 border-r-4 border-primary/20">
             <div className="flex items-center gap-4">
@@ -265,30 +306,35 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
           <div className="space-y-6 pt-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Full Nominal *</label>
-              <Input value={form.fullName} onChange={e => setForm({ ...form, fullName: e.target.value })} className="h-12 border-2 rounded-sm font-bold" placeholder="ARJUN SHARMA" />
+              <Input {...register('fullName')} className={`h-12 border-2 rounded-sm font-bold ${errors.fullName ? 'border-destructive' : ''}`} placeholder="ARJUN SHARMA" />
+              {errors.fullName && <p className="text-[10px] font-bold text-destructive uppercase">{errors.fullName.message}</p>}
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Gateway Email *</label>
-                <Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="h-12 border-2 rounded-sm font-bold" placeholder="ARJUN@PEC.EDU" />
+                <Input type="email" {...register('email')} className={`h-12 border-2 rounded-sm font-bold ${errors.email ? 'border-destructive' : ''}`} placeholder="ARJUN@PEC.EDU" />
+                {errors.email && <p className="text-[10px] font-bold text-destructive uppercase">{errors.email.message}</p>}
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assigned Domain</label>
-                <Input value={form.department} onChange={e => setForm({ ...form, department: e.target.value })} className="h-12 border-2 rounded-sm font-bold" placeholder="CSE" />
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assigned Domain *</label>
+                <Input {...register('department')} className={`h-12 border-2 rounded-sm font-bold ${errors.department ? 'border-destructive' : ''}`} placeholder="CSE" />
+                {errors.department && <p className="text-[10px] font-bold text-destructive uppercase">{errors.department.message}</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Staff Registry ID</label>
-                <Input value={form.employeeId} onChange={e => setForm({ ...form, employeeId: e.target.value })} className="h-12 border-2 rounded-sm font-mono font-bold" placeholder="FAC001" />
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Staff Registry ID *</label>
+                <Input {...register('employeeId')} className={`h-12 border-2 rounded-sm font-mono font-bold ${errors.employeeId ? 'border-destructive' : ''}`} placeholder="FAC001" />
+                {errors.employeeId && <p className="text-[10px] font-bold text-destructive uppercase">{errors.employeeId.message}</p>}
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Designation Badge</label>
-                <Input value={form.designation} onChange={e => setForm({ ...form, designation: e.target.value })} className="h-12 border-2 rounded-sm font-bold" placeholder="Associate Professor" />
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Designation Badge *</label>
+                <Input {...register('designation')} className={`h-12 border-2 rounded-sm font-bold ${errors.designation ? 'border-destructive' : ''}`} placeholder="Associate Professor" />
+                {errors.designation && <p className="text-[10px] font-bold text-destructive uppercase">{errors.designation.message}</p>}
               </div>
             </div>
             <div className="flex gap-4 pt-8">
-              <Button onClick={handleSubmit} className="flex-1 h-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg rounded-sm hover:brightness-110 active:scale-[0.98] transition-all" disabled={isPending}>
+              <Button onClick={formSubmit(onSubmit)} className="flex-1 h-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg rounded-sm hover:brightness-110 active:scale-[0.98] transition-all" disabled={isPending}>
                 {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {editingFaculty ? 'Commit Changes' : 'Authorize Identity'}
               </Button>

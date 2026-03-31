@@ -38,8 +38,8 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull }: Pro
         {todayClasses.length === 0 ? (
           <EmptyState title="No classes scheduled" description="You are all clear for this day." />
         ) : (
-          todayClasses.map((cls) => (
-            <div key={cls.id} className="rounded-lg border border-border bg-secondary/10 p-3">
+          todayClasses.map((cls, index) => (
+            <div key={`${cls.id || 'class'}-${index}`} className="rounded-lg border border-border bg-secondary/10 p-3">
               <div className="mb-2 flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">

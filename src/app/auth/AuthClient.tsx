@@ -165,19 +165,19 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background overflow-hidden relative font-sans">
       {/* LEFT SIDE: BRANDING & IMAGE (SWISS - CLEANER & BILINGUAL) */}
-      <div className="hidden md:flex md:w-5/12 lg:w-1/2 bg-accent relative flex-col justify-center p-12 lg:p-24 text-accent-foreground group overflow-hidden border-r border-primary/20">
+      <div className="hidden md:flex md:w-6/12 bg-black relative flex-col justify-center p-12 lg:p-16 text-white group overflow-hidden border-r border-white/5">
         <div className="relative z-20 space-y-12">
           {/* HEADER LOGO + BILINGUAL TITLE */}
-          <div className="flex items-start gap-5">
-            <div className="w-14 h-14 bg-black flex items-center justify-center shadow-[4px_4px_0px_white] rounded-sm">
-              <Building2 className="w-7 h-7 text-white" />
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-accent flex items-center justify-center shadow-[4px_4px_0px_white] rounded-sm">
+              <Building2 className="w-6 h-6 text-black" />
             </div>
-            <div className="space-y-1">
-              <h2 className="text-lg lg:text-xl font-bold text-black uppercase tracking-tight leading-none">
+            <div className="space-y-0.5">
+              <h2 className="text-base lg:text-lg font-bold text-white uppercase tracking-tight leading-none">
                 Punjab Engineering College 
               </h2>
-              <p className="text-sm font-medium text-black">
-                पंजाब इंजीनियरिंग कॉलेज | <span className="font-bold">Chandigarh</span>
+              <p className="text-[11px] font-medium text-white/60">
+                पंजाब इंजीनियरिंग कॉलेज | <span className="font-bold text-accent">Chandigarh</span>
               </p>
             </div>
           </div>
@@ -186,12 +186,12 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="pt-8"
+            className="pt-4"
           >
-            <h1 className="text-6xl lg:text-8xl font-bold font-monument leading-[1.1] tracking-tight uppercase text-black">
-              Hello <span className="text-white drop-shadow-[2px_2px_0px_black]">SCHOLAR</span>!
+            <h1 className="text-5xl lg:text-7xl font-bold font-monument leading-[1.1] tracking-tight uppercase text-white">
+              Hello <span className="text-accent underline underline-offset-8 decoration-8 decoration-white/5">SCHOLAR</span>!
             </h1>
-            <p className="text-xl lg:text-2xl text-black font-medium max-w-sm mt-8 leading-snug font-display tracking-tight">
+            <p className="text-lg lg:text-xl text-white/50 font-medium max-w-sm mt-6 leading-snug font-display tracking-tight">
               Seamless campus governance for the next generation of engineers.
             </p>
           </motion.div>
@@ -201,33 +201,33 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="flex items-center gap-6 pt-8 border-t border-black/10 w-fit"
+            className="flex items-center gap-6 pt-6 border-t border-white/5 w-fit"
           >
              <div className="flex -space-x-3">
                {[1,2,3,4].map(i => (
-                 <div key={i} className="w-10 h-10 border-2 border-black bg-muted flex items-center justify-center overflow-hidden rounded-sm">
+                 <div key={i} className="w-9 h-9 border-2 border-black bg-muted flex items-center justify-center overflow-hidden rounded-sm">
                     <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" className="w-full h-full object-cover grayscale brightness-110" />
                  </div>
                ))}
-               <div className="w-10 h-10 border-2 border-black bg-black flex items-center justify-center text-[10px] font-bold text-accent rounded-sm">12K+</div>
+               <div className="w-9 h-9 border-2 border-black bg-white flex items-center justify-center text-[10px] font-bold text-black rounded-sm">12K+</div>
              </div>
-             <p className="text-[11px] font-bold uppercase tracking-widest text-black/80">Active in the databank</p>
+             <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Active in the databank</p>
           </motion.div>
         </div>
 
         {/* BRUTALIST IMAGE OVERLAY */}
-        <div className="absolute inset-0 z-10 opacity-30 mix-blend-multiply transition-opacity duration-1000 group-hover:opacity-40">
+        <div className="absolute inset-0 z-10 opacity-80 group-hover:opacity-100 transition-opacity duration-1000">
            <img 
              src="/login.webp" 
-             className="w-full h-full object-cover grayscale contrast-[1.8] saturate-0 group-hover:scale-105 transition-transform duration-[5s] ease-out" 
+             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[7s] ease-out sepia-[0.15] contrast-[1.05]" 
              alt="PEC Academic Block" 
            />
         </div>
-        <div className="absolute inset-0 z-10 bg-accent/15" />
+        <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/80 via-black/20 to-transparent" />
         
-        <div className="absolute bottom-10 left-12 lg:left-24 z-20 flex items-center gap-4">
-          <Globe className="w-4 h-4 text-black opacity-50" />
-          <p className="text-[10px] text-black font-bold uppercase tracking-[0.25em]">
+        <div className="absolute bottom-10 left-12 lg:left-16 z-20 flex items-center gap-4">
+          <Globe className="w-4 h-4 text-white opacity-20" />
+          <p className="text-[10px] text-white/20 font-bold uppercase tracking-[0.25em]">
             PEC.EDU • CHANDIGARH • 160012
           </p>
         </div>

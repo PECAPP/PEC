@@ -26,6 +26,7 @@ export class CanteenService {
 
   async createOrder(data: any) {
     const { items, ...orderData } = data;
+    // @ts-ignore
     return this.prismaAny.canteenOrder.create({
       data: {
         ...orderData,

@@ -1,27 +1,15 @@
-import { IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { departmentSchema } from '@shared/schemas/erp';
 
 export class UpdateDepartmentDto {
-  @IsOptional()
-  @IsString()
-  code?: string;
+  @ApiPropertyOptional() name?: string;
+  @ApiPropertyOptional() code?: string;
+  @ApiPropertyOptional() hod?: string;
+  @ApiPropertyOptional() description?: string;
+  @ApiPropertyOptional() status?: string;
+  @ApiPropertyOptional() timetableLabel?: string;
 
-  @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  hod?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  status?: string;
-
-  @IsOptional()
-  @IsString()
-  timetableLabel?: string;
+  static validate(data: unknown): Partial<ReturnType<typeof departmentSchema.parse>> {
+    return departmentSchema.partial().parse(data);
+  }
 }

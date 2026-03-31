@@ -1,15 +1,17 @@
-import { IsDateString, IsIn, IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { attendanceSchema } from '@shared/schemas/erp';
 
 export class UpdateAttendanceDto {
-  @IsOptional()
-  @IsDateString()
-  date?: string;
-
-  @IsOptional()
-  @IsIn(['present', 'absent', 'late'])
+  @ApiPropertyOptional({ enum: ['present', 'absent', 'late'] })
   status?: 'present' | 'absent' | 'late';
 
-  @IsOptional()
-  @IsString()
-  subject?: string;
+  @ApiPropertyOptional()
+  date?: string | Date;
+
+  @ApiPropertyOptional()
+  remarks?: string;
+
+  static validate(data: unknown): Partial<ReturnType<typeof attendanceSchema.parse>> {
+    return attendanceSchema.partial().parse(data);
+  }
 }

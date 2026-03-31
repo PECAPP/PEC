@@ -1,39 +1,32 @@
-import { Type } from 'class-transformer';
-import {
-  IsDateString,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { enrollmentSchema } from '@shared/schemas/erp';
 
 export class CreateEnrollmentDto {
-  @IsString()
+  @ApiProperty({ example: 'uuid-student-id' })
   studentId: string;
 
-  @IsUUID('4')
+  @ApiProperty({ example: 'uuid-course-id' })
   courseId: string;
 
-  @IsString()
+  @ApiProperty({ example: 'Introduction to Computing' })
   courseName: string;
 
-  @IsString()
+  @ApiProperty({ example: 'CS101' })
   courseCode: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
+  @ApiPropertyOptional({ example: 3 })
   semester?: number;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ example: '2024-25' })
   batch?: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional({ enum: ['active', 'inactive', 'completed', 'withdrawn'], default: 'active' })
   status?: string;
 
-  @IsOptional()
-  @IsDateString()
+  @ApiPropertyOptional()
   enrolledAt?: string;
+
+  static validate(data: unknown): ReturnType<typeof enrollmentSchema.parse> {
+    return enrollmentSchema.parse(data);
+  }
 }

@@ -35,9 +35,9 @@ export function EnrolledCoursesCard({ enrolledCoursesList, onViewAll, onCourseCl
             onAction={onViewAll}
           />
         ) : (
-          enrolledCoursesList.slice(0, 4).map((course) => (
+          enrolledCoursesList.slice(0, 4).map((course, index) => (
             <div 
-              key={course.id} 
+              key={`${course.id || 'course'}-${index}`} 
               className="p-4 rounded-xl border border-border bg-card/50 hover:bg-accent/50 hover:border-accent transition-all group cursor-pointer relative overflow-hidden"
               onClick={() => onCourseClick(course.id)}
             >

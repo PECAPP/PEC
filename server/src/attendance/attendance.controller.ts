@@ -11,6 +11,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AttendanceService } from './attendance.service';
 import { AttendanceQueryDto } from './dto/attendance-query.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
@@ -35,6 +36,7 @@ export class AttendanceController {
 
   @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('summary')
+  @Throttle({ short: { limit: 10, ttl: 60000 } })
   async getSummary(@Request() req: any, @Query('studentId') studentId?: string) {
     const targetId = req.user?.role === 'student' ? req.user.sub : studentId;
     if (!targetId) throw new BadRequestException('Student ID is required');
@@ -44,6 +46,7 @@ export class AttendanceController {
 
   @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('predict')
+  @Throttle({ short: { limit: 5, ttl: 60000 } })
   async getPrediction(@Request() req: any, @Query('studentId') studentId?: string, @Query('target') target?: string) {
     const targetId = req.user?.role === 'student' ? req.user.sub : studentId;
     if (!targetId) throw new BadRequestException('Student ID is required');

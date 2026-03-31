@@ -1,8 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useEffect, useRef } from 'react';
+import { useInView, useMotionValue, useSpring } from 'framer-motion';
 
 interface AnimatedCounterProps {
   end: number;
@@ -12,56 +9,43 @@ interface AnimatedCounterProps {
   decimals?: number;
   className?: string;
 }
- /** Animated counter that counts up when scrolled into view */
+
+/** 
+ * Lightweight animated counter using Framer Motion.
+ * Replaces GSAP for better bundle control and performance.
+ */
 export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   end,
-  duration = 2,
   suffix = '',
   prefix = '',
   decimals = 0,
   className = '',
 }) => {
-  const counterRef = useRef<HTMLSpanElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, {
+    damping: 60,
+    stiffness: 100,
+  });
 
   useEffect(() => {
-    if (!counterRef.current || hasAnimated) return;
-
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      if (counterRef.current) {
-        counterRef.current.textContent = `${prefix}${end.toFixed(decimals)}${suffix}`;
-      }
-      return;
+    if (isInView) {
+      motionValue.set(end);
     }
+  }, [motionValue, end, isInView]);
 
-    const counter = { value: 0 };
-
-    const animation = gsap.to(counter, {
-      value: end,
-      duration,
-      ease: 'power2.out',
-      onUpdate: () => {
-        if (counterRef.current) {
-          counterRef.current.textContent = `${prefix}${counter.value.toFixed(decimals)}${suffix}`;
-        }
-      },
-      scrollTrigger: {
-        trigger: counterRef.current,
-        start: 'top 80%',
-        once: true,
-        onEnter: () => setHasAnimated(true),
-      },
+  useEffect(() => {
+    springValue.on("change", (latest) => {
+      if (ref.current) {
+        ref.current.textContent = `${prefix}${latest.toFixed(decimals)}${suffix}`;
+      }
     });
-
-    return () => {
-      animation.kill();
-    };
-  }, [end, duration, suffix, prefix, decimals, hasAnimated]);
+  }, [springValue, prefix, suffix, decimals]);
 
   return (
-    <span ref={counterRef} className={className}>
+    <span ref={ref} className={className}>
       {prefix}0{suffix}
     </span>
   );

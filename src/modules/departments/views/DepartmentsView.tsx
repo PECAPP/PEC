@@ -1,6 +1,9 @@
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
+import { useState, useTransition, useEffect, useOptimistic } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { departmentSchema, DepartmentInput } from '@shared/schemas/erp';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -37,17 +40,29 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
   const [showDialog, setShowDialog] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [editingDept, setEditingDept] = useState<any>(null);
-  const [deptForm, setDeptForm] = useState(emptyForm);
+  
+  const {
+    register,
+    handleSubmit: formSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<DepartmentInput>({
+    resolver: zodResolver(departmentSchema),
+    defaultValues: emptyForm,
+  });
 
   // Safe Action Hooks for professional status management
   const { execute: executeCreate } = useAction(createDepartmentAction, {
     onSuccess: () => {
       toast.success('Department created!');
       setShowDialog(false);
-      resetForm();
+      reset();
       router.refresh();
     },
-    onError: ({ error }) => toast.error(error.serverError || 'Failed to create.'),
+    onError: ({ error }) => {
+        toast.error(error.serverError || 'Failed to create.');
+        router.refresh(); // Sync back to server state on error
+    }
   });
 
   const { execute: executeUpdate } = useAction(updateDepartmentAction, {
@@ -55,10 +70,13 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
       toast.success('Department updated!');
       setShowDialog(false);
       setEditingDept(null);
-      resetForm();
+      reset();
       router.refresh();
     },
-    onError: ({ error }) => toast.error(error.serverError || 'Failed to update.'),
+    onError: ({ error }) => {
+        toast.error(error.serverError || 'Failed to update.');
+        router.refresh();
+    }
   });
 
   const { execute: executeDelete, isPending: isDeleting } = useAction(deleteDepartmentAction, {
@@ -66,32 +84,58 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
       toast.success('Department deleted!');
       router.refresh();
     },
-    onError: ({ error }) => toast.error(error.serverError || 'Failed to delete.'),
+    onError: ({ error }) => {
+        toast.error(error.serverError || 'Failed to delete.');
+        router.refresh();
+    }
   });
 
   useEffect(() => {
     setDepartments(initialDepartments);
   }, [initialDepartments]);
 
-  const resetForm = () => { setDeptForm(emptyForm); };
+  const [optimisticDepts, addOptimisticDept] = useOptimistic(
+    departments,
+    (state, { type, payload }: { type: 'create' | 'update' | 'delete', payload: any }) => {
+      switch (type) {
+        case 'create':
+          return [...state, { ...payload, id: 'temp-' + Date.now(), status: 'active' }];
+        case 'update':
+          return state.map(d => d.id === payload.id ? { ...d, ...payload } : d);
+        case 'delete':
+          return state.filter(d => d.id !== payload.id);
+        default:
+          return state;
+      }
+    }
+  );
+
+  const resetForm = () => { reset(emptyForm); };
 
   const openEditDialog = (dept: any) => {
     setEditingDept(dept);
-    setDeptForm({ name: dept.name, code: dept.code, hod: dept.hod || '', description: dept.description || '' });
+    reset({ name: dept.name, code: dept.code, hod: dept.hod || '', description: dept.description || '' });
     setShowDialog(true);
   };
 
-  const handleSubmit = () => {
-    if (editingDept) {
-      executeUpdate({ ...deptForm, id: editingDept.id });
-    } else {
-      executeCreate(deptForm);
-    }
+  const onSubmit = (data: DepartmentInput) => {
+    startTransition(() => {
+      if (editingDept) {
+        addOptimisticDept({ type: 'update', payload: { ...data, id: editingDept.id } });
+        executeUpdate({ ...data, id: editingDept.id });
+      } else {
+        addOptimisticDept({ type: 'create', payload: data });
+        executeCreate(data);
+      }
+    });
   };
 
   const handleDelete = (deptId: string) => {
     if (!confirm('Are you sure you want to delete this department?')) return;
-    executeDelete({ id: deptId });
+    startTransition(() => {
+      addOptimisticDept({ type: 'delete', payload: { id: deptId } });
+      executeDelete({ id: deptId });
+    });
   };
 
   const exportDepartments = async () => {
@@ -131,7 +175,7 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
     return { success: successCount, failed: failCount, errors };
   };
 
-  const filtered = departments.filter(d =>
+  const filtered = optimisticDepts.filter(d =>
     d.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     d.code?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -166,9 +210,9 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
 
       <div className="grid gap-4 md:grid-cols-3">
         {[
-          { icon: Building2, label: 'Domain Nodes', value: departments.length, color: 'primary' },
-          { icon: GraduationCap, label: 'Active Clusters', value: departments.filter(d => d.status !== 'inactive').length, color: 'success' },
-          { icon: Users, label: 'Managed Leads', value: departments.filter(d => d.hod).length, color: 'accent' },
+          { icon: Building2, label: 'Domain Nodes', value: optimisticDepts.length, color: 'primary' },
+          { icon: GraduationCap, label: 'Active Clusters', value: optimisticDepts.filter(d => d.status !== 'inactive').length, color: 'success' },
+          { icon: Users, label: 'Managed Leads', value: optimisticDepts.filter(d => d.hod).length, color: 'accent' },
         ].map(({ icon: Icon, label, value, color }) => (
           <div key={label} className="card-elevated p-6 border-b-4 border-r-4 border-primary/20">
             <div className="flex items-center gap-4">
@@ -230,23 +274,25 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Entry Code *</label>
-                <Input value={deptForm.code} onChange={e => setDeptForm({ ...deptForm, code: e.target.value })} placeholder="e.g. CS" className="mt-1 h-12 border-2 rounded-sm font-bold font-mono" />
+                <Input {...register('code')} placeholder="e.g. CS" className={`mt-1 h-12 border-2 rounded-sm font-bold font-mono ${errors.code ? 'border-destructive' : ''}`} />
+                {errors.code && <p className="text-[10px] font-bold text-destructive uppercase">{errors.code.message}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Formal Title *</label>
-                <Input value={deptForm.name} onChange={e => setDeptForm({ ...deptForm, name: e.target.value })} placeholder="e.g. Computer Science" className="mt-1 h-12 border-2 rounded-sm font-black" />
+                <Input {...register('name')} placeholder="e.g. Computer Science" className={`mt-1 h-12 border-2 rounded-sm font-black ${errors.name ? 'border-destructive' : ''}`} />
+                {errors.name && <p className="text-[10px] font-bold text-destructive uppercase">{errors.name.message}</p>}
               </div>
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assigned Lead Lead</label>
-              <Input value={deptForm.hod} onChange={e => setDeptForm({ ...deptForm, hod: e.target.value })} placeholder="e.g. Dr. Persona" className="mt-1 h-12 border-2 rounded-sm font-bold" />
+              <Input {...register('hod')} placeholder="e.g. Dr. Persona" className="mt-1 h-12 border-2 rounded-sm font-bold" />
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Manifest Definition</label>
-              <textarea value={deptForm.description} onChange={e => setDeptForm({ ...deptForm, description: e.target.value })} placeholder="Define node parameters..." className="mt-1 w-full min-h-[100px] p-4 rounded-sm border-2 border-border bg-background/50 font-medium focus:border-primary transition-all" />
+              <textarea {...register('description')} placeholder="Define node parameters..." className="mt-1 w-full min-h-[100px] p-4 rounded-sm border-2 border-border bg-background/50 font-medium focus:border-primary transition-all" />
             </div>
             <div className="flex gap-4 pt-6">
-              <Button onClick={handleSubmit} className="flex-1 h-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
+              <Button onClick={formSubmit(onSubmit)} className="flex-1 h-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
                 {isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                 {editingDept ? 'Update Domain Node' : 'Authorize Node Creation'}
               </Button>

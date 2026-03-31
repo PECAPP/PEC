@@ -1,5 +1,6 @@
 ﻿import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -19,9 +20,9 @@ import { HostelIssuesModule } from './hostel-issues/hostel-issues.module';
 import { CampusMapModule } from './campus-map/campus-map.module';
 import { CourseMaterialsModule } from './course-materials/course-materials.module';
 import { NoticeboardModule } from './noticeboard/noticeboard.module';
+import { AiModule } from './ai/ai.module';
 
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
-import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
 import { CanteenModule } from './canteen/canteen.module';
@@ -50,6 +51,16 @@ import { AdminModule } from './admin/admin.module';
     CourseMaterialsModule,
     NoticeboardModule,
     AdminModule,
+    AiModule,
+    ThrottlerModule.forRoot([{
+      name: 'short',
+      ttl: 60000,
+      limit: 100,
+    }, {
+      name: 'long',
+      ttl: 600000,
+      limit: 1000,
+    }]),
   ],
   controllers: [AppController],
   providers: [
@@ -60,7 +71,7 @@ import { AdminModule } from './admin/admin.module';
     },
     {
       provide: APP_GUARD,
-      useClass: RateLimitGuard,
+      useClass: ThrottlerGuard,
     },
   ],
 })

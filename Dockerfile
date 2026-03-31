@@ -1,31 +1,20 @@
-FROM node:20-alpine AS deps
+FROM node:20-alpine
 
 WORKDIR /app
 
+# Copy root and shared
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps
+COPY tsconfig*.json ./
+COPY shared ./shared
 
-FROM node:20-alpine AS builder
+# Install all dependencies (frontend + dev tools)
+RUN npm install --legacy-peer-deps
 
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
+# Copy rest of the source
 COPY . .
-RUN npm run build
 
-FROM node:20-alpine AS runner
-
-WORKDIR /app
-
-ENV NODE_ENV=production
-ENV PORT=3000
-
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/next.config.mjs ./next.config.mjs
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-
+# Expose Next.js port
 EXPOSE 3000
 
-CMD ["npm", "run", "start", "--", "-H", "0.0.0.0", "-p", "3000"]
+# Run in Development mode to avoid strict production build checks as requested
+CMD ["npm", "run", "frontend"]

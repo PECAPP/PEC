@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCollegeSettings } from "@/hooks/useCollegeSettings";
+import api from "@/lib/api";
 import { doc, getDoc, updateDoc } from "@/lib/postgres-bridge";
 import {
   ResumeData,
@@ -29,17 +30,8 @@ const getPdfJs = async () => {
 };
 
 const callOpenAI = async (payload: unknown) => {
-  const response = await fetch('/api/openai', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const message = data?.error || data?.message || `AI proxy request failed (${response.status})`;
-    throw new Error(message);
-  }
-  return data;
+  const result = await api.post('/ai/completion', payload);
+  return result.data;
 };
 
 export function useResumeBuilder() {

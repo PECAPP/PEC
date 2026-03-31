@@ -14,41 +14,21 @@ services:
 
   backend:
     build:
-      context: ./server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./server/Dockerfile
     container_name: pec_backend
     restart: always
     ports:
-      - "3000:3000"
+      - "4000:4000"
     environment:
       JWT_SECRET: "pec_secret_key_2026"
-      PORT: "3000"
-      NODE_ENV: "production"
-      CORS_ORIGINS: "http://localhost:3001"
-      DB_HOST: "postgres"
+      PORT: "4000"
+      NODE_ENV: "development"
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
     command: >
-      sh -c "
-      npx prisma migrate deploy &&
-      npm run start:prod
-      "
+      sh -c " npx prisma db push --accept-data-loss && npm run db:seed && npm run start:dev "
     depends_on:
       - postgres
-
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: pec_frontend
-    restart: always
-    ports:
-      - "3001:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:3000"
-      GITHUB_AI_API_KEY: "${GITHUB_AI_API_KEY:-}"
-      VITE_API_URL: "http://localhost:3000"
-    depends_on:
-      - backend
 
 volumes:
   postgres_data:

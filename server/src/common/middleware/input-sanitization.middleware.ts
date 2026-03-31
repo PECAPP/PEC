@@ -3,7 +3,7 @@ import {
   Injectable,
   NestMiddleware,
 } from '@nestjs/common';
-import mongoSanitize from 'mongo-sanitize';
+
 import sanitizeHtml from 'sanitize-html';
 
 @Injectable()
@@ -75,10 +75,10 @@ export class InputSanitizationMiddleware implements NestMiddleware {
       return payload;
     }
 
-    const sanitizedObject = mongoSanitize(payload as Record<string, unknown>);
     const nextObject: Record<string, unknown> = {};
+    const objPayload = payload as Record<string, unknown>;
 
-    for (const [key, value] of Object.entries(sanitizedObject)) {
+    for (const [key, value] of Object.entries(objPayload)) {
       if (key.startsWith('$') || key.includes('.')) {
         throw new BadRequestException(`Invalid key detected in ${source}`);
       }

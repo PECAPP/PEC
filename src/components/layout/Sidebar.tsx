@@ -3,29 +3,28 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  IconLayoutDashboard,
-  IconUsers,
-  IconChartBar,
-  IconMessageCircle,
-  IconBuilding,
-  IconUserCog,
-  IconUserCircle,
-  IconBook,
-  IconCalendar,
-  IconClipboardCheck,
-  IconFileText,
-  IconMapPin,
-  IconToolsKitchen2,
-  IconChefHat,
-  IconTool,
-  IconSettings,
-  IconHelpCircle,
-  IconBell,
-} from "@tabler/icons-react";
-import {
+  LayoutDashboard,
+  Users,
+  BarChart3,
+  MessageCircle,
+  Building2,
+  UserCog,
+  UserCircle,
+  Book,
+  Calendar,
+  ClipboardCheck,
+  FileText,
+  MapPin,
+  UtensilsCrossed,
+  ChefHat,
+  Wrench,
+  Settings,
+  HelpCircle,
+  Bell,
   ChevronLeft,
   ChevronRight,
   X,
+  Users2,
 } from "lucide-react";
 
 
@@ -52,129 +51,129 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    icon: IconLayoutDashboard,
+    icon: LayoutDashboard,
     label: "Dashboard",
     path: "/dashboard",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconUsers,
+    icon: Users,
     label: "Users",
     path: "/users",
     roles: ["college_admin", "faculty"],
   },
   {
-    icon: IconMessageCircle,
+    icon: MessageCircle,
     label: "Chat",
     path: "/chat",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconBell,
+    icon: Bell,
     label: "Noticeboard",
     path: "/noticeboard",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconUsers,
+    icon: Users2,
     label: "Clubs",
     path: "/clubs",
     roles: ["student", "college_admin"],
   },
 
   {
-    icon: IconBuilding,
+    icon: Building2,
     label: "Departments",
     path: "/departments",
     roles: ["college_admin"],
   },
   {
-    icon: IconUserCog,
+    icon: UserCog,
     label: "Faculty",
     path: "/faculty",
     roles: ["college_admin"],
   },
   {
-    icon: IconUserCircle,
+    icon: UserCircle,
     label: "My Profile",
     path: "/profile",
     roles: ["student"],
   },
   {
-    icon: IconBook,
+    icon: Book,
     label: "Courses",
     path: "/courses",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconCalendar,
+    icon: Calendar,
     label: "Timetable",
     path: "/timetable",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconChartBar,
+    icon: BarChart3,
     label: "Examinations",
     path: "/examinations",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconClipboardCheck,
+    icon: ClipboardCheck,
     label: "Attendance",
     path: "/attendance",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconBook,
+    icon: Book,
     label: "Course Materials",
     path: "/course-materials",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconFileText,
+    icon: FileText,
     label: "Resume Builder",
     path: "/resume-builder",
     roles: ["student"],
   },
 
   {
-    icon: IconBuilding,
+    icon: Building2,
     label: "Hostel Issues",
     path: "/hostel-issues",
     roles: ["student"],
   },
   {
-    icon: IconToolsKitchen2,
+    icon: UtensilsCrossed,
     label: "Night Canteen",
     path: "/canteen",
     roles: ["student"],
   },
   {
-    icon: IconMapPin,
+    icon: MapPin,
     label: "Campus Map",
     path: "/campus-map",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconChefHat,
+    icon: ChefHat,
     label: "Canteen Manager",
     path: "/admin/canteen",
     roles: ["college_admin"],
   },
   {
-    icon: IconTool,
+    icon: Wrench,
     label: "Manage Hostel",
     path: "/admin/hostel",
     roles: ["college_admin"],
   },
   {
-    icon: IconSettings,
+    icon: Settings,
     label: "Settings",
     path: "/settings",
     roles: ["student", "faculty", "college_admin"],
   },
   {
-    icon: IconHelpCircle,
+    icon: HelpCircle,
     label: "Help & Support",
     path: "/help",
     roles: ["student", "faculty", "college_admin"],
@@ -255,7 +254,7 @@ export function Sidebar({
                 "w-5 h-5 shrink-0 transition-colors",
                 isActive ? "text-primary-foreground" : "text-sidebar-foreground/75"
               )}
-              stroke={1.9}
+              strokeWidth={1.9}
             />
           ) : (
             <AnimatePresence mode="wait">

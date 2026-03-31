@@ -1,19 +1,42 @@
-import axios from "axios";
 import { authClient } from "./auth-client";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-const API = axios.create({
-  baseURL: API_BASE_URL,
-});
-
-API.interceptors.request.use((config) => {
+// Simplified Fetch Wrapper to match the original Axios usage
+const request = async (method: string, url: string, body?: any, params?: any) => {
   const token = authClient.getAccessToken();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
-  return config;
-});
+
+  let finalUrl = `${API_BASE_URL}${url}`;
+  if (params) {
+    const searchParams = new URLSearchParams(params);
+    finalUrl += `?${searchParams.toString()}`;
+  }
+
+  const response = await fetch(finalUrl, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return { data: await response.json() };
+};
+
+const API = {
+  get: (url: string, options?: any) => request("GET", url, undefined, options?.params),
+  post: (url: string, body: any) => request("POST", url, body),
+  patch: (url: string, body: any) => request("PATCH", url, body),
+  delete: (url: string) => request("DELETE", url),
+};
 
 // Mock Firestore
 export const db = {};
@@ -49,7 +72,7 @@ export const getDocs = async (q: any) => {
     return { empty: true, docs: [] };
   }
 };
-export const setDoc = async (docRef: string, payload: any, options?: any) => {
+export const setDoc = async (docRef: string, payload: any, _options?: any) => {
   await API.post(`/${docRef}`, payload);
 };
 export const updateDoc = async (docRef: string, payload: any) => {
@@ -82,7 +105,7 @@ export const orderBy = (field: string, dir: string) => ({
 });
 export const limit = (num: number) => ({ type: "limit", num });
 export const increment = (n: number) => ({ _op: "increment", n });
-export const onSnapshot = (q: any, cb: (s: any) => void) => {
+export const onSnapshot = (_q: any, _cb: (s: any) => void) => {
   return () => {};
 };
 export const serverTimestamp = () => new Date().toISOString();

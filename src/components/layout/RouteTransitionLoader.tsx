@@ -26,13 +26,13 @@ function RouteTransitionLoaderInner() {
     if (startTimerRef.current !== null) {
       window.clearTimeout(startTimerRef.current);
     }
-    // Defer state update so we never schedule from internal insertion/history phases.
+    // Defer state update so we don't flash for fast loads (200ms threshold)
     startTimerRef.current = window.setTimeout(() => {
       if (mountedRef.current) {
         setIsNavigating(true);
       }
       startTimerRef.current = null;
-    }, 0);
+    }, 200);
   };
 
   useEffect(() => {
@@ -50,6 +50,10 @@ function RouteTransitionLoaderInner() {
     if (previousRouteKeyRef.current !== currentRouteKey) {
       setIsNavigating(false);
       previousRouteKeyRef.current = currentRouteKey;
+      if (startTimerRef.current !== null) {
+        window.clearTimeout(startTimerRef.current);
+        startTimerRef.current = null;
+      }
     }
   }, [currentRouteKey]);
 

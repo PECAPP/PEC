@@ -15,12 +15,9 @@ const nextConfig = {
 
   // ─── Experimental ────────────────────────────────────────────────────────────
   experimental: {
-    // Enable Partial Prerendering — pages opt-in via `export const experimental_ppr = true`
-    ppr: 'incremental',
     // Tree-shake large icon libraries at import time
     optimizePackageImports: [
       'lucide-react',
-      '@tabler/icons-react',
       'date-fns',
       'recharts',
       'framer-motion',
@@ -39,11 +36,12 @@ const nextConfig = {
 
   // ─── Turbopack alias (dev) ────────────────────────────────────────────────────
   turbopack: {
+    root: __dirname,
     resolveAlias: {
-      canvas: emptyModulePath,
-      fs: emptyModulePath,
-      net: emptyModulePath,
-      tls: emptyModulePath,
+      canvas: './src/lib/empty-module.ts',
+      fs: './src/lib/empty-module.ts',
+      net: './src/lib/empty-module.ts',
+      tls: './src/lib/empty-module.ts',
     },
   },
 
@@ -79,7 +77,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') ?? 'http://localhost:8000'}/:path*`,
+        destination: `${process.env.BACKEND_API_URL ?? 'http://localhost:4000'}/:path*`,
       },
     ];
   },

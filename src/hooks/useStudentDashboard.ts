@@ -44,31 +44,48 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[]) => {
     if (summary && typeof summary === 'object') {
       const statsObj = summary.totalSummary || {};
-      const coursesArr = Array.isArray(summary.courses) ? summary.courses : [];
+      const rawCourses = Array.isArray(summary.courses) ? summary.courses : [];
       
-      setEnrolledCoursesList(coursesArr);
+      // Enrich enrolled courses with full details from allCourses
+      const enrichedCourses = rawCourses.map((c: any) => {
+        const idToMatch = String(c.id || c.courseId || '');
+        const fullCourse = allCourses.find(ac => String(ac.id) === idToMatch);
+        return { 
+          ...fullCourse, 
+          ...c, 
+          id: idToMatch || c.id || c.courseId 
+        };
+      });
+
+      setEnrolledCoursesList(enrichedCourses);
       setStats({
         attendancePercentage: typeof statsObj.percentage === 'number' ? statsObj.percentage : 0,
-        enrolledCourses: coursesArr.length,
+        enrolledCourses: enrichedCourses.length,
       });
       
-      const enrolledCourseIds = new Set(coursesArr.map((c: any) => c.courseId || c.id));
+      const enrolledCourseIds = new Set(enrichedCourses.map((c: any) => String(c.id)).filter(id => id && id !== 'undefined'));
       const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long' });
       
       const safeTimetable = Array.isArray(timetableData) ? timetableData : [];
       
       let scheduleItems = safeTimetable
-        .filter((t: any) => enrolledCourseIds.has(t.courseId))
-        .map((t: any) => ({
-          ...t,
-          courseName: allCourses.find((c: any) => c.id === t.courseId)?.name || t.courseName || 'Class',
-          instructor: allCourses.find((c: any) => c.id === t.courseId)?.instructor || t.facultyName || 'Faculty',
-        }));
+        .filter((t: any) => enrolledCourseIds.has(String(t.courseId)))
+        .map((t: any) => {
+          const course = allCourses.find((c: any) => String(c.id) === String(t.courseId));
+          return {
+            ...t,
+            id: t.id || `schedule-${t.courseId}-${t.day}-${t.startTime}`,
+            courseCode: course?.code || t.courseCode || 'CLS',
+            courseName: course?.name || t.courseName || 'Class',
+            instructor: course?.instructor || t.facultyName || t.instructor || 'Faculty',
+            room: t.room || t.location || 'TBA'
+          };
+        });
 
       const getScheduleForDay = (dayName: string) => {
         return scheduleItems
-          .filter((item: any) => item.day === dayName)
+          .filter((item: any) => String(item.day).toLowerCase() === dayName.toLowerCase())
           .sort((a: any, b: any) => (a.startTime || '').localeCompare(b.startTime || ''));
       };
 
@@ -99,18 +116,24 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     if (!user) return;
     try {
       setLoadError(null);
-      type ApiResponse<T> = { success: boolean; data: T; meta?: any };
+      
+      // Helper to handle both {data: {data: T}} and {data: T}
+      const getData = (res: any) => {
+        if (res?.data?.success && res.data.data) return res.data.data;
+        if (res?.data) return res.data;
+        return res;
+      };
 
       const [summaryRes, coursesRes, timetableRes] = await Promise.all([
-        api.get<ApiResponse<any>>('/attendance/summary'),
-        api.get<ApiResponse<Course[]>>('/courses'),
-        api.get<ApiResponse<any>>('/timetable'),
+        api.get('/attendance/summary'),
+        api.get('/courses'),
+        api.get('/timetable'),
       ]);
 
       processDashboardData(
-        extractData<any>(summaryRes),
-        extractData<Course[]>(coursesRes) || [],
-        extractData<any>(timetableRes) || []
+        getData(summaryRes),
+        getData(coursesRes) || [],
+        getData(timetableRes) || []
       );
 
     } catch (error) {

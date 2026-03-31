@@ -1,91 +1,106 @@
-﻿import axios from "axios";
-import { authClient } from "./auth-client";
+﻿import { authClient } from "./auth-client";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-export const api = axios.create({
-  baseURL: apiBaseUrl,
-  withCredentials: true,
-  timeout: 15000,
-});
+async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  const token = authClient.getAccessToken();
+  const headers = new Headers(options.headers);
+  
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+  
+  if (!headers.has('Content-Type') && options.body && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
 
-let isRefreshing = false;
-let failedQueue: Array<{
-  resolve: (value: string) => void;
-  reject: (reason?: any) => void;
-}> = [];
+  // Handle URL formation
+  let fullUrl = url;
+  if (!url.startsWith('http')) {
+    fullUrl = `${apiBaseUrl.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+  }
 
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token || "");
-    }
-  });
-  failedQueue = [];
-};
-
-// Request interceptor: attach access token
-api.interceptors.request.use(
-  (config) => {
-    const token = authClient.getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
-
-// Response interceptor: handle 401 with refresh token rotation
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // If not a 401, reject immediately
-    if (error.response?.status !== 401) {
-      if (error.response?.status === 404) {
-        console.error(`[API 404] ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
+  // Emulate Axios URL params if present
+  const params = (options as any).params;
+  if (params && typeof params === 'object') {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== undefined && val !== null) {
+        query.append(key, String(val));
       }
-      return Promise.reject(error);
-    }
+    });
+    const connector = fullUrl.includes('?') ? '&' : '?';
+    fullUrl += `${connector}${query.toString()}`;
+  }
 
-    // Prevent infinite retry loops
-    if (originalRequest.url?.includes("/auth/refresh")) {
-      authClient.logout();
-      window.dispatchEvent(new CustomEvent("auth-failed"));
-      return Promise.reject(error);
-    }
+  let response = await fetch(fullUrl, { ...options, headers });
 
-    // If already refreshing, queue the request
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      }).then((token) => {
-        originalRequest.headers.Authorization = `Bearer ${token}`;
-        return api(originalRequest);
-      });
-    }
-
-    isRefreshing = true;
-
+  // Handle 401 Unauthorized with Refresh Token rotation
+  if (response.status === 401 && !url.includes('/auth/refresh')) {
     try {
-      const newAccessToken = await authClient.refreshAccessToken();
-      api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-      processQueue(null, newAccessToken);
-      return api(originalRequest);
-    } catch (refreshError) {
-      processQueue(refreshError, null);
-      authClient.logout();
+      const newToken = await authClient.refreshAccessToken();
+      headers.set('Authorization', `Bearer ${newToken}`);
+      response = await fetch(fullUrl, { ...options, headers });
+    } catch (e) {
       window.dispatchEvent(new CustomEvent("auth-failed"));
-      return Promise.reject(refreshError);
-    } finally {
-      isRefreshing = false;
+      throw e;
+    }
+  }
+
+  const isJson = response.headers.get('content-type')?.includes('application/json');
+  const data = isJson ? await response.json().catch(() => ({})) : await response.text().catch(() => '');
+
+  if (!response.ok) {
+    const error: any = new Error(data?.message || data?.error || `API Error: ${response.status}`);
+    error.response = {
+      status: response.status,
+      statusText: response.statusText,
+      data,
+      headers: response.headers,
+    };
+    error.config = { url, method: options.method };
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Lightweight native fetch wrapper that emulates the Axios interface
+ * used throughout the application, allowing us to remove the 30KB Axios dependency.
+ */
+export const api = {
+  get: async <T = any>(url: string, options?: any): Promise<{ data: T }> => {
+    const data = await fetchWithAuth(url, { ...options, method: 'GET' });
+    return { data };
+  },
+  post: async <T = any>(url: string, body?: any, options?: any): Promise<{ data: T }> => {
+    const data = await fetchWithAuth(url, { ...options, method: 'POST', body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : undefined });
+    return { data };
+  },
+  put: async <T = any>(url: string, body?: any, options?: any): Promise<{ data: T }> => {
+    const data = await fetchWithAuth(url, { ...options, method: 'PUT', body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : undefined });
+    return { data };
+  },
+  patch: async <T = any>(url: string, body?: any, options?: any): Promise<{ data: T }> => {
+    const data = await fetchWithAuth(url, { ...options, method: 'PATCH', body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : undefined });
+    return { data };
+  },
+  delete: async <T = any>(url: string, options?: any): Promise<{ data: T }> => {
+    const data = await fetchWithAuth(url, { ...options, method: 'DELETE' });
+    return { data };
+  },
+  // emulating axios.create for consistency if needed elsewhere
+  create: (config: any) => api,
+  defaults: {
+    headers: {
+      common: {} as any
     }
   },
-);
+  interceptors: {
+    request: { use: () => {} },
+    response: { use: () => {} }
+  }
+};
 
 export default api;

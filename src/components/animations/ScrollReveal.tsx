@@ -1,9 +1,5 @@
-import { useEffect, useRef, ReactNode } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Register ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -15,7 +11,11 @@ interface ScrollRevealProps {
   stagger?: number;
   once?: boolean;
 }
- /** Reusable scroll reveal component with GSAP ScrollTrigger */
+
+/** 
+ * Modular ScrollReveal using Framer Motion. 
+ * Provides declarative scroll-triggered animations.
+ */
 export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   children,
   direction = 'up',
@@ -26,77 +26,42 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   stagger = 0,
   once = true,
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
-
-    const element = ref.current;
-    const children = stagger > 0 ? element.children : element;
-
-    // Initial state based on direction
-    const initialState: gsap.TweenVars = {
-      opacity: 0,
-    };
-
+  const getVariants = () => {
+    const initial: any = { opacity: 0 };
     switch (direction) {
-      case 'up':
-        initialState.y = distance;
-        break;
-      case 'down':
-        initialState.y = -distance;
-        break;
-      case 'left':
-        initialState.x = distance;
-        break;
-      case 'right':
-        initialState.x = -distance;
-        break;
-      case 'scale':
-        initialState.scale = 0.8;
-        break;
-      case 'fade':
-        // Only opacity
-        break;
+      case 'up': initial.y = distance; break;
+      case 'down': initial.y = -distance; break;
+      case 'left': initial.x = distance; break;
+      case 'right': initial.x = -distance; break;
+      case 'scale': initial.scale = 0.8; break;
     }
-
-    gsap.set(children, initialState);
-
-    // Animate on scroll
-    const animation = gsap.to(children, {
-      opacity: 1,
-      x: 0,
-      y: 0,
-      scale: 1,
-      duration,
-      delay,
-      stagger: stagger > 0 ? stagger : 0,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: element,
-        start: 'top 85%',
-        toggleActions: once ? 'play none none none' : 'play none none reverse',
-      },
-    });
-
-    return () => {
-      animation.kill();
-      ScrollTrigger.getAll().forEach(trigger => {
-        if (trigger.vars.trigger === element) {
-          trigger.kill();
+    return {
+      hidden: initial,
+      visible: {
+        opacity: 1,
+        x: 0,
+        y: 0,
+        scale: 1,
+        transition: {
+          delay,
+          duration,
+          ease: "easeInOut",
+          staggerChildren: stagger,
         }
-      });
+      }
     };
-  }, [direction, delay, duration, distance, stagger, once]);
+  };
 
   return (
-    <div ref={ref} className={className}>
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once, margin: "-100px" }}
+      variants={getVariants()}
+      className={className}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 };
 

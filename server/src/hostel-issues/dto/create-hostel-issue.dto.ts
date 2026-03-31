@@ -20,9 +20,8 @@ export class CreateHostelIssueDto {
   @IsString()
   roomNumber: string;
 
-  @IsOptional()
   @IsString()
-  studentId?: string;
+  studentId: string;
 
   @IsString()
   studentName: string;

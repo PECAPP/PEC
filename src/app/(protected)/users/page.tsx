@@ -1,6 +1,6 @@
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
-import { UserManagementView } from './UserManagementView';
+import { UserManagementView } from '@/modules/users/views/UserManagementView';
 
 export const experimental_ppr = true;
 

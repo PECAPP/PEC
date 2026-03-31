@@ -1,11 +1,67 @@
-import axios from "axios";
 import { authClient } from "./auth-client";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-const API = axios.create({
-  baseURL: API_BASE_URL,
-});
+const API = {
+  get: async (url: string, config?: { params?: Record<string, any> }) => {
+    const searchParams = new URLSearchParams();
+    if (config?.params) {
+      Object.entries(config.params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (Array.isArray(value)) {
+            value.forEach((v) => searchParams.append(key, String(v)));
+          } else {
+            searchParams.append(key, String(value));
+          }
+        }
+      });
+    }
+    const query = searchParams.toString();
+    const fullUrl = `${API_BASE_URL}${url}${query ? `?${query}` : ""}`;
+
+    const response = await fetch(fullUrl, {
+      headers: {
+        Authorization: `Bearer ${authClient.getAccessToken()}`,
+      },
+    });
+    if (!response.ok) throw new Error(`GET ${url} failed: ${response.status}`);
+    return { data: await response.json() };
+  },
+  post: async (url: string, body?: any) => {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authClient.getAccessToken()}`,
+      },
+      body: JSON.stringify(body || {}),
+    });
+    if (!response.ok) throw new Error(`POST ${url} failed: ${response.status}`);
+    return { data: await response.json() };
+  },
+  patch: async (url: string, body?: any) => {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authClient.getAccessToken()}`,
+      },
+      body: JSON.stringify(body || {}),
+    });
+    if (!response.ok) throw new Error(`PATCH ${url} failed: ${response.status}`);
+    return { data: await response.json() };
+  },
+  delete: async (url: string) => {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authClient.getAccessToken()}`,
+      },
+    });
+    if (!response.ok) throw new Error(`DELETE ${url} failed: ${response.status}`);
+    return { data: await response.json() };
+  },
+};
 
 const timestampWrapper = (value: string | Date | undefined) => {
   const date = value ? new Date(value) : new Date();
@@ -18,13 +74,6 @@ const timestampWrapper = (value: string | Date | undefined) => {
   };
 };
 
-API.interceptors.request.use((config) => {
-  const token = authClient.getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 export const db = {};
 export const auth = {};
