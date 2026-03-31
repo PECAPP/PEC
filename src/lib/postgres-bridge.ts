@@ -2,10 +2,21 @@ import { authClient } from "./auth-client";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
+const resolveBaseUrl = () => {
+  if (API_BASE_URL.startsWith("http")) {
+    return API_BASE_URL;
+  }
+  if (typeof window !== "undefined" && API_BASE_URL.startsWith("/")) {
+    return `${window.location.origin}${API_BASE_URL}`;
+  }
+  return API_BASE_URL;
+};
+
 const buildUrl = (route: string, params?: Record<string, any>) => {
+  const baseUrl = resolveBaseUrl();
   const url = route.startsWith("http")
     ? new URL(route)
-    : new URL(route, API_BASE_URL);
+    : new URL(route, baseUrl);
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
@@ -21,8 +32,8 @@ const buildUrl = (route: string, params?: Record<string, any>) => {
   return url.toString();
 };
 
-const buildAuthHeaders = () => {
-  const token = authClient.getAccessToken();
+const buildAuthHeaders = (tokenOverride?: string | null) => {
+  const token = tokenOverride ?? authClient.getAccessToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -33,14 +44,26 @@ const request = async (
 ) => {
   const url = buildUrl(route, options?.params);
   const hasBody = options?.body !== undefined;
-  const res = await fetch(url, {
-    method,
-    headers: {
-      ...(hasBody ? { "Content-Type": "application/json" } : {}),
-      ...buildAuthHeaders(),
-    },
-    body: hasBody ? JSON.stringify(options?.body) : undefined,
-  });
+  const run = async (tokenOverride?: string | null) => {
+    return fetch(url, {
+      method,
+      headers: {
+        ...(hasBody ? { "Content-Type": "application/json" } : {}),
+        ...buildAuthHeaders(tokenOverride),
+      },
+      body: hasBody ? JSON.stringify(options?.body) : undefined,
+    });
+  };
+
+  let res = await run();
+  if (res.status === 401) {
+    try {
+      const refreshed = await authClient.refreshAccessToken();
+      res = await run(refreshed);
+    } catch {
+      // fall through to error handling below
+    }
+  }
 
   const data = await res.json().catch(() => null);
   if (!res.ok) {

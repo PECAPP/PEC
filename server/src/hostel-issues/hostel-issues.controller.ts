@@ -23,7 +23,7 @@ import { UpdateHostelIssueDto } from './dto/update-hostel-issue.dto';
 export class HostelIssuesController {
   constructor(private readonly service: HostelIssuesService) {}
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
   @Get()
   async findMany(@Query() query: HostelIssueQueryDto) {
     const result = await this.service.findMany(query);
@@ -34,28 +34,28 @@ export class HostelIssuesController {
     });
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const data = await this.service.findById(id);
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
   @Post()
   async create(@Body() body: CreateHostelIssueDto) {
     const data = await this.service.create(body);
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
   @Patch(':id')
   async update(@Param('id') id: string, @Body() body: UpdateHostelIssueDto) {
     const data = await this.service.update(id, body);
     return ok(data);
   }
 
-  @Roles('admin')
+  @Roles('admin', 'moderator', 'college_admin')
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const data = await this.service.delete(id);

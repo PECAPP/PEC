@@ -270,7 +270,18 @@ export class ChatService {
   }
 
   async getChatUsers(query: string) {
-    if (!query) return [];
+    if (!query || query.trim().length === 0) {
+      return this.prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+        orderBy: { name: 'asc' },
+        take: 20,
+      });
+    }
 
     return this.prisma.user.findMany({
       where: {

@@ -6,7 +6,5 @@ config({ path: ".env" });
 export default defineConfig({
   schema: "prisma/schema.prisma",
   engine: "classic",
-  datasource: {
-    url: env("DATABASE_URL"),
-  },
+  datasourceUrl: env("DATABASE_URL"),
 });

@@ -18,8 +18,10 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
   const [showScheduleManager, setShowScheduleManager] = useState(false);
   
   const [courses, setCourses] = useState<any[]>(initialData?.courses || []);
+  const [courseCards, setCourseCards] = useState<any[]>(initialData?.courseCards || []);
+  const [todaySchedule, setTodaySchedule] = useState<any[]>(initialData?.todaySchedule || []);
   const [loading, setLoading] = useState(!initialData);
-  const [stats, setStats] = useState(initialData?.stats || { activeCount: 0, studentCount: 0 });
+  const [stats, setStats] = useState(initialData?.stats || { activeCount: 0, studentCount: 0, lowAttendanceCount: 0 });
 
   const fetchFacultyData = useCallback(async () => {
     if (!user || user.role !== 'faculty') return;
@@ -56,7 +58,28 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
       setStats({
         activeCount: facultyCourses.length,
         studentCount: uniqueStudents.size,
+        lowAttendanceCount: 0,
       });
+
+      const enrollmentByCourse = allEnrollments.reduce((acc: Record<string, number>, item: any) => {
+        const key = String(item.courseId || '');
+        if (!key) return acc;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+
+      setCourseCards(
+        facultyCourses.map((course: any) => ({
+          id: course.id,
+          code: course.code || 'COURSE',
+          name: course.name || 'Course',
+          students: enrollmentByCourse[String(course.id)] || 0,
+          progress: 0,
+          avgAttendance: 0,
+        }))
+      );
+
+      setTodaySchedule(Array.isArray(initialData?.todaySchedule) ? initialData.todaySchedule : []);
 
       if (facultyCourses.length > 0 && !selectedCourse) {
         setSelectedCourse(facultyCourses[0]);
@@ -92,6 +115,8 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
     loading,
     user,
     courses,
+    courseCards,
+    todaySchedule,
     stats,
     selectedCourse,
     setSelectedCourse,

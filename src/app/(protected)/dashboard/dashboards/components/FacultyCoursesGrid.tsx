@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 
 interface Props {
-  courses: {
+  courses?: {
     id: string;
     code: string;
     name: string;
@@ -23,6 +23,7 @@ const item = {
 };
 
 export function FacultyCoursesGrid({ courses, onManage }: Props) {
+  const safeCourses = Array.isArray(courses) ? courses : [];
   return (
     <motion.div variants={item} className="card-elevated p-6">
       <div className="flex items-center justify-between mb-4">
@@ -33,12 +34,12 @@ export function FacultyCoursesGrid({ courses, onManage }: Props) {
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {courses.length === 0 ? (
+        {safeCourses.length === 0 ? (
           <p className="text-sm text-muted-foreground md:col-span-2">
             No faculty courses found.
           </p>
         ) : (
-          courses.map((course) => (
+          safeCourses.map((course) => (
             <CourseCard
               key={course.id}
               code={course.code}
