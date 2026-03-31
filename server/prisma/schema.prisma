@@ -634,3 +634,98 @@ model ResumeProfile {
 
   @@index([userId])
 }
+
+model StudentProject {
+  id          String   @id @default(uuid())
+  studentId   String
+  title       String
+  description String
+  techStack   String   // JSON array of technologies
+  githubUrl   String?
+  liveUrl     String?
+  imageUrl    String?
+  startDate   DateTime?
+  endDate     DateTime?
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([studentId, isFeatured])
+}
+
+model StudentSkill {
+  id         String   @id @default(uuid())
+  studentId  String
+  name       String
+  level      Int      @default(50) // 0-100
+  category   String   @default("technical") // "technical", "soft", "language", "tool"
+  createdAt  DateTime @default(now())
+
+  @@unique([studentId, name])
+  @@index([studentId, category])
+}
+
+model FacultyPublication {
+  id          String   @id @default(uuid())
+  facultyId   String
+  title       String
+  journal     String?
+  conference  String?
+  year        Int
+  doi         String?
+  url         String?
+  abstract    String?
+  citations   Int      @default(0)
+  coAuthors   String?  // JSON array
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([facultyId])
+  @@index([facultyId, year])
+}
+
+model FacultyAward {
+  id          String   @id @default(uuid())
+  facultyId   String
+  title       String
+  description String?
+  awardedBy   String?
+  year        Int
+  category    String   @default("academic") // "academic", "research", "teaching", "service"
+  createdAt   DateTime @default(now())
+
+  @@index([facultyId])
+  @@index([facultyId, year])
+}
+
+model FacultyConference {
+  id          String   @id @default(uuid())
+  facultyId   String
+  name        String
+  location    String?
+  startDate   DateTime?
+  endDate     DateTime?
+  role        String?  @default("presenter") // "presenter", "attendee", "organizer", "keynote"
+  presentationTitle String?
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([facultyId])
+  @@index([facultyId, startDate])
+}
+
+model FacultyConsultation {
+  id          String   @id @default(uuid())
+  facultyId   String
+  organization String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      String   @default("active") // "active", "completed", "ongoing"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([facultyId])
+  @@index([facultyId, status])
+}

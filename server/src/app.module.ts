@@ -26,6 +26,8 @@ import { ScoreSheetModule } from './score-sheet/score-sheet.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { FacultyBioModule } from './faculty-bio/faculty-bio.module';
 import { SocialSyncModule } from './social-sync/social-sync.module';
+import { StudentPortfolioModule } from './student-portfolio/student-portfolio.module';
+import { FacultyBioSystemModule } from './faculty-bio-system/faculty-bio-system.module';
 
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
@@ -60,6 +62,8 @@ import { AdminModule } from './admin/admin.module';
     RoomsModule,
     FacultyBioModule,
     SocialSyncModule,
+    StudentPortfolioModule,
+    FacultyBioSystemModule,
     ThrottlerModule.forRoot([{
       name: 'short',
       ttl: 60000,
