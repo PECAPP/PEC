@@ -22,6 +22,10 @@ import { CourseMaterialsModule } from './course-materials/course-materials.modul
 import { NoticeboardModule } from './noticeboard/noticeboard.module';
 import { AiModule } from './ai/ai.module';
 import { AttendanceSessionModule } from './attendance-session/attendance-session.module';
+import { ScoreSheetModule } from './score-sheet/score-sheet.module';
+import { RoomsModule } from './rooms/rooms.module';
+import { FacultyBioModule } from './faculty-bio/faculty-bio.module';
+import { SocialSyncModule } from './social-sync/social-sync.module';
 
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
@@ -52,6 +56,10 @@ import { AdminModule } from './admin/admin.module';
     AdminModule,
     AiModule,
     AttendanceSessionModule,
+    ScoreSheetModule,
+    RoomsModule,
+    FacultyBioModule,
+    SocialSyncModule,
     ThrottlerModule.forRoot([{
       name: 'short',
       ttl: 60000,
