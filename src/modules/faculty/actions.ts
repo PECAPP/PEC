@@ -31,9 +31,9 @@ async function apiFetch(method: string, path: string, body?: object) {
 
 // 1. Create Faculty Action
 export const createFacultyAction = actionClient
-  .schema(facultySchema)
-  .action(async ({ parsedInput }) => {
-    const body = { ...parsedInput, role: 'faculty' };
+  .schema(facultySchema as any)
+  .action(async ({ parsedInput }: { parsedInput: any }) => {
+    const body = { ...(parsedInput as object), role: 'faculty' };
     const { ok } = await apiFetch('POST', 'users', body);
     
     if (!ok) {
@@ -47,8 +47,8 @@ export const createFacultyAction = actionClient
 
 // 2. Update Faculty Action
 export const updateFacultyAction = actionClient
-  .schema(facultySchema)
-  .action(async ({ parsedInput }) => {
+  .schema(facultySchema as any)
+  .action(async ({ parsedInput }: { parsedInput: any }) => {
     if (!parsedInput.id) throw new Error('Faculty ID is required for updates.');
     
     const { ok } = await apiFetch('PATCH', `users/${parsedInput.id}`, parsedInput);
@@ -63,8 +63,9 @@ export const updateFacultyAction = actionClient
 
 // 3. Delete Faculty Action
 export const deleteFacultyAction = actionClient
-  .schema(z.object({ id: z.string() }))
-  .action(async ({ parsedInput: { id } }) => {
+  .schema(z.object({ id: z.string() }) as any)
+  .action(async ({ parsedInput }: { parsedInput: { id: string } }) => {
+    const { id } = parsedInput;
     const { ok } = await apiFetch('DELETE', `users/${id}`);
     if (!ok) {
       throw new Error('Failed to delete faculty member.');
@@ -77,8 +78,8 @@ export const deleteFacultyAction = actionClient
 
 // 4. Promote to HOD Action
 export const promoteToHODAction = actionClient
-  .schema(facultySchema) // Reusing facultySchema as it contains basic user info
-  .action(async ({ parsedInput }) => {
+  .schema(facultySchema as any) // Reusing facultySchema as it contains basic user info
+  .action(async ({ parsedInput }: { parsedInput: any }) => {
     if (!parsedInput.id) throw new Error('Faculty ID is required.');
     
     // 1. Update user role/designation

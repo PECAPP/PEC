@@ -28,9 +28,9 @@ async function apiFetch(method: string, path: string, body?: object) {
 
 // 1. Create User
 export const createUserAction = actionClient
-  .schema(userSchema)
-  .action(async ({ parsedInput }) => {
-    const { ok, data } = await apiFetch('POST', 'users', parsedInput);
+  .schema(userSchema as any)
+  .action(async ({ parsedInput }: { parsedInput: any }) => {
+    const { ok, data } = await apiFetch('POST', 'users', parsedInput as object);
     if (!ok) throw new Error('Failed to create user account.');
     revalidateTag('users', 'default');
     logActivity('create', 'user', { email: parsedInput.email, role: parsedInput.role });
@@ -39,8 +39,8 @@ export const createUserAction = actionClient
 
 // 2. Update User
 export const updateUserAction = actionClient
-  .schema(userSchema)
-  .action(async ({ parsedInput }) => {
+  .schema(userSchema as any)
+  .action(async ({ parsedInput }: { parsedInput: any }) => {
     if (!parsedInput.id) throw new Error('User ID required for updates.');
     const { ok } = await apiFetch('PATCH', `users/${parsedInput.id}`, parsedInput);
     if (!ok) throw new Error('Failed to update user.');
@@ -51,8 +51,9 @@ export const updateUserAction = actionClient
 
 // 3. Delete User
 export const deleteUserAction = actionClient
-  .schema(z.object({ id: z.string() }))
-  .action(async ({ parsedInput: { id } }) => {
+  .schema(z.object({ id: z.string() }) as any)
+  .action(async ({ parsedInput }: { parsedInput: { id: string } }) => {
+    const { id } = parsedInput;
     const { ok } = await apiFetch('DELETE', `users/${id}`);
     if (!ok) throw new Error('Failed to delete user.');
     revalidateTag('users', 'default');
@@ -62,9 +63,10 @@ export const deleteUserAction = actionClient
 
 // 4. Change User Status (suspend / activate)
 export const changeStatusAction = actionClient
-  .schema(z.object({ id: z.string(), status: z.enum(['active', 'inactive', 'suspended']) }))
-  .action(async ({ parsedInput }) => {
-    const { ok } = await apiFetch('PATCH', `users/${parsedInput.id}`, { status: parsedInput.status });
+  .schema(z.object({ id: z.string(), status: z.enum(['active', 'inactive', 'suspended']) }) as any)
+  .action(async ({ parsedInput }: { parsedInput: any }) => {
+    const { id, status } = parsedInput;
+    const { ok } = await apiFetch('PATCH', `users/${id}`, { status });
     if (!ok) throw new Error('Failed to update user status.');
     revalidateTag('users', 'default');
     logActivity('status_change', 'user', parsedInput);
