@@ -1,6 +1,5 @@
 import { authClient } from "./auth-client";
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "/api";
+import { buildApiUrl } from "./api-base";
 
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = authClient.getAccessToken();
@@ -14,24 +13,9 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json');
   }
 
-  // Handle URL formation
-  let fullUrl = url;
-  if (!url.startsWith('http')) {
-    fullUrl = `${apiBaseUrl.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
-  }
-
-  // Emulate Axios URL params if present
+  // Handle URL formation + params
   const params = (options as any).params;
-  if (params && typeof params === 'object') {
-    const query = new URLSearchParams();
-    Object.entries(params).forEach(([key, val]) => {
-      if (val !== undefined && val !== null) {
-        query.append(key, String(val));
-      }
-    });
-    const connector = fullUrl.includes('?') ? '&' : '?';
-    fullUrl += `${connector}${query.toString()}`;
-  }
+  const fullUrl = buildApiUrl(url, params);
 
   let response = await fetch(fullUrl, { ...options, headers });
 

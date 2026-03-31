@@ -41,14 +41,11 @@ export class FeatureFlagsService {
 
     if (!featureFlag) {
       if (key === 'college-settings') {
-        const fallback = {
-          key,
+        return this.upsert(key, {
           enabled: true,
           description: 'College settings',
           payload: JSON.stringify({ attendanceRequiredPercentage: 75 }),
-          updatedAt: new Date(),
-        };
-        return fallback;
+        });
       }
       throw new NotFoundException('Feature flag not found');
     }

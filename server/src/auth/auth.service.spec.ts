@@ -3,12 +3,14 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let moduleRef: TestingModule;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    moduleRef = await Test.createTestingModule({
       providers: [
         AuthService,
         {
@@ -78,10 +80,84 @@ describe('AuthService', () => {
       ],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
+    service = moduleRef.get<AuthService>(AuthService);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('signIn should return tokens for valid credentials', async () => {
+    const usersService = moduleRef.get<UsersService>(UsersService);
+    const prisma = moduleRef.get<PrismaService>(PrismaService);
+    const jwt = moduleRef.get<JwtService>(JwtService);
+
+    const user = {
+      id: 'user-1',
+      email: 'student@pec.edu',
+      name: 'Student',
+      password: 'hashed',
+      role: 'student',
+      avatar: null,
+      profileComplete: true,
+      emailVerified: true,
+      sessionVersion: 0,
+      passwordChangedAt: null,
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+      roles: [{ role: { name: 'student' } }],
+    } as any;
+
+    jest.spyOn(usersService, 'findOne').mockResolvedValue(user);
+    jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as any);
+    jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(user as any);
+    jest.spyOn(prisma.refreshToken, 'create').mockResolvedValue({} as any);
+    jest.spyOn(jwt, 'signAsync').mockResolvedValue('access-token' as any);
+
+    const result = await service.signIn('student@pec.edu', 'password', {});
+
+    expect(result.access_token).toBe('access-token');
+    expect(result.refresh_token).toEqual(expect.any(String));
+    expect(result.user.uid).toBe(user.id);
+    expect(result.user.role).toBe('student');
+  });
+
+  it('refreshSession should rotate refresh tokens', async () => {
+    const prisma = moduleRef.get<PrismaService>(PrismaService);
+    const jwt = moduleRef.get<JwtService>(JwtService);
+
+    const tokenRecord = {
+      id: 'refresh-1',
+      tokenHash: 'hash',
+      familyId: 'family-1',
+      revokedAt: null,
+      expiresAt: new Date(Date.now() + 60_000),
+      userId: 'user-1',
+      user: {
+        id: 'user-1',
+        email: 'student@pec.edu',
+        name: 'Student',
+        role: 'student',
+        avatar: null,
+        profileComplete: true,
+        emailVerified: true,
+        sessionVersion: 0,
+        passwordChangedAt: null,
+        roles: [{ role: { name: 'student' } }],
+      },
+    } as any;
+
+    jest.spyOn(prisma.refreshToken, 'findUnique').mockResolvedValue(tokenRecord);
+    jest.spyOn(prisma.refreshToken, 'update').mockResolvedValue({} as any);
+    jest
+      .spyOn(prisma, '$transaction')
+      .mockResolvedValue([{ id: 'refresh-2' }] as any);
+    jest.spyOn(jwt, 'signAsync').mockResolvedValue('access-token' as any);
+
+    const result = await service.refreshSession('raw-refresh', {});
+
+    expect(result.access_token).toBe('access-token');
+    expect(result.refresh_token).toEqual(expect.any(String));
+    expect(result.user.uid).toBe('user-1');
   });
 });

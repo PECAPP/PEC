@@ -44,6 +44,7 @@ export function GoogleTranslate({
   containerId = "google_translate_element" 
 }: GoogleTranslateProps) {
   const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [widgetStatus, setWidgetStatus] = useState<'loading' | 'ready' | 'blocked'>('loading');
   const selectedLanguageRef = useRef('en');
   const applyRequestIdRef = useRef(0);
   const widgetInitializedRef = useRef(false);
@@ -164,6 +165,7 @@ export function GoogleTranslate({
           );
           widgetInitializedRef.current = true;
         }
+        setWidgetStatus('ready');
       }
     };
 
@@ -193,10 +195,17 @@ export function GoogleTranslate({
     const syncTimeout = window.setTimeout(() => {
       applyLanguageWithRetry(initialLanguage);
     }, 250);
+
+    const blockedTimeout = window.setTimeout(() => {
+      if (!window.google?.translate?.TranslateElement) {
+        setWidgetStatus('blocked');
+      }
+    }, 2000);
     
     return () => {
       window.removeEventListener('google-translate-ready', handleReady);
       window.clearTimeout(syncTimeout);
+      window.clearTimeout(blockedTimeout);
     };
   }, [containerId, includedLanguages]);
 
@@ -215,7 +224,8 @@ export function GoogleTranslate({
           aria-label="Select language"
           value={selectedLanguage}
           onChange={(event) => handleLanguageChange(event.target.value)}
-          className="h-9 min-w-[150px] rounded-md border border-border bg-background px-3 pr-8 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          disabled={widgetStatus !== 'ready'}
+          className="h-9 min-w-[150px] rounded-md border border-border bg-background px-3 pr-8 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
         >
           {languageOptions.map((language) => (
             <option key={language.value} value={language.value}>
@@ -223,6 +233,11 @@ export function GoogleTranslate({
             </option>
           ))}
         </select>
+        {widgetStatus === 'blocked' && (
+          <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-amber-600">
+            Translation unavailable (blocked by browser extensions).
+          </p>
+        )}
       </div>
 
       <div 

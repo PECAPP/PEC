@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
+import { doc, getDoc } from "@/lib/dataClient";
 import type { CollegeSettings } from "@/types";
-
-// Data client stubs
-const doc = (...args: any[]) => ({});
-const getDoc = async (...args: any[]) => ({
-  exists: () => false,
-  data: () => null,
-});
 
 export function useCollegeSettings() {
   const [settings, setSettings] = useState<CollegeSettings | null>(null);
@@ -16,7 +10,7 @@ export function useCollegeSettings() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const settingsRef = doc({} as any, "collegeSettings", "main");
+        const settingsRef = doc(null as any, "collegeSettings", "main");
         const settingsSnap = await getDoc(settingsRef);
 
         if (settingsSnap.exists()) {

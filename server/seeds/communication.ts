@@ -60,27 +60,6 @@ export async function seedCommunicationAndActivity(
     }
   }
 
-  // 12.5 Private Chats for mock-user
-  const mockUserId = students.find(s => s.id === 'mock-user-id')?.id;
-  if (mockUserId) {
-    for (let i = 0; i < 5; i++) {
-        const otherUser = faculties[i % faculties.length].id;
-        const privateRoom = await prisma.chatRoom.create({
-            data: { name: `Direct Chat ${i}`, isGroup: false },
-        });
-        await prisma.userChatRoom.create({ data: { userId: mockUserId, chatRoomId: privateRoom.id } });
-        await prisma.userChatRoom.create({ data: { userId: otherUser, chatRoomId: privateRoom.id } });
-        
-        await prisma.message.create({
-            data: {
-                chatRoomId: privateRoom.id,
-                senderId: otherUser,
-                content: `Hello! I had a question about your project submission. Can we discuss?`,
-            }
-        });
-    }
-  }
-
   const clubNames = ['Robotics Club', 'Coding Club', 'Photography Club'];
   for (let index = 0; index < clubNames.length; index += 1) {
     const clubName = clubNames[index];

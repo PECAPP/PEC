@@ -39,6 +39,7 @@ export default function StudentProfile() {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<any>(null);
   const [githubStats, setGithubStats] = useState<any>(null);
+  const [githubLookupError, setGithubLookupError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -94,8 +95,22 @@ export default function StudentProfile() {
         const githubUsername = normalizedProfile.socials.github;
         if (githubUsername) {
           try {
+            setGithubLookupError(null);
             const resp = await fetch(`https://api.github.com/users/${githubUsername.replace('@', '')}`);
-            if (!resp.ok) return;
+            if (resp.status === 404) {
+              if (active) {
+                setGithubStats(null);
+                setGithubLookupError('Username not found on GitHub.');
+              }
+              return;
+            }
+            if (!resp.ok) {
+              if (active) {
+                setGithubStats(null);
+                setGithubLookupError('GitHub lookup unavailable right now.');
+              }
+              return;
+            }
             const data = await resp.json();
             if (!active) return;
             setGithubStats({
@@ -104,10 +119,15 @@ export default function StudentProfile() {
               avatar: data.avatar_url,
             });
           } catch {
+            if (active) {
+              setGithubStats(null);
+              setGithubLookupError('GitHub lookup failed.');
+            }
             // ignore github failures without blocking profile
           }
         } else {
           setGithubStats(null);
+          setGithubLookupError(null);
         }
       } catch (err) {
         toast.error("Failed to fetch profile");
@@ -345,7 +365,7 @@ export default function StudentProfile() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    <Card className="border-primary/10 shadow-lg bg-card overflow-hidden">
                       <div className="p-1 bg-gradient-to-r from-primary to-accent" />
-                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                          <div className="space-y-1">
                            <CardTitle className="text-sm font-black uppercase tracking-widest">GitHub Activity</CardTitle>
                            <CardDescription className="text-[10px] font-bold">
@@ -363,6 +383,11 @@ export default function StudentProfile() {
                             <p className="text-xl font-black">{githubStats?.followers ?? 'N/A'}</p>
                             <p className="text-[10px] text-muted-foreground uppercase font-black tracking-wider">Followers</p>
                          </div>
+                         {githubLookupError && (
+                           <p className="col-span-2 text-[10px] font-black uppercase tracking-widest text-amber-600">
+                             {githubLookupError}
+                           </p>
+                         )}
                       </CardContent>
                    </Card>
 

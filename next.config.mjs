@@ -11,7 +11,7 @@ const nextConfig = {
   reactStrictMode: true,
   typedRoutes: true,
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 
   // ─── Experimental ────────────────────────────────────────────────────────────

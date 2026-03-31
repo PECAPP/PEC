@@ -22,19 +22,6 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException();
     }
-    
-    // Developer bypass for stable testing during migration
-    if (process.env.NODE_ENV !== 'production' && token === 'mock-token') {
-       // Mock a student user if using the mock token
-       request['user'] = {
-          sub: 'mock-user-id',
-          uid: 'mock-user-id',
-          role: 'student',
-          roles: ['student'],
-          email: 'student@pec.edu'
-       };
-       return true;
-    }
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {

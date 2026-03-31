@@ -19,7 +19,8 @@ import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Link from 'next/link';
 import { CourseInteractionsClient as CourseInteractions } from './CourseInteractionsClient';
-// Refreshing module resolution
+import { getServerSession } from '@/lib/server-auth';
+import { extractData } from '@/lib/utils';
 
 // This is the new Next.js 15+ Server Component pattern
 interface PageProps {
@@ -43,48 +44,28 @@ export async function generateMetadata({ params }: PageProps) {
  * In Next.js 16, fetching directly in the component is the standard.
  */
 async function getCourse(id: string) {
-  // Simulate database latency
-  // In real app: return prisma.course.findUnique({ where: { id } })
-  const mockCourses = [
-    {
-      id: '1',
-      code: 'CS301',
-      name: 'Data Structures & Algorithms',
-      department: 'Computer Science',
-      credits: 4,
-      instructor: 'Dr. Sarah Mitchell',
-      instructorBio: 'PhD from MIT, 15+ years of teaching experience in algorithms and data structures. Published 50+ research papers.',
-      semester: 'Fall 2024',
-      type: 'core',
-      enrolled: 45,
-      capacity: 60,
-      rating: 4.8,
-      schedule: 'Mon, Wed, Fri - 10:00 AM',
-      description: 'Comprehensive study of data structures including arrays, linked lists, trees, graphs, and algorithm analysis. This course provides the foundation for efficient programming and problem-solving.',
-      objectives: [
-        'Understand fundamental data structures and their applications',
-        'Analyze algorithm complexity using Big-O notation',
-        'Implement efficient solutions to computational problems',
-        'Apply appropriate data structures for different scenarios',
-      ],
-      syllabus: [
-        { week: 'Week 1-2', topic: 'Arrays and Linked Lists', subtopics: ['Array operations', 'Singly/Doubly linked lists', 'Circular lists'] },
-        { week: 'Week 3-4', topic: 'Stacks and Queues', subtopics: ['Stack operations', 'Queue implementations', 'Applications'] },
-        { week: 'Week 5-7', topic: 'Trees', subtopics: ['Binary trees', 'BST', 'AVL trees', 'Heap'] },
-        { week: 'Week 8-10', topic: 'Graphs', subtopics: ['Graph representations', 'BFS/DFS', 'Shortest paths', 'MST'] },
-        { week: 'Week 11-12', topic: 'Sorting & Searching', subtopics: ['Quick sort', 'Merge sort', 'Binary search', 'Hashing'] },
-      ],
-      prerequisites: ['CS101 - Programming Fundamentals', 'MA101 - Discrete Mathematics'],
-      assessments: [
-        { name: 'Mid-term Exam', weight: 25 },
-        { name: 'End-term Exam', weight: 35 },
-        { name: 'Assignments', weight: 20 },
-        { name: 'Project', weight: 20 },
-      ],
-    }
-  ];
+  const session = await getServerSession();
+  const rawBase =
+    process.env.INTERNAL_API_URL ||
+    process.env.API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    '/api';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const base = rawBase.startsWith('http')
+    ? rawBase.replace(/\/$/, '')
+    : new URL(rawBase, siteUrl).toString().replace(/\/$/, '');
 
-  return mockCourses.find(c => c.id === id) || null;
+  try {
+    const response = await fetch(`${base}/courses/${id}`, {
+      headers: session?.token ? { Authorization: `Bearer ${session.token}` } : undefined,
+      cache: 'no-store',
+    });
+    if (!response.ok) return null;
+    const payload = await response.json().catch(() => null);
+    return extractData<any>(payload) || null;
+  } catch {
+    return null;
+  }
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {

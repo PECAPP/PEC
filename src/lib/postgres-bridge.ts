@@ -1,52 +1,5 @@
 import { authClient } from "./auth-client";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
-
-const resolveBaseUrl = () => {
-  if (API_BASE_URL.startsWith("http")) {
-    return API_BASE_URL;
-  }
-  if (typeof window !== "undefined" && API_BASE_URL.startsWith("/")) {
-    return `${window.location.origin}${API_BASE_URL}`;
-  }
-  return API_BASE_URL;
-};
-
-const buildUrl = (route: string, params?: Record<string, any>) => {
-  const baseUrl = resolveBaseUrl();
-  if (!route.startsWith("http") && route.startsWith("/") && baseUrl.startsWith("http")) {
-    const base = new URL(baseUrl);
-    const basePath = base.pathname && base.pathname !== "/" ? base.pathname.replace(/\/$/, "") : "";
-    const merged = `${base.origin}${basePath}${route}`;
-    const url = new URL(merged);
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value === undefined || value === null) return;
-        if (Array.isArray(value)) {
-          value.forEach((item) => url.searchParams.append(key, String(item)));
-          return;
-        }
-        url.searchParams.set(key, String(value));
-      });
-    }
-    return url.toString();
-  }
-
-  const url = route.startsWith("http") ? new URL(route) : new URL(route, baseUrl);
-
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === undefined || value === null) return;
-      if (Array.isArray(value)) {
-        value.forEach((item) => url.searchParams.append(key, String(item)));
-        return;
-      }
-      url.searchParams.set(key, String(value));
-    });
-  }
-
-  return url.toString();
-};
+import { buildApiUrl } from "./api-base";
 
 const buildAuthHeaders = (tokenOverride?: string | null) => {
   const token = tokenOverride ?? authClient.getAccessToken();
@@ -58,7 +11,7 @@ const request = async (
   route: string,
   options?: { params?: Record<string, any>; body?: any },
 ) => {
-  const url = buildUrl(route, options?.params);
+  const url = buildApiUrl(route, options?.params);
   const hasBody = options?.body !== undefined;
   const run = async (tokenOverride?: string | null) => {
     return fetch(url, {
