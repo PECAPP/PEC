@@ -104,6 +104,8 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
     super_admin: 'Super Admin',
   };
 
+  const showNoticeboardButton = user.role === 'college_admin' || user.role === 'admin' || user.role === 'super_admin';
+
   return (
     <header
       className={cn(
@@ -177,24 +179,28 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
             </button>
           </div>
           <div className="scale-90 sm:scale-100"><GoogleTranslate containerId="google_translate_header" /></div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="hidden md:inline-flex"
-            onClick={() => router.push('/noticeboard')}
-          >
-            <Bell className="w-4 h-4 mr-2" />
-            Noticeboard
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="md:hidden"
-            onClick={() => router.push('/noticeboard')}
-            title="Open noticeboard"
-          >
-            <Bell className="w-4 h-4" />
-          </Button>
+          {showNoticeboardButton && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:inline-flex"
+                onClick={() => router.push('/noticeboard')}
+              >
+                <Bell className="w-4 h-4 mr-2" />
+                Noticeboard
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="md:hidden"
+                onClick={() => router.push('/noticeboard')}
+                title="Open noticeboard"
+              >
+                <Bell className="w-4 h-4" />
+              </Button>
+            </>
+          )}
           <div className="hidden md:block"><LandingColorTheme /></div>
           <div className="hidden md:block"><ThemeToggler/></div>
 

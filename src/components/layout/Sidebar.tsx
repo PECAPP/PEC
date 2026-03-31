@@ -72,7 +72,7 @@ const navItems: NavItem[] = [
     icon: Bell,
     label: "Noticeboard",
     path: "/noticeboard",
-    roles: ["student", "faculty", "college_admin"],
+    roles: [],
   },
   {
     icon: Users2,
@@ -194,7 +194,7 @@ export function Sidebar({
   const sectionConfig: Array<{ title: string; paths: string[] }> = [
     {
       title: 'Core',
-      paths: ['/dashboard', '/profile', '/chat', '/noticeboard', '/clubs', '/users', '/departments', '/faculty'],
+      paths: ['/dashboard', '/profile', '/chat', '/clubs', '/users', '/departments', '/faculty'],
     },
     {
       title: 'Academics',

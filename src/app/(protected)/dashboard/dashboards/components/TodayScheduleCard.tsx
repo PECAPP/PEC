@@ -19,11 +19,15 @@ interface Props {
   scheduleDay: string;
   todayClasses: ScheduleCardItem[];
   onViewFull: () => void;
+  containerHeight?: number | null;
 }
 
-export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull }: Props) {
+export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull, containerHeight }: Props) {
   return (
-    <div className="card-elevated ui-card-pad">
+    <div
+      className="card-elevated ui-card-pad flex h-fit flex-col"
+      style={containerHeight ? { height: containerHeight } : undefined}
+    >
       <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
           <Calendar className="h-5 w-5 text-primary" />
@@ -34,7 +38,7 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull }: Pro
           <ArrowUpRight className="ml-1 h-4 w-4" />
         </Button>
       </div>
-      <div className="space-y-3">
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
         {todayClasses.length === 0 ? (
           <EmptyState title="No classes scheduled" description="You are all clear for this day." />
         ) : (

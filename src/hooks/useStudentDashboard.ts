@@ -8,7 +8,16 @@ import type {
   StudentProfile, 
   Course, 
 } from '@/types';
-import { extractData } from '@/lib/utils';
+type NoticeboardItem = {
+  id: string;
+  title: string;
+  content: string;
+  category: 'news' | 'update' | 'event' | 'alert' | string;
+  important?: boolean;
+  pinned?: boolean;
+  authorName?: string;
+  publishedAt?: string;
+};
 
 interface StudentStats {
   attendancePercentage: number;
@@ -39,6 +48,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   const [todayClasses, setTodayClasses] = useState<any[]>([]);
   const [scheduleDay, setScheduleDay] = useState<string>('Today');
   const [enrolledCoursesList, setEnrolledCoursesList] = useState<Course[]>(initialData?.summary?.courses || []);
+  const [noticeboardItems, setNoticeboardItems] = useState<NoticeboardItem[]>(initialData?.noticeboard || []);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[]) => {
@@ -139,10 +149,11 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         return res;
       };
 
-      const [summaryRes, coursesRes, timetableRes] = await Promise.all([
+      const [summaryRes, coursesRes, timetableRes, noticeboardRes] = await Promise.all([
         api.get('/attendance/summary'),
         api.get('/courses'),
         api.get('/timetable'),
+        api.get('/noticeboard', { params: { limit: 4, offset: 0 } }),
       ]);
 
       processDashboardData(
@@ -150,6 +161,9 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         getData(coursesRes) || [],
         getData(timetableRes) || []
       );
+
+      const notices = getData(noticeboardRes);
+      setNoticeboardItems(Array.isArray(notices?.data) ? notices.data : Array.isArray(notices) ? notices : []);
 
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
@@ -167,6 +181,9 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         initialData.courses || [],
         initialData.timetable || []
       );
+      if (Array.isArray(initialData.noticeboard)) {
+        setNoticeboardItems(initialData.noticeboard);
+      }
       setLoading(false);
     }
   }, [initialData, processDashboardData]);
@@ -208,6 +225,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     todayClasses,
     scheduleDay,
     enrolledCoursesList,
+    noticeboardItems,
     loadError,
     setLoading,
     fetchStudentStats,
