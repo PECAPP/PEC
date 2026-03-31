@@ -34,20 +34,33 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
 
     try {
       type ApiResponse<T> = { success: boolean; data: T; meta?: any };
-      const [coursesRes, enrollmentsRes] = await Promise.all([
-        api.get<ApiResponse<any>>('/courses', { params: { limit: 200, offset: 0 } }),
-        api.get<ApiResponse<any>>('/enrollments', { params: { limit: 200, offset: 0 } }),
+      const [coursesRes] = await Promise.all([
+        api.get<ApiResponse<any>>('/courses', { params: { facultyId: user.uid, limit: 200, offset: 0 } }),
       ]);
 
-      const allCourses = coursesRes.data.data || [];
-      const allEnrollments = enrollmentsRes.data.data || [];
+      let facultyCourses = coursesRes.data.data || [];
 
-      // Filter courses by instructor name
-      const facultyCourses = allCourses.filter((c: any) => 
-        c.instructor && user.fullName && c.instructor.toLowerCase().includes(user.fullName.toLowerCase())
-      );
+      if (!facultyCourses.length && user.fullName) {
+        const allCoursesRes = await api.get<ApiResponse<any>>('/courses', { params: { limit: 200, offset: 0 } });
+        const allCourses = allCoursesRes.data.data || [];
+        const name = user.fullName.toLowerCase();
+        facultyCourses = allCourses.filter((c: any) => {
+          const instructor = (c.instructor || c.facultyName || '').toLowerCase();
+          return instructor.includes(name);
+        });
+      }
 
       setCourses(facultyCourses);
+
+      const enrollmentResponses = await Promise.all(
+        facultyCourses.map((course: any) =>
+          api.get<ApiResponse<any>>('/enrollments', {
+            params: { courseId: course.id, status: 'active', limit: 200, offset: 0 },
+          })
+        )
+      );
+
+      const allEnrollments = enrollmentResponses.flatMap((res) => res.data.data || []);
 
       const uniqueStudents = new Set(
         allEnrollments

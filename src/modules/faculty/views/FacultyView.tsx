@@ -265,7 +265,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
             </thead>
             <tbody className="divide-y divide-border">
               {filtered.map(fac => (
-                <tr key={fac.id} className="hover:bg-muted/20 cursor-pointer transition-all border-l-4 border-transparent hover:border-primary" onClick={() => router.push(`/users/${fac.id}`)}>
+                <tr key={fac.id} className="hover:bg-muted/20 cursor-pointer transition-all border-l-4 border-transparent hover:border-primary" onClick={() => router.push(`/faculty/${fac.id}`)}>
                   <td className="p-5 font-mono text-xs font-bold text-primary">{fac.employeeId || '---'}</td>
                   <td className="p-5 font-bold text-base tracking-tight">{fac.fullName}</td>
                   <td className="p-5 text-muted-foreground font-bold text-xs uppercase">{fac.department || 'GLOBAL'}</td>

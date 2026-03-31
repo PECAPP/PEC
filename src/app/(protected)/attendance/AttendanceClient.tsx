@@ -95,17 +95,26 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
 
   const fetchCourses = async () => {
     try {
-      const response = await api.get<any>('/courses', {
-        params: { limit: 200, offset: 0 },
-      });
-      let data = extractData<any[]>(response) || [];
-      
-      if (!isAdmin) {
-        data = data.filter((course: any) => 
-          course.instructor === userId || 
-          course.facultyId === userId || 
-          course.facultyName?.includes(userId)
-        );
+      let data: any[] = [];
+      if (isAdmin) {
+        const response = await api.get<any>('/courses', {
+          params: { limit: 200, offset: 0 },
+        });
+        data = extractData<any[]>(response) || [];
+      } else {
+        const response = await api.get<any>('/courses', {
+          params: { facultyId: userId, limit: 200, offset: 0 },
+        });
+        data = extractData<any[]>(response) || [];
+        if (!data.length) {
+          const fallback = await api.get<any>('/courses', {
+            params: { limit: 200, offset: 0 },
+          });
+          const allCourses = extractData<any[]>(fallback) || [];
+          data = allCourses.filter((course: any) =>
+            course.facultyId === userId || course.instructorId === userId
+          );
+        }
       }
       
       setCourses(data);

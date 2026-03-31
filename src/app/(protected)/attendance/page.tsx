@@ -25,7 +25,10 @@ export default async function AttendancePage() {
     initialData = { summary, records };
   } else {
     // For faculty/admin, pre-fetch their courses
-    const courses = await serverFetch('/courses?limit=100');
+    const courses =
+      session.role === 'faculty'
+        ? await serverFetch(`/courses?facultyId=${session.uid}&limit=100`)
+        : await serverFetch('/courses?limit=100');
     initialData = { courses };
   }
 

@@ -1,5 +1,24 @@
 import { collection, getDocs, query, where } from '@/lib/dataClient';
 
+const normalizeCourse = (doc: any) => {
+  const data = doc?.data ? doc.data() : doc;
+  if (!data) return null;
+  const id = doc?.id || data.id;
+  if (!id) return null;
+  return { id, courseId: id, ...data };
+};
+
+const fetchFacultyCourses = async (facultyId: string) => {
+  const coursesQuery = query(
+    collection(({} as any), 'courses'),
+    where('facultyId', '==', facultyId)
+  );
+  const snapshot = await getDocs(coursesQuery);
+  return snapshot.docs
+    .map((doc: any) => normalizeCourse(doc))
+    .filter(Boolean) as Array<{ id: string; courseId: string; [key: string]: any }>;
+};
+
 /**
  * Check if user has faculty access to a specific resource
  */
@@ -10,28 +29,23 @@ export async function checkFacultyAccess(
 ): Promise<boolean> {
   try {
     if (resourceType === 'course') {
-      // Check if faculty is assigned to this course
-      const assignmentsQuery = query(
-        collection(({} as any), 'facultyAssignments'),
-        where('facultyId', '==', facultyId),
-        where('courseId', '==', resourceId)
-      );
-      const snapshot = await getDocs(assignmentsQuery);
-      return !snapshot.empty;
+      const facultyCourses = await fetchFacultyCourses(facultyId);
+      return facultyCourses.some(course => course.courseId === resourceId || course.id === resourceId);
     }
     
     if (resourceType === 'student') {
-      // Check if student is enrolled in any of faculty's courses
-      const facultyCourses = await getFacultyAssignments(facultyId);
-      const courseIds = facultyCourses.map(c => c.courseId);
-      
+      const facultyCourses = await fetchFacultyCourses(facultyId);
+      const courseIds = new Set(facultyCourses.map(c => c.courseId || c.id));
+
+      if (courseIds.size === 0) return false;
+
       const enrollmentQuery = query(
         collection(({} as any), 'enrollments'),
-        where('studentId', '==', resourceId),
-        where('courseId', 'in', courseIds.slice(0, 10)) // backend filter limit
+        where('studentId', '==', resourceId)
       );
       const snapshot = await getDocs(enrollmentQuery);
-      return !snapshot.empty;
+      const enrollments = snapshot.docs.map((doc: any) => doc.data?.() ?? doc.data);
+      return enrollments.some((en: any) => courseIds.has(en?.courseId));
     }
     
     return false;
@@ -43,12 +57,7 @@ export async function checkFacultyAccess(
 // Get all courses assigned to a faculty member.
 export async function getFacultyAssignments(facultyId: string) {
   try {
-    const assignmentsQuery = query(
-      collection(({} as any), 'facultyAssignments'),
-      where('facultyId', '==', facultyId)
-    );
-    const snapshot = await getDocs(assignmentsQuery);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return await fetchFacultyCourses(facultyId);
   } catch (error) {
     console.error('Error fetching faculty assignments:', error);
     return [];
@@ -61,7 +70,7 @@ export async function filterCoursesByFaculty(
 ): Promise<any[]> {
   try {
     const assignments = await getFacultyAssignments(facultyId);
-    const assignedCourseIds = assignments.map(a => a.courseId);
+    const assignedCourseIds = assignments.map(a => a.courseId || a.id);
     
     return courses.filter(course => assignedCourseIds.includes(course.id));
   } catch (error) {
@@ -76,17 +85,25 @@ export async function filterStudentsByFaculty(
 ): Promise<any[]> {
   try {
     const assignments = await getFacultyAssignments(facultyId);
-    const courseIds = assignments.map(a => a.courseId);
+    const courseIds = assignments.map(a => a.courseId || a.id);
     
     if (courseIds.length === 0) return [];
     
-    // Get all enrollments for faculty's courses
-    const enrollmentQuery = query(
-      collection(({} as any), 'enrollments'),
-      where('courseId', 'in', courseIds.slice(0, 10))
+    const enrollmentSnapshots = await Promise.all(
+      courseIds.map((courseId) =>
+        getDocs(
+          query(
+            collection(({} as any), 'enrollments'),
+            where('courseId', '==', courseId)
+          )
+        )
+      )
     );
-    const snapshot = await getDocs(enrollmentQuery);
-    const enrolledStudentIds = new Set(snapshot.docs.map(doc => doc.data().studentId));
+    const enrolledStudentIds = new Set(
+      enrollmentSnapshots.flatMap((snapshot) =>
+        snapshot.docs.map((doc: any) => doc.data?.().studentId ?? doc.data?.studentId)
+      )
+    );
     
     return students.filter(student => enrolledStudentIds.has(student.id));
   } catch (error) {
@@ -101,7 +118,7 @@ export async function filterAttendanceByFaculty(
 ): Promise<any[]> {
   try {
     const assignments = await getFacultyAssignments(facultyId);
-    const courseIds = assignments.map(a => a.courseId);
+    const courseIds = assignments.map(a => a.courseId || a.id);
     
     return attendanceRecords.filter(record => courseIds.includes(record.courseId));
   } catch (error) {
@@ -136,7 +153,7 @@ export function getFacultyDataFilter(facultyId: string, dataType: 'courses' | 's
 export async function getFacultyCourseIds(facultyId: string): Promise<string[]> {
   try {
     const assignments = await getFacultyAssignments(facultyId);
-    return assignments.map((a: any) => a.courseId);
+    return assignments.map((a: any) => a.courseId || a.id);
   } catch (error) {
     console.error('Error getting faculty course IDs:', error);
     return [];

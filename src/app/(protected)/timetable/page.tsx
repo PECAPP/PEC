@@ -234,15 +234,21 @@ export default function Timetable() {
   const fetchData = async () => {
     try {
       const allCourses = await fetchAllPages<any>('/courses');
-      const facultyOwnedCourses =
+      let facultyOwnedCourses =
         isFaculty && user?.uid
           ? allCourses.filter(
               (course: any) =>
-                course.instructor === user.uid || 
-                course.facultyId === user.uid || 
-                user.uid === 'mock-user-id',
+                course.facultyId === user.uid || course.instructorId === user.uid
             )
           : [];
+
+      if (isFaculty && facultyOwnedCourses.length === 0 && facultyDisplayName) {
+        const name = facultyDisplayName.toLowerCase();
+        facultyOwnedCourses = allCourses.filter((course: any) => {
+          const instructor = String(course.instructor || course.facultyName || '').toLowerCase();
+          return instructor.includes(name);
+        });
+      }
       
       // Resolve faculty department from owned courses, or fall back to user's department
       const resolvedFacultyDepartment = (

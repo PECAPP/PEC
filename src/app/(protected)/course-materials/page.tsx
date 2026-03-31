@@ -121,10 +121,22 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
   const fetchCourses = async () => {
     try {
+      if (isAdmin) {
+        const allCourses = await fetchAllPages<any>('/courses');
+        setCourses(allCourses);
+        return;
+      }
+
+      const facultyCourses = await fetchAllPages<any>('/courses', { facultyId: userId });
+      if (facultyCourses.length > 0) {
+        setCourses(facultyCourses);
+        return;
+      }
+
       const allCourses = await fetchAllPages<any>('/courses');
-      const scopedCourses = isAdmin
-        ? allCourses
-        : allCourses.filter((course: any) => course.instructor === userId || course.facultyId === userId);
+      const scopedCourses = allCourses.filter(
+        (course: any) => course.facultyId === userId || course.instructorId === userId
+      );
       setCourses(scopedCourses);
     } catch (error) {
       console.error('Error fetching courses:', error);
