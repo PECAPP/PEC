@@ -4,14 +4,11 @@ import { cookies } from 'next/headers';
  * Robust server-side session retriever.
  * Priority:
  * 1. access_token cookie (decoded as JWT)
- * 2. user_id + user_role cookies (as identity labels)
- * 3. refresh_token cookie (as presence indicator)
  */
 export async function getServerSession() {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('access_token')?.value;
-    const refreshToken = cookieStore.get('refresh_token')?.value;
     const userIdCookie = cookieStore.get('user_id')?.value;
     const userRoleCookie = cookieStore.get('user_role')?.value;
 
@@ -37,21 +34,7 @@ export async function getServerSession() {
       }
     }
 
-    // 2. DEVELOPMENT / SANDBOX FALLBACK
-    // If we have explicit ID/Role cookies OR a refresh token, we consider the user at least partially authenticated.
-    // This provides a much smoother UX for SSR than strict JWT validation in this context.
-    if (userIdCookie || refreshToken) {
-      return {
-        uid: userIdCookie || 'unknown',
-        role: (userRoleCookie || 'student') as any,
-        email: 'user@pec.edu',
-        fullName: 'Member',
-        token: refreshToken || accessToken || 'mock-token',
-        profileComplete: true,
-      };
-    }
-
-    // 3. No session found
+    // 2. No session found
     return null;
   } catch (error) {
     console.error('Core SSR session error:', error);

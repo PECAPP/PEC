@@ -46,6 +46,9 @@ export class HostelIssuesRepository {
   }
 
   create(data: CreateHostelIssueDto) {
+    if (!data.studentId) {
+      throw new Error('studentId is required to create a hostel issue');
+    }
     return this.prisma.hostelIssue.create({
       data: {
         description: data.description,
@@ -62,6 +65,43 @@ export class HostelIssuesRepository {
   }
 
   async update(id: string, data: UpdateHostelIssueDto) {
+    const existing = await this.prisma.hostelIssue.findUnique({
+      where: { id },
+    });
+    const currentResponses = Array.isArray(existing?.responses)
+      ? existing?.responses
+      : [];
+
+    let nextResponses: Prisma.JsonArray | undefined;
+    const responsePatch = data.responses as
+      | { _op?: string; val?: unknown }
+      | unknown[]
+      | undefined;
+
+    if (Array.isArray(responsePatch)) {
+      nextResponses = responsePatch as Prisma.JsonArray;
+    } else if (
+      responsePatch &&
+      typeof responsePatch === 'object' &&
+      (responsePatch as { _op?: string })._op === 'arrayUnion'
+    ) {
+      nextResponses = [
+        ...currentResponses,
+        (responsePatch as { val?: unknown }).val ?? null,
+      ] as Prisma.JsonArray;
+    } else if (
+      responsePatch &&
+      typeof responsePatch === 'object' &&
+      (responsePatch as { _op?: string })._op === 'arrayRemove'
+    ) {
+      const removeVal = JSON.stringify(
+        (responsePatch as { val?: unknown }).val ?? null,
+      );
+      nextResponses = currentResponses.filter(
+        (item: Prisma.JsonValue) => JSON.stringify(item) !== removeVal,
+      ) as Prisma.JsonArray;
+    }
+
     return this.prisma.hostelIssue.update({
       where: { id },
       data: {

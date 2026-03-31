@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
 
-export const experimental_ppr = true;
-
 export const metadata: Metadata = {
   title: 'Settings | OmniFlow ERP',
   description: 'Manage your account and platform preferences.',

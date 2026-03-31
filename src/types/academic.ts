@@ -6,7 +6,12 @@ export interface Course {
   instructor: string;
   department: string;
   semester: number;
-  status: "ongoing" | "completed" | "upcoming";
+  status?: "ongoing" | "completed" | "upcoming";
+  facultyName?: string;
+  maxStudents?: number;
+  enrolledStudents?: number;
+  description?: string;
+  type?: string;
 }
 
 export interface AttendanceRecord {

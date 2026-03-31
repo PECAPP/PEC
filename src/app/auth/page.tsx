@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getServerSession } from '@/lib/server-auth';
+import { cookies } from 'next/headers';
 import AuthClient from './AuthClient';
 
 /**
@@ -7,18 +7,17 @@ import AuthClient from './AuthClient';
  * Handles initial session check to prevent client-side flicker.
  */
 export default async function AuthPage() {
-  const session = await getServerSession();
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('access_token')?.value;
 
-  // If already authenticated, redirect based on role
-  if (session) {
-    // In a real app, we might check if profile is complete here too
-    // For now, let's redirect to dashboard which handles sub-routing
+  // Only redirect if a real access token is present.
+  if (accessToken) {
     return redirect('/dashboard');
   }
 
   return (
     <main className="bg-background">
-      <AuthClient initialSessionStatus={!!session} />
+      <AuthClient initialSessionStatus={false} />
     </main>
   );
 }

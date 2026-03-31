@@ -6,9 +6,24 @@ export async function seedCampusFacilities(students: StudentSeed[]) {
 
   // 9.1 Canteen Items
   const canteenItems = [
-    { name: 'Veg Cheese Maggi', category: 'snacks', price: 45, isAvailable: true },
-    { name: 'Schezwan Noodles', category: 'snacks', price: 50, isAvailable: true },
-    { name: 'Cold Coffee', category: 'beverages', price: 30, isAvailable: true },
+    {
+      name: 'Veg Cheese Maggi',
+      category: 'snacks',
+      price: 45,
+      isAvailable: true,
+    },
+    {
+      name: 'Schezwan Noodles',
+      category: 'snacks',
+      price: 50,
+      isAvailable: true,
+    },
+    {
+      name: 'Cold Coffee',
+      category: 'beverages',
+      price: 30,
+      isAvailable: true,
+    },
     { name: 'Ice Tea', category: 'beverages', price: 25, isAvailable: true },
     { name: 'Paneer Puff', category: 'snacks', price: 20, isAvailable: true },
     { name: 'Samosa', category: 'snacks', price: 15, isAvailable: true },
@@ -35,7 +50,10 @@ export async function seedCampusFacilities(students: StudentSeed[]) {
       price: item.price,
     }));
 
-    const totalAmount = orderItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+    const totalAmount = orderItems.reduce(
+      (sum: number, item: any) => sum + item.price * item.quantity,
+      0,
+    );
 
     await prismaAny.canteenOrder.create({
       data: {
@@ -54,9 +72,24 @@ export async function seedCampusFacilities(students: StudentSeed[]) {
 
   // 9.3 Hostel Issues
   const complaints = [
-    { title: 'Wi-Fi Signal Weak', category: 'internet', priority: 'medium', description: 'Signal strength is very low in room B-204.' },
-    { title: 'Leaking Tap', category: 'plumbing', priority: 'high', description: 'Bathroom tap is constantly leaking.' },
-    { title: 'Fan Making Noise', category: 'maintenance', priority: 'low', description: 'The ceiling fan is making a clicking sound.' },
+    {
+      title: 'Wi-Fi Signal Weak',
+      category: 'internet',
+      priority: 'medium',
+      description: 'Signal strength is very low in room B-204.',
+    },
+    {
+      title: 'Leaking Tap',
+      category: 'plumbing',
+      priority: 'high',
+      description: 'Bathroom tap is constantly leaking.',
+    },
+    {
+      title: 'Fan Making Noise',
+      category: 'maintenance',
+      priority: 'low',
+      description: 'The ceiling fan is making a clicking sound.',
+    },
   ];
 
   for (let i = 0; i < 10; i++) {

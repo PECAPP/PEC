@@ -44,32 +44,47 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[]) => {
     if (summary && typeof summary === 'object') {
       const statsObj = summary.totalSummary || {};
-      const rawCourses = Array.isArray(summary.courses) ? summary.courses : [];
+      const summaryCourses = Array.isArray(summary.courses) ? summary.courses : [];
+      const fallbackCourses = Array.isArray(allCourses) ? allCourses : [];
       
       // Enrich enrolled courses with full details from allCourses
-      const enrichedCourses = rawCourses.map((c: any) => {
-        const idToMatch = String(c.id || c.courseId || '');
-        const fullCourse = allCourses.find(ac => String(ac.id) === idToMatch);
-        return { 
-          ...fullCourse, 
-          ...c, 
-          id: idToMatch || c.id || c.courseId 
+      const normalizedEnrolled: Course[] = summaryCourses.map((course: any, index: number) => {
+        const idToMatch = String(course.courseId || course.id || '');
+        const matchById = fallbackCourses.find((c) => String(c.id) === idToMatch);
+        const matchByCode = fallbackCourses.find((c) => c.code === course.courseCode || c.code === course.courseCode);
+        const matched = matchById ?? matchByCode;
+
+        const resolvedId = idToMatch || matched?.id || `course-${index}`;
+
+        return {
+          id: resolvedId,
+          code: course.code ?? course.courseCode ?? matched?.code ?? 'COURSE',
+          name: course.name ?? course.courseName ?? matched?.name ?? 'Course',
+          department: course.department ?? matched?.department ?? 'General',
+          semester: course.semester ?? matched?.semester ?? 0,
+          credits: course.credits ?? matched?.credits ?? 0,
+          facultyName: course.facultyName ?? matched?.facultyName ?? '',
+          maxStudents: course.maxStudents ?? matched?.maxStudents ?? 0,
+          enrolledStudents: course.enrolledStudents ?? matched?.enrolledStudents ?? 0,
+          description: course.description ?? matched?.description,
+          type: course.type ?? matched?.type,
+          instructor: (course.instructor ?? course.facultyName ?? matched?.instructor ?? matched?.facultyName) as string,
         };
       });
 
-      setEnrolledCoursesList(enrichedCourses);
+      setEnrolledCoursesList(normalizedEnrolled);
       setStats({
         attendancePercentage: typeof statsObj.percentage === 'number' ? statsObj.percentage : 0,
-        enrolledCourses: enrichedCourses.length,
+        enrolledCourses: normalizedEnrolled.length,
       });
       
-      const enrolledCourseIds = new Set(enrichedCourses.map((c: any) => String(c.id)).filter(id => id && id !== 'undefined'));
+      const enrolledCourseIds = new Set(normalizedEnrolled.map((c: any) => String(c.id)).filter(id => id && id !== 'undefined'));
       const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long' });
       
       const safeTimetable = Array.isArray(timetableData) ? timetableData : [];
       
-      let scheduleItems = safeTimetable
+      const scheduleItems = safeTimetable
         .filter((t: any) => enrolledCourseIds.has(String(t.courseId)))
         .map((t: any) => {
           const course = allCourses.find((c: any) => String(c.id) === String(t.courseId));
@@ -78,8 +93,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
             id: t.id || `schedule-${t.courseId}-${t.day}-${t.startTime}`,
             courseCode: course?.code || t.courseCode || 'CLS',
             courseName: course?.name || t.courseName || 'Class',
-            instructor: course?.instructor || t.facultyName || t.instructor || 'Faculty',
-            room: t.room || t.location || 'TBA'
+            instructor: (course?.instructor || t.facultyName || t.instructor || 'Faculty') as string,
+            room: (t.room || t.location || 'TBA') as string,
           };
         });
 

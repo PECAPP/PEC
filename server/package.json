@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "api": "cd server && npx nest start --watch --swc",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "prisma:generate": "prisma generate",
@@ -39,8 +40,10 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.6",
+    "@prisma/adapter-pg": "^6.19.2",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "^6.19.2",
+    "pg": "^8.11.5",
     "@types/multer": "^2.1.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",

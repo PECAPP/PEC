@@ -7,7 +7,7 @@
     "dev:full": "concurrently --kill-others \"npm run frontend\" \"npm run api\"",
     "frontend": "next dev --turbopack -p 3000",
     "dev:fresh": "npm run clean:next && concurrently --kill-others \"npm run frontend\" \"npm run api\"",
-    "api": "cd server && npx ts-node -r tsconfig-paths/register src/main.ts",
+    "api": "npm --prefix server run start:dev -- --swc",
     "build": "next build",
     "start": "next start",
     "start:fresh": "npm run clean:next && next build && next start",

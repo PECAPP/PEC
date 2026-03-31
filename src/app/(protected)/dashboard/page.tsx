@@ -5,10 +5,6 @@ import { StudentDataSlot } from './slots/StudentDataSlot';
 import { FacultyDataSlot } from './slots/FacultyDataSlot';
 import { AdminDataSlot } from './slots/AdminDataSlot';
 
-// Opt this page into Partial Prerendering (Next.js 16)
-// The static shell renders instantly; user-data slots stream in.
-export const experimental_ppr = true;
-
 export const metadata = {
   title: 'Dashboard | OmniFlow ERP',
   description: 'Your personalized campus command center.',

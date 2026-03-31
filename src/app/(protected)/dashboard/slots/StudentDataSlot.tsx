@@ -5,8 +5,8 @@ import { StudentDashboard } from '../dashboards/StudentDashboard';
 export async function StudentDataSlot({ session }: { session: any }) {
   const [summary, courses, timetable, profile] = await Promise.all([
     serverFetch('/attendance/summary'),
-    serverFetch('/courses?limit=10'),
-    serverFetch('/timetable?limit=10'),
+    serverFetch('/courses'),
+    serverFetch('/timetable'),
     serverFetch('/auth/profile'),
   ]);
 

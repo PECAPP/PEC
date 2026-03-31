@@ -42,6 +42,16 @@ export default function ClubsPage() {
     [user?.role],
   );
 
+  const studentClubStats = useMemo(() => {
+    if (isAdmin) return null;
+    const total = clubs.length;
+    const joined = clubs.filter((club) => club.joined).length;
+    const pending = clubs.filter((club) => !club.joined && club.requestStatus === 'pending').length;
+    const rejected = clubs.filter((club) => !club.joined && club.requestStatus === 'rejected').length;
+    const available = Math.max(0, total - joined - pending - rejected);
+    return { total, joined, pending, rejected, available };
+  }, [clubs, isAdmin]);
+
   const loadClubs = async () => {
     try {
       setLoading(true);
@@ -122,6 +132,31 @@ export default function ClubsPage() {
             : 'Join clubs and participate in club-specific discussions.'}
         </p>
       </div>
+
+      {!isAdmin && studentClubStats && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="card-elevated ui-card-pad">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Total Clubs</p>
+            <p className="text-2xl font-bold text-foreground">{studentClubStats.total}</p>
+          </div>
+          <div className="card-elevated ui-card-pad">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Accepted</p>
+            <p className="text-2xl font-bold text-foreground">{studentClubStats.joined}</p>
+          </div>
+          <div className="card-elevated ui-card-pad">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Pending</p>
+            <p className="text-2xl font-bold text-foreground">{studentClubStats.pending}</p>
+          </div>
+          <div className="card-elevated ui-card-pad">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Rejected</p>
+            <p className="text-2xl font-bold text-foreground">{studentClubStats.rejected}</p>
+          </div>
+          <div className="card-elevated ui-card-pad">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Available</p>
+            <p className="text-2xl font-bold text-foreground">{studentClubStats.available}</p>
+          </div>
+        </div>
+      )}
 
       {isAdmin && (
         <div className="card-elevated ui-card-pad space-y-3">

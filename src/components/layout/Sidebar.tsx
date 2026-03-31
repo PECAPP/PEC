@@ -329,8 +329,8 @@ export function Sidebar({
               <Image 
                 src={appLogoSrc} 
                 alt="App logo" 
-                width={32} 
-                height={32} 
+                fill
+                sizes="40px"
                 className="object-contain" 
                 priority 
               />

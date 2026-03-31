@@ -3,8 +3,6 @@ import { redirect } from 'next/navigation';
 import { serverFetch } from '@/lib/server-data';
 import AttendanceView from '@/modules/attendance/views/AttendanceView';
 
-export const experimental_ppr = true;
-
 export const metadata = {
   title: 'Attendance | OmniFlow',
   description: 'Manage and track academic attendance.',

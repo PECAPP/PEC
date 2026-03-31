@@ -1,4 +1,4 @@
-﻿import { authClient } from "./auth-client";
+import { authClient } from "./auth-client";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "/api";
 

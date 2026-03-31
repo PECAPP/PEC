@@ -45,7 +45,7 @@ export function ChatSidebar({
         return String(room.participantNames[otherUserId]);
       }
     }
-    return String(room.title || "Untitled Chat");
+    return room.title ?? "";
   };
 
   // Filter rooms based on search

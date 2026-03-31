@@ -2,67 +2,65 @@ import { authClient } from "./auth-client";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-const API = {
-  get: async (url: string, config?: { params?: Record<string, any> }) => {
-    const searchParams = new URLSearchParams();
-    if (config?.params) {
-      Object.entries(config.params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          if (Array.isArray(value)) {
-            value.forEach((v) => searchParams.append(key, String(v)));
-          } else {
-            searchParams.append(key, String(value));
-          }
-        }
-      });
-    }
-    const query = searchParams.toString();
-    const fullUrl = `${API_BASE_URL}${url}${query ? `?${query}` : ""}`;
+const buildUrl = (route: string, params?: Record<string, any>) => {
+  const url = route.startsWith("http")
+    ? new URL(route)
+    : new URL(route, API_BASE_URL);
 
-    const response = await fetch(fullUrl, {
-      headers: {
-        Authorization: `Bearer ${authClient.getAccessToken()}`,
-      },
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+      if (Array.isArray(value)) {
+        value.forEach((item) => url.searchParams.append(key, String(item)));
+        return;
+      }
+      url.searchParams.set(key, String(value));
     });
-    if (!response.ok) throw new Error(`GET ${url} failed: ${response.status}`);
-    return { data: await response.json() };
-  },
-  post: async (url: string, body?: any) => {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authClient.getAccessToken()}`,
-      },
-      body: JSON.stringify(body || {}),
-    });
-    if (!response.ok) throw new Error(`POST ${url} failed: ${response.status}`);
-    return { data: await response.json() };
-  },
-  patch: async (url: string, body?: any) => {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authClient.getAccessToken()}`,
-      },
-      body: JSON.stringify(body || {}),
-    });
-    if (!response.ok) throw new Error(`PATCH ${url} failed: ${response.status}`);
-    return { data: await response.json() };
-  },
-  delete: async (url: string) => {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${authClient.getAccessToken()}`,
-      },
-    });
-    if (!response.ok) throw new Error(`DELETE ${url} failed: ${response.status}`);
-    return { data: await response.json() };
-  },
+  }
+
+  return url.toString();
 };
 
+const buildAuthHeaders = () => {
+  const token = authClient.getAccessToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const request = async (
+  method: "GET" | "POST" | "PATCH" | "DELETE",
+  route: string,
+  options?: { params?: Record<string, any>; body?: any },
+) => {
+  const url = buildUrl(route, options?.params);
+  const hasBody = options?.body !== undefined;
+  const res = await fetch(url, {
+    method,
+    headers: {
+      ...(hasBody ? { "Content-Type": "application/json" } : {}),
+      ...buildAuthHeaders(),
+    },
+    body: hasBody ? JSON.stringify(options?.body) : undefined,
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const error = new Error(
+      (data && (data.message || data.error)) ||
+        `Request failed with status ${res.status}`,
+    );
+    throw error;
+  }
+
+  return { data };
+};
+
+const API = {
+  get: (url: string, options?: { params?: Record<string, any> }) =>
+    request("GET", url, options),
+  post: (url: string, body?: any) => request("POST", url, { body }),
+  patch: (url: string, body?: any) => request("PATCH", url, { body }),
+  delete: (url: string) => request("DELETE", url),
+};
 const timestampWrapper = (value: string | Date | undefined) => {
   const date = value ? new Date(value) : new Date();
   const ms = date.getTime();
@@ -73,7 +71,6 @@ const timestampWrapper = (value: string | Date | undefined) => {
     nanoseconds: 0,
   };
 };
-
 
 export const db = {};
 export const auth = {};

@@ -48,14 +48,17 @@ model User {
 
 model HostelIssue {
   id          String   @id @default(uuid())
+  title       String   @default("")
   studentId   String
   studentName String?
-  hostelName  String
+  hostelName  String   @default("Hostel")
   roomNumber  String
   category    String   // "Plumbing", "Electrical", "Internet", "Furniture", "Other"
   description String
   status      String   @default("Open") // "Open", "InProgress", "Resolved", "Closed"
   priority    String   @default("Medium") // "Low", "Medium", "High", "Critical"
+  organizationId String?
+  responses   Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -63,6 +66,7 @@ model HostelIssue {
   @@index([hostelName, status])
   @@index([category])
   @@index([createdAt])
+  @@index([organizationId])
 }
 
 

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const emptyModulePath = path.resolve(__dirname, 'src/lib/empty-module.ts');
+const emptyModuleAlias = './src/lib/empty-module.ts';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,6 +16,8 @@ const nextConfig = {
 
   // ─── Experimental ────────────────────────────────────────────────────────────
   experimental: {
+    // Partial Prerendering is now enabled via cacheComponents
+    cacheComponents: true,
     // Tree-shake large icon libraries at import time
     optimizePackageImports: [
       'lucide-react',
@@ -38,10 +41,10 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
     resolveAlias: {
-      canvas: './src/lib/empty-module.ts',
-      fs: './src/lib/empty-module.ts',
-      net: './src/lib/empty-module.ts',
-      tls: './src/lib/empty-module.ts',
+      canvas: emptyModuleAlias,
+      fs: emptyModuleAlias,
+      net: emptyModuleAlias,
+      tls: emptyModuleAlias,
     },
   },
 
@@ -74,10 +77,15 @@ const nextConfig = {
   // All client-side calls to /api/* are forwarded to the NestJS backend.
   // SSR calls use INTERNAL_API_URL (localhost:8000) directly for speed.
   async rewrites() {
+    const apiTarget =
+      process.env.INTERNAL_API_URL ??
+      process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') ??
+      'http://localhost:8000';
+
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.BACKEND_API_URL ?? 'http://localhost:4000'}/:path*`,
+        destination: `${apiTarget}/:path*`,
       },
     ];
   },

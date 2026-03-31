@@ -113,6 +113,12 @@ export class NightCanteenRepository {
   }
 
   createOrder(data: CreateCanteenOrderDto) {
+    if (!data.studentId) {
+      throw new Error('studentId is required to create a canteen order');
+    }
+    if (!data.items?.length) {
+      throw new Error('items are required to create a canteen order');
+    }
     return (this.prisma.canteenOrder as any).create({
       data: {
         studentId: data.studentId,
@@ -130,7 +136,7 @@ export class NightCanteenRepository {
           })),
         },
       } as any,
-      include: { items: true }
+      include: { items: true },
     });
   }
 
@@ -143,8 +149,28 @@ export class NightCanteenRepository {
         ...(typeof data.totalAmount === 'number'
           ? { totalAmount: data.totalAmount }
           : {}),
+        ...(data.items
+          ? {
+              items: {
+                deleteMany: {},
+                create: data.items.map((item) => {
+                  if (!item.itemId) {
+                    throw new Error(
+                      'itemId is required for each canteen order item',
+                    );
+                  }
+                  return {
+                    itemId: item.itemId,
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price,
+                  };
+                }),
+              },
+            }
+          : {}),
       } as any,
-      include: { items: true }
+      include: { items: true },
     });
   }
 
