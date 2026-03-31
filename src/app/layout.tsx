@@ -1,9 +1,20 @@
 import type { Metadata } from 'next';
+import { Inter, Sora } from 'next/font/google';
 import { Providers } from './providers';
 import { RouteTransitionLoader } from '@/components/layout/RouteTransitionLoader';
 import './globals.css';
-import '@fontsource/dm-sans/400.css';
-import '@fontsource/dm-sans/700.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
+
+const sora = Sora({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-display',
+});
 
 export const metadata: Metadata = {
   title: 'PEC App - Smart College Management System',
@@ -24,7 +35,7 @@ export default function RootLayout({
       lang="en" 
       suppressHydrationWarning 
       data-scroll-behavior="smooth"
-      className="font-sans"
+      className={`${inter.variable} ${sora.variable}`}
     >
       <head>
         <script

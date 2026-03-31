@@ -49,11 +49,12 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   const [todayClasses, setTodayClasses] = useState<any[]>([]);
   const [scheduleDay, setScheduleDay] = useState<string>('Today');
   const [enrolledCoursesList, setEnrolledCoursesList] = useState<Course[]>(initialData?.summary?.courses || []);
-  const [noticeboardItems, setNoticeboardItems] = useState<NoticeboardItem[]>(initialData?.noticeboard || []);
+  const [noticeboardItems, setNoticeboardItems] = useState<NoticeboardItem[]>(initialData?.noticeboard || initialData?.notices || []);
   const [requiredAttendancePercentage, setRequiredAttendancePercentage] = useState<number>(75);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[]) => {
+  const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[], noticeboardData: any[] = []) => {
+    setNoticeboardItems(Array.isArray(noticeboardData) ? noticeboardData : []);
     if (summary && typeof summary === 'object') {
       const statsObj = summary.totalSummary || {};
       const summaryCourses = Array.isArray(summary.courses) ? summary.courses : [];
@@ -179,7 +180,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       processDashboardData(
         getData(summaryRes),
         getData(coursesRes) || [],
-        getData(timetableRes) || []
+        getData(timetableRes) || [],
+        getData(noticeboardRes) || []
       );
 
       const notices = getData(noticeboardRes);
@@ -200,11 +202,14 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       processDashboardData(
         initialData.summary,
         initialData.courses || [],
-        initialData.timetable || []
+        initialData.timetable || [],
+        initialData.noticeboard || initialData.notices || []
       );
       void fetchCollegeSettings();
-      if (Array.isArray(initialData.noticeboard)) {
-        setNoticeboardItems(initialData.noticeboard);
+      
+      const dashboardNotices = initialData.noticeboard || initialData.notices;
+      if (Array.isArray(dashboardNotices)) {
+        setNoticeboardItems(dashboardNotices);
       } else {
         void (async () => {
           try {

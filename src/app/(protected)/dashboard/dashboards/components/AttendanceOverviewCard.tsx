@@ -24,7 +24,7 @@ export function AttendanceOverviewCard({ attendancePercentage, onClick, targetPe
 
   return (
     <div 
-      className="card-elevated ui-card-pad cursor-pointer hover:bg-muted/50 transition-colors duration-150 relative overflow-hidden"
+      className="card-elevated ui-card-pad h-full cursor-pointer hover:bg-muted/50 transition-colors duration-150 relative overflow-hidden flex flex-col"
       onClick={onClick}
     >
       <div className="absolute -top-12 -right-12 h-36 w-36 rounded-full bg-success/10 blur-2xl" />

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, CheckCircle, XCircle, Clock, BookOpen, User } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { CheckCircle, AlertTriangle, Calendar, BookOpen, UserCheck, UserX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import api from '@/lib/api';
 import { extractData } from '@/lib/utils';
@@ -38,107 +38,159 @@ export default function StudentAttendance({ userId, initialData }: any) {
     }
   };
 
-  const statusMap = (p: number) => ({
-    color: p >= 75 ? 'text-success' : p >= 65 ? 'text-warning' : 'text-destructive',
-    bg: p >= 75 ? 'bg-success' : p >= 65 ? 'bg-warning' : 'bg-destructive'
-  });
+  const getStatusColor = (percentage: number) => {
+    if (percentage >= 75) return 'text-success';
+    if (percentage >= 65) return 'text-warning';
+    return 'text-destructive';
+  };
+
+  const getProgressColor = (percentage: number) => {
+    if (percentage >= 75) return 'bg-success';
+    if (percentage >= 65) return 'bg-warning';
+    return 'bg-destructive';
+  };
 
   if (loading) return <LoadingGrid count={4} className="grid md:grid-cols-2 gap-8" />;
 
   return (
-    <div className="space-y-12">
-      <div className="flex justify-between items-end">
+    <div className="space-y-6 pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-           <h1 className="text-3xl font-black font-monument uppercase tracking-tight">Identity Status</h1>
-           <p className="text-muted-foreground font-bold italic text-[11px] uppercase tracking-widest mt-1">Personal Integrity Metrics</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Attendance Records</h1>
+          <p className="text-sm text-muted-foreground font-medium italic">Official academic attendance summary for the current semester</p>
         </div>
-        <div className="flex gap-4">
-           <Badge variant="outline" className={`h-12 border-2 px-8 font-black uppercase tracking-widest text-[10px] rounded-sm ${overallPercentage >= 75 ? 'text-success border-success/30' : 'text-destructive border-destructive/30 animate-pulse'}`}>
-             {overallPercentage >= 75 ? 'Protocol Eligible' : 'Status Alert'}
-           </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant={overallPercentage >= 75 ? 'outline' : 'destructive'} className="h-8 px-4 font-bold border-border/60">
+            {overallPercentage >= 75 ? 'STATUS: ELIGIBLE' : 'STATUS: BELOW TARGET'}
+          </Badge>
         </div>
       </div>
 
-      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="card-elevated p-12 border-2 border-primary relative overflow-hidden group shadow-[12px_12px_0px_rgba(255,0,0,0.05)]">
-        <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity"><TrendingUp className="w-56 h-56" /></div>
-        <div className="flex flex-col lg:flex-row items-center gap-16">
-           <div className="relative w-48 h-48">
-              <svg className="w-full h-full -rotate-90">
-                <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="16" fill="none" className="text-muted/20" />
-                <motion.circle 
-                  cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="16" fill="none" 
-                  strokeDasharray={`${2 * Math.PI * 88}`} 
-                  initial={{ strokeDashoffset: 2 * Math.PI * 88 }}
-                  animate={{ strokeDashoffset: 2 * Math.PI * 88 * (1 - overallPercentage / 100) }}
-                  transition={{ duration: 1.5, ease: "circOut" }}
-                  strokeLinecap="round" className={statusMap(overallPercentage).color}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                 <span className={`text-5xl font-black font-monument tracking-tighter ${statusMap(overallPercentage).color}`}>{Math.round(overallPercentage)}%</span>
-                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-2">Aggregate</span>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="card-elevated p-6 bg-card/50">
+           <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-4">Cumulative Attendance</p>
+           <div className="flex items-baseline gap-2">
+             <span className={`text-4xl font-bold tracking-tight ${getStatusColor(overallPercentage)}`}>{Math.round(overallPercentage)}%</span>
+             <span className="text-xs font-medium text-muted-foreground">of total classes</span>
            </div>
-
-           <div className="flex-1 grid grid-cols-2 gap-12 text-center lg:text-left">
-              <div className="space-y-2">
-                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-70">Authenticated Sessions</p>
-                 <p className="text-5xl font-black font-monument text-success">{courseAttendance.reduce((s,c)=>s+c.present, 0)}</p>
-              </div>
-              <div className="space-y-2">
-                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-70">Missed Syncs</p>
-                 <p className="text-5xl font-black font-monument text-destructive">{courseAttendance.reduce((s,c)=>s+c.absent, 0)}</p>
-              </div>
+           <div className="mt-4 h-1.5 w-full bg-muted rounded-full">
+             <motion.div initial={{ width: 0 }} animate={{ width: `${overallPercentage}%` }} className={`h-full ${getProgressColor(overallPercentage)}`} />
            </div>
         </div>
-      </motion.div>
 
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-         {courseAttendance.map(c => (
-           <motion.div key={c.courseId} whileHover={{ y: -6 }} className={`card-elevated p-8 border-2 rounded-sm relative overflow-hidden group shadow-[6px_6px_0px_rgba(0,0,0,0.03)] ${c.percentage < 75 ? 'border-destructive/40' : 'border-success/40'}`}>
-              <div className="flex justify-between items-start mb-8">
-                 <div className="space-y-2">
-                    <Badge className="font-mono text-[10px] font-bold h-6 rounded-sm bg-muted text-muted-foreground border-border">{c.courseCode}</Badge>
-                    <h3 className="font-black text-xl leading-tight uppercase font-monument tracking-tight">{c.courseName}</h3>
-                 </div>
-                 <div className={`text-3xl font-black font-monument ${statusMap(c.percentage).color}`}>{Math.round(c.percentage)}%</div>
-              </div>
-              <div className="space-y-6">
-                 <div className="h-4 w-full bg-muted border border-border/50 rounded-sm overflow-hidden p-1">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${c.percentage}%` }} className={`h-full rounded-sm ${statusMap(c.percentage).bg}`} />
-                 </div>
-                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest px-1">
-                    <span className="text-success">Vouched: {c.present}</span>
-                    <span className="text-destructive">Ghosted: {c.absent}</span>
-                 </div>
-              </div>
-           </motion.div>
-         ))}
+        <div className="card-elevated p-6 bg-card/50 border-l-4 border-success">
+           <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-4">Classes Attended</p>
+           <div className="flex items-center gap-3">
+             <div className="p-2 bg-success/10 rounded-lg"><UserCheck className="w-5 h-5 text-success" /></div>
+             <span className="text-4xl font-bold text-foreground">{courseAttendance.reduce((s,c)=>s+c.present,0)}</span>
+           </div>
+        </div>
+
+        <div className="card-elevated p-6 bg-card/50 border-l-4 border-destructive">
+           <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-4">Classes Missed</p>
+           <div className="flex items-center gap-3">
+             <div className="p-2 bg-destructive/10 rounded-lg"><UserX className="w-5 h-5 text-destructive" /></div>
+             <span className="text-4xl font-bold text-foreground">{courseAttendance.reduce((s,c)=>s+c.absent,0)}</span>
+           </div>
+        </div>
       </div>
 
-      <div className="card-elevated border-2 rounded-sm overflow-hidden shadow-[15px_15px_0px_rgba(0,0,0,0.02)]">
-         <div className="p-8 border-b-2 border-border bg-muted/40 flex items-center justify-between">
-            <h2 className="font-black uppercase tracking-widest text-xs flex items-center gap-3"><Clock className="w-5 h-5 text-primary" /> Session Identity Log</h2>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 px-1">
+           <BookOpen className="w-4 h-4 text-primary" />
+           <h2 className="text-base font-bold tracking-tight text-foreground">Course Performance</h2>
+        </div>
+        
+        <div className="border border-border/60 rounded-lg overflow-hidden bg-card/50 shadow-sm">
+           <table className="w-full border-collapse">
+             <thead>
+               <tr className="bg-muted/40 border-b border-border/60">
+                 <th className="py-3 px-6 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Course Code</th>
+                 <th className="py-3 px-6 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Course Name</th>
+                 <th className="py-3 px-6 text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Attended</th>
+                 <th className="py-3 px-6 text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Missed</th>
+                 <th className="py-3 px-6 text-right font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Percentage</th>
+               </tr>
+             </thead>
+             <tbody className="divide-y divide-border/40">
+               {courseAttendance.map(c => (
+                 <tr key={c.courseId} className="hover:bg-muted/10 transition-colors">
+                   <td className="py-4 px-6 font-mono text-xs font-bold text-primary">{c.courseCode}</td>
+                   <td className="py-4 px-6 text-sm font-medium text-foreground">{c.courseName}</td>
+                   <td className="py-4 px-6 text-center text-sm font-bold text-success">{c.present}</td>
+                   <td className="py-4 px-6 text-center text-sm font-bold text-destructive">{c.absent}</td>
+                   <td className="py-4 px-6 text-right">
+                     <div className="flex items-center justify-end gap-3 font-bold">
+                       <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden hidden sm:block">
+                         <div className={`h-full ${getProgressColor(c.percentage)}`} style={{ width: `${c.percentage}%` }} />
+                       </div>
+                       <span className={getStatusColor(c.percentage)}>{Math.round(c.percentage)}%</span>
+                     </div>
+                   </td>
+                 </tr>
+               ))}
+               {courseAttendance.length === 0 && (
+                 <tr>
+                   <td colSpan={5} className="py-12 text-center text-muted-foreground italic text-sm">No course enrollments found for current session.</td>
+                 </tr>
+               )}
+             </tbody>
+           </table>
+        </div>
+      </div>
+
+      <div className="space-y-4 pt-6">
+         <div className="flex items-center justify-between px-1">
+           <div className="flex items-center gap-2">
+             <Calendar className="w-4 h-4 text-primary" />
+             <h2 className="text-base font-bold tracking-tight text-foreground">Recent Session History</h2>
+           </div>
          </div>
-         <div className="divide-y-2 divide-border">
-            {attendanceRecords.length === 0 ? <div className="p-20 text-center text-muted-foreground font-black uppercase tracking-widest text-[10px] italic">No identity logs detected.</div> : attendanceRecords.map(r => (
-               <div key={r.id} className="p-6 flex items-center justify-between hover:bg-muted/30 transition-all border-l-8 border-transparent hover:border-primary">
-                  <div className="flex items-center gap-8">
-                     <div className={`w-14 h-14 border-2 rounded-sm flex items-center justify-center ${r.status === 'present' ? 'bg-success/10 text-success border-success/20' : 'bg-destructive/10 text-destructive border-destructive/20'}`}>
-                        {r.status === 'present' ? <CheckCircle className="w-8 h-8" /> : <XCircle className="w-8 h-8" />}
-                     </div>
-                     <div>
-                        <p className="font-black text-lg uppercase tracking-tight">{(courseAttendance || []).find(c => c.courseId === r.subject)?.courseCode || 'CORE_DOMAIN'}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-1 opacity-70">{new Date(r.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                     </div>
-                  </div>
-                  <Badge className={`h-10 px-8 font-black uppercase tracking-widest text-[10px] rounded-sm ${r.status === 'present' ? 'bg-success text-white' : 'bg-destructive text-white'}`}>
-                     {r.status}
-                  </Badge>
-               </div>
-            ))}
+         
+         <div className="border border-border/60 rounded-lg overflow-hidden bg-card/50 shadow-sm">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-muted/40 border-b border-border/60">
+                  <th className="py-3 px-6 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Date</th>
+                  <th className="py-3 px-6 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Course</th>
+                  <th className="py-3 px-6 text-right font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {attendanceRecords.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="py-12 text-center text-muted-foreground italic text-sm">No historical attendance records found.</td>
+                  </tr>
+                ) : (
+                  attendanceRecords.map((r) => {
+                    const course = (courseAttendance || []).find(c => c.courseId === r.subject);
+                    const isPresent = r.status === 'present';
+                    return (
+                      <tr key={r.id} className="hover:bg-muted/10 transition-colors">
+                        <td className="py-4 px-6">
+                          <span className="text-sm font-medium text-foreground">{new Date(r.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="text-sm font-bold text-foreground">{course?.courseCode || 'CORE'}</span>
+                          <span className="text-xs text-muted-foreground ml-2 opacity-70">| {course?.courseName || 'Academic Session'}</span>
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <span className={`text-xs font-bold uppercase tracking-wider ${isPresent ? 'text-success' : 'text-destructive'}`}>
+                            {isPresent ? 'Present' : 'Absent'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
          </div>
       </div>
     </div>
   );
 }
+
+
+
+

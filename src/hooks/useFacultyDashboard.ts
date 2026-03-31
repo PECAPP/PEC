@@ -18,6 +18,7 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
   const [showScheduleManager, setShowScheduleManager] = useState(false);
   
   const [courses, setCourses] = useState<any[]>(initialData?.courses || []);
+  const [notices, setNotices] = useState<any[]>(initialData?.notices || []);
   const [courseCards, setCourseCards] = useState<any[]>(initialData?.courseCards || []);
   const [todaySchedule, setTodaySchedule] = useState<any[]>(initialData?.todaySchedule || []);
   const [loading, setLoading] = useState(!initialData);
@@ -34,11 +35,19 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
 
     try {
       type ApiResponse<T> = { success: boolean; data: T; meta?: any };
-      const [coursesRes] = await Promise.all([
+      const [coursesRes, enrollmentsRes, noticesRes, timetableRes] = await Promise.all([
         api.get<ApiResponse<any>>('/courses', { params: { facultyId: user.uid, limit: 200, offset: 0 } }),
+        api.get<ApiResponse<any>>('/enrollments', { params: { limit: 200, offset: 0 } }),
+        api.get<ApiResponse<any>>('/noticeboard', { params: { limit: 5 } }),
+        api.get<ApiResponse<any>>('/timetable'),
       ]);
 
       let facultyCourses = coursesRes.data.data || [];
+      const allEnrollments = enrollmentsRes.data.data || [];
+      const allNotices = noticesRes.data.data || [];
+      const allTimetable = timetableRes.data.data || [];
+
+      setNotices(allNotices);
 
       if (!facultyCourses.length && user.fullName) {
         const allCoursesRes = await api.get<ApiResponse<any>>('/courses', { params: { limit: 200, offset: 0 } });
@@ -52,15 +61,8 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
 
       setCourses(facultyCourses);
 
-      const enrollmentResponses = await Promise.all(
-        facultyCourses.map((course: any) =>
-          api.get<ApiResponse<any>>('/enrollments', {
-            params: { courseId: course.id, status: 'active', limit: 200, offset: 0 },
-          })
-        )
-      );
-
-      const allEnrollments = enrollmentResponses.flatMap((res) => res.data.data || []);
+      // Calculate Low Attendance Count
+      const lowAttendanceCount = facultyCourses.length > 0 ? 0 : 0; // Placeholder or use actual logic if available
 
       const uniqueStudents = new Set(
         allEnrollments
@@ -71,7 +73,7 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
       setStats({
         activeCount: facultyCourses.length,
         studentCount: uniqueStudents.size,
-        lowAttendanceCount: 0,
+        lowAttendanceCount,
       });
 
       const enrollmentByCourse = allEnrollments.reduce((acc: Record<string, number>, item: any) => {
@@ -92,7 +94,25 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
         }))
       );
 
-      setTodaySchedule(Array.isArray(initialData?.todaySchedule) ? initialData.todaySchedule : []);
+      // Prepare Today's Schedule
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const today = days[new Date().getDay()];
+      const facultyTimetable = allTimetable.filter((t: any) => 
+        facultyCourses.some(c => c.id === t.courseId) && t.day === today
+      );
+
+      setTodaySchedule(facultyTimetable.map((t: any) => {
+        const course = facultyCourses.find(c => c.id === t.courseId);
+        return {
+          id: t.id,
+          time: `${t.startTime} - ${t.endTime}`,
+          course: course?.name || 'Class',
+          section: t.section || 'N/A',
+          room: t.room || 'TBA',
+          students: enrollmentByCourse[String(t.courseId)] || 0,
+          status: 'upcoming' as const,
+        };
+      }));
 
       if (facultyCourses.length > 0 && !selectedCourse) {
         setSelectedCourse(facultyCourses[0]);
@@ -128,6 +148,7 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
     loading,
     user,
     courses,
+    notices,
     courseCards,
     todaySchedule,
     stats,

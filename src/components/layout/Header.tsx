@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import api from '@/lib/api';
 import {
   Bell,
   Search,
@@ -180,28 +182,37 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
             </button>
           </div>
           <div className="scale-90 sm:scale-100"><GoogleTranslate containerId="google_translate_header" /></div>
-          {showNoticeboardButton && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                className="hidden md:inline-flex"
-                onClick={() => router.push('/noticeboard')}
-              >
-                <Bell className="w-4 h-4 mr-2" />
-                Noticeboard
-              </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 size="icon"
-                className="md:hidden"
-                onClick={() => router.push('/noticeboard')}
-                title="Open noticeboard"
+                className="relative"
+                title="Notifications"
               >
                 <Bell className="w-4 h-4" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full border-2 border-background animate-pulse" />
               </Button>
-            </>
-          )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 p-0">
+              <div className="p-3 border-b border-border flex items-center justify-between bg-muted/30">
+                <h3 className="text-sm font-bold tracking-tight">Recent Notices</h3>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary hover:bg-primary/5"
+                  onClick={() => router.push('/noticeboard')}
+                >
+                  View All
+                </Button>
+              </div>
+              <div className="max-h-[320px] overflow-y-auto py-1 px-1">
+                <NoticePreviewList router={router} />
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <div className="hidden md:block"><LandingColorTheme /></div>
           <div className="hidden md:block"><ThemeToggler/></div>
 
@@ -259,5 +270,71 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
         </div>
       </div>
     </header>
+  );
+}
+
+function NoticePreviewList({ router }: { router: any }) {
+  const [notices, setNotices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await api.get('/noticeboard', { params: { limit: 4, offset: 0 } });
+        setNotices(res?.data?.data || []);
+      } catch {
+        // Silently skip
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  if (loading) return (
+    <div className="py-8 text-center text-[10px] uppercase font-bold tracking-widest text-muted-foreground/30 animate-pulse">
+      Securing Updates...
+    </div>
+  );
+
+  if (notices.length === 0) return (
+    <div className="py-12 text-center">
+      <Bell className="w-8 h-8 mx-auto mb-2 opacity-10" />
+      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">System Clear</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-1">
+      {notices.map((n, i) => (
+        <button
+          key={n.id || i}
+          className="w-full text-left p-3 hover:bg-secondary transition-colors group flex items-start gap-3 rounded-sm"
+          onClick={() => router.push(`/noticeboard#${n.id}`)}
+        >
+          <div className={cn(
+            "mt-1 w-2 h-2 rounded-full flex-shrink-0",
+            n.important ? "bg-destructive animate-pulse" : (n.pinned ? "bg-primary" : "bg-muted-foreground/30")
+          )} />
+          <div className="space-y-1 min-w-0 flex-1">
+            <h4 className="text-xs font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors uppercase tracking-tight">
+              {n.title}
+            </h4>
+            <p className="text-[10px] text-muted-foreground line-clamp-2 leading-[1.3] font-medium opacity-80">
+              {n.content}
+            </p>
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-[9px] font-bold uppercase text-muted-foreground/50 tracking-widest">
+                {new Date(n.publishedAt || n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+              </span>
+              {n.category && (
+                <span className="text-[8px] font-bold uppercase py-0.5 px-1.5 bg-muted/40 border border-border/40 text-muted-foreground/80 tracking-widest rounded-sm">
+                  {n.category}
+                </span>
+              )}
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
   );
 }

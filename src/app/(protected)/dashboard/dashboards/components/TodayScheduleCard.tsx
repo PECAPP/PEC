@@ -38,6 +38,7 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull, conta
           <ArrowUpRight className="ml-1 h-4 w-4" />
         </Button>
       </div>
+
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
         {todayClasses.length === 0 ? (
           <EmptyState title="No classes scheduled" description="You are all clear for this day." />

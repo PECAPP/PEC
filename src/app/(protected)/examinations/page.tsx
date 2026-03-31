@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import BulkUpload from '@/components/BulkUpload';
 
 import api from '@/lib/api';
@@ -330,29 +331,52 @@ function CollegeAdminExaminations() {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            {filteredSchedules.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No schedules found for selected filters.</p>
-            ) : (
-              filteredSchedules.map((schedule) => (
-                <div key={schedule.id} className="border rounded-lg p-3 flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="font-medium text-foreground">
-                      {schedule.courseCode} - {schedule.courseName}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {schedule.department || 'N/A'} - {formatDate(schedule.date)} - {schedule.startTime}-{schedule.endTime} - {schedule.room}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{schedule.examType}</Badge>
-                    <Button variant="ghost" size="sm" onClick={() => handleDeleteSchedule(schedule.id)}>
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
+          <div className="border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Course</TableHead>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Room</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredSchedules.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      No schedules found for selected filters.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredSchedules.map((schedule) => (
+                    <TableRow key={schedule.id}>
+                      <TableCell className="font-medium">
+                        <div className="flex flex-col">
+                          <span>{schedule.courseCode}</span>
+                          <span className="text-xs text-muted-foreground font-normal">{schedule.courseName}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{schedule.department || 'N/A'}</TableCell>
+                      <TableCell>{formatDate(schedule.date)}</TableCell>
+                      <TableCell>{schedule.startTime} - {schedule.endTime}</TableCell>
+                      <TableCell>{schedule.room}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{schedule.examType}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteSchedule(schedule.id)}>
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </TabsContent>
 
@@ -462,24 +486,101 @@ function DepartmentUpcomingExams({
         <Input value="Upcoming only" disabled />
       </div>
 
-      <div className="space-y-2">
-        {filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No upcoming exams for your department.</p>
-        ) : (
-          filtered.map((schedule) => (
-            <div key={schedule.id} className="border rounded-lg p-3">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-medium text-foreground">{schedule.courseCode} - {schedule.courseName}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(schedule.date)} - {schedule.startTime}-{schedule.endTime} - {schedule.room}
-                  </p>
-                </div>
-                <Badge variant="outline">{schedule.examType}</Badge>
-              </div>
-            </div>
-          ))
-        )}
+      <div className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-2xl">
+        <Table className="border-collapse">
+          <TableHeader>
+            <TableRow className="bg-muted hover:bg-muted border-b border-border/60">
+              <TableHead className="w-40 font-black uppercase text-[10px] tracking-widest text-primary py-4 border-r border-border/60 text-center">Status & Date</TableHead>
+              <TableHead className="font-black uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Course Details</TableHead>
+              <TableHead className="font-black uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Time Slot</TableHead>
+              <TableHead className="font-black uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Venue</TableHead>
+              <TableHead className="text-right font-black uppercase text-[10px] tracking-widest py-4">Type</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {(() => {
+              const grouped = filtered.reduce((acc, exam) => {
+                const dateStr = formatDate(exam.date);
+                if (!acc[dateStr]) acc[dateStr] = [];
+                acc[dateStr].push(exam);
+                return acc;
+              }, {} as Record<string, ExamSchedule[]>);
+
+              const dateKeys = Object.keys(grouped);
+
+              if (dateKeys.length === 0) {
+                return (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-24 text-muted-foreground italic font-medium">
+                      No upcoming exams found for your department.
+                    </TableCell>
+                  </TableRow>
+                );
+              }
+
+              return dateKeys.map((dateKey) => {
+                const exams = grouped[dateKey];
+                const examDate = new Date(exams[0].date);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const diffTime = examDate.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const isVerySoon = diffDays <= 2;
+
+                return exams.map((exam, idx) => (
+                  <TableRow 
+                    key={exam.id} 
+                    className={`group transition-all duration-200 border-b border-border/60 ${isVerySoon ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-muted/50'}`}
+                  >
+                    {/* Date Column - Clubbed for the first item in the group */}
+                    {idx === 0 && (
+                      <TableCell 
+                        rowSpan={exams.length} 
+                        className={`align-top border-r border-border/60 py-6 text-center ${isVerySoon ? 'bg-primary/10' : 'bg-muted/30'}`}
+                      >
+                        <div className="flex flex-col items-center justify-center space-y-2 sticky top-6">
+                          <span className={`text-[10px] font-black leading-none px-2 py-1 rounded-full ${isVerySoon ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-muted-foreground/20 text-muted-foreground'}`}>
+                            {diffDays === 0 ? 'TODAY' : diffDays === 1 ? 'TOMORROW' : `${diffDays}D LEFT`}
+                          </span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-3xl font-black text-foreground tracking-tighter">{examDate.getDate()}</span>
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{new Intl.DateTimeFormat('en-US', { month: 'short' }).format(examDate)}</span>
+                            <div className="h-px w-8 bg-border/60 my-1" />
+                            <span className="text-[9px] font-bold text-primary uppercase tracking-tight">{new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(examDate)}</span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    )}
+
+                    {/* Content Columns with borders */}
+                    <TableCell className="py-6 border-r border-border/60">
+                      <div className="flex flex-col">
+                        <span className="text-base font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">{exam.courseCode}</span>
+                        <span className="text-[11px] text-muted-foreground font-medium leading-tight">{exam.courseName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-6 border-r border-border/60">
+                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md border font-mono text-xs font-bold leading-none shadow-sm ${isVerySoon ? 'bg-primary/20 border-primary/30 text-primary' : 'bg-background border-border/60 text-muted-foreground'}`}>
+                         {exam.startTime} — {exam.endTime}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-6 border-r border-border/60">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-black text-foreground/40 uppercase tracking-widest mb-0.5">Venue</span>
+                        <span className="text-sm font-black text-foreground tracking-widest uppercase">{exam.room}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-6 text-right">
+                      <Badge variant={isVerySoon ? 'default' : 'outline'} className="font-black uppercase text-[9px] tracking-widest px-2 shadow-sm">
+                        {exam.examType}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ));
+              });
+            })()}
+          </TableBody>
+        </Table>
       </div>
     </motion.div>
   );

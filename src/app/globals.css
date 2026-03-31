@@ -30,7 +30,7 @@ iframe.goog-te-balloon-frame,
 .VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
 .VIpgJd-ZVi9od-l4eHX-hSRGPd,
 #goog-gt-tt,
-.skiptranslate > iframe.goog-te-banner-frame {
+.skiptranslate>iframe.goog-te-banner-frame {
   display: none !important;
   visibility: hidden !important;
 }
@@ -39,8 +39,15 @@ iframe.goog-te-balloon-frame,
   display: none !important;
 }
 
-body { top: 0px !important; position: static !important; }
-html { margin-top: 0 !important; top: 0px !important; }
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+html {
+  margin-top: 0 !important;
+  top: 0px !important;
+}
 
 /* Keep Google widget hidden */
 .goog-te-gadget {
@@ -496,10 +503,6 @@ html { margin-top: 0 !important; top: 0px !important; }
 @layer components {
 
   /* Display Fonts */
-  .font-monument {
-    font-family: "Monument Extended", serif;
-  }
-
   .font-fraunces {
     font-family: "Fraunces", serif;
   }
