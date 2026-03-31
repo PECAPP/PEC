@@ -30,8 +30,13 @@ import {
  promoteToHODAction,
 } from '../actions';
 
+interface FacultyMember extends FacultyInput {
+ id: string;
+ status?: string;
+}
+
 interface FacultyViewProps {
- initialFaculty: any[];
+ initialFaculty: FacultyMember[];
  isAdmin: boolean;
 }
 
@@ -44,11 +49,11 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
  const router = useRouter();
  const [isPending, startTransition] = useTransition();
 
- const [faculty, setFaculty] = useState<any[]>(initialFaculty);
+ const [faculty, setFaculty] = useState<FacultyMember[]>(initialFaculty);
  const [searchTerm, setSearchTerm] = useState('');
  const [showDialog, setShowDialog] = useState(false);
  const [showBulkUpload, setShowBulkUpload] = useState(false);
- const [editingFaculty, setEditingFaculty] = useState<any>(null);
+ const [editingFaculty, setEditingFaculty] = useState<FacultyMember | null>(null);
 
  const {
   register,
@@ -62,9 +67,9 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
 
  useEffect(() => { setFaculty(initialFaculty); }, [initialFaculty]);
  
- const [optimisticFaculty, addOptimisticFaculty] = useOptimistic(
-  faculty,
-  (state, { type, payload }: { type: 'create' | 'update' | 'delete' | 'promote', payload: any }) => {
+  const [optimisticFaculty, addOptimisticFaculty] = useOptimistic(
+    faculty,
+    (state, { type, payload }: { type: 'create' | 'update' | 'delete' | 'promote', payload: any }) => {
    switch (type) {
     case 'create':
      return [{ ...payload, id: 'temp-' + Date.now(), status: 'active' }, ...state];
@@ -120,12 +125,15 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
 
  const resetForm = () => reset(emptyForm);
 
- const openEditDialog = (fac: any) => {
+ const openEditDialog = (fac: FacultyMember) => {
   setEditingFaculty(fac);
   reset({
-   fullName: fac.fullName, email: fac.email,
-   employeeId: fac.employeeId || '', department: fac.department || '',
-   designation: fac.designation || '', phone: fac.phone || '',
+   fullName: fac.fullName, 
+   email: fac.email,
+   employeeId: fac.employeeId || '', 
+   department: fac.department || '',
+   designation: fac.designation || '', 
+   phone: fac.phone || '',
    specialization: fac.specialization || '',
   });
   setShowDialog(true);
@@ -151,7 +159,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
   });
  };
 
- const handlePromoteHOD = (fac: any) => {
+ const handlePromoteHOD = (fac: FacultyMember) => {
   if (!fac.department) {
    toast.error('Department assignment required before HOD elevation.');
    return;
@@ -334,11 +342,15 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
        </div>
       </div>
       <div className="flex gap-4 pt-8">
-       <Button onClick(formSubmit(onSubmit)) className="flex-1 h-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg rounded-sm hover:brightness-110 active:scale-[0.98] transition-all" disabled={isPending}>
-        {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-        {editingFaculty ? 'Commit Changes' : 'Authorize Identity'}
-       </Button>
-       <Button variant="outline" onClick={() => setShowDialog(false)} className="h-14 border-2 font-bold px-8 uppercase tracking-widest text-[10px] rounded-sm">Abort</Button>
+        <Button 
+          onClick={formSubmit(onSubmit)} 
+          className="flex-1 h-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg rounded-sm hover:brightness-110 active:scale-[0.98] transition-all" 
+          disabled={isPending}
+        >
+          {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          {editingFaculty ? 'Commit Changes' : 'Authorize Identity'}
+        </Button>
+        <Button variant="outline" onClick={() => setShowDialog(false)} className="h-14 border-2 font-bold px-8 uppercase tracking-widest text-[10px] rounded-sm">Abort</Button>
       </div>
      </div>
     </DialogContent>

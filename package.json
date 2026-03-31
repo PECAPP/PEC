@@ -13,6 +13,7 @@
     "start:fresh": "npm run clean:next && next build && next start",
     "lint": "next lint",
     "clean:next": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});console.log('cleaned .next')\"",
+    "prisma:studio": "npx prisma studio --schema server/prisma/schema.prisma",
     "dev:docker:logs": "docker compose -f docker-compose.dev.yml logs -f --tail=100",
     "dev:docker:restart": "docker compose -f docker-compose.dev.yml restart",
     "prod:docker": "docker compose up -d --build",
