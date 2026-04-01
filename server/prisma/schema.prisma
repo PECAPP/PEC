@@ -493,6 +493,8 @@ model Attendance {
   method    String?   @default("manual") // "manual" or "qr"
   courseId  String?
   facultyId String?
+  lat       Float?
+  lng       Float?
 
   @@unique([studentId, date, subject])
   @@index([date])

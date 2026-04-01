@@ -35,6 +35,7 @@ export interface DashboardStats {
   totalStudents: number;
   totalFaculty: number;
   totalCourses: number;
+  totalDepartments?: number;
   activeUsers?: number;
   pendingRequests?: number;
 }

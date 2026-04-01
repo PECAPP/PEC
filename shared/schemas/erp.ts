@@ -36,6 +36,30 @@ export const attendanceSchema = z.object({
   method: z.enum(['qr', 'manual']).default('manual'),
   courseId: z.string().optional(),
   facultyId: z.string().uuid().optional(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
+});
+
+export const AuthLoginSchema = z.object({
+  email: z.string().email('Invalid institutional email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+export const AuthSignupSchema = z.object({
+  fullName: z.string().min(3, 'Full name required'),
+  email: z.string().email('Invalid institutional email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  role: z.enum(['student', 'faculty', 'college_admin']).default('student'),
+});
+
+export const AuthResponseSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    email: z.string(),
+    fullName: z.string(),
+    role: z.string(),
+  }),
+  token: z.string(),
 });
 
 export const attendanceSessionSchema = z.object({

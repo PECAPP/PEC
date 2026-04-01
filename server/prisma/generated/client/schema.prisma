@@ -5,6 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -483,9 +484,40 @@ model Attendance {
   studentId String
   student   User     @relation("StudentAttendance", fields: [studentId], references: [id], onDelete: Cascade)
 
+  // QR Attendance fields
+  sessionId String?
+  session   AttendanceSession? @relation("SessionAttendance", fields: [sessionId], references: [id], onDelete: SetNull)
+  markedAt  DateTime?          @default(now())
+  method    String?            @default("manual") // "manual" or "qr"
+  courseId  String?
+  facultyId String?
+  lat       Float?
+  lng       Float?
+
   @@unique([studentId, date, subject])
   @@index([date])
   @@index([status])
+  @@index([sessionId])
+}
+
+model AttendanceSession {
+  id              String       @id @default(uuid())
+  facultyId       String
+  courseId        String
+  courseName      String
+  date            String
+  startTime       String
+  qrCode          String       @unique
+  active          Boolean      @default(true)
+  expiresAt       String
+  attendanceCount Int          @default(0)
+  createdAt       DateTime     @default(now())
+  endedAt         DateTime?
+  attendances     Attendance[] @relation("SessionAttendance")
+
+  @@index([facultyId])
+  @@index([courseId])
+  @@index([qrCode])
 }
 
 model ExamSchedule {
@@ -624,4 +656,131 @@ model CanteenOrderItem {
   price    Float
 
   @@index([orderId])
+}
+
+model ScoreEntry {
+  id         String    @id @default(uuid())
+  studentId  String
+  courseName String
+  courseCode String?
+  term       String?
+  maxMarks   Float     @default(100)
+  score      Float     @default(0)
+  grade      String?
+  examDate   DateTime?
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([studentId, createdAt])
+}
+
+model ResumeProfile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  personalInfo Json?
+  education    Json?
+  experience   Json?
+  projects     Json?
+  skills       Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model StudentProject {
+  id          String    @id @default(uuid())
+  studentId   String
+  title       String
+  description String
+  techStack   String // JSON array of technologies
+  githubUrl   String?
+  liveUrl     String?
+  imageUrl    String?
+  startDate   DateTime?
+  endDate     DateTime?
+  isFeatured  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([studentId, isFeatured])
+}
+
+model StudentSkill {
+  id        String   @id @default(uuid())
+  studentId String
+  name      String
+  level     Int      @default(50) // 0-100
+  category  String   @default("technical") // "technical", "soft", "language", "tool"
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, name])
+  @@index([studentId, category])
+}
+
+model FacultyPublication {
+  id         String   @id @default(uuid())
+  facultyId  String
+  title      String
+  journal    String?
+  conference String?
+  year       Int
+  doi        String?
+  url        String?
+  abstract   String?
+  citations  Int      @default(0)
+  coAuthors  String? // JSON array
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([facultyId])
+  @@index([facultyId, year])
+}
+
+model FacultyAward {
+  id          String   @id @default(uuid())
+  facultyId   String
+  title       String
+  description String?
+  awardedBy   String?
+  year        Int
+  category    String   @default("academic") // "academic", "research", "teaching", "service"
+  createdAt   DateTime @default(now())
+
+  @@index([facultyId])
+  @@index([facultyId, year])
+}
+
+model FacultyConference {
+  id                String    @id @default(uuid())
+  facultyId         String
+  name              String
+  location          String?
+  startDate         DateTime?
+  endDate           DateTime?
+  role              String?   @default("presenter") // "presenter", "attendee", "organizer", "keynote"
+  presentationTitle String?
+  description       String?
+  createdAt         DateTime  @default(now())
+
+  @@index([facultyId])
+  @@index([facultyId, startDate])
+}
+
+model FacultyConsultation {
+  id           String    @id @default(uuid())
+  facultyId    String
+  organization String
+  description  String?
+  startDate    DateTime?
+  endDate      DateTime?
+  status       String    @default("active") // "active", "completed", "ongoing"
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([facultyId])
+  @@index([facultyId, status])
 }

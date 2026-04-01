@@ -8,6 +8,9 @@ export class CreateCampusMapRegionDto {
   @IsString()
   description?: string;
 
+  @IsString()
+  type: string;
+
   @IsNumber()
   x: number;
 
