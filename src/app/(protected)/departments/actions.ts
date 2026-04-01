@@ -3,9 +3,10 @@
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { logActivity } from '@/lib/logger';
+import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
 import { departmentSchema } from '@/lib/schemas';
 
-const API = process.env.INTERNAL_API_URL ?? 'http://localhost:8000';
+const API = resolveInternalApiBaseUrl();
 
 async function getToken() {
   const cookieStore = await cookies();

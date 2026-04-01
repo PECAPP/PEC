@@ -77,10 +77,14 @@ const nextConfig = {
   // All client-side calls to /api/* are forwarded to the NestJS backend.
   // SSR calls use INTERNAL_API_URL (localhost:8000) directly for speed.
   async rewrites() {
-    const apiTarget =
+    const configuredTarget =
       process.env.INTERNAL_API_URL ??
-      process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') ??
-      'http://localhost:8000';
+      process.env.NEXT_PUBLIC_API_URL ??
+      'http://localhost:8000/api';
+    const normalizedTarget = configuredTarget.replace(/\/$/, '');
+    const apiTarget = normalizedTarget.endsWith('/api')
+      ? normalizedTarget
+      : `${normalizedTarget}/api`;
 
     return [
       {

@@ -5,9 +5,10 @@ import { cookies } from 'next/headers';
 import { actionClient } from '@/lib/safe-action';
 import { attendanceSchema } from '@shared/schemas/erp';
 import { logActivity } from '@/lib/logger';
+import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
 import { z } from 'zod';
 
-const API = process.env.INTERNAL_API_URL ?? 'http://localhost:8000';
+const API = resolveInternalApiBaseUrl();
 
 async function getToken() {
   const cookieStore = await cookies();

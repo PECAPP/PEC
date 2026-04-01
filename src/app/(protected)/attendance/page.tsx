@@ -17,7 +17,7 @@ export default async function AttendancePage() {
 
   // Pre-fetch initial data for students
   let initialData: any = null;
-  if (session.role === 'student') {
+  if (session.role === 'student' && session.uid) {
     const [summary, records] = await Promise.all([
       serverFetch('/attendance/summary'),
       serverFetch(`/attendance?studentId=${session.uid}&limit=100`),

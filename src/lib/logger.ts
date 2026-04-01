@@ -1,5 +1,6 @@
 import { after } from 'next/server';
 import { cookies } from 'next/headers';
+import { resolveInternalApiBaseUrl } from './internal-api-url';
 
 /**
  * Professional Audit Logger using Next.js 15+ 'after' API.
@@ -11,7 +12,7 @@ export async function logActivity(action: string, entity: string, metadata: any 
       const cookieStore = await cookies();
       const token = cookieStore.get('access_token')?.value;
 
-      const API = process.env.INTERNAL_API_URL ?? 'http://localhost:8000';
+      const API = resolveInternalApiBaseUrl();
       
       // Fire-and-forget log to the backend
       await fetch(`${API}/audit-logs`, {

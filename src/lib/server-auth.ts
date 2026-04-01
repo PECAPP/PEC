@@ -1,5 +1,13 @@
 import { cookies } from 'next/headers';
 
+const isValidSessionUid = (value: string | undefined): value is string => {
+  if (!value) return false;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return false;
+  if (normalized === 'unknown') return false;
+  return true;
+};
+
 /**
  * Robust server-side session retriever.
  * Priority:
@@ -19,9 +27,14 @@ export async function getServerSession() {
         if (parts.length === 3) {
           const payloadBase64 = parts[1];
           const decoded = JSON.parse(Buffer.from(payloadBase64, 'base64').toString());
+          const uid = decoded.sub || decoded.uid || userIdCookie;
+
+          if (!isValidSessionUid(uid)) {
+            return null;
+          }
           
           return {
-            uid: decoded.sub || decoded.uid || userIdCookie || 'unknown',
+            uid,
             role: (decoded.role || userRoleCookie || 'student') as any,
             email: decoded.email || 'user@pec.edu',
             fullName: decoded.name || decoded.fullName || 'User',

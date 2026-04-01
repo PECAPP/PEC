@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { unstable_cache } from 'next/cache';
+import { resolveInternalApiBaseUrl } from './internal-api-url';
 
 /**
  * Authenticated SSR fetch via the Next.js proxy (/api -> localhost:8000).
@@ -19,7 +20,7 @@ export async function serverFetch(endpoint: string, options: RequestInit = {}) {
 
   // Always use the internal backend URL for Server→Backend calls (avoids Proxy hop)
   const path = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-  const baseUrl = process.env.INTERNAL_API_URL ?? 'http://localhost:8000';
+  const baseUrl = resolveInternalApiBaseUrl();
   const url = `${baseUrl}/${path}`;
 
   const headers: Record<string, string> = {
@@ -72,7 +73,7 @@ export function cachedServerFetch(
   revalidate = 3600,
 ) {
   const path = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-  const url = `${process.env.INTERNAL_API_URL ?? 'http://localhost:8000'}/${path}`;
+  const url = `${resolveInternalApiBaseUrl()}/${path}`;
 
   return unstable_cache(
     async () => {
