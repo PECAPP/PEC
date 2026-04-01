@@ -9,7 +9,8 @@ const emptyModuleAlias = './src/lib/empty-module.ts';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  typedRoutes: true,
+  typedRoutes: false,
+  transpilePackages: ['@shared'],
   typescript: {
     ignoreBuildErrors: process.env.NEXT_DISABLE_TYPECHECK?.trim() === '1',
   },

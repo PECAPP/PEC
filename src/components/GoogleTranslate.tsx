@@ -22,6 +22,7 @@ declare global {
   interface Window {
     googleTranslateElementInit?: () => void;
     __googleTranslateCustomInit?: () => void;
+    __googleTranslateLoadingPromise?: Promise<void>;
     google?: {
       translate?: GoogleTranslateElement;
     };
@@ -39,6 +40,46 @@ const languageOptions = [
 ];
 
 const LANGUAGE_STORAGE_KEY = 'ui.language';
+
+const GOOGLE_TRANSLATE_SCRIPT_ID = 'google-translate-script';
+
+function ensureGoogleTranslateScript(): Promise<void> {
+  if (typeof window === 'undefined') {
+    return Promise.resolve();
+  }
+
+  if (window.google?.translate?.TranslateElement) {
+    return Promise.resolve();
+  }
+
+  if (window.__googleTranslateLoadingPromise) {
+    return window.__googleTranslateLoadingPromise;
+  }
+
+  window.__googleTranslateLoadingPromise = new Promise<void>((resolve, reject) => {
+    window.googleTranslateElementInit = () => {
+      window.dispatchEvent(new Event('google-translate-ready'));
+      resolve();
+    };
+
+    const existingScript = document.getElementById(GOOGLE_TRANSLATE_SCRIPT_ID) as HTMLScriptElement | null;
+    if (existingScript) {
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = GOOGLE_TRANSLATE_SCRIPT_ID;
+    script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    script.async = true;
+    script.onerror = () => {
+      reject(new Error('Failed to load Google Translate script'));
+    };
+
+    document.head.appendChild(script);
+  });
+
+  return window.__googleTranslateLoadingPromise;
+}
 
 export function GoogleTranslate({ 
   containerId = "google_translate_element" 
@@ -140,7 +181,13 @@ export function GoogleTranslate({
       }
     };
 
-    if (window.google?.translate?.TranslateElement) initWidget();
+    void ensureGoogleTranslateScript()
+      .then(() => {
+        initWidget();
+      })
+      .catch(() => {
+        setWidgetStatus('blocked');
+      });
 
     const handleReady = () => {
       initWidget();

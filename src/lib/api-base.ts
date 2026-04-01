@@ -1,17 +1,30 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
+const normalizeApiBasePath = (value: string) => {
+  const trimmed = value.trim();
+  const ensuredLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  return ensuredLeadingSlash.replace(/\/$/, "") || "/api";
+};
+
 export const resolveApiBaseUrl = () => {
-  if (API_BASE_URL.startsWith("http")) {
-    return API_BASE_URL;
+  const configuredBase = API_BASE_URL.trim();
+
+  if (!configuredBase) {
+    return "/api";
   }
-  if (API_BASE_URL.startsWith("/") && typeof window !== "undefined") {
-    return `${window.location.origin}${API_BASE_URL}`;
+
+  if (configuredBase.startsWith("http")) {
+    return configuredBase.replace(/\/$/, "");
   }
-  if (API_BASE_URL.startsWith("/")) {
-    return new URL(API_BASE_URL, SITE_URL).toString();
+
+  const normalizedPath = normalizeApiBasePath(configuredBase);
+
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}${normalizedPath}`;
   }
-  return API_BASE_URL;
+
+  return new URL(normalizedPath, SITE_URL).toString();
 };
 
 export const buildApiUrl = (route: string, params?: Record<string, any>) => {

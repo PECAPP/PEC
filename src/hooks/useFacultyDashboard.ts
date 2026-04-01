@@ -26,11 +26,21 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
 
   const fetchFacultyData = useCallback(async () => {
     if (!user || user.role !== 'faculty') return;
-    
-    // If we already have initial data and it's fresh, skip first fetch
-    if (initialData && courses.length > 0) {
-       setLoading(false);
-       return;
+
+    const hasPrecomputedCards = Array.isArray(initialData?.courseCards);
+    const hasPrecomputedSchedule = Array.isArray(initialData?.todaySchedule);
+    const hasPrecomputedStats = Boolean(initialData?.stats);
+    const canUseInitialSnapshot =
+      Boolean(initialData) &&
+      courses.length > 0 &&
+      hasPrecomputedCards &&
+      hasPrecomputedSchedule &&
+      hasPrecomputedStats;
+
+    // Skip first refetch only when server snapshot is complete.
+    if (canUseInitialSnapshot) {
+      setLoading(false);
+      return;
     }
 
     try {
@@ -138,7 +148,7 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
     } finally {
       setLoading(false);
     }
-  }, [user, selectedCourse]);
+  }, [user, selectedCourse, initialData, courses.length]);
 
   useEffect(() => {
     if (authLoading) return;

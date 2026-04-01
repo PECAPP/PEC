@@ -6,8 +6,7 @@ import {
   getRolePermissions,
 } from "@/features/auth/lib/rolePermissions";
 import { authClient } from "@/lib/auth-client";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
+import { buildApiUrl } from "@/lib/api-base";
 
 export interface CurrentUser {
   id: string;
@@ -81,7 +80,7 @@ async function fetchProfile(
   }
 
   inFlightRequest = (async () => {
-    const res = await fetch(`${API_BASE_URL}/auth/profile`, {
+    const res = await fetch(buildApiUrl("/auth/profile"), {
       headers: {
         Authorization: `Bearer ${token}`,
       },

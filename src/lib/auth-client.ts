@@ -3,7 +3,9 @@
  * Handles secure cookie + header-based token delivery for web + mobile clients
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
+import { buildApiUrl } from "./api-base";
+
+const authUrl = (route: string) => buildApiUrl(`/auth/${route}`);
 
 export interface AuthCredentials {
   email: string;
@@ -102,7 +104,7 @@ class AuthClient {
   }
 
   async login(credentials: AuthCredentials): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(authUrl("login"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
@@ -127,7 +129,7 @@ class AuthClient {
   async signup(
     credentials: SignUpCredentials,
   ): Promise<AuthResponse & { emailVerificationToken?: string }> {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(authUrl("register"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
@@ -157,7 +159,7 @@ class AuthClient {
     this.isRefreshing = true;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      const response = await fetch(authUrl("refresh"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
@@ -211,7 +213,7 @@ class AuthClient {
         ? JSON.stringify({ refreshToken: this.refreshToken })
         : JSON.stringify({});
 
-      await fetch(`${API_BASE_URL}/auth/logout`, {
+      await fetch(authUrl("logout"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body,
@@ -225,7 +227,7 @@ class AuthClient {
   }
 
   async verifyEmail(token: string): Promise<{ verified: boolean }> {
-    const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+    const response = await fetch(authUrl("verify-email"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
@@ -244,15 +246,12 @@ class AuthClient {
   }
 
   async requestPasswordReset(email: string): Promise<{ accepted: boolean }> {
-    const response = await fetch(
-      `${API_BASE_URL}/auth/request-password-reset`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-        credentials: "include",
-      },
-    );
+    const response = await fetch(authUrl("request-password-reset"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+      credentials: "include",
+    });
 
     if (!response.ok) {
       const message = await this.parseErrorMessage(
@@ -268,7 +267,7 @@ class AuthClient {
   async resetPassword(
     payload: ResetPasswordPayload,
   ): Promise<{ reset: boolean }> {
-    const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+    const response = await fetch(authUrl("reset-password"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -289,7 +288,7 @@ class AuthClient {
   async changePassword(
     payload: ChangePasswordPayload,
   ): Promise<{ changed: boolean }> {
-    const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+    const response = await fetch(authUrl("change-password"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
