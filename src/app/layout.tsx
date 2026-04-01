@@ -35,7 +35,7 @@ export default function RootLayout({
       lang="en" 
       suppressHydrationWarning 
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${sora.variable}`}
+      className={`accent-pec-gold ${inter.variable} ${sora.variable}`}
     >
       <body suppressHydrationWarning>
         <RouteTransitionLoader />
