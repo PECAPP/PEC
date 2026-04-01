@@ -58,35 +58,6 @@ Backend: AI service configured but requires API key
 Issue: Needs API key configuration
 
 
-================================================================================
-## 9. Websockets for Real-time
---------------------------------------------------------------------------------
-Frontend: Optimistic UI updates implemented
-Backend: README mentions Socket.io but no implementation found
-Issue: Only polling/REST - no WebSocket implementation
-
-
-================================================================================
-## 10. Remove.bg Integration
---------------------------------------------------------------------------------
-Frontend: Used in logo processor
-Backend: N/A
-Issue: Remove.bg API key not configured - shows warning
-
-================================================================================
-## 11. Cloudinary Integration
---------------------------------------------------------------------------------
-Frontend: Image uploads exist
-Backend: cloudinaryManager.ts exists but not configured
-Issue: Requires cloud name and upload preset configuration
-
-================================================================================
-## 12. Google Translate Widget
---------------------------------------------------------------------------------
-Frontend: Component exists at /components/GoogleTranslate.tsx
-Backend: N/A
-Issue: Shows "Google Translate widget is not ready" when API key missing
-
 
 
 

@@ -10,7 +10,7 @@ Modules Needed: Syllabus creation, lesson plan builder, topic tracking,
                 learning objectives mapping
 
 ================================================================================
-## 2. Academic Calendar (HIGH PRIORITY) ->done
+## 2. Academic Calendar (HIGH PRIORITY) 
 --------------------------------------------------------------------------------
 Description: Event scheduling, holiday management, semester planning
 Modules Needed: Calendar view, event creation, holiday list, semester

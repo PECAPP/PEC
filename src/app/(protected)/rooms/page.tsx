@@ -384,8 +384,9 @@ export default function RoomsPage() {
               <Input
                 value={form.facilities === '[]' ? '' : form.facilities.replace(/[\[\]"]/g, '')}
                 onChange={(e) => {
-                  const facilities = e.target.value
-                    ? JSON.stringify(e.target.value.split(',').map((f) => f.trim()).filter(Boolean))
+                  const val = e.target.value;
+                  const facilities = (val && typeof val === 'string')
+                    ? JSON.stringify(val.split(',').map((f) => (f || '').trim()).filter(Boolean))
                     : '[]';
                   setForm({ ...form, facilities });
                 }}

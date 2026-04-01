@@ -139,7 +139,7 @@ export default function PaymentSettings({ embedded }: Props) {
 
   const handleSave = async () => {
     if (method === 'upi') {
-      if (!upiId.trim() || !upiName.trim()) {
+      if (!(upiId || '').trim() || !(upiName || '').trim()) {
         toast.error('Please fill in UPI ID and Name');
         return;
       }
@@ -148,12 +148,12 @@ export default function PaymentSettings({ embedded }: Props) {
         return;
       }
     } else if (method === 'bank') {
-      if (!bankName.trim() || !accountName.trim() || !accountNumber.trim() || !ifscCode.trim()) {
+      if (!(bankName || '').trim() || !(accountName || '').trim() || !(accountNumber || '').trim() || !(ifscCode || '').trim()) {
         toast.error('Please fill in all bank details');
         return;
       }
     } else if (method === 'razorpay') {
-      if (!apiKey.trim() || !apiSecret.trim()) {
+      if (!(apiKey || '').trim() || !(apiSecret || '').trim()) {
         toast.error('Please fill in API Key and Secret');
         return;
       }
@@ -170,21 +170,21 @@ export default function PaymentSettings({ embedded }: Props) {
 
       if (method === 'upi') {
         newConfig.upi = {
-          upiId: upiId.trim(),
-          upiName: upiName.trim(),
+          upiId: (upiId || '').trim(),
+          upiName: (upiName || '').trim(),
         };
       } else if (method === 'bank') {
         newConfig.bank = {
-          bankName: bankName.trim(),
-          accountName: accountName.trim(),
-          accountNumber: accountNumber.trim(),
-          ifscCode: ifscCode.trim(),
-          branch: branch.trim(),
+          bankName: (bankName || '').trim(),
+          accountName: (accountName || '').trim(),
+          accountNumber: (accountNumber || '').trim(),
+          ifscCode: (ifscCode || '').trim(),
+          branch: (branch || '').trim(),
         };
       } else if (method === 'razorpay') {
         newConfig.razorpay = {
-          apiKey: apiKey.trim(),
-          apiSecret: apiSecret.trim(),
+          apiKey: (apiKey || '').trim(),
+          apiSecret: (apiSecret || '').trim(),
         };
       }
 

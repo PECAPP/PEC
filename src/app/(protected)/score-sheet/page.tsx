@@ -88,7 +88,7 @@ export default function ScoreSheetPage() {
   };
 
   const handleSave = async () => {
-    const trimmedName = form.courseName.trim();
+    const trimmedName = (form.courseName || '').trim();
     if (!trimmedName) return;
 
     setSaving(true);
@@ -96,13 +96,13 @@ export default function ScoreSheetPage() {
       const payload = {
         studentId: user?.uid,
         courseName: trimmedName,
-        courseCode: form.courseCode.trim(),
-        term: form.term.trim(),
+        courseCode: (form.courseCode || '').trim(),
+        term: (form.term || '').trim(),
         maxMarks: Number(form.maxMarks) || 100,
         score: Number(form.score) || 0,
-        grade: form.grade.trim() || null,
+        grade: (form.grade || '').trim() || null,
         examDate: form.examDate || null,
-        notes: form.notes.trim() || null,
+        notes: (form.notes || '').trim() || null,
       };
 
       if (editingId) {
@@ -126,14 +126,14 @@ export default function ScoreSheetPage() {
   const handleEdit = (entry: ScoreEntry) => {
     setEditingId(entry.id);
     setForm({
-      courseName: entry.courseName,
-      courseCode: entry.courseCode,
-      term: entry.term,
-      maxMarks: entry.maxMarks,
-      score: entry.score,
-      grade: entry.grade,
-      examDate: entry.examDate,
-      notes: entry.notes,
+      courseName: entry.courseName || '',
+      courseCode: entry.courseCode || '',
+      term: entry.term || '',
+      maxMarks: entry.maxMarks || 100,
+      score: entry.score || 0,
+      grade: entry.grade || '',
+      examDate: entry.examDate || '',
+      notes: entry.notes || '',
     });
   };
 

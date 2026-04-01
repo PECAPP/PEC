@@ -11,6 +11,15 @@ export class AttendanceRepository extends BaseRepository {
     super();
   }
 
+  async create(data: CreateAttendanceDto) {
+    return this.prisma.attendance.create({
+      data: {
+        ...data,
+        date: new Date(data.date),
+      },
+    });
+  }
+
   async findMany(query: AttendanceQueryDto) {
     const where = {
       ...(query.studentId ? { studentId: query.studentId } : {}),
@@ -72,12 +81,20 @@ export class AttendanceRepository extends BaseRepository {
         where: { studentId, status: 'active' },
         include: { 
           course: {
-            select: { name: true, code: true }
+            select: { 
+              id: true, 
+              name: true, 
+              code: true, 
+              credits: true, 
+              semester: true, 
+              instructor: true, 
+              department: true 
+            }
           }
         }
       }),
       this.prisma.attendance.groupBy({
-        by: ['courseId', 'status'],
+        by: ['courseId', 'subject', 'status'],
         where: { studentId },
         _count: { _all: true }
       })
@@ -86,7 +103,18 @@ export class AttendanceRepository extends BaseRepository {
     const statsMap = new Map<string, { present: number; absent: number; late: number; total: number }>();
     
     aggregates.forEach(agg => {
-       const courseId = agg.courseId;
+       let courseId = agg.courseId;
+       
+       // Fallback: match subject to courseId or code if courseId is missing
+       if (!courseId && agg.subject) {
+         const match = enrollments.find(e => 
+           e.courseId === agg.subject || 
+           e.course.code === agg.subject || 
+           e.course.name === agg.subject
+         );
+         if (match) courseId = match.courseId;
+       }
+
        if (!courseId) return;
        
        const current = statsMap.get(courseId) || { present: 0, absent: 0, late: 0, total: 0 };
@@ -108,6 +136,10 @@ export class AttendanceRepository extends BaseRepository {
         courseId: en.courseId,
         courseCode: en.course.code,
         courseName: en.course.name,
+        credits: en.course.credits,
+        semester: en.course.semester,
+        instructor: en.course.instructor,
+        department: en.course.department,
         present: stats.present,
         late: stats.late,
         absent: stats.absent,
