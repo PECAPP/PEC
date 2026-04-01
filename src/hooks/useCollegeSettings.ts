@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { doc, getDoc } from "@/lib/dataClient";
+import api from "@/lib/api";
 import type { CollegeSettings } from "@/types";
 
 export function useCollegeSettings() {
@@ -10,11 +10,11 @@ export function useCollegeSettings() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const settingsRef = doc(null as any, "collegeSettings", "main");
-        const settingsSnap = await getDoc(settingsRef);
-
-        if (settingsSnap.exists()) {
-          setSettings(settingsSnap.data() as CollegeSettings);
+        const response = await api.get("/college-settings");
+        // Handle result-wrapper from ok() utility in backend
+        const data = response.data?.success ? response.data.data : response.data;
+        if (data) {
+          setSettings(data as CollegeSettings);
         } else {
           setSettings(null);
         }

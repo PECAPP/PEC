@@ -13,9 +13,17 @@ export class TimetableService {
   }
 
   async create(data: CreateTimetableDto) {
-    const conflict = await this.repo.findConflicts(data.room, data.day, data.startTime, data.endTime);
+    const conflict = await this.repo.findConflicts({
+      room: data.room,
+      day: data.day,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      facultyId: data.facultyId,
+      batch: data.batch,
+      semester: data.semester,
+    });
     if (conflict) {
-      throw new Error(`Room conflict: ${data.room} is already occupied by ${conflict.courseCode} on ${data.day} ${data.startTime}-${data.endTime}`);
+      throw new Error(`Schedule conflict detected with ${conflict.courseCode} affecting either Room, Faculty, or Batch.`);
     }
     return this.repo.create(data);
   }
@@ -24,15 +32,20 @@ export class TimetableService {
     const current = await this.repo.findById(id);
     if (!current) throw new Error('Timetable entry not found');
 
-    if (data.room || data.day || data.startTime || data.endTime) {
-       const room = data.room || current.room;
-       const day = data.day || current.day;
-       const start = data.startTime || current.startTime;
-       const end = data.endTime || current.endTime;
-       
-       const conflict = await this.repo.findConflicts(room, day, start, end, id);
+    if (data.room || data.day || data.startTime || data.endTime || data.facultyId || data.batch) {
+       const conflict = await this.repo.findConflicts({
+         room: data.room || current.room,
+         day: data.day || current.day,
+         startTime: data.startTime || current.startTime,
+         endTime: data.endTime || current.endTime,
+         facultyId: data.facultyId || current.facultyId,
+         batch: data.batch || current.batch,
+         semester: data.semester || current.semester,
+         excludeId: id,
+       });
+
        if (conflict) {
-         throw new Error(`Room conflict during reschedule: ${room} is already occupied by ${conflict.courseCode} on ${day} ${start}-${end}`);
+         throw new Error(`Conflict while updating schedule for ${conflict.courseCode}. Check Room/Faculty availability.`);
        }
     }
     return this.repo.update(id, data);

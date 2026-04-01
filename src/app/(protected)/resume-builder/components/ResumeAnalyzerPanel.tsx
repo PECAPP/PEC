@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   XCircle,
   Lightbulb,
-  ArrowRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -55,35 +54,35 @@ export function ResumeAnalyzerPanel({
 }: ResumeAnalyzerPanelProps) {
   return (
     <div className="space-y-6">
-      <div className="card-elevated ui-card-pad flex flex-col md:flex-row gap-4 items-center justify-between border-l-2 border-primary bg-card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-            <Sparkles className="w-5 h-5" />
+      <div className="card-elevated p-6 flex flex-col md:flex-row gap-6 items-center justify-between border-2 border-primary/30 bg-card shadow-[8px_8px_0px_rgba(0,0,0,0.05)] rounded-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-sm bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary shadow-inner">
+            <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-bold text-sm">Analysis Source</h3>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-              Evaluate Builder Data or an External PDF/Image
+            <h3 className="font-bold text-lg tracking-tight">Analysis source</h3>
+            <p className="text-[10px] text-muted-foreground font-semibold">
+              Select builder data or upload an external file
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="flex bg-secondary/40 p-1 rounded-md w-full md:w-auto border border-border">
+          <div className="flex bg-muted/40 p-1 rounded-sm w-full md:w-auto border-2 border-border shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
             <button
               onClick={() => {
                 setSelectedResume('current');
                 setUploadedFile(null);
               }}
               className={cn(
-                'flex-1 md:flex-none px-4 py-1.5 rounded-sm text-xs font-medium transition-all duration-150 flex items-center justify-center gap-2',
+                'flex-1 md:flex-none px-6 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest transition-all',
                 selectedResume === 'current'
-                  ? 'bg-background shadow-md text-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              <FileText className="w-3.5 h-3.5" />
-              Builder Data
+              <FileText className="w-3.5 h-3.5 mr-2 inline-block" />
+              Builder data
             </button>
 
             <div className="relative flex-1 md:flex-none">
@@ -97,21 +96,21 @@ export function ResumeAnalyzerPanel({
                   if (file) {
                     setUploadedFile(file);
                     setSelectedResume('upload');
-                    toast.success(`Loaded: ${file.name}`);
+                    toast.success(`Identity loaded: ${file.name}`);
                   }
                 }}
               />
               <button
                 onClick={() => document.getElementById('resume-upload-field')?.click()}
                 className={cn(
-                  'w-full px-4 py-1.5 rounded-sm text-xs font-medium transition-all duration-150 flex items-center justify-center gap-2',
+                  'w-full px-6 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest transition-all',
                   selectedResume === 'upload'
-                    ? 'bg-background shadow-md text-foreground'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                <Upload className="w-3.5 h-3.5" />
-                {uploadedFile ? uploadedFile.name.substring(0, 10) + '...' : 'Upload File'}
+                <Upload className="w-3.5 h-3.5 mr-2 inline-block" />
+                {uploadedFile ? uploadedFile.name.substring(0, 10) + '...' : 'Upload file'}
               </button>
             </div>
           </div>
@@ -135,36 +134,36 @@ export function ResumeAnalyzerPanel({
 
       <div className="grid lg:grid-cols-2 gap-8 items-start">
         <div className="space-y-6">
-          <div className="card-elevated ui-card-pad border-t-2 border-primary">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+          <div className="card-elevated p-8 border-2 border-border rounded-sm shadow-[8px_8px_0px_rgba(0,0,0,0.05)] bg-card/50 backdrop-blur-sm">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-sm bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary shadow-inner">
                 <Target className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-lg">Job Description</h3>
-                <p className="text-xs text-muted-foreground font-medium">Define your target role requirements</p>
+                <h3 className="font-bold text-xl tracking-tight">Job description</h3>
+                <p className="text-[10px] text-muted-foreground font-semibold">Requirement parameters</p>
               </div>
             </div>
 
             <Textarea
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
-              placeholder="Paste the target job description here for deep semantic analysis..."
-              className="min-h-[280px] bg-muted/20 border border-border focus-visible:ring-1 resize-none leading-relaxed text-sm"
+              placeholder="Inject target job directives for deep neural analysis..."
+              className="min-h-[300px] bg-background/50 border-2 border-border rounded-sm focus-visible:ring-0 focus:border-primary/50 resize-none leading-relaxed text-sm font-medium transition-all italic"
             />
 
             <Button
-              className="w-full mt-6 h-12 text-md font-semibold shadow-sm transition-all duration-150"
+              className="w-full mt-8 h-14 bg-primary text-primary-foreground font-black uppercase tracking-[0.25em] text-xs shadow-[6px_6px_0px_rgba(0,0,0,0.1)] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_rgba(0,0,0,0.15)] active:translate-y-[1px] active:shadow-none transition-all rounded-sm"
               onClick={onAnalyze}
               disabled={isAnalyzing || !jobDescription.trim()}
             >
               {isAnalyzing ? (
                 <>
-                  <RefreshCw className="w-5 h-5 animate-spin mr-3" /> Processing Data...
+                  <RefreshCw className="w-5 h-5 animate-spin mr-3" /> Processing Directives...
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5 mr-3 text-amber-400" /> Run AI Audit
+                  <Sparkles className="w-5 h-5 mr-3" /> Bootstrap AI Audit
                 </>
               )}
             </Button>
@@ -191,28 +190,28 @@ export function ResumeAnalyzerPanel({
         <div className="space-y-6 min-h-[500px]">
           {analysisResult && !isAnalyzing ? (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
-              <div className="card-elevated ui-card-pad text-center border-b-2 border-primary">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Overall Match Score</p>
-                <div className={cn('text-7xl font-black mb-4 font-mono transition-colors', getScoreColor(analysisResult.matchScore))}>
+              <div className="card-elevated p-10 text-center border border-primary/20 rounded-sm bg-primary/5">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">ATS Compatibility Score</p>
+                <div className={cn('text-8xl font-bold mb-6 font-mono tracking-tighter transition-colors', getScoreColor(analysisResult.matchScore))}>
                   {analysisResult.matchScore}%
                 </div>
-                <Progress value={analysisResult.matchScore} className="h-3 shadow-inner bg-secondary" />
+                <Progress value={analysisResult.matchScore} className="h-3 border border-border bg-background rounded-sm" />
               </div>
 
-              <div className="card-elevated ui-card-pad">
-                <h4 className="font-bold text-xs mb-4 flex items-center gap-2 uppercase tracking-tight">
-                  <Target className="w-4 h-4 text-primary" /> Industry Keyword Matching
+              <div className="card-elevated p-8 border-2 border-border rounded-sm shadow-[8px_8px_0px_rgba(0,0,0,0.05)]">
+                <h4 className="font-bold text-xs mb-6 flex items-center gap-3 text-muted-foreground uppercase tracking-widest">
+                  <Target className="w-4 h-4 text-primary" /> Keyword Analysis
                 </h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {analysisResult.keywordMatch.map((keywordMatchItem, index) => (
                     <Badge
                       key={index}
-                      variant={keywordMatchItem.found ? 'default' : 'outline'}
+                      variant="outline"
                       className={cn(
-                        'px-3 py-1 text-[10px] transition-all',
+                        'px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-sm border transition-all',
                         keywordMatchItem.found
-                          ? 'bg-green-500/10 text-green-700 border-green-500/20 hover:bg-green-500/20'
-                          : 'opacity-40 grayscale border-dashed',
+                          ? 'bg-primary/10 text-primary border-primary/30 shadow-sm'
+                          : 'opacity-30 grayscale border-dashed border-border',
                       )}
                     >
                       {keywordMatchItem.found ? '✓ ' : '× '}
@@ -222,37 +221,46 @@ export function ResumeAnalyzerPanel({
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-green-500/5 border-l-4 border-green-600 p-4 rounded-r-lg shadow-sm ring-1 ring-green-500/10">
-                  <h5 className="font-bold text-green-700 text-xs mb-3 flex items-center gap-2 uppercase">
-                    <CheckCircle2 className="w-4 h-4" /> Core Strengths
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-success/5 border border-success/30 p-6 rounded-sm group transition-all hover:bg-success/10">
+                  <h5 className="font-bold text-success text-[10px] mb-4 flex items-center gap-2 uppercase tracking-widest">
+                    <CheckCircle2 className="w-4 h-4" /> Key Strengths
                   </h5>
-                  <ul className="text-[11px] space-y-2 text-foreground/80 list-disc ml-4 leading-relaxed">
+                  <ul className="text-xs space-y-2 text-foreground/80 list-none ml-0 leading-relaxed font-medium">
                     {analysisResult.strengths.map((strength, index) => (
-                      <li key={index}>{strength}</li>
+                      <li key={index} className="flex gap-3 pl-1">
+                        <span className="text-success mt-0.5 opacity-60">/</span>
+                        {strength}
+                      </li>
                     ))}
                   </ul>
                 </div>
-                <div className="bg-red-500/5 border-l-4 border-red-600 p-4 rounded-r-lg shadow-sm ring-1 ring-red-500/10">
-                  <h5 className="font-bold text-red-700 text-xs mb-3 flex items-center gap-2 uppercase">
-                    <XCircle className="w-4 h-4" /> Optimization Gaps
+                <div className="bg-destructive/5 border border-destructive/30 p-6 rounded-sm group transition-all hover:bg-destructive/10">
+                  <h5 className="font-bold text-destructive text-[10px] mb-4 flex items-center gap-2 uppercase tracking-widest">
+                    <XCircle className="w-4 h-4" /> Improvement Areas
                   </h5>
-                  <ul className="text-[11px] space-y-2 text-foreground/80 list-disc ml-4 leading-relaxed">
+                  <ul className="text-xs space-y-2 text-foreground/80 list-none ml-0 leading-relaxed font-medium">
                     {analysisResult.gaps.map((gap, index) => (
-                      <li key={index}>{gap}</li>
+                      <li key={index} className="flex gap-3 pl-1">
+                        <span className="text-destructive mt-0.5 opacity-60">/</span>
+                        {gap}
+                      </li>
                     ))}
                   </ul>
                 </div>
               </div>
 
-              <div className="card-elevated ui-card-pad bg-primary/5 border border-primary/20 relative overflow-hidden">
-                <h4 className="font-bold flex items-center gap-2 mb-4 text-primary uppercase tracking-wider text-xs">
-                  <Lightbulb className="w-5 h-5 text-amber-500" /> Strategic AI Suggestions
+              <div className="card-elevated p-8 bg-primary/5 border border-primary/20 rounded-sm relative overflow-hidden">
+                <div className="absolute top-[-20px] right-[-20px] w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+                <h4 className="font-bold flex items-center gap-3 mb-6 text-primary uppercase tracking-widest text-[10px]">
+                  <Lightbulb className="w-5 h-5 text-amber-500" /> AI Recommendations
                 </h4>
-                <div className="space-y-4">
+                <div className="grid gap-6">
                   {analysisResult.suggestions.map((suggestion, index) => (
-                    <div key={index} className="flex gap-3 text-sm leading-relaxed text-foreground/90 group">
-                      <ArrowRight className="w-4 h-4 text-primary shrink-0 mt-1 transition-transform duration-150 group-hover:translate-x-1" />
+                    <div key={index} className="flex gap-4 text-sm leading-relaxed text-foreground/90 font-medium group">
+                      <div className="w-6 h-6 shrink-0 bg-primary/10 border border-primary/20 rounded-sm flex items-center justify-center text-primary text-[10px] font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                        {index + 1}
+                      </div>
                       <span>{suggestion}</span>
                     </div>
                   ))}
@@ -262,8 +270,8 @@ export function ResumeAnalyzerPanel({
           ) : !isAnalyzing ? (
             <EmptyState
               title="Analysis pending"
-              description="Paste a job description and run the audit to generate your compatibility report."
-              className="min-h-[420px] flex items-center justify-center"
+              description="Paste a job description and run the audit to generate your alignment report."
+              className="min-h-[420px] flex items-center justify-center font-medium"
             />
           ) : null}
         </div>

@@ -140,7 +140,7 @@ export function ChatSidebar({
               {/* Direct Messages */}
               {dmRooms.length > 0 && (
                 <div className="mb-4">
-                  <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
+                  <div className="px-3 py-2 text-xs text-muted-foreground font-semibold">
                     Direct Messages
                   </div>
                   {dmRooms.map((room) => {
@@ -167,7 +167,7 @@ export function ChatSidebar({
               {/* Community */}
               {communityRooms.length > 0 && (
                 <div className="mb-4">
-                  <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
+                  <div className="px-3 py-2 text-xs text-muted-foreground font-semibold">
                     Community
                   </div>
                   {communityRooms.map((room) => {
@@ -194,7 +194,7 @@ export function ChatSidebar({
               {/* Department Groups */}
               {departmentRooms.length > 0 && (
                 <div className="mb-4">
-                  <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
+                  <div className="px-3 py-2 text-xs text-muted-foreground font-semibold">
                     Department Groups
                   </div>
                   {departmentRooms.map((room) => {
@@ -221,7 +221,7 @@ export function ChatSidebar({
               {/* Club Groups */}
               {clubRooms.length > 0 && (
                 <div className="mb-4">
-                  <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
+                  <div className="px-3 py-2 text-xs text-muted-foreground font-semibold">
                     Club Groups
                   </div>
                   {clubRooms.map((room) => {
@@ -248,7 +248,7 @@ export function ChatSidebar({
               {/* Groups */}
               {groupRooms.length > 0 && (
                 <div className="mb-4">
-                  <div className="px-3 py-2 text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
+                  <div className="px-3 py-2 text-xs text-muted-foreground font-semibold">
                     Groups
                   </div>
                   {groupRooms.map((room) => {
@@ -293,7 +293,7 @@ export function ChatSidebar({
         {/* Debug/Role Indicator */}
         <div className="p-2 border-t border-border bg-muted/20">
           <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest font-mono">
-            {userRole || "Guest"} View
+            {userRole || "Guest"} view
           </p>
         </div>
       </aside>

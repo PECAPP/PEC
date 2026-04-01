@@ -21,9 +21,7 @@ const TestimonialsSection = dynamic(() => import('@/components/landing/Testimoni
   loading: () => <div className="h-screen bg-black animate-pulse" />,
 });
 
-const PricingSection = dynamic(() => import('@/components/landing/PricingSection').then(mod => mod.PricingSection), {
-  loading: () => <div className="h-screen bg-black animate-pulse" />,
-});
+
 
 const FAQSection = dynamic(() => import('@/components/landing/FAQSection').then(mod => mod.FAQSection), {
   loading: () => <div className="h-[50vh] bg-black animate-pulse" />,
@@ -32,6 +30,10 @@ const FAQSection = dynamic(() => import('@/components/landing/FAQSection').then(
 const Footer = dynamic(() => import('@/components/landing/Footer').then(mod => mod.Footer), {
   loading: () => <div className="h-64 bg-black animate-pulse" />,
 });
+
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export function LandingClient() {
   return (
@@ -47,9 +49,25 @@ export function LandingClient() {
       <HowItWorksSection />
       <IntegrationsSection />
       <TestimonialsSection />
-      <PricingSection />
+
       <FAQSection />
       <Footer />
+
+      {/* GLOBAL MOBILE FIXED BOTTOM BAR - TRANSPARENT FLOATING */}
+      <div className="fixed bottom-0 left-0 right-0 z-[999] flex sm:hidden bg-transparent p-4 gap-4">
+        <Button
+          className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-black h-16 rounded-none border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all text-sm"
+          asChild
+        >
+          <Link href="/auth">Student Access</Link>
+        </Button>
+        <Button
+          className="flex-1 bg-white hover:bg-slate-100 text-black font-black h-16 rounded-none border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all text-sm"
+          asChild
+        >
+          <a href="#features">Explore</a>
+        </Button>
+      </div>
     </div>
   );
 }

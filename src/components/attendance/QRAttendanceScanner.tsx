@@ -154,6 +154,18 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
         return;
       }
 
+      // Get Geo Location for Geofencing
+      let location: { lat?: number; lng?: number } = {};
+      try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+        });
+        location = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      } catch (err) {
+        console.warn('Geolocation failed or denied:', err);
+        // We will continue but backend may enforce it if required
+      }
+
       // Mark attendance
       await addDoc(collection(({} as any), 'attendance'), {
         sessionId: sessionDoc.id,
@@ -164,6 +176,8 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
         markedAt: serverTimestamp(),
         method: 'qr',
         date: sessionData.date,
+        lat: location.lat,
+        lng: location.lng,
       });
 
       setResult('success');

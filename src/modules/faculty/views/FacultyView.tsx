@@ -107,7 +107,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
   onError: ({ error }) => toast.error(error.serverError || 'Failed to update.'),
  });
 
- const { execute: executeDelete, isPending: isDeleting } = useAction(deleteFacultyAction, {
+ const { execute: executeDelete } = useAction(deleteFacultyAction, {
   onSuccess: () => {
    toast.success('Faculty deleted!');
    router.refresh();
@@ -202,7 +202,11 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
    
    if (result?.validationErrors || result?.serverError) {
     failCount++;
-    errors.push(`${row.fullName}: Injection Refused`);
+    const errorDetail =
+     (typeof result?.validationErrors === 'string' && result.validationErrors) ||
+     (result?.serverError && String(result.serverError)) ||
+     'Failed to create faculty record';
+    errors.push(`${row.fullName}: ${errorDetail}`);
    } else {
     successCount++;
    }
@@ -230,7 +234,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
       <Download className="w-4 h-4 mr-2" /> Export
      </Button>
      <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-11 border-2 font-bold px-6 rounded-sm">
-      <Upload className="w-4 h-4 mr-2" /> Massive Injection
+      <Upload className="w-4 h-4 mr-2" /> Bulk Upload
      </Button>
      {isAdmin && (
       <Button onClick={() => { resetForm(); setEditingFaculty(null); setShowDialog(true); }} className="h-11 bg-primary text-white font-black uppercase tracking-widest text-[10px] rounded-sm px-6">
@@ -359,7 +363,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
    <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
     <DialogContent className="max-w-4xl border-2 border-primary rounded-sm overflow-hidden p-0">
      <DialogHeader className="bg-primary text-white p-10">
-      <DialogTitle className="text-3xl font-black uppercase">Mass Enrollment Protocol</DialogTitle>
+      <DialogTitle className="text-3xl font-black uppercase">Bulk Upload</DialogTitle>
      </DialogHeader>
      <div className="p-10">
       <BulkUpload

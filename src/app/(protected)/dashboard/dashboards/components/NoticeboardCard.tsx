@@ -17,13 +17,14 @@ export interface NoticeboardItem {
 interface Props {
   notices: NoticeboardItem[];
   onViewAll: () => void;
+  className?: string;
 }
 
-export function NoticeboardCard({ notices, onViewAll }: Props) {
+export function NoticeboardCard({ notices, onViewAll, className }: Props) {
   const safeNotices = Array.isArray(notices) ? notices : [];
 
   return (
-    <div className="card-elevated ui-card-pad flex h-full flex-col">
+    <div className={`card-elevated ui-card-pad flex h-full flex-col ${className || ''}`}>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
           <Bell className="h-5 w-5 text-primary" />

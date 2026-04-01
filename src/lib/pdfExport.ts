@@ -569,6 +569,62 @@ export function exportRoomSchedule(roomName: string, scheduleData: any[]) {
  */
 
 
+/**
+ * Export Hall Ticket as PDF
+ */
+export function exportHallTicket(studentData: any, courses: any[]) {
+  const doc = new jsPDF();
+  const yPos = addPDFHeader(doc, "Official Hall Ticket - End Semester Examination");
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("Candidate Details", 20, yPos);
+  
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  const details = [
+    `Name: ${studentData.fullName || studentData.name || "Student"}`,
+    `Roll No: ${studentData.enrollmentNumber || "N/A"}`,
+    `Department: ${studentData.department || "General"}`,
+    `Semester: ${studentData.semester || "Current"}`,
+  ];
+
+  let currentY = yPos + 7;
+  details.forEach((info) => {
+    doc.text(info, 20, currentY);
+    currentY += 6;
+  });
+
+  // Table of subjects
+  const tableData = courses.map((course, idx) => [
+    idx + 1,
+    course.courseCode || course.code || "-",
+    course.subjectName || course.name || "-",
+    course.examDate || "TBA",
+    "________________" // Signature/Seal space
+  ]);
+
+  autoTable(doc, {
+    startY: currentY + 5,
+    head: [["#", "Code", "Subject Name", "Exam Date", "Invigilator Sig."]],
+    body: tableData,
+    theme: "grid",
+    headStyles: { fillColor: [40, 40, 40] },
+    styles: { fontSize: 9 },
+  });
+
+  const finalY = (doc as any).lastAutoTable.finalY + 20;
+
+  // Signatures
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text("Candidate Signature", 30, finalY);
+  doc.text("Controller of Examinations", 140, finalY);
+
+  addPDFFooter(doc);
+  doc.save(`hall_ticket_${studentData.enrollmentNumber || "pec"}.pdf`);
+}
+
 export default {
   exportAttendanceReport,
   exportTimetablePDF,
@@ -577,4 +633,5 @@ export default {
   exportUserProfile,
   exportCourseDetails,
   exportEnrolledStudents,
+  exportHallTicket,
 };

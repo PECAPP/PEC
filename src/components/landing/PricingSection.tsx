@@ -115,14 +115,14 @@ export function PricingSection() {
           className="text-center mb-20"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border-2 border-zinc-600 mb-4 neo-brutal-shadow">
-            <TrendingUp className="w-4 h-4 text-white" />
-            <span className="text-sm font-medium text-white">Transparent Pricing</span>
+            <Sparkles className="w-4 h-4 text-white" />
+            <span className="text-sm font-medium text-white">Academic Excellence</span>
           </div>
           <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
-            <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">Plans for Every Institution</span>
+            <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">Start Your Journey Today</span>
           </h2>
           <p className="text-lg text-white/80 max-w-2xl mx-auto">
-            Start free. Scale as you grow. No hidden fees, no surprises.
+            Experience the next generation of campus orchestration. Free for small teams, scales with your ambition.
           </p>
         </motion.div>
 

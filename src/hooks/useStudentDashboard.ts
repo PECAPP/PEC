@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import api from '@/lib/api';
-import { doc, getDoc } from '@/lib/dataClient';
 import type { 
   StudentProfile, 
   Course, 
 } from '@/types';
+
 type NoticeboardItem = {
   id: string;
   title: string;
@@ -32,8 +32,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   
   // Use SSR data if provided, otherwise show loading
   const [loading, setLoading] = useState(!initialData);
-  const [firstName, setFirstName] = useState(initialUser?.fullName?.split(' ')[0] || 'Student');
-  const [profileData, setProfileData] = useState<StudentProfile | null>(initialUser ? {
+  const firstName = initialUser?.fullName?.split(' ')[0] || 'Student';
+  const [profileData] = useState<StudentProfile | null>(initialUser ? {
     department: initialUser.department,
     semester: initialUser.semester,
     enrollmentNumber: initialUser.enrollmentNumber,
@@ -137,10 +137,9 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
 
   const fetchCollegeSettings = useCallback(async () => {
     try {
-      const settingsRef = doc(null as any, 'collegeSettings', 'main');
-      const settingsSnap = await getDoc(settingsRef);
-      if (settingsSnap.exists()) {
-        const data = settingsSnap.data() as any;
+      const response = await api.get('/college-settings');
+      const data = response.data?.success ? response.data.data : response.data;
+      if (data) {
         const value = Number(data?.attendanceRequiredPercentage);
         if (!Number.isNaN(value) && value > 0) {
           setRequiredAttendancePercentage(Math.max(0, Math.min(100, Math.round(value))));
@@ -156,7 +155,6 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     try {
       setLoadError(null);
       
-      // Helper to handle both {data: {data: T}} and {data: T}
       const getData = (res: any) => {
         if (res?.data?.success && res.data.data) return res.data.data;
         if (res?.data) return res.data;

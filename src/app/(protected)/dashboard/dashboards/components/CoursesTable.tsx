@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 
 interface CoursesTableProps {
   courses: any[];
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
   onAddCourse: () => void;
   onEditCourse: (course: any) => void;
   onDeleteCourse: (courseId: string) => void;
@@ -14,6 +16,8 @@ interface CoursesTableProps {
 
 export function CoursesTable({ 
   courses, 
+  searchQuery,
+  onSearchChange,
   onAddCourse, 
   onEditCourse, 
   onDeleteCourse 
@@ -21,7 +25,12 @@ export function CoursesTable({
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <Input placeholder="Search courses..." className="max-w-sm w-full" />
+        <Input 
+          placeholder="Search courses..." 
+          className="max-w-sm w-full" 
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
         <Button onClick={onAddCourse} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />Add Course
         </Button>

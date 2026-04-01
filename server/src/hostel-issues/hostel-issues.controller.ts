@@ -64,6 +64,26 @@ export class HostelIssuesController {
     return ok(data);
   }
 
+  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
+  @Post(':id/replies')
+  async reply(
+    @Param('id') id: string,
+    @Body() body: { text: string; authorName?: string; authorRole?: string },
+  ) {
+    const data = await this.service.update(id, {
+      responses: {
+        _op: 'arrayUnion',
+        val: {
+          text: body.text,
+          authorName: body.authorName || 'Staff',
+          authorRole: body.authorRole || 'Admin',
+          createdAt: new Date().toISOString(),
+        },
+      },
+    } as any);
+    return ok(data);
+  }
+
   @Roles('admin', 'moderator', 'college_admin')
   @Delete(':id')
   async remove(@Param('id') id: string) {

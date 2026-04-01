@@ -174,17 +174,17 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
  }
 
  return (
-  <div className="min-h-screen flex flex-col md:flex-row bg-background overflow-hidden relative font-sans">
+  <div className="h-screen flex flex-col md:flex-row bg-background overflow-hidden relative font-sans">
    {/* LEFT SIDE: BRANDING & IMAGE (SWISS - CLEANER & BILINGUAL) */}
    <div className="hidden md:flex md:w-6/12 bg-black relative flex-col justify-center p-12 lg:p-16 text-white group overflow-hidden border-r border-white/5">
-    <div className="relative z-20 space-y-12">
+    <div className="relative z-20 space-y-10 max-w-[560px]">
      {/* HEADER LOGO + BILINGUAL TITLE */}
-     <div className="flex items-start gap-4">
+     <div className="flex items-start gap-4 bg-black/50 backdrop-blur-sm border border-white/10 rounded-lg p-4">
       <div className="w-12 h-12 bg-accent flex items-center justify-center shadow-[4px_4px_0px_white] rounded-sm">
        <Building2 className="w-6 h-6 text-black" />
       </div>
       <div className="space-y-0.5">
-       <h2 className="text-base lg:text-lg font-bold text-white uppercase tracking-tight leading-none">
+        <h2 className="text-base lg:text-lg font-bold text-white uppercase tracking-tight leading-none">
         Punjab Engineering College 
        </h2>
        <p className="text-[11px] font-medium text-white/60">
@@ -197,13 +197,13 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
       initial={{ opacity: 0, x: -30 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.8 }}
-      className="pt-4"
+      className="pt-4 bg-black/45 backdrop-blur-sm border border-white/10 rounded-xl p-5 max-w-[520px]"
      >
-      <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight uppercase text-white">
-       Hello <span className="text-accent underline underline-offset-8 decoration-8 decoration-white/5">SCHOLAR</span>!
+      <h1 className="text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight uppercase text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.55)]">
+       Student <span className="text-accent">Portal</span>
       </h1>
-      <p className="text-lg lg:text-xl text-white/50 font-medium max-w-sm mt-6 leading-snug font-display tracking-tight">
-       Seamless campus governance for the next generation of engineers.
+      <p className="text-base lg:text-lg text-white/90 font-medium max-w-md mt-4 leading-snug tracking-tight">
+       Official access portal for academics, attendance, and institutional services.
       </p>
      </motion.div>
 
@@ -212,7 +212,7 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.5 }}
-      className="flex items-center gap-6 pt-6 border-t border-white/5 w-fit"
+      className="flex items-center gap-6 pt-5 border-t border-white/10 w-fit bg-black/35 backdrop-blur-sm rounded-lg px-4 pb-3"
      >
        <div className="flex -space-x-3">
         {[1,2,3,4].map(i => (
@@ -222,7 +222,7 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
         ))}
         <div className="w-9 h-9 border-2 border-black bg-white flex items-center justify-center text-[10px] font-bold text-black rounded-sm">12K+</div>
        </div>
-       <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Active in the databank</p>
+       <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">Authorized Users</p>
      </motion.div>
     </div>
 
@@ -230,11 +230,12 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
     <div className="absolute inset-0 z-10 opacity-80 group-hover:opacity-100 transition-opacity duration-1000">
       <img 
        src="/login.webp" 
-       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[7s] ease-out sepia-[0.15] contrast-[1.05]" 
+       className="w-full h-full object-cover group-hover:scale-105 transition-transform ease-out sepia-[0.15] contrast-[1.05]" 
+       style={{ transitionDuration: '7s' }}
        alt="PEC Academic Block" 
       />
     </div>
-    <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/80 via-black/20 to-transparent" />
+    <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/88 via-black/55 to-black/35" />
     
     <div className="absolute bottom-10 left-12 lg:left-16 z-20 flex items-center gap-4">
      <Globe className="w-4 h-4 text-white opacity-20" />
@@ -245,20 +246,20 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
    </div>
 
    {/* RIGHT SIDE: AUTH FORMS (CLEANER SWISS GRID) */}
-   <div className="flex-1 flex items-center justify-center p-6 lg:p-20 bg-background relative overflow-y-auto">
+   <div className="flex-1 flex items-center justify-center p-6 lg:p-16 bg-background relative overflow-hidden">
     <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 
     <motion.div
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     className="w-full max-w-[420px] z-10"
+     className="w-full max-w-[460px] z-10 bg-card/85 backdrop-blur-md border border-border/70 rounded-xl p-6 lg:p-7 shadow-[0_18px_60px_rgba(0,0,0,0.35)]"
     >
-     <div className="mb-14 text-center md:text-left">
+     <div className="mb-8 text-center md:text-left">
       <h2 className="text-4xl font-bold tracking-tight uppercase text-foreground leading-none mb-6">
        {activeTab === 'signin' ? 'Sign In' : activeTab === 'signup' ? 'Request Access' : 'Recovery'}
       </h2>
       <div className="h-1.5 w-16 bg-primary mb-8" />
-      <p className="text-muted-foreground font-medium text-lg leading-relaxed tracking-tight">
+      <p className="text-foreground/85 font-medium text-base leading-relaxed tracking-tight">
        Authenticate via the central university gateway.
       </p>
      </div>
@@ -277,12 +278,12 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
      )}
 
      <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="w-full space-y-10">
-      <TabsList className="grid w-full grid-cols-2 bg-muted p-1 h-12 rounded-sm border border-border">
+      <TabsList className="grid w-full grid-cols-2 bg-muted/90 p-1 h-12 rounded-md border border-border">
        <TabsTrigger value="signin" className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold uppercase text-[11px] tracking-widest transition-all">Sign In</TabsTrigger>
        <TabsTrigger value="signup" className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold uppercase text-[11px] tracking-widest transition-all">Register</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="signin" className="space-y-8 mt-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
+       <TabsContent value="signin" className="space-y-6 mt-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
        <form onSubmit={handleSignIn} className="space-y-6">
         <div className="space-y-3">
          <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Email Access</label>
@@ -294,15 +295,15 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
            placeholder="arjun@pec.edu"
            value={formData.email}
            onChange={handleInputChange}
-           className="pl-12 h-12 rounded-sm border border-border bg-background/50 focus:border-primary font-medium text-sm transition-all"
+          className="pl-12 h-12 rounded-md border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
           />
          </div>
         </div>
 
         <div className="space-y-3">
          <div className="flex items-center justify-between">
-          <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Passphrase</label>
-          <button type="button" onClick={() => setActiveTab('forgot')} className="text-[11px] font-bold text-primary hover:underline transition-colors lowercase italic">forgot?</button>
+          <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Password</label>
+          <button type="button" onClick={() => setActiveTab('forgot')} className="text-[11px] font-semibold text-primary hover:underline transition-colors">Forgot password?</button>
          </div>
          <div className="relative group">
           <Lock className="w-4 h-4 absolute left-4 top-4 text-muted-foreground/60 transition-colors group-focus-within:text-primary" />
@@ -312,7 +313,7 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
            placeholder="••••••••"
            value={formData.password}
            onChange={handleInputChange}
-           className="pl-12 pr-12 h-12 rounded-sm border border-border bg-background/50 focus:border-primary font-medium text-sm transition-all"
+          className="pl-12 pr-12 h-12 rounded-md border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-3.5 text-muted-foreground hover:text-foreground">
            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -320,34 +321,34 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
          </div>
         </div>
 
-        <Button type="submit" disabled={loading} className="w-full h-13 rounded-sm bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[11px] shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
-         {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Log System Access'}
+        <Button type="submit" disabled={loading} className="w-full h-12 rounded-md bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[11px] shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
+         {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Sign In'}
         </Button>
        </form>
 
-       <div className="relative pt-4">
+        <div className="relative pt-2">
         <div className="absolute inset-0 flex items-center px-4"><span className="w-full border-t border-border"></span></div>
-        <div className="relative flex justify-center"><span className="bg-background px-4 text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground opacity-40">Secure Identity Layer</span></div>
+        <div className="relative flex justify-center"><span className="bg-background px-4 text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground opacity-50">Authorized Access</span></div>
        </div>
 
        <Button 
         variant="outline" 
         onClick={() => setShowCredentialsModal(true)}
-        className="w-full h-12 rounded-sm border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 text-[10px] font-bold uppercase tracking-widest transition-all gap-3"
+        className="w-full h-11 rounded-md border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 text-[10px] font-bold uppercase tracking-widest transition-all gap-3"
        >
         <Shield className="w-4 h-4 text-primary" />
-        Select Persona Identity
+        Use Test Accounts
        </Button>
       </TabsContent>
 
       <TabsContent value="signup" className="mt-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-       <div className="bg-muted/80 border border-border p-12 text-center space-y-8 rounded-sm shadow-inner">
+       <div className="bg-muted/80 border border-border p-8 text-center space-y-6 rounded-md shadow-inner">
          <div className="w-14 h-14 bg-primary flex items-center justify-center mx-auto rounded-sm"><Building2 className="w-7 h-7 text-primary-foreground" /></div>
          <div className="space-y-2">
-          <h3 className="text-xl font-bold uppercase tracking-tight">Identity Protected</h3>
-          <p className="text-[11px] text-muted-foreground font-bold tracking-tight uppercase">Credentials are provisioned by the Office of Academic Affairs.</p>
+          <h3 className="text-xl font-bold uppercase tracking-tight">Institutional Registration</h3>
+          <p className="text-[11px] text-muted-foreground font-semibold tracking-tight uppercase">Accounts are provisioned by the Office of Academic Affairs.</p>
          </div>
-         <Button onClick={() => router.push('/apply-institution')} className="w-full h-12 rounded-sm uppercase font-bold tracking-widest text-[10px] bg-primary">Registrar Portal</Button>
+         <Button onClick={() => router.push('/apply-institution')} className="w-full h-11 rounded-sm uppercase font-bold tracking-widest text-[10px] bg-primary">Open Registration Portal</Button>
        </div>
       </TabsContent>
 
@@ -357,8 +358,8 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
          <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Institutional Email</label>
          <Input type="email" placeholder="ARJUN@PEC.EDU" className="h-12 rounded-sm border border-border font-medium" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} />
         </div>
-        <Button type="submit" className="w-full h-12 rounded-sm bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[11px]">Dispatch Passcode</Button>
-        <Button variant="ghost" onClick={() => setActiveTab('signin')} className="w-full h-11 text-[10px] font-bold uppercase tracking-widest text-primary italic">← Return to Login</Button>
+        <Button type="submit" className="w-full h-11 rounded-sm bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[11px]">Send Reset Link</Button>
+        <Button variant="ghost" onClick={() => setActiveTab('signin')} className="w-full h-10 text-[10px] font-bold uppercase tracking-widest text-primary">Return to Login</Button>
         </form>
       </TabsContent>
      </Tabs>
@@ -367,24 +368,31 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
 
    {/* IDENTITY MODAL */}
    {showCredentialsModal && (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md animate-in fade-in duration-500">
+   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md animate-in fade-in duration-500">
      <motion.div
       initial={{ opacity: 0, scale: 0.98, y: 30 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      className="bg-card border border-primary rounded-sm shadow-[10px_10px_0px_hsl(var(--primary))] max-w-lg w-full overflow-hidden"
+      className="bg-card border border-primary/40 rounded-xl shadow-[0_30px_80px_rgba(0,0,0,0.55)] max-w-2xl w-full overflow-hidden"
      >
-      <div className="bg-primary text-primary-foreground px-8 py-10 relative">
-       <h2 className="text-3xl font-bold uppercase tracking-tight">System Persona</h2>
-       <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary-foreground/60 mt-3 italic">Select an pre-seeded identity to verify databank access</p>
+      <div className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground px-8 py-8 relative border-b border-black/10">
+       <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary-foreground/70">Secure Access</p>
+       <h2 className="text-3xl font-bold uppercase tracking-tight mt-2">Test Accounts</h2>
+       <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary-foreground/75 mt-3">Select a test account to auto-fill sign-in credentials</p>
        <button 
         onClick={() => setShowCredentialsModal(false)}
-        className="absolute top-8 right-8 p-2 rounded-sm hover:bg-white/10 transition-all text-white/50 hover:text-white"
+        className="absolute top-6 right-6 p-2 rounded-md hover:bg-white/10 transition-all text-white/60 hover:text-white"
        >
         <X className="w-5 h-5" />
        </button>
       </div>
 
-      <div className="p-8 grid gap-3">
+      <div className="px-6 py-6 border-b border-border/60 bg-card">
+       <p className="text-xs text-muted-foreground font-semibold">
+        Choose an account below to populate email and password.
+       </p>
+      </div>
+
+      <div className="p-6 grid gap-3 bg-gradient-to-b from-background to-background/80">
        {[
         { r: 'student', e: 'arjun@pec.edu', p: 'password123', i: GraduationCap, t: 'ARJUN SHARMA' },
         { r: 'faculty', e: 'faculty@pec.edu', p: 'password123', i: Users, t: 'DR. PRIYA RAO' },
@@ -393,22 +401,35 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
         <button
          key={role.r}
          onClick={() => fillCredentials(role.e, role.p)}
-         className="flex items-center gap-6 p-5 border border-border bg-background hover:bg-muted transition-all group rounded-sm"
+         className="flex items-center gap-4 p-4 border border-border/80 bg-background hover:bg-muted/50 hover:border-primary/40 transition-all group rounded-lg text-left"
         >
-         <div className={`w-12 h-12 bg-primary text-primary-foreground flex items-center justify-center group-hover:scale-105 transition-transform rounded-sm shadow-[2px_2px_0px_rgba(0,0,0,0.2)]`}>
-          <role.i className="w-6 h-6" />
+         <div className="w-12 h-12 bg-primary/90 text-primary-foreground flex items-center justify-center group-hover:scale-105 transition-transform rounded-md shadow-md">
+          <role.i className="w-5 h-5" />
          </div>
          <div className="flex-1 text-left">
           <h4 className="font-bold text-sm uppercase text-foreground group-hover:text-primary transition-colors">{role.t}</h4>
-          <p className="text-[10px] font-mono text-muted-foreground uppercase opacity-60 font-bold">{role.e}</p>
+          <p className="text-[10px] font-mono text-muted-foreground uppercase opacity-70 font-bold mt-0.5">{role.e}</p>
          </div>
-         <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+         <div className="flex items-center gap-3">
+          <span className="text-[9px] uppercase tracking-wider font-bold border border-primary/30 text-primary bg-primary/5 px-2 py-1 rounded-md">
+           {role.r.replace('_', ' ')}
+          </span>
+          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+         </div>
         </button>
        ))}
       </div>
 
-      <div className="bg-muted/50 px-8 py-5 border-t border-border">
-       <p className="text-[9px] text-center text-muted-foreground uppercase tracking-[0.4em] font-bold italic underline opacity-40">Sandbox Access Restricted</p>
+      <div className="bg-muted/40 px-6 py-4 border-t border-border flex items-center justify-between gap-3">
+       <p className="text-[9px] text-muted-foreground uppercase tracking-[0.24em] font-bold opacity-65">For Demonstration in Sandbox Environment</p>
+       <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setShowCredentialsModal(false)}
+        className="text-[10px] uppercase tracking-wider font-bold"
+       >
+        Continue Manually
+       </Button>
       </div>
      </motion.div>
     </div>

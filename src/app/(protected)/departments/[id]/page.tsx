@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-;
 import {
   ArrowLeft,
   Users,
   GraduationCap,
   BookOpen,
-  TrendingUp,
   Mail,
   Phone,
   Building2,

@@ -1,7 +1,7 @@
-# OmniFlow ERP Professional Setup & Run script
+# PEC App ERP Professional Setup & Run script
 # This script automates the dependency installation, database synchronization, seeding, and execution of the entire stack.
 
-Write-Host "🚀 INITIALIZING OMNIFLOW ERP PROFESSIONAL STACK..." -ForegroundColor Cyan
+Write-Host "🚀 INITIALIZING PEC App ERP PROFESSIONAL STACK..." -ForegroundColor Cyan
 
 # 1. Front-end Dependencies (Root)
 Write-Host "`n📦 Step 1: Installing Front-end Dependencies (Next.js 16/React 19)..." -ForegroundColor Yellow

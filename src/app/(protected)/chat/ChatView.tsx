@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, Info } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatMessage } from "@/components/chat/ChatMessage";
@@ -54,7 +54,6 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const inputRef = useRef<any>(null);
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
 
   useEffect(() => {
@@ -74,13 +73,6 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
     }
   };
 
-  const scrollToMessage = (messageId: string) => {
-    const element = messageRefs.current[messageId];
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  };
-
   if (!user) return null;
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
@@ -91,7 +83,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
   };
 
   return (
-    <div className="flex h-[calc(100vh-7rem)] bg-background md:rounded-md md:border md:border-border overflow-hidden">
+    <div className="flex h-[calc(100vh-4rem)] bg-background overflow-hidden w-full">
       <div className={`${showChatOnMobile ? 'hidden lg:block' : 'block'} lg:block w-full lg:w-auto`}>
         <ChatSidebar
           rooms={rooms}

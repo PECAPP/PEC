@@ -1,108 +1,67 @@
 'use client';
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
-import { features, rolesData } from "@/data/landingData";
+import { rolesData } from "@/data/landingData";
 
 export function FeaturesSection() {
-  const [activeFeature, setActiveFeature] = useState(features[0]);
-
   return (
     <>
-      {/* Why PEC Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden min-h-[50vh] flex items-center snap-start">
-        <div className="absolute inset-0 z-0 bg-orange-600" />
-        <div className="max-w-6xl mx-auto relative z-10 w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
-              Why <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">PEC</span>
-            </h2>
-            <p className="text-xl text-white/90 font-medium max-w-2xl mx-auto">
-              The all-in-one platform trusted by leading institutions
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-6 mt-12 relative">
-            {features.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="group p-8 rounded-none border border-white/20 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-300 relative overflow-hidden"
-              >
-                <div className="absolute top-2 right-2 w-3 h-3 border-t border-r border-white/30" />
-                <div className="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-white/30" />
-                <div className="flex items-start gap-5 relative z-10">
-                  <div className="w-14 h-14 rounded-none border border-white/20 bg-black/50 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-all">
-                    <feature.icon className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                    <p className="text-white/80 leading-relaxed">{feature.desc}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Role-Based Access */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden min-h-screen flex items-center snap-start">
-        <div className="absolute inset-0 z-0 bg-black">
+      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-black">
+        <div className="absolute inset-0 z-0">
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-fixed opacity-50"
-            style={{ backgroundImage: `url('/bg-15.png')` }}
+            className="absolute inset-0 bg-cover bg-center bg-fixed opacity-60"
+            style={{ backgroundImage: `url('/bg-9.png')` }}
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/60" />
         </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-6xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl sm:text-5xl font-bold mb-6" style={{ fontFamily: "'Monument Extended', serif" }}>
-              <span className="bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">Tailored for Every User</span>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
+              Built for <span className="text-yellow-400">Students</span>
             </h2>
-            <p className="text-lg text-white/90 font-medium max-w-2xl mx-auto">
-              Each stakeholder gets a personalized dashboard with features relevant to their role.
+            <p className="text-lg text-white/50 max-w-2xl mx-auto font-medium">
+              A comprehensive institutional ecosystem designed to orchestrate the modern campus life-cycle.
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {rolesData.map((roleData, index) => (
+          <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-6">
+            {rolesData.map((role) => (
               <motion.div
-                key={roleData.role}
+                key={role.role}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-                className={`${roleData.bgColor} border-2 ${roleData.borderColor} rounded-none p-6 transition-all duration-300 hover:shadow-none neo-brutal-shadow group cursor-pointer`}
+                whileHover={{ 
+                  y: -10,
+                  scale: 1.02,
+                  transition: { duration: 0.2, ease: "easeOut" }
+                }}
+                className={`p-10 border-2 ${role.borderColor} ${role.bgColor} relative group overflow-hidden neo-brutal-shadow hover:shadow-[8px_8px_0px_0px_white] transition-all duration-300`}
               >
-                <div className={`w-14 h-14 bg-black border-2 ${roleData.borderColor} rounded-none flex items-center justify-center mb-4 neo-brutal-shadow`}>
-                  <roleData.icon className="w-7 h-7 text-white" />
+                {/* Animated Background Pulse */}
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="relative z-10">
+                  <div className={`w-20 h-20 border-2 ${role.borderColor} flex items-center justify-center mb-8 bg-black/40 group-hover:bg-black/60 transition-colors`}>
+                    <role.icon className="w-10 h-10 text-white" />
+                  </div>
+                  <h3 className="text-3xl font-bold mb-6 text-white uppercase tracking-wider font-monument">{role.role}</h3>
+                  <ul className="space-y-4">
+                    {role.features.map((feature, i) => (
+                      <li key={i} className="flex items-center gap-4 text-white/90 group-hover:text-white transition-colors">
+                        <div className={`w-2 h-2 rounded-none bg-white opacity-40 group-hover:opacity-100 transition-all duration-300 ${i === 0 ? 'scale-150 animate-pulse' : ''}`} />
+                        <span className="text-lg font-medium leading-tight">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="text-lg font-bold mb-4 text-white">{roleData.role}</h3>
-                <ul className="space-y-2.5">
-                  {roleData.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm text-white/80">
-                      <CheckCircle className="w-4 h-4 text-white flex-shrink-0 mt-0.5" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
               </motion.div>
             ))}
           </div>

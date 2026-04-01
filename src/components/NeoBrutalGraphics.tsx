@@ -15,11 +15,11 @@ export const NeoBrutalGraphics = () => {
         </svg>
       </motion.div>
 
-      {/* Hero Right Squiggle - Pink/Black */}
+      {/* Hero Right Squiggle - Gold/Black */}
       <motion.div 
         animate={{ y: [0, -15, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[20%] right-[10%] text-rose-400 w-32 h-32 opacity-100"
+        className="absolute top-[20%] right-[10%] text-yellow-200 w-32 h-32 opacity-100"
         style={{ filter: "drop-shadow(4px 4px 0px rgba(0,0,0,1))" }}
       >
         <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="12" strokeLinecap="square">
@@ -27,11 +27,11 @@ export const NeoBrutalGraphics = () => {
         </svg>
       </motion.div>
 
-      {/* Center Left Burst - Green/Black */}
+      {/* Center Left Burst - Amber/Black */}
       <motion.div 
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[45%] left-[-2%] text-emerald-400 w-40 h-40 opacity-100"
+        className="absolute top-[45%] left-[-2%] text-amber-500 w-40 h-40 opacity-100"
         style={{ filter: "drop-shadow(4px 4px 0px rgba(0,0,0,1))" }}
       >
         <svg viewBox="0 0 24 24" fill="currentColor" stroke="black" strokeWidth="0.5">
@@ -39,11 +39,11 @@ export const NeoBrutalGraphics = () => {
         </svg>
       </motion.div>
 
-      {/* Bottom Right Shape - Geometric - Blue/Black */}
+      {/* Bottom Right Shape - Geometric - Gold/Black */}
       <motion.div 
         animate={{ rotate: -360 }}
         transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-[20%] right-[5%] text-blue-400 w-24 h-24 opacity-100"
+        className="absolute bottom-[20%] right-[5%] text-yellow-400 w-24 h-24 opacity-100"
         style={{ filter: "drop-shadow(4px 4px 0px rgba(0,0,0,1))" }}
       >
          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

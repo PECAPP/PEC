@@ -78,7 +78,7 @@ export default function ResumeBuilderIvyLeague() {
         downloadPDF={downloadPDF}
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="w-full mx-auto px-4 lg:px-8 py-6">
         {activeTab === "builder" && (
           <div className="grid xl:grid-cols-12 gap-8 items-start">
             {!preview && (

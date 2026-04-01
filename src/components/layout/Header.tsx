@@ -10,10 +10,7 @@ import {
   ChevronDown,
   LogOut,
   Settings,
-  HelpCircle,
   Menu,
-  Palette,
-  Building2,
 } from 'lucide-react';
 
 
@@ -72,11 +69,11 @@ interface HeaderProps {
   sidebarCollapsed: boolean;
   isMobile?: boolean;
   onMenuClick?: () => void;
-  densityMode: 'comfortable' | 'compact';
-  onDensityModeChange: (mode: 'comfortable' | 'compact') => void;
+  densityMode?: 'comfortable' | 'compact';
+  onDensityModeChange?: (mode: 'comfortable' | 'compact') => void;
 }
 
-export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityMode, onDensityModeChange }: HeaderProps) {
+export function Header({ user, sidebarCollapsed, isMobile, onMenuClick }: HeaderProps) {
   const router = useRouter();
 
   const appLogoSrc = '/logo.png';
@@ -105,8 +102,6 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
     recruiter: 'Recruiter',
     super_admin: 'Super Admin',
   };
-
-  const showNoticeboardButton = user.role === 'college_admin' || user.role === 'admin' || user.role === 'super_admin';
 
   return (
     <header
@@ -155,34 +150,9 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
 
         {/* Right Section */}
         <div className="flex items-center gap-3 ml-auto">
-          <div className="hidden lg:flex items-center border border-border">
-            <button
-              type="button"
-              onClick={() => onDensityModeChange('comfortable')}
-              className={cn(
-                "px-2.5 h-8 text-[11px] font-medium transition-colors",
-                densityMode === 'comfortable'
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              )}
-            >
-              Comfort
-            </button>
-            <button
-              type="button"
-              onClick={() => onDensityModeChange('compact')}
-              className={cn(
-                "px-2.5 h-8 text-[11px] font-medium transition-colors border-l border-border",
-                densityMode === 'compact'
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              )}
-            >
-              Compact
-            </button>
+          <div className="hidden lg:block scale-90 sm:scale-100">
+             <GoogleTranslate containerId="google_translate_header" />
           </div>
-          <div className="scale-90 sm:scale-100"><GoogleTranslate containerId="google_translate_header" /></div>
-          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -213,8 +183,7 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, densityM
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="hidden md:block"><LandingColorTheme /></div>
-          <div className="hidden md:block"><ThemeToggler/></div>
+
 
 
           {/* User Menu */}

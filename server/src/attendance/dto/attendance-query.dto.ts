@@ -22,6 +22,10 @@ export class AttendanceQueryDto extends PaginationQueryDto {
   date?: string;
 
   @IsOptional()
-  @IsIn(['present', 'absent', 'late'])
+  @IsString()
   status?: 'present' | 'absent' | 'late';
+
+  @IsOptional()
+  @IsString()
+  courseId?: string;
 }

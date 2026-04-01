@@ -10,7 +10,6 @@ const footerLinks = [
     title: "Product",
     links: [
       { label: "Features", href: "#features", aria: "View all features" },
-      { label: "Pricing", href: "#pricing", aria: "View pricing plans" },
       { label: "Dashboard", href: "/dashboard", aria: "Access dashboard" },
       { label: "Integrations", href: "#integrations", aria: "View integrations" },
     ],
@@ -19,7 +18,6 @@ const footerLinks = [
     title: "Company",
     links: [
       { label: "Blog", href: "/blog", aria: "Read our blog" },
-      { label: "Careers", href: "/careers", aria: "View career opportunities" },
       { label: "Contact", href: "/contact", aria: "Contact us" },
     ],
   },
@@ -48,7 +46,7 @@ export function Footer() {
         <div className="absolute inset-0 z-0 bg-black">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-fixed opacity-50"
-            style={{ backgroundImage: `url('/bg-20.png')` }}
+            style={{ backgroundImage: `url('/bg-12.png')` }}
           />
           <div className="absolute inset-0 bg-black/90" />
         </div>
@@ -58,11 +56,11 @@ export function Footer() {
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
               <Link href="/">
                 <div className="flex items-center gap-3 mb-6 hover:opacity-80 transition-opacity">
-                  <span className="text-2xl font-bold text-white">PEC</span>
+                  <span className="text-2xl font-bold text-white uppercase tracking-tighter">PEC App</span>
                 </div>
               </Link>
-              <p className="text-sm text-white/70 leading-relaxed max-w-xs">
-                The complete ERP solution for modern educational institutions. Empowering education worldwide.
+              <p className="text-sm text-white/70 leading-relaxed max-w-xs transition-colors hover:text-white">
+                The absolute orchestration platform for your academic life. Empowering the next generation of students.
               </p>
             </motion.div>
 
@@ -83,7 +81,7 @@ export function Footer() {
           </div>
 
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
-            <p className="text-sm text-white/50">© 2025 PEC. All rights reserved.</p>
+            <p className="text-sm text-white/50">© 2025 PEC App. All rights reserved.</p>
             <div className="flex items-center gap-6">
               {socials.map((social) => (
                 <motion.a key={social.name} href={social.url} aria-label={social.ariaLabel} className="text-white/60 hover:text-white transition-all duration-300" whileHover={{ scale: 1.2, rotate: 10 }} whileTap={{ scale: 0.9 }}>
@@ -104,6 +102,7 @@ export function Footer() {
         curve="bezier"
         exponential={false}
         opacity={0.8}
+        zIndex={500}
       />
     </>
   );

@@ -21,19 +21,20 @@ import { CampusMapModule } from './campus-map/campus-map.module';
 import { CourseMaterialsModule } from './course-materials/course-materials.module';
 import { NoticeboardModule } from './noticeboard/noticeboard.module';
 import { AiModule } from './ai/ai.module';
-import { AttendanceSessionModule } from './attendance-session/attendance-session.module';
-import { ScoreSheetModule } from './score-sheet/score-sheet.module';
 import { RoomsModule } from './rooms/rooms.module';
-import { FacultyBioModule } from './faculty-bio/faculty-bio.module';
 import { SocialSyncModule } from './social-sync/social-sync.module';
 import { StudentPortfolioModule } from './student-portfolio/student-portfolio.module';
+import { AttendanceSessionModule } from './attendance-session/attendance-session.module';
 import { FacultyBioSystemModule } from './faculty-bio-system/faculty-bio-system.module';
+import { CgpaEntriesModule } from './cgpa-entries/cgpa-entries.module';
 
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
 import { CanteenModule } from './canteen/canteen.module';
 import { AdminModule } from './admin/admin.module';
+import { CollegeSettingsModule } from './college-settings/college-settings.module';
+import { ClubsModule } from './clubs/clubs.module';
 
 @Module({
   imports: [
@@ -55,15 +56,16 @@ import { AdminModule } from './admin/admin.module';
     CampusMapModule,
     CourseMaterialsModule,
     NoticeboardModule,
+    CgpaEntriesModule,
     AdminModule,
     AiModule,
     AttendanceSessionModule,
-    ScoreSheetModule,
     RoomsModule,
-    FacultyBioModule,
     SocialSyncModule,
     StudentPortfolioModule,
     FacultyBioSystemModule,
+    CollegeSettingsModule,
+    ClubsModule,
     ThrottlerModule.forRoot([{
       name: 'short',
       ttl: 60000,

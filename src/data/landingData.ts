@@ -15,177 +15,146 @@ import {
 
 export const testimonials = [
   {
-    quote: "Migrated from a 15-year-old system. Within 2 months, we saved 800 hours of manual data entry. Attendance tracking now takes 10 minutes instead of 3 days.",
-    name: "Dr. Rajesh Mehra",
-    designation: "Dean of Admissions, PEC",
+    quote: "PEC App completely transformed my academic workflow. The unified dashboard helped me track my research progress and lecture schedules in one place. It's essential for every student.",
+    name: "Aman Singhania",
+    designation: "B.Tech Final Year, PEC",
     src: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=3540&auto=format&fit=crop",
     rating: 5,
-    savedHours: "800 hrs/month",
+    savedHours: "Academic Excellence",
   },
   {
-    quote: "Our placement team tracked 2,000 applications in spreadsheets. Now it's automated. We matched 450 students to jobs in one season—previously took all year.",
-    name: "Prof. Anita Sharma",
-    designation: "Placement Officer, IIT Kanpur",
+    quote: "Tracking attendance and exam schedules in one place is a lifesaver. No more missing deadlines or checking 10 different portals. Best student tool ever.",
+    name: "Riya Verma",
+    designation: "3rd Year Student, PEC",
     src: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=3540&auto=format&fit=crop",
     rating: 5,
-    savedHours: "500+ placements/season",
+    savedHours: "100% Attendance",
   },
   {
-    quote: "Fee collection used to require 3 accountants and countless follow-ups. Automated reminders + online payment gateway = 95% collection rate. Best ROI we've seen.",
-    name: "Dr. Arvind Nair",
-    designation: "Finance Head, IIT Bombay",
+    quote: "The personalized academic insights showed me exactly where I stood in my course credits. Managed to align my electives perfectly and graduated with honors.",
+    name: "Arjun Dev",
+    designation: "M.Tech Graduate, PEC",
     src: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=3540&auto=format&fit=crop",
     rating: 5,
-    savedHours: "95% collection rate",
+    savedHours: "Honors Graduate",
   },
   {
-    quote: "Real-time attendance dashboards saved us 40% of time spent on compliance reports. Now admissions, finance, and academics are fully integrated.",
-    name: "Mrs. Kavita Rao",
-    designation: "College Principal, DTU",
+    quote: "Managed all my course materials and institutional communications seamlessly. The dashboard is intuitive and actually fun to use. It's the ultimate campus companion.",
+    name: "Kavya Sharma",
+    designation: "B.Des Student, PEC",
     src: "https://images.unsplash.com/photo-1580584128409-9b5c3b3c4b9e?q=80&w=3540&auto=format&fit=crop",
     rating: 5,
-    savedHours: "40% time saved",
-  },
-  {
-    quote: "We couldn't track which students were eligible for placements. Now it's automatic—plus predictive insights on who needs extra mentoring.",
-    name: "Mr. Prakash Iyer",
-    designation: "Academic Coordinator, Chandigarh University",
-    src: "https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=3540&auto=format&fit=crop",
-    rating: 5,
-    savedHours: "100% eligibility tracking",
+    savedHours: "Unified Learning",
   },
 ];
 
+
 export const faqs = [
   {
-    q: "How long does implementation typically take?",
-    a: "Most institutions go live in 2-4 weeks. We provide white-glove onboarding support to ensure a smooth transition.",
+    q: "Is PEC App really free?",
+    a: "Yes! PEC App is completely free for all students and faculty. We believe institutional success shouldn't come with a price tag.",
   },
   {
-    q: "Can you import our existing data?",
-    a: "Yes! We support data import from Excel, CSV, and other ERP systems. Our team handles the migration at no extra cost.",
+    q: "How do I get started?",
+    a: "Simply sign up using your institutional credentials. Most students are verified and set up in under 60 seconds.",
   },
   {
-    q: "What systems can PEC integrate with?",
-    a: "We support Google Workspace, Microsoft 365, Canvas LMS, and any system with REST API. Custom integrations available.",
+    q: "Can I use it for research tracking?",
+    a: "Absolutely. We have specialized modules for academic progress, research documentation, and thesis management.",
   },
   {
-    q: "Is there an API we can use?",
-    a: "Yes, PEC has a comprehensive REST API with full documentation. Perfect for custom development.",
-  },
-  {
-    q: "Is PEC GDPR compliant?",
-    a: "Yes, PEC is fully GDPR and FERPA compliant. All data is encrypted at rest and in transit. We're SOC 2 Type II certified.",
-  },
-  {
-    q: "What about data backup and recovery?",
-    a: "We perform hourly backups with 30-day retention. Recovery time objective (RTO) is less than 1 hour.",
+    q: "Is my data secure?",
+    a: "Yes, we use industry-standard encryption and follow full compliance protocols to keep your academic records safe.",
   },
 ];
+
 
 export const features = [
   {
     icon: Zap,
-    title: "Automate Everything",
-    desc: "From attendance to fee collection, automate repetitive tasks and save hours every week."
+    title: "Student-First Design",
+    desc: "Experience a unified dashboard built around your academic success and personalized campus journey."
   },
   {
-    icon: Server,
-    title: "One Platform",
-    desc: "Replace scattered spreadsheets with a unified system for all your institutional data."
-  },
-  {
-    icon: BarChart3,
-    title: "Live Analytics",
-    desc: "Real-time dashboards and reports to make data-driven decisions instantly."
+    icon: GraduationCap,
+    title: "Institutional Sync",
+    desc: "Automatically synchronize with campus resources, schedules, and digital identity systems."
   },
   {
     icon: Shield,
-    title: "Secure Access",
-    desc: "Role-based permissions ensure everyone sees only what they need."
+    title: "Secure & Verifiable",
+    desc: "Industry-standard security for your academic records and institutional communications."
   }
 ];
 
 export const rolesData = [
   {
-    role: "College Administrators",
-    icon: GraduationCap,
-    features: [
-      "Department & faculty management",
-      "Fee collection tracking",
-      "Admission workflows",
-      "Institution-wide reports"
-    ],
-    bgColor: "bg-emerald-900",
-    borderColor: "border-emerald-600"
-  },
-  {
-    role: "Faculty Members",
-    icon: BookOpen,
-    features: [
-      "Class schedules & attendance",
-      "Student performance tracking",
-      "Course material management",
-      "Exam coordination"
-    ],
-    bgColor: "bg-green-900",
-    borderColor: "border-green-600"
-  },
-  {
     role: "Students",
     icon: Users,
     features: [
-      "Academic dashboard",
-      "Fee payments & history",
-      "Placement applications",
-      "Resume builder & analyzer"
+      "Smart Schedule Synchronization",
+      "Digital Identity Management",
+      "Institutional Resource Hub"
     ],
     bgColor: "bg-teal-900",
     borderColor: "border-teal-600"
   },
   {
-    role: "Recruiters",
-    icon: Briefcase,
+    role: "Faculty",
+    icon: BookOpen,
     features: [
-      "Job posting portal",
-      "Student shortlisting",
-      "Interview scheduling",
-      "Hiring analytics"
+      "Smart Attendance Management",
+      "Student Mentorship Portal",
+      "Digital Course Repositories"
     ],
-    bgColor: "bg-cyan-900",
-    borderColor: "border-cyan-600"
+    bgColor: "bg-green-900",
+    borderColor: "border-green-600"
+  },
+  {
+    role: "Admins",
+    icon: GraduationCap,
+    features: [
+      "Institutional Orchestration",
+      "Resource & Space Tracking",
+      "Advanced Data Analytics"
+    ],
+    bgColor: "bg-emerald-900",
+    borderColor: "border-emerald-600"
   }
 ];
+
 
 export const stepsData = [
   {
     step: "1",
-    title: "Sign Up & Verify",
-    description: "Create your account in 30 seconds. Verify your institution instantly through automated authentication.",
+    title: "Create Your Profile",
+    description: "Set up your student or faculty identity in seconds. Securely authenticated through your institutional credentials.",
     icon: Shield,
-    bgColor: "bg-orange-900",
-    borderColor: "border-orange-600",
-    iconColor: "text-orange-400",
-    highlights: ["Instant verification", "No paperwork", "Enterprise SSO"]
+    bgColor: "bg-yellow-900",
+    borderColor: "border-yellow-600",
+    iconColor: "text-yellow-400",
+    highlights: ["Instant authentication", "Zero paperwork", "Secure Access"]
   },
   {
     step: "2",
-    title: "Configure Your System",
-    description: "Import student data, set up departments, and configure user roles with our intelligent setup wizard.",
+    title: "Sync Your Academics",
+    description: "Automatically pull your course schedules, attendance logs, and academic records into one unified view.",
     icon: Target,
     bgColor: "bg-amber-900",
     borderColor: "border-amber-600",
     iconColor: "text-amber-400",
-    highlights: ["Smart data import", "Custom workflows", "Role templates"]
+    highlights: ["Smart synchronization", "Personalized view", "Auto-grading docs"]
   },
   {
     step: "3",
-    title: "Launch & Scale",
-    description: "Invite your team, activate modules, and start managing operations. Support available 24/7.",
+    title: "Accelerate Your Growth",
+    description: "Utilize AI-driven analysis, mentorship, and personalized insights to stay ahead of your campus journey.",
     icon: Zap,
-    bgColor: "bg-red-900",
-    borderColor: "border-red-600",
-    iconColor: "text-red-400",
-    highlights: ["One-click launch", "Live training", "Dedicated support"]
+    bgColor: "bg-yellow-950",
+    borderColor: "border-yellow-500",
+    iconColor: "text-yellow-400",
+    highlights: ["Smarter Insights", "Live Performance", "Institutional Sync"]
   }
 ];
+
+

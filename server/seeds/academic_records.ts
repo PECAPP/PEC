@@ -72,6 +72,37 @@ export async function seedAcademicRecords(
         },
       ],
     });
+  }
 
+  // --- Seeding Grade / CGPA History ---
+  console.log(`Seeding grade records for ${students.length} students...`);
+  const cgpaData: any[] = [];
+  const subjects = ['Mathematics', 'Physics', 'Programming', 'Ethics', 'Mechanics', 'Digital Logic', 'Database', 'Operating Systems', 'Networking', 'AI'];
+
+  for (const student of students) {
+    // Seed grades for previous semesters
+    const currentSemester = student.semester || 1;
+    for (let sem = 1; sem < currentSemester; sem++) {
+      for (let subIdx = 0; subIdx < 5; subIdx++) {
+        const isHonors = Math.random() > 0.8;
+        const isElective = Math.random() > 0.6;
+        const gradePoint = Math.random() > 0.05 ? (6 + Math.random() * 4) : 3.0; // 5% chance of backlog
+
+        cgpaData.push({
+          userId: student.id,
+          subjectName: subjects[subIdx % subjects.length] + ' ' + (subIdx + 1),
+          courseCode: `${student.departmentCode}-${sem}0${subIdx + 1}`,
+          semester: sem,
+          credits: isHonors ? 4 : 3,
+          gradePoint: Number(gradePoint.toFixed(1)),
+          courseType: isHonors ? 'honors' : isElective ? 'elective' : 'core',
+          examDate: daysAgo(180 * (currentSemester - sem) + 30),
+        });
+      }
+    }
+  }
+
+  if (cgpaData.length > 0) {
+    await prisma.cgpaEntry.createMany({ data: cgpaData });
   }
 }

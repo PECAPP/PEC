@@ -35,7 +35,7 @@ export function StudentWelcomeHeader({ firstName, profileData, onShowScanner }: 
       </div>
       
       <div className="space-y-2 z-10">
-        <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider mb-1 animate-fade-in">
+        <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-wider mb-1 animate-fade-in">
           Institutional Dashboard
         </div>
         <h1 className="text-3xl font-bold text-foreground">

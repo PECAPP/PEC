@@ -18,25 +18,21 @@ services:
     working_dir: /app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "4000:4000"
     environment:
       JWT_SECRET: "pec_secret_key_2026"
-      PORT: "3000"
+      PORT: "4000"
       NODE_ENV: "development"
-      CORS_ORIGINS: "http://localhost:3001"
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:3001"
       DB_HOST: "postgres"
+      NODE_PATH: "/app/node_modules"
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
     volumes:
       - ./server:/app
+      - ./shared:/shared
       - backend_node_modules:/app/node_modules
     command: >
-      sh -c "
-      if [ ! -d node_modules/@nestjs ]; then npm install; fi &&
-      npx prisma generate &&
-      npx prisma migrate deploy &&
-      npm run build &&
-      npm run start
-      "
+      sh -c " npm install && npx prisma generate && npx prisma db push --accept-data-loss && npm run db:seed && npm run start:dev "
     depends_on:
       - postgres
 
@@ -48,11 +44,12 @@ services:
     working_dir: /app
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:3000"
+      NEXT_PUBLIC_API_URL: "http://localhost:3000/api"
+      INTERNAL_API_URL: "http://backend:4000"
       GITHUB_AI_API_KEY: "${GITHUB_AI_API_KEY:-}"
-      VITE_API_URL: "http://localhost:3000"
+      VITE_API_URL: "http://localhost:4000"
       NEXT_TELEMETRY_DISABLED: "1"
       CHOKIDAR_USEPOLLING: "true"
     volumes:
@@ -61,10 +58,7 @@ services:
       - /app/archive
       - /app/server
     command: >
-      sh -c "
-      if [ ! -d node_modules/next ]; then npm install --legacy-peer-deps; fi &&
-      npm run dev -- --turbopack --hostname 0.0.0.0 --port 3001
-      "
+      sh -c " if [ ! -d node_modules/next ]; then npm install --legacy-peer-deps; fi && npm run dev -- --turbopack --hostname 0.0.0.0 --port 3000 "
     depends_on:
       - backend
 

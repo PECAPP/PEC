@@ -51,9 +51,9 @@ const STATUS_META: Record<string, string> = {
  suspended: 'bg-destructive/10 text-destructive border-destructive/20',
 };
 
-export function UserManagementView({ initialUsers, isAdmin, isFaculty }: UserManagementViewProps) {
+export function UserManagementView({ initialUsers, isAdmin }: UserManagementViewProps) {
  const router = useRouter();
- const [users, setUsers] = useState(initialUsers);
+ const [users] = useState(initialUsers);
  const [searchTerm, setSearchTerm] = useState('');
  const [roleFilter, setRoleFilter] = useState('all');
  const [showDialog, setShowDialog] = useState(false);
@@ -215,7 +215,7 @@ export function UserManagementView({ initialUsers, isAdmin, isFaculty }: UserMan
                 <ShieldOff className="w-4 h-4 mr-2" /> {user.status === 'active' ? 'Suspend Access' : 'Restore Access'}
                </DropdownMenuItem>
                <DropdownMenuSeparator />
-               <DropdownMenuItem onClick={() => { if (confirm(`Terminate ${user.fullName}?`)) deleteUserAction({ id: user.id }); router.refresh(); }} className="text-destructive cursor-pointer">
+               <DropdownMenuItem onClick={() => { if (confirm(`Terminate ${user.fullName}?`)) executeDelete({ id: user.id }); }} className="text-destructive cursor-pointer">
                 <Trash2 className="w-4 h-4 mr-2" /> Terminate Identity
                </DropdownMenuItem>
               </DropdownMenuContent>

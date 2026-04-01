@@ -1,12 +1,14 @@
 'use client';
 
-import { Users, UserPlus, Edit, Trash2 } from 'lucide-react';
+import { UserPlus, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 
 interface UsersTableProps {
   users: any[];
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
   onAddUser: () => void;
   onEditUser: (user: any) => void;
   onDeleteUser: (userId: string) => void;
@@ -14,6 +16,8 @@ interface UsersTableProps {
 
 export function UsersTable({ 
   users, 
+  searchQuery,
+  onSearchChange,
   onAddUser, 
   onEditUser, 
   onDeleteUser 
@@ -32,7 +36,12 @@ export function UsersTable({
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <Input placeholder="Search users..." className="max-w-sm w-full" />
+        <Input 
+          placeholder="Search users..." 
+          className="max-w-sm w-full" 
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
         <Button onClick={onAddUser} className="w-full sm:w-auto">
           <UserPlus className="w-4 h-4 mr-2" />Add User
         </Button>

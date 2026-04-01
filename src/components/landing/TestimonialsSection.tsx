@@ -7,11 +7,12 @@ import { testimonials } from "@/data/landingData";
 export function TestimonialsSection() {
   return (
     <section id="testimonials" className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-black snap-start">
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `repeating-linear-gradient(0deg, #fff 0px, #fff 2px, transparent 2px, transparent 40px),
-                           repeating-linear-gradient(90deg, #fff 0px, #fff 2px, transparent 2px, transparent 40px)`
-        }} />
+      <div className="absolute inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-fixed opacity-40"
+          style={{ backgroundImage: `url('/bg-14.png')` }}
+        />
+        <div className="absolute inset-0 bg-black/60" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -19,13 +20,13 @@ export function TestimonialsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-5xl sm:text-6xl font-black mb-6 uppercase" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-            <span className="bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">Real Results</span>
+          <h2 className="text-3xl sm:text-5xl font-black mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
+            <span className="bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 bg-clip-text text-transparent">Real Results</span>
           </h2>
-          <p className="text-2xl text-white font-bold max-w-3xl mx-auto uppercase tracking-wide">
-            80% Less Admin Work in 3 Months
+          <p className="text-lg text-white font-bold max-w-3xl mx-auto uppercase tracking-wide opacity-60">
+            Join 5,000+ Students Excelling Daily
           </p>
         </motion.div>
         
