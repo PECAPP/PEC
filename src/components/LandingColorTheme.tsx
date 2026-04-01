@@ -5,22 +5,23 @@ import { cn } from "@/lib/utils";
 
 // Unified accent color themes - must match index.css definitions
 const accentThemes = [
-  { id: "obsidian", name: "Obsidian", color: "#18181B" },
+  { id: "pec-gold", name: "PEC Gold", color: "#F59E0B" },
   { id: "emerald", name: "Emerald", color: "#10B981" },
   { id: "sapphire", name: "Sapphire", color: "#3B82F6" },
   { id: "amethyst", name: "Amethyst", color: "#8B5CF6" },
-  { id: "coral", name: "Gold", color: "#EAB308" },
 ];
 
 export function LandingColorTheme() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const savedAccent = localStorage.getItem("accent-color") || "obsidian";
-    const index = accentThemes.findIndex(t => t.id === savedAccent);
+    const rawSavedAccent = localStorage.getItem("accent-color");
+    const savedAccent = !rawSavedAccent || rawSavedAccent === "golden" ? "pec-gold" : rawSavedAccent;
+    const index = accentThemes.findIndex((t) => t.id === savedAccent);
     if (index !== -1) {
       setCurrentIndex(index);
       applyAccentTheme(savedAccent);
+      localStorage.setItem("accent-color", savedAccent);
     }
   }, []);
 
@@ -32,14 +33,14 @@ export function LandingColorTheme() {
     root.classList.add(`accent-${accentId}`);
   };
 
-  const cycleTheme = (direction: 'next' | 'prev') => {
+  const cycleTheme = (direction: "next" | "prev") => {
     let newIndex;
-    if (direction === 'next') {
-        newIndex = (currentIndex + 1) % accentThemes.length;
+    if (direction === "next") {
+      newIndex = (currentIndex + 1) % accentThemes.length;
     } else {
-        newIndex = (currentIndex - 1 + accentThemes.length) % accentThemes.length;
+      newIndex = (currentIndex - 1 + accentThemes.length) % accentThemes.length;
     }
-    
+
     const newTheme = accentThemes[newIndex];
     setCurrentIndex(newIndex);
     localStorage.setItem("accent-color", newTheme.id);
@@ -54,17 +55,17 @@ export function LandingColorTheme() {
         variant="ghost"
         size="icon"
         className="h-6 w-6 hover:bg-accent/20 text-muted-foreground hover:text-accent"
-        onClick={() => cycleTheme('prev')}
+        onClick={() => cycleTheme("prev")}
         title="Previous Color"
       >
         <ChevronLeft className="h-3 w-3" />
       </Button>
-      
+
       <div className="flex items-center justify-center w-6 h-6">
-        <div 
-            className="w-3 h-3 rounded-full shadow-sm ring-2 ring-background transition-all"
-            style={{ backgroundColor: currentTheme?.color }}     
-            title={currentTheme?.name}
+        <div
+          className="w-3 h-3 rounded-full shadow-sm ring-2 ring-background transition-all"
+          style={{ backgroundColor: currentTheme?.color }}
+          title={currentTheme?.name}
         />
       </div>
 
@@ -72,7 +73,7 @@ export function LandingColorTheme() {
         variant="ghost"
         size="icon"
         className="h-6 w-6 hover:bg-accent/20 text-muted-foreground hover:text-accent"
-        onClick={() => cycleTheme('next')}
+        onClick={() => cycleTheme("next")}
         title="Next Color"
       >
         <ChevronRight className="h-3 w-3" />

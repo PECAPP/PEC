@@ -290,45 +290,51 @@ html {
      ACCENT COLOR THEMES
      ==================================== */
 
-  /* Theme 1: Obsidian (High Contrast Neo-Brutalist) */
-  .accent-obsidian {
-    --accent-hue: 48;
-    --accent-sat: 96%;
+  /* Theme 1: Golden (Premium Warm Amber) */
+  .accent-pec-gold,
+  .accent-golden {
+    --accent-hue: 45;
+    --accent-sat: 90%;
   }
 
-  .accent-obsidian.dark {
-    --background: 0 0% 0%;
-    /* Pure Black */
-    --card: 0 0% 5%;
-    --sidebar-background: 0 0% 3%;
-    --primary: 0 0% 100%;
-    /* Pure White */
-    --primary-foreground: 0 0% 0%;
-    --primary-rgb: 255, 255, 255;
-    --accent: 0 0% 100%;
-    /* Vibrant Yellow */
-    --accent-foreground: 0 0% 0%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 70%;
-    --border: 0 0% 20%;
-    --sidebar-border: 0 0% 20%;
+  .accent-pec-gold.dark,
+  .accent-golden.dark {
+    --background: 40 20% 6%;
+    --card: 40 20% 10%;
+    --sidebar-background: 40 20% 5%;
+    --primary: 45 95% 55%;
+    --primary-foreground: 40 20% 6%;
+    --primary-rgb: 245, 158, 11;
+    --ring: 45 95% 55%;
+    --sidebar-primary: 45 95% 55%;
+    --shadow-glow: 0 0 40px hsl(45 95% 55% / 0.15);
+    
+    --muted: 40 20% 15%;
+    --muted-foreground: 40 20% 70%;
+    --border: 40 20% 18%;
+    --sidebar-border: 40 20% 18%;
+    --accent: 45 95% 15%;
+    --accent-foreground: 45 95% 55%;
   }
 
-  .accent-obsidian:not(.dark) {
-    --background: 0 0% 100%;
-    /* Pure White */
-    --card: 0 0% 100%;
-    --sidebar-background: 0 0% 98%;
-    --primary: 0 0% 0%;
-    /* Pure Black */
-    --primary-foreground: 0 0% 100%;
-    --primary-rgb: 0, 0, 0;
-    --accent: 0 0% 90%;
-    /* Light gray */
-    --accent-foreground: 0 0% 0%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
-    --border: 0 0% 90%;
+  .accent-pec-gold:not(.dark),
+  .accent-golden:not(.dark) {
+    --background: 40 10% 98%;
+    --card: 40 10% 100%;
+    --sidebar-background: 40 10% 96%;
+    --primary: 45 95% 45%;
+    --primary-foreground: 40 20% 6%;
+    --primary-rgb: 217, 119, 6;
+    --ring: 45 95% 45%;
+    --sidebar-primary: 45 95% 45%;
+    --shadow-glow: 0 0 30px hsl(45 95% 45% / 0.15);
+
+    --muted: 40 10% 92%;
+    --muted-foreground: 40 10% 40%;
+    --border: 40 10% 90%;
+    --sidebar-border: 40 10% 90%;
+    --accent: 45 95% 90%;
+    --accent-foreground: 45 95% 35%;
   }
 
   /* Theme 2: Emerald (Deep Green Tint) */
@@ -415,35 +421,7 @@ html {
     --shadow-glow: 0 0 30px hsl(270 70% 50% / 0.15);
   }
 
-  /* Theme 5: Gold (Warm Yellow Tint) */
-  .accent-coral {
-    --accent-hue: 46;
-    --accent-sat: 95%;
-  }
 
-  .accent-coral.dark {
-    --background: 44 30% 8%;
-    --card: 44 24% 11%;
-    --sidebar-background: 44 30% 6%;
-    --primary: 46 95% 56%;
-    --primary-foreground: 44 30% 8%;
-    --primary-rgb: 245, 158, 11;
-    --ring: 46 95% 56%;
-    --sidebar-primary: 46 95% 56%;
-    --shadow-glow: 0 0 40px hsl(46 95% 56% / 0.14);
-  }
-
-  .accent-coral:not(.dark) {
-    --background: 46 35% 95%;
-    --card: 46 35% 100%;
-    --sidebar-background: 46 28% 92%;
-    --primary: 46 95% 42%;
-    --primary-foreground: 44 30% 8%;
-    --primary-rgb: 217, 119, 6;
-    --ring: 46 95% 42%;
-    --sidebar-primary: 46 95% 42%;
-    --shadow-glow: 0 0 30px hsl(46 95% 42% / 0.18);
-  }
 
   /* ===== BASE STYLES ===== */
   * {

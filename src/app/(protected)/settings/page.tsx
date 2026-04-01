@@ -44,7 +44,7 @@ export default function Settings() {
   const [userData, setUserData] = useState<any>(null);
 
   const accentColors = [
-    { id: 'gold', name: 'PEC Gold', color: '#EAB308' },
+    { id: 'pec-gold', name: 'PEC Gold', color: '#F59E0B' },
     { id: 'emerald', name: 'Emerald', color: '#10B981' },
     { id: 'sapphire', name: 'Sapphire', color: '#3B82F6' },
     { id: 'amethyst', name: 'Amethyst', color: '#8B5CF6' },
@@ -52,9 +52,11 @@ export default function Settings() {
 
   const [accentColor, setAccentColor] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('accent-color') || 'gold';
+      const savedAccent = localStorage.getItem('accent-color');
+      if (!savedAccent || savedAccent === 'golden') return 'pec-gold';
+      return savedAccent;
     }
-    return 'gold';
+    return 'pec-gold';
   });
 
   useEffect(() => {
@@ -108,13 +110,13 @@ export default function Settings() {
   }
 
   return (
-    <div className="container mx-auto max-w-5xl space-y-8 p-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b-2 border-primary/10">
-        <div className="space-y-2">
-          <h1 className="text-5xl font-[1000] tracking-tighter text-foreground uppercase leading-none">Settings Engine</h1>
-          <p className="text-muted-foreground font-black text-[10px] uppercase tracking-widest opacity-90">Synchronize Neural Environment Layer</p>
+    <div className="space-y-6">
+      <div className="flex flex-col items-start gap-4 pb-8 border-b-2 border-primary/10">
+        <div className="space-y-2 text-left">
+          <h1 className="text-5xl font-[1000] tracking-tighter text-foreground leading-none">Settings Engine</h1>
+          <p className="text-muted-foreground font-black text-[10px] tracking-widest opacity-90 uppercase">Synchronize Neural Environment Layer</p>
         </div>
-        <Button variant="ghost" onClick={handleSignOut} className="h-10 rounded-xl hover:bg-destructive/10 text-destructive font-black uppercase text-[10px] tracking-widest gap-2">
+        <Button variant="ghost" onClick={handleSignOut} className="h-10 px-0 hover:bg-transparent hover:text-destructive/80 text-destructive font-black text-[12px] tracking-widest gap-2">
            <LogOut className="w-5 h-5" /> Terminate Access
         </Button>
       </div>
@@ -125,68 +127,68 @@ export default function Settings() {
             <TabsTrigger 
               key={tab} 
               value={tab} 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-3 text-xs font-black uppercase tracking-widest transition-all"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-3 text-xs font-black tracking-widest transition-all capitalize"
             >
-              {tab.replace('-', ' ')}
+              {tab.replace(/-/g, ' ')}
             </TabsTrigger>
           ))}
           {user?.role === 'college_admin' && (
-            <TabsTrigger value="college" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-3 text-xs font-black uppercase tracking-widest transition-all">
+            <TabsTrigger value="college" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-3 text-xs font-black tracking-widest transition-all capitalize">
               College Admin
             </TabsTrigger>
           )}
         </TabsList>
 
         <TabsContent value="profile" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <Card className="border-primary/10 bg-card shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+          <Card className="border-primary/10 bg-card shadow-lg text-left">
+            <CardHeader className="text-left">
+              <CardTitle className="text-sm font-black tracking-widest flex items-center justify-start gap-2 uppercase">
                 <Database className="w-4 h-4 text-primary" />
                 Personal Identifiers
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-6 sm:grid-cols-2">
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground ml-1">Access Name</label>
+            <CardContent className="grid gap-6 sm:grid-cols-2 text-left">
+              <div className="space-y-1 text-left">
+                <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Access Name</label>
                 <Input value={userData?.fullName || ''} className="h-11 rounded-xl bg-background border-primary/10 font-bold" readOnly />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground ml-1">Protocol Line</label>
+              <div className="space-y-1 text-left">
+                <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Protocol Line</label>
                 <Input value={userData?.email || ''} className="h-11 rounded-xl bg-muted border-primary/5 opacity-70" disabled />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground ml-1">Secure Contact</label>
+              <div className="space-y-1 text-left">
+                <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Secure Contact</label>
                 <Input placeholder="+91 XXX-XXX-XXXX" className="h-11 rounded-xl bg-background border-primary/10 font-bold" />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground ml-1">Department</label>
+              <div className="space-y-1 text-left">
+                <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Department</label>
                 <Input value={userData?.department || 'N/A'} className="h-11 rounded-xl bg-muted border-primary/5 opacity-70" disabled />
               </div>
-              <div className="sm:col-span-2 flex justify-end">
-                <Button className="h-11 px-8 rounded-xl bg-primary text-primary-foreground font-black uppercase text-[10px] tracking-widest">
+              <div className="sm:col-span-2 flex justify-start">
+                <Button className="h-11 px-8 rounded-xl bg-primary text-primary-foreground font-black text-[12px] tracking-widest mt-2">
                   <RefreshCw className="w-4 h-4 mr-2" /> Sync Records
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-primary/10 bg-card">
-              <CardHeader>
-                <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+          <Card className="border-primary/10 bg-card text-left">
+              <CardHeader className="text-left">
+                <CardTitle className="text-sm font-black tracking-widest flex items-center justify-start gap-2 uppercase">
                   <Globe className="w-4 h-4 text-primary" />
                   Environment Constants
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground ml-1">Native Language</label>
+              <CardContent className="grid gap-6 sm:grid-cols-2 text-left">
+                <div className="space-y-1 text-left">
+                  <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Native Language</label>
                   <Select defaultValue="en">
                     <SelectTrigger className="h-11 rounded-xl bg-background border-primary/10 font-bold">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-primary/10">
-                      <SelectItem value="en" className="font-bold">English (Intl)</SelectItem>
-                      <SelectItem value="hi" className="font-bold">Hindi (Dev)</SelectItem>
+                      <SelectItem value="en" className="font-bold">English (International)</SelectItem>
+                      <SelectItem value="hi" className="font-bold">Hindi (Devanagari)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -195,37 +197,39 @@ export default function Settings() {
         </TabsContent>
 
         <TabsContent value="appearance" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <Card className="border-primary/10 bg-card">
-            <CardHeader>
-              <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-primary">
+          <Card className="border-primary/10 bg-card text-left">
+            <CardHeader className="text-left">
+              <CardTitle className="text-sm font-black tracking-widest flex items-center justify-start gap-2 text-primary uppercase">
                 <Palette className="w-4 h-4" />
                 Surface Theme
               </CardTitle>
-              <CardDescription className="text-[10px] font-bold uppercase">Configure cognitive visual overlays</CardDescription>
+              <CardDescription className="text-[10px] font-bold text-left ml-6 uppercase opacity-90">Configure Cognitive Visual Overlays</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-8">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <CardContent className="space-y-8 text-left">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-start">
                 {accentColors.map((color) => (
                   <button
                     key={color.id}
                     onClick={() => setAccentColor(color.id)}
                     className={cn(
-                      "relative flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-300",
+                      "relative flex flex-col items-start gap-3 p-4 rounded-2xl border-2 transition-all duration-300 w-full",
                       accentColor === color.id
                         ? "border-primary bg-primary/5 shadow-md"
                         : "border-primary/5 bg-background hover:border-primary/20"
                     )}
                   >
-                    <div
-                      className="w-10 h-10 rounded-xl shadow-lg"
-                      style={{ background: color.color }}
-                    />
-                    <span className="text-[10px] font-black uppercase tracking-widest">
-                      {color.name}
-                    </span>
+                    <div className="flex items-center gap-3 w-full">
+                      <div
+                        className="w-8 h-8 rounded-full shadow-lg"
+                        style={{ background: color.color }}
+                      />
+                      <span className="text-[10px] font-black tracking-widest">
+                        {color.name}
+                      </span>
+                    </div>
                     {accentColor === color.id && (
-                      <div className="absolute top-2 right-2">
-                        <Check className="w-3 h-3 text-primary" />
+                      <div className="absolute top-4 right-4">
+                        <Check className="w-4 h-4 text-primary" />
                       </div>
                     )}
                   </button>

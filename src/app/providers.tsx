@@ -13,10 +13,12 @@ const queryClient = new QueryClient();
 // Initialize accent color from localStorage on page load
 const initAccentColor = () => {
   if (typeof window === 'undefined') return;
-  const accent = localStorage.getItem('accent-color') || 'sapphire';
+  const savedAccent = localStorage.getItem('accent-color');
+  const accent = savedAccent === 'golden' || !savedAccent ? 'pec-gold' : savedAccent;
   const root = document.documentElement;
-  root.classList.remove('accent-obsidian', 'accent-emerald', 'accent-sapphire', 'accent-amethyst', 'accent-coral');
+  root.classList.remove('accent-emerald', 'accent-sapphire', 'accent-amethyst', 'accent-golden', 'accent-pec-gold');
   root.classList.add(`accent-${accent}`);
+  localStorage.setItem('accent-color', accent);
   root.removeAttribute('style');
 };
 
