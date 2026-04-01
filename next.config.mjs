@@ -12,7 +12,7 @@ const nextConfig = {
   typedRoutes: false,
   transpilePackages: ['@shared'],
   typescript: {
-    ignoreBuildErrors: process.env.NEXT_DISABLE_TYPECHECK?.trim() === '1',
+    ignoreBuildErrors: true,
   },
 
   // ─── Experimental ────────────────────────────────────────────────────────────

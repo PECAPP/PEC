@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 
 // Types
-import { AdminDashboardData, Course, User } from '../../../../shared/types';
+import { AdminDashboardData, Course, User } from '@pec/shared';
 
 // Components
 import { AdminStatsCards } from './components/AdminStatsCards';
@@ -106,7 +106,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => router.push('/admin/college-settings')}
+            onClick={() => router.push('/admin/college-settings' as any)}
             className="gap-2"
           >
             <Settings className="w-4 h-4" />

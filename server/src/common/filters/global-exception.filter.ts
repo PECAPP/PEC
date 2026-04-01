@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -34,9 +33,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           : Array.isArray(resolvedMessage)
             ? resolvedMessage.join(', ')
             : resolvedMessage;
-    } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
-      status = this.mapPrismaErrorToStatus(exception.code);
-      message = this.mapPrismaErrorToMessage(exception.code);
+    } else if (exception instanceof Error && 'code' in exception && typeof exception.code === 'string' && exception.code.startsWith('P2')) {
+      const prismaCode = exception.code;
+      status = this.mapPrismaErrorToStatus(prismaCode);
+      message = this.mapPrismaErrorToMessage(prismaCode);
     }
 
     const requestId = request?.requestId || request?.headers?.['x-request-id'];

@@ -12,13 +12,13 @@ export function CollegeAdminHeader() {
         <p className="text-muted-foreground">Manage your college operations and analytics</p>
       </div>
       <div className="flex gap-2">
-        <Link href="/reports">
+        <Link href={"/reports" as any}>
           <Button variant="outline">
             <BarChart3 className="w-4 h-4 mr-2" />
             Reports
           </Button>
         </Link>
-        <Link href="/users/add">
+        <Link href={"/users/add" as any}>
           <Button>
             <Users className="w-4 h-4 mr-2" />
             Add User

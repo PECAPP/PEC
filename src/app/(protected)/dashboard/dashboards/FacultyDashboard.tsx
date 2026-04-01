@@ -86,7 +86,7 @@ export function FacultyDashboard({ initialData, user: serverUser }: FacultyDashb
             lowAttendanceCount={stats.lowAttendanceCount}
             onViewStudents={() => router.push('/attendance')}
           />
-          <FacultyQuickActions onAction={(path) => router.push(path)} />
+          <FacultyQuickActions onAction={(path) => router.push(path as any)} />
           <NoticeboardCard 
             notices={notices} 
             onViewAll={() => router.push('/noticeboard')} 

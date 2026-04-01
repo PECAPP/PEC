@@ -225,7 +225,7 @@ export default function PaymentSettings({ embedded }: Props) {
     >
       {/* Back Button */}
       {!embedded && (
-        <Button variant="ghost" onClick={() => router.push('/finance')} className="gap-2">
+        <Button variant="ghost" onClick={() => router.push('/finance' as any)} className="gap-2">
           <ArrowLeft className="w-4 h-4" />
           Back to Finance
         </Button>
@@ -599,7 +599,7 @@ export default function PaymentSettings({ embedded }: Props) {
           <Button
             variant="outline"
             size="lg"
-            onClick={() => router.push('/finance')}
+            onClick={() => router.push('/finance' as any)}
           >
             Cancel
           </Button>

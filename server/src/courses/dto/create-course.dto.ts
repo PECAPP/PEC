@@ -11,8 +11,8 @@ export class CreateCourseDto {
   @ApiProperty({ example: 4, minimum: 1, maximum: 20 })
   credits: number;
 
-  @ApiPropertyOptional({ example: 'Dr. Jane Smith' })
-  instructor?: string;
+  @ApiProperty({ example: 'Dr. Jane Smith' })
+  instructor: string;
 
   @ApiPropertyOptional({ example: 'uuid-instructor-id' })
   instructorId?: string;

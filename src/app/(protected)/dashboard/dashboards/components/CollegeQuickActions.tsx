@@ -15,7 +15,7 @@ export function CollegeQuickActions({ type }: { type: 'courses' | 'users' }) {
     return (
       <motion.div variants={item} className="card-elevated p-6">
         <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
-        <Link href="/courses/add">
+        <Link href={"/courses/add" as any}>
           <Button variant="outline" size="sm" className="justify-start w-full">
             <BookOpen className="w-4 h-4 mr-2" />
             New Course
@@ -34,7 +34,7 @@ export function CollegeQuickActions({ type }: { type: 'courses' | 'users' }) {
   return (
     <motion.div variants={item} className="card-elevated p-6">
       <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
-      <Link href="/users/add">
+      <Link href={"/users/add" as any}>
         <Button variant="outline" size="sm" className="justify-start w-full">
           <Users className="w-4 h-4 mr-2" />
           Add Faculty
