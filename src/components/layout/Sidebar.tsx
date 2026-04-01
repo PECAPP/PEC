@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -26,14 +27,20 @@ import {
   ChevronRight,
   X,
   Users2,
+  GripVertical,
 } from "lucide-react";
 
 
 import { cn } from "@/lib/utils";
-import ThemeToggler from "@/components/ThemeToggler"; // Import ThemeToggler
-import { LandingColorTheme } from "@/components/LandingColorTheme"; // Import Accent Picker
+import ThemeToggler from "@/components/ThemeToggler";
+import { LandingColorTheme } from "@/components/LandingColorTheme";
 import type { UserRole } from "@/types";
 import { GoogleTranslate } from "@/components/GoogleTranslate";
+
+const SIDEBAR_WIDTH_KEY = 'sidebar-width';
+const MIN_WIDTH = 200;
+const MAX_WIDTH = 400;
+const DEFAULT_WIDTH = 256;
 
 interface SidebarProps {
   role: UserRole;
@@ -210,6 +217,59 @@ export function Sidebar({
 }: SidebarProps) {
   const location = usePathname();
   const appLogoSrc = '/logo.png';
+  
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (parsed >= MIN_WIDTH && parsed <= MAX_WIDTH) return parsed;
+      }
+    }
+    return DEFAULT_WIDTH;
+  });
+  
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
+  }, [sidebarWidth]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      
+      const newWidth = e.clientX;
+      if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) {
+        setSidebarWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'ew-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing]);
   const filteredItems = navItems.filter((item) => item.roles.includes(role));
   const sectionConfig: Array<{ title: string; paths: string[] }> = [
     {
@@ -314,17 +374,38 @@ export function Sidebar({
     </AnimatePresence>
 
     <aside
+      ref={sidebarRef}
       className={cn(
         "fixed left-0 top-0 z-[100] h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col shadow-sm",
-        collapsed ? "w-16" : "w-64",
         isMobile && !mobileMenuOpen && "-translate-x-full",
-        isMobile && mobileMenuOpen && "translate-x-0 w-64"
+        isMobile && mobileMenuOpen && "translate-x-0"
       )}
+      style={{
+        width: collapsed ? undefined : sidebarWidth,
+        minWidth: collapsed ? undefined : sidebarWidth,
+        maxWidth: collapsed ? undefined : sidebarWidth,
+      }}
     >
+      {/* Resize Handle */}
+      {!isMobile && !collapsed && (
+        <div
+          onMouseDown={handleMouseDown}
+          onClick={(e) => e.stopPropagation()}
+          className={cn(
+            "absolute top-0 right-0 w-1 h-full cursor-ew-resize group z-10",
+            "hover:bg-primary/20",
+            "flex items-center justify-center",
+            isResizing && "bg-primary/30"
+          )}
+        >
+          <GripVertical className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
+      )}
+
       {/* Sidebar Header Controls */}
       <div
         className={cn(
-          "min-h-20 flex items-center border-b border-sidebar-border",
+          "min-h-20 flex items-center border-b border-sidebar-border shrink-0",
           collapsed ? "justify-center px-2" : "justify-between px-4"
         )}
       >

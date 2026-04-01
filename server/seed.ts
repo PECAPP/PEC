@@ -10,6 +10,7 @@ import { seedTimetable } from './seeds/timetable';
 import { seedNoticeboard } from './seeds/noticeboard';
 import { seedCommunicationAndActivity } from './seeds/communication';
 import { seedCampusFacilities } from './seeds/campus_facilities';
+import { seedAcademicCalendar } from './seeds/academic_calendar';
 
 async function main() {
   console.log('--- Starting Modular PEC Campus Seed ---');
@@ -49,6 +50,9 @@ async function main() {
 
     console.log('11. Seeding communication systems (Chat, Audit, Flags)...');
     await seedCommunicationAndActivity(admin.id, faculties, students, courses);
+
+    console.log('12. Seeding academic calendar...');
+    await seedAcademicCalendar(admin.id);
 
     console.log('--- Seeding Completed Successfully ---');
   } catch (error) {

@@ -14,10 +14,14 @@ async function getUsers(token: string) {
   const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
   
   try {
-     const res = await fetch(`${base}/users`, { 
+     // Use absolute URL for server-side fetch
+     const url = new URL('/users', base).toString();
+     const res = await fetch(url, { 
+        method: 'GET',
         headers: {
            'Authorization': `Bearer ${token}`,
-           'Content-Type': 'application/json'
+           'Content-Type': 'application/json',
+           'Accept': 'application/json'
         },
         next: { revalidate: 60 } 
      });
@@ -28,7 +32,9 @@ async function getUsers(token: string) {
      }
      
      const data = await res.json();
-     return (data.data || []).map((u: any) => ({
+     // Handle both nested (data.data) and flat (data) response formats
+     const users = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+     return users.map((u: any) => ({
         ...u,
         fullName: u.fullName || u.name || '',
         status: u.status || 'active',

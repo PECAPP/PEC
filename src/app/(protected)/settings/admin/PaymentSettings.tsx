@@ -60,11 +60,8 @@ const extractData = <T,>(payload: any): T => {
   return payload as T;
 };
 
-interface Props {
-  embedded?: boolean;
-}
-
-export default function PaymentSettings({ embedded }: Props) {
+export default function PaymentSettings() {
+  const embedded = false;
   const router = useRouter();
   const { user, isAdmin, loading: authLoading } = usePermissions();
   const [loading, setLoading] = useState(true);

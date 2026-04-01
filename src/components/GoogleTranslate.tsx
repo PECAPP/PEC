@@ -161,11 +161,23 @@ export function GoogleTranslate({
     setGoogtransCookie(language);
   };
 
+  // Initialize on mount: read persisted language preference ONCE
+  useEffect(() => {
+    if (widgetInitializedRef.current) return; // Skip if already initialized
+    widgetInitializedRef.current = true;
+
+    const initialLanguage = readPreferredLanguage();
+    setSelectedLanguage(initialLanguage);
+    selectedLanguageRef.current = initialLanguage;
+    setGoogtransCookie(initialLanguage);
+  }, []); // Empty dependency array - runs once on mount
+
+  // Setup Google Translate widget and re-apply language
   useEffect(() => {
     const initWidget = () => {
       if (window.google?.translate?.TranslateElement) {
         const element = document.getElementById(containerId);
-        if (element && !widgetInitializedRef.current) {
+        if (element) {
           element.innerHTML = '';
           new window.google.translate.TranslateElement(
             { 
@@ -175,9 +187,10 @@ export function GoogleTranslate({
             }, 
             containerId
           );
-          widgetInitializedRef.current = true;
         }
         setWidgetStatus('ready');
+        // Apply saved language after widget initializes
+        applyLanguageWithRetry(selectedLanguageRef.current);
       }
     };
 
@@ -191,18 +204,8 @@ export function GoogleTranslate({
 
     const handleReady = () => {
       initWidget();
-      applyLanguageWithRetry(selectedLanguageRef.current);
     };
     window.addEventListener('google-translate-ready', handleReady);
-
-    const initialLanguage = readPreferredLanguage();
-    setSelectedLanguage(initialLanguage);
-    selectedLanguageRef.current = initialLanguage;
-    setGoogtransCookie(initialLanguage);
-
-    const syncTimeout = window.setTimeout(() => {
-      applyLanguageWithRetry(initialLanguage);
-    }, 250);
 
     const statusTimeout = window.setTimeout(() => {
       if (window.google?.translate?.TranslateElement) {
@@ -214,7 +217,6 @@ export function GoogleTranslate({
     
     return () => {
       window.removeEventListener('google-translate-ready', handleReady);
-      window.clearTimeout(syncTimeout);
       window.clearTimeout(statusTimeout);
     };
   }, [containerId, includedLanguages]);

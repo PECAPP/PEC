@@ -148,7 +148,7 @@ export const timetableSchema = z.object({
   department: z.string().optional(),
   semester: z.number().int().min(1).max(8).optional(),
   batch: z.string().optional(),
-});
+}).passthrough();
 
 export const examinationSchema = z.object({
   id: z.string().uuid().optional(),

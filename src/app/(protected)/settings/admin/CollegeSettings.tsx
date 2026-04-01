@@ -37,11 +37,8 @@ import type { CollegeSettings as CollegeSettingsType } from '@/types';
 
 type CollegeSettings = CollegeSettingsType;
 
-interface Props {
-  embedded?: boolean;
-}
-
-export default function CollegeSettings({ embedded }: Props) {
+export default function CollegeSettings() {
+  const embedded = false;
   const router = useRouter();
   const { user, isAdmin, loading: authLoading } = usePermissions();
   const [loading, setLoading] = useState(true);
