@@ -29,6 +29,9 @@ export function ProtectedLayoutClient({ children, user }: ProtectedLayoutClientP
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const pathname = usePathname();
+  const isSpecialModule = ['/chat', '/resume-builder'].some(route => pathname?.startsWith(route));
+
   return (
     <div className="min-h-screen relative isolate overflow-x-hidden">
       <div className="mesh-gradient-bg">
@@ -63,7 +66,7 @@ export function ProtectedLayoutClient({ children, user }: ProtectedLayoutClientP
         <div className="mesh-content-overlay" aria-hidden="true" />
         <div className={cn(
           "relative z-10 w-full min-h-[calc(100vh-4rem)]", // Set full width and min-height
-          ['/chat', '/resume-builder'].some(route => usePathname()?.startsWith(route)) 
+          isSpecialModule 
             ? "p-0 h-full w-full" // Flush, full-height, and full-width for chat and resume
             : "p-4 md:p-5 lg:p-6 ui-section-gap",
         )}>

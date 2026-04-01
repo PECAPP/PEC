@@ -18,6 +18,7 @@ export function useAdminDashboard(initialData?: any) {
     totalStudents: 0,
     totalFaculty: 0,
     totalCourses: 0,
+    totalDepartments: 0,
   });
 
   // Course Dialog states
@@ -72,22 +73,19 @@ export function useAdminDashboard(initialData?: any) {
 
   const fetchAdminData = useCallback(async () => {
     try {
-      const [coursesData, usersData] = await Promise.all([
+      const [coursesData, usersData, statsRes] = await Promise.all([
         fetchAllPages<any>('/courses'),
         fetchAllPages<any>('/users'),
+        api.get('/admin/dashboard-stats'),
       ]);
+      
       setCourses(coursesData);
       setUsers(usersData);
-
-      // Calculate stats
-      const students = (usersData as any[]).filter(u => u.role === 'student').length;
-      const faculty = (usersData as any[]).filter(u => u.role === 'faculty').length;
       
-      setStats({
-        totalStudents: students,
-        totalFaculty: faculty,
-        totalCourses: coursesData.length,
-      });
+      const serverStats = statsRes.data?.success ? statsRes.data.data : statsRes.data;
+      if (serverStats) {
+        setStats(serverStats);
+      }
     } catch (error) {
       console.error('Error fetching admin data:', error);
       throw error;

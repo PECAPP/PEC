@@ -6,9 +6,15 @@ interface Props {
   attendancePercentage: number;
   onClick: () => void;
   targetPercentage?: number;
+  className?: string;
 }
 
-export function AttendanceOverviewCard({ attendancePercentage, onClick, targetPercentage = 75 }: Props) {
+export function AttendanceOverviewCard({ 
+  attendancePercentage, 
+  onClick, 
+  targetPercentage = 75,
+  className 
+}: Props) {
   const strokeDasharray = 351.86;
   const strokeDashoffset = strokeDasharray - (strokeDasharray * attendancePercentage) / 100;
   const clampedPercentage = Math.max(0, Math.min(100, Math.round(attendancePercentage)));
@@ -24,7 +30,7 @@ export function AttendanceOverviewCard({ attendancePercentage, onClick, targetPe
 
   return (
     <div 
-      className="card-elevated ui-card-pad h-full cursor-pointer hover:bg-muted/50 transition-colors duration-150 relative overflow-hidden flex flex-col"
+      className={`card-elevated ui-card-pad h-full cursor-pointer hover:bg-muted/50 transition-colors duration-150 relative overflow-hidden flex flex-col ${className || ''}`}
       onClick={onClick}
     >
       <div className="absolute -top-12 -right-12 h-36 w-36 rounded-full bg-success/10 blur-2xl" />

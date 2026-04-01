@@ -19,7 +19,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -170,20 +170,35 @@ export default function StudentProfile() {
   const handleSaveProfile = async () => {
     try {
       setSaving(true);
-      const payload = {
+      const resolvedRole = profileData?.role || user?.role || 'student';
+
+      const payload: Record<string, any> = {
         userId: user?.uid,
         email: user?.email || profileData?.email,
         fullName: editForm.fullName?.trim() || user?.name || profileData?.fullName,
+        role: resolvedRole,
         phone: editForm.phone?.trim() || null,
         address: editForm.address?.trim() || null,
         bio: editForm.bio?.trim() || null,
         githubUsername: editForm.githubUsername?.trim() || null,
         linkedinUsername: editForm.linkedinUsername?.trim() || null,
-        role: profileData?.role || user?.role,
       };
 
-      // Unified profile update endpoint
-      await api.patch('/auth/profile', payload);
+      if (resolvedRole === 'student') {
+        payload.enrollmentNumber = profileData?.enrollmentNumber || '';
+        payload.department = profileData?.department || '';
+        payload.semester = Number(profileData?.semester || 1);
+      }
+
+      if (resolvedRole === 'faculty') {
+        payload.employeeId = profileData?.employeeId || '';
+        payload.department = profileData?.department || '';
+        payload.designation = profileData?.designation || '';
+        payload.specialization = profileData?.specialization || '';
+      }
+
+      // Backend supports POST /auth/complete-profile for profile updates
+      await api.post('/auth/complete-profile', payload);
 
       toast.success('Profile updated');
       setEditOpen(false);
@@ -215,7 +230,11 @@ export default function StudentProfile() {
       }));
     } catch (error) {
       console.error('Update failed:', error);
-      toast.error('Failed to update profile. Please check all fields.');
+      const message =
+        (error as any)?.message ||
+        (error as any)?.response?.data?.message ||
+        'Failed to update profile. Please check all fields.';
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -258,26 +277,26 @@ export default function StudentProfile() {
   const avatarUrl = profileData?.avatar || user?.avatar || githubStats?.avatar || undefined;
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-10">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
       {/* Header Profile Section */}
-      <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6 border-b-2 pb-12 border-primary/20">
+      <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6 border-b pb-8 border-border">
         <div className="flex flex-col md:flex-row items-center md:items-center gap-10">
-          <div className="p-1 bg-primary">
-            <Avatar className="w-32 h-32 md:w-36 md:h-36 rounded-none border-4 border-background ring-2 ring-primary ring-offset-4 ring-offset-background">
+          <div className="p-1.5 bg-primary/15 rounded-lg border border-primary/30">
+            <Avatar className="w-28 h-28 md:w-32 md:h-32 rounded-md border-2 border-primary/50">
               <AvatarImage src={avatarUrl} className="object-cover" />
-              <AvatarFallback className="text-4xl bg-primary text-primary-foreground rounded-none font-bold">
+              <AvatarFallback className="text-4xl bg-primary text-primary-foreground rounded-md font-bold">
                 {profileData?.fullName?.[0]}
               </AvatarFallback>
             </Avatar>
           </div>
           
           <div className="space-y-3 text-center md:text-left">
-            <h1 className="text-5xl font-extrabold tracking-tighter text-foreground leading-none">{profileData?.fullName}</h1>
-            <div className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
-              <div className="w-1.5 h-1.5 bg-background animate-pulse" />
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground leading-none">{profileData?.fullName}</h1>
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 text-xs font-semibold border border-primary/30 rounded-md">
+              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
               {displayRole}
             </div>
-            <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-4">
+            <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-muted-foreground mt-3">
               <MapPin className="w-4 h-4 text-primary" />
               <span>{profileData?.address || profileData?.department || 'Institutional Campus'}</span>
             </div>
@@ -285,32 +304,32 @@ export default function StudentProfile() {
         </div>
 
         <div className="flex gap-4 w-full md:w-auto">
-          <Button onClick={openEdit} variant="outline" className="flex-1 md:flex-none h-14 rounded-none px-8 text-xs font-black uppercase tracking-[0.2em] border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-            Edit profile
+          <Button onClick={openEdit} variant="outline" className="flex-1 md:flex-none h-11 px-6 text-sm font-semibold border border-primary/40 text-primary hover:bg-primary/10">
+            Edit Profile
           </Button>
-          <Button onClick={handleShare} className="flex-1 md:flex-none h-14 rounded-none px-8 text-xs font-black uppercase tracking-[0.2em] bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all">
-            Share profile
+          <Button onClick={handleShare} className="flex-1 md:flex-none h-11 px-6 text-sm font-semibold bg-primary text-primary-foreground">
+            Share Profile
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Aspect: Contact & Bio (Themed) */}
-        <div className="lg:col-span-4 space-y-12 bg-primary/5 p-10 border-2 border-primary/20">
+        <div className="lg:col-span-4 space-y-8 bg-card p-6 border border-border rounded-xl">
           <section className="space-y-4">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary border-b border-primary/30 pb-2">Contact layer</h4>
-            <div className="space-y-8 pt-4">
+            <h4 className="text-sm font-semibold text-foreground border-b border-border pb-2">Contact Information</h4>
+            <div className="space-y-6 pt-2">
               <div className="flex items-start gap-4">
                 <Mail className="w-4 h-4 mt-0.5 text-muted-foreground" />
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase text-muted-foreground/60">Email</p>
+                  <p className="text-xs font-medium text-muted-foreground">Email</p>
                   <p className="text-sm font-medium">{profileData?.email || user?.email || 'N/A'}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <Phone className="w-4 h-4 mt-0.5 text-muted-foreground" />
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase text-muted-foreground/60">Phone</p>
+                  <p className="text-xs font-medium text-muted-foreground">Phone</p>
                   <p className="text-sm font-medium">{profileData?.phone || 'N/A'}</p>
                 </div>
               </div>
@@ -318,14 +337,14 @@ export default function StudentProfile() {
           </section>
 
           <section className="space-y-4">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 border-b pb-2 border-border/40">Connect</h4>
+            <h4 className="text-sm font-semibold text-foreground border-b pb-2 border-border">Professional Links</h4>
             <div className="flex gap-4 pt-2">
                {profileData?.socials?.github && (
-                 <a href={`https://github.com/${profileData.socials.github.replace('@', '')}`} target="_blank" rel="noreferrer" className="p-2 border border-border hover:bg-muted transition-colors">
+                 <a href={`https://github.com/${profileData.socials.github.replace('@', '')}`} target="_blank" rel="noreferrer" className="p-2 border border-border rounded-md hover:bg-muted transition-colors">
                    <Github className="w-5 h-5" />
                  </a>
                )}
-               <Button variant="outline" size="icon" className="rounded-none border-border">
+               <Button variant="outline" size="icon" className="rounded-md border-border">
                  <QrCode className="w-5 h-5" />
                </Button>
             </div>
@@ -333,24 +352,24 @@ export default function StudentProfile() {
         </div>
 
         {/* Right Aspect: Academic & Expertise */}
-        <div className="lg:col-span-8 space-y-12">
+        <div className="lg:col-span-8 space-y-8">
           {/* Stats Bar (Themed Accented block) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 border-2 border-primary bg-primary/5 divide-x-2 divide-primary">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {statItems.map((stat, i) => (
-              <div key={i} className="p-8 text-center space-y-1 hover:bg-primary hover:text-primary-foreground transition-all cursor-default">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{stat.label}</p>
-                <p className="text-3xl font-black tracking-tighter">{stat.value}</p>
+              <div key={i} className="p-5 text-center space-y-1 border border-border rounded-lg bg-card">
+                <p className="text-xs font-semibold text-muted-foreground">{stat.label}</p>
+                <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
               </div>
             ))}
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent flex gap-10">
+            <TabsList className="w-full justify-start border-b h-auto p-0 bg-transparent flex gap-8 rounded-none">
               {['overview', 'academic', 'projects', 'achievements'].map((tab) => (
                 <TabsTrigger 
                   key={tab} 
                   value={tab}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground px-0 py-4 text-[10px] font-bold uppercase tracking-[0.2em] transition-all opacity-60 data-[state=active]:opacity-100"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground px-0 py-3 text-xs font-semibold capitalize transition-all opacity-70 data-[state=active]:opacity-100"
                 >
                   {tab}
                 </TabsTrigger>
@@ -361,8 +380,8 @@ export default function StudentProfile() {
                {/* Technical Expertise */}
                <section className="space-y-8">
                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold tracking-tight">Technical expertise</h3>
-                    <Badge variant="outline" className="rounded-none px-3 font-semibold text-[10px] uppercase tracking-widest border-muted-foreground/30">Verified</Badge>
+                    <h3 className="text-2xl font-bold tracking-tight">Technical Expertise</h3>
+                    <Badge variant="outline" className="px-3 font-semibold text-[10px] uppercase tracking-wider border-muted-foreground/30">Verified</Badge>
                  </div>
                  
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
@@ -375,11 +394,11 @@ export default function StudentProfile() {
                                {typeof skill.level === 'number' ? `${skill.level}%` : 'N/A'}
                              </span>
                            </div>
-                           <Progress value={typeof skill.level === 'number' ? skill.level : 0} className="h-1 rounded-none bg-muted [&>div]:bg-foreground" />
+                           <Progress value={typeof skill.level === 'number' ? skill.level : 0} className="h-2 rounded-md bg-muted [&>div]:bg-primary" />
                         </div>
                       ))
                     ) : (
-                      <div className="text-xs text-muted-foreground font-medium col-span-full py-8 border-2 border-dashed flex items-center justify-center">
+                      <div className="text-sm text-muted-foreground font-medium col-span-full py-8 border border-dashed rounded-lg flex items-center justify-center bg-card">
                         No expertise metrics recorded.
                       </div>
                     )}
@@ -388,12 +407,12 @@ export default function StudentProfile() {
 
                {/* Digital Dossier / CV */}
                <div className="pt-6 border-t border-border/40">
-                  <div className="bg-muted/30 p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-border/50">
+                  <div className="bg-card p-6 flex flex-col md:flex-row items-center justify-between gap-6 border border-border rounded-lg">
                     <div className="space-y-1 text-center md:text-left">
-                      <h4 className="font-bold text-base">Institutional dossier</h4>
+                      <h4 className="font-bold text-base">Academic Profile Document</h4>
                       <p className="text-xs text-muted-foreground font-medium">Download the verified academic and professional summary of {profileData?.fullName}.</p>
                     </div>
-                    <Button className="h-11 rounded-none bg-foreground text-background hover:bg-foreground/90 px-8 text-xs font-bold uppercase tracking-wider">
+                    <Button className="h-11 bg-primary text-primary-foreground px-6 text-xs font-semibold uppercase tracking-wider">
                       <Download className="w-4 h-4 mr-2" /> Download CV
                     </Button>
                   </div>
@@ -413,6 +432,9 @@ export default function StudentProfile() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
+            <DialogDescription>
+              Update your profile details and save changes.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <Input

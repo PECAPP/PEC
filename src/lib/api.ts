@@ -1,6 +1,48 @@
 import { authClient } from "./auth-client";
 import { buildApiUrl } from "./api-base";
 
+function extractErrorMessage(value: unknown): string | undefined {
+  if (value == null) return undefined;
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : undefined;
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    const collected = value
+      .map(extractErrorMessage)
+      .filter((msg): msg is string => Boolean(msg));
+    return collected.length ? collected.join(", ") : undefined;
+  }
+
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+
+    for (const key of ["message", "error", "detail", "title", "reason"]) {
+      const nested = extractErrorMessage(record[key]);
+      if (nested) return nested;
+    }
+
+    const values = Object.values(record)
+      .map(extractErrorMessage)
+      .filter((msg): msg is string => Boolean(msg));
+    if (values.length) return values[0];
+
+    try {
+      return JSON.stringify(record);
+    } catch {
+      return undefined;
+    }
+  }
+
+  return undefined;
+}
+
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = authClient.getAccessToken();
   const headers = new Headers(options.headers);
@@ -35,7 +77,13 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const data = isJson ? await response.json().catch(() => ({})) : await response.text().catch(() => '');
 
   if (!response.ok) {
-    const error: any = new Error(data?.message || data?.error || `API Error: ${response.status}`);
+    const message =
+      extractErrorMessage(data?.message) ||
+      extractErrorMessage(data?.error) ||
+      extractErrorMessage(data) ||
+      `API Error: ${response.status}`;
+
+    const error: any = new Error(message);
     error.response = {
       status: response.status,
       statusText: response.statusText,

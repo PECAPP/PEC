@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   MessageCircle,
   User,
+  UtensilsCrossed,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,11 @@ export function BottomNav() {
       label: "Chat",
       icon: MessageCircle,
       path: "/chat",
+    },
+    {
+      label: "Canteen",
+      icon: UtensilsCrossed,
+      path: "/canteen",
     },
     {
       label: "Profile",
@@ -50,7 +56,7 @@ export function BottomNav() {
           return (
             <Link
               key={itemPath}
-              href={finalPath}
+              href={finalPath as any}
               className={cn(
                 "flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform",
                 isActive

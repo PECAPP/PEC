@@ -9,6 +9,7 @@ import {
 } from './config/runtime-config';
 
 export const configureApp = (app: INestApplication): void => {
+  app.setGlobalPrefix('api');
   enforceLeastPrivilegeDatabaseUser();
   const corsConfig = getCorsConfig();
   const bodySizeLimit = getBodySizeLimit();
@@ -29,7 +30,8 @@ export const configureApp = (app: INestApplication): void => {
         return;
       }
 
-      callback(new Error('Origin not allowed by CORS'));
+      console.error(`[CORS Error] Origin rejected: "${origin}". Allowed origins:`, Array.from(allowedOrigins));
+      callback(new Error(`Origin not allowed by CORS: ${origin}`));
     },
     methods: corsConfig.allowedMethods,
     allowedHeaders: corsConfig.allowedHeaders,

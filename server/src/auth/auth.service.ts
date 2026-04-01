@@ -87,6 +87,7 @@ export class AuthService {
     this.ensureNotLocked(user);
 
     const isMatch = await bcrypt.compare(pass, user.password);
+
     if (!isMatch) {
       await this.registerFailedLogin(user.id, user.failedLoginAttempts);
       throw new UnauthorizedException();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, BookOpen, UserCheck, UserX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -9,14 +9,19 @@ import { extractData } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
 
 export default function StudentAttendance({ userId, initialData }: any) {
+  const hasFetchedRef = useRef(false);
   const [loading, setLoading] = useState(!initialData?.summary);
   const [attendanceRecords, setAttendanceRecords] = useState<any[]>(initialData?.records || []);
   const [courseAttendance, setCourseAttendance] = useState<any[]>(initialData?.summary?.courses || []);
   const [overallPercentage, setOverallPercentage] = useState(initialData?.summary?.totalSummary?.percentage || 0);
 
   useEffect(() => {
-    if (!initialData?.summary) fetchData();
-  }, [userId, initialData]);
+    if (initialData?.summary) return;
+    if (!userId) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+    void fetchData();
+  }, [userId, initialData?.summary]);
 
   const fetchData = async () => {
     setLoading(true);

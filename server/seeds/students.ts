@@ -17,11 +17,12 @@ export async function seedStudents(passwordHash: string): Promise<StudentSeed[]>
     for (let studentIndex = 0; studentIndex < 15; studentIndex += 1) {
       const semester = SEMESTER_DISTRIBUTION[studentIndex % SEMESTER_DISTRIBUTION.length];
       
-      const firstName = faker.person.firstName();
-      const lastName = faker.person.lastName();
+      const isArjun = deptIndex === 0 && studentIndex === 0;
+      const firstName = isArjun ? 'Arjun' : faker.person.firstName();
+      const lastName = isArjun ? 'Sharma' : faker.person.lastName();
       const fullName = `${firstName} ${lastName}`;
       
-      const email = faker.internet.email({ firstName, lastName, provider: 'pec.edu' }).toLowerCase();
+      const email = isArjun ? 'arjun@pec.edu' : faker.internet.email({ firstName, lastName, provider: 'pec.edu' }).toLowerCase();
 
       const batch = batchForSemester(semester);
       

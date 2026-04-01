@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -39,10 +40,32 @@ model User {
   reviewedClubJoinRequests ClubJoinRequest[] @relation("ClubJoinReviewer")
   createdClubs Club[] @relation("ClubCreator")
   notices Notice[] @relation("NoticeAuthor")
+  cgpaEntries CgpaEntry[]
+  notifications Notification[]
 
   @@index([role])
   @@index([emailVerified])
   @@index([lockedUntil])
+}
+
+model CgpaEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String?
+  subjectName String
+  courseCode  String?
+  semester    Int
+  credits     Float
+  gradePoint  Float
+  courseType  String   @default("core") // core | elective | minor | honors
+  examDate    DateTime?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, semester])
+  @@index([userId, createdAt])
 }
 
 model HostelIssue {
@@ -77,13 +100,33 @@ model CampusMapRegion {
   y              Float
   width          Float
   height         Float
-  category       String
+  type           String   // 'building' | 'gate' | 'landmark'
+  color          String?
+  category       String   @default("general")
   link           String?
   organizationId String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
+  @@index([type])
   @@index([organizationId, category])
+}
+
+model CollegeSettings {
+  id                        String   @id @default("main")
+  name                      String   @default("PEC University")
+  shortName                 String   @default("PEC")
+  logo                      String?
+  primaryColor              String   @default("#000000")
+  secondaryColor            String   @default("#ffffff")
+  accentColor               String   @default("#4f46e5")
+  attendanceRequiredPercentage Float @default(75)
+  academicSession           String   @default("2024-25")
+  semester                  Int      @default(1)
+  allowRegistration         Boolean  @default(true)
+  allowLogin                Boolean  @default(true)
+  lastUpdatedBy             String?
+  updatedAt                 DateTime @updatedAt
 }
 
 model CampusMapRoad {
@@ -394,6 +437,21 @@ model ClubJoinRequest {
   @@index([clubId, status])
   @@index([requesterId, status])
   @@index([status, createdAt])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("info") // info | alert | success | error
+  link      String?  // Optional path to redirect to
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, read, createdAt])
 }
 
 model Message {

@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 import ThemeToggler from "@/components/ThemeToggler"; // Import ThemeToggler
 import { LandingColorTheme } from "@/components/LandingColorTheme"; // Import Accent Picker
 import type { UserRole } from "@/types";
+import { GoogleTranslate } from "@/components/GoogleTranslate";
 
 interface SidebarProps {
   role: UserRole;
@@ -376,12 +377,15 @@ export function Sidebar({
       {/* Mobile Fixed Bottom Controls */}
       {!collapsed && (
         <div className="lg:hidden mt-auto px-4 py-4 border-t border-sidebar-border bg-sidebar-accent/5">
-            <div className="flex items-center justify-between gap-3">
-                 <div className="scale-90 origin-left"><ThemeToggler /></div>
-                 <div className="h-6 w-[1px] bg-border" />
-                 <div className="scale-90"><LandingColorTheme /></div>
-                 <div className="h-6 w-[1px] bg-border" />
-                 {/* <div className="flex-1 min-w-0 overflow-hidden"><GoogleTranslate containerId="google_translate_sidebar" /></div> */}
+            <div className="flex flex-col gap-4">
+                 <div className="flex items-center justify-between gap-3">
+                      <div className="scale-90 origin-left"><ThemeToggler /></div>
+                      <div className="h-6 w-[1px] bg-border" />
+                      <div className="scale-90"><LandingColorTheme /></div>
+                 </div>
+                 <div className="w-full pt-2 border-t border-sidebar-border/30">
+                      <GoogleTranslate containerId="google_translate_sidebar" />
+                 </div>
             </div>
         </div>
       )}

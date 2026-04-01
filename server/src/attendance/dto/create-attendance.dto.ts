@@ -19,6 +19,12 @@ export class CreateAttendanceDto {
   @ApiPropertyOptional({ example: 'Medical leave' })
   remarks?: string;
 
+  @ApiPropertyOptional({ example: 30.7673, description: 'Latitude for geofencing' })
+  lat?: number;
+
+  @ApiPropertyOptional({ example: 76.7865, description: 'Longitude for geofencing' })
+  lng?: number;
+
   // Zod runtime validator available for services to call directly
   static validate(data: unknown): ReturnType<typeof attendanceSchema.parse> {
     return attendanceSchema.parse(data);

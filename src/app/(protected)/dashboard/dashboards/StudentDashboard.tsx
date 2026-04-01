@@ -116,6 +116,7 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         onStatClick={(type) => {
           if (type === 'attendance') window.location.href = getFullUrl('/attendance');
           if (type === 'courses') window.location.href = getFullUrl('/courses');
+          if (type === 'scores') window.location.href = getFullUrl('/score-sheet');
         }}
       />
 
@@ -136,20 +137,23 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         />
       </div>
 
-      <motion.div variants={item} className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1">
-          <AttendanceOverviewCard 
-            attendancePercentage={stats.attendancePercentage}
-            onClick={() => window.location.href = getFullUrl('/attendance')}
-            targetPercentage={requiredAttendancePercentage}
-          />
-        </div>
-        <div className="lg:col-span-2">
-          <NoticeboardCard
-            notices={noticeboardItems}
-            onViewAll={() => window.location.href = getFullUrl('/noticeboard')}
-          />
-        </div>
+      <motion.div 
+        variants={item} 
+        initial="hidden"
+        animate="show"
+        className="grid gap-6 lg:grid-cols-3"
+      >
+        <AttendanceOverviewCard 
+          className="lg:col-span-1"
+          attendancePercentage={stats.attendancePercentage}
+          onClick={() => window.location.href = getFullUrl('/attendance')}
+          targetPercentage={requiredAttendancePercentage}
+        />
+        <NoticeboardCard
+          className="lg:col-span-2"
+          notices={noticeboardItems}
+          onViewAll={() => window.location.href = getFullUrl('/noticeboard')}
+        />
       </motion.div>
 
       <Dialog open={showQRScanner} onOpenChange={setShowQRScanner}>

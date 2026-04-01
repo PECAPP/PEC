@@ -21,10 +21,10 @@ RUN npm install --legacy-peer-deps
 WORKDIR /app
 COPY server ./server
 
-# Build
+# Prepare Prisma client for runtime. We intentionally skip `npm run build`
+# because this image runs `start:dev` (transpile-only) in docker-compose.
 WORKDIR /app/server
 RUN npx prisma generate
-RUN npm run build
 
 EXPOSE 4000
 

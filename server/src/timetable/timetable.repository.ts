@@ -27,16 +27,51 @@ export class TimetableRepository extends BaseRepository {
     });
   }
 
-  async findConflicts(room: string, day: string, startTime: string, endTime: string, excludeId?: string) {
+  async findConflicts(params: {
+    room?: string | null;
+    day: string;
+    startTime: string;
+    endTime: string;
+    facultyId?: string | null;
+    batch?: string | null;
+    semester?: number | null;
+    excludeId?: string;
+  }) {
+    const { room, day, startTime, endTime, facultyId, batch, semester, excludeId } = params;
+
     return this.prisma.timetable.findFirst({
       where: {
-        room,
         day,
         id: excludeId ? { not: excludeId } : undefined,
         OR: [
-          { startTime: { gte: startTime, lt: endTime } },
-          { endTime: { gt: startTime, lte: endTime } },
-          { startTime: { lte: startTime }, endTime: { gte: endTime } }
+          // Room conflict
+          ...(room ? [{
+            room,
+            OR: [
+              { startTime: { gte: startTime, lt: endTime } },
+              { endTime: { gt: startTime, lte: endTime } },
+              { startTime: { lte: startTime }, endTime: { gte: endTime } }
+            ]
+          }] : []),
+          // Faculty busy conflict
+          ...(facultyId ? [{
+            facultyId,
+            OR: [
+              { startTime: { gte: startTime, lt: endTime } },
+              { endTime: { gt: startTime, lte: endTime } },
+              { startTime: { lte: startTime }, endTime: { gte: endTime } }
+            ]
+          }] : []),
+          // Batch/Semester overlap conflict
+          ...(batch && semester ? [{
+            batch,
+            semester,
+            OR: [
+              { startTime: { gte: startTime, lt: endTime } },
+              { endTime: { gt: startTime, lte: endTime } },
+              { startTime: { lte: startTime }, endTime: { gte: endTime } }
+            ]
+          }] : [])
         ]
       }
     });

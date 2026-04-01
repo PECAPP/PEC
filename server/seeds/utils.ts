@@ -1,7 +1,12 @@
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../prisma/generated/client';
 
-export const prisma = new PrismaClient();
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+export const prisma = new PrismaClient({ adapter });
 
 export function sample<T>(items: T[], index: number): T {
   return items[index % items.length];
@@ -50,36 +55,46 @@ export function batchForSemester(semester: number) {
 }
 
 export async function clearDatabase() {
+  if (process.env.SKIP_WIPE === 'true') {
+     console.log('Skipping database wipe (SKIP_WIPE=true)');
+     return;
+  }
+
   const prismaAny = prisma as any;
-  await prisma.auditLog.deleteMany();
-  await prismaAny.backgroundJob.deleteMany();
-  await prismaAny.featureFlag.deleteMany();
-  await prisma.attendance.deleteMany();
-  await prisma.message.deleteMany();
-  await prismaAny.notice.deleteMany();
-  await prisma.clubJoinRequest.deleteMany();
-  await prisma.club.deleteMany();
-  await prisma.userChatRoom.deleteMany();
-  await prisma.chatRoom.deleteMany();
-  await prisma.enrollment.deleteMany();
-  await prisma.timetable.deleteMany();
-  await prisma.course.deleteMany();
-  await prisma.job.deleteMany();
-  await prisma.room.deleteMany();
-  await prismaAny.department.deleteMany();
-  await (prisma as any).feeRecord.deleteMany();
-  await prisma.facultyProfile.deleteMany();
-  await prisma.studentProfile.deleteMany();
-  await prisma.passwordResetToken.deleteMany();
-  await prisma.emailVerificationToken.deleteMany();
-  await prisma.refreshToken.deleteMany();
-  await prisma.userRole.deleteMany();
-  await prisma.role.deleteMany();
-  await (prisma as any).hostelIssue.deleteMany();
-  await (prisma as any).canteenOrderItem.deleteMany();
-  await (prisma as any).canteenOrder.deleteMany();
-  await (prisma as any).canteenItem.deleteMany();
-  await prisma.user.deleteMany();
+  try {
+    await prisma.auditLog.deleteMany();
+    await prismaAny.backgroundJob.deleteMany();
+    await prismaAny.featureFlag.deleteMany();
+    await prisma.attendance.deleteMany();
+    await prisma.message.deleteMany();
+    await prismaAny.notice.deleteMany();
+    await prisma.clubJoinRequest.deleteMany();
+    await prisma.club.deleteMany();
+    await prisma.userChatRoom.deleteMany();
+    await prisma.chatRoom.deleteMany();
+    await prisma.enrollment.deleteMany();
+    await prisma.timetable.deleteMany();
+    await prisma.course.deleteMany();
+    await prisma.job.deleteMany();
+    await prisma.room.deleteMany();
+    await prismaAny.department.deleteMany();
+    await (prisma as any).feeRecord.deleteMany();
+    await prisma.facultyProfile.deleteMany();
+    await prisma.studentProfile.deleteMany();
+    await prisma.passwordResetToken.deleteMany();
+    await prisma.emailVerificationToken.deleteMany();
+    await prisma.refreshToken.deleteMany();
+    await prisma.userRole.deleteMany();
+    await prisma.role.deleteMany();
+    await (prisma as any).hostelIssue.deleteMany();
+    await (prisma as any).canteenOrderItem.deleteMany();
+    await (prisma as any).canteenOrder.deleteMany();
+    await (prisma as any).canteenItem.deleteMany();
+    await prisma.user.deleteMany();
+    console.log('Database wipe completed.');
+  } catch (error) {
+    console.warn('Wipe encountered issues, likely tables already empty or missing:', (error as any).message);
+  }
 }
 
 export function encryptField(value: string) {

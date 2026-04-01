@@ -289,6 +289,7 @@ html {
     --primary: 0 0% 100%;
     /* Pure White */
     --primary-foreground: 0 0% 0%;
+    --primary-rgb: 255, 255, 255;
     --accent: 0 0% 100%;
     /* Vibrant Yellow */
     --accent-foreground: 0 0% 0%;
@@ -306,6 +307,7 @@ html {
     --primary: 0 0% 0%;
     /* Pure Black */
     --primary-foreground: 0 0% 100%;
+    --primary-rgb: 0, 0, 0;
     --accent: 0 0% 90%;
     /* Light gray */
     --accent-foreground: 0 0% 0%;
@@ -410,6 +412,7 @@ html {
     --sidebar-background: 44 30% 6%;
     --primary: 46 95% 56%;
     --primary-foreground: 44 30% 8%;
+    --primary-rgb: 245, 158, 11;
     --ring: 46 95% 56%;
     --sidebar-primary: 46 95% 56%;
     --shadow-glow: 0 0 40px hsl(46 95% 56% / 0.14);
@@ -421,6 +424,7 @@ html {
     --sidebar-background: 46 28% 92%;
     --primary: 46 95% 42%;
     --primary-foreground: 44 30% 8%;
+    --primary-rgb: 217, 119, 6;
     --ring: 46 95% 42%;
     --sidebar-primary: 46 95% 42%;
     --shadow-glow: 0 0 30px hsl(46 95% 42% / 0.18);
@@ -483,7 +487,7 @@ html {
     @apply text-2xl font-bold tracking-tight text-foreground;
   }
 
-  .protected-shell h1 + p {
+  .protected-shell h1+p {
     @apply text-sm text-muted-foreground;
   }
 
@@ -770,6 +774,20 @@ html {
         transparent 1px),
       linear-gradient(to bottom, hsl(var(--border) / 0.5) 1px, transparent 1px);
     background-size: 40px 40px;
+  }
+
+  /* Glow Effects */
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.25);
+  }
+
+  .glow-primary-lg {
+    box-shadow: 0 0 35px rgba(var(--primary-rgb), 0.35);
+  }
+
+  .border-glow {
+    border-color: rgba(var(--primary-rgb), 0.5);
+    box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.2);
   }
 
   /* Responsive Button Container */

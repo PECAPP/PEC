@@ -38,6 +38,10 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
         },
       });
     });
+
+    this.handlers.set('attendance.check-low', async () => {
+      await this.handleLowAttendanceCheck();
+    });
   }
 
   async onModuleInit() {
@@ -247,5 +251,58 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
         lockedBy: null,
       },
     });
+  }
+
+  private async handleLowAttendanceCheck() {
+    this.logger.log('Running Low Attendance Check...');
+    
+    // 1. Get institutional threshold
+    const settings = await this.prisma.collegeSettings.findUnique({ where: { id: 'main' } });
+    const threshold = settings?.attendanceRequiredPercentage ?? 75;
+
+    // 2. Simple but effective logic: iterate over active students
+    const students = await this.prisma.user.findMany({
+      where: { role: 'student' },
+      select: { id: true, name: true }
+    });
+
+    for (const student of students) {
+       // Query attendance counts per student
+       const attendance = await (this.prisma as any).attendance.groupBy({
+         by: ['status'],
+         where: { studentId: student.id },
+         _count: { _all: true }
+       });
+
+       let present = 0;
+       let total = 0;
+
+       for (const group of attendance) {
+         const count = (group as any)._count._all;
+         total += count;
+         if (group.status === 'present') present += count;
+         if (group.status === 'late') present += 0.5 * count;
+       }
+
+       const percentage = total > 0 ? (present / total) * 100 : 100;
+
+       if (percentage < threshold && total > 5) { // Only alert if they have at least 5 sessions
+         await this.prisma.notification.upsert({
+           where: {
+             id: `att-alert-${student.id}-${new Date().toISOString().split('T')[0]}` // Dedupe by day
+           },
+           update: {}, // Don't spam if already exists today
+           create: {
+             id: `att-alert-${student.id}-${new Date().toISOString().split('T')[0]}`,
+             userId: student.id,
+             title: '📉 Low Attendance Alert',
+             message: `Your current attendance is ${percentage.toFixed(1)}%, which is below the required ${threshold}%. Please attend next classes to avoid penalties.`,
+             type: 'alert',
+             link: '/attendance'
+           }
+         });
+       }
+    }
+    this.logger.log('Low Attendance Check Completed.');
   }
 }

@@ -634,6 +634,8 @@ export const addDoc = async (col: string, payload: any) => {
       status: payload?.status,
       date: toIsoDate(payload?.date),
       subject,
+      lat: payload?.lat,
+      lng: payload?.lng,
     };
     const { data } = await API.post("/attendance", body);
     const created = unwrapSuccess<any>(data);

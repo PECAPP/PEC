@@ -10,7 +10,10 @@ import {
   ParseUUIDPipe,
   Request,
   UseGuards,
+  BadRequestException,
+  Res,
 } from '@nestjs/common';
+import { type Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { AttendanceService } from './attendance.service';
 import { AttendanceQueryDto } from './dto/attendance-query.dto';
@@ -22,7 +25,6 @@ import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { BadRequestException } from '@nestjs/common';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('attendance')
@@ -38,7 +40,6 @@ export class AttendanceController {
 
   @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('summary')
-  @Throttle({ short: { limit: 10, ttl: 60000 } })
   async getSummary(@Request() req: any, @Query('studentId') studentId?: string) {
     const targetId = req.user?.role === 'student' ? req.user.sub : studentId;
     if (!targetId) throw new BadRequestException('Student ID is required');
@@ -46,9 +47,33 @@ export class AttendanceController {
     return ok(data);
   }
 
+  @Roles('faculty', 'college_admin', 'admin')
+  @Get('export/:courseId')
+  async exportExcel(
+    @Param('courseId') courseId: string,
+    @Res() res: Response
+  ) {
+    const buffer = await this.attendanceService.generateExcel(courseId);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=attendance_${courseId}.xlsx`);
+    res.send(buffer);
+  }
+
+  @Roles('student')
+  @Get('my/export')
+  async exportMyExcel(
+    @Request() req: any,
+    @Res() res: Response
+  ) {
+    const buffer = await this.attendanceService.generateStudentExcel(req.user.sub);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=my_attendance.xlsx`);
+    res.send(buffer);
+  }
+
   @Roles('student', 'faculty', 'college_admin', 'admin')
   @Get('predict')
-  @Throttle({ short: { limit: 5, ttl: 60000 } })
+  @Throttle({ short: { limit: 20, ttl: 60000 } })
   async getPrediction(@Request() req: any, @Query('studentId') studentId?: string, @Query('target') target?: string) {
     const targetId = req.user?.role === 'student' ? req.user.sub : studentId;
     if (!targetId) throw new BadRequestException('Student ID is required');

@@ -15,6 +15,7 @@ export class AttendanceRepository extends BaseRepository {
     const where = {
       ...(query.studentId ? { studentId: query.studentId } : {}),
       ...(query.subject ? { subject: query.subject } : {}),
+      ...(query.courseId ? { subject: query.courseId } : {}),
       ...(query.status ? { status: query.status } : {}),
       ...(query.date
         ? {
