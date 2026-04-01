@@ -34,6 +34,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.1.17",
     "@nestjs/jwt": "^11.0.2",
@@ -73,6 +74,20 @@
     "tar": "^7.5.13",
     "undici": "^7.24.6",
     "path-to-regexp": "^8.4.1",
+    "@nestjs/core": {
+      "path-to-regexp": "^8.4.1"
+    },
+    "@nestjs/platform-express": {
+      "path-to-regexp": "^8.4.1"
+    },
+    "@nestjs/swagger": {
+      "path-to-regexp": "^8.4.1"
+    },
+    "@nestjs/cli": {
+      "@angular-devkit/core": {
+        "picomatch": "^4.0.4"
+      }
+    },
     "ajv": "^8.18.0",
     "picomatch": "^4.0.4",
     "handlebars": "^4.7.9",

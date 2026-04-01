@@ -119,7 +119,7 @@ export default function Help() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Link href={category.path}>
+            <Link href={category.path as any}>
               <Card className="hover:shadow-md transition-shadow cursor-pointer group">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">

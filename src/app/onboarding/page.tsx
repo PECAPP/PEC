@@ -26,7 +26,6 @@ const roleIcons: Record<UserRole, ElementType> = {
   student: GraduationCap,
   faculty: Users,
   college_admin: Building2,
-  admin: Shield,
   user: Users,
   moderator: ShieldAlert,
   placement_officer: Building2,
@@ -38,7 +37,6 @@ const roleLabels: Record<UserRole, string> = {
   student: 'Student',
   faculty: 'Faculty',
   college_admin: 'College Admin',
-  admin: 'System Admin',
   user: 'Regular User',
   moderator: 'Moderator',
   placement_officer: 'Placement Officer',
@@ -108,10 +106,10 @@ export default function Onboarding() {
       >
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <RoleIcon className="w-8 h-8 text-foreground" />
+            {(() => { const RoleIconComponent = RoleIcon as any; return <RoleIconComponent className="w-8 h-8 text-foreground" />; })()}
           </div>
           <h1 className="text-3xl font-bold mb-2">Complete Your Profile</h1>
-          <p className="text-muted-foreground">Tell us more about yourself as a {roleLabels[user.role]}</p>
+          <p className="text-muted-foreground">Tell us more about yourself as a {roleLabels[user.role as UserRole] || user.role}</p>
         </div>
 
         <Card>

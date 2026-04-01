@@ -22,7 +22,7 @@ function StatePanel({
 }: StatePanelProps) {
   return (
     <div className={cn('ui-state-box rounded-md text-center', className)}>
-      {Icon ? <Icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground" /> : null}
+      {Icon ? (() => { const IconComponent = Icon as any; return <IconComponent className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />; })() : null}
       <p className="text-sm font-medium text-foreground">{title}</p>
       {description ? <p className="text-xs text-muted-foreground mt-1">{description}</p> : null}
       {actionLabel && onAction ? (

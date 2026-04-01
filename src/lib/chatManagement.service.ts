@@ -1,23 +1,27 @@
 import api from "@/lib/api";
 
 export async function addMemberToGroup(roomId: string, userEmail: string) {
-  const search = await api.get("/users/search", {
-    params: { email: userEmail.toLowerCase().trim() },
-    validateStatus: (status) => status === 200 || status === 404,
-  });
+  try {
+    const search = await api.get<any>("/users/search", {
+      params: { email: userEmail.toLowerCase().trim() },
+    });
 
-  if (search.status === 404 || !search.data?.uid) {
-    throw new Error("User not found");
+    if (!search.data?.uid) {
+      throw new Error("User not found");
+    }
+
+    await api.post(`/chat/room/${roomId}/participants`, {
+      userId: search.data.uid,
+    });
+
+    return {
+      userId: search.data.uid,
+      userName: search.data.fullName || search.data.name || search.data.email,
+    };
+  } catch (error: any) {
+    if (error.message === "User not found") throw error;
+    throw new Error("Failed to search for user");
   }
-
-  await api.post(`/chat/room/${roomId}/participants`, {
-    userId: search.data.uid,
-  });
-
-  return {
-    userId: search.data.uid,
-    userName: search.data.fullName || search.data.name || search.data.email,
-  };
 }
 
 export async function removeMemberFromGroup(roomId: string, userId: string) {

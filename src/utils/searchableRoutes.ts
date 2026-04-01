@@ -52,6 +52,12 @@ export const searchableRoutes = [
     keywords: ["schedule", "routine"],
   },
   {
+    title: "Academic Calendar",
+    path: "/academic-calendar",
+    icon: Calendar,
+    keywords: ["calendar", "events", "holidays", "dates", "schedule"],
+  },
+  {
     title: "Attendance",
     path: "/attendance",
     icon: Calendar,

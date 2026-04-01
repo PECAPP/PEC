@@ -25,7 +25,7 @@ export function UserCard({ user }: { user: any }) {
 export function JobCard({ job }: { job: any }) {
   const router = useRouter();
   return (
-    <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => router.push(`/career`)}>
+    <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => router.push(`/career` as any)}>
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
           <div>
@@ -47,7 +47,7 @@ export function JobCard({ job }: { job: any }) {
 export function DriveCard({ drive }: { drive: any }) {
   const router = useRouter();
   return (
-    <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => router.push(`/placements/drives`)}>
+    <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => router.push(`/placements/drives` as any)}>
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
            <div>

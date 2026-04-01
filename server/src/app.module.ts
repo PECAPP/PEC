@@ -27,6 +27,7 @@ import { StudentPortfolioModule } from './student-portfolio/student-portfolio.mo
 import { AttendanceSessionModule } from './attendance-session/attendance-session.module';
 import { FacultyBioSystemModule } from './faculty-bio-system/faculty-bio-system.module';
 import { CgpaEntriesModule } from './cgpa-entries/cgpa-entries.module';
+import { AcademicCalendarModule } from './academic-calendar/academic-calendar.module';
 
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
@@ -66,6 +67,7 @@ import { ClubsModule } from './clubs/clubs.module';
     FacultyBioSystemModule,
     CollegeSettingsModule,
     ClubsModule,
+    AcademicCalendarModule,
     ThrottlerModule.forRoot([{
       name: 'short',
       ttl: 60000,

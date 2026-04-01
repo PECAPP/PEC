@@ -12,6 +12,7 @@ import {
   UserCircle,
   Book,
   Calendar,
+  CalendarDays,
   ClipboardCheck,
   FileText,
   MapPin,
@@ -113,6 +114,12 @@ const navItems: NavItem[] = [
     roles: ["student", "faculty", "college_admin"],
   },
   {
+    icon: CalendarDays,
+    label: "Academic Calendar",
+    path: "/academic-calendar",
+    roles: ["student", "faculty", "college_admin"],
+  },
+  {
     icon: BarChart3,
     label: "Examinations",
     path: "/examinations",
@@ -174,6 +181,12 @@ const navItems: NavItem[] = [
     roles: ["college_admin"],
   },
   {
+    icon: Calendar,
+    label: "Manage Academic Calendar",
+    path: "/admin/academic-calendar",
+    roles: ["college_admin"],
+  },
+  {
     icon: Settings,
     label: "Settings",
     path: "/settings",
@@ -205,7 +218,7 @@ export function Sidebar({
     },
     {
       title: 'Academics',
-      paths: ['/courses', '/timetable', '/examinations', '/attendance', '/score-sheet', '/course-materials', '/resume-builder'],
+      paths: ['/courses', '/timetable', '/examinations', '/academic-calendar', '/attendance', '/score-sheet', '/course-materials', '/resume-builder'],
     },
     {
       title: 'Campus',
@@ -255,15 +268,18 @@ export function Sidebar({
             isActive && "sidebar-item-active"
           )}
         >
-          {collapsed ? (
-            <item.icon
-              className={cn(
-                "w-5 h-5 shrink-0 transition-colors",
-                isActive ? "text-primary-foreground" : "text-sidebar-foreground/75"
-              )}
-              strokeWidth={1.9}
-            />
-          ) : (
+          {collapsed ? (() => {
+            const Icon = item.icon as any;
+            return (
+              <Icon
+                className={cn(
+                  "w-5 h-5 shrink-0 transition-colors",
+                  isActive ? "text-primary-foreground" : "text-sidebar-foreground/75"
+                )}
+                strokeWidth={1.9}
+              />
+            );
+          })() : (
             <AnimatePresence mode="wait">
               <motion.span
                 initial={{ opacity: 0, width: 0 }}

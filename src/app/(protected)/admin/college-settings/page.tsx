@@ -32,7 +32,6 @@ import {
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useRouter } from 'next/navigation';
-;
 import { uploadToCloudinary } from '@/lib/cloudinaryManager';
 import { processLogoImage } from '@/lib/logoProcessor';
 import { doc, getDoc, setDoc, serverTimestamp } from '@/lib/dataClient';
@@ -40,11 +39,8 @@ import type { CollegeSettings as CollegeSettingsType } from '@/types';
 
 type CollegeSettings = CollegeSettingsType;
 
-interface Props {
-  embedded?: boolean;
-}
-
-export default function CollegeSettings({ embedded }: Props) {
+export default function CollegeSettings() {
+  const embedded = false;
   const router = useRouter();
   const { user, isAdmin, loading: authLoading } = usePermissions();
   const [loading, setLoading] = useState(true);

@@ -787,3 +787,28 @@ model FacultyConsultation {
   @@index([facultyId])
   @@index([facultyId, status])
 }
+
+model AcademicCalendarEvent {
+  id             String   @id @default(uuid())
+  title          String
+  description    String   @default("")
+  date           DateTime
+  endDate        DateTime?
+  startTime      String?
+  endTime        String?
+  eventType      String   // holiday|exam|event|deadline|working-day|orientation|registration|result|recess
+  category       String   @default("academic") // academic|examination|holiday|administrative|cultural|sports|technical
+  location       String?
+  importance     String   @default("medium") // high|medium|low
+  targetAudience String?  // all|students|faculty|specific-department
+  rawData        Json?
+  isEditable     Boolean  @default(true)
+  createdBy      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([date, eventType])
+  @@index([category])
+  @@index([importance])
+  @@index([date])
+}

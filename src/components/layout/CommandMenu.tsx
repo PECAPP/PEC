@@ -105,7 +105,7 @@ export default function CommandMenu() {
                 key={route.path}
                 onSelect={() => {
                   setOpen(false);
-                  router.push(route.path);
+                  router.push(route.path as any);
                 }}
               >
                 <route.icon className="mr-2 h-4 w-4" />

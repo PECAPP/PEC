@@ -45,7 +45,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
         transition: {
           delay,
           duration,
-          ease: "easeInOut",
+          ease: "easeInOut" as const,
           staggerChildren: stagger,
         }
       }
