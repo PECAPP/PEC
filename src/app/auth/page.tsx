@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { getServerSession } from '@/lib/server-auth';
 import AuthClient from './AuthClient';
 
 /**
@@ -7,11 +7,10 @@ import AuthClient from './AuthClient';
  * Handles initial session check to prevent client-side flicker.
  */
 export default async function AuthPage() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
+  const user = await getServerSession();
 
-  // Only redirect if a real access token is present.
-  if (accessToken) {
+  // Only redirect if a valid session with identity is present.
+  if (user) {
     return redirect('/dashboard');
   }
 

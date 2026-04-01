@@ -1,25 +1,25 @@
 export const EVENT_COLORS: Record<string, string> = {
-  holiday: 'bg-rose-500/10 text-rose-600 border-rose-200/50 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800/50',
-  exam: 'bg-violet-500/10 text-violet-600 border-violet-200/50 dark:bg-violet-900/20 dark:text-violet-400 dark:border-violet-800/50',
-  event: 'bg-blue-500/10 text-blue-600 border-blue-200/50 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/50',
-  deadline: 'bg-amber-500/10 text-amber-600 border-amber-200/50 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/50',
-  'working-day': 'bg-emerald-500/10 text-emerald-600 border-emerald-200/50 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/50',
-  orientation: 'bg-cyan-500/10 text-cyan-600 border-cyan-200/50 dark:bg-cyan-900/20 dark:text-cyan-400 dark:border-cyan-800/50',
-  registration: 'bg-indigo-500/10 text-indigo-600 border-indigo-200/50 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800/50',
-  result: 'bg-yellow-500/10 text-yellow-600 border-yellow-200/50 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800/50',
-  recess: 'bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-200/50 dark:bg-fuchsia-900/20 dark:text-fuchsia-400 dark:border-fuchsia-800/50',
+  holiday: 'bg-[hsl(160,84%,39%,0.1)] text-[hsl(160,84%,39%)] border-[hsl(160,84%,39%,0.2)] dark:bg-[hsl(160,70%,42%,0.2)] dark:text-[hsl(160,70%,42%)] dark:border-[hsl(160,70%,42%,0.3)]',
+  exam: 'bg-[hsl(0,72%,51%,0.1)] text-[hsl(0,72%,51%)] border-[hsl(0,72%,51%,0.2)] dark:bg-[hsl(0,62%,55%,0.2)] dark:text-[hsl(0,62%,55%)] dark:border-[hsl(0,62%,55%,0.3)]',
+  event: 'bg-[hsl(220,90%,45%,0.1)] text-[hsl(220,90%,45%)] border-[hsl(220,90%,45%,0.2)] dark:bg-[hsl(220,90%,56%,0.2)] dark:text-[hsl(220,90%,56%)] dark:border-[hsl(220,90%,56%,0.3)]',
+  deadline: 'bg-[hsl(38,92%,50%,0.1)] text-[hsl(38,92%,50%)] border-[hsl(38,92%,50%,0.2)] dark:bg-[hsl(38,92%,50%,0.2)] dark:text-[hsl(38,92%,50%)] dark:border-[hsl(38,92%,50%,0.3)]',
+  'working-day': 'bg-[hsl(180,60%,45%,0.1)] text-[hsl(180,60%,45%)] border-[hsl(180,60%,45%,0.2)] dark:bg-[hsl(180,50%,55%,0.2)] dark:text-[hsl(180,50%,55%)] dark:border-[hsl(180,50%,55%,0.3)]',
+  orientation: 'bg-[hsl(190,90%,45%,0.1)] text-[hsl(190,90%,45%)] border-[hsl(190,90%,45%,0.2)] dark:bg-[hsl(190,80%,55%,0.2)] dark:text-[hsl(190,80%,55%)] dark:border-[hsl(190,80%,55%,0.3)]',
+  registration: 'bg-[hsl(270,70%,50%,0.1)] text-[hsl(270,70%,50%)] border-[hsl(270,70%,50%,0.2)] dark:bg-[hsl(270,70%,60%,0.2)] dark:text-[hsl(270,70%,60%)] dark:border-[hsl(270,70%,60%,0.3)]',
+  result: 'bg-[hsl(46,95%,42%,0.1)] text-[hsl(46,95%,42%)] border-[hsl(46,95%,42%,0.2)] dark:bg-[hsl(46,95%,56%,0.2)] dark:text-[hsl(46,95%,56%)] dark:border-[hsl(46,95%,56%,0.3)]',
+  recess: 'bg-[hsl(220,10%,45%,0.1)] text-[hsl(220,10%,45%)] border-[hsl(220,10%,45%,0.2)] dark:bg-[hsl(220,10%,60%,0.2)] dark:text-[hsl(220,10%,60%)] dark:border-[hsl(220,10%,60%,0.3)]',
 };
 
 export const EVENT_DOT_COLORS: Record<string, string> = {
-  holiday: 'bg-rose-500 shadow-[0_0_8px_-1px_rgba(244,63,94,0.6)]',
-  exam: 'bg-violet-500 shadow-[0_0_8px_-1px_rgba(139,92,246,0.6)]',
-  event: 'bg-blue-500 shadow-[0_0_8px_-1px_rgba(59,130,246,0.6)]',
-  deadline: 'bg-amber-500 shadow-[0_0_8px_-1px_rgba(245,158,11,0.6)]',
-  'working-day': 'bg-emerald-500 shadow-[0_0_8px_-1px_rgba(16,185,129,0.6)]',
-  orientation: 'bg-cyan-500 shadow-[0_0_8px_-1px_rgba(6,182,212,0.6)]',
-  registration: 'bg-indigo-500 shadow-[0_0_8px_-1px_rgba(99,102,241,0.6)]',
-  result: 'bg-yellow-500 shadow-[0_0_8px_-1px_rgba(234,179,8,0.6)]',
-  recess: 'bg-fuchsia-500 shadow-[0_0_8px_-1px_rgba(217,70,239,0.6)]',
+  holiday: 'bg-[hsl(160,84%,39%)] shadow-[0_0_10px_rgba(16,185,129,0.5)]',
+  exam: 'bg-[hsl(0,72%,51%)] shadow-[0_0_10px_rgba(239,68,68,0.5)]',
+  event: 'bg-[hsl(220,90%,45%)] shadow-[0_0_10px_rgba(59,130,246,0.5)]',
+  deadline: 'bg-[hsl(38,92%,50%)] shadow-[0_0_10px_rgba(245,158,11,0.5)]',
+  'working-day': 'bg-[hsl(180,60%,45%)] shadow-[0_0_10px_rgba(20,184,166,0.5)]',
+  orientation: 'bg-[hsl(190,90%,45%)] shadow-[0_0_10px_rgba(6,182,212,0.5)]',
+  registration: 'bg-[hsl(270,70%,50%)] shadow-[0_0_10px_rgba(168,85,247,0.5)]',
+  result: 'bg-[hsl(46,95%,42%)] shadow-[0_0_10px_rgba(234,179,8,0.5)]',
+  recess: 'bg-[hsl(220,10%,45%)] shadow-[0_0_10px_rgba(100,116,139,0.5)]',
 };
 
 export const EVENT_LABELS: Record<string, string> = {

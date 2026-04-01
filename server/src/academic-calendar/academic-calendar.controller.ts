@@ -59,10 +59,10 @@ export class AcademicCalendarController {
   @Post('bulk-import')
   @Roles('admin')
   async bulkImport(@Body() body: { events: CreateAcademicCalendarEventDto[] }, @Query('userId') userId?: string) {
-    const createdEvents = await this.calendarService.createMany(body.events, userId);
+    const createdEvents = await this.calendarService.replaceAll(body.events, userId);
 
     return {
-      message: `Successfully imported ${createdEvents.length} events`,
+      message: `Successfully replaced calendar with ${createdEvents.length} events`,
       events: createdEvents,
     };
   }

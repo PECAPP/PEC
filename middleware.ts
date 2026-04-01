@@ -46,18 +46,19 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Deep validation: check expiration and structure
+    // Deep validation: check expiration and identity
     const payload = parseJwt(accessToken);
     const isExpired = payload?.exp ? Date.now() >= payload.exp * 1000 : false;
+    const hasIdentity = payload?.sub || payload?.uid;
 
-    if (!payload || isExpired) {
+    if (!payload || isExpired || !hasIdentity) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth";
       url.searchParams.set("callbackUrl", encodeURIComponent(pathname));
-      url.searchParams.set("error", "session_expired");
+      url.searchParams.set("error", isExpired ? "session_expired" : "invalid_identity");
       const response = NextResponse.redirect(url);
 
-      // Clean up orphaned cookie
+      // Clean up orphaned or invalid cookie
       response.cookies.delete("access_token");
       return response;
     }
@@ -67,8 +68,9 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith("/auth") && accessToken) {
     const payload = parseJwt(accessToken);
     const isExpired = payload?.exp ? Date.now() >= payload.exp * 1000 : false;
+    const hasIdentity = payload?.sub || payload?.uid;
 
-    if (payload && !isExpired) {
+    if (payload && !isExpired && hasIdentity) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);

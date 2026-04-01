@@ -55,21 +55,25 @@ export class AcademicCalendarService {
     });
   }
 
-  async createMany(events: CreateAcademicCalendarEventDto[], userId?: string) {
-    const createdEvents = await Promise.all(
-      events.map((event) =>
-        this.prisma.academicCalendarEvent.create({
-          data: {
-            ...event,
-            date: new Date(event.date),
-            endDate: event.endDate ? new Date(event.endDate) : null,
-            createdBy: userId,
-          },
-        })
-      )
-    );
+  async replaceAll(events: CreateAcademicCalendarEventDto[], userId?: string) {
+    return this.prisma.$transaction(async (tx) => {
+      await tx.academicCalendarEvent.deleteMany();
 
-    return createdEvents;
+      const createdEvents = await Promise.all(
+        events.map((event) =>
+          tx.academicCalendarEvent.create({
+            data: {
+              ...event,
+              date: new Date(event.date),
+              endDate: event.endDate ? new Date(event.endDate) : null,
+              createdBy: userId,
+            },
+          })
+        )
+      );
+
+      return createdEvents;
+    });
   }
 
   async update(id: string, data: UpdateAcademicCalendarEventDto) {
