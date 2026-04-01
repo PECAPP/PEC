@@ -1,0 +1,110 @@
+# MISSING FEATURES - MUST BE ADDED
+# Core features that should be implemented for a complete system
+
+================================================================================
+## 1. Syllabus Management (HIGH PRIORITY)
+--------------------------------------------------------------------------------
+Description: Faculty-driven curriculum management with lesson plans and
+             objective tracking for accreditation readiness
+Modules Needed: Syllabus creation, lesson plan builder, topic tracking,
+                learning objectives mapping
+
+================================================================================
+## 2. Academic Calendar (HIGH PRIORITY) 
+--------------------------------------------------------------------------------
+Description: Event scheduling, holiday management, semester planning
+Modules Needed: Calendar view, event creation, holiday list, semester
+                management, important date reminders
+
+================================================================================
+## 3. Assignment Submission (HIGH PRIORITY)
+--------------------------------------------------------------------------------
+Description: Student assignment upload, grading, late submission tracking
+Modules Needed: Assignment creation by faculty, file upload by students,
+                grading interface, plagiarism check integration, late
+                submission penalty calculation
+
+================================================================================
+## 4. Exam Results/Grades (HIGH PRIORITY)
+--------------------------------------------------------------------------------
+Description: Grade entry by faculty, transcript view for students
+Modules Needed: Grade submission, grade calculation (SGPA/CGPA), result
+                publication, transcript generation, grade appeals
+
+================================================================================
+## 5. Library Integration (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Book search, availability, borrowing records, due dates
+Modules Needed: Book catalog, search functionality, borrowing system,
+                return tracking, overdue notifications, fine calculation
+
+================================================================================
+## 6. Attendance Notifications (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Push notifications for low attendance warnings
+Modules Needed: Real-time notifications, attendance threshold alerts,
+                parent notification integration, email/SMS alerts
+
+================================================================================
+## 7. Leave Management (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Student/faculty leave applications and approval workflow
+Modules Needed: Leave request form, approval workflow, leave balance tracking,
+                holiday calendar integration, notification to approvers
+
+================================================================================
+## 8. Feedback System (MEDIUM PRIORITY)
+--------------------------------------------------------------------------------
+Description: Course feedback, faculty evaluation, infrastructure rating
+Modules Needed: Feedback forms, anonymous submission, rating scales,
+                result analytics for admin, improvement suggestions
+
+================================================================================
+## 9. Student Profile Enhancements (MEDIUM PRIORITY)->partly done
+--------------------------------------------------------------------------------
+Description: GitHub portfolio, LinkedIn integration, skills showcase
+Modules Needed: GitHub API integration, LinkedIn import, skill tags,
+                portfolio/project showcase, resume download
+
+================================================================================
+## 10. Faculty Bio System (MEDIUM PRIORITY)->done
+--------------------------------------------------------------------------------
+Description: Professional biography, achievements, publications
+Modules Needed: Bio editor, research publications, awards, conference
+                presentations, consultation history
+
+
+
+
+
+
+
+
+Feature 9: Student Profile Enhancements
+Backend (/student-portfolio):
+- 3 new Prisma models: StudentProject, StudentSkill, ResumeProfile
+- Full CRUD endpoints for projects and skills
+- GitHub repo sync via /student-portfolio/github/sync
+Frontend (/student-portfolio):
+- Projects tab: Create/edit/delete projects with tech stack, GitHub/live URLs, featured flag
+- Skills tab: Categorized skills (Technical, Soft, Tools, Languages) with proficiency sliders
+- GitHub tab: Sync repos from GitHub API, import repos to portfolio with one click
+Feature 10: Faculty Bio System
+Backend (/faculty-bio-system):
+- 4 new Prisma models: FacultyPublication, FacultyAward, FacultyConference, FacultyConsultation
+- Full CRUD for each entity type
+- /faculty-bio-system/:facultyId returns complete profile with stats
+Frontend (/faculty-bio-system):
+- Overview tab: Stats dashboard + biography + qualifications
+- Publications tab: Journal articles, conference papers, DOI, citations, co-authors
+- Awards tab: Academic/research/teaching/service awards
+- Conferences tab: Presentations, keynotes, organizing roles
+- Consultations tab: Industry engagements with status tracking
+Next Steps
+1. Restart the backend server — Prisma client needs regeneration (DLL file lock prevented it):
+      cd server && npx prisma generate
+   npm run start:dev
+   
+2. Set API keys in server/.env:
+   - OPENAI_API_KEY — for AI features
+   - GITHUB_TOKEN — for higher GitHub API rate limits

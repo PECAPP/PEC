@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 
+// Types
+import { AdminDashboardData, Course, User } from '../../../../shared/types';
+
 // Components
 import { AdminStatsCards } from './components/AdminStatsCards';
 import { CoursesTable } from './components/CoursesTable';
@@ -30,7 +33,7 @@ const AdminAnalyticsCharts = dynamic(
 );
 
 export interface AdminDashboardProps {
-  initialData?: any;
+  initialData?: AdminDashboardData;
 }
 
 export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
@@ -88,8 +91,8 @@ export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="relative overflow-hidden p-6 rounded-2xl bg-card border border-border flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-sm">
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="relative overflow-hidden p-8 rounded-2xl bg-card/60 backdrop-blur-md border border-border flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-xl glass-premium">
         <div className="z-10">
           <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-wider mb-2">
             System Administration

@@ -721,6 +721,28 @@ html {
     transition-duration: var(--motion-base);
   }
 
+  /* GLASSMORHISM ENHANCEMENTS */
+  .glass-premium {
+    @apply backdrop-blur-2xl border border-white/20 bg-white/5 shadow-2xl;
+  }
+
+  .glass-card {
+    @apply glass-premium rounded-2xl overflow-hidden transition-all duration-300;
+  }
+
+  .glass-card:hover {
+    @apply border-white/30 bg-white/10 scale-[1.01];
+  }
+
+  /* CHART GRADIENT WRAPPERS */
+  .chart-wrapper {
+    @apply relative overflow-hidden rounded-xl border border-border bg-card/40 backdrop-blur-sm p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:bg-card/60;
+  }
+
+  .chart-indicator-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  }
+
   /* Enforce brutalist sharp corners */
   .strict-sharp-corners,
   .strict-sharp-corners * {

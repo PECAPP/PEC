@@ -60,30 +60,23 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       const summaryCourses = Array.isArray(summary.courses) ? summary.courses : [];
       const fallbackCourses = Array.isArray(allCourses) ? allCourses : [];
       
-      // Enrich enrolled courses with full details from allCourses
+      // Enrich enrolled courses with full details from summary (now comprehensive)
       const normalizedEnrolled: Course[] = summaryCourses.map((course: any, index: number) => {
         const idToMatch = String(course.courseId || course.id || '');
-        const matchById = fallbackCourses.find((c) => String(c.id) === idToMatch);
-        const matchByCode = fallbackCourses.find(
-          (c) => c.code === course.courseCode || c.code === course.code
-        );
-        const matched = matchById ?? matchByCode;
-
-        const resolvedId = idToMatch || matched?.id || `course-${index}`;
-
+        
         return {
-          id: resolvedId,
-          code: course.code ?? course.courseCode ?? matched?.code ?? 'COURSE',
-          name: course.name ?? course.courseName ?? matched?.name ?? 'Course',
-          department: course.department ?? matched?.department ?? 'General',
-          semester: course.semester ?? matched?.semester ?? 0,
-          credits: course.credits ?? matched?.credits ?? 0,
-          facultyName: course.facultyName ?? matched?.facultyName ?? '',
-          maxStudents: course.maxStudents ?? matched?.maxStudents ?? 0,
-          enrolledStudents: course.enrolledStudents ?? matched?.enrolledStudents ?? 0,
-          description: course.description ?? matched?.description,
-          type: course.type ?? matched?.type,
-          instructor: (course.instructor ?? course.facultyName ?? matched?.instructor ?? matched?.facultyName) as string,
+          id: idToMatch || `course-${index}`,
+          code: course.courseCode ?? course.code ?? 'COURSE',
+          name: course.courseName ?? course.name ?? 'Course',
+          department: course.department ?? 'General',
+          semester: course.semester ?? 0,
+          credits: course.credits ?? 0,
+          facultyName: course.instructor ?? course.facultyName ?? '',
+          maxStudents: course.maxStudents ?? 0,
+          enrolledStudents: course.enrolledStudents ?? 0,
+          description: course.description ?? '',
+          type: course.type ?? 'Core',
+          instructor: (course.instructor ?? course.facultyName) as string,
         };
       });
 
@@ -102,7 +95,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       const scheduleItems = safeTimetable
         .filter((t: any) => enrolledCourseIds.has(String(t.courseId)))
         .map((t: any) => {
-          const course = allCourses.find((c: any) => String(c.id) === String(t.courseId));
+          const course = normalizedEnrolled.find((c: any) => String(c.id) === String(t.courseId));
           return {
             ...t,
             id: t.id || `schedule-${t.courseId}-${t.day}-${t.startTime}`,
@@ -168,16 +161,15 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         return res;
       };
 
-      const [summaryRes, coursesRes, timetableRes, noticeboardRes] = await Promise.all([
+      const [summaryRes, timetableRes, noticeboardRes] = await Promise.all([
         api.get('/attendance/summary'),
-        api.get('/courses'),
         api.get('/timetable'),
         api.get('/noticeboard', { params: { limit: 4, offset: 0 } }),
       ]);
 
       processDashboardData(
         getData(summaryRes),
-        getData(coursesRes) || [],
+        [], // allCourses no longer needed for details
         getData(timetableRes) || [],
         getData(noticeboardRes) || []
       );
@@ -199,7 +191,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     if (initialData) {
       processDashboardData(
         initialData.summary,
-        initialData.courses || [],
+        [], // allCourses no longer provided/needed
         initialData.timetable || [],
         initialData.noticeboard || initialData.notices || []
       );

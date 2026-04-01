@@ -7,10 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 const {
   Decimal,
-  DbNull,
-  JsonNull,
-  AnyNull,
-  NullTypes,
+  objectEnumValues,
   makeStrictEnum,
   Public,
   getRuntime,
@@ -24,12 +21,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.6.0
- * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
+ * Prisma Client JS version: 6.19.2
+ * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
  */
 Prisma.prismaVersion = {
-  client: "7.6.0",
-  engine: "75cbdc1eb7150937890ad5465d861175c6624711"
+  client: "6.19.2",
+  engine: "c2990dca591cba766e3b7ef5d9e8a84796e47ab7"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -101,11 +98,15 @@ In case this error is unexpected for you, please report it in https://pris.ly/pr
 /**
  * Shorthand utilities for JSON filtering
  */
-Prisma.DbNull = DbNull
-Prisma.JsonNull = JsonNull
-Prisma.AnyNull = AnyNull
+Prisma.DbNull = objectEnumValues.instances.DbNull
+Prisma.JsonNull = objectEnumValues.instances.JsonNull
+Prisma.AnyNull = objectEnumValues.instances.AnyNull
 
-Prisma.NullTypes = NullTypes
+Prisma.NullTypes = {
+  DbNull: objectEnumValues.classes.DbNull,
+  JsonNull: objectEnumValues.classes.JsonNull,
+  AnyNull: objectEnumValues.classes.AnyNull
+}
 
 
 
@@ -461,7 +462,29 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   date: 'date',
   status: 'status',
   subject: 'subject',
-  studentId: 'studentId'
+  studentId: 'studentId',
+  sessionId: 'sessionId',
+  markedAt: 'markedAt',
+  method: 'method',
+  courseId: 'courseId',
+  facultyId: 'facultyId',
+  lat: 'lat',
+  lng: 'lng'
+};
+
+exports.Prisma.AttendanceSessionScalarFieldEnum = {
+  id: 'id',
+  facultyId: 'facultyId',
+  courseId: 'courseId',
+  courseName: 'courseName',
+  date: 'date',
+  startTime: 'startTime',
+  qrCode: 'qrCode',
+  active: 'active',
+  expiresAt: 'expiresAt',
+  attendanceCount: 'attendanceCount',
+  createdAt: 'createdAt',
+  endedAt: 'endedAt'
 };
 
 exports.Prisma.ExamScheduleScalarFieldEnum = {
@@ -567,6 +590,110 @@ exports.Prisma.CanteenOrderItemScalarFieldEnum = {
   price: 'price'
 };
 
+exports.Prisma.ScoreEntryScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  courseName: 'courseName',
+  courseCode: 'courseCode',
+  term: 'term',
+  maxMarks: 'maxMarks',
+  score: 'score',
+  grade: 'grade',
+  examDate: 'examDate',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ResumeProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  personalInfo: 'personalInfo',
+  education: 'education',
+  experience: 'experience',
+  projects: 'projects',
+  skills: 'skills',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StudentProjectScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  title: 'title',
+  description: 'description',
+  techStack: 'techStack',
+  githubUrl: 'githubUrl',
+  liveUrl: 'liveUrl',
+  imageUrl: 'imageUrl',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  isFeatured: 'isFeatured',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StudentSkillScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  name: 'name',
+  level: 'level',
+  category: 'category',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FacultyPublicationScalarFieldEnum = {
+  id: 'id',
+  facultyId: 'facultyId',
+  title: 'title',
+  journal: 'journal',
+  conference: 'conference',
+  year: 'year',
+  doi: 'doi',
+  url: 'url',
+  abstract: 'abstract',
+  citations: 'citations',
+  coAuthors: 'coAuthors',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FacultyAwardScalarFieldEnum = {
+  id: 'id',
+  facultyId: 'facultyId',
+  title: 'title',
+  description: 'description',
+  awardedBy: 'awardedBy',
+  year: 'year',
+  category: 'category',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FacultyConferenceScalarFieldEnum = {
+  id: 'id',
+  facultyId: 'facultyId',
+  name: 'name',
+  location: 'location',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  role: 'role',
+  presentationTitle: 'presentationTitle',
+  description: 'description',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FacultyConsultationScalarFieldEnum = {
+  id: 'id',
+  facultyId: 'facultyId',
+  organization: 'organization',
+  description: 'description',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -627,6 +754,7 @@ exports.Prisma.ModelName = {
   Message: 'Message',
   UserChatRoom: 'UserChatRoom',
   Attendance: 'Attendance',
+  AttendanceSession: 'AttendanceSession',
   ExamSchedule: 'ExamSchedule',
   Job: 'Job',
   AuditLog: 'AuditLog',
@@ -634,7 +762,15 @@ exports.Prisma.ModelName = {
   BackgroundJob: 'BackgroundJob',
   CanteenItem: 'CanteenItem',
   CanteenOrder: 'CanteenOrder',
-  CanteenOrderItem: 'CanteenOrderItem'
+  CanteenOrderItem: 'CanteenOrderItem',
+  ScoreEntry: 'ScoreEntry',
+  ResumeProfile: 'ResumeProfile',
+  StudentProject: 'StudentProject',
+  StudentSkill: 'StudentSkill',
+  FacultyPublication: 'FacultyPublication',
+  FacultyAward: 'FacultyAward',
+  FacultyConference: 'FacultyConference',
+  FacultyConsultation: 'FacultyConsultation'
 };
 
 /**

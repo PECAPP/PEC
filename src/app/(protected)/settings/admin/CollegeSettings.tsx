@@ -104,20 +104,20 @@ export default function CollegeSettings({ embedded }: Props) {
       if (settingsSnap.exists()) {
         const data = settingsSnap.data() as CollegeSettings;
         setSettings(data);
-        setCollegeName(data.collegeName);
+        setCollegeName(data.collegeName || '');
         setCollegeShortName(data.collegeShortName || '');
-        setEmail(data.email);
-        setPhone(data.phone);
-        setAddress(data.address);
-        setWebsite(data.website);
-        setTagline(data.tagline);
-        setLogoUrl(data.logoUrl);
-      setLogoDisplayMode(data.logoDisplayMode || 'both');
-      setCloudinaryCloudName(data.cloudinaryCloudName || '');
-      setCloudinaryPreset(data.cloudinaryPreset || '');
-      setAttendanceRequiredPercentage(
-        typeof data.attendanceRequiredPercentage === 'number' ? data.attendanceRequiredPercentage : 75
-      );
+        setEmail(data.email || '');
+        setPhone(data.phone || '');
+        setAddress(data.address || '');
+        setWebsite(data.website || '');
+        setTagline(data.tagline || '');
+        setLogoUrl(data.logoUrl || '');
+        setLogoDisplayMode(data.logoDisplayMode || 'both');
+        setCloudinaryCloudName(data.cloudinaryCloudName || '');
+        setCloudinaryPreset(data.cloudinaryPreset || '');
+        setAttendanceRequiredPercentage(
+          typeof data.attendanceRequiredPercentage === 'number' ? data.attendanceRequiredPercentage : 75
+        );
     } else {
       setSettings(null);
       setAttendanceRequiredPercentage(75);
@@ -250,17 +250,17 @@ export default function CollegeSettings({ embedded }: Props) {
   const saveSettings = async (logoUrl: string) => {
     try {
       const newSettings: CollegeSettings = {
-        collegeName: collegeName.trim(),
-        collegeShortName: collegeShortName.trim() || '',
-        email: email.trim(),
-        phone: phone.trim(),
-        address: address.trim(),
-        website: website.trim(),
-        tagline: tagline.trim(),
+        collegeName: (collegeName || '').trim(),
+        collegeShortName: (collegeShortName || '').trim(),
+        email: (email || '').trim(),
+        phone: (phone || '').trim(),
+        address: (address || '').trim(),
+        website: (website || '').trim(),
+        tagline: (tagline || '').trim(),
         logoUrl: logoUrl,
         logoDisplayMode: logoDisplayMode,
-        cloudinaryCloudName: cloudinaryCloudName.trim() || '',
-        cloudinaryPreset: cloudinaryPreset.trim() || '',
+        cloudinaryCloudName: (cloudinaryCloudName || '').trim(),
+        cloudinaryPreset: (cloudinaryPreset || '').trim(),
         attendanceRequiredPercentage: Math.max(0, Math.min(100, Math.round(attendanceRequiredPercentage || 75))),
         lastUpdated: serverTimestamp(),
         updatedBy: user?.email || 'unknown',

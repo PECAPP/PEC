@@ -19,6 +19,21 @@ export class CreateAttendanceDto {
   @ApiPropertyOptional({ example: 'Medical leave' })
   remarks?: string;
 
+  @ApiPropertyOptional({ description: 'Attendance Session UUID' })
+  sessionId?: string;
+
+  @ApiPropertyOptional({ description: 'ISO marked at timestamp' })
+  markedAt?: string;
+
+  @ApiPropertyOptional({ enum: ['qr', 'manual'], default: 'manual' })
+  method?: 'qr' | 'manual';
+
+  @ApiPropertyOptional({ description: 'Course UUID' })
+  courseId?: string;
+
+  @ApiPropertyOptional({ description: 'Faculty UUID' })
+  facultyId?: string;
+
   @ApiPropertyOptional({ example: 30.7673, description: 'Latitude for geofencing' })
   lat?: number;
 

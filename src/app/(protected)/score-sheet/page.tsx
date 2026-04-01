@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, FileText } from 'lucide-react';
+import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, FileText, Star, Gauge, Loader2 } from 'lucide-react';
 import { 
   AreaChart, 
   Area, 
@@ -84,7 +84,7 @@ export default function ScoreSheetPage() {
   const [entries, setEntries] = useState<CgpaEntry[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [entriesLoading, setEntriesLoading] = useState(false);
+  const [apiLoading, setApiLoading] = useState(false);
   const [savingEntry, setSavingEntry] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [courses, setCourses] = useState<CourseOption[]>([]);
@@ -99,7 +99,7 @@ export default function ScoreSheetPage() {
     let active = true;
     const loadEntries = async () => {
       try {
-        setEntriesLoading(true);
+        setApiLoading(true);
         const response = await api.get('/cgpa-entries', {
           params: { limit: 2000, offset: 0, sortBy: 'createdAt', sortOrder: 'desc' },
         });
@@ -111,7 +111,7 @@ export default function ScoreSheetPage() {
         setEntries([]);
         toast.error(error?.message || 'Failed to load CGPA entries.');
       } finally {
-        if (active) setEntriesLoading(false);
+        if (active) setApiLoading(false);
       }
     };
 
@@ -250,7 +250,7 @@ export default function ScoreSheetPage() {
   };
 
   const handleSave = async () => {
-    const trimmedName = form.subjectName.trim();
+    const trimmedName = (form.subjectName || '').trim();
     if (!trimmedName) return;
     if (form.credits <= 0) return;
     if (form.semester <= 0) return;
@@ -258,12 +258,12 @@ export default function ScoreSheetPage() {
     const payload = {
       courseId: form.courseId || undefined,
       subjectName: trimmedName,
-      courseCode: form.courseCode.trim() || undefined,
+      courseCode: (form.courseCode || '').trim() || undefined,
       semester: Math.max(1, Number(form.semester) || 1),
       credits: clamp(Number(form.credits) || 0, 0.5, 12),
       gradePoint: clamp(Number(form.gradePoint) || 0, 0, 10),
       examDate: form.examDate || undefined,
-      notes: form.notes.trim() || undefined,
+      notes: (form.notes || '').trim() || undefined,
     };
 
     try {
@@ -302,6 +302,7 @@ export default function ScoreSheetPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm('Delete this entry?')) return;
     try {
       setDeletingId(id);
       await api.delete(`/cgpa-entries/${id}`);
@@ -314,6 +315,14 @@ export default function ScoreSheetPage() {
       setDeletingId(null);
     }
   };
+
+  if (apiLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -337,7 +346,7 @@ export default function ScoreSheetPage() {
               toast.success('Hall Ticket generated for End Semester Examination.');
             }}
           >
-            <FileText className="h-4 w-4" />
+            <Download className="h-4 w-4" />
             Hall Ticket
           </Button>
           <div className="h-10 w-[1px] bg-border mx-1 hidden md:block" />
@@ -487,7 +496,7 @@ export default function ScoreSheetPage() {
 
         <div className="flex justify-end">
           <Button onClick={handleSave} className="gap-2" disabled={savingEntry}>
-            {editingId ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {savingEntry ? <Loader2 className="h-4 w-4 animate-spin" /> : editingId ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             {savingEntry ? 'Saving...' : editingId ? 'Update Subject' : 'Add Subject'}
           </Button>
         </div>
@@ -574,7 +583,7 @@ export default function ScoreSheetPage() {
 
       <div className="space-y-3">
         <h3 className="text-lg font-semibold text-foreground">Subjects Ledger</h3>
-        {entriesLoading ? (
+        {apiLoading ? (
           <div className="card-elevated ui-card-pad text-center text-sm text-muted-foreground">
             Loading subjects...
           </div>
@@ -646,4 +655,3 @@ export default function ScoreSheetPage() {
     </div>
   );
 }
-

@@ -3,27 +3,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { User, Course, DashboardStats, AdminDashboardData } from '../../shared/types';
 import api from '@/lib/api';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import { toast } from 'sonner';
 
-export function useAdminDashboard(initialData?: any) {
+export function useAdminDashboard(initialData?: AdminDashboardData) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   
   const [loading, setLoading] = useState(!initialData);
-  const [courses, setCourses] = useState<any[]>(initialData?.courses || []);
-  const [users, setUsers] = useState<any[]>(initialData?.users || []);
-  const [stats, setStats] = useState(initialData?.stats || {
+  const [courses, setCourses] = useState<Course[]>(initialData?.courses || []);
+  const [users, setUsers] = useState<User[]>(initialData?.users || []);
+  const [stats, setStats] = useState<DashboardStats>(initialData?.stats || {
     totalStudents: 0,
     totalFaculty: 0,
     totalCourses: 0,
-    totalDepartments: 0,
   });
 
   // Course Dialog states
   const [showCourseDialog, setShowCourseDialog] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<any>(null);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [courseForm, setCourseForm] = useState({
     code: '',
     name: '',
@@ -37,7 +37,7 @@ export function useAdminDashboard(initialData?: any) {
 
   // User Dialog states
   const [showUserDialog, setShowUserDialog] = useState(false);
-  const [editingUser, setEditingUser] = useState<any>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userForm, setUserForm] = useState({
     fullName: '',
     email: '',

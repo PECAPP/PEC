@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MapPin, 
@@ -15,7 +15,10 @@ import {
   Route,
   Square,
   Maximize2,
-  RotateCcw
+  RotateCcw,
+  Box,
+  Map,
+  Loader2,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -34,6 +37,12 @@ import {
 } from '@/lib/dataClient';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
+import dynamic from 'next/dynamic';
+
+const CampusMap3D = dynamic(
+  () => import('@/components/campus-map/CampusMap3D').then((mod) => mod.default),
+  { ssr: false, loading: () => <div className="w-full h-[600px] flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div> }
+);
 
 interface MapRegion {
   id: string;
@@ -169,6 +178,7 @@ export default function CampusMap() {
   const [newRegion, setNewRegion] = useState<Partial<MapRegion> | null>(null);
   const [newRoad, setNewRoad] = useState<Partial<MapRoad> | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
   
   // Resize and drag state
   const [resizing, setResizing] = useState<{region: MapRegion, handle: ResizeHandle} | null>(null);
@@ -512,6 +522,26 @@ export default function CampusMap() {
           </div>
           
           <div className="flex items-center gap-2">
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-1 border border-border rounded-lg p-1 bg-card">
+              <Button
+                variant={viewMode === '2d' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('2d')}
+                className="gap-1 h-7 px-2 text-xs"
+              >
+                <Map className="w-3.5 h-3.5" /> 2D
+              </Button>
+              <Button
+                variant={viewMode === '3d' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('3d')}
+                className="gap-1 h-7 px-2 text-xs"
+              >
+                <Box className="w-3.5 h-3.5" /> 3D
+              </Button>
+            </div>
+
             {/* Zoom */}
             <div className="flex items-center gap-1 border border-border rounded-lg p-1 bg-card">
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setZoom(z => Math.max(0.5, z - 0.25))}>
@@ -620,6 +650,16 @@ export default function CampusMap() {
 
       {/* Map */}
       <div className="max-w-7xl mx-auto">
+        {viewMode === '3d' ? (
+          <Suspense fallback={<div className="w-full h-[600px] flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+            <CampusMap3D
+              regions={regions}
+              roads={roads}
+              selectedRegion={selectedRegion}
+              onSelectRegion={setSelectedRegion}
+            />
+          </Suspense>
+        ) : (
         <div 
           ref={mapContainerRef}
           className={cn(
@@ -849,6 +889,7 @@ export default function CampusMap() {
             })}
           </div>
         </div>
+        )}
       </div>
 
       {/* Selected Region Info */}
