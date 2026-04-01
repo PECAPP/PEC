@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -94,6 +94,8 @@ export function EventDetailModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl p-0 overflow-hidden border-none bg-background/80 backdrop-blur-xl shadow-2xl rounded-[2rem]">
+        <DialogTitle className="sr-only">{event.title}</DialogTitle>
+        <DialogDescription className="sr-only">{event.description}</DialogDescription>
         {/* Modal Header/Banner */}
         <div className={cn(
           "h-32 w-full relative overflow-hidden",

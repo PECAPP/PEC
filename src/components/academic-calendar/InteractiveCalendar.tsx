@@ -219,15 +219,15 @@ export function InteractiveCalendar({
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedDate(day)}
                       className={cn(
-                        "h-20 md:h-28 p-3 rounded-2xl border transition-all relative flex flex-col items-start gap-2 text-left overflow-hidden",
+                        "min-h-24 md:min-h-32 p-2.5 rounded-2xl border transition-all relative flex flex-col items-start gap-2 text-left overflow-hidden",
                         !isCurrentMonth ? "text-muted-foreground/30 opacity-40 border-transparent bg-transparent" : "bg-background shadow-sm hover:shadow-md",
                         isSelected ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 z-10 scale-[1.03]" : "hover:border-primary/40",
                         isToday && !isSelected ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20" : "border-border/60"
                       )}
                     >
-                      <div className="flex justify-between w-full items-start">
+                      <div className="flex justify-between w-full items-start px-1">
                         <span className={cn(
-                          "text-lg font-bold transition-colors",
+                          "text-base font-bold transition-colors",
                           isSelected ? "text-primary-foreground" : "text-foreground",
                           isToday && !isSelected ? "text-primary" : ""
                         )}>
@@ -241,23 +241,31 @@ export function InteractiveCalendar({
                         )}
                       </div>
                       
-                      <div className="flex flex-wrap gap-1 mt-auto">
-                        {dayEvents.slice(0, 3).map((event) => (
+                      <div className="flex flex-col gap-1.5 w-full">
+                        {dayEvents.slice(0, 2).map((event) => (
                           <div
                             key={event.id}
                             className={cn(
-                              "w-1.5 h-1.5 rounded-full transition-all duration-300",
-                              isSelected ? "bg-primary-foreground" : getEventDotColor(event.eventType)
+                              "text-[10px] md:text-xs px-2 py-1 rounded-lg truncate font-semibold transition-all leading-tight",
+                              isSelected 
+                                ? "bg-primary-foreground/20 text-primary-foreground" 
+                                : "bg-primary/15 text-primary border border-primary/20"
                             )}
-                          />
+                            title={event.title}
+                          >
+                            <span className="truncate block">{event.title}</span>
+                            {event.startTime && (
+                              <span className="text-[9px] opacity-75 block truncate">{event.startTime}</span>
+                            )}
+                          </div>
                         ))}
-                        {dayEvents.length > 3 && (
-                          <span className={cn(
-                            "text-[9px] font-bold",
+                        {dayEvents.length > 2 && (
+                          <div className={cn(
+                            "text-[9px] px-2 py-0.5 font-bold",
                             isSelected ? "text-primary-foreground/80" : "text-muted-foreground/80"
                           )}>
-                            +{dayEvents.length - 3}
-                          </span>
+                            +{dayEvents.length - 2} more
+                          </div>
                         )}
                       </div>
                     </motion.button>
@@ -341,12 +349,12 @@ export function InteractiveCalendar({
                       {selectedDateEvents.map((event) => (
                         <motion.button
                           key={event.id}
-                          whileHover={{ x: 4, backgroundColor: "hsl(var(--accent))" }}
+                          whileHover={{ x: 4 }}
                           onClick={() => {
                             setSelectedEvent(event);
                             setIsDetailOpen(true);
                           }}
-                          className="w-full text-left p-4 rounded-2xl border border-border/60 bg-background transition-all group flex gap-4"
+                          className="w-full text-left p-4 rounded-2xl border border-border/60 bg-background hover:bg-accent transition-all group flex gap-4"
                         >
                           <div className={cn(
                             "w-1 rounded-full shrink-0 group-hover:scale-y-110 transition-transform duration-300",
