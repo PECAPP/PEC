@@ -22,8 +22,6 @@ import {
   Calendar as CalendarIcon,
   Clock,
   MapPin,
-  ChevronUp,
-  ChevronDown,
   Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

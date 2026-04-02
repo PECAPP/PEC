@@ -2,16 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, FileText, Star, Gauge, Loader2 } from 'lucide-react';
+import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, Loader2 } from 'lucide-react';
 import { 
-  AreaChart, 
   Area, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  LineChart,
   Line,
   Legend,
   ComposedChart
@@ -583,11 +581,7 @@ export default function ScoreSheetPage() {
 
       <div className="space-y-3">
         <h3 className="text-lg font-semibold text-foreground">Subjects Ledger</h3>
-        {apiLoading ? (
-          <div className="card-elevated ui-card-pad text-center text-sm text-muted-foreground">
-            Loading subjects...
-          </div>
-        ) : entries.length === 0 ? (
+        {entries.length === 0 ? (
           <div className="card-elevated ui-card-pad text-center text-sm text-muted-foreground">
             No subjects added yet. Add your first subject to start CGPA calculation.
           </div>

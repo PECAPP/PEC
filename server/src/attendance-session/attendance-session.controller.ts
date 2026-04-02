@@ -8,7 +8,6 @@ import {
   Delete,
   Query,
   UseGuards,
-  Request,
 } from '@nestjs/common';
 import { AttendanceSessionService } from './attendance-session.service';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';

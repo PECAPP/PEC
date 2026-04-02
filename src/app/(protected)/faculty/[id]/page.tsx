@@ -11,7 +11,6 @@ import {
   BookOpen,
   Users,
   Award,
-  Calendar,
   MapPin,
   Loader2,
 } from 'lucide-react';

@@ -1,22 +1,18 @@
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
 import { UserManagementView } from '@/modules/users/views/UserManagementView';
+import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
 
 export const metadata = {
-  title: 'Identity Governance | PEC APP ERP',
-  description: 'Institutional management of students, faculty, and administrative personnel.',
+  title: 'User Management | PEC APP ERP',
+  description: 'Manage institutional user accounts and roles.',
 };
 
-
 async function getUsers(token: string) {
-  const API_URL = process.env.INTERNAL_API_URL || process.env.BACKEND_API_URL || "http://localhost:4000";
-  // Strip trailing slash if present
-  const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+  const API = resolveInternalApiBaseUrl();
   
   try {
-     // Use absolute URL for server-side fetch
-     const url = new URL('/users', base).toString();
-     const res = await fetch(url, { 
+     const res = await fetch(`${API}/users`, { 
         method: 'GET',
         headers: {
            'Authorization': `Bearer ${token}`,

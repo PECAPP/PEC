@@ -48,14 +48,6 @@ const ThemeToggler = dynamic(() => import('../../components/ThemeToggler'), {
   loading: () => null,
 });
 
-const LandingColorTheme = dynamic(
-  () => import('@/components/LandingColorTheme').then((mod) => mod.LandingColorTheme),
-  {
-    ssr: false,
-    loading: () => null,
-  },
-);
-
 const GoogleTranslate = dynamic(
   () => import('@/components/GoogleTranslate').then((mod) => mod.GoogleTranslate),
   {
@@ -71,9 +63,10 @@ interface HeaderProps {
   onMenuClick?: () => void;
   densityMode?: 'comfortable' | 'compact';
   onDensityModeChange?: (mode: 'comfortable' | 'compact') => void;
+  sidebarWidth: number;
 }
 
-export function Header({ user, sidebarCollapsed, isMobile, onMenuClick }: HeaderProps) {
+export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, sidebarWidth }: HeaderProps) {
   const router = useRouter();
 
   const appLogoSrc = '/logo.png';
@@ -106,9 +99,12 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick }: Header
   return (
     <header
       className={cn(
-        "fixed top-0 right-0 z-40 h-16 border-b border-sidebar-border bg-background transition-all duration-150 shadow-sm",
-        isMobile ? "left-0" : (sidebarCollapsed ? "left-16" : "left-64")
+        "fixed top-0 right-0 z-40 h-16 header-accent transition-all duration-150 shadow-sm",
+        isMobile && "left-0"
       )}
+      style={{
+        left: isMobile ? 0 : (sidebarCollapsed ? '4rem' : `${sidebarWidth}px`)
+      }}
     >
       <div className="h-full px-4 md:px-6 flex items-center justify-between">
         {/* Mobile Menu Toggle */}

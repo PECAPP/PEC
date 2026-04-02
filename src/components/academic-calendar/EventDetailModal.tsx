@@ -86,13 +86,6 @@ export function EventDetailModal({
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    try {
-      return format(new Date(dateStr), 'EEEE, MMMM d, yyyy');
-    } catch (e) {
-      return dateStr;
-    }
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

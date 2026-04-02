@@ -1,243 +1,271 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Globe,
-  LogOut,
-  Palette,
-  Check,
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  User, 
+  Palette, 
+  Bell, 
+  Shield, 
+  Globe, 
+  Lock, 
   RefreshCw,
-  Database,
+  LogOut,
+  Moon,
+  Sun,
+  Monitor,
+  Settings as SettingsIcon,
+  Check
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
-import api from '@/lib/api';
-import { useRouter } from 'next/navigation';
+import { useTheme } from "next-themes";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
-import { usePermissions } from '@/hooks/usePermissions';
-import { authClient } from '@/lib/auth-client';
+import { cn } from "@/lib/utils";
 import { LoadingGrid } from '@/components/common/AsyncState';
-import CollegeSettings from './admin/CollegeSettings';
 
-const extractData = <T,>(payload: any): T => {
-  if (payload && typeof payload === 'object' && 'success' in payload && 'data' in payload) {
-    return payload.data as T;
-  }
-  return payload as T;
-};
-
-export default function Settings() {
-  const router = useRouter();
-  const { user, loading: authLoading } = usePermissions();
-  const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<any>(null);
-
-  const accentColors = [
-    { id: 'pec-gold', name: 'PEC Gold', color: '#F59E0B' },
-    { id: 'emerald', name: 'Emerald', color: '#10B981' },
-    { id: 'sapphire', name: 'Sapphire', color: '#3B82F6' },
-    { id: 'amethyst', name: 'Amethyst', color: '#8B5CF6' },
-  ];
-
-  const [accentColor, setAccentColor] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedAccent = localStorage.getItem('accent-color');
-      if (!savedAccent || savedAccent === 'golden') return 'pec-gold';
-      return savedAccent;
-    }
-    return 'pec-gold';
-  });
+export default function SettingsPage() {
+  const { user, loading: authLoading } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const [activeTab, setActiveTab] = useState('profile');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const root = document.documentElement;
-    accentColors.forEach(({ id }) => root.classList.remove(`accent-${id}`));
-    root.classList.add(`accent-${accentColor}`);
-    localStorage.setItem('accent-color', accentColor);
-  }, [accentColor]);
+    setMounted(true);
+  }, []);
 
-  useEffect(() => {
-    if (authLoading) return;
-    
-    if (!user) {
-      router.replace('/auth');
-      return;
-    }
-
-    const loadUserData = async () => {
-      try {
-        const profileRes = await api.get('/auth/profile');
-        setUserData(extractData<any>(profileRes.data) || {});
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void loadUserData();
-  }, [authLoading, router, user]);
-
-  const handleSignOut = async () => {
-    try {
-      await authClient.logout();
-      window.dispatchEvent(new Event('auth-change'));
-      toast.success('Signed out successfully');
-      router.replace('/auth');
-    } catch (error) {
-      toast.error('Failed to sign out');
-    }
+  const handleSignOut = () => {
+    toast.success('Logged out successfully');
+    window.location.href = '/auth';
   };
 
-  if (loading) {
+  if (!mounted || authLoading) {
     return (
-      <div className="space-y-6 md:space-y-8">
-        <div className="h-8 w-56 bg-muted rounded-md animate-pulse" />
-        <LoadingGrid count={3} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" itemClassName="h-28 rounded-md" />
+      <div className="container py-8 max-w-6xl space-y-8 animate-in fade-in duration-500">
+        <div className="flex items-center gap-4">
+           <div className="h-12 w-12 bg-muted rounded-xl animate-pulse" />
+           <div className="space-y-2">
+             <div className="h-8 w-48 bg-muted rounded animate-pulse" />
+             <div className="h-4 w-64 bg-muted rounded animate-pulse" />
+           </div>
+        </div>
+        <LoadingGrid count={3} />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col items-start gap-4 pb-8 border-b-2 border-primary/10">
-        <div className="space-y-2 text-left">
-          <h1 className="text-5xl font-[1000] tracking-tighter text-foreground leading-none">Settings Engine</h1>
-          <p className="text-muted-foreground font-black text-[10px] tracking-widest opacity-90 uppercase">Synchronize Neural Environment Layer</p>
+    <div className="container py-8 px-6 max-w-6xl space-y-8 animate-in fade-in duration-500 relative min-h-screen">
+      {/* Decorative Atmosphere */}
+      <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[radial-gradient(circle_at_center,rgba(var(--primary-rgb),0.07)_0%,transparent_70%)] blur-[100px]" />
+      </div>
+
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/60 relative z-10">
+        <div className="flex items-center gap-5">
+          <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm">
+            <SettingsIcon className="w-8 h-8 text-primary shadow-glow" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Settings</h1>
+            <p className="text-sm text-muted-foreground font-medium italic">Manage your account and application preferences</p>
+          </div>
         </div>
-        <Button variant="ghost" onClick={handleSignOut} className="h-10 px-0 hover:bg-transparent hover:text-destructive/80 text-destructive font-black text-[12px] tracking-widest gap-2">
-           <LogOut className="w-5 h-5" /> Terminate Access
+        <Button 
+          variant="outline" 
+          onClick={handleSignOut}
+          className="h-11 rounded-xl px-6 border-destructive/20 text-destructive hover:bg-destructive/5 font-bold text-xs tracking-wider gap-2 transition-all uppercase"
+        >
+          <LogOut className="w-4 h-4" /> 
+          Log Out
         </Button>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-8">
-        <TabsList className="flex flex-wrap h-auto bg-transparent border-b rounded-none p-0 gap-8 justify-start">
-          {['profile', 'appearance', 'notifications', 'privacy', 'connected', 'security'].map(tab => (
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
+        <TabsList className="w-full justify-start h-auto p-1 bg-muted/30 rounded-2xl border border-border/40 mb-2 flex-wrap gap-1">
+          {[
+            { id: 'profile', label: 'Profile', icon: User },
+            { id: 'appearance', label: 'Appearance', icon: Palette },
+            { id: 'notifications', label: 'Notifications', icon: Bell },
+            { id: 'privacy', label: 'Privacy', icon: Shield },
+            { id: 'connected', label: 'Network', icon: Globe },
+            { id: 'security', label: 'Security', icon: Lock }
+          ].map(tab => (
             <TabsTrigger 
-              key={tab} 
-              value={tab} 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-3 text-xs font-black tracking-widest transition-all capitalize"
+              key={tab.id} 
+              value={tab.id} 
+              className="rounded-xl py-2.5 px-5 gap-2.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all text-xs font-bold uppercase tracking-wider"
             >
-              {tab.replace(/-/g, ' ')}
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
             </TabsTrigger>
           ))}
-          {user?.role === 'college_admin' && (
-            <TabsTrigger value="college" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-3 text-xs font-black tracking-widest transition-all capitalize">
-              College Admin
-            </TabsTrigger>
-          )}
         </TabsList>
 
-        <TabsContent value="profile" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <Card className="border-primary/10 bg-card shadow-lg text-left">
-            <CardHeader className="text-left">
-              <CardTitle className="text-sm font-black tracking-widest flex items-center justify-start gap-2 uppercase">
-                <Database className="w-4 h-4 text-primary" />
-                Personal Identifiers
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-6 sm:grid-cols-2 text-left">
-              <div className="space-y-1 text-left">
-                <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Access Name</label>
-                <Input value={userData?.fullName || ''} className="h-11 rounded-xl bg-background border-primary/10 font-bold" readOnly />
-              </div>
-              <div className="space-y-1 text-left">
-                <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Protocol Line</label>
-                <Input value={userData?.email || ''} className="h-11 rounded-xl bg-muted border-primary/5 opacity-70" disabled />
-              </div>
-              <div className="space-y-1 text-left">
-                <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Secure Contact</label>
-                <Input placeholder="+91 XXX-XXX-XXXX" className="h-11 rounded-xl bg-background border-primary/10 font-bold" />
-              </div>
-              <div className="space-y-1 text-left">
-                <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Department</label>
-                <Input value={userData?.department || 'N/A'} className="h-11 rounded-xl bg-muted border-primary/5 opacity-70" disabled />
-              </div>
-              <div className="sm:col-span-2 flex justify-start">
-                <Button className="h-11 px-8 rounded-xl bg-primary text-primary-foreground font-black text-[12px] tracking-widest mt-2">
-                  <RefreshCw className="w-4 h-4 mr-2" /> Sync Records
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-primary/10 bg-card text-left">
-              <CardHeader className="text-left">
-                <CardTitle className="text-sm font-black tracking-widest flex items-center justify-start gap-2 uppercase">
-                  <Globe className="w-4 h-4 text-primary" />
-                  Environment Constants
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-6 sm:grid-cols-2 text-left">
-                <div className="space-y-1 text-left">
-                  <label className="text-[10px] font-black tracking-tighter text-muted-foreground ml-1 uppercase">Native Language</label>
-                  <Select defaultValue="en">
-                    <SelectTrigger className="h-11 rounded-xl bg-background border-primary/10 font-bold">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border-primary/10">
-                      <SelectItem value="en" className="font-bold">English (International)</SelectItem>
-                      <SelectItem value="hi" className="font-bold">Hindi (Devanagari)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="appearance" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <Card className="border-primary/10 bg-card text-left">
-            <CardHeader className="text-left">
-              <CardTitle className="text-sm font-black tracking-widest flex items-center justify-start gap-2 text-primary uppercase">
-                <Palette className="w-4 h-4" />
-                Surface Theme
-              </CardTitle>
-              <CardDescription className="text-[10px] font-bold text-left ml-6 uppercase opacity-90">Configure Cognitive Visual Overlays</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8 text-left">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-start">
-                {accentColors.map((color) => (
-                  <button
-                    key={color.id}
-                    onClick={() => setAccentColor(color.id)}
-                    className={cn(
-                      "relative flex flex-col items-start gap-3 p-4 rounded-2xl border-2 transition-all duration-300 w-full",
-                      accentColor === color.id
-                        ? "border-primary bg-primary/5 shadow-md"
-                        : "border-primary/5 bg-background hover:border-primary/20"
-                    )}
-                  >
-                    <div className="flex items-center gap-3 w-full">
-                      <div
-                        className="w-8 h-8 rounded-full shadow-lg"
-                        style={{ background: color.color }}
-                      />
-                      <span className="text-[10px] font-black tracking-widest">
-                        {color.name}
-                      </span>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <TabsContent value="profile" className="mt-0 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="md:col-span-2 space-y-6">
+                  <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8">
+                    <div className="flex items-center gap-3 pb-4 border-b border-border/40">
+                      <User className="w-5 h-5 text-primary" />
+                      <h2 className="text-xl font-bold tracking-tight">Profile Information</h2>
                     </div>
-                    {accentColor === color.id && (
-                      <div className="absolute top-4 right-4">
-                        <Check className="w-4 h-4 text-primary" />
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Full Name</Label>
+                        <Input value={user?.fullName || 'Ananay Dubey'} className="h-12 rounded-xl bg-background border-border/60 font-bold" readOnly />
                       </div>
-                    )}
-                  </button>
-                ))}
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Email Address</Label>
+                        <Input value={user?.email || 'student@pec.edu'} className="h-12 rounded-xl bg-muted/40 border-border/40 opacity-70" disabled />
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Student ID</Label>
+                        <Input value="PEC2026CS101" className="h-12 rounded-xl bg-muted/40 border-border/40 opacity-70" disabled />
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Role</Label>
+                        <Input value={user?.role?.toUpperCase() || 'STUDENT'} className="h-12 rounded-xl bg-muted/40 border-border/40 opacity-70" disabled />
+                      </div>
+                    </div>
+
+                    <div className="pt-6 flex justify-start">
+                      <Button className="h-12 px-8 rounded-xl bg-primary text-primary-foreground font-bold text-sm tracking-wide gap-2 shadow-glow hover:scale-[1.02] transition-all">
+                        <RefreshCw className="w-4 h-4" /> Save Changes
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="card-elevated p-6 bg-card/40 flex flex-col items-center gap-6 text-center">
+                    <div className="relative group">
+                      <div className="w-32 h-32 rounded-[2rem] bg-primary/5 flex items-center justify-center border-2 border-dashed border-primary/20 group-hover:border-primary/50 transition-all overflow-hidden shadow-inner">
+                        <User className="w-16 h-16 text-primary/30" />
+                        <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all cursor-pointer">
+                           <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Upload</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-bold text-foreground">User Profile</h3>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Profile Picture</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </TabsContent>
+
+            <TabsContent value="appearance" className="mt-0 space-y-8">
+              <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-12">
+                <div className="flex items-center gap-3 pb-4 border-b border-border/40">
+                  <Palette className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-bold tracking-tight">Appearance Settings</h2>
+                </div>
+
+                {/* Theme Mode */}
+                <div className="space-y-6">
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Theme Mode</Label>
+                    <p className="text-[10px] text-muted-foreground italic font-medium">Select your preferred system interface theme</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                      { id: 'light', name: 'Light', icon: Sun },
+                      { id: 'dark', name: 'Dark', icon: Moon },
+                      { id: 'system', name: 'System', icon: Monitor }
+                    ].map((m) => (
+                      <div
+                        key={m.id}
+                        onClick={() => setTheme(m.id)}
+                        className={cn(
+                          "p-6 rounded-2xl border-2 cursor-pointer transition-all flex flex-col gap-4 group",
+                          theme === m.id
+                            ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
+                            : "border-border/40 hover:border-primary/20 bg-background/40"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm",
+                          theme === m.id ? "bg-primary text-primary-foreground" : "bg-muted/40 text-muted-foreground group-hover:bg-muted"
+                        )}>
+                          <m.icon className="w-6 h-6" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-sm tracking-tight">{m.name}</span>
+                          {theme === m.id && <Check className="w-4 h-4 text-primary" />}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Accent Color */}
+                <div className="space-y-6 pt-6 border-t border-border/20">
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Accent Color</Label>
+                    <p className="text-[10px] text-muted-foreground italic font-medium">Choose a color for interactive interface elements</p>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {[
+                      { id: 'pec-gold', name: 'PEC Gold', color: 'bg-[#F59E0B]' },
+                      { id: 'emerald', name: 'Emerald', color: 'bg-[#10B981]' },
+                      { id: 'sapphire', name: 'Sapphire', color: 'bg-[#3B82F6]' },
+                      { id: 'amethyst', name: 'Amethyst', color: 'bg-[#8B5CF6]' }
+                    ].map((acc) => {
+                      const isActive = typeof window !== 'undefined' && localStorage.getItem('accent-color') === acc.id;
+                      return (
+                        <div
+                          key={acc.id}
+                          onClick={() => {
+                            const root = document.documentElement;
+                            root.classList.remove('accent-emerald', 'accent-sapphire', 'accent-amethyst', 'accent-pec-gold');
+                            root.classList.add(`accent-${acc.id}`);
+                            localStorage.setItem('accent-color', acc.id);
+                            toast.success(`${acc.name} theme applied`);
+                            setActiveTab('appearance');
+                          }}
+                          className={cn(
+                            "p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col gap-4 group",
+                            isActive 
+                              ? "border-primary bg-primary/5 shadow-sm shadow-primary/5" 
+                              : "border-border/40 hover:border-primary/20 bg-background/40"
+                          )}
+                        >
+                          <div className={cn("w-full aspect-[2/1] rounded-lg shadow-inner", acc.color)} />
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/80">{acc.name}</span>
+                            {isActive && <Check className="w-3 h-3 text-primary shrink-0" />}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="notifications" className="mt-0">
+               <div className="card-elevated p-12 bg-card/50 text-center italic text-muted-foreground font-medium text-sm">
+                  Notification settings will be available in the next update.
+               </div>
+            </TabsContent>
+          </motion.div>
+        </AnimatePresence>
       </Tabs>
     </div>
   );

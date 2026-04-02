@@ -96,7 +96,7 @@ export class StudentPortfolioService {
 
     try {
       const response = await fetch(
-        `https://api.github.com/users/${username}/repos?sort=updated&per_page=15`,
+        `https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=15`,
         {
           headers: {
             Accept: 'application/vnd.github.v3+json',

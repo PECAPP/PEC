@@ -44,7 +44,7 @@ export function StudentStatsCards({ stats, onStatClick }: StatsProps) {
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Attendance</p>
-            <p className="text-2xl font-black text-foreground">{stats.attendancePercentage}%</p>
+            <p className="text-2xl font-bold text-foreground">{stats.attendancePercentage}%</p>
           </div>
         </div>
       </motion.div>
@@ -60,7 +60,7 @@ export function StudentStatsCards({ stats, onStatClick }: StatsProps) {
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Enrolled</p>
-            <p className="text-2xl font-black text-foreground">{stats.enrolledCourses}</p>
+            <p className="text-2xl font-bold text-foreground">{stats.enrolledCourses}</p>
           </div>
         </div>
       </motion.div>
@@ -76,7 +76,7 @@ export function StudentStatsCards({ stats, onStatClick }: StatsProps) {
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Score Sheet</p>
-            <p className="text-2xl font-black text-foreground text-amber-500">VIEW</p>
+            <p className="text-2xl font-bold text-foreground text-amber-500">VIEW</p>
           </div>
         </div>
       </motion.div>

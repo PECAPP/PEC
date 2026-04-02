@@ -9,7 +9,6 @@ import {
   Edit2,
   Trash2,
   Search,
-  Filter,
   DoorOpen,
   Users,
   Layers,

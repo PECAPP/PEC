@@ -49,6 +49,8 @@ interface SidebarProps {
   isMobile?: boolean;
   mobileMenuOpen?: boolean;
   onMobileClose?: () => void;
+  width: number;
+  onWidthChange: (width: number) => void;
 }
 
 interface NavItem {
@@ -213,28 +215,15 @@ export function Sidebar({
   onToggle, 
   isMobile, 
   mobileMenuOpen, 
-  onMobileClose 
+  onMobileClose,
+  width,
+  onWidthChange
 }: SidebarProps) {
   const location = usePathname();
   const appLogoSrc = '/logo.png';
   
-  const [sidebarWidth, setSidebarWidth] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
-      if (saved) {
-        const parsed = parseInt(saved, 10);
-        if (parsed >= MIN_WIDTH && parsed <= MAX_WIDTH) return parsed;
-      }
-    }
-    return DEFAULT_WIDTH;
-  });
-  
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
-  }, [sidebarWidth]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -248,7 +237,8 @@ export function Sidebar({
       
       const newWidth = e.clientX;
       if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) {
-        setSidebarWidth(newWidth);
+        onWidthChange(newWidth);
+        localStorage.setItem(SIDEBAR_WIDTH_KEY, newWidth.toString());
       }
     };
 
@@ -322,35 +312,41 @@ export function Sidebar({
         <Link
           href={item.path as any}
           className={cn(
-            "sidebar-item",
+            "sidebar-item group",
             !collapsed && "w-full",
             collapsed && "justify-center gap-0 px-0",
             isActive && "sidebar-item-active"
           )}
         >
-          {collapsed ? (() => {
+          {(() => {
             const Icon = item.icon as any;
             return (
-              <Icon
-                className={cn(
-                  "w-5 h-5 shrink-0 transition-colors",
-                  isActive ? "text-primary-foreground" : "text-sidebar-foreground/75"
+              <div className={cn("flex items-center", collapsed ? "justify-center w-full" : "w-full px-2")}>
+                {collapsed ? (
+                  <Icon
+                    className={cn(
+                      "w-5 h-5 shrink-0 transition-all duration-300",
+                      isActive 
+                        ? "text-primary scale-110 drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]" 
+                        : "text-sidebar-foreground/60 group-hover:text-sidebar-foreground group-hover:scale-110"
+                    )}
+                    strokeWidth={isActive ? 2.5 : 1.8}
+                  />
+                ) : (
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -5 }}
+                      className="swiss-nav-label truncate"
+                    >
+                      {item.label}
+                    </motion.span>
+                  </AnimatePresence>
                 )}
-                strokeWidth={1.9}
-              />
+              </div>
             );
-          })() : (
-            <AnimatePresence mode="wait">
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                className="swiss-nav-label truncate"
-              >
-                {item.label}
-              </motion.span>
-            </AnimatePresence>
-          )}
+          })()}
         </Link>
       </li>
     );
@@ -381,11 +377,13 @@ export function Sidebar({
         isMobile && mobileMenuOpen && "translate-x-0"
       )}
       style={{
-        width: collapsed ? undefined : sidebarWidth,
-        minWidth: collapsed ? undefined : sidebarWidth,
-        maxWidth: collapsed ? undefined : sidebarWidth,
+        width: collapsed ? undefined : width,
+        minWidth: collapsed ? undefined : width,
+        maxWidth: collapsed ? undefined : width,
       }}
     >
+      {/* Mesh Atmosphere */}
+      <div className="sidebar-mesh" aria-hidden="true" />
       {/* Resize Handle */}
       {!isMobile && !collapsed && (
         <div

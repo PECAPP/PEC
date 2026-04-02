@@ -8,13 +8,13 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
  Users, UserPlus, Edit, Trash2, Upload, Download,
- Crown, MoreVertical, BookOpen, Loader2,
+ Crown, MoreVertical, BookOpen, Loader2, Search
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
- Dialog, DialogContent, DialogHeader, DialogTitle,
+ Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
 import {
  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -88,36 +88,36 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
  // Safe Action Hooks
  const { execute: executeCreate } = useAction(createFacultyAction, {
   onSuccess: () => {
-   toast.success('Faculty created!');
+   toast.success('Faculty member added!');
    setShowDialog(false);
    reset();
    router.refresh();
   },
-  onError: ({ error }) => toast.error(error.serverError || 'Failed to create.'),
+  onError: ({ error }) => toast.error(error.serverError || 'Failed to add faculty member.'),
  });
 
  const { execute: executeUpdate } = useAction(updateFacultyAction, {
   onSuccess: () => {
-   toast.success('Faculty updated!');
+   toast.success('Faculty details updated!');
    setShowDialog(false);
    setEditingFaculty(null);
    reset();
    router.refresh();
   },
-  onError: ({ error }) => toast.error(error.serverError || 'Failed to update.'),
+  onError: ({ error }) => toast.error(error.serverError || 'Update failed.'),
  });
 
  const { execute: executeDelete } = useAction(deleteFacultyAction, {
   onSuccess: () => {
-   toast.success('Faculty deleted!');
+   toast.success('Faculty member deleted!');
    router.refresh();
   },
-  onError: ({ error }) => toast.error(error.serverError || 'Failed to delete.'),
+  onError: ({ error }) => toast.error(error.serverError || 'Delete failed.'),
  });
 
  const { execute: executePromote } = useAction(promoteToHODAction, {
   onSuccess: () => {
-   toast.success('Promotion processed successfully!');
+   toast.success('Faculty appointed as HOD successfully!');
    router.refresh();
   },
   onError: ({ error }) => toast.error(error.serverError || 'Failed to promote.'),
@@ -161,7 +161,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
 
  const handlePromoteHOD = (fac: FacultyMember) => {
   if (!fac.department) {
-   toast.error('Department assignment required before HOD elevation.');
+   toast.error('Department assignment required before HOD appointment.');
    return;
   }
   startTransition(() => {
@@ -188,7 +188,6 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
   let successCount = 0, failCount = 0;
   const errors: string[] = [];
 
-  // Separate from optimistic for bulk high-volume operations
   for (const row of data) {
    const result = await createFacultyAction({
     fullName: row.fullName,
@@ -202,11 +201,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
    
    if (result?.validationErrors || result?.serverError) {
     failCount++;
-    const errorDetail =
-     (typeof result?.validationErrors === 'string' && result.validationErrors) ||
-     (result?.serverError && String(result.serverError)) ||
-     'Failed to create faculty record';
-    errors.push(`${row.fullName}: ${errorDetail}`);
+    errors.push(`${row.fullName}: Error`);
    } else {
     successCount++;
    }
@@ -223,11 +218,11 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
  );
 
  return (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
    <div className="flex items-center justify-between">
     <div>
-     <h1 className="text-2xl font-bold uppercase tracking-tight">Faculty Nexus</h1>
-     <p className="text-muted-foreground mt-1 font-medium italic">Administrative Persona Control</p>
+     <h1 className="text-3xl font-bold tracking-tight">Faculty</h1>
+     <p className="text-muted-foreground mt-1 font-medium italic text-[11px]">Manage institutional faculty members and staff</p>
     </div>
     <div className="flex gap-3">
      <Button variant="outline" onClick={exportFaculty} className="h-11 border-2 font-bold px-6 rounded-sm">
@@ -237,41 +232,47 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
       <Upload className="w-4 h-4 mr-2" /> Bulk Upload
      </Button>
      {isAdmin && (
-      <Button onClick={() => { resetForm(); setEditingFaculty(null); setShowDialog(true); }} className="h-11 bg-primary text-white font-black uppercase tracking-widest text-[10px] rounded-sm px-6">
-       <UserPlus className="w-4 h-4 mr-2" /> Add Persona
+      <Button onClick={() => { resetForm(); setEditingFaculty(null); setShowDialog(true); }} className="h-11 bg-primary text-white font-bold uppercase tracking-widest text-[10px] rounded-sm px-6">
+       <UserPlus className="w-4 h-4 mr-2" /> Add Faculty
       </Button>
      )}
     </div>
    </div>
 
-   <div className="grid gap-4 md:grid-cols-2">
+   <div className="grid gap-6 md:grid-cols-2">
     {[
-     { icon: Users, label: 'Staff Count', value: optimisticFaculty.length, color: 'primary' },
-     { icon: BookOpen, label: 'Domain Reach', value: new Set(optimisticFaculty.filter(f => f.department).map(f => f.department)).size, color: 'success' },
+     { icon: Users, label: 'Total Faculty', value: optimisticFaculty.length, color: 'primary' },
+     { icon: BookOpen, label: 'Departments', value: new Set(optimisticFaculty.filter(f => f.department).map(f => f.department)).size, color: 'success' },
     ].map(({ icon: Icon, label, value, color }) => (
-     <div key={label} className="card-elevated p-6 border-b-4 border-r-4 border-primary/20">
+     <div key={label} className="card-elevated p-6 border-b-4 border-r-4 border-primary/10">
       <div className="flex items-center gap-4">
        <div className={`p-3 rounded-sm bg-${color}/10 border border-${color}/20`}><Icon className={`w-6 h-6 text-${color}`} /></div>
-       <div><p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">{label}</p><p className="text-3xl font-black mt-1">{value}</p></div>
+       <div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{label}</p>
+        <p className="text-4xl font-bold mt-1">{value}</p>
+       </div>
       </div>
      </div>
     ))}
    </div>
 
-   <Input
-    placeholder="Search identity matrix..."
-    value={searchTerm}
-    onChange={e => setSearchTerm(e.target.value)}
-    className="h-12 border-2 rounded-sm bg-background/50 font-bold"
-   />
+   <div className="relative">
+    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+    <Input
+     placeholder="Search faculty members..."
+     value={searchTerm}
+     onChange={e => setSearchTerm(e.target.value)}
+     className="h-14 pl-12 border-2 rounded-sm bg-background/50 font-bold"
+    />
+   </div>
 
-   <div className="card-elevated overflow-hidden border-2 rounded-sm shadow-[8px_8px_0px_rgba(0,0,0,0.05)]">
+   <div className="card-elevated overflow-hidden border-2 rounded-sm shadow-[12px_12px_0px_rgba(0,0,0,0.03)]">
     <div className="overflow-x-auto">
      <table className="w-full">
       <thead className="bg-muted/50 border-b-2 border-border">
        <tr>
-        {['Registry ID', 'Full Persona', 'Domain', 'Identity Badge', 'Actions'].map((h, i) => (
-         <th key={h} className={`p-5 text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/50 ${i === 4 ? 'text-right' : 'text-left'}`}>{h}</th>
+        {['Employee ID', 'Full Name', 'Department', 'Designation', 'Actions'].map((h, i) => (
+         <th key={h} className={`p-5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 ${i === 4 ? 'text-right' : 'text-left'}`}>{h}</th>
         ))}
        </tr>
       </thead>
@@ -282,7 +283,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
          <td className="p-5 font-bold text-base tracking-tight">{fac.fullName}</td>
          <td className="p-5 text-muted-foreground font-bold text-xs uppercase">{fac.department || 'GLOBAL'}</td>
          <td className="p-5">
-          <Badge variant="outline" className="rounded-sm border-2 font-black uppercase text-[9px] tracking-widest px-3 py-1">
+          <Badge variant="outline" className="rounded-sm border-2 font-bold uppercase text-[9px] tracking-widest px-3 py-1">
            {fac.designation || 'FACULTY'}
           </Badge>
          </td>
@@ -290,15 +291,15 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
           {isAdmin && (
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
-             <Button variant="ghost" size="sm" disabled={isPending} className="hover:bg-primary/10 rounded-sm">
+             <Button variant="ghost" size="sm" disabled={isPending} className="hover:bg-primary/10 rounded-sm h-9 w-9 p-0">
               {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MoreVertical className="w-4 h-4" />}
              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-sm border-2 border-primary w-48 font-bold">
-             <DropdownMenuItem onClick={() => openEditDialog(fac)} className="cursor-pointer font-bold"><Edit className="w-4 h-4 mr-2" /> Modify Persona</DropdownMenuItem>
-             <DropdownMenuItem onClick={() => handlePromoteHOD(fac)} className="cursor-pointer font-bold text-primary"><Crown className="w-4 h-4 mr-2" /> Elevate to Lead</DropdownMenuItem>
+            <DropdownMenuContent align="end" className="rounded-sm border-2 border-primary w-56 font-bold shadow-xl">
+             <DropdownMenuItem onClick={() => openEditDialog(fac)} className="cursor-pointer font-bold"><Edit className="w-4 h-4 mr-2" /> Edit Details</DropdownMenuItem>
+             <DropdownMenuItem onClick={() => handlePromoteHOD(fac)} className="cursor-pointer font-bold text-primary"><Crown className="w-4 h-4 mr-2" /> Appoint as HOD</DropdownMenuItem>
              <DropdownMenuSeparator />
-             <DropdownMenuItem onClick={() => handleDelete(fac.id)} className="text-destructive cursor-pointer font-bold"><Trash2 className="w-4 h-4 mr-2" /> Terminate Access</DropdownMenuItem>
+             <DropdownMenuItem onClick={() => handleDelete(fac.id)} className="text-destructive cursor-pointer font-bold"><Trash2 className="w-4 h-4 mr-2" /> Delete Faculty</DropdownMenuItem>
             </DropdownMenuContent>
            </DropdownMenu>
           )}
@@ -311,36 +312,37 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
    </div>
 
    <Dialog open={showDialog} onOpenChange={setShowDialog}>
-    <DialogContent className="max-w-xl rounded-sm border-2 border-primary shadow-[15px_15px_0px_rgba(0,0,0,0.1)]">
+    <DialogContent className="max-w-xl rounded-sm border-2 border-primary shadow-[20px_20px_0px_rgba(0,0,0,0.05)]">
      <DialogHeader className="space-y-4">
-      <DialogTitle className="text-3xl font-black uppercase tracking-tight">{editingFaculty ? 'Modify Persona' : 'Initialize Identity'}</DialogTitle>
+      <DialogTitle className="text-3xl font-bold">{editingFaculty ? 'Edit Faculty Details' : 'Add New Faculty member'}</DialogTitle>
+      <DialogDescription className="font-bold text-[11px] uppercase tracking-widest text-muted-foreground bg-muted p-2 rounded-sm italic opacity-60">Institutional Faculty Registration</DialogDescription>
      </DialogHeader>
      <div className="space-y-6 pt-6">
       <div className="space-y-2">
-       <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Full Nominal *</label>
-       <Input {...register('fullName')} className={`h-12 border-2 rounded-sm font-bold ${errors.fullName ? 'border-destructive' : ''}`} placeholder="ARJUN SHARMA" />
+       <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Full Name *</label>
+       <Input {...register('fullName')} className={`h-12 border-2 rounded-sm font-bold ${errors.fullName ? 'border-destructive' : ''}`} placeholder="e.g. ARJUN SHARMA" />
        {errors.fullName && <p className="text-[10px] font-bold text-destructive uppercase">{errors.fullName.message}</p>}
       </div>
       <div className="grid grid-cols-2 gap-6">
        <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Gateway Email *</label>
-        <Input type="email" {...register('email')} className={`h-12 border-2 rounded-sm font-bold ${errors.email ? 'border-destructive' : ''}`} placeholder="ARJUN@PEC.EDU" />
+        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Email Address *</label>
+        <Input type="email" {...register('email')} className={`h-12 border-2 rounded-sm font-bold ${errors.email ? 'border-destructive' : ''}`} placeholder="arjun@college.edu" />
         {errors.email && <p className="text-[10px] font-bold text-destructive uppercase">{errors.email.message}</p>}
        </div>
        <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assigned Domain *</label>
+        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Department *</label>
         <Input {...register('department')} className={`h-12 border-2 rounded-sm font-bold ${errors.department ? 'border-destructive' : ''}`} placeholder="CSE" />
         {errors.department && <p className="text-[10px] font-bold text-destructive uppercase">{errors.department.message}</p>}
        </div>
       </div>
       <div className="grid grid-cols-2 gap-6">
        <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Staff Registry ID *</label>
+        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Employee ID *</label>
         <Input {...register('employeeId')} className={`h-12 border-2 rounded-sm font-mono font-bold ${errors.employeeId ? 'border-destructive' : ''}`} placeholder="FAC001" />
         {errors.employeeId && <p className="text-[10px] font-bold text-destructive uppercase">{errors.employeeId.message}</p>}
        </div>
        <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Designation Badge *</label>
+        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Designation *</label>
         <Input {...register('designation')} className={`h-12 border-2 rounded-sm font-bold ${errors.designation ? 'border-destructive' : ''}`} placeholder="Associate Professor" />
         {errors.designation && <p className="text-[10px] font-bold text-destructive uppercase">{errors.designation.message}</p>}
        </div>
@@ -348,13 +350,13 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
       <div className="flex gap-4 pt-8">
         <Button 
           onClick={formSubmit(onSubmit)} 
-          className="flex-1 h-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg rounded-sm hover:brightness-110 active:scale-[0.98] transition-all" 
+          className="flex-1 h-14 bg-primary text-white font-bold uppercase tracking-widest text-xs shadow-lg rounded-sm hover:brightness-110 active:scale-[0.98] transition-all" 
           disabled={isPending}
         >
           {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {editingFaculty ? 'Commit Changes' : 'Authorize Identity'}
+          {editingFaculty ? 'Save Changes' : 'Create Faculty account'}
         </Button>
-        <Button variant="outline" onClick={() => setShowDialog(false)} className="h-14 border-2 font-bold px-8 uppercase tracking-widest text-[10px] rounded-sm">Abort</Button>
+        <Button variant="outline" onClick={() => setShowDialog(false)} className="h-14 border-2 font-bold px-8 uppercase tracking-widest text-[10px] rounded-sm">Cancel</Button>
       </div>
      </div>
     </DialogContent>
@@ -363,7 +365,8 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
    <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
     <DialogContent className="max-w-4xl border-2 border-primary rounded-sm overflow-hidden p-0">
      <DialogHeader className="bg-primary text-white p-10">
-      <DialogTitle className="text-3xl font-black uppercase">Bulk Upload</DialogTitle>
+      <DialogTitle className="text-3xl font-bold">Bulk Upload Faculty</DialogTitle>
+      <DialogDescription className="text-white/70 font-bold uppercase tracking-widest text-[11px] mt-2 italic">Standardized CSV/XLSX data upload</DialogDescription>
      </DialogHeader>
      <div className="p-10">
       <BulkUpload

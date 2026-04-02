@@ -60,6 +60,9 @@ class AuthClient {
   private clearSession(): void {
     this.accessToken = null;
     this.refreshToken = null;
+    if (typeof document !== 'undefined') {
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
   }
 
   private waitForRefresh(): Promise<string> {
@@ -313,7 +316,14 @@ class AuthClient {
   }
 
   getAccessToken(): string | null {
-    return this.accessToken;
+    if (this.accessToken) return this.accessToken;
+    
+    // Recovery from cookie for SSR/Page Reloads
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(new RegExp('(^| )access_token=([^;]+)'));
+      if (match) return match[2];
+    }
+    return null;
   }
 
   getRefreshToken(): string | null {

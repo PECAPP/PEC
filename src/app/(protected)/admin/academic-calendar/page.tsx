@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, CheckCircle, XCircle, Loader2, Eye, Save, Trash2, Plus, Edit } from 'lucide-react';
+import { Upload, FileText, Loader2, Eye, Save, Trash2, Plus, Edit, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -216,11 +216,6 @@ export default function AdminAcademicCalendarPage() {
     setEditingEvent({ ...event });
   };
 
-  const handleEventDetail = (event: CalendarEvent) => {
-    setSelectedEvent(event);
-    setIsDetailOpen(true);
-  };
-
   const loadExistingEvents = async () => {
     try {
       const response = await api.get('/academic-calendar');
@@ -343,7 +338,7 @@ export default function AdminAcademicCalendarPage() {
                 Add Event
               </Button>
               <Button variant="outline" onClick={() => setView('upload')}>
-                <XCircle className="w-4 h-4 mr-2" />
+                <X className="w-4 h-4 mr-2" />
                 Cancel
               </Button>
               <Button onClick={() => setIsReplaceConfirmOpen(true)} disabled={isSaving || parsedEvents.length === 0}>
@@ -452,12 +447,12 @@ export default function AdminAcademicCalendarPage() {
         </div>
       )}
 
-      {editingParsedIndex !== null && parsedEvents[editingParsedIndex] && (
+      {editingParsedIndex !== null && (
         <ParsedEventEditModal
           event={parsedEvents[editingParsedIndex]}
-          isOpen={editingParsedIndex !== null}
+          isOpen={true}
           onClose={() => setEditingParsedIndex(null)}
-          onSave={(updatedEvent) => handleSaveParsedEvent(editingParsedIndex, updatedEvent)}
+          onSave={(updatedEvent) => handleSaveParsedEvent(editingParsedIndex as number, updatedEvent)}
         />
       )}
 

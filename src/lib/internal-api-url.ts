@@ -1,4 +1,4 @@
-const DEFAULT_INTERNAL_API_BASE = 'http://localhost:8000/api';
+const DEFAULT_INTERNAL_API_BASE = 'http://localhost:4000/api';
 
 export const resolveInternalApiBaseUrl = (): string => {
   const configured =

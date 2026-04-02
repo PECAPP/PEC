@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
  Building2, Users, GraduationCap,
- Plus, Edit, Trash2, Upload, Download, Loader2,
+ Plus, Edit, Trash2, Upload, Download, Loader2, Search
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,17 +51,15 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
   defaultValues: emptyForm,
  });
 
- // Safe Action Hooks for professional status management
  const { execute: executeCreate } = useAction(createDepartmentAction, {
   onSuccess: () => {
-   toast.success('Department created!');
+   toast.success('Department created successfully!');
    setShowDialog(false);
    reset();
    router.refresh();
   },
   onError: ({ error }) => {
-    toast.error(error.serverError || 'Failed to create.');
-    router.refresh(); // Sync back to server state on error
+    toast.error(error.serverError || 'Failed to create department.');
   }
  });
 
@@ -74,8 +72,7 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
    router.refresh();
   },
   onError: ({ error }) => {
-    toast.error(error.serverError || 'Failed to update.');
-    router.refresh();
+    toast.error(error.serverError || 'Failed to update department.');
   }
  });
 
@@ -85,8 +82,7 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
    router.refresh();
   },
   onError: ({ error }) => {
-    toast.error(error.serverError || 'Failed to delete.');
-    router.refresh();
+    toast.error(error.serverError || 'Failed to delete department.');
   }
  });
 
@@ -155,7 +151,6 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
   const errors: string[] = [];
 
   for (const row of data) {
-   // Manual execution for bulk loop
    const result = await createDepartmentAction({
     name: row.name,
     code: row.code,
@@ -165,7 +160,7 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
    
    if (result?.validationErrors || result?.serverError) {
     failCount++;
-    errors.push(`${row.name}: Validation or Server Error`);
+    errors.push(`${row.name}: Error`);
    } else {
     successCount++;
    }
@@ -180,77 +175,77 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
   d.code?.toLowerCase().includes(searchTerm.toLowerCase())
  );
 
- const bulkTemplate = ['name', 'code', 'hod', 'description'];
- const sampleData = [
-  { name: 'Computer Science', code: 'CS', hod: 'Dr. John Smith', description: 'CSE Dept' },
-  { name: 'Mechanical Engineering', code: 'ME', hod: 'Dr. Jane Doe', description: 'ME Dept' },
- ];
-
  return (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
    <div className="flex items-center justify-between">
     <div>
-     <h1 className="text-2xl font-bold text-foreground uppercase tracking-tight">Departments</h1>
-     <p className="text-muted-foreground mt-1 font-medium italic">Integrated Domain Governance</p>
+     <h1 className="text-3xl font-bold tracking-tight">Departments</h1>
+     <p className="text-muted-foreground mt-1 font-medium italic text-[11px]">Manage and track institutional academic departments</p>
     </div>
-    <div className="flex gap-2">
-     <Button variant="outline" onClick={exportDepartments} className="h-11 rounded-sm border-2">
+    <div className="flex gap-3">
+     <Button variant="outline" onClick={exportDepartments} className="h-11 rounded-sm border-2 font-bold px-6">
       <Download className="w-4 h-4 mr-2" /> Export
      </Button>
-     <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-11 rounded-sm border-2">
+     <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-11 rounded-sm border-2 font-bold px-6">
       <Upload className="w-4 h-4 mr-2" /> Bulk Upload
      </Button>
      {isAdmin && (
-      <Button onClick={() => { resetForm(); setEditingDept(null); setShowDialog(true); }} className="h-11 rounded-sm bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[10px]">
+      <Button onClick={() => { resetForm(); setEditingDept(null); setShowDialog(true); }} className="h-11 rounded-sm bg-primary text-white font-bold uppercase tracking-widest text-[10px] px-6">
        <Plus className="w-4 h-4 mr-2" /> Add Department
       </Button>
      )}
     </div>
    </div>
 
-   <div className="grid gap-4 md:grid-cols-3">
+   <div className="grid gap-6 md:grid-cols-3">
     {[
-     { icon: Building2, label: 'Domain Nodes', value: optimisticDepts.length, color: 'primary' },
-     { icon: GraduationCap, label: 'Active Clusters', value: optimisticDepts.filter(d => d.status !== 'inactive').length, color: 'success' },
-     { icon: Users, label: 'Managed Leads', value: optimisticDepts.filter(d => d.hod).length, color: 'accent' },
+     { icon: Building2, label: 'Departments', value: optimisticDepts.length, color: 'primary' },
+     { icon: GraduationCap, label: 'Active', value: optimisticDepts.filter(d => d.status !== 'inactive').length, color: 'success' },
+     { icon: Users, label: 'HODs Assigned', value: optimisticDepts.filter(d => d.hod).length, color: 'warning' },
     ].map(({ icon: Icon, label, value, color }) => (
-     <div key={label} className="card-elevated p-6 border-b-4 border-r-4 border-primary/20">
+     <div key={label} className="card-elevated p-6 border-b-4 border-r-4 border-primary/10">
       <div className="flex items-center gap-4">
        <div className={`p-3 rounded-sm bg-${color}/10 border border-${color}/20`}><Icon className={`w-6 h-6 text-${color}`} /></div>
-       <div><p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</p><p className="text-3xl font-black leading-none mt-1">{value}</p></div>
+       <div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{label}</p>
+        <p className="text-4xl font-bold mt-1">{value}</p>
+       </div>
       </div>
      </div>
     ))}
    </div>
 
-   <Input placeholder="Filter matrix..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="h-12 border-2 rounded-sm bg-background/50 focus:border-primary transition-all font-medium" />
+   <div className="relative">
+    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+    <Input placeholder="Search departments..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="h-14 pl-12 border-2 rounded-sm bg-background/50 font-bold" />
+   </div>
 
-   <div className="card-elevated overflow-hidden border-2 rounded-sm shadow-[8px_8px_0px_rgba(0,0,0,0.05)]">
+   <div className="card-elevated overflow-hidden border-2 rounded-sm shadow-[12px_12px_0px_rgba(0,0,0,0.03)]">
     <div className="overflow-x-auto">
      <table className="w-full">
       <thead className="bg-muted/50 border-b-2 border-border">
        <tr>
-        {['ID Code', 'Department Name', 'HOD Persona', 'Actions'].map((h, i) => (
-         <th key={h} className={`p-5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ${i === 3 ? 'text-right' : 'text-left'}`}>{h}</th>
+        {['Code', 'Name', 'Head of Department', 'Actions'].map((h, i) => (
+         <th key={h} className={`p-5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 ${i === 3 ? 'text-right' : 'text-left'}`}>{h}</th>
         ))}
        </tr>
       </thead>
       <tbody className="divide-y divide-border">
        {filtered.length === 0 ? (
-        <tr><td colSpan={4} className="p-12 text-center text-muted-foreground font-medium italic">No nodes identified in current parity.</td></tr>
+        <tr><td colSpan={4} className="p-12 text-center text-muted-foreground font-medium italic">No departments found.</td></tr>
        ) : filtered.map(dept => (
         <tr key={dept.id} className="hover:bg-muted/30 cursor-pointer transition-all border-l-4 border-transparent hover:border-primary" onClick={() => router.push(`/departments/${dept.id}`)}>
-         <td className="p-5 font-bold font-mono text-primary text-sm uppercase">{dept.code}</td>
+         <td className="p-5 font-bold font-mono text-primary text-sm tracking-tight">{dept.code}</td>
          <td className="p-5 font-bold text-foreground text-base tracking-tight">{dept.name}</td>
          <td className="p-5 text-muted-foreground font-mono text-xs uppercase opacity-70">{dept.hodName || dept.hod || '---'}</td>
          <td className="p-5">
           <div className="flex items-center justify-end gap-3" onClick={e => e.stopPropagation()}>
            {isAdmin && (
             <>
-             <Button variant="ghost" size="sm" onClick={() => openEditDialog(dept)} className="hover:bg-primary/10 hover:text-primary rounded-sm">
+             <Button variant="ghost" size="sm" onClick={() => openEditDialog(dept)} className="hover:bg-primary/10 hover:text-primary rounded-sm h-9 w-9 p-0">
               <Edit className="w-4 h-4" />
              </Button>
-             <Button variant="ghost" size="sm" onClick={() => handleDelete(dept.id)} disabled={isDeleting} className="hover:bg-destructive/10 hover:text-destructive rounded-sm">
+             <Button variant="ghost" size="sm" onClick={() => handleDelete(dept.id)} disabled={isDeleting} className="hover:bg-destructive/10 hover:text-destructive rounded-sm h-9 w-9 p-0">
               {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
              </Button>
             </>
@@ -265,36 +260,36 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
    </div>
 
    <Dialog open={showDialog} onOpenChange={setShowDialog}>
-    <DialogContent className="max-w-xl rounded-sm border-2 border-primary shadow-[15px_15px_0px_rgba(255,0,0,0.1)]">
+    <DialogContent className="max-w-xl rounded-sm border-2 border-primary shadow-[20px_20px_0px_rgba(0,0,0,0.05)]">
      <DialogHeader className="space-y-4">
-      <DialogTitle className="text-3xl font-black uppercase tracking-tight">{editingDept ? 'Update Node' : 'Initialize Node'}</DialogTitle>
-      <DialogDescription className="font-bold text-[11px] uppercase tracking-widest text-muted-foreground bg-muted p-2 rounded-sm">Secure Domain Record Entry</DialogDescription>
+      <DialogTitle className="text-3xl font-bold">{editingDept ? 'Edit Department' : 'Add New Department'}</DialogTitle>
+      <DialogDescription className="font-bold text-[11px] uppercase tracking-widest text-muted-foreground bg-muted p-2 rounded-sm italic opacity-60">Institutional Department Details</DialogDescription>
      </DialogHeader>
      <div className="space-y-6 pt-4">
       <div className="grid grid-cols-2 gap-6">
        <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Entry Code *</label>
+        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Department Code *</label>
         <Input {...register('code')} placeholder="e.g. CS" className={`mt-1 h-12 border-2 rounded-sm font-bold font-mono ${errors.code ? 'border-destructive' : ''}`} />
         {errors.code && <p className="text-[10px] font-bold text-destructive uppercase">{errors.code.message}</p>}
        </div>
        <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Formal Title *</label>
-        <Input {...register('name')} placeholder="e.g. Computer Science" className={`mt-1 h-12 border-2 rounded-sm font-black ${errors.name ? 'border-destructive' : ''}`} />
+        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Department Name *</label>
+        <Input {...register('name')} placeholder="e.g. Computer Science" className={`mt-1 h-12 border-2 rounded-sm font-bold ${errors.name ? 'border-destructive' : ''}`} />
         {errors.name && <p className="text-[10px] font-bold text-destructive uppercase">{errors.name.message}</p>}
        </div>
       </div>
       <div className="space-y-2">
-       <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assigned Lead Lead</label>
-       <Input {...register('hod')} placeholder="e.g. Dr. Persona" className="mt-1 h-12 border-2 rounded-sm font-bold" />
+       <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Head of Department (HOD)</label>
+       <Input {...register('hod')} placeholder="e.g. Dr. John Doe" className="mt-1 h-12 border-2 rounded-sm font-bold" />
       </div>
       <div className="space-y-2">
-       <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Manifest Definition</label>
-       <textarea {...register('description')} placeholder="Define node parameters..." className="mt-1 w-full min-h-[100px] p-4 rounded-sm border-2 border-border bg-background/50 font-medium focus:border-primary transition-all" />
+       <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Description</label>
+       <textarea {...register('description')} placeholder="Describe the department's focus..." className="mt-1 w-full min-h-[100px] p-4 rounded-sm border-2 border-border bg-background/50 font-medium focus:border-primary transition-all" />
       </div>
       <div className="flex gap-4 pt-6">
-       <Button onClick={formSubmit(onSubmit)} className="flex-1 h-14 bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
+       <Button onClick={formSubmit(onSubmit)} className="flex-1 h-14 bg-primary text-white font-bold uppercase tracking-widest text-xs shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
         {isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-        {editingDept ? 'Update Domain Node' : 'Authorize Node Creation'}
+        {editingDept ? 'Save Changes' : 'Create Department'}
        </Button>
        <Button variant="outline" onClick={() => { setShowDialog(false); setEditingDept(null); resetForm(); }} className="h-14 border-2 font-bold px-8 uppercase tracking-widest text-[10px] rounded-sm">Cancel</Button>
       </div>
@@ -303,17 +298,16 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
    </Dialog>
 
    <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-    <DialogContent className="max-w-4xl border-2 border-primary rounded-sm overflow-hidden">
+    <DialogContent className="max-w-4xl border-2 border-primary rounded-sm overflow-hidden p-0">
      <DialogHeader className="bg-primary text-white p-10">
-      <DialogTitle className="text-3xl font-black uppercase tracking-tight">Bulk Node Injection</DialogTitle>
-      <DialogDescription className="text-white/70 font-bold uppercase tracking-widest text-[11px] mt-2 italic">Standardized CSV/XLSX Protocol Access</DialogDescription>
+      <DialogTitle className="text-3xl font-bold">Bulk Upload Departments</DialogTitle>
+      <DialogDescription className="text-white/70 font-bold uppercase tracking-widest text-[11px] mt-2 italic">Standardized CSV/Excel data upload</DialogDescription>
      </DialogHeader>
      <div className="p-10">
-      <BulkUpload entityType="departments" onImport={handleBulkImport} templateColumns={bulkTemplate} sampleData={sampleData} />
+      <BulkUpload entityType="departments" onImport={handleBulkImport} templateColumns={['name', 'code', 'hod', 'description']} sampleData={[{ name: 'Computer Science', code: 'CS', hod: 'Dr. John Smith', description: 'CSE Dept' }]} />
      </div>
     </DialogContent>
    </Dialog>
   </motion.div>
  );
 }
-
