@@ -44,13 +44,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface CourseDirectoryProps {
   initialCourses: Course[];
   initialEnrolledIds: string[];
+  initialEnrolledCourses?: Course[];
   user: any;
   studentProfile?: any;
 }
 
-export function CourseDirectory({ initialCourses, initialEnrolledIds, user, studentProfile }: CourseDirectoryProps) {
+export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnrolledCourses = [], user, studentProfile }: CourseDirectoryProps) {
   const [courses, setCourses] = useState(initialCourses);
-  const [enrolledCourseIds, setEnrolledCourseIds] = useState(initialEnrolledIds);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState(Array.from(new Set(initialEnrolledIds)));
   
   const [optimisticEnrolledIds, setOptimisticEnrolledIds] = useOptimistic(
     enrolledCourseIds,
@@ -142,7 +143,17 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, user, stud
     return true;
   });
   
-  const enrolled = courses.filter(c => optimisticEnrolledIds.includes(c.id));
+  const enrolledCourseMap = new Map<string, Course>();
+  for (const course of initialEnrolledCourses) {
+    if (course?.id) enrolledCourseMap.set(course.id, course);
+  }
+  for (const course of courses) {
+    if (course?.id) enrolledCourseMap.set(course.id, course);
+  }
+
+  const enrolled = optimisticEnrolledIds
+    .map((id) => enrolledCourseMap.get(id))
+    .filter((course): course is Course => Boolean(course));
 
   return (
     <div className="space-y-8 pb-10">

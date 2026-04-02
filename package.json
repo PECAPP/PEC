@@ -19,7 +19,7 @@
     "setup": "npm install --legacy-peer-deps && cd server && npm install --legacy-peer-deps && npx prisma db push --accept-data-loss && npx prisma generate && npm run db:seed && cd ..",
     "clean:full": "node -e \"const fs=require('fs');['node_modules','server/node_modules','.next','server/dist'].forEach(p=>fs.rmSync(p,{recursive:true,force:true})); console.log('Cleaned all artifacts.')\"",
     "clean:next": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});console.log('cleaned .next')\"",
-    "prisma:studio": "npx prisma studio --schema server/prisma/schema.prisma",
+    "prisma:studio": "npx prisma studio --config server/prisma.config.ts --browser none",
     "start": "next start",
     "start:fresh": "npm run clean:next && next build && next start"
   },

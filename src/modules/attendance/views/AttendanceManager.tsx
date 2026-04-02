@@ -95,26 +95,23 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
       const course = courses.find((c) => c.id === selectedCourse);
       const subjectId = course?.id || selectedCourse;
 
-      const [enrollRes, usersRes, attRes] = await Promise.all([
+      const [enrollRes, attRes] = await Promise.all([
         api.get<any>('/enrollments', { params: { courseId: selectedCourse, status: 'active', limit: 200 } }),
-        fetchAllPages<any>('/users', { role: 'student' }, 200),
         api.get<any>('/attendance', { params: { subject: subjectId, date: selectedDate } })
       ]);
 
       const enrolled = extractData<any[]>(enrollRes) || [];
-      const allUsers = Array.isArray(usersRes) ? usersRes : [];
       const records = extractData<any[]>(attRes) || [];
       
-      const userMap = new Map(allUsers.map((u: any) => [u.id, u]));
       const recordMap = new Map(records.map((r: any) => [r.studentId, r]));
 
       setStudents(enrolled.map(en => {
-        const u = userMap.get(en.studentId);
+        const student = en.student || null;
         const r = recordMap.get(en.studentId);
         return {
           id: en.studentId,
-          name: u?.fullName || 'Unknown Student',
-          email: u?.email || '',
+          name: student?.name || student?.fullName || 'Unknown Student',
+          email: student?.email || '',
           recordId: r?.id,
           status: r?.status || null
         };

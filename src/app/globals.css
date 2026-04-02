@@ -319,8 +319,6 @@ html {
     --muted-foreground: 40 20% 70%;
     --border: 40 25% 22%;
     --sidebar-border: 40 25% 22%;
-    --accent: 45 95% 15%;
-    --accent-foreground: 45 95% 55%;
   }
 
   .accent-pec-gold:not(.dark),
@@ -339,8 +337,6 @@ html {
     --muted-foreground: 42 15% 42%;
     --border: 40 22% 88%;
     --sidebar-border: 40 22% 88%;
-    --accent: 45 92% 92%;
-    --accent-foreground: 45 95% 35%;
   }
 
   /* Theme 2: Emerald (Deep Green Tint) */

@@ -9,12 +9,32 @@ export async function FacultyDataSlot({ session }: { session: any }) {
   let notices: any[] = [];
 
   try {
-    [courses, stats, profile, notices] = await Promise.all([
-      serverFetch(`/courses?facultyId=${session.uid}&limit=20`),
+    [stats, profile, notices] = await Promise.all([
       serverFetch('/attendance/faculty-stats'),
       serverFetch('/auth/profile'),
       serverFetch('/noticeboard?limit=5'),
     ]);
+
+    const scopedCourses = await serverFetch(`/courses?facultyId=${session.uid}&limit=200`);
+    courses = Array.isArray(scopedCourses) ? scopedCourses : [];
+
+    if (!courses.length) {
+      const allCourses = await serverFetch('/courses?limit=200');
+      const facultyName = String(
+        profile?.fullName || profile?.name || session.fullName || ''
+      ).toLowerCase();
+      const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
+      courses = safeAllCourses.filter((course: any) => {
+        if (course.facultyId === session.uid || course.instructorId === session.uid) {
+          return true;
+        }
+        if (!facultyName) return false;
+        const instructor = String(
+          course.instructor || course.facultyName || course.instructorName || ''
+        ).toLowerCase();
+        return instructor.includes(facultyName);
+      });
+    }
   } catch (err) {
     console.error('[FacultyDataSlot] SSR Fetch Error:', err);
   }

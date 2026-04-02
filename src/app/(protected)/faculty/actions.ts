@@ -48,7 +48,7 @@ export async function createFaculty(_prev: any, formData: FormData) {
   const { ok } = await apiFetch('POST', 'users', validation.data);
   if (!ok) return { error: 'Failed to create faculty member' };
 
-  revalidateTag('faculty', 'default');
+  revalidateTag('faculty');
   logActivity('create', 'faculty', { name: validation.data.fullName, email: validation.data.email });
   return { success: true };
 }
@@ -73,7 +73,7 @@ export async function updateFaculty(_prev: any, formData: FormData) {
   const { ok } = await apiFetch('PATCH', `users/${id}`, validation.data);
   if (!ok) return { error: 'Failed to update faculty member' };
 
-  revalidateTag('faculty', 'default');
+  revalidateTag('faculty');
   logActivity('update', 'faculty', { id, email: validation.data.email });
   return { success: true };
 }
@@ -83,7 +83,7 @@ export async function deleteFaculty(_prev: any, formData: FormData) {
   const { ok } = await apiFetch('DELETE', `users/${id}`);
   if (!ok) return { error: 'Failed to delete faculty member' };
 
-  revalidateTag('faculty', 'default');
+  revalidateTag('faculty');
   logActivity('delete', 'faculty', { id });
   return { success: true };
 }
@@ -117,8 +117,8 @@ export async function promoteToHOD(_prev: any, formData: FormData) {
     }
   }
 
-  revalidateTag('faculty', 'default');
-  revalidateTag('departments', 'default');
+  revalidateTag('faculty');
+  revalidateTag('departments');
   logActivity('promote', 'faculty', { id, role: 'HOD' });
   return { success: true };
 }
