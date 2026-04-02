@@ -41,7 +41,7 @@ export const createFacultyAction = actionClient
       throw new Error('Failed to create faculty member via gateway API.');
     }
 
-    revalidateTag('faculty');
+    revalidateTag('faculty', 'default' as any);
     logActivity('create', 'faculty', { name: parsedInput.fullName, email: parsedInput.email });
     return { success: true };
   });
@@ -57,7 +57,7 @@ export const updateFacultyAction = actionClient
       throw new Error('Failed to update faculty member.');
     }
 
-    revalidateTag('faculty');
+    revalidateTag('faculty', 'default' as any);
     logActivity('update', 'faculty', { id: parsedInput.id, email: parsedInput.email });
     return { success: true };
   });
@@ -72,7 +72,7 @@ export const deleteFacultyAction = actionClient
       throw new Error('Failed to delete faculty member.');
     }
 
-    revalidateTag('faculty');
+    revalidateTag('faculty', 'default' as any);
     logActivity('delete', 'faculty', { id });
     return { success: true };
   });
@@ -102,8 +102,8 @@ export const promoteToHODAction = actionClient
       }
     }
 
-    revalidateTag('faculty');
-    revalidateTag('departments');
+    revalidateTag('faculty', 'default' as any);
+    revalidateTag('departments', 'default' as any);
     logActivity('promote', 'faculty', { id: parsedInput.id, role: 'HOD' });
     return { success: true };
   });
