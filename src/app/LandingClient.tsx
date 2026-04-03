@@ -17,11 +17,6 @@ const IntegrationsSection = dynamic(() => import('@/components/landing/Integrati
   loading: () => <div className="h-screen bg-black animate-pulse" />,
 });
 
-const TestimonialsSection = dynamic(() => import('@/components/landing/TestimonialsSection').then(mod => mod.TestimonialsSection), {
-  loading: () => <div className="h-screen bg-black animate-pulse" />,
-});
-
-
 
 const FAQSection = dynamic(() => import('@/components/landing/FAQSection').then(mod => mod.FAQSection), {
   loading: () => <div className="h-[50vh] bg-black animate-pulse" />,
@@ -48,9 +43,7 @@ export function LandingClient() {
       <FeaturesSection />
       <HowItWorksSection />
       <IntegrationsSection />
-      <TestimonialsSection />
-
-      <FAQSection />
+<FAQSection />
       <Footer />
 
       {/* GLOBAL MOBILE FIXED BOTTOM BAR - TRANSPARENT FLOATING */}
