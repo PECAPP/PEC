@@ -8,8 +8,23 @@ export async function seedAcademicRecords(
   students: StudentSeed[],
   courses: CourseSeed[],
 ) {
+  const existingStudents = await prisma.user.findMany({
+    where: {
+      id: {
+        in: students.map((student) => student.id),
+      },
+    },
+    select: { id: true },
+  });
+  const validStudentIds = new Set(existingStudents.map((student) => student.id));
+
   const attendanceData: any[] = [];
   for (const student of students) {
+    if (!validStudentIds.has(student.id)) {
+      console.warn(`Skipping missing student during enrollment seed: ${student.id}`);
+      continue;
+    }
+
     const semesterCourses = courses.filter(
       (course) =>
         course.departmentCode === student.departmentCode &&

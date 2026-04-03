@@ -13,6 +13,7 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
+    "seed": "npm run db:seed",
     "db:seed": "ts-node seed.ts",
     "db:check": "ts-node check_db.ts",
     "db:backup": "node scripts/db-backup.js",
@@ -23,6 +24,7 @@
     "db:clean:confirm": "node scripts/db-clean.js",
     "db:migrate-sqlite": "node scripts/migrate-sqlite-to-postgres.js",
     "start": "nest start",
+    "prestart:dev": "npx kill-port 8000",
     "start:dev": "ts-node --project tsconfig.json -r tsconfig-paths/register --transpile-only src/main.ts",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
@@ -70,29 +72,6 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^3.24.1"
   },
-  "overrides": {
-    "tar": "^7.5.13",
-    "undici": "^7.24.6",
-    "path-to-regexp": "^8.4.1",
-    "@nestjs/core": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/platform-express": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/swagger": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/cli": {
-      "@angular-devkit/core": {
-        "picomatch": "^4.0.4"
-      }
-    },
-    "ajv": "^8.18.0",
-    "picomatch": "^4.0.4",
-    "handlebars": "^4.7.9",
-    "flatted": "^3.4.2"
-  },
   "devDependencies": {
     "@angular-devkit/core": "^21.2.5",
     "@angular-devkit/schematics": "^21.2.5",
@@ -115,6 +94,7 @@
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
     "jest": "^30.0.0",
+    "kill-port": "^2.0.1",
     "prettier": "^3.4.2",
     "prisma": "^7.6.0",
     "source-map-support": "^0.5.21",

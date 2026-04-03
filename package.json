@@ -4,12 +4,14 @@
   "version": "0.0.0",
   "packageManager": "npm@11.7.0",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "npm run dev:host",
+    "dev:turbo": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "frontend": "next dev -p 3000",
+    "frontend": "next dev -p 3001",
     "api": "npm --prefix server run start:dev -- --swc",
     "db:reset": "npm --prefix server run db:clean && npm --prefix server run db:push && npm --prefix server run db:seed",
+    "predev:host": "npx kill-port 3001 8000",
     "dev:host": "concurrently --kill-others \"npm run frontend\" \"npm run api\"",
     "check:env": "node tools/check_env.js",
     "dev:docker:logs": "docker compose -f docker-compose.dev.yml logs -f --tail=100",
@@ -111,20 +113,6 @@
     "tar": "^7.5.13",
     "undici": "^7.24.6",
     "path-to-regexp": "^8.4.1",
-    "@nestjs/core": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/platform-express": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/swagger": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/cli": {
-      "@angular-devkit/core": {
-        "picomatch": "^4.0.4"
-      }
-    },
     "picomatch": "^4.0.4",
     "handlebars": "^4.7.9",
     "flatted": "^3.4.2",
