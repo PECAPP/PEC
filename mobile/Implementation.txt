@@ -1,0 +1,1228 @@
+================================================================================
+         PEC CAMPUS ERP — FLUTTER MOBILE APP IMPLEMENTATION PLAN
+         Cross-Platform (Android + iOS) | Connected to Existing NestJS APIs
+================================================================================
+
+Document Version : 1.0
+Date             : 2026-04-04
+Author           : Aryan Singh
+Backend Base URL : http://<server-ip>:8000  (configurable per environment)
+Target Platforms : Android 8.0+ (API 26+) | iOS 14.0+
+Flutter Version  : 3.24.x (Dart 3.5.x)
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+ 1.  Executive Summary
+ 2.  Architecture Overview
+ 3.  Project Structure
+ 4.  Tech Stack & Dependencies
+ 5.  Authentication & Session Management
+ 6.  Feature Modules (Screen-by-Screen)
+ 7.  API Integration Strategy
+ 8.  State Management
+ 9.  Navigation & Routing
+10.  Offline Support & Caching
+11.  Real-Time Features (Chat & Notifications)
+12.  Mobile-Specific Features (QR, Camera, Notifications)
+13.  UI/UX Design System
+14.  Role-Based Access Control
+15.  Environment Configuration
+16.  Testing Strategy
+17.  Build & Release Pipeline
+18.  Phased Delivery Roadmap
+19.  Security Considerations
+20.  Known Constraints & Decisions
+
+================================================================================
+1. EXECUTIVE SUMMARY
+================================================================================
+
+The PEC Campus ERP system currently runs as a Next.js web application backed by
+a NestJS REST API. This plan describes building a Flutter mobile application that
+replicates the full feature set of the web app for Android and iOS, consuming the
+same existing backend APIs without any backend modification.
+
+The mobile app serves three primary user roles — Student, Faculty, and Admin —
+each with a tailored home dashboard and feature set. The UI follows the same
+neo-brutalist design language (bold borders, high-contrast colour palette) used
+in the web application, adapted for touch interaction and mobile ergonomics.
+
+Key deliverables:
+  • Single Flutter codebase targeting Android APK/AAB and iOS IPA.
+  • JWT-based authentication mirroring the web session model.
+  • Real-time chat powered by WebSocket (Socket.IO).
+  • QR code generation (faculty) and scanning (student) for attendance.
+  • Push notifications via Firebase Cloud Messaging (FCM).
+  • Offline-first caching for timetable, attendance, and course data.
+  • Role-gated navigation so each user sees only what is relevant.
+
+================================================================================
+2. ARCHITECTURE OVERVIEW
+================================================================================
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                     Flutter Mobile App                         │
+  │                                                                 │
+  │  ┌──────────┐  ┌──────────────┐  ┌──────────────────────────┐ │
+  │  │  UI Layer│  │ Business     │  │  Data Layer              │ │
+  │  │  Widgets │→ │ Logic (BLoC/ │→ │  Repositories            │ │
+  │  │  Screens │  │ Riverpod)    │  │  Remote (Dio HTTP)       │ │
+  │  └──────────┘  └──────────────┘  │  Local  (Hive/SQLite)    │ │
+  │                                  └──────────────────────────┘ │
+  └──────────────────────────┬──────────────────────────────────────┘
+                             │  REST / WebSocket
+  ┌──────────────────────────▼──────────────────────────────────────┐
+  │              NestJS Backend (Port 8000)                        │
+  │  Auth | Users | Courses | Attendance | Chat | Canteen | …     │
+  └─────────────────────────────────────────────────────────────────┘
+                             │
+  ┌──────────────────────────▼──────────────────────────────────────┐
+  │              PostgreSQL Database (Prisma ORM)                  │
+  └─────────────────────────────────────────────────────────────────┘
+
+Pattern: Feature-first Clean Architecture
+  • Presentation  → Flutter Widgets + Screens
+  • Domain        → Entities, Use Cases, Repository Interfaces
+  • Data          → Repository Implementations, DTOs, API Clients, Local Storage
+
+================================================================================
+3. PROJECT STRUCTURE
+================================================================================
+
+mobile/
+├── pec_app/                          ← Flutter project root
+│   ├── android/                      ← Android native config
+│   ├── ios/                          ← iOS native config
+│   ├── assets/
+│   │   ├── images/                   ← Logo, placeholders, illustrations
+│   │   ├── fonts/                    ← Monument Extended + Inter
+│   │   └── icons/                    ← SVG icons
+│   ├── lib/
+│   │   ├── main.dart                 ← Entry point, provider scope
+│   │   ├── app.dart                  ← MaterialApp + router init
+│   │   ├── core/
+│   │   │   ├── api/
+│   │   │   │   ├── api_client.dart   ← Dio instance with interceptors
+│   │   │   │   ├── api_endpoints.dart← All API URL constants
+│   │   │   │   └── websocket_client.dart ← Socket.IO client
+│   │   │   ├── auth/
+│   │   │   │   ├── token_storage.dart← Secure storage for JWT
+│   │   │   │   └── auth_interceptor.dart ← Token refresh interceptor
+│   │   │   ├── constants/
+│   │   │   │   ├── app_colors.dart
+│   │   │   │   ├── app_text_styles.dart
+│   │   │   │   └── app_dimensions.dart
+│   │   │   ├── errors/
+│   │   │   │   └── failures.dart     ← Typed failure classes
+│   │   │   ├── router/
+│   │   │   │   └── app_router.dart   ← GoRouter configuration
+│   │   │   ├── theme/
+│   │   │   │   └── app_theme.dart    ← ThemeData (light + dark)
+│   │   │   └── utils/
+│   │   │       ├── date_utils.dart
+│   │   │       ├── validators.dart
+│   │   │       └── permission_utils.dart
+│   │   ├── features/
+│   │   │   ├── auth/
+│   │   │   ├── dashboard/
+│   │   │   ├── courses/
+│   │   │   ├── attendance/
+│   │   │   ├── timetable/
+│   │   │   ├── examinations/
+│   │   │   ├── course_materials/
+│   │   │   ├── academic_calendar/
+│   │   │   ├── chat/
+│   │   │   ├── noticeboard/
+│   │   │   ├── clubs/
+│   │   │   ├── canteen/
+│   │   │   ├── rooms/
+│   │   │   ├── hostel_issues/
+│   │   │   ├── campus_map/
+│   │   │   ├── score_sheet/
+│   │   │   ├── departments/
+│   │   │   ├── faculty/
+│   │   │   ├── users/
+│   │   │   ├── profile/
+│   │   │   ├── resume_builder/
+│   │   │   ├── student_portfolio/
+│   │   │   ├── notifications/
+│   │   │   └── settings/
+│   │   └── shared/
+│   │       ├── widgets/              ← Reusable UI components
+│   │       ├── models/               ← Shared data models
+│   │       └── providers/            ← Global Riverpod providers
+│   ├── test/
+│   │   ├── unit/
+│   │   ├── widget/
+│   │   └── integration/
+│   ├── pubspec.yaml
+│   └── README.md
+└── Implementation.txt                ← This file
+
+Each feature folder follows this internal layout:
+  feature/
+  ├── data/
+  │   ├── datasources/   ← remote_datasource.dart, local_datasource.dart
+  │   ├── models/        ← JSON-serialisable DTOs (freezed)
+  │   └── repositories/  ← concrete repository implementation
+  ├── domain/
+  │   ├── entities/      ← pure Dart entities
+  │   ├── repositories/  ← abstract repository interface
+  │   └── usecases/      ← single-responsibility use case classes
+  └── presentation/
+      ├── screens/       ← full-page screens
+      ├── widgets/       ← feature-scoped widgets
+      └── providers/     ← Riverpod notifiers / state notifiers
+
+================================================================================
+4. TECH STACK & DEPENDENCIES
+================================================================================
+
+CORE FRAMEWORK
+  flutter                       ^3.24.0
+  dart                          ^3.5.0
+
+HTTP & NETWORKING
+  dio                           ^5.7.0    — HTTP client
+  dio_cookie_manager            ^3.1.1    — Cookie handling for JWT
+  socket_io_client              ^2.0.3+1  — WebSocket / Socket.IO
+  connectivity_plus             ^6.0.5    — Network status detection
+
+STATE MANAGEMENT
+  flutter_riverpod              ^2.5.1    — Primary state management
+  riverpod_annotation           ^2.3.5    — Code generation for providers
+  freezed                       ^2.5.2    — Immutable state & union types
+  freezed_annotation             ^2.4.4
+
+ROUTING
+  go_router                     ^14.2.7   — Declarative routing with guards
+
+LOCAL STORAGE
+  flutter_secure_storage        ^9.2.2    — JWT token secure storage
+  hive_flutter                  ^1.1.0    — Offline cache (NoSQL)
+  hive                          ^2.2.3
+  sqflite                       ^2.3.3+1  — Structured local data if needed
+
+AUTHENTICATION
+  local_auth                    ^2.3.0    — Biometric / PIN unlock
+
+MEDIA & CAMERA
+  mobile_scanner                ^5.2.3    — QR code scanning (attendance)
+  qr_flutter                    ^4.1.0    — QR code generation (faculty)
+  image_picker                  ^1.1.2    — Profile photo / file upload
+  file_picker                   ^8.1.2    — Course material uploads
+
+NOTIFICATIONS
+  firebase_messaging            ^15.1.3   — FCM push notifications
+  flutter_local_notifications   ^18.0.1   — In-app notification banners
+  firebase_core                 ^3.6.0
+
+UI & DESIGN
+  google_fonts                  ^6.2.1    — Inter, Poppins fonts
+  flutter_svg                   ^2.0.10+1 — SVG icon rendering
+  cached_network_image          ^3.4.1    — Image caching
+  shimmer                       ^3.0.0    — Skeleton loading states
+  lottie                        ^3.1.2    — Animated illustrations
+  fl_chart                      ^0.69.0   — Charts (attendance stats, CGPA)
+  table_calendar                ^3.1.2    — Academic calendar widget
+  intl                          ^0.19.0   — Date/number localisation
+
+FORMS & VALIDATION
+  reactive_forms                ^17.0.0   — Reactive form handling
+  form_validator                ^2.1.1    — Field validators
+
+PDF & EXPORT
+  pdf                           ^3.11.1   — Generate score sheet / resume PDFs
+  printing                      ^5.13.1   — Print / share PDFs
+  share_plus                    ^10.0.2   — Share content across apps
+
+MAPS (Campus)
+  flutter_map                   ^7.0.2    — 2D campus map (OpenStreetMap tiles)
+  latlong2                      ^0.9.0    — Coordinate types
+
+CODE GENERATION (dev)
+  build_runner                  ^2.4.12
+  riverpod_generator            ^2.4.3
+  freezed                       ^2.5.2
+  json_serializable             ^6.8.0
+
+TESTING (dev)
+  flutter_test                  (SDK)
+  mockito                       ^5.4.4
+  bloc_test                     ^9.1.7
+  integration_test              (SDK)
+
+================================================================================
+5. AUTHENTICATION & SESSION MANAGEMENT
+================================================================================
+
+FLOW
+  1. User opens app → GoRouter guard checks for stored access token.
+  2. No token → redirect to /login screen.
+  3. Login screen calls POST /auth/sign-in with {email, password}.
+  4. Backend returns {accessToken, refreshToken, user}.
+  5. Tokens stored in FlutterSecureStorage (AES-256 backed by Keychain/Keystore).
+  6. User entity (id, name, email, roles, profileComplete) stored in Hive.
+  7. Dio interceptor attaches accessToken as Authorization: Bearer header.
+  8. On 401 response → interceptor calls POST /auth/refresh with refreshToken.
+  9. On success → store new tokens, retry original request.
+  10. On refresh failure → clear tokens, redirect to /login.
+
+TOKEN STORAGE KEYS
+  KEY_ACCESS_TOKEN   → flutter_secure_storage
+  KEY_REFRESH_TOKEN  → flutter_secure_storage
+  KEY_USER_JSON      → hive box 'auth'
+
+BIOMETRIC UNLOCK
+  After first login, offer biometric lock (local_auth).
+  On subsequent opens, verify biometric before decrypting stored token.
+  User can disable this in Settings.
+
+ROLE DETECTION
+  Parse user.roles[] array from stored user JSON.
+  Expose currentRole via Riverpod AuthNotifier.
+  Navigation guard uses role to build bottom-nav items dynamically.
+
+SCREENS
+  /login              → Email + password form, "Forgot password" link
+  /forgot-password    → Email input → POST /auth/forgot-password
+  /reset-password     → Token + new password → POST /auth/reset-password
+  /onboarding         → Profile completion wizard (mirrors web /onboarding)
+  /role-selection     → If user has multiple roles, pick active role
+
+================================================================================
+6. FEATURE MODULES (SCREEN-BY-SCREEN)
+================================================================================
+
+Each section below lists: Screen Name | API Endpoints Used | Key UI Elements
+
+────────────────────────────────────────────────────────────────────────────────
+6.1 DASHBOARD
+────────────────────────────────────────────────────────────────────────────────
+Screen: DashboardScreen
+Endpoints:
+  GET  /users/me
+  GET  /courses?enrolled=true
+  GET  /attendance/summary?userId=:id
+  GET  /timetable/today
+  GET  /notices?limit=3
+  GET  /academic-calendar/upcoming
+
+UI Elements:
+  • Greeting header with user avatar
+  • Today's timetable horizontal scroll list
+  • Attendance percentage ring chart
+  • Quick-action grid (Scan QR, Courses, Chat, Noticeboard)
+  • Recent notices card list
+  • Upcoming exam countdown card
+  • Role-specific widgets:
+      Student  → CGPA pill, enrolled courses count
+      Faculty  → Classes today, pending attendance sessions
+      Admin    → Pending approvals, active users count
+
+────────────────────────────────────────────────────────────────────────────────
+6.2 COURSES
+────────────────────────────────────────────────────────────────────────────────
+Screens: CourseListScreen, CourseDetailScreen, AddCourseScreen (Admin/Faculty)
+Endpoints:
+  GET    /courses
+  GET    /courses/:id
+  POST   /courses           (admin/faculty)
+  PATCH  /courses/:id       (admin/faculty)
+  DELETE /courses/:id       (admin)
+  GET    /enrollments?courseId=:id
+  POST   /enrollments       (enroll student)
+
+UI Elements:
+  • Search + filter bar (department, semester, faculty)
+  • Course card grid with credit hours badge
+  • Course detail: description, faculty, prerequisites, enrolled count
+  • Enroll/Unenroll button (student)
+  • Materials tab → links to course_materials feature
+  • Attendance tab → links to attendance feature
+
+────────────────────────────────────────────────────────────────────────────────
+6.3 ATTENDANCE
+────────────────────────────────────────────────────────────────────────────────
+Screens: AttendanceHomeScreen, QRScanScreen, QRGenerateScreen,
+         AttendanceHistoryScreen, AttendanceSessionScreen
+
+Endpoints:
+  GET  /attendance?studentId=:id
+  GET  /attendance?courseId=:id      (faculty)
+  POST /attendance-session           (faculty — create session + QR payload)
+  GET  /attendance-session/:id
+  POST /attendance                   (student marks via QR scan)
+  GET  /attendance/summary
+
+STUDENT FLOW
+  1. Open Scan QR screen → camera activates via mobile_scanner.
+  2. Scan QR code generated by faculty.
+  3. App calls POST /attendance with {sessionId, studentId, timestamp}.
+  4. Success confirmation with animated tick.
+
+FACULTY FLOW
+  1. Open Generate QR screen → pick course, select date/time.
+  2. POST /attendance-session → receive sessionId + QR payload.
+  3. Display generated QR on screen (qr_flutter) for students to scan.
+  4. Live list of students who have marked attendance, auto-refreshes.
+
+UI Elements:
+  • Attendance % per course (progress bar)
+  • Calendar heat map of attendance
+  • Session management list for faculty
+  • Manual override entry for faculty
+
+────────────────────────────────────────────────────────────────────────────────
+6.4 TIMETABLE
+────────────────────────────────────────────────────────────────────────────────
+Screens: TimetableScreen, TimetableDetailScreen
+Endpoints:
+  GET  /timetable?userId=:id
+  GET  /timetable?courseId=:id
+  POST /timetable              (admin)
+  PATCH /timetable/:id         (admin)
+
+UI Elements:
+  • Weekly view with day column layout
+  • Time slot cards with room, faculty, and subject info
+  • Tap card → detail bottom sheet
+  • Conflict highlight (admin view)
+  • Export to calendar (iOS/Android Calendar intent)
+
+────────────────────────────────────────────────────────────────────────────────
+6.5 EXAMINATIONS
+────────────────────────────────────────────────────────────────────────────────
+Screens: ExamListScreen, ExamDetailScreen, AddExamScreen (Admin)
+Endpoints:
+  GET  /examinations
+  GET  /examinations/:id
+  POST /examinations     (admin)
+  PATCH /examinations/:id
+
+UI Elements:
+  • Grouped by upcoming / past
+  • Countdown timer to next exam
+  • Room and seating info
+  • Download admit card (PDF generation on-device)
+
+────────────────────────────────────────────────────────────────────────────────
+6.6 COURSE MATERIALS
+────────────────────────────────────────────────────────────────────────────────
+Screens: MaterialsListScreen, MaterialDetailScreen, UploadMaterialScreen
+Endpoints:
+  GET    /course-materials?courseId=:id
+  POST   /course-materials   (multipart upload — faculty)
+  DELETE /course-materials/:id
+
+UI Elements:
+  • File type icon (PDF, PPT, DOC, video)
+  • Download progress indicator
+  • Open-in / share functionality (share_plus)
+  • Upload screen with file picker + title/description form
+
+────────────────────────────────────────────────────────────────────────────────
+6.7 ACADEMIC CALENDAR
+────────────────────────────────────────────────────────────────────────────────
+Screens: CalendarScreen, EventDetailScreen, AddEventScreen (Admin)
+Endpoints:
+  GET  /academic-calendar
+  GET  /academic-calendar/:id
+  POST /academic-calendar   (admin)
+  PATCH /academic-calendar/:id
+
+UI Elements:
+  • table_calendar widget in month/week view
+  • Event dots colour-coded by type (holiday, exam, event)
+  • Tap day → event list bottom sheet
+  • Admin: inline add event FAB
+
+────────────────────────────────────────────────────────────────────────────────
+6.8 CHAT (REAL-TIME)
+────────────────────────────────────────────────────────────────────────────────
+Screens: ChatListScreen, ChatRoomScreen, NewChatScreen, GroupInfoScreen
+Endpoints (REST):
+  GET  /chat/rooms
+  GET  /chat/rooms/:id/messages?cursor=:cursor
+  POST /chat/rooms               (create group)
+  POST /chat/rooms/:id/members   (add members)
+
+WebSocket Events (Socket.IO):
+  emit:    join_room   { roomId }
+  emit:    send_message { roomId, content, type }
+  emit:    typing       { roomId, userId }
+  on:      new_message  { message }
+  on:      user_typing  { userId, roomId }
+  on:      user_online  { userId }
+
+UI Elements:
+  • WhatsApp-style chat list with unread badge
+  • Chat bubble view with sent/delivered/read ticks
+  • Typing indicator (animated dots)
+  • Image/file attachment (image_picker)
+  • Group info screen with member list
+  • Search messages within room
+
+────────────────────────────────────────────────────────────────────────────────
+6.9 NOTICEBOARD
+────────────────────────────────────────────────────────────────────────────────
+Screens: NoticeListScreen, NoticeDetailScreen, CreateNoticeScreen (Admin/Faculty)
+Endpoints:
+  GET  /noticeboard
+  GET  /noticeboard/:id
+  POST /noticeboard   (admin/faculty)
+  PATCH /noticeboard/:id
+  DELETE /noticeboard/:id
+
+UI Elements:
+  • Priority badge (urgent / general / event)
+  • Category filter chips
+  • Rich text notice body (flutter_markdown)
+  • Pin to top (admin)
+  • Share notice button
+
+────────────────────────────────────────────────────────────────────────────────
+6.10 CLUBS
+────────────────────────────────────────────────────────────────────────────────
+Screens: ClubListScreen, ClubDetailScreen, ClubJoinRequestScreen
+Endpoints:
+  GET  /clubs
+  GET  /clubs/:id
+  POST /clubs/:id/join-request
+  PATCH /clubs/:id/join-request/:reqId  (admin approve/reject)
+  POST /clubs              (admin)
+
+UI Elements:
+  • Club card with banner image + member count
+  • Detail: description, events, members, join button
+  • Join request status chip (pending/approved/rejected)
+  • Admin request queue list
+
+────────────────────────────────────────────────────────────────────────────────
+6.11 CANTEEN
+────────────────────────────────────────────────────────────────────────────────
+Screens: CanteenMenuScreen, CartScreen, OrderHistoryScreen,
+         AdminMenuScreen (Admin)
+Endpoints:
+  GET  /canteen/items
+  POST /canteen/orders
+  GET  /canteen/orders?userId=:id
+  GET  /canteen/orders/:id
+  PATCH /canteen/orders/:id/status  (admin)
+  POST /canteen/items               (admin)
+  PATCH /canteen/items/:id          (admin)
+
+UI Elements:
+  • Grid menu with category tabs (breakfast/lunch/snacks)
+  • Item card: image, name, price, add-to-cart button
+  • Cart bottom sheet with quantity control
+  • Order confirmation with token number
+  • Order status tracker (placed → preparing → ready)
+  • Order history with re-order shortcut
+
+────────────────────────────────────────────────────────────────────────────────
+6.12 ROOMS
+────────────────────────────────────────────────────────────────────────────────
+Screens: RoomListScreen, RoomDetailScreen, RoomBookingScreen
+Endpoints:
+  GET  /rooms
+  GET  /rooms/:id
+  GET  /rooms/availability?date=:date
+  POST /rooms/booking
+  DELETE /rooms/booking/:id
+
+UI Elements:
+  • List/grid toggle with building filter
+  • Capacity, facilities chips
+  • Availability calendar (booked / free slots)
+  • Book slot form with purpose field
+
+────────────────────────────────────────────────────────────────────────────────
+6.13 HOSTEL ISSUES
+────────────────────────────────────────────────────────────────────────────────
+Screens: IssueListScreen, IssueDetailScreen, ReportIssueScreen
+Endpoints:
+  GET  /hostel-issues
+  GET  /hostel-issues/:id
+  POST /hostel-issues
+  PATCH /hostel-issues/:id/status  (admin)
+
+UI Elements:
+  • Issue list with priority colour code
+  • Status progress (reported → in-progress → resolved)
+  • Image attachments (camera/gallery)
+  • Admin: batch status update
+
+────────────────────────────────────────────────────────────────────────────────
+6.14 CAMPUS MAP
+────────────────────────────────────────────────────────────────────────────────
+Screen: CampusMapScreen, BuildingDetailScreen
+Endpoints:
+  GET /campus-map/regions
+  GET /campus-map/roads
+
+Implementation:
+  Use flutter_map with OpenStreetMap tiles or a static PNG floor plan.
+  Overlay custom GeoJSON polygons from /campus-map/regions.
+  Tap polygon → BuildingDetailScreen with name, floors, rooms info.
+  NOTE: The 3D Three.js map from the web cannot be directly ported.
+        Use a 2D interactive map as MVP; 3D via Flutter's scene3d or
+        a WebView embedding the existing Three.js scene as an enhancement.
+
+────────────────────────────────────────────────────────────────────────────────
+6.15 SCORE SHEET
+────────────────────────────────────────────────────────────────────────────────
+Screens: ScoreSheetScreen, CGPADetailScreen
+Endpoints:
+  GET /cgpa-entries?studentId=:id
+  GET /examinations/scores?studentId=:id
+
+UI Elements:
+  • Semester-wise grouped score table
+  • CGPA trend line chart (fl_chart)
+  • Credit distribution pie chart
+  • Export to PDF (pdf package)
+
+────────────────────────────────────────────────────────────────────────────────
+6.16 DEPARTMENTS
+────────────────────────────────────────────────────────────────────────────────
+Screens: DepartmentListScreen, DepartmentDetailScreen
+Endpoints:
+  GET /departments
+  GET /departments/:id
+
+UI Elements:
+  • Department card with HOD name and course count
+  • Detail: faculty list, course list, news
+
+────────────────────────────────────────────────────────────────────────────────
+6.17 FACULTY
+────────────────────────────────────────────────────────────────────────────────
+Screens: FacultyListScreen, FacultyDetailScreen, AddFacultyScreen (Admin)
+Endpoints:
+  GET  /faculty
+  GET  /faculty/:id
+  POST /faculty        (admin)
+  PATCH /faculty/:id   (admin)
+
+UI Elements:
+  • Faculty card with photo, designation, department
+  • Specialisation tags
+  • Contact (email intent)
+
+────────────────────────────────────────────────────────────────────────────────
+6.18 USERS / USER MANAGEMENT (Admin)
+────────────────────────────────────────────────────────────────────────────────
+Screens: UserListScreen, UserDetailScreen, AddUserScreen, BulkUploadScreen
+Endpoints:
+  GET  /users
+  GET  /users/:id
+  POST /users
+  PATCH /users/:id
+  DELETE /users/:id
+  POST /users/bulk-upload   (multipart CSV)
+
+UI Elements:
+  • Searchable user table with role filter
+  • User profile editor
+  • Bulk CSV upload with progress + error report
+  • Role assignment chips
+
+────────────────────────────────────────────────────────────────────────────────
+6.19 PROFILE
+────────────────────────────────────────────────────────────────────────────────
+Screen: ProfileScreen, EditProfileScreen
+Endpoints:
+  GET  /users/me
+  PATCH /users/me
+  POST /users/me/avatar    (multipart)
+
+UI Elements:
+  • Avatar with edit overlay
+  • Profile completeness progress bar
+  • Editable fields: name, phone, bio, social links
+  • Change password section
+  • Linked roles display
+
+────────────────────────────────────────────────────────────────────────────────
+6.20 RESUME BUILDER
+────────────────────────────────────────────────────────────────────────────────
+Screens: ResumeEditorScreen, ResumePreviewScreen
+Endpoints:
+  GET  /users/me/resume
+  PATCH /users/me/resume
+
+UI Elements:
+  • Section-by-section form (education, experience, skills, projects)
+  • Live PDF preview (pdf package widget)
+  • Template picker (2-3 styles)
+  • Download / share PDF
+
+────────────────────────────────────────────────────────────────────────────────
+6.21 STUDENT PORTFOLIO
+────────────────────────────────────────────────────────────────────────────────
+Screens: PortfolioScreen, AddProjectScreen
+Endpoints:
+  GET  /student-portfolio?studentId=:id
+  POST /student-portfolio
+  PATCH /student-portfolio/:id
+  DELETE /student-portfolio/:id
+
+UI Elements:
+  • Project card grid with tech stack chips
+  • GitHub / demo link buttons
+  • Add project form with image upload
+
+────────────────────────────────────────────────────────────────────────────────
+6.22 NOTIFICATIONS
+────────────────────────────────────────────────────────────────────────────────
+Screens: NotificationsScreen
+Endpoints:
+  GET  /notifications?userId=:id
+  PATCH /notifications/:id/read
+  DELETE /notifications/:id
+
+Push:
+  FCM device token registered on login via POST /users/me/fcm-token.
+  Background messages handled by firebase_messaging onBackgroundMessage.
+  Tap notification → deep link to relevant screen via GoRouter.
+
+UI Elements:
+  • Grouped by date (today / earlier)
+  • Unread dot + mark all read button
+  • Type-based icon (chat, notice, attendance, exam)
+
+────────────────────────────────────────────────────────────────────────────────
+6.23 SETTINGS
+────────────────────────────────────────────────────────────────────────────────
+Screen: SettingsScreen
+Sections:
+  • Appearance: dark/light mode toggle, colour theme selector
+  • Notifications: per-category push toggle
+  • Account: change password, biometric toggle, sign out
+  • College: college name, logo (admin only)
+  • About: app version, licences, feedback link
+
+================================================================================
+7. API INTEGRATION STRATEGY
+================================================================================
+
+BASE SETUP (api_client.dart)
+  • Single Dio instance with BaseOptions {baseUrl, connectTimeout, receiveTimeout}
+  • AuthInterceptor: adds Bearer token, handles 401 → refresh → retry
+  • LoggingInterceptor: logs requests/responses in debug builds only
+  • ErrorInterceptor: maps HTTP errors to typed Failure classes
+
+TYPED RESPONSE HANDLING
+  All API responses deserialised using freezed + json_serializable DTOs.
+  Repository layer maps DTOs → domain Entities.
+  Example:
+    CourseDto (json) → CourseEntity (domain)
+    Keeps API changes isolated from business logic.
+
+PAGINATION
+  Cursor-based pagination where backend supports it (chat messages).
+  Offset-based pagination for lists (courses, users, notices).
+  InfiniteScrollListView widget reads paginated endpoints automatically.
+
+FILE UPLOAD
+  Multipart/form-data via Dio FormData for:
+    - Profile avatar (image_picker → FormData)
+    - Course materials (file_picker → FormData)
+    - Bulk user CSV (file_picker → FormData)
+  Upload progress tracked via Dio onSendProgress callback.
+
+ERROR MAPPING
+  HTTP 400 → ValidationFailure (field errors from backend)
+  HTTP 401 → UnauthorisedFailure (triggers re-login)
+  HTTP 403 → ForbiddenFailure (role guard)
+  HTTP 404 → NotFoundFailure
+  HTTP 500 → ServerFailure
+  No connection → NetworkFailure (connectivity_plus)
+
+================================================================================
+8. STATE MANAGEMENT
+================================================================================
+
+Tool: Flutter Riverpod 2.x with code generation
+
+PROVIDER TYPES USED
+  @riverpod AsyncNotifier   → async data loading + mutations (most features)
+  @riverpod Notifier        → synchronous state (cart, form state)
+  @riverpod StreamNotifier  → real-time WebSocket streams (chat, notifications)
+  Provider                  → read-only derived data
+  FutureProvider            → simple one-shot async reads
+
+KEY GLOBAL PROVIDERS
+  authProvider           → AuthState { user, roles, status }
+  themeProvider          → ThemeMode
+  connectivityProvider   → ConnectivityStatus
+  chatSocketProvider     → WebSocket connection singleton
+  notificationProvider   → Unread count + notification list
+
+CACHING PATTERN
+  Riverpod's keepAlive() used for data that should persist across routes.
+  Hive boxes used for persisting data across cold starts.
+  Cache invalidation triggered by:
+    - Pull-to-refresh (ref.invalidate)
+    - Mutation success (ref.invalidate target provider)
+    - TTL-based expiry in local_datasource
+
+================================================================================
+9. NAVIGATION & ROUTING
+================================================================================
+
+Tool: GoRouter 14.x
+
+SHELL ROUTE (authenticated scaffold)
+  Wraps all protected screens in a common Scaffold with:
+    BottomNavigationBar   — 4-5 tabs (role-dependent)
+    AppBar                — with notification bell + avatar
+    Drawer (optional)     — full feature menu
+
+BOTTOM NAV TABS BY ROLE
+
+  Student:
+    1. Dashboard    (/dashboard)
+    2. Courses      (/courses)
+    3. Attendance   (/attendance)
+    4. Chat         (/chat)
+    5. More         (/more) → drawer/list for remaining features
+
+  Faculty:
+    1. Dashboard    (/dashboard)
+    2. Courses      (/courses)
+    3. Attendance   (/attendance/session)
+    4. Chat         (/chat)
+    5. More         (/more)
+
+  Admin:
+    1. Dashboard    (/dashboard)
+    2. Users        (/users)
+    3. Departments  (/departments)
+    4. Chat         (/chat)
+    5. More         (/more)
+
+ROUTE GUARDS
+  GoRouter redirect callback checks:
+    1. authProvider.status == unauthenticated → /login
+    2. onboarding incomplete → /onboarding
+    3. role selection needed → /role-selection
+  Role-specific routes guarded by checking currentRole in redirect.
+
+DEEP LINKS
+  Android: intent filter for pec://app/<path>
+  iOS: Universal Links + custom scheme pecapp://
+  Used for FCM notification taps.
+
+================================================================================
+10. OFFLINE SUPPORT & CACHING
+================================================================================
+
+STRATEGY
+  Network-first with local fallback for most data.
+  Cache-first for static/infrequently-changing data.
+
+CACHED DATA (Hive boxes)
+  Box 'timetable'          → today's + weekly timetable (TTL: 24h)
+  Box 'courses'            → enrolled courses list (TTL: 12h)
+  Box 'attendance_summary' → per-course attendance % (TTL: 1h)
+  Box 'notices'            → latest 20 notices (TTL: 30min)
+  Box 'chat_messages'      → last 50 messages per room (persistent)
+  Box 'user_profile'       → own profile (TTL: session)
+
+NOT CACHED (always live)
+  Exam scores, CGPA entries, canteen orders, room bookings.
+
+OFFLINE INDICATOR
+  Global banner at top of screen when ConnectivityStatus == offline.
+  Cached data shown with "Last updated: X min ago" label.
+  Mutation queued offline → retried on reconnect (basic queue in Hive).
+
+================================================================================
+11. REAL-TIME FEATURES (CHAT & NOTIFICATIONS)
+================================================================================
+
+WEBSOCKET (socket_io_client)
+  Connection established after successful login.
+  Singleton managed by chatSocketProvider (Riverpod).
+  Reconnect with exponential backoff on disconnect.
+  Rooms joined/left as user navigates in/out of chat screens.
+
+CHAT EVENTS
+  Client → Server:
+    join_room      { roomId }
+    leave_room     { roomId }
+    send_message   { roomId, content, type: 'text'|'image'|'file' }
+    typing_start   { roomId }
+    typing_stop    { roomId }
+    mark_read      { roomId, messageId }
+
+  Server → Client:
+    new_message    { message: MessageEntity }
+    message_read   { roomId, userId, messageId }
+    user_typing    { roomId, userId }
+    user_online    { userId }
+    user_offline   { userId }
+
+FCM PUSH NOTIFICATIONS
+  Foreground:  flutter_local_notifications shows in-app banner.
+  Background:  Firebase handles OS notification tray display.
+  Data payload includes { type, entityId, route } for deep linking.
+  On tap:      GoRouter.go(notification.route).
+
+================================================================================
+12. MOBILE-SPECIFIC FEATURES
+================================================================================
+
+QR CODE SCANNING (mobile_scanner)
+  Permissions: Camera (requested on first use with rationale dialog).
+  Flow: Open CameraPreview → decode QR → validate payload format
+        → POST /attendance → show result overlay.
+  Error handling: expired session QR, invalid format, already marked.
+
+QR CODE GENERATION (qr_flutter)
+  Faculty generates QR containing: { sessionId, courseId, expiresAt }.
+  QR refreshes every 30 seconds (auto-rotation for security).
+  Brightness boosted to max on QR display screen for easy scanning.
+
+BIOMETRIC AUTH (local_auth)
+  Fingerprint / Face ID / PIN fallback.
+  Only used for app unlock, not re-authentication to backend.
+
+FILE HANDLING
+  Downloads saved to app-specific external storage (path_provider).
+  Open-in system viewer via open_file package.
+  Share via share_plus.
+
+PERMISSIONS REQUIRED
+  CAMERA              → QR scanning, profile photo
+  READ/WRITE_STORAGE  → file downloads, uploads (Android <13 only)
+  NOTIFICATIONS       → FCM push (Android 13+ runtime permission)
+  INTERNET            → all network calls
+  USE_BIOMETRIC       → biometric unlock
+
+================================================================================
+13. UI/UX DESIGN SYSTEM
+================================================================================
+
+DESIGN LANGUAGE
+  Matches the web app's Neo-Brutalist aesthetic:
+    • Bold black borders (Border: 3-4px solid black)
+    • Offset drop shadows: BoxShadow(offset: Offset(6,6), color: Colors.black)
+    • High-contrast fills: yellow (#FACC15), green (#4ADE80), blue (#3B82F6)
+    • All-caps typography for headings with tight letter spacing
+    • Flat, sharp-cornered cards (borderRadius: 0 or 4)
+
+TYPOGRAPHY
+  Display / Heading : "Monument Extended" (loaded via assets/fonts/)
+  Body              : "Inter" (via google_fonts package)
+  Mono              : "JetBrains Mono" (code, tokens)
+
+COLOUR PALETTE
+  Background Dark   : #000000
+  Background Light  : #FFFFFF
+  Primary Yellow    : #FACC15
+  Accent Green      : #4ADE80
+  Accent Blue       : #3B82F6
+  Accent Red        : #EF4444
+  Border            : #000000
+  Text Primary      : #000000 (light) / #FFFFFF (dark)
+  Text Secondary    : rgba(0,0,0,0.6) (light) / rgba(255,255,255,0.6) (dark)
+
+COMPONENT LIBRARY (shared/widgets/)
+  PecCard            → BorderedCard with offset shadow
+  PecButton          → Filled / Outlined / Ghost variants, neo-brutal style
+  PecTextField       → Bordered input with label
+  PecBadge           → Coloured pill badge
+  PecChip            → Selectable filter chip
+  PecAvatar          → Circular avatar with initials fallback
+  PecProgressBar     → Thick bordered progress
+  PecShimmer         → Skeleton loading wrapper
+  PecBottomSheet     → Draggable bottom sheet with handle
+  PecSnackBar        → Toast notification
+  PecEmptyState      → Illustrated empty state with CTA
+  PecErrorState      → Error state with retry button
+  InfiniteListView   → Paginated list with loading footer
+
+RESPONSIVE LAYOUT
+  Use LayoutBuilder + MediaQuery for phone / tablet breakpoints.
+  Tablet: sidebar navigation instead of bottom nav.
+  Screen width < 600  → phone layout
+  Screen width >= 600 → tablet layout (split pane where applicable)
+
+DARK MODE
+  Supported via ThemeData.dark().
+  Toggle stored in Hive + applied at app root via themeProvider.
+
+ACCESSIBILITY
+  Semantic labels on all interactive elements.
+  Minimum 48x48 touch targets.
+  Sufficient colour contrast (WCAG AA minimum).
+
+================================================================================
+14. ROLE-BASED ACCESS CONTROL
+================================================================================
+
+Roles and their permissions mirror the backend:
+
+  ROLE              FEATURES VISIBLE
+  ─────────────────────────────────────────────────────────────────
+  student           Dashboard, Courses, Attendance (scan), Timetable,
+                    Exams, Materials, Calendar, Chat, Noticeboard,
+                    Clubs, Canteen, Hostel Issues, Campus Map,
+                    Score Sheet, Profile, Resume, Portfolio,
+                    Notifications
+
+  faculty           All student features PLUS:
+                    Attendance (generate QR + manage sessions),
+                    Add Course Materials, Faculty Bio System
+
+  college_admin     All faculty features PLUS:
+                    User Management, Bulk Upload, Department Mgmt,
+                    Room Management, Hostel Admin, Canteen Admin,
+                    College Settings, Academic Calendar Admin,
+                    Noticeboard Create, Payment Settings
+
+  super_admin       All admin features PLUS:
+                    Feature Flags, Background Jobs, System Settings
+
+  placement_officer Profile review, Portfolio view, Resume export
+
+  moderator         Noticeboard moderation, Club approval
+
+IMPLEMENTATION
+  roleGuard() helper reads authProvider.currentRole and returns bool.
+  Screens check guard in build() to conditionally show admin controls.
+  GoRouter redirects role-restricted deep links to /forbidden screen.
+
+================================================================================
+15. ENVIRONMENT CONFIGURATION
+================================================================================
+
+Files:
+  .env.development   → DEV backend URL, FCM test project
+  .env.staging       → Staging backend URL
+  .env.production    → Production backend URL
+
+Loaded via flutter_dotenv + compile-time dart-define:
+  flutter run --dart-define-from-file=.env.development
+
+Constants (app_config.dart):
+  static const String apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+  static const String wsUrl      = String.fromEnvironment('WS_URL');
+  static const String fcmSenderId = String.fromEnvironment('FCM_SENDER_ID');
+
+Environment flavors:
+  dev     → debug APK, verbose logging, mock-friendly
+  staging → release APK, staging API, TestFlight/Firebase App Distribution
+  prod    → release APK/AAB, production API, Play Store / App Store
+
+================================================================================
+16. TESTING STRATEGY
+================================================================================
+
+UNIT TESTS (test/unit/)
+  • Repository implementations (mock Dio with mockito)
+  • Use cases (pure Dart, no mocks needed)
+  • Providers (using ProviderContainer from Riverpod)
+  • Utility functions (validators, formatters)
+  Target: 80% coverage on domain + data layers.
+
+WIDGET TESTS (test/widget/)
+  • PecCard, PecButton, PecTextField components
+  • Login form validation
+  • Dashboard widget render for each role
+  • QR scan screen (mock mobile_scanner)
+
+INTEGRATION TESTS (test/integration/)
+  • Full login → dashboard flow (real API on CI staging environment)
+  • Attendance scan → mark → confirmation flow
+  • Chat send → receive message flow
+
+GOLDEN TESTS
+  Snapshot tests for PecCard, PecButton to catch unintended UI regressions.
+
+CI PIPELINE TESTS
+  flutter analyze     → static analysis
+  flutter test        → unit + widget tests
+  flutter test integration_test/ --dart-define-from-file=.env.staging
+
+================================================================================
+17. BUILD & RELEASE PIPELINE
+================================================================================
+
+ANDROID
+  Signing: keystore in CI secrets (never in repo).
+  Build commands:
+    Debug : flutter build apk --debug
+    Release: flutter build apk --release
+    Bundle : flutter build appbundle --release
+  Distribution: Google Play Internal → Closed → Open → Production track.
+
+iOS
+  Signing: Apple Distribution certificate + provisioning profile in CI.
+  Build: flutter build ipa --release --export-options-plist=ExportOptions.plist
+  Distribution: TestFlight → App Store Connect review.
+
+CI/CD (GitHub Actions)
+  Trigger: push to main, pull_request, manual dispatch.
+  Steps:
+    1. flutter pub get
+    2. flutter gen-l10n (if i18n added)
+    3. dart run build_runner build --delete-conflicting-outputs
+    4. flutter analyze --fatal-infos
+    5. flutter test
+    6. flutter build appbundle --release (Android)
+    7. flutter build ipa --release (iOS, macOS runner)
+    8. Upload artifacts to Firebase App Distribution (staging)
+    9. Upload to Play Store / App Store (production, manual trigger)
+
+VERSIONING
+  pubspec.yaml version: MAJOR.MINOR.PATCH+BUILD_NUMBER
+  BUILD_NUMBER auto-incremented by CI from GitHub run number.
+
+================================================================================
+18. PHASED DELIVERY ROADMAP
+================================================================================
+
+PHASE 1 — FOUNDATION (Weeks 1-3)
+  ✦ Flutter project scaffold + folder structure
+  ✦ Dio API client + interceptors
+  ✦ JWT auth flow (login, refresh, logout, secure storage)
+  ✦ GoRouter setup + auth guards
+  ✦ Design system: PecCard, PecButton, PecTextField, theme
+  ✦ Dashboard screen (all roles — read-only data)
+  ✦ Profile screen
+  ✦ CI/CD pipeline (analyze + test + build)
+  Deliverable: Working login → dashboard for all 3 roles
+
+PHASE 2 — CORE ACADEMIC FEATURES (Weeks 4-7)
+  ✦ Courses (list, detail, enroll)
+  ✦ Timetable (weekly view, today view)
+  ✦ Attendance — student QR scan flow
+  ✦ Attendance — faculty QR generate + session management
+  ✦ Examinations (schedule list, countdown)
+  ✦ Course materials (browse, download)
+  ✦ Academic calendar
+  ✦ Score sheet + CGPA chart
+  Deliverable: Core academic daily-use features working
+
+PHASE 3 — COMMUNICATION & SOCIAL (Weeks 8-10)
+  ✦ Real-time chat (WebSocket integration)
+  ✦ Noticeboard (read + admin create)
+  ✦ Clubs (browse, join request)
+  ✦ Push notifications (FCM)
+  ✦ In-app notifications screen
+  Deliverable: All communication features functional
+
+PHASE 4 — CAMPUS SERVICES (Weeks 11-13)
+  ✦ Canteen ordering flow
+  ✦ Room booking
+  ✦ Hostel issue reporting
+  ✦ Campus map (2D interactive)
+  Deliverable: Campus service features complete
+
+PHASE 5 — ADMIN & ADVANCED FEATURES (Weeks 14-16)
+  ✦ User management + bulk upload
+  ✦ Department management
+  ✦ Resume builder with PDF export
+  ✦ Student portfolio
+  ✦ College settings (admin)
+  ✦ Feature flags, background job status (super admin)
+  Deliverable: Full admin feature set
+
+PHASE 6 — POLISH & RELEASE (Weeks 17-18)
+  ✦ Offline caching + offline indicator
+  ✦ Biometric unlock
+  ✦ Accessibility audit + fixes
+  ✦ Performance profiling (DevTools)
+  ✦ Golden + integration tests
+  ✦ Play Store / TestFlight submission
+  Deliverable: Production-ready app submitted to stores
+
+================================================================================
+19. SECURITY CONSIDERATIONS
+================================================================================
+
+TOKEN SECURITY
+  • Access + refresh tokens stored ONLY in flutter_secure_storage
+    (Keychain on iOS, EncryptedSharedPreferences on Android).
+  • Never stored in SharedPreferences or Hive unencrypted.
+  • Tokens cleared on logout AND on auth failure.
+
+NETWORK SECURITY
+  • Certificate pinning via Dio's BadCertificateCallback (production).
+  • All API calls over HTTPS in staging and production.
+  • HTTP allowed only for local development (android:usesCleartextTraffic
+    in debug manifest only).
+
+INPUT VALIDATION
+  • All user inputs validated client-side with reactive_forms validators
+    BEFORE sending to backend (defence in depth, UX convenience).
+  • Backend remains the source of truth; client validation does not replace it.
+
+SENSITIVE DATA
+  • No PII logged in release builds (LoggingInterceptor disabled in release).
+  • Student marks, CGPA, fee records not cached to Hive.
+  • Profile photos fetched with auth header (not public URLs).
+
+CODE OBFUSCATION
+  flutter build appbundle --obfuscate --split-debug-info=build/debug-info/
+  Keeps release binaries hard to reverse-engineer.
+
+PERMISSIONS PRINCIPLE OF LEAST PRIVILEGE
+  Camera requested only when QR scan screen is navigated to.
+  Storage permission requested only when user initiates a download.
+  Biometric permission requested only when user enables it in settings.
+
+================================================================================
+20. KNOWN CONSTRAINTS & DECISIONS
+================================================================================
+
+DECISION: Riverpod over BLoC
+  Riverpod chosen for less boilerplate with equivalent testability.
+  BLoC would be viable too; the pattern choice doesn't affect API contracts.
+
+DECISION: 2D campus map instead of 3D
+  The web app uses Three.js for a 3D campus map. Flutter's 3D ecosystem
+  (flutter_scene, Model Viewer) is less mature for this use case.
+  Phase 4 ships a 2D flutter_map version. A WebView embedding the existing
+  Three.js scene can replace it in a future iteration.
+
+DECISION: No backend changes
+  The Flutter app consumes the NestJS API as-is. Any missing endpoints
+  needed by the mobile app must be raised as backend tasks separately.
+  FCM token registration endpoint (POST /users/me/fcm-token) may need to be
+  added to the backend if not already present.
+
+CONSTRAINT: Real-time chat
+  Backend uses Socket.IO. socket_io_client on Flutter has known compatibility
+  issues with Socket.IO v4 when transport is forced to polling on older devices.
+  Test WebSocket transport first; fall back to polling + long-poll as needed.
+
+CONSTRAINT: PDF generation
+  On-device PDF generation (score sheet, resume) is CPU-intensive on low-end
+  Android devices. Use compute() isolate for PDF rendering to avoid UI jank.
+
+CONSTRAINT: Google Translate
+  The web app integrates the Google Translate widget. Flutter does not support
+  this natively. Options: use google_mlkit_translation package for on-device
+  translation of key UI strings, or skip and rely on server-side i18n.
+
+CONSTRAINT: File size on iOS
+  Flutter app with embedded fonts and Firebase can exceed 20MB thin binary.
+  Use deferred components (Android) and asset slicing (App Store) to manage.
+
+OPEN ITEMS (to resolve before Phase 1 kickoff)
+  [ ] Confirm NestJS backend is accessible from mobile network / VPN
+  [ ] Confirm Socket.IO server version (v2 vs v4) for client compatibility
+  [ ] Provide Firebase project credentials (google-services.json / GoogleService-Info.plist)
+  [ ] Confirm whether FCM token endpoint exists on backend
+  [ ] Agree on minimum supported OS versions (Android 8 / iOS 14 recommended)
+  [ ] Confirm font licensing for Monument Extended on mobile distribution
+
+================================================================================
+END OF DOCUMENT
+================================================================================
