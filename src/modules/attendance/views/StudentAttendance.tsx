@@ -31,6 +31,8 @@ export default function StudentAttendance({ userId, initialData }: any) {
   const [courseAttendance, setCourseAttendance] = useState<any[]>(initialData?.summary?.courses || []);
   const [overallPercentage, setOverallPercentage] = useState(initialData?.summary?.totalSummary?.percentage || 0);
 
+  const asArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
+
   useEffect(() => {
     if (initialData?.summary) return;
     if (!userId) return;
@@ -46,12 +48,12 @@ export default function StudentAttendance({ userId, initialData }: any) {
         api.get<any>('/attendance/summary'),
         api.get<any>('/attendance', { params: { studentId: userId, limit: 100 } })
       ]);
-      const summary = extractData<any>(sumRes);
+      const summary = extractData<any>(sumRes.data);
       if (summary) {
-        setCourseAttendance(summary.courses || []);
+        setCourseAttendance(asArray<any>(summary.courses));
         setOverallPercentage(summary.totalSummary?.percentage || 0);
       }
-      setAttendanceRecords(extractData<any[]>(recRes) || []);
+      setAttendanceRecords(asArray<any>(extractData<any>(recRes.data)));
     } catch (e) {
       console.error(e);
     } finally {

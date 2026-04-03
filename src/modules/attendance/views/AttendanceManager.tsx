@@ -30,7 +30,7 @@ import PDFExportButton from '@/components/common/PDFExportButton';
 import BulkUpload from '@/components/BulkUpload';
 import { markBulkAttendanceAction } from '../actions';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchAllPages } from '@/lib/fetchAllPages';
+
 
 export default function AttendanceManager({ userId, userRole, initialData }: any) {
   const [courses, setCourses] = useState<any[]>(initialData?.courses || []);
@@ -41,6 +41,8 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
   const [showBulkUpload, setShowBulkUpload] = useState(false);
 
   const isAdmin = ['college_admin', 'super_admin'].includes(userRole);
+
+  const asArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
 
   const { execute: executeBulk, isPending: isSaving } = useAction(markBulkAttendanceAction, {
     onSuccess: () => {
@@ -63,10 +65,10 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
     let data: any[] = [];
     if (isAdmin) {
       const response = await api.get<any>('/courses', { params: { limit: 200 } });
-      data = extractData<any[]>(response) || [];
+      data = asArray<any>(extractData<any>(response.data));
     } else {
       const response = await api.get<any>('/courses', { params: { facultyId: userId, limit: 200 } });
-      data = extractData<any[]>(response) || [];
+      data = asArray<any>(extractData<any>(response.data));
       if (!data.length) {
         let facultyName = '';
         try {
@@ -76,7 +78,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
           facultyName = '';
         }
         const fallback = await api.get<any>('/courses', { params: { limit: 200 } });
-        const allCourses = extractData<any[]>(fallback) || [];
+        const allCourses = asArray<any>(extractData<any>(fallback.data));
         const name = facultyName.toLowerCase();
         data = allCourses.filter((c: any) => {
           if (c.facultyId === userId || c.instructorId === userId) return true;
@@ -100,8 +102,8 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
         api.get<any>('/attendance', { params: { subject: subjectId, date: selectedDate } })
       ]);
 
-      const enrolled = extractData<any[]>(enrollRes) || [];
-      const records = extractData<any[]>(attRes) || [];
+      const enrolled = asArray<any>(extractData<any>(enrollRes.data));
+      const records = asArray<any>(extractData<any>(attRes.data));
       
       const recordMap = new Map(records.map((r: any) => [r.studentId, r]));
 
