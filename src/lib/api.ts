@@ -1,6 +1,18 @@
 import { authClient } from "./auth-client";
 import { buildApiUrl } from "./api-base";
 
+export function isAuthError(error: unknown): boolean {
+  const status = (error as any)?.response?.status;
+  if (status === 401 || status === 403) return true;
+
+  const message = String((error as any)?.message || "").toLowerCase();
+  return (
+    message.includes("no active refresh session") ||
+    message.includes("unauthorized") ||
+    message.includes("token refresh failed")
+  );
+}
+
 function extractErrorMessage(value: unknown): string | undefined {
   if (value == null) return undefined;
 
@@ -67,9 +79,11 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
       const newToken = await authClient.refreshAccessToken();
       headers.set('Authorization', `Bearer ${newToken}`);
       response = await fetch(fullUrl, { ...options, headers });
-    } catch (e) {
-      window.dispatchEvent(new CustomEvent("auth-failed"));
-      throw e;
+    } catch {
+      authClient.resetSession();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth-failed'));
+      }
     }
   }
 

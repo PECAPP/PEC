@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import api from '@/lib/api';
+import { isAuthError } from '@/lib/api';
 import { toast } from 'sonner';
 
 export function useFacultyDashboard(initialData?: any, serverUser?: any) {
@@ -143,6 +144,12 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
         setSelectedCourse(facultyCourses[0]);
       }
     } catch (error) {
+      if (isAuthError(error)) {
+        toast.error('Session expired. Please login again.');
+        router.replace('/auth');
+        return;
+      }
+
       console.error('Error fetching faculty data:', error);
       toast.error('Failed to load dashboard data');
     } finally {

@@ -33,10 +33,13 @@ async function main() {
     return;
   }
 
-  const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  const child = spawn(npmCmd, ['--prefix', 'server', 'run', 'start:dev', '--', '--swc'], {
+  const npmCommand = process.platform === 'win32'
+    ? 'npm.cmd --prefix server run start:dev'
+    : 'npm --prefix server run start:dev';
+
+  const child = spawn(npmCommand, {
     stdio: 'inherit',
-    shell: false,
+    shell: true,
   });
 
   child.on('exit', (code) => {
