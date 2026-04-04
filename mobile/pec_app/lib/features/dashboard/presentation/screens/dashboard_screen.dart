@@ -516,22 +516,10 @@ class _EnrolledCoursesPreview extends ConsumerWidget {
           child: CircularProgressIndicator(color: AppColors.yellow),
         ),
       ),
-      error: (_, __) => PecCard(
-        color: AppColors.bgSurface,
-        child: Text(
-          'Could not load enrolled courses',
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-        ),
-      ),
+      error: (_, __) => const SizedBox.shrink(),
       data: (enrollments) {
         if (enrollments.isEmpty) {
-          return PecCard(
-            color: AppColors.bgSurface,
-            child: Text(
-              'No enrolled courses yet',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-            ),
-          );
+          return const SizedBox.shrink();
         }
 
         final shown = enrollments.take(4).toList();
@@ -856,18 +844,10 @@ class _RecentNotices extends ConsumerWidget {
         child: const Center(
             child: CircularProgressIndicator(color: AppColors.yellow)),
       ),
-      error: (_, __) => PecCard(
-        child: Text('Could not load notices',
-            style:
-                AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-      ),
+      error: (_, __) => const SizedBox.shrink(),
       data: (notices) {
         if (notices.isEmpty) {
-          return PecCard(
-            child: Text('No recent notices',
-                style: AppTextStyles.bodySmall
-                    .copyWith(color: AppColors.textSecondary)),
-          );
+          return const SizedBox.shrink();
         }
         final shown = notices.take(3).toList();
         return PecCard(
