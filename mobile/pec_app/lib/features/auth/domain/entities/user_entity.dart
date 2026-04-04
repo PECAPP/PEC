@@ -45,6 +45,8 @@ class UserEntity extends Equatable {
   final bool profileComplete;
   final String? avatarUrl;
   final String? phone;
+  final String? department;
+  final int? semester;
 
   const UserEntity({
     required this.id,
@@ -54,6 +56,8 @@ class UserEntity extends Equatable {
     required this.profileComplete,
     this.avatarUrl,
     this.phone,
+    this.department,
+    this.semester,
   });
 
   bool get isAdmin =>
@@ -72,5 +76,5 @@ class UserEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, email, roles, profileComplete];
+  List<Object?> get props => [id, email, roles, profileComplete, department, semester];
 }

@@ -10,6 +10,8 @@ class UserModel extends UserEntity {
     required super.profileComplete,
     super.avatarUrl,
     super.phone,
+    super.department,
+    super.semester,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,8 @@ class UserModel extends UserEntity {
       profileComplete: json['profileComplete'] as bool? ?? false,
       avatarUrl: json['avatarUrl'] as String?,
       phone: json['phone'] as String?,
+      department: json['department'] as String?,
+      semester: json['semester'] is int ? json['semester'] as int : int.tryParse('${json['semester'] ?? ''}'),
     );
   }
 
@@ -40,6 +44,8 @@ class UserModel extends UserEntity {
         'profileComplete': profileComplete,
         'avatarUrl': avatarUrl,
         'phone': phone,
+        'department': department,
+        'semester': semester,
       };
 
   String toJsonString() => jsonEncode(toJson());

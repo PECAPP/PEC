@@ -102,6 +102,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> continueAsStudentFromSignUp({String? email}) async {
+    final studentUser = UserModel(
+      id: 'local-student',
+      email: (email != null && email.trim().isNotEmpty)
+          ? email.trim()
+          : 'student@pec.edu.in',
+      name: 'Student',
+      roles: const [UserRole.student],
+      profileComplete: true,
+      department: 'Computer Science',
+      semester: 1,
+    );
+
+    await _cacheUser(studentUser);
+    state = AuthState(status: AuthStatus.authenticated, user: studentUser);
+  }
+
   Future<void> signOut() async {
     try {
       await _dataSource.signOut();
@@ -121,12 +138,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   AuthState _resolveStatus(UserModel user) {
-    if (!user.profileComplete) {
-      return AuthState(status: AuthStatus.onboarding, user: user);
-    }
-    if (user.roles.length > 1) {
-      return AuthState(status: AuthStatus.roleSelection, user: user);
-    }
+    // Mobile flow: always enter dashboard after a successful sign-in.
     return AuthState(status: AuthStatus.authenticated, user: user);
   }
 

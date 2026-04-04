@@ -16,6 +16,7 @@ class AppColors {
   static const Color bgLight = Color(0xFFFFFFFF);
   static const Color bgSurface = Color(0xFFF5F5F5);
   static const Color bgSurfaceDark = Color(0xFF111111);
+  static const Color surface = bgSurfaceDark;
 
   // Text
   static const Color textPrimary = Color(0xFF000000);

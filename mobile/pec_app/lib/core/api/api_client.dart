@@ -8,15 +8,31 @@ class ApiClient {
   late final Dio _dio;
   final TokenStorage _tokenStorage;
 
-  // Base URL injected via dart-define at build time; fallback to localhost
-  static const String _baseUrl =
-      String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:8000');
+  // API base URL can be overridden via --dart-define=API_BASE_URL=...
+  static const String _configuredBaseUrl =
+      String.fromEnvironment('API_BASE_URL', defaultValue: '');
+
+  static String _resolveBaseUrl() {
+    if (_configuredBaseUrl.trim().isNotEmpty) {
+      return _configuredBaseUrl.trim();
+    }
+
+    // Android emulator cannot reach localhost directly.
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return 'http://10.0.2.2:3000';
+    }
+
+    // Windows/macOS/Linux and iOS simulator fallback.
+    return 'http://localhost:3000';
+  }
 
   ApiClient(this._tokenStorage) {
+    final baseUrl = _resolveBaseUrl();
+
     _dio = Dio(BaseOptions(
-      baseUrl: _baseUrl,
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 30),
+      baseUrl: baseUrl,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 45),
       headers: {'Content-Type': 'application/json'},
     ));
 
@@ -142,6 +158,9 @@ class _ErrorInterceptor extends Interceptor {
     final status = err.response?.statusCode;
 
     if (err.type == DioExceptionType.connectionError ||
+        err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.receiveTimeout ||
+        err.type == DioExceptionType.sendTimeout ||
         err.type == DioExceptionType.unknown) {
       failure = const NetworkFailure();
     } else {

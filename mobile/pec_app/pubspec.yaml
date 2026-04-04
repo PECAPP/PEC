@@ -84,6 +84,7 @@ dev_dependencies:
   freezed: ^2.5.2
   json_serializable: ^6.8.0
   mockito: ^5.4.4
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true
@@ -92,3 +93,14 @@ flutter:
     - assets/images/
     - assets/icons/
     - .env
+
+flutter_launcher_icons:
+  image_path: assets/images/PECLogo.png
+  android: true
+  ios: true
+  web:
+    generate: true
+  windows:
+    generate: true
+  macos:
+    generate: true

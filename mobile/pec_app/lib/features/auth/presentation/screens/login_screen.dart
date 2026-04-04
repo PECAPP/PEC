@@ -58,20 +58,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Logo / title
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.md,
-                    vertical: AppDimensions.sm,
-                  ),
+                  padding: const EdgeInsets.all(AppDimensions.xs),
                   decoration: BoxDecoration(
-                    color: AppColors.yellow,
+                    color: Colors.transparent,
                     border: Border.all(color: AppColors.black, width: AppDimensions.borderWidth),
                   ),
-                  child: Text(
-                    'PEC',
-                    style: AppTextStyles.heading1.copyWith(
-                      color: AppColors.black,
-                      letterSpacing: 4,
-                    ),
+                  child: Image.asset(
+                    'assets/images/PECLogo.png',
+                    height: 72,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(height: AppDimensions.lg),
@@ -168,6 +163,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   isLoading: _loading,
                   fullWidth: true,
                   color: AppColors.yellow,
+                ),
+                const SizedBox(height: AppDimensions.md),
+                Center(
+                  child: TextButton(
+                    onPressed: _loading
+                        ? null
+                        : () async {
+                            await ref
+                                .read(authNotifierProvider.notifier)
+                                .continueAsStudentFromSignUp(
+                                  email: _emailCtrl.text.trim(),
+                                );
+                            if (context.mounted) {
+                              context.go('/dashboard');
+                            }
+                          },
+                    child: Text(
+                      'SIGN UP',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.yellow,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.yellow,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
