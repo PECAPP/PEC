@@ -41,6 +41,7 @@ model User {
   notices Notice[] @relation("NoticeAuthor")
   cgpaEntries CgpaEntry[]
   notifications Notification[]
+  financeTransactions FinanceTransaction[] @relation("FinanceTransactions")
   marketplaceListings MarketplaceListing[] @relation("MarketplaceListings")
   marketplaceBookmarks MarketplaceBookmark[] @relation("MarketplaceBookmarks")
   marketplaceBuyerChats MarketplaceChat[] @relation("MarketplaceBuyerChats")
@@ -310,26 +311,52 @@ model Enrollment {
 }
 
 model FeeRecord {
-  id                     String   @id @default(uuid())
-  studentId              String
-  student                User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  amount                 Float
-  description            String
-  dueDate                DateTime
-  category               String
-  status                 String   @default("pending")
-  paidDate               DateTime?
-  pendingTransactionId   String?
-  paymentTransactionId   String?
-  lastPaymentAttempt     DateTime?
+  id                      String               @id @default(uuid())
+  studentId               String
+  student                 User                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  amount                  Float
+  description             String
+  dueDate                 DateTime
+  category                String               // college | mess | hostel | library | exam | other
+  status                  String               @default("pending") // pending | paid | failed | waived
+  semester                String?
+  month                   String?              // e.g. "2024-03" for mess/hostel monthly
+  lateFeeApplied          Boolean              @default(false)
+  lateFeeAmount           Float                @default(0)
+  paidDate                DateTime?
+  pendingTransactionId    String?
+  paymentTransactionId    String?
+  lastPaymentAttempt      DateTime?
   verificationSubmittedAt DateTime?
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-  deletedAt              DateTime?
+  transactions            FinanceTransaction[]
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  deletedAt               DateTime?
 
   @@index([studentId, status])
+  @@index([category, status])
   @@index([dueDate])
   @@index([deletedAt])
+}
+
+model FinanceTransaction {
+  id            String     @id @default(uuid())
+  studentId     String
+  student       User       @relation("FinanceTransactions", fields: [studentId], references: [id], onDelete: Cascade)
+  feeRecordId   String
+  feeRecord     FeeRecord  @relation(fields: [feeRecordId], references: [id], onDelete: Cascade)
+  amount        Float
+  paymentMethod String     @default("online") // online | cash | dd | neft | upi
+  status        String     // success | failed | pending | refunded
+  gatewayTxnId  String?    // Razorpay/Stripe order/payment ID
+  receiptNo     String     @unique
+  notes         String?
+  createdAt     DateTime   @default(now())
+
+  @@index([studentId])
+  @@index([feeRecordId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Timetable {

@@ -39,8 +39,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     enrollmentNumber: initialUser.enrollmentNumber,
   } as any : null);
   
-  const [showQRScanner, setShowQRScanner] = useState(false);
-  
+
   const [stats, setStats] = useState<StudentStats>({
     attendancePercentage: initialData?.summary?.totalSummary?.percentage || 0,
     enrolledCourses: initialData?.summary?.courses?.length || 0,
@@ -235,21 +234,10 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     }
   }, [authLoading, user, router, fetchStudentStats, initialData, fetchCollegeSettings]);
 
-  const handleQRSuccess = () => {
-    setStats((prev) => ({
-      ...prev,
-      attendancePercentage: Math.min(100, prev.attendancePercentage + 1),
-    }));
-    setShowQRScanner(false);
-    void fetchStudentStats();
-  };
-
   return {
     loading,
     firstName,
     profileData,
-    showQRScanner,
-    setShowQRScanner,
     stats,
     todayClasses,
     scheduleDay,
@@ -259,7 +247,6 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     loadError,
     setLoading,
     fetchStudentStats,
-    handleQRSuccess,
     orgSlug,
   };
 }

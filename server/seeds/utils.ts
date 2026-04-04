@@ -83,6 +83,7 @@ export async function clearDatabase() {
     await prisma.job.deleteMany();
     await prisma.room.deleteMany();
     await prismaAny.department.deleteMany();
+    await (prisma as any).financeTransaction.deleteMany();
     await (prisma as any).feeRecord.deleteMany();
     await prisma.facultyProfile.deleteMany();
     await prisma.studentProfile.deleteMany();

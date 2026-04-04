@@ -625,6 +625,146 @@ export function exportHallTicket(studentData: any, courses: any[]) {
   doc.save(`hall_ticket_${studentData.enrollmentNumber || "pec"}.pdf`);
 }
 
+/**
+ * Generate a fee payment receipt PDF
+ */
+export function exportFeeReceipt(txn: {
+  receiptNo: string;
+  amount: number;
+  paymentMethod: string;
+  status: string;
+  gatewayTxnId?: string;
+  createdAt: string;
+  feeRecord?: { category: string; description: string; semester?: string; month?: string };
+  student?: { name: string; email: string; studentProfile?: { enrollmentNumber?: string; department?: string } };
+}) {
+  const doc = new jsPDF();
+  const y = addPDFHeader(doc, "Fee Payment Receipt");
+
+  // Institution sub-line
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text("Punjab Engineering College (Deemed to be University), Chandigarh", 105, y - 5, { align: "center" });
+
+  // Receipt box
+  doc.setDrawColor(200, 200, 200);
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(15, y + 2, 180, 14, 3, 3, "FD");
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Receipt No: ${txn.receiptNo}`, 20, y + 11);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(
+    `Date: ${new Date(txn.createdAt).toLocaleString("en-IN", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}`,
+    195,
+    y + 11,
+    { align: "right" },
+  );
+
+  let cur = y + 22;
+
+  // Student section
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("Student Information", 20, cur);
+  cur += 6;
+  doc.setLineWidth(0.3);
+  doc.setDrawColor(99, 102, 241);
+  doc.line(20, cur, 100, cur);
+  cur += 5;
+
+  const studentRows = [
+    ["Name", txn.student?.name ?? "—"],
+    ["Email", txn.student?.email ?? "—"],
+    ["Enrollment No.", txn.student?.studentProfile?.enrollmentNumber ?? "—"],
+    ["Department", txn.student?.studentProfile?.department ?? "—"],
+  ];
+
+  autoTable(doc, {
+    startY: cur,
+    head: [],
+    body: studentRows,
+    theme: "plain",
+    styles: { fontSize: 10, cellPadding: 2 },
+    columnStyles: { 0: { fontStyle: "bold", cellWidth: 50, textColor: [75, 85, 99] }, 1: { cellWidth: 120 } },
+    margin: { left: 20 },
+  });
+
+  cur = (doc as any).lastAutoTable.finalY + 8;
+
+  // Payment section
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("Payment Details", 20, cur);
+  cur += 6;
+  doc.setDrawColor(16, 185, 129);
+  doc.line(20, cur, 100, cur);
+  cur += 5;
+
+  const category = txn.feeRecord?.category ?? "—";
+  const paymentRows = [
+    ["Fee Category", category.charAt(0).toUpperCase() + category.slice(1)],
+    ["Description", txn.feeRecord?.description ?? "—"],
+    ...(txn.feeRecord?.semester ? [["Semester", txn.feeRecord.semester]] : []),
+    ...(txn.feeRecord?.month ? [["Month", txn.feeRecord.month]] : []),
+    ["Payment Method", txn.paymentMethod?.toUpperCase() ?? "—"],
+    ["Transaction ID", txn.gatewayTxnId ?? "—"],
+    ["Status", txn.status.toUpperCase()],
+  ];
+
+  autoTable(doc, {
+    startY: cur,
+    head: [],
+    body: paymentRows,
+    theme: "plain",
+    styles: { fontSize: 10, cellPadding: 2 },
+    columnStyles: { 0: { fontStyle: "bold", cellWidth: 50, textColor: [75, 85, 99] }, 1: { cellWidth: 120 } },
+    margin: { left: 20 },
+  });
+
+  cur = (doc as any).lastAutoTable.finalY + 8;
+
+  // Amount box
+  doc.setFillColor(239, 246, 255);
+  doc.setDrawColor(99, 102, 241);
+  doc.setLineWidth(0.8);
+  doc.roundedRect(15, cur, 180, 20, 3, 3, "FD");
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(79, 70, 229);
+  doc.text("Amount Paid", 20, cur + 13);
+  doc.setFontSize(16);
+  doc.text(
+    `₹${txn.amount.toLocaleString("en-IN")}`,
+    195,
+    cur + 13,
+    { align: "right" },
+  );
+  doc.setTextColor(0, 0, 0);
+
+  cur += 28;
+
+  // Status stamp
+  if (txn.status === "success") {
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(16, 185, 129);
+    doc.text("✓ PAID", 105, cur, { align: "center" });
+    doc.setTextColor(0, 0, 0);
+    cur += 10;
+  }
+
+  // Note
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "italic");
+  doc.setTextColor(107, 114, 128);
+  doc.text("This is a computer-generated receipt and does not require a signature.", 105, cur, { align: "center" });
+
+  addPDFFooter(doc);
+  doc.save(`receipt_${txn.receiptNo}.pdf`);
+}
+
 export default {
   exportAttendanceReport,
   exportTimetablePDF,
@@ -634,4 +774,5 @@ export default {
   exportCourseDetails,
   exportEnrolledStudents,
   exportHallTicket,
+  exportFeeReceipt,
 };

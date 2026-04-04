@@ -2,9 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ErrorState, LoadingGrid } from '@/components/common/AsyncState';
-import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
 import { useStudentDashboard } from '@/hooks/useStudentDashboard';
 
 // Components
@@ -32,8 +30,6 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
     loading,
     firstName,
     profileData,
-    showQRScanner,
-    setShowQRScanner,
     stats,
     todayClasses,
     scheduleDay,
@@ -43,7 +39,6 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
     loadError,
     setLoading,
     fetchStudentStats,
-    handleQRSuccess,
     orgSlug,
   } = useStudentDashboard(initialData, initialUser);
 
@@ -108,7 +103,6 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
       <StudentWelcomeHeader 
         firstName={firstName} 
         profileData={profileData} 
-        onShowScanner={() => setShowQRScanner(true)} 
       />
 
       <StudentStatsCards 
@@ -156,17 +150,6 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         />
       </motion.div>
 
-      <Dialog open={showQRScanner} onOpenChange={setShowQRScanner}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Scan QR Code</DialogTitle>
-          </DialogHeader>
-          <QRAttendanceScanner
-            onSuccess={handleQRSuccess}
-            onClose={() => setShowQRScanner(false)}
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
