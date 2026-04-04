@@ -5,18 +5,31 @@ import { motion } from 'framer-motion';
 import { 
   Calendar, 
   BookOpen, 
-  UserCheck, 
-  UserX, 
   TrendingUp, 
   Activity, 
   ShieldCheck, 
   ShieldAlert,
-  ArrowRight
+  ArrowRight,
+  Loader2,
+  Paperclip,
+  CheckCircle2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import api from '@/lib/api';
+import api, { isAuthError } from '@/lib/api';
 import { extractData, cn } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { 
   RadialBarChart, 
   RadialBar, 
@@ -24,20 +37,49 @@ import {
   PolarAngleAxis 
 } from 'recharts';
 
+type WaiverRequest = {
+  id: string;
+  courseId?: string | null;
+  courseCode?: string | null;
+  courseName?: string | null;
+  fromDate: string;
+  toDate: string;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected' | string;
+  reviewerNote?: string | null;
+  createdAt: string;
+};
+
 export default function StudentAttendance({ userId, initialData }: any) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const hasFetchedRef = useRef(false);
+  const waiverFileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(!initialData?.summary);
   const [attendanceRecords, setAttendanceRecords] = useState<any[]>(initialData?.records || []);
   const [courseAttendance, setCourseAttendance] = useState<any[]>(initialData?.summary?.courses || []);
   const [overallPercentage, setOverallPercentage] = useState(initialData?.summary?.totalSummary?.percentage || 0);
+  const [isWaiverDialogOpen, setIsWaiverDialogOpen] = useState(false);
+  const [isSubmittingWaiver, setIsSubmittingWaiver] = useState(false);
+  const [isUploadingWaiverDoc, setIsUploadingWaiverDoc] = useState(false);
+  const [uploadedWaiverFileName, setUploadedWaiverFileName] = useState('');
+  const [waiverRequests, setWaiverRequests] = useState<WaiverRequest[]>([]);
+  const [waiverForm, setWaiverForm] = useState({
+    courseId: '',
+    fromDate: '',
+    toDate: '',
+    reason: '',
+    supportingDocUrl: '',
+  });
 
   useEffect(() => {
     if (initialData?.summary) return;
     if (!userId) return;
+    if (authLoading) return;
+    if (!isAuthenticated) return;
     if (hasFetchedRef.current) return;
     hasFetchedRef.current = true;
     void fetchData();
-  }, [userId, initialData?.summary]);
+  }, [userId, initialData?.summary, authLoading, isAuthenticated]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -53,13 +95,124 @@ export default function StudentAttendance({ userId, initialData }: any) {
       }
       setAttendanceRecords(extractData<any[]>(recRes) || []);
     } catch (e) {
-      console.error(e);
+      if (!isAuthError(e)) {
+        console.error(e);
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchWaiverRequests = async () => {
+    try {
+      const response = await api.get<any>('/attendance/waivers/my');
+      const payload = extractData<any>(response);
+      const list = extractData<WaiverRequest[]>(payload);
+      setWaiverRequests(Array.isArray(list) ? list : []);
+    } catch (error) {
+      if (!isAuthError(error)) {
+        toast.error('Unable to fetch waiver requests');
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isWaiverDialogOpen || authLoading || !isAuthenticated) return;
+    void fetchWaiverRequests();
+  }, [isWaiverDialogOpen, authLoading, isAuthenticated]);
+
+  const handleWaiverSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isSubmittingWaiver) return;
+
+    if (!waiverForm.fromDate || !waiverForm.toDate || waiverForm.reason.trim().length < 10) {
+      toast.error('Fill all required fields and provide a detailed reason (10+ chars).');
+      return;
+    }
+
+    const selectedCourse = courseAttendance.find((course) => course.courseId === waiverForm.courseId);
+
+    setIsSubmittingWaiver(true);
+    try {
+      await api.post('/attendance/waivers', {
+        courseId: selectedCourse?.courseId || undefined,
+        courseCode: selectedCourse?.courseCode || undefined,
+        courseName: selectedCourse?.courseName || undefined,
+        fromDate: waiverForm.fromDate,
+        toDate: waiverForm.toDate,
+        reason: waiverForm.reason.trim(),
+        supportingDocUrl: waiverForm.supportingDocUrl.trim() || undefined,
+      });
+
+      toast.success('Waiver request submitted successfully.');
+      setWaiverForm({
+        courseId: waiverForm.courseId,
+        fromDate: '',
+        toDate: '',
+        reason: '',
+        supportingDocUrl: '',
+      });
+      await fetchWaiverRequests();
+    } catch (error: any) {
+      const message = String(error?.message || 'Failed to submit waiver request');
+      toast.error(message);
+    } finally {
+      setIsSubmittingWaiver(false);
+    }
+  };
+
+  const handleWaiverDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const maxBytes = 5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      toast.error('File size should be 5 MB or less.');
+      event.target.value = '';
+      return;
+    }
+
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.type)) {
+      toast.error('Only PDF, JPG, PNG or WEBP files are allowed.');
+      event.target.value = '';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setIsUploadingWaiverDoc(true);
+    try {
+      const response = await api.post<any>('/attendance/waivers/upload', formData);
+      const uploaded = extractData<any>(response);
+      const uploadedData = extractData<any>(uploaded);
+      const docUrl = String(uploadedData?.url || '').trim();
+      if (!docUrl) {
+        throw new Error('Upload succeeded but no document URL was returned.');
+      }
+
+      setWaiverForm((prev) => ({ ...prev, supportingDocUrl: docUrl }));
+      setUploadedWaiverFileName(String(uploadedData?.originalName || file.name));
+      toast.success('Document attached successfully.');
+    } catch (error: any) {
+      toast.error(String(error?.message || 'Failed to upload document'));
+    } finally {
+      setIsUploadingWaiverDoc(false);
+      event.target.value = '';
+    }
+  };
+
   const isEligible = overallPercentage >= 75;
+  const totalPresent = courseAttendance.reduce((sum, course) => sum + (Number(course.present) || 0), 0);
+  const totalAbsent = courseAttendance.reduce((sum, course) => sum + (Number(course.absent) || 0), 0);
+  const totalSessions = totalPresent + totalAbsent;
+  const leavesLeft =
+    totalSessions > 0 ? Math.max(0, Math.floor(totalPresent / 0.75 - totalSessions)) : 0;
+  const sessionsNeededForEligibility =
+    totalSessions > 0 && !isEligible
+      ? Math.max(0, Math.ceil((0.75 * totalSessions - totalPresent) / 0.25))
+      : 0;
 
   const chartData = [
     {
@@ -152,15 +305,20 @@ export default function StudentAttendance({ userId, initialData }: any) {
                   Your cumulative presence is <span className="font-bold text-foreground">{Math.round(overallPercentage)}%</span>. 
                   Maintenance of a 75% threshold is mandatory for examination clearance.
                 </p>
+                <p className="text-xs font-semibold mt-3 text-primary/90">
+                  {isEligible
+                    ? `Leaves left (considering 75% attendance): ${leavesLeft} session${leavesLeft === 1 ? '' : 's'}.`
+                    : `Leaves left (considering 75% attendance): 0. Attend ${sessionsNeededForEligibility} more session${sessionsNeededForEligibility === 1 ? '' : 's'} to recover eligibility.`}
+                </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-2xl bg-success/5 border border-success/10 space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-success/70">Attended</p>
-                  <p className="text-2xl font-bold font-display">{courseAttendance.reduce((s,c)=>s+c.present,0)}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
+                  <p className="text-2xl font-bold font-display">{totalPresent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
                 </div>
                 <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/10 space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-destructive/70">Missed</p>
-                  <p className="text-2xl font-bold font-display">{courseAttendance.reduce((s,c)=>s+c.absent,0)}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
+                  <p className="text-2xl font-bold font-display">{totalAbsent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
                 </div>
               </div>
             </div>
@@ -180,12 +338,175 @@ export default function StudentAttendance({ userId, initialData }: any) {
             </p>
           </div>
           <div className="pt-6">
-            <button className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-glow hover:scale-[1.02] transition-all">
+            <button
+              onClick={() => setIsWaiverDialogOpen(true)}
+              className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-glow hover:scale-[1.02] transition-all"
+            >
               Request Waiver <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
+
+      <Dialog open={isWaiverDialogOpen} onOpenChange={setIsWaiverDialogOpen}>
+        <DialogContent className="max-w-2xl border-border/60 bg-card/95 backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Request Attendance Waiver</DialogTitle>
+            <DialogDescription>
+              Submit your request with reason and date range. Faculty/admin will review it.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleWaiverSubmit} className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Course (optional)</label>
+                <select
+                  value={waiverForm.courseId}
+                  onChange={(e) => setWaiverForm((prev) => ({ ...prev, courseId: e.target.value }))}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">General Waiver (All Courses)</option>
+                  {courseAttendance.map((course) => (
+                    <option key={course.courseId} value={course.courseId}>
+                      {course.courseCode} - {course.courseName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Supporting Document URL (optional)</label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="https://..."
+                      value={waiverForm.supportingDocUrl}
+                      onChange={(e) => {
+                        setWaiverForm((prev) => ({ ...prev, supportingDocUrl: e.target.value }));
+                        if (!e.target.value.trim()) {
+                          setUploadedWaiverFileName('');
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => waiverFileInputRef.current?.click()}
+                      disabled={isUploadingWaiverDoc}
+                      className="shrink-0"
+                    >
+                      {isUploadingWaiverDoc ? (
+                        <span className="inline-flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" /> Uploading
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-2">
+                          <Paperclip className="w-4 h-4" /> Attach Document
+                        </span>
+                      )}
+                    </Button>
+                    <input
+                      ref={waiverFileInputRef}
+                      type="file"
+                      accept=".pdf,image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={handleWaiverDocumentUpload}
+                    />
+                  </div>
+                  {uploadedWaiverFileName ? (
+                    <p className="text-xs text-success inline-flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Attached: {uploadedWaiverFileName}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">From Date</label>
+                <Input
+                  type="date"
+                  value={waiverForm.fromDate}
+                  onChange={(e) => setWaiverForm((prev) => ({ ...prev, fromDate: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">To Date</label>
+                <Input
+                  type="date"
+                  value={waiverForm.toDate}
+                  onChange={(e) => setWaiverForm((prev) => ({ ...prev, toDate: e.target.value }))}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Reason</label>
+              <Textarea
+                value={waiverForm.reason}
+                onChange={(e) => setWaiverForm((prev) => ({ ...prev, reason: e.target.value }))}
+                minLength={10}
+                maxLength={1000}
+                rows={4}
+                placeholder="Explain your situation (medical, official duty, emergency, etc.)"
+                required
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <Button type="submit" disabled={isSubmittingWaiver} className="min-w-40">
+                {isSubmittingWaiver ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Submitting...
+                  </span>
+                ) : (
+                  'Submit Waiver'
+                )}
+              </Button>
+            </div>
+          </form>
+
+          <div className="mt-2 border-t border-border/50 pt-4 space-y-3">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Recent Requests</h4>
+            <div className="max-h-56 overflow-auto rounded-xl border border-border/40 divide-y divide-border/30">
+              {waiverRequests.length === 0 ? (
+                <div className="p-4 text-sm text-muted-foreground">No waiver requests submitted yet.</div>
+              ) : (
+                waiverRequests.map((request) => (
+                  <div key={request.id} className="p-4 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {request.courseCode ? `${request.courseCode} - ${request.courseName}` : 'General Waiver'}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(request.fromDate).toLocaleDateString()} to {new Date(request.toDate).toLocaleDateString()}
+                      </p>
+                      {request.reviewerNote ? (
+                        <p className="text-xs text-muted-foreground mt-1">Reviewer Note: {request.reviewerNote}</p>
+                      ) : null}
+                    </div>
+                    <Badge
+                      className={cn(
+                        'uppercase text-[10px] font-bold tracking-wider',
+                        request.status === 'approved'
+                          ? 'bg-success/10 text-success border-success/30'
+                          : request.status === 'rejected'
+                            ? 'bg-destructive/10 text-destructive border-destructive/30'
+                            : 'bg-primary/10 text-primary border-primary/30'
+                      )}
+                    >
+                      {request.status}
+                    </Badge>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="space-y-6">
         <div className="flex items-center gap-3 px-1">
@@ -208,9 +529,22 @@ export default function StudentAttendance({ userId, initialData }: any) {
                  <tr key={c.courseId} className="hover:bg-primary/[0.02] transition-colors group">
                    <td className="py-5 px-8 font-mono text-xs font-bold text-primary/80">{c.courseCode}</td>
                    <td className="py-5 px-8">
+                      {(() => {
+                        const present = Number(c.present) || 0;
+                        const absent = Number(c.absent) || 0;
+                        const total = present + absent;
+                        const perCourseLeavesLeft =
+                          total > 0 ? Math.max(0, Math.floor(present / 0.75 - total)) : 0;
+
+                        return (
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{c.courseName}</span>
+                        <span className="text-[11px] font-semibold text-muted-foreground mt-1">
+                          Leaves left: {perCourseLeavesLeft}
+                        </span>
                       </div>
+                        );
+                      })()}
                    </td>
                    <td className="py-5 px-8 text-center text-sm">
                       <div className="inline-flex items-center gap-3 bg-muted/30 px-4 py-1.5 rounded-full border border-border/40 font-bold">

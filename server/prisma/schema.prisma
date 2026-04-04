@@ -41,6 +41,10 @@ model User {
   notices Notice[] @relation("NoticeAuthor")
   cgpaEntries CgpaEntry[]
   notifications Notification[]
+  marketplaceListings MarketplaceListing[] @relation("MarketplaceListings")
+  marketplaceBookmarks MarketplaceBookmark[] @relation("MarketplaceBookmarks")
+  marketplaceBuyerChats MarketplaceChat[] @relation("MarketplaceBuyerChats")
+  marketplaceMessages MarketplaceMessage[] @relation("MarketplaceMessages")
 
   @@index([role])
   @@index([emailVerified])
@@ -813,3 +817,69 @@ model AcademicCalendarEvent {
   @@index([date])
 }
 
+
+// ──────────────────────────────────────────────
+// Buy & Sell Marketplace
+// ──────────────────────────────────────────────
+
+model MarketplaceListing {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @default("")
+  price       Float
+  category    String   // Books|Electronics|Furniture|Clothing|Sports|Stationery|Other
+  condition   String   // New|Like New|Good|Used|Poor
+  images      String[]
+  status      String   @default("Available") // Available|Sold|Deleted
+  sellerId    String
+  seller      User     @relation("MarketplaceListings", fields: [sellerId], references: [id], onDelete: Cascade)
+  bookmarks   MarketplaceBookmark[]
+  chats       MarketplaceChat[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sellerId])
+  @@index([category])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model MarketplaceBookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("MarketplaceBookmarks", fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId])
+}
+
+model MarketplaceChat {
+  id        String   @id @default(uuid())
+  listingId String
+  listing   MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId   String
+  buyer     User     @relation("MarketplaceBuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
+  messages  MarketplaceMessage[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([listingId, buyerId])
+  @@index([listingId])
+  @@index([buyerId])
+}
+
+model MarketplaceMessage {
+  id        String   @id @default(uuid())
+  chatId    String
+  chat      MarketplaceChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation("MarketplaceMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  text      String
+  createdAt DateTime @default(now())
+
+  @@index([chatId])
+  @@index([senderId])
+}

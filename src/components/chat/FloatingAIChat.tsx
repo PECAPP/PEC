@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import api from "@/lib/api";
+import api, { isAuthError } from "@/lib/api";
 
 const SYSTEM_PROMPT = `
 You are the PEC AI Assistant. 
@@ -22,7 +22,7 @@ interface Message {
 
 const FloatingAIChat = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -47,6 +47,21 @@ const FloatingAIChat = () => {
   const handleSend = async () => {
     if (!inputValue.trim() || isTyping) return;
 
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: "Please sign in again to use the AI assistant.",
+          timestamp: new Date(),
+        },
+      ]);
+      return;
+    }
+
     const userText = inputValue.trim();
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -63,7 +78,6 @@ const FloatingAIChat = () => {
       // In a real scenario, context would be fetched here. 
       // For now, we use a clean structure hitting the NestJS backend.
       const response = await api.post('/ai/completion', {
-        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
@@ -84,12 +98,15 @@ const FloatingAIChat = () => {
       setMessages((prev) => [...prev, aiResponse]);
     } catch (error) {
       console.error("AI Error:", error);
+      const message = isAuthError(error)
+        ? "Your session has expired. Please sign in again to continue."
+        : "I'm sorry, I'm having trouble connecting to my brain. Please try again later.";
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now().toString(),
           role: "assistant",
-          content: "I'm sorry, I'm having trouble connecting to my brain. Please try again later.",
+          content: message,
           timestamp: new Date(),
         },
       ]);

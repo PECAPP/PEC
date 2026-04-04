@@ -30,7 +30,6 @@ class OnboardingScreen extends ConsumerWidget {
                     .copyWith(color: AppColors.white.withValues(alpha: 0.7)),
               ),
               const Spacer(),
-              // TODO: Replace with actual profile completion form (Phase 5)
               PecButton(
                 label: 'CONTINUE TO APP',
                 onPressed: () =>

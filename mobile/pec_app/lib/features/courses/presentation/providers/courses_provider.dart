@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/api/api_client.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/datasources/courses_remote_datasource.dart';
 import '../../data/models/course_model.dart';

@@ -55,8 +55,26 @@ function extractErrorMessage(value: unknown): string | undefined {
   return undefined;
 }
 
+function hasRefreshMarkerCookie(): boolean {
+  if (typeof document === "undefined") return false;
+
+  return document.cookie
+    .split(";")
+    .some((cookie) => cookie.trim().startsWith("refresh_present="));
+}
+
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const token = authClient.getAccessToken();
+  let token = authClient.getAccessToken();
+
+  // Recover access token once after a hard refresh when only refresh cookie exists.
+  if (!token && !url.includes('/auth/refresh') && hasRefreshMarkerCookie()) {
+    try {
+      token = await authClient.refreshAccessToken();
+    } catch {
+      // Keep request flow consistent and let the eventual response handling surface the error.
+    }
+  }
+
   const headers = new Headers(options.headers);
   
   if (token) {
@@ -71,14 +89,22 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const params = (options as any).params;
   const fullUrl = buildApiUrl(url, params);
 
-  let response = await fetch(fullUrl, { ...options, headers });
+  let response = await fetch(fullUrl, {
+    ...options,
+    headers,
+    credentials: options.credentials ?? 'include',
+  });
 
   // Handle 401 Unauthorized with Refresh Token rotation
   if (response.status === 401 && !url.includes('/auth/refresh')) {
     try {
       const newToken = await authClient.refreshAccessToken();
       headers.set('Authorization', `Bearer ${newToken}`);
-      response = await fetch(fullUrl, { ...options, headers });
+      response = await fetch(fullUrl, {
+        ...options,
+        headers,
+        credentials: options.credentials ?? 'include',
+      });
     } catch {
       authClient.resetSession();
       if (typeof window !== 'undefined') {
