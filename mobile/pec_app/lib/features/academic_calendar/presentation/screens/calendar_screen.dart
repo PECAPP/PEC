@@ -7,7 +7,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/pec_card.dart';
 import '../../../../shared/widgets/pec_error_state.dart';
-import '../../../../shared/widgets/pec_shimmer.dart';
+// import '../../../../shared/widgets/pec_shimmer.dart';
 import '../../data/models/calendar_event_model.dart';
 import '../providers/calendar_provider.dart';
 
