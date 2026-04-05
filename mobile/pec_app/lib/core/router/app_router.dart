@@ -7,9 +7,12 @@ import 'package:pec_app/features/attendance/presentation/screens/qr_generate_scr
 import 'package:pec_app/features/attendance/presentation/screens/qr_scan_screen.dart';
 import 'package:pec_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:pec_app/features/auth/presentation/screens/forgot_password_screen.dart';
+import 'package:pec_app/features/auth/presentation/screens/intro_onboarding_screen.dart';
 import 'package:pec_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:pec_app/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:pec_app/features/auth/presentation/screens/welcome_splash_screen.dart';
 import 'package:pec_app/features/auth/presentation/screens/role_selection_screen.dart';
+import 'package:pec_app/features/buy_sell/presentation/screens/buy_sell_screen.dart';
 import 'package:pec_app/features/campus_map/presentation/screens/campus_map_screen.dart';
 import 'package:pec_app/features/canteen/presentation/screens/canteen_menu_screen.dart';
 import 'package:pec_app/features/chat/presentation/screens/chat_list_screen.dart';
@@ -40,31 +43,46 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterRefreshNotifier(ref);
 
   return GoRouter(
-    initialLocation: '/dashboard',
+    initialLocation: '/welcome',
     refreshListenable: notifier,
     redirect: (context, state) {
       final isAuthenticated = authState.status == AuthStatus.authenticated;
       final isOnboarding = authState.status == AuthStatus.onboarding;
       final needsRoleSelection = authState.status == AuthStatus.roleSelection;
-      final isAuthRoute = state.matchedLocation.startsWith('/login') ||
-          state.matchedLocation.startsWith('/forgot-password');
+      final isUnknown = authState.status == AuthStatus.unknown;
 
-      if (!isAuthenticated && !isOnboarding && !needsRoleSelection && !isAuthRoute) {
-        return '/login';
+      final loc = state.matchedLocation;
+      final isLoginRoute = loc.startsWith('/login') ||
+          loc.startsWith('/forgot-password');
+      final isWelcomeRoute = loc.startsWith('/welcome');
+      final isIntroRoute = loc.startsWith('/intro');
+
+      // Still resolving auth — stay on welcome (acts as app startup splash)
+      if (isUnknown) return isWelcomeRoute ? null : '/welcome';
+
+      // Unauthenticated: send to intro (first launch) or login
+      if (!isAuthenticated && !isOnboarding && !needsRoleSelection) {
+        // Keep splash route reachable so app always plays startup splash first.
+        if (isLoginRoute || isIntroRoute || isWelcomeRoute) return null;
+        return '/intro';
       }
-      if (isAuthenticated && isAuthRoute) return '/dashboard';
-      if (isOnboarding && state.matchedLocation != '/onboarding') return '/onboarding';
-      if (needsRoleSelection && state.matchedLocation != '/role-selection') {
-        return '/role-selection';
-      }
+      // Authenticated: login/forgot-password/intro → welcome splash
+      if (isAuthenticated && (isLoginRoute || isIntroRoute)) return '/welcome';
+      // Authenticated on welcome → let the splash play, it navigates itself
+      if (isAuthenticated && isWelcomeRoute) return null;
+
+      if (isOnboarding && loc != '/onboarding') return '/onboarding';
+      if (needsRoleSelection && loc != '/role-selection') return '/role-selection';
       return null;
     },
     routes: [
       // ── Public routes ──────────────────────────────────────────────────
+      GoRoute(path: '/intro', builder: (_, __) => const IntroOnboardingScreen()),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/forgot-password', builder: (_, __) => const ForgotPasswordScreen()),
       GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
       GoRoute(path: '/role-selection', builder: (_, __) => const RoleSelectionScreen()),
+      GoRoute(path: '/welcome', builder: (_, __) => const WelcomeSplashScreen()),
 
       // ── Protected shell (bottom nav) ───────────────────────────────────
       ShellRoute(
@@ -114,6 +132,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/canteen', builder: (_, __) => const CanteenMenuScreen()),
           GoRoute(path: '/rooms', builder: (_, __) => const RoomListScreen()),
           GoRoute(path: '/hostel-issues', builder: (_, __) => const IssueListScreen()),
+          GoRoute(path: '/buy-sell', builder: (_, __) => const BuySellScreen()),
           GoRoute(path: '/campus-map', builder: (_, __) => const CampusMapScreen()),
           GoRoute(path: '/score-sheet', builder: (_, __) => const ScoreSheetScreen()),
           GoRoute(path: '/departments', builder: (_, __) => const DepartmentListScreen()),

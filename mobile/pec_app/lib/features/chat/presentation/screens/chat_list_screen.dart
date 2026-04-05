@@ -8,10 +8,44 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/pec_avatar.dart';
 import '../../../../shared/widgets/pec_card.dart';
 import '../../../../shared/widgets/pec_empty_state.dart';
-import '../../../../shared/widgets/pec_error_state.dart';
 import '../../../../shared/widgets/pec_shimmer.dart';
 import '../../data/models/chat_models.dart';
 import '../providers/chat_provider.dart';
+
+final List<ChatRoom> _dummyRooms = [
+  ChatRoom(
+    id: 'dummy-pec-ai-assistant',
+    name: 'PEC AI Assistant',
+    isGroup: false,
+    memberIds: const [],
+    unreadCount: 0,
+    updatedAt: DateTime(2026, 4, 5, 12, 0),
+  ),
+  ChatRoom(
+    id: 'dummy-placement-cell',
+    name: 'Placement Cell Updates',
+    isGroup: true,
+    memberIds: const [],
+    unreadCount: 2,
+    updatedAt: DateTime(2026, 4, 5, 11, 30),
+  ),
+  ChatRoom(
+    id: 'dummy-cse-2026',
+    name: 'CSE 2026 Batch',
+    isGroup: true,
+    memberIds: const [],
+    unreadCount: 0,
+    updatedAt: DateTime(2026, 4, 5, 10, 45),
+  ),
+  ChatRoom(
+    id: 'dummy-exam-helpdesk',
+    name: 'Exam Helpdesk',
+    isGroup: true,
+    memberIds: const [],
+    unreadCount: 1,
+    updatedAt: DateTime(2026, 4, 4, 18, 20),
+  ),
+];
 
 class ChatListScreen extends ConsumerStatefulWidget {
   const ChatListScreen({super.key});
@@ -44,9 +78,8 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                 separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.sm),
                 itemBuilder: (_, __) => const PecShimmerBox(height: 46, width: double.infinity),
               ),
-              error: (e, _) => PecErrorState(
-                message: e.toString(),
-                onRetry: () => ref.invalidate(chatRoomsProvider),
+              error: (e, _) => _DummyChatOptions(
+                onRoomTap: (roomId) => context.push('/chat/$roomId'),
               ),
               data: (rooms) {
                 final filtered = rooms.where((r) {
@@ -217,6 +250,39 @@ class _SectionTitle extends StatelessWidget {
         color: AppColors.textSecondaryDark,
         fontWeight: FontWeight.w700,
       ),
+    );
+  }
+}
+
+class _DummyChatOptions extends StatelessWidget {
+  final void Function(String roomId) onRoomTap;
+
+  const _DummyChatOptions({required this.onRoomTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.md,
+        0,
+        AppDimensions.md,
+        AppDimensions.md,
+      ),
+      children: [
+        Text(
+          'Chat service is unavailable. Showing dummy chats.',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondaryDark,
+          ),
+        ),
+        const SizedBox(height: AppDimensions.md),
+        const _SectionTitle('Dummy Chat Options'),
+        const SizedBox(height: AppDimensions.sm),
+        ..._dummyRooms.map((room) => Padding(
+              padding: const EdgeInsets.only(bottom: AppDimensions.sm),
+              child: _RoomTile(room: room, highlighted: room.id == 'dummy-pec-ai-assistant'),
+            )),
+      ],
     );
   }
 }

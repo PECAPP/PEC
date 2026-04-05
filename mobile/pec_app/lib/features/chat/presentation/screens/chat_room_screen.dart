@@ -6,7 +6,6 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../shared/widgets/pec_avatar.dart';
-import '../../../../shared/widgets/pec_error_state.dart';
 import '../../data/models/chat_models.dart';
 import '../providers/chat_provider.dart';
 
@@ -79,10 +78,8 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
             child: messagesAsync.when(
               loading: () => const Center(
                   child: CircularProgressIndicator(color: AppColors.yellow)),
-              error: (e, _) => PecErrorState(
-                message: e.toString(),
-                onRetry: () =>
-                    ref.invalidate(messagesProvider(widget.roomId)),
+              error: (e, _) => _DummyChatFallback(
+                onRetry: () => ref.invalidate(messagesProvider(widget.roomId)),
               ),
               data: (messages) {
                 if (messages.isEmpty) {
@@ -198,6 +195,68 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
     ref
         .read(messagesProvider(widget.roomId).notifier)
         .sendMessage(content);
+  }
+}
+
+class _DummyChatFallback extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _DummyChatFallback({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final options = [
+      'Ask about attendance policy',
+      'Show placement drive timeline',
+      'Check upcoming exam dates',
+      'Find canteen timings',
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.all(AppDimensions.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Demo chat options',
+            style: AppTextStyles.heading3.copyWith(color: AppColors.white),
+          ),
+          const SizedBox(height: AppDimensions.sm),
+          Text(
+            'Live chat is currently unavailable. Use these dummy options:',
+            style: AppTextStyles.bodySmall
+                .copyWith(color: AppColors.textSecondaryDark),
+          ),
+          const SizedBox(height: AppDimensions.md),
+          ...options.map((o) => Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: AppDimensions.sm),
+                padding: const EdgeInsets.all(AppDimensions.md),
+                decoration: BoxDecoration(
+                  color: AppColors.bgSurfaceDark,
+                  border: Border.all(color: AppColors.yellow.withValues(alpha: 0.4)),
+                ),
+                child: Text(
+                  o,
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+                ),
+              )),
+          const SizedBox(height: AppDimensions.sm),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.black,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              onPressed: onRetry,
+              child: const Text('Refresh Chat'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

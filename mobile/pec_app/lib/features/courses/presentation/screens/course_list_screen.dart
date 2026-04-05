@@ -97,6 +97,26 @@ class _CourseListScreenState extends ConsumerState<CourseListScreen>
               ),
               child: _CoreExpandedWidgets(),
             ),
+          if (_selectedModule == 'Academics')
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                AppDimensions.md,
+                0,
+                AppDimensions.md,
+                AppDimensions.md,
+              ),
+              child: _AcademicsExpandedWidgets(),
+            ),
+          if (_selectedModule == 'Campus')
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                AppDimensions.md,
+                0,
+                AppDimensions.md,
+                AppDimensions.md,
+              ),
+              child: _CampusExpandedWidgets(),
+            ),
           Expanded(
             child: _AllCoursesTab(search: _search),
           ),
@@ -322,6 +342,123 @@ class _CoreExpandedWidgets extends StatelessWidget {
                         child: Text(
                           item.$1,
                           style: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+class _AcademicsExpandedWidgets extends StatelessWidget {
+  const _AcademicsExpandedWidgets();
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      ('Courses', Icons.book_outlined, '/courses'),
+      ('TimeTable', Icons.schedule_outlined, '/timetable'),
+      ('Academic Calendar', Icons.calendar_month_outlined, '/calendar'),
+      ('Examinations', Icons.fact_check_outlined, '/examinations'),
+      ('Attendance', Icons.how_to_reg_outlined, '/attendance'),
+      ('Score Sheet', Icons.bar_chart_outlined, '/score-sheet'),
+      ('Course Materials', Icons.menu_book_outlined, '/course-materials'),
+      ('Resume Builder', Icons.description_outlined, '/resume'),
+    ];
+
+    return Wrap(
+      spacing: AppDimensions.sm,
+      runSpacing: AppDimensions.sm,
+      children: items
+          .map(
+            (item) => Container(
+              width: (MediaQuery.of(context).size.width -
+                      (AppDimensions.md * 2) -
+                      AppDimensions.sm) /
+                  2,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.bgSurfaceDark,
+                border: Border.all(
+                    color: AppColors.borderLight.withValues(alpha: 0.2)),
+              ),
+              child: InkWell(
+                onTap: () => context.go(item.$3),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppDimensions.md),
+                  child: Row(
+                    children: [
+                      Icon(item.$2, size: 18, color: AppColors.yellow),
+                      const SizedBox(width: AppDimensions.sm),
+                      Expanded(
+                        child: Text(
+                          item.$1,
+                          style: AppTextStyles.labelLarge
+                              .copyWith(color: AppColors.white),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+class _CampusExpandedWidgets extends StatelessWidget {
+  const _CampusExpandedWidgets();
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      ('Finance', Icons.account_balance_wallet_outlined, '/score-sheet'),
+      ('Buy and Sell', Icons.storefront_outlined, '/buy-sell'),
+      ('Hostel Issues', Icons.report_problem_outlined, '/hostel-issues'),
+      ('Night Canteen', Icons.nightlife_outlined, '/canteen'),
+      ('Campus Map', Icons.map_outlined, '/campus-map'),
+    ];
+
+    return Wrap(
+      spacing: AppDimensions.sm,
+      runSpacing: AppDimensions.sm,
+      children: items
+          .map(
+            (item) => Container(
+              width: (MediaQuery.of(context).size.width -
+                      (AppDimensions.md * 2) -
+                      AppDimensions.sm) /
+                  2,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.bgSurfaceDark,
+                border: Border.all(
+                    color: AppColors.borderLight.withValues(alpha: 0.2)),
+              ),
+              child: InkWell(
+                onTap: () => context.go(item.$3),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppDimensions.md),
+                  child: Row(
+                    children: [
+                      Icon(item.$2, size: 18, color: AppColors.yellow),
+                      const SizedBox(width: AppDimensions.sm),
+                      Expanded(
+                        child: Text(
+                          item.$1,
+                          style: AppTextStyles.labelLarge
+                              .copyWith(color: AppColors.white),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

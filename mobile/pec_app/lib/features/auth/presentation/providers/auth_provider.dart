@@ -47,6 +47,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final TokenStorage _tokenStorage;
   final AuthRemoteDataSource _dataSource;
 
+  static const bool _skipAuthForNow = false;
   static const _hiveBox = 'auth';
   static const _keyUser = 'user';
 
@@ -55,14 +56,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _init();
   }
 
+  Future<Box<dynamic>> _authBox() async {
+    if (Hive.isBoxOpen(_hiveBox)) {
+      return Hive.box(_hiveBox);
+    }
+    return Hive.openBox(_hiveBox);
+  }
+
   Future<void> _init() async {
+    if (_skipAuthForNow) {
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        user: _buildLocalStudentUser(),
+      );
+      return;
+    }
+
     final token = await _tokenStorage.getAccessToken();
     if (token == null) {
       state = state.copyWith(status: AuthStatus.unauthenticated);
       return;
     }
     // Restore user from local cache
-    final box = await Hive.openBox(_hiveBox);
+    final box = await _authBox();
     final userJson = box.get(_keyUser) as String?;
     if (userJson != null) {
       final user = UserModel.fromJsonString(userJson);
@@ -81,6 +97,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signIn({required String email, required String password}) async {
+    if (_skipAuthForNow) {
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        user: _buildLocalStudentUser(email: email),
+      );
+      return;
+    }
+
     state = state.copyWith(status: AuthStatus.unknown, error: null);
     try {
       final data = await _dataSource.signIn(email: email, password: password);
@@ -103,7 +127,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> continueAsStudentFromSignUp({String? email}) async {
-    final studentUser = UserModel(
+    final studentUser = _buildLocalStudentUser(email: email);
+
+    if (!_skipAuthForNow) {
+      await _cacheUser(studentUser);
+    }
+    state = AuthState(status: AuthStatus.authenticated, user: studentUser);
+  }
+
+  UserModel _buildLocalStudentUser({String? email}) {
+    return UserModel(
       id: 'local-student',
       email: (email != null && email.trim().isNotEmpty)
           ? email.trim()
@@ -114,9 +147,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       department: 'Computer Science',
       semester: 1,
     );
-
-    await _cacheUser(studentUser);
-    state = AuthState(status: AuthStatus.authenticated, user: studentUser);
   }
 
   Future<void> signOut() async {
@@ -124,7 +154,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _dataSource.signOut();
     } catch (_) {}
     await _tokenStorage.clearAll();
-    final box = await Hive.openBox(_hiveBox);
+    final box = await _authBox();
     await box.delete(_keyUser);
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
@@ -143,7 +173,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _cacheUser(UserModel user) async {
-    final box = await Hive.openBox(_hiveBox);
+    final box = await _authBox();
     await box.put(_keyUser, user.toJsonString());
   }
 

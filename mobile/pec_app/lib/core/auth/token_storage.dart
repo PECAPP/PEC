@@ -5,7 +5,12 @@ class TokenStorage {
   static const _keyAccessToken = 'KEY_ACCESS_TOKEN';
   static const _keyRefreshToken = 'KEY_REFRESH_TOKEN';
 
-  Future<Box<dynamic>> _box() => Hive.openBox(_boxName);
+  Future<Box<dynamic>> _box() {
+    if (Hive.isBoxOpen(_boxName)) {
+      return Future.value(Hive.box(_boxName));
+    }
+    return Hive.openBox(_boxName);
+  }
 
   Future<void> saveTokens({
     required String accessToken,
