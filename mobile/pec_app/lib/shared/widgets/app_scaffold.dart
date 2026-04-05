@@ -46,7 +46,8 @@ class AppScaffold extends ConsumerWidget {
 
   static final _studentNav = [
     _NavItem(label: 'Home', icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, route: '/dashboard'),
-    _NavItem(label: 'Categories', icon: Icons.category_outlined, activeIcon: Icons.category, route: '/courses'),
+    _NavItem(label: 'Chat', icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble_outline, route: '/chat'),
+    _NavItem(label: 'Finance', icon: Icons.account_balance_wallet_outlined, activeIcon: Icons.account_balance_wallet, route: '/score-sheet'),
     _NavItem(label: 'Profile', icon: Icons.person_outline, activeIcon: Icons.person, route: '/profile'),
   ];
 
@@ -95,28 +96,27 @@ class _PecBottomNav extends StatelessWidget {
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-      height: AppDimensions.bottomNavHeight + bottomInset + 4,
+      margin: EdgeInsets.zero,
+      height: AppDimensions.bottomNavHeight + bottomInset + 8,
       decoration: BoxDecoration(
-        color: const Color(0xFF111111),
+        color: const Color(0xFF131313),
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.yellow.withValues(alpha: 0.09),
-            const Color(0xFF17140B),
-            const Color(0xFF111111),
+            AppColors.yellow.withValues(alpha: 0.06),
+            const Color(0xFF17150E),
+            const Color(0xFF131313),
           ],
         ),
-        borderRadius: BorderRadius.circular(0),
         border: Border(
           top: BorderSide(
-            color: AppColors.yellow.withValues(alpha: 0.22),
-            width: 0.7,
+            color: AppColors.yellow.withValues(alpha: 0.42),
+            width: 1,
           ),
-          left: BorderSide(color: Colors.white.withValues(alpha: 0.08), width: 0.6),
-          right: BorderSide(color: Colors.white.withValues(alpha: 0.08), width: 0.6),
-          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.08), width: 0.6),
+          left: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.7),
+          right: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.7),
+          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.7),
         ),
       ),
       child: Row(
@@ -132,17 +132,19 @@ class _PecBottomNav extends StatelessWidget {
                 children: [
                   Icon(
                     isActive ? item.activeIcon : item.icon,
-                    color: isActive ? AppColors.yellow : AppColors.white.withValues(alpha: 0.4),
-                    size: isActive ? 24 : 23,
+                    color: isActive
+                        ? AppColors.yellow
+                        : AppColors.white.withValues(alpha: 0.72),
+                    size: isActive ? 25 : 24,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
                     item.label,
                     style: AppTextStyles.labelSmall.copyWith(
                       color: isActive
                           ? AppColors.yellow
-                          : AppColors.white.withValues(alpha: 0.8),
-                      fontSize: 10,
+                          : AppColors.white.withValues(alpha: 0.82),
+                      fontSize: 11,
                       fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                       letterSpacing: 0,
                     ),

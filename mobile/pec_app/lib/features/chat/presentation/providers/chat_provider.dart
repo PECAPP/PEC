@@ -60,6 +60,29 @@ List<ChatRoom> _defaultRooms() {
   ];
 }
 
+List<ChatMessage> _dummyMessagesForRoom(String roomId) {
+  final now = DateTime.now();
+  return [
+    ChatMessage(
+      id: 'dummy-msg-1',
+      roomId: roomId,
+      senderId: 'pec-ai',
+      senderName: 'PEC AI Assistant',
+      content: 'Chat backend is temporarily offline. You are in demo mode.',
+      createdAt: now.subtract(const Duration(minutes: 4)),
+    ),
+    ChatMessage(
+      id: 'dummy-msg-2',
+      roomId: roomId,
+      senderId: 'pec-ai',
+      senderName: 'PEC AI Assistant',
+      content:
+          'Try these options: Attendance help, Placement updates, Exam schedule, Campus services.',
+      createdAt: now.subtract(const Duration(minutes: 3)),
+    ),
+  ];
+}
+
 // ── Message stream per room ───────────────────────────────────────────────────
 class MessagesNotifier extends StateNotifier<AsyncValue<List<ChatMessage>>> {
   final ChatRemoteDataSource _ds;
@@ -78,8 +101,8 @@ class MessagesNotifier extends StateNotifier<AsyncValue<List<ChatMessage>>> {
       // Oldest first for ListView
       messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       state = AsyncValue.data(messages);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+    } catch (_) {
+      state = AsyncValue.data(_dummyMessagesForRoom(roomId));
       return;
     }
     _connectWs();
