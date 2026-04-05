@@ -8,7 +8,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../data/datasources/attendance_remote_datasource.dart';
+// import '../../data/datasources/attendance_remote_datasource.dart';
 import '../providers/attendance_provider.dart';
 
 class QrScanScreen extends ConsumerStatefulWidget {

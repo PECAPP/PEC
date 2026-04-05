@@ -476,8 +476,8 @@ class _PageText extends StatelessWidget {
 
   static const _data = [
     (
-      'WELCOME TO\nPEC',
-      'Punjab Engineering College — over a century of engineering excellence, now in your pocket.',
+      'CENTURY EXPERIENCE\nIN YOUR HAND',
+      'Punjab Engineering College brings over a century of excellence into your hand with one unified campus app.',
     ),
     (
       'ACADEMICS\nSIMPLIFIED',

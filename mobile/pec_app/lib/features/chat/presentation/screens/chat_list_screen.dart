@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
-import '../../../../shared/widgets/pec_avatar.dart';
-import '../../../../shared/widgets/pec_card.dart';
+// import '../../../../shared/widgets/pec_avatar.dart';
+// import '../../../../shared/widgets/pec_card.dart';
 import '../../../../shared/widgets/pec_empty_state.dart';
 import '../../../../shared/widgets/pec_shimmer.dart';
 import '../../data/models/chat_models.dart';
@@ -385,7 +385,7 @@ class _NewChatDialogState extends ConsumerState<_NewChatDialog> {
               Switch(
                 value: _isGroup,
                 onChanged: (v) => setState(() => _isGroup = v),
-                activeColor: AppColors.yellow,
+                activeThumbColor: AppColors.yellow,
               ),
               Text('Group chat', style: AppTextStyles.bodySmall),
             ],

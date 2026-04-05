@@ -221,7 +221,7 @@ class _WelcomeSplashScreenState extends ConsumerState<WelcomeSplashScreen>
       if (status == AuthStatus.authenticated) {
         context.go('/dashboard');
       } else {
-        context.go('/login');
+        context.go('/intro');
       }
     });
   }
