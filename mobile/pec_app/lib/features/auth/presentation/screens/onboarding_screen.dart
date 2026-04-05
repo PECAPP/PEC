@@ -235,7 +235,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
       await ref.read(authNotifierProvider.notifier).refreshUser();
       ref.read(authNotifierProvider.notifier).completeOnboarding();
-      if (mounted) context.go('/dashboard');
+      if (mounted) context.go('/intro');
     } catch (e) {
       setState(() {
         _saving = false;

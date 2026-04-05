@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../providers/auth_provider.dart';
 import '../providers/first_launch_provider.dart';
 
 // ── Entry point ───────────────────────────────────────────────────────────────
@@ -97,7 +98,13 @@ class _IntroOnboardingScreenState extends ConsumerState<IntroOnboardingScreen>
 
   Future<void> _finish() async {
     await markIntroSeen();
-    if (mounted) context.go('/login');
+    if (!mounted) return;
+    final status = ref.read(authNotifierProvider).status;
+    if (status == AuthStatus.authenticated) {
+      context.go('/dashboard');
+    } else {
+      context.go('/login');
+    }
   }
 
   @override

@@ -66,8 +66,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (isLoginRoute || isIntroRoute || isWelcomeRoute) return null;
         return '/intro';
       }
-      // Authenticated: login/forgot-password/intro → welcome splash
-      if (isAuthenticated && (isLoginRoute || isIntroRoute)) return '/welcome';
+      // Authenticated: login/forgot-password → welcome splash
+      if (isAuthenticated && isLoginRoute) return '/welcome';
       // Authenticated on welcome → let the splash play, it navigates itself
       if (isAuthenticated && isWelcomeRoute) return null;
 
