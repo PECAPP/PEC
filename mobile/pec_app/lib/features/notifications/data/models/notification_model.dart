@@ -52,4 +52,24 @@ class AppNotification {
       default: return Icons.notifications_outlined;
     }
   }
+
+  AppNotification copyWith({
+    String? id,
+    String? title,
+    String? body,
+    String? type,
+    bool? isRead,
+    String? actionRoute,
+    DateTime? createdAt,
+  }) {
+    return AppNotification(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      type: type ?? this.type,
+      isRead: isRead ?? this.isRead,
+      actionRoute: actionRoute ?? this.actionRoute,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }
