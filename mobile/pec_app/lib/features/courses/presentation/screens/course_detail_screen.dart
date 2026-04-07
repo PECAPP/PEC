@@ -24,7 +24,8 @@ class CourseDetailScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.folder_open_outlined),
-            onPressed: () => context.push('/materials?courseId=$courseId'),
+            onPressed: () =>
+                context.push('/course-materials?courseId=$courseId'),
             tooltip: 'Materials',
           ),
         ],
@@ -85,8 +86,8 @@ class CourseDetailScreen extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                      child: _InfoTile(label: 'CREDITS',
-                          value: '${course.credits}')),
+                      child: _InfoTile(
+                          label: 'CREDITS', value: '${course.credits}')),
                   const SizedBox(width: AppDimensions.sm),
                   Expanded(
                       child: _InfoTile(
@@ -112,8 +113,7 @@ class CourseDetailScreen extends ConsumerWidget {
               ),
               if (course.instructor != null) ...[
                 const SizedBox(height: AppDimensions.sm),
-                _InfoTile(
-                    label: 'INSTRUCTOR', value: course.instructor!),
+                _InfoTile(label: 'INSTRUCTOR', value: course.instructor!),
               ],
               const SizedBox(height: AppDimensions.md),
 
@@ -143,7 +143,8 @@ class CourseDetailScreen extends ConsumerWidget {
                 icon: Icons.folder_open_outlined,
                 label: 'Course Materials',
                 color: AppColors.blue,
-                onTap: () => context.push('/materials?courseId=$courseId'),
+                onTap: () =>
+                    context.push('/course-materials?courseId=$courseId'),
               ),
               const SizedBox(height: AppDimensions.sm),
               _QuickLink(
@@ -172,8 +173,8 @@ class _InfoTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style:
-                  AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
+              style: AppTextStyles.caption
+                  .copyWith(color: AppColors.textSecondary)),
           const SizedBox(height: 2),
           Text(value, style: AppTextStyles.labelLarge),
         ],

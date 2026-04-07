@@ -22,7 +22,9 @@ class ExamModel {
   });
 
   factory ExamModel.fromJson(Map<String, dynamic> j) {
-    final dateStr = j['examDate'] as String? ?? j['date'] as String? ?? DateTime.now().toIso8601String();
+    final dateStr = j['examDate'] as String? ??
+        j['date'] as String? ??
+        DateTime.now().toIso8601String();
     final examDate = DateTime.tryParse(dateStr) ?? DateTime.now();
     final now = DateTime.now();
     String status;
@@ -34,9 +36,11 @@ class ExamModel {
       status = 'upcoming';
     }
     return ExamModel(
-      id: j['id'] as String,
-      courseName: j['courseName'] as String? ?? j['course']?['name'] as String? ?? '',
-      courseCode: j['courseCode'] as String? ?? j['course']?['code'] as String? ?? '',
+      id: (j['id'] ?? '').toString(),
+      courseName:
+          j['courseName'] as String? ?? j['course']?['name'] as String? ?? '',
+      courseCode:
+          j['courseCode'] as String? ?? j['course']?['code'] as String? ?? '',
       examType: j['examType'] as String? ?? j['type'] as String? ?? 'exam',
       examDate: examDate,
       venue: j['venue'] as String?,
@@ -44,6 +48,20 @@ class ExamModel {
       instructions: j['instructions'] as String?,
       status: status,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'courseName': courseName,
+      'courseCode': courseCode,
+      'examType': examType,
+      'examDate': examDate.toIso8601String(),
+      'venue': venue,
+      'duration': duration,
+      'instructions': instructions,
+      'status': status,
+    };
   }
 
   Duration get timeUntil => examDate.difference(DateTime.now());

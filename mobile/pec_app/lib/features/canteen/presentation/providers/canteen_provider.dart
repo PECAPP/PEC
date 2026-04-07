@@ -1,23 +1,61 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/utils/hive_cache.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/datasources/canteen_remote_datasource.dart';
 import '../../data/models/canteen_models.dart';
 
-final canteenDataSourceProvider = Provider<CanteenRemoteDataSource>((ref) =>
-    CanteenRemoteDataSource(ref.watch(apiClientProvider)));
+final canteenDataSourceProvider = Provider<CanteenRemoteDataSource>(
+    (ref) => CanteenRemoteDataSource(ref.watch(apiClientProvider)));
 
-final canteenItemsProvider =
-    FutureProvider<List<CanteenItem>>((ref) async {
+final canteenItemsProvider = FutureProvider<List<CanteenItem>>((ref) async {
   final ds = ref.watch(canteenDataSourceProvider);
-  return ds.getItems();
+  const cacheKey = 'canteen:items';
+
+  try {
+    final items = await ds.getItems();
+    await HiveCache.put(
+      cacheKey,
+      items.map((e) => e.toJson()).toList(growable: false),
+      ttl: const Duration(hours: 6),
+    );
+    return items;
+  } catch (_) {
+    final cached = await HiveCache.get<List<dynamic>>(cacheKey);
+    if (cached != null && cached.isNotEmpty) {
+      return cached
+          .whereType<Map<String, dynamic>>()
+          .map(CanteenItem.fromJson)
+          .toList(growable: false);
+    }
+    rethrow;
+  }
 });
 
-final canteenOrdersProvider =
-    FutureProvider<List<CanteenOrder>>((ref) async {
+final canteenOrdersProvider = FutureProvider<List<CanteenOrder>>((ref) async {
   final ds = ref.watch(canteenDataSourceProvider);
-  final orders = await ds.getMyOrders();
-  orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  return orders;
+  const cacheKey = 'canteen:orders:mine';
+
+  try {
+    final orders = await ds.getMyOrders();
+    orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    await HiveCache.put(
+      cacheKey,
+      orders.map((e) => e.toJson()).toList(growable: false),
+      ttl: const Duration(hours: 6),
+    );
+    return orders;
+  } catch (_) {
+    final cached = await HiveCache.get<List<dynamic>>(cacheKey);
+    if (cached != null && cached.isNotEmpty) {
+      final orders = cached
+          .whereType<Map<String, dynamic>>()
+          .map(CanteenOrder.fromJson)
+          .toList(growable: false);
+      orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return orders;
+    }
+    rethrow;
+  }
 });
 
 // ── Cart ──────────────────────────────────────────────────────────────────────
@@ -49,15 +87,12 @@ class CartNotifier extends StateNotifier<Map<String, CartItem>> {
 
   void clear() => state = {};
 
-  double get total =>
-      state.values.fold(0, (sum, e) => sum + e.subtotal);
+  double get total => state.values.fold(0, (sum, e) => sum + e.subtotal);
 
-  int get itemCount =>
-      state.values.fold(0, (sum, e) => sum + e.qty);
+  int get itemCount => state.values.fold(0, (sum, e) => sum + e.qty);
 }
 
-final cartProvider =
-    StateNotifierProvider<CartNotifier, Map<String, CartItem>>(
+final cartProvider = StateNotifierProvider<CartNotifier, Map<String, CartItem>>(
   (_) => CartNotifier(),
 );
 
@@ -72,9 +107,8 @@ class OrderNotifier extends StateNotifier<AsyncValue<CanteenOrder?>> {
     if (cart.isEmpty) return;
     state = const AsyncValue.loading();
     try {
-      final lines = cart.values
-          .map((c) => {'itemId': c.item.id, 'qty': c.qty})
-          .toList();
+      final lines =
+          cart.values.map((c) => {'itemId': c.item.id, 'qty': c.qty}).toList();
       final order = await _ds.placeOrder(lines);
       _ref.read(cartProvider.notifier).clear();
       _ref.invalidate(canteenOrdersProvider);

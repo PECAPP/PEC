@@ -11,12 +11,22 @@ class NotificationsRemoteDataSource {
       ApiEndpoints.notifications,
       queryParameters: {'limit': limit},
     );
-    final raw = resp.data as Map<String, dynamic>;
-    final items = raw['data'] as List<dynamic>? ??
-        raw['items'] as List<dynamic>? ??
-        (resp.data is List ? resp.data as List<dynamic> : []);
+    final data = resp.data;
+    List<dynamic> items;
+
+    if (data is Map<String, dynamic>) {
+      items = data['data'] as List<dynamic>? ??
+          data['items'] as List<dynamic>? ??
+          <dynamic>[];
+    } else if (data is List) {
+      items = data;
+    } else {
+      items = <dynamic>[];
+    }
+
     return items
-        .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
+        .whereType<Map>()
+        .map((e) => AppNotification.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
 

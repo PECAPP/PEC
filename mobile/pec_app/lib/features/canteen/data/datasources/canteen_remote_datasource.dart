@@ -6,6 +6,19 @@ class CanteenRemoteDataSource {
   final ApiClient _client;
   CanteenRemoteDataSource(this._client);
 
+  List<dynamic> _extractItems(dynamic raw) {
+    if (raw is List) return raw;
+    if (raw is Map<String, dynamic>) {
+      final data = raw['data'];
+      if (data is List) return data;
+      final items = raw['items'];
+      if (items is List) return items;
+      final results = raw['results'];
+      if (results is List) return results;
+    }
+    return const [];
+  }
+
   Future<List<CanteenItem>> getItems({String? category}) async {
     final resp = await _client.dio.get(
       ApiEndpoints.canteenItems,
@@ -14,13 +27,11 @@ class CanteenRemoteDataSource {
         if (category != null) 'category': category,
       },
     );
-    final raw = resp.data as Map<String, dynamic>;
-    final items = raw['data'] as List<dynamic>? ??
-        raw['items'] as List<dynamic>? ??
-        (resp.data is List ? resp.data as List<dynamic> : []);
+    final items = _extractItems(resp.data);
     return items
-        .map((e) => CanteenItem.fromJson(e as Map<String, dynamic>))
-        .toList();
+        .whereType<Map<String, dynamic>>()
+        .map(CanteenItem.fromJson)
+        .toList(growable: false);
   }
 
   Future<List<CanteenOrder>> getMyOrders({int limit = 20}) async {
@@ -28,13 +39,11 @@ class CanteenRemoteDataSource {
       ApiEndpoints.canteenOrders,
       queryParameters: {'limit': limit, 'mine': true},
     );
-    final raw = resp.data as Map<String, dynamic>;
-    final items = raw['data'] as List<dynamic>? ??
-        raw['items'] as List<dynamic>? ??
-        (resp.data is List ? resp.data as List<dynamic> : []);
+    final items = _extractItems(resp.data);
     return items
-        .map((e) => CanteenOrder.fromJson(e as Map<String, dynamic>))
-        .toList();
+        .whereType<Map<String, dynamic>>()
+        .map(CanteenOrder.fromJson)
+        .toList(growable: false);
   }
 
   Future<CanteenOrder> placeOrder(List<Map<String, dynamic>> lines) async {

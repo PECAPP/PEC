@@ -1,42 +1,97 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../data/models/score_model.dart';
+import '../../../../shared/widgets/pec_card.dart';
+import '../../../../shared/widgets/pec_empty_state.dart';
+import '../providers/score_provider.dart';
 
-class ScoreSheetScreen extends StatelessWidget {
+class ScoreSheetScreen extends ConsumerStatefulWidget {
   const ScoreSheetScreen({super.key});
+
+  static const double _maxContentWidth = 900;
+
+  @override
+  ConsumerState<ScoreSheetScreen> createState() => _ScoreSheetScreenState();
+}
+
+class _ScoreSheetScreenState extends ConsumerState<ScoreSheetScreen> {
+  int _selectedSemester = 0;
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        backgroundColor: const Color(0xFF0F0D09),
-        body: Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF1A1205),
-                Color(0xFF100D08),
-                Color(0xFF0C0A07),
-              ],
-              stops: [0.0, 0.42, 1.0],
-            ),
+    final cgpaAsync = ref.watch(cgpaProvider);
+    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = width >= 900
+        ? AppDimensions.lg
+        : width >= 600
+            ? AppDimensions.md
+            : AppDimensions.sm;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('SCORE SHEET'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => ref.invalidate(cgpaProvider),
           ),
-          child: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  _FinanceHeaderSection(),
-                  SizedBox(height: 16),
-                  _FinanceTabsBody(),
-                ],
+        ],
+      ),
+      body: SafeArea(
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+                maxWidth: ScoreSheetScreen._maxContentWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: cgpaAsync.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: AppColors.yellow),
+                ),
+                error: (_, __) => _ScoreLoadFallback(
+                  onRetry: () => ref.invalidate(cgpaProvider),
+                ),
+                data: (cgpaData) {
+                  if (cgpaData.semesters.isEmpty) {
+                    return const PecEmptyState(
+                      icon: Icons.bar_chart_outlined,
+                      title: 'No score data yet',
+                      subtitle: 'Scores will appear here once published',
+                    );
+                  }
+
+                  final semesterIndex =
+                      _selectedSemester >= cgpaData.semesters.length
+                          ? 0
+                          : _selectedSemester;
+                  final selected = cgpaData.semesters[semesterIndex];
+
+                  return ListView(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: AppDimensions.md),
+                    children: [
+                      _ScoreSummaryCard(cgpaData: cgpaData),
+                      const SizedBox(height: AppDimensions.md),
+                      _SemesterSelector(
+                        semesters: cgpaData.semesters,
+                        selectedIndex: semesterIndex,
+                        onSelect: (index) =>
+                            setState(() => _selectedSemester = index),
+                      ),
+                      const SizedBox(height: AppDimensions.sm),
+                      ...selected.subjects.map((s) => Padding(
+                            padding:
+                                const EdgeInsets.only(bottom: AppDimensions.sm),
+                            child: _SubjectScoreCard(score: s),
+                          )),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -46,326 +101,230 @@ class ScoreSheetScreen extends StatelessWidget {
   }
 }
 
-class _FinanceHeaderSection extends StatelessWidget {
-  const _FinanceHeaderSection();
+class _ScoreLoadFallback extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _ScoreLoadFallback({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.school_outlined,
+            size: 42,
+            color: AppColors.textSecondaryDark,
+          ),
+          const SizedBox(height: AppDimensions.sm),
+          Text(
+            'Could not load score sheet right now',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondaryDark,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppDimensions.md),
+          SizedBox(
+            width: 180,
+            child: FilledButton(
+              onPressed: onRetry,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.black,
+              ),
+              child: const Text('Retry'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScoreSummaryCard extends StatelessWidget {
+  final CgpaData cgpaData;
+  const _ScoreSummaryCard({required this.cgpaData});
+
+  @override
+  Widget build(BuildContext context) {
+    return PecCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Overall Performance', style: AppTextStyles.labelLarge),
+          const SizedBox(height: AppDimensions.sm),
+          Row(
+            children: [
+              Expanded(
+                child: _MetricChip(
+                  title: 'CGPA',
+                  value: cgpaData.cgpaLabel,
+                  color: AppColors.yellow,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              Expanded(
+                child: _MetricChip(
+                  title: 'Credits',
+                  value: '${cgpaData.totalCredits}',
+                  color: AppColors.blue,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.sm),
+          Text(
+            cgpaData.classification,
+            style: AppTextStyles.bodyMedium
+                .copyWith(color: AppColors.textSecondary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetricChip extends StatelessWidget {
+  final String title;
+  final String value;
+  final Color color;
+  const _MetricChip(
+      {required this.title, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+      padding: const EdgeInsets.all(AppDimensions.sm),
       decoration: BoxDecoration(
-        color: const Color(0xFF120F0B),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF2B261A), width: 1),
+        color: color.withValues(alpha: 0.15),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: AppTextStyles.caption),
+          const SizedBox(height: 2),
+          Text(value, style: AppTextStyles.labelLarge.copyWith(color: color)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SemesterSelector extends StatelessWidget {
+  final List<SemesterResult> semesters;
+  final int selectedIndex;
+  final ValueChanged<int> onSelect;
+
+  const _SemesterSelector({
+    required this.semesters,
+    required this.selectedIndex,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: semesters.length,
+        separatorBuilder: (_, __) => const SizedBox(width: AppDimensions.xs),
+        itemBuilder: (_, i) {
+          final active = i == selectedIndex;
+          final s = semesters[i];
+          return GestureDetector(
+            onTap: () => onSelect(i),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: active ? AppColors.yellow : Colors.transparent,
+                border: Border.all(color: AppColors.black, width: 2),
+              ),
+              child: Text(
+                'SEM ${s.semester} · SGPA ${s.sgpa.toStringAsFixed(2)}',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SubjectScoreCard extends StatelessWidget {
+  final SubjectScore score;
+  const _SubjectScoreCard({required this.score});
+
+  Color get gradeColor {
+    switch (score.gradeColor) {
+      case 'green':
+        return AppColors.green;
+      case 'blue':
+        return AppColors.blue;
+      case 'yellow':
+        return AppColors.yellow;
+      case 'warning':
+        return AppColors.warning;
+      case 'red':
+        return AppColors.red;
+      default:
+        return AppColors.textSecondary;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PecCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2B250D),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                      color: AppColors.yellow.withValues(alpha: 0.35)),
-                ),
-                child: const Icon(Icons.account_balance_wallet_outlined,
-                    size: 18, color: AppColors.yellow),
-              ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Finance',
-                      style: AppTextStyles.heading2.copyWith(
-                        color: AppColors.white,
-                        fontSize: 32 / 2,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Fees, Payments & Transactions',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.white.withValues(alpha: 0.66),
-                        fontSize: 12,
-                      ),
-                    ),
+                    Text(score.courseName,
+                        style: AppTextStyles.labelLarge,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                    Text(score.courseCode, style: AppTextStyles.caption),
                   ],
                 ),
               ),
               Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF121212),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFF2B2B2B)),
-                ),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.refresh, size: 17),
-                  color: AppColors.white.withValues(alpha: 0.85),
-                  padding: EdgeInsets.zero,
-                  splashRadius: 16,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                color: gradeColor.withValues(alpha: 0.2),
+                child: Text(
+                  score.grade ?? '--',
+                  style: AppTextStyles.labelSmall.copyWith(color: gradeColor),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Container(
-            height: 38,
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2E2618),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: const TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: Colors.transparent,
-              indicator: BoxDecoration(
-                color: Color(0xFF16120B),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-              ),
-              labelColor: AppColors.white,
-              unselectedLabelColor: Color(0xFFC9BDA8),
-              labelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-              tabs: [
-                Tab(text: 'Overview'),
-                Tab(text: 'My Fees'),
-                Tab(text: 'Transactions'),
-              ],
-            ),
+          const SizedBox(height: AppDimensions.sm),
+          Wrap(
+            spacing: AppDimensions.md,
+            runSpacing: 4,
+            children: [
+              Text('Credits: ${score.credits}', style: AppTextStyles.caption),
+              Text(
+                  'Internal: ${score.internalMarks?.toStringAsFixed(1) ?? '--'}',
+                  style: AppTextStyles.caption),
+              Text(
+                  'External: ${score.externalMarks?.toStringAsFixed(1) ?? '--'}',
+                  style: AppTextStyles.caption),
+              Text('Total: ${score.totalMarks?.toStringAsFixed(1) ?? '--'}',
+                  style: AppTextStyles.caption),
+            ],
           ),
         ],
       ),
-    );
-  }
-}
-
-class _FinanceTabsBody extends StatelessWidget {
-  const _FinanceTabsBody();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 360,
-      child: TabBarView(
-        children: [
-          _OverviewFinancePane(),
-          _PlaceholderPane(
-            icon: Icons.request_page_outlined,
-            title: 'My Fees',
-            subtitle: 'Detailed fee items will appear here.',
-          ),
-          _PlaceholderPane(
-            icon: Icons.receipt_long_outlined,
-            title: 'Transactions',
-            subtitle: 'Recent payments and receipts will appear here.',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _OverviewFinancePane extends StatelessWidget {
-  const _OverviewFinancePane();
-
-  @override
-  Widget build(BuildContext context) {
-    const stats = [
-      _FinanceStat(
-        title: 'Total Pending',
-        value: '—',
-        icon: Icons.schedule_outlined,
-        accent: Color(0xFFFFA726),
-        border: Color(0xFF55411F),
-      ),
-      _FinanceStat(
-        title: 'Total Paid',
-        value: '—',
-        icon: Icons.check_circle_outline,
-        accent: Color(0xFF00D8A6),
-        border: Color(0xFF1C574A),
-      ),
-      _FinanceStat(
-        title: 'Overdue',
-        value: '—',
-        icon: Icons.warning_amber_rounded,
-        accent: Color(0xFFFF4B4B),
-        border: Color(0xFF5A2222),
-      ),
-      _FinanceStat(
-        title: 'Total Paid Fees',
-        value: '0',
-        icon: Icons.currency_rupee,
-        accent: Color(0xFF2E7CFF),
-        border: Color(0xFF243A66),
-      ),
-    ];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isPhone = constraints.maxWidth < 760;
-        final isVeryNarrow = constraints.maxWidth < 430;
-        return GridView.builder(
-          itemCount: stats.length,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: isPhone ? 2 : 4,
-            crossAxisSpacing: isVeryNarrow ? 10 : 14,
-            mainAxisSpacing: isVeryNarrow ? 10 : 14,
-            childAspectRatio: isVeryNarrow
-                ? 1.65
-                : isPhone
-                    ? 1.95
-                    : 2.35,
-          ),
-          itemBuilder: (_, i) => _FinanceStatCard(stat: stats[i]),
-        );
-      },
-    );
-  }
-}
-
-class _FinanceStat {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color accent;
-  final Color border;
-
-  const _FinanceStat({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.accent,
-    required this.border,
-  });
-}
-
-class _FinanceStatCard extends StatelessWidget {
-  final _FinanceStat stat;
-  const _FinanceStatCard({required this.stat});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compact = constraints.maxWidth < 190 || constraints.maxHeight < 112;
-        final padH = compact ? 10.0 : 14.0;
-        final padV = compact ? 10.0 : 14.0;
-        final iconSize = compact ? 34.0 : 40.0;
-        final iconGlyph = compact ? 18.0 : 20.0;
-        final titleSize = compact ? 12.0 : 13.0;
-        final valueSize = compact ? 13.0 : 16.0;
-
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: padH, vertical: padV),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A241A).withValues(alpha: 0.48),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: stat.border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: iconSize,
-                    height: iconSize,
-                    decoration: BoxDecoration(
-                      color: stat.accent.withValues(alpha: 0.16),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Icon(stat.icon, size: iconGlyph, color: stat.accent),
-                  ),
-                  SizedBox(width: compact ? 8 : 10),
-                  Expanded(
-                    child: Text(
-                      stat.title,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.white.withValues(alpha: 0.78),
-                        fontSize: titleSize,
-                      ),
-                      maxLines: compact ? 2 : 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                stat.value,
-                style: AppTextStyles.heading2.copyWith(
-                  color: stat.accent,
-                  fontSize: valueSize,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _PlaceholderPane extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _PlaceholderPane({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFF17120C),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF2D281E)),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 30, color: AppColors.yellow.withValues(alpha: 0.8)),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                style: AppTextStyles.heading3.copyWith(
-                  color: AppColors.white,
-                  fontSize: 20,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.white.withValues(alpha: 0.72),
-                ),
-              ),
-            ],
-          ),
-        ),
-        ),
     );
   }
 }

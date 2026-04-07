@@ -11,12 +11,10 @@ class IssuesRemoteDataSource {
       ApiEndpoints.hostelIssues,
       queryParameters: {'mine': true, 'limit': 100},
     );
-    final raw = resp.data as Map<String, dynamic>;
-    final items = raw['data'] as List<dynamic>? ??
-        raw['items'] as List<dynamic>? ??
-        (resp.data is List ? resp.data as List<dynamic> : []);
+    final items = _extractItems(resp.data);
     return items
-        .map((e) => HostelIssue.fromJson(e as Map<String, dynamic>))
+        .whereType<Map<String, dynamic>>()
+        .map(HostelIssue.fromJson)
         .toList();
   }
 
@@ -39,10 +37,57 @@ class IssuesRemoteDataSource {
         if (imageUrl != null) 'imageUrl': imageUrl,
       },
     );
-    return HostelIssue.fromJson(resp.data as Map<String, dynamic>);
+    final payload = resp.data;
+    if (payload is Map<String, dynamic>) {
+      final data = payload['data'];
+      if (data is Map<String, dynamic>) {
+        return HostelIssue.fromJson(data);
+      }
+      return HostelIssue.fromJson(payload);
+    }
+    if (payload is List && payload.isNotEmpty && payload.first is Map<String, dynamic>) {
+      return HostelIssue.fromJson(payload.first as Map<String, dynamic>);
+    }
+    return HostelIssue.fromJson({
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'title': title,
+      'description': description,
+      'category': category,
+      'priority': priority,
+      'status': 'open',
+      'roomNumber': roomNumber,
+      'imageUrl': imageUrl,
+      'createdAt': DateTime.now().toIso8601String(),
+    });
   }
 
   Future<void> deleteIssue(String id) async {
     await _client.dio.delete(ApiEndpoints.hostelIssue(id));
+  }
+
+  List<dynamic> _extractItems(dynamic payload) {
+    if (payload is List) {
+      return payload;
+    }
+    if (payload is Map<String, dynamic>) {
+      final candidates = [
+        payload['data'],
+        payload['items'],
+        payload['results'],
+        payload['issues'],
+      ];
+      for (final candidate in candidates) {
+        if (candidate is List) {
+          return candidate;
+        }
+        if (candidate is Map<String, dynamic>) {
+          final nested = _extractItems(candidate);
+          if (nested.isNotEmpty) {
+            return nested;
+          }
+        }
+      }
+    }
+    return const [];
   }
 }

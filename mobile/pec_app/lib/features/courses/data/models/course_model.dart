@@ -27,24 +27,54 @@ class CourseModel {
     required this.enrollmentCount,
   });
 
+  static String _asString(dynamic value, {String fallback = ''}) {
+    if (value == null) return fallback;
+    if (value is String) return value;
+    return value.toString();
+  }
+
+  static int _asInt(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? fallback;
+  }
+
   factory CourseModel.fromJson(Map<String, dynamic> j) => CourseModel(
-        id: j['id'] as String,
-        code: j['code'] as String,
-        name: j['name'] as String,
-        credits: (j['credits'] as num).toInt(),
-        instructor: j['instructor'] as String?,
-        instructorId: j['facultyId'] as String?,
-        department: j['department'] as String? ?? '',
-        semester: j['semester'] != null ? (j['semester'] as num).toInt() : null,
-        status: j['status'] as String? ?? 'active',
-        capacity: (j['capacity'] as num?)?.toInt() ?? 60,
+        id: _asString(j['id']),
+        code: _asString(j['code']),
+        name: _asString(j['name'], fallback: 'Untitled Course'),
+        credits: _asInt(j['credits'], fallback: 0),
+        instructor: j['instructor']?.toString(),
+        instructorId: j['facultyId']?.toString(),
+        department: _asString(j['department']),
+        semester: j['semester'] != null ? _asInt(j['semester']) : null,
+        status: _asString(j['status'], fallback: 'active'),
+        capacity: _asInt(j['capacity'], fallback: 60),
         prerequisiteIds: (j['prerequisiteIds'] as List<dynamic>?)
-                ?.map((e) => e as String)
+                ?.map((e) => e.toString())
                 .toList() ??
             [],
-        enrollmentCount:
-            (j['_count'] as Map<String, dynamic>?)?['enrollments'] as int? ?? 0,
+        enrollmentCount: _asInt(
+          (j['_count'] as Map<String, dynamic>?)?['enrollments'] ??
+              j['enrollmentCount'],
+          fallback: 0,
+        ),
       );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'code': code,
+        'name': name,
+        'credits': credits,
+        'instructor': instructor,
+        'facultyId': instructorId,
+        'department': department,
+        'semester': semester,
+        'status': status,
+        'capacity': capacity,
+        'prerequisiteIds': prerequisiteIds,
+        'enrollmentCount': enrollmentCount,
+      };
 }
 
 class EnrollmentModel {
@@ -70,16 +100,45 @@ class EnrollmentModel {
     required this.enrolledAt,
   });
 
+  static String _asString(dynamic value, {String fallback = ''}) {
+    if (value == null) return fallback;
+    if (value is String) return value;
+    return value.toString();
+  }
+
+  static int _asInt(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? fallback;
+  }
+
   factory EnrollmentModel.fromJson(Map<String, dynamic> j) => EnrollmentModel(
-        id: j['id'] as String,
-        studentId: j['studentId'] as String,
-        courseId: j['courseId'] as String,
-        courseName: j['courseName'] as String,
-        courseCode: j['courseCode'] as String,
-        semester:
-            j['semester'] != null ? (j['semester'] as num).toInt() : null,
-        batch: j['batch'] as String?,
-        status: j['status'] as String? ?? 'active',
-        enrolledAt: DateTime.parse(j['enrolledAt'] as String),
+        id: _asString(j['id']),
+        studentId: _asString(j['studentId']),
+        courseId: _asString(j['courseId']),
+        courseName: _asString(
+          j['courseName'] ?? (j['course'] as Map<String, dynamic>?)?['name'],
+          fallback: 'Unknown Course',
+        ),
+        courseCode: _asString(
+          j['courseCode'] ?? (j['course'] as Map<String, dynamic>?)?['code'],
+        ),
+        semester: j['semester'] != null ? _asInt(j['semester']) : null,
+        batch: j['batch']?.toString(),
+        status: _asString(j['status'], fallback: 'active'),
+        enrolledAt:
+            DateTime.tryParse(_asString(j['enrolledAt'])) ?? DateTime.now(),
       );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'studentId': studentId,
+        'courseId': courseId,
+        'courseName': courseName,
+        'courseCode': courseCode,
+        'semester': semester,
+        'batch': batch,
+        'status': status,
+        'enrolledAt': enrolledAt.toIso8601String(),
+      };
 }

@@ -8,10 +8,11 @@ import 'package:pec_app/features/attendance/presentation/screens/qr_scan_screen.
 import 'package:pec_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:pec_app/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:pec_app/features/auth/presentation/screens/intro_onboarding_screen.dart';
+import 'package:pec_app/features/auth/presentation/screens/loading_splash_screen.dart';
 import 'package:pec_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:pec_app/features/auth/presentation/screens/onboarding_screen.dart';
-import 'package:pec_app/features/auth/presentation/screens/welcome_splash_screen.dart';
 import 'package:pec_app/features/auth/presentation/screens/role_selection_screen.dart';
+import 'package:pec_app/features/auth/presentation/screens/welcome_splash_screen.dart';
 import 'package:pec_app/features/buy_sell/presentation/screens/buy_sell_screen.dart';
 import 'package:pec_app/features/campus_map/presentation/screens/campus_map_screen.dart';
 import 'package:pec_app/features/canteen/presentation/screens/canteen_menu_screen.dart';
@@ -25,6 +26,8 @@ import 'package:pec_app/features/dashboard/presentation/screens/dashboard_screen
 import 'package:pec_app/features/departments/presentation/screens/department_list_screen.dart';
 import 'package:pec_app/features/examinations/presentation/screens/exam_list_screen.dart';
 import 'package:pec_app/features/faculty/presentation/screens/faculty_list_screen.dart';
+import 'package:pec_app/features/finance/presentation/screens/finance_screen.dart';
+import 'package:pec_app/features/help_support/presentation/screens/help_support_screen.dart';
 import 'package:pec_app/features/hostel_issues/presentation/screens/issue_list_screen.dart';
 import 'package:pec_app/features/noticeboard/presentation/screens/notice_list_screen.dart';
 import 'package:pec_app/features/notifications/presentation/screens/notifications_screen.dart';
@@ -52,23 +55,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isUnknown = authState.status == AuthStatus.unknown;
 
       final loc = state.matchedLocation;
-      final isLoginRoute = loc.startsWith('/login') ||
-          loc.startsWith('/forgot-password');
+      final isLoginRoute = loc.startsWith('/login') || loc.startsWith('/forgot-password');
       final isWelcomeRoute = loc.startsWith('/welcome');
       final isIntroRoute = loc.startsWith('/intro');
 
-      // Still resolving auth — stay on welcome (acts as app startup splash)
       if (isUnknown) return isWelcomeRoute ? null : '/welcome';
 
-      // Unauthenticated: send to intro (first launch) or login
       if (!isAuthenticated && !isOnboarding && !needsRoleSelection) {
-        // Keep splash route reachable so app always plays startup splash first.
-        if (isLoginRoute || isIntroRoute || isWelcomeRoute) return null;
+        if (isLoginRoute || isIntroRoute || isWelcomeRoute || loc.startsWith('/loading-splash')) {
+          return null;
+        }
         return '/intro';
       }
-      // Authenticated: login/forgot-password → welcome splash
+
       if (isAuthenticated && isLoginRoute) return '/welcome';
-      // Authenticated on welcome → let the splash play, it navigates itself
       if (isAuthenticated && isWelcomeRoute) return null;
 
       if (isOnboarding && loc != '/onboarding') return '/onboarding';
@@ -76,15 +76,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      // ── Public routes ──────────────────────────────────────────────────
       GoRoute(path: '/intro', builder: (_, __) => const IntroOnboardingScreen()),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/forgot-password', builder: (_, __) => const ForgotPasswordScreen()),
       GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
       GoRoute(path: '/role-selection', builder: (_, __) => const RoleSelectionScreen()),
       GoRoute(path: '/welcome', builder: (_, __) => const WelcomeSplashScreen()),
-
-      // ── Protected shell (bottom nav) ───────────────────────────────────
+      GoRoute(
+        path: '/loading-splash',
+        builder: (context, state) => LoadingSplashScreen(
+          email: state.uri.queryParameters['email'],
+        ),
+      ),
       ShellRoute(
         builder: (context, state, child) => AppScaffold(child: child),
         routes: [
@@ -116,14 +119,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(path: '/calendar', builder: (_, __) => const CalendarScreen()),
+          GoRoute(path: '/academic-calendar', builder: (_, __) => const CalendarScreen()),
           GoRoute(
             path: '/chat',
             builder: (_, __) => const ChatListScreen(),
             routes: [
               GoRoute(
                 path: ':roomId',
-                builder: (_, state) =>
-                    ChatRoomScreen(roomId: state.pathParameters['roomId']!),
+                builder: (_, state) => ChatRoomScreen(roomId: state.pathParameters['roomId']!),
               ),
             ],
           ),
@@ -135,14 +138,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/buy-sell', builder: (_, __) => const BuySellScreen()),
           GoRoute(path: '/campus-map', builder: (_, __) => const CampusMapScreen()),
           GoRoute(path: '/score-sheet', builder: (_, __) => const ScoreSheetScreen()),
+          GoRoute(path: '/finance', builder: (_, __) => const FinanceScreen()),
           GoRoute(path: '/departments', builder: (_, __) => const DepartmentListScreen()),
           GoRoute(path: '/faculty', builder: (_, __) => const FacultyListScreen()),
           GoRoute(path: '/users', builder: (_, __) => const UserListScreen()),
           GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
           GoRoute(path: '/resume', builder: (_, __) => const ResumeEditorScreen()),
+          GoRoute(path: '/resume-builder', builder: (_, __) => const ResumeEditorScreen()),
           GoRoute(path: '/portfolio', builder: (_, __) => const PortfolioScreen()),
           GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
           GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
+          GoRoute(path: '/help-support', builder: (_, __) => const HelpSupportScreen()),
         ],
       ),
     ],

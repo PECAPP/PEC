@@ -6,13 +6,14 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/pec_card.dart';
-import '../../../../shared/widgets/pec_error_state.dart';
 // import '../../../../shared/widgets/pec_shimmer.dart';
 import '../../data/models/calendar_event_model.dart';
 import '../providers/calendar_provider.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
+
+  static const double _maxContentWidth = 900;
 
   @override
   ConsumerState<CalendarScreen> createState() => _CalendarScreenState();
@@ -28,6 +29,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final eventsMapAsync = ref.watch(eventsByDayProvider);
+    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = width >= 900
+        ? AppDimensions.lg
+        : width >= 600
+            ? AppDimensions.md
+            : AppDimensions.sm;
 
     return Scaffold(
       appBar: AppBar(
@@ -39,88 +46,146 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ),
         ],
       ),
-      body: eventsMapAsync.when(
-        loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.yellow)),
-        error: (e, _) => PecErrorState(
-            message: e.toString(),
-            onRetry: () => ref.invalidate(calendarEventsProvider)),
-        data: (eventsMap) {
-          final selectedEvents = eventsMap[_dateKey(_selectedDay)] ?? [];
+      body: SafeArea(
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints:
+                const BoxConstraints(maxWidth: CalendarScreen._maxContentWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: eventsMapAsync.when(
+                loading: () => const Center(
+                    child: CircularProgressIndicator(color: AppColors.yellow)),
+                error: (_, __) => _CalendarLoadFallback(
+                    onRetry: () => ref.invalidate(calendarEventsProvider)),
+                data: (eventsMap) {
+                  final selectedEvents =
+                      eventsMap[_dateKey(_selectedDay)] ?? [];
 
-          return Column(
-            children: [
-              // ── Calendar ───────────────────────────────────────────────
-              Container(
-                decoration: const BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(color: AppColors.black, width: 2)),
-                ),
-                child: TableCalendar<CalendarEventModel>(
-                  firstDay: DateTime(2020),
-                  lastDay: DateTime(2030),
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
-                  onDaySelected: (selected, focused) {
-                    setState(() {
-                      _selectedDay = selected;
-                      _focusedDay = focused;
-                    });
-                  },
-                  onPageChanged: (focused) =>
-                      setState(() => _focusedDay = focused),
-                  eventLoader: (day) => eventsMap[_dateKey(day)] ?? [],
-                  calendarStyle: CalendarStyle(
-                    selectedDecoration: const BoxDecoration(
-                        color: AppColors.yellow, shape: BoxShape.rectangle),
-                    selectedTextStyle: AppTextStyles.labelLarge
-                        .copyWith(color: AppColors.black),
-                    todayDecoration: BoxDecoration(
-                      border: Border.all(
-                          color: AppColors.yellow, width: 2),
-                      shape: BoxShape.rectangle,
-                    ),
-                    todayTextStyle: AppTextStyles.labelLarge,
-                    weekendTextStyle: AppTextStyles.bodySmall
-                        .copyWith(color: AppColors.red),
-                    outsideDaysVisible: false,
-                    markerDecoration: const BoxDecoration(
-                        color: AppColors.yellow, shape: BoxShape.circle),
-                    markersMaxCount: 3,
-                    markerSize: 5,
-                  ),
-                  headerStyle: HeaderStyle(
-                    formatButtonVisible: false,
-                    titleCentered: true,
-                    titleTextStyle: AppTextStyles.labelLarge,
-                    leftChevronIcon: const Icon(Icons.chevron_left,
-                        color: AppColors.black),
-                    rightChevronIcon: const Icon(Icons.chevron_right,
-                        color: AppColors.black),
-                  ),
-                  daysOfWeekStyle: DaysOfWeekStyle(
-                    weekdayStyle: AppTextStyles.labelSmall.copyWith(fontSize: 11),
-                    weekendStyle: AppTextStyles.labelSmall
-                        .copyWith(color: AppColors.red, fontSize: 11),
-                  ),
-                ),
-              ),
-              // ── Events list ────────────────────────────────────────────
-              Expanded(
-                child: selectedEvents.isEmpty
-                    ? _NoEvents(day: _selectedDay)
-                    : ListView.separated(
-                        padding: const EdgeInsets.all(AppDimensions.md),
-                        itemCount: selectedEvents.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: AppDimensions.sm),
-                        itemBuilder: (_, i) =>
-                            _EventCard(event: selectedEvents[i]),
+                  return Column(
+                    children: [
+                      // ── Calendar ───────────────────────────────────────────────
+                      Container(
+                        decoration: const BoxDecoration(
+                          border: Border(
+                              bottom:
+                                  BorderSide(color: AppColors.black, width: 2)),
+                        ),
+                        child: TableCalendar<CalendarEventModel>(
+                          firstDay: DateTime(2020),
+                          lastDay: DateTime(2030),
+                          focusedDay: _focusedDay,
+                          selectedDayPredicate: (day) =>
+                              isSameDay(day, _selectedDay),
+                          onDaySelected: (selected, focused) {
+                            setState(() {
+                              _selectedDay = selected;
+                              _focusedDay = focused;
+                            });
+                          },
+                          onPageChanged: (focused) =>
+                              setState(() => _focusedDay = focused),
+                          eventLoader: (day) => eventsMap[_dateKey(day)] ?? [],
+                          calendarStyle: CalendarStyle(
+                            selectedDecoration: const BoxDecoration(
+                                color: AppColors.yellow,
+                                shape: BoxShape.rectangle),
+                            selectedTextStyle: AppTextStyles.labelLarge
+                                .copyWith(color: AppColors.black),
+                            todayDecoration: BoxDecoration(
+                              border:
+                                  Border.all(color: AppColors.yellow, width: 2),
+                              shape: BoxShape.rectangle,
+                            ),
+                            todayTextStyle: AppTextStyles.labelLarge,
+                            weekendTextStyle: AppTextStyles.bodySmall
+                                .copyWith(color: AppColors.red),
+                            outsideDaysVisible: false,
+                            markerDecoration: const BoxDecoration(
+                                color: AppColors.yellow,
+                                shape: BoxShape.circle),
+                            markersMaxCount: 3,
+                            markerSize: 5,
+                          ),
+                          headerStyle: HeaderStyle(
+                            formatButtonVisible: false,
+                            titleCentered: true,
+                            titleTextStyle: AppTextStyles.labelLarge,
+                            leftChevronIcon: const Icon(Icons.chevron_left,
+                                color: AppColors.black),
+                            rightChevronIcon: const Icon(Icons.chevron_right,
+                                color: AppColors.black),
+                          ),
+                          daysOfWeekStyle: DaysOfWeekStyle(
+                            weekdayStyle:
+                                AppTextStyles.labelSmall.copyWith(fontSize: 11),
+                            weekendStyle: AppTextStyles.labelSmall
+                                .copyWith(color: AppColors.red, fontSize: 11),
+                          ),
+                        ),
                       ),
+                      // ── Events list ────────────────────────────────────────────
+                      Expanded(
+                        child: selectedEvents.isEmpty
+                            ? _NoEvents(day: _selectedDay)
+                            : ListView.separated(
+                                padding: const EdgeInsets.all(AppDimensions.md),
+                                itemCount: selectedEvents.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: AppDimensions.sm),
+                                itemBuilder: (_, i) =>
+                                    _EventCard(event: selectedEvents[i]),
+                              ),
+                      ),
+                    ],
+                  );
+                },
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CalendarLoadFallback extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _CalendarLoadFallback({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.calendar_month_outlined,
+            size: 42,
+            color: AppColors.textSecondaryDark,
+          ),
+          const SizedBox(height: AppDimensions.sm),
+          Text(
+            'Could not load calendar right now',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondaryDark,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppDimensions.md),
+          SizedBox(
+            width: 180,
+            child: FilledButton(
+              onPressed: onRetry,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.black,
+              ),
+              child: const Text('Retry'),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -153,7 +218,8 @@ class _EventCard extends StatelessWidget {
                     ),
                     const SizedBox(width: AppDimensions.sm),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       color: event.dotColor,
                       child: Text(event.typeLabel,
                           style: AppTextStyles.labelSmall
@@ -193,7 +259,20 @@ class _NoEvents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,

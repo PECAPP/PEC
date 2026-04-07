@@ -11,12 +11,21 @@ class ClubsRemoteDataSource {
       ApiEndpoints.clubs,
       queryParameters: {'limit': limit},
     );
-    final raw = resp.data as Map<String, dynamic>;
-    final items = raw['data'] as List<dynamic>? ??
-        raw['items'] as List<dynamic>? ??
-        (resp.data is List ? resp.data as List<dynamic> : []);
+    final data = resp.data;
+    List<dynamic> items;
+    if (data is Map<String, dynamic>) {
+      items = data['data'] as List<dynamic>? ??
+          data['items'] as List<dynamic>? ??
+          <dynamic>[];
+    } else if (data is List) {
+      items = data;
+    } else {
+      items = <dynamic>[];
+    }
+
     return items
-        .map((e) => ClubModel.fromJson(e as Map<String, dynamic>))
+        .whereType<Map>()
+        .map((e) => ClubModel.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
 
@@ -30,7 +39,7 @@ class ClubsRemoteDataSource {
   }
 
   Future<void> cancelJoinRequest(String clubId, String requestId) async {
-    await _client.dio.delete(
-        ApiEndpoints.clubJoinRequestAction(clubId, requestId));
+    await _client.dio
+        .delete(ApiEndpoints.clubJoinRequestAction(clubId, requestId));
   }
 }

@@ -11,10 +11,21 @@ class CalendarRemoteDataSource {
       ApiEndpoints.academicCalendar,
       queryParameters: {'limit': limit},
     );
-    final raw = resp.data as Map<String, dynamic>;
-    final items = raw['data'] as List<dynamic>? ?? raw['items'] as List<dynamic>? ?? [];
+    final data = resp.data;
+    List<dynamic> items;
+    if (data is Map<String, dynamic>) {
+      items = data['data'] as List<dynamic>? ??
+          data['items'] as List<dynamic>? ??
+          <dynamic>[];
+    } else if (data is List) {
+      items = data;
+    } else {
+      items = <dynamic>[];
+    }
+
     return items
-        .map((e) => CalendarEventModel.fromJson(e as Map<String, dynamic>))
+        .whereType<Map>()
+        .map((e) => CalendarEventModel.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
 }

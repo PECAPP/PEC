@@ -18,6 +18,8 @@ class ChatRoomScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
+  static const double _maxRoomContentWidth = 900;
+
   final _msgCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   bool _isTyping = false;
@@ -71,118 +73,128 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Messages
-          Expanded(
-            child: messagesAsync.when(
-              loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.yellow)),
-              error: (e, _) => _DummyChatFallback(
-                onRetry: () => ref.invalidate(messagesProvider(widget.roomId)),
-              ),
-              data: (messages) {
-                if (messages.isEmpty) {
-                  return Center(
-                    child: Text('No messages yet. Say hello!',
-                        style: AppTextStyles.bodySmall
-                            .copyWith(color: AppColors.textSecondary)),
-                  );
-                }
-                return NotificationListener<ScrollNotification>(
-                  onNotification: (n) {
-                    if (n is ScrollStartNotification &&
-                        _scrollCtrl.position.pixels <= 40) {
-                      notifier.loadOlder();
-                    }
-                    return false;
-                  },
-                  child: ListView.builder(
-                    controller: _scrollCtrl,
-                    padding: const EdgeInsets.all(AppDimensions.md),
-                    itemCount: messages.length,
-                    itemBuilder: (_, i) {
-                      final msg = messages[i];
-                      final isMe = msg.senderId == me?.id;
-                      final showAvatar = i == 0 ||
-                          messages[i - 1].senderId != msg.senderId;
-                      return _MessageBubble(
-                        message: msg,
-                        isMe: isMe,
-                        showAvatar: showAvatar,
+      body: SafeArea(
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxRoomContentWidth),
+            child: Column(
+              children: [
+                // Messages
+                Expanded(
+                  child: messagesAsync.when(
+                    loading: () => const Center(
+                        child:
+                            CircularProgressIndicator(color: AppColors.yellow)),
+                    error: (e, _) => _DummyChatFallback(
+                      onRetry: () =>
+                          ref.invalidate(messagesProvider(widget.roomId)),
+                    ),
+                    data: (messages) {
+                      if (messages.isEmpty) {
+                        return Center(
+                          child: Text('No messages yet. Say hello!',
+                              style: AppTextStyles.bodySmall
+                                  .copyWith(color: AppColors.textSecondary)),
+                        );
+                      }
+                      return NotificationListener<ScrollNotification>(
+                        onNotification: (n) {
+                          if (n is ScrollStartNotification &&
+                              _scrollCtrl.position.pixels <= 40) {
+                            notifier.loadOlder();
+                          }
+                          return false;
+                        },
+                        child: ListView.builder(
+                          controller: _scrollCtrl,
+                          padding: const EdgeInsets.all(AppDimensions.md),
+                          itemCount: messages.length,
+                          itemBuilder: (_, i) {
+                            final msg = messages[i];
+                            final isMe = msg.senderId == me?.id;
+                            final showAvatar = i == 0 ||
+                                messages[i - 1].senderId != msg.senderId;
+                            return _MessageBubble(
+                              message: msg,
+                              isMe: isMe,
+                              showAvatar: showAvatar,
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
-                );
-              },
-            ),
-          ),
-
-          // Typing indicator
-          Consumer(builder: (ctx, r, _) {
-            final typers =
-                r.watch(typingUsersProvider(widget.roomId));
-            if (typers.isEmpty) return const SizedBox.shrink();
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.md, vertical: 4),
-              child: Text(
-                '${typers.join(', ')} ${typers.length == 1 ? 'is' : 'are'} typing…',
-                style: AppTextStyles.caption
-                    .copyWith(color: AppColors.textSecondary),
-              ),
-            );
-          }),
-
-          // Input bar
-          Container(
-            decoration: const BoxDecoration(
-              border:
-                  Border(top: BorderSide(color: AppColors.black, width: 2)),
-              color: AppColors.white,
-            ),
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.sm, vertical: AppDimensions.xs),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _msgCtrl,
-                    maxLines: null,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(
-                      hintText: 'Type a message…',
-                      hintStyle: AppTextStyles.bodySmall,
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                    ),
-                    onChanged: (v) {
-                      if (v.isNotEmpty && !_isTyping) {
-                        _isTyping = true;
-                        notifier.typingStart();
-                      } else if (v.isEmpty && _isTyping) {
-                        _isTyping = false;
-                        notifier.typingStop();
-                      }
-                    },
-                  ),
                 ),
-                const SizedBox(width: AppDimensions.xs),
-                GestureDetector(
-                  onTap: _send,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    color: AppColors.yellow,
-                    child: const Icon(Icons.send_rounded,
-                        color: AppColors.black, size: 20),
+
+                // Typing indicator
+                Consumer(builder: (ctx, r, _) {
+                  final typers = r.watch(typingUsersProvider(widget.roomId));
+                  if (typers.isEmpty) return const SizedBox.shrink();
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.md, vertical: 4),
+                    child: Text(
+                      '${typers.join(', ')} ${typers.length == 1 ? 'is' : 'are'} typing…',
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.textSecondary),
+                    ),
+                  );
+                }),
+
+                // Input bar
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                        top: BorderSide(color: AppColors.black, width: 2)),
+                    color: AppColors.white,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.sm, vertical: AppDimensions.xs),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _msgCtrl,
+                          maxLines: null,
+                          textCapitalization: TextCapitalization.sentences,
+                          decoration: InputDecoration(
+                            hintText: 'Type a message…',
+                            hintStyle: AppTextStyles.bodySmall,
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                          ),
+                          onChanged: (v) {
+                            if (v.isNotEmpty && !_isTyping) {
+                              _isTyping = true;
+                              notifier.typingStart();
+                            } else if (v.isEmpty && _isTyping) {
+                              _isTyping = false;
+                              notifier.typingStop();
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: AppDimensions.xs),
+                      GestureDetector(
+                        onTap: _send,
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          color: AppColors.yellow,
+                          child: const Icon(Icons.send_rounded,
+                              color: AppColors.black, size: 20),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -192,9 +204,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
     if (content.isEmpty) return;
     _msgCtrl.clear();
     _isTyping = false;
-    ref
-        .read(messagesProvider(widget.roomId).notifier)
-        .sendMessage(content);
+    ref.read(messagesProvider(widget.roomId).notifier).sendMessage(content);
   }
 }
 
@@ -212,7 +222,7 @@ class _DummyChatFallback extends StatelessWidget {
       'Find canteen timings',
     ];
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(AppDimensions.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,11 +244,13 @@ class _DummyChatFallback extends StatelessWidget {
                 padding: const EdgeInsets.all(AppDimensions.md),
                 decoration: BoxDecoration(
                   color: AppColors.bgSurfaceDark,
-                  border: Border.all(color: AppColors.yellow.withValues(alpha: 0.4)),
+                  border: Border.all(
+                      color: AppColors.yellow.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   o,
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+                  style:
+                      AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
                 ),
               )),
           const SizedBox(height: AppDimensions.sm),
@@ -265,17 +277,23 @@ class _MessageBubble extends StatelessWidget {
   final bool isMe;
   final bool showAvatar;
   const _MessageBubble(
-      {required this.message,
-      required this.isMe,
-      required this.showAvatar});
+      {required this.message, required this.isMe, required this.showAvatar});
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final sideGutter = width < 380
+        ? 24.0
+        : width < 600
+            ? 48.0
+            : 96.0;
+    final bubbleMaxWidthFactor = width < 600 ? 0.72 : 0.62;
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: AppDimensions.xs,
-        left: isMe ? 48 : 0,
-        right: isMe ? 0 : 48,
+        left: isMe ? sideGutter : 0,
+        right: isMe ? 0 : sideGutter,
       ),
       child: Row(
         mainAxisAlignment:
@@ -304,21 +322,17 @@ class _MessageBubble extends StatelessWidget {
                 ),
               Container(
                 constraints: BoxConstraints(
-                    maxWidth:
-                        MediaQuery.of(context).size.width * 0.65),
+                    maxWidth: MediaQuery.of(context).size.width *
+                        bubbleMaxWidthFactor),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.sm,
-                    vertical: AppDimensions.xs),
+                    horizontal: AppDimensions.sm, vertical: AppDimensions.xs),
                 decoration: BoxDecoration(
                   color: isMe ? AppColors.yellow : AppColors.bgSurface,
-                  border:
-                      Border.all(color: AppColors.black, width: 1.5),
+                  border: Border.all(color: AppColors.black, width: 1.5),
                   boxShadow: [
                     BoxShadow(
                       offset: const Offset(2, 2),
-                      color: isMe
-                          ? AppColors.black
-                          : AppColors.borderLight,
+                      color: isMe ? AppColors.black : AppColors.borderLight,
                     ),
                   ],
                 ),

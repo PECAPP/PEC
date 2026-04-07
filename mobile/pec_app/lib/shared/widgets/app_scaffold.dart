@@ -45,25 +45,77 @@ class AppScaffold extends ConsumerWidget {
   }
 
   static final _studentNav = [
-    _NavItem(label: 'Home', icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, route: '/dashboard'),
-    _NavItem(label: 'Chat', icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble_outline, route: '/chat'),
-    _NavItem(label: 'Finance', icon: Icons.account_balance_wallet_outlined, activeIcon: Icons.account_balance_wallet, route: '/score-sheet'),
-    _NavItem(label: 'Profile', icon: Icons.person_outline, activeIcon: Icons.person, route: '/profile'),
+    _NavItem(
+        label: 'Home',
+        icon: Icons.grid_view_rounded,
+        activeIcon: Icons.grid_view_rounded,
+        route: '/dashboard'),
+    _NavItem(
+        label: 'Chat',
+        icon: Icons.chat_bubble_outline,
+        activeIcon: Icons.chat_bubble_outline,
+        route: '/chat'),
+    _NavItem(
+        label: 'Finance',
+        icon: Icons.account_balance_wallet_outlined,
+        activeIcon: Icons.account_balance_wallet,
+        route: '/finance'),
+    _NavItem(
+        label: 'Profile',
+        icon: Icons.person_outline,
+        activeIcon: Icons.person,
+        route: '/profile'),
   ];
 
   static final _facultyNav = [
-    _NavItem(label: 'Home', icon: Icons.home_outlined, activeIcon: Icons.home, route: '/dashboard'),
-    _NavItem(label: 'Courses', icon: Icons.book_outlined, activeIcon: Icons.book, route: '/courses'),
-    _NavItem(label: 'Chat', icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble, route: '/chat'),
-    _NavItem(label: 'Profile', icon: Icons.person_outline, activeIcon: Icons.person, route: '/profile'),
+    _NavItem(
+        label: 'Home',
+        icon: Icons.home_outlined,
+        activeIcon: Icons.home,
+        route: '/dashboard'),
+    _NavItem(
+        label: 'Courses',
+        icon: Icons.book_outlined,
+        activeIcon: Icons.book,
+        route: '/courses'),
+    _NavItem(
+        label: 'Chat',
+        icon: Icons.chat_bubble_outline,
+        activeIcon: Icons.chat_bubble,
+        route: '/chat'),
+    _NavItem(
+        label: 'Profile',
+        icon: Icons.person_outline,
+        activeIcon: Icons.person,
+        route: '/profile'),
   ];
 
   static final _adminNav = [
-    _NavItem(label: 'Home', icon: Icons.home_outlined, activeIcon: Icons.home, route: '/dashboard'),
-    _NavItem(label: 'Users', icon: Icons.people_outline, activeIcon: Icons.people, route: '/users'),
-    _NavItem(label: 'Depts', icon: Icons.account_balance_outlined, activeIcon: Icons.account_balance, route: '/departments'),
-    _NavItem(label: 'Chat', icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble, route: '/chat'),
-    _NavItem(label: 'Profile', icon: Icons.person_outline, activeIcon: Icons.person, route: '/profile'),
+    _NavItem(
+        label: 'Home',
+        icon: Icons.home_outlined,
+        activeIcon: Icons.home,
+        route: '/dashboard'),
+    _NavItem(
+        label: 'Users',
+        icon: Icons.people_outline,
+        activeIcon: Icons.people,
+        route: '/users'),
+    _NavItem(
+        label: 'Depts',
+        icon: Icons.account_balance_outlined,
+        activeIcon: Icons.account_balance,
+        route: '/departments'),
+    _NavItem(
+        label: 'Chat',
+        icon: Icons.chat_bubble_outline,
+        activeIcon: Icons.chat_bubble,
+        route: '/chat'),
+    _NavItem(
+        label: 'Profile',
+        icon: Icons.person_outline,
+        activeIcon: Icons.person,
+        route: '/profile'),
   ];
 }
 
@@ -114,9 +166,12 @@ class _PecBottomNav extends StatelessWidget {
             color: AppColors.yellow.withValues(alpha: 0.42),
             width: 1,
           ),
-          left: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.7),
-          right: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.7),
-          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.7),
+          left: BorderSide(
+              color: Colors.white.withValues(alpha: 0.1), width: 0.7),
+          right: BorderSide(
+              color: Colors.white.withValues(alpha: 0.1), width: 0.7),
+          bottom: BorderSide(
+              color: Colors.white.withValues(alpha: 0.1), width: 0.7),
         ),
       ),
       child: Row(

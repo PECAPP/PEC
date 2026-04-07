@@ -21,8 +21,7 @@ class ResumeEditorScreen extends ConsumerStatefulWidget {
   const ResumeEditorScreen({super.key});
 
   @override
-  ConsumerState<ResumeEditorScreen> createState() =>
-      _ResumeEditorScreenState();
+  ConsumerState<ResumeEditorScreen> createState() => _ResumeEditorScreenState();
 }
 
 class _ResumeEditorScreenState extends ConsumerState<ResumeEditorScreen> {
@@ -36,7 +35,7 @@ class _ResumeEditorScreenState extends ConsumerState<ResumeEditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('RESUME'),
+        title: const Text('RESUME BUILDER'),
         actions: [
           if (!_showPreview)
             IconButton(
@@ -62,16 +61,12 @@ class _ResumeEditorScreenState extends ConsumerState<ResumeEditorScreen> {
                 ? null
                 : () async {
                     setState(() => _saving = true);
-                    final ok =
-                        await ref.read(resumeProvider.notifier).save();
+                    final ok = await ref.read(resumeProvider.notifier).save();
                     setState(() => _saving = false);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(ok
-                            ? 'Resume saved'
-                            : 'Save failed'),
-                        backgroundColor:
-                            ok ? AppColors.green : AppColors.red,
+                        content: Text(ok ? 'Resume saved' : 'Save failed'),
+                        backgroundColor: ok ? AppColors.green : AppColors.red,
                       ));
                     }
                   },
@@ -91,8 +86,7 @@ class _ResumeEditorScreenState extends ConsumerState<ResumeEditorScreen> {
         loading: () => ListView.separated(
           padding: const EdgeInsets.all(AppDimensions.md),
           itemCount: 5,
-          separatorBuilder: (_, __) =>
-              const SizedBox(height: AppDimensions.sm),
+          separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.sm),
           itemBuilder: (_, __) =>
               const PecShimmerBox(height: 80, width: double.infinity),
         ),
@@ -100,13 +94,45 @@ class _ResumeEditorScreenState extends ConsumerState<ResumeEditorScreen> {
           message: e.toString(),
           onRetry: () => ref.read(resumeProvider.notifier).reload(),
         ),
-        data: (resume) => _showPreview
-            ? _PdfPreview(resume: resume, name: user?.name ?? 'Student')
-            : _ResumeEditor(
-                resume: resume,
-                onUpdate: (updater) =>
-                    ref.read(resumeProvider.notifier).update(updater),
+        data: (resume) => Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 980),
+            child: Padding(
+              padding: const EdgeInsets.all(AppDimensions.md),
+              child: Column(
+                children: [
+                  _ResumeHero(
+                    name: user?.name ?? 'Student',
+                    resume: resume,
+                    showPreview: _showPreview,
+                    onTogglePreview: resume.isEmpty
+                        ? null
+                        : () => setState(() => _showPreview = !_showPreview),
+                  ),
+                  const SizedBox(height: AppDimensions.md),
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 220),
+                      child: _showPreview
+                          ? _PdfPreview(
+                              key: const ValueKey('preview'),
+                              resume: resume,
+                              name: user?.name ?? 'Student',
+                            )
+                          : _ResumeEditor(
+                              key: const ValueKey('editor'),
+                              resume: resume,
+                              onUpdate: (updater) => ref
+                                  .read(resumeProvider.notifier)
+                                  .update(updater),
+                            ),
+                    ),
+                  ),
+                ],
               ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -117,8 +143,150 @@ class _ResumeEditorScreenState extends ConsumerState<ResumeEditorScreen> {
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/resume_$name.pdf');
     await file.writeAsBytes(bytes);
-    await Share.shareXFiles([XFile(file.path)],
-        subject: '$name — Resume');
+    await Share.shareXFiles([XFile(file.path)], subject: '$name — Resume');
+  }
+}
+
+class _ResumeHero extends StatelessWidget {
+  final String name;
+  final ResumeData resume;
+  final bool showPreview;
+  final VoidCallback? onTogglePreview;
+
+  const _ResumeHero({
+    required this.name,
+    required this.resume,
+    required this.showPreview,
+    required this.onTogglePreview,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PecCard(
+      color: const Color(0xFF121212),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.yellow,
+                  border: Border.all(color: AppColors.black, width: 2),
+                ),
+                child: const Icon(Icons.description_outlined,
+                    color: AppColors.black),
+              ),
+              const SizedBox(width: AppDimensions.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: AppTextStyles.heading2.copyWith(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      resume.objective?.isNotEmpty == true
+                          ? resume.objective!
+                          : 'Build a polished resume with education, skills, projects, and experience.',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.md),
+          Wrap(
+            spacing: AppDimensions.sm,
+            runSpacing: AppDimensions.sm,
+            children: [
+              _HeroStat(
+                  label: 'Education',
+                  value: resume.education.length.toString()),
+              _HeroStat(
+                  label: 'Experience',
+                  value: resume.experience.length.toString()),
+              _HeroStat(
+                  label: 'Projects', value: resume.projects.length.toString()),
+              _HeroStat(
+                  label: 'Skills', value: resume.skills.length.toString()),
+              _HeroStat(
+                  label: 'Certs',
+                  value: resume.certifications.length.toString()),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.md),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton(
+                  onPressed: onTogglePreview,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.yellow,
+                    foregroundColor: AppColors.black,
+                  ),
+                  child: Text(showPreview ? 'EDIT RESUME' : 'PREVIEW PDF'),
+                ),
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: resume.isEmpty ? null : () {},
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.white,
+                    side: const BorderSide(color: AppColors.borderLight),
+                  ),
+                  child: const Text('READY TO EXPORT'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroStat extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _HeroStat({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.bgSurface,
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: AppTextStyles.caption
+                  .copyWith(color: AppColors.textSecondary)),
+          const SizedBox(height: 2),
+          Text(value,
+              style: AppTextStyles.labelLarge.copyWith(color: AppColors.white)),
+        ],
+      ),
+    );
   }
 }
 
@@ -126,7 +294,7 @@ class _ResumeEditorScreenState extends ConsumerState<ResumeEditorScreen> {
 class _PdfPreview extends StatelessWidget {
   final ResumeData resume;
   final String name;
-  const _PdfPreview({required this.resume, required this.name});
+  const _PdfPreview({super.key, required this.resume, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -147,13 +315,11 @@ pw.Document _buildPdf(ResumeData r, String name) {
     build: (ctx) => [
       // Header
       pw.Text(name,
-          style: pw.TextStyle(
-              fontSize: 22, fontWeight: pw.FontWeight.bold)),
+          style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
       pw.SizedBox(height: 2),
       if (r.objective != null && r.objective!.isNotEmpty) ...[
         pw.SizedBox(height: 8),
-        pw.Text(r.objective!,
-            style: const pw.TextStyle(fontSize: 10)),
+        pw.Text(r.objective!, style: const pw.TextStyle(fontSize: 10)),
         pw.Divider(),
       ] else
         pw.Divider(),
@@ -206,10 +372,9 @@ pw.Document _buildPdf(ResumeData r, String name) {
               .map((s) => pw.Container(
                     padding: const pw.EdgeInsets.symmetric(
                         horizontal: 6, vertical: 2),
-                    decoration: pw.BoxDecoration(
-                        border: pw.Border.all(width: 0.5)),
-                    child: pw.Text(s,
-                        style: const pw.TextStyle(fontSize: 9)),
+                    decoration:
+                        pw.BoxDecoration(border: pw.Border.all(width: 0.5)),
+                    child: pw.Text(s, style: const pw.TextStyle(fontSize: 9)),
                   ))
               .toList(),
         ),
@@ -222,8 +387,7 @@ pw.Document _buildPdf(ResumeData r, String name) {
         for (final c in r.certifications)
           pw.Row(
             children: [
-              pw.Text('• ${c.name}',
-                  style: const pw.TextStyle(fontSize: 10)),
+              pw.Text('• ${c.name}', style: const pw.TextStyle(fontSize: 10)),
               if (c.issuer != null)
                 pw.Text(' — ${c.issuer}',
                     style: const pw.TextStyle(fontSize: 9)),
@@ -242,8 +406,7 @@ pw.Widget _pdfSection(String title) => pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(title,
-            style: pw.TextStyle(
-                fontSize: 11, fontWeight: pw.FontWeight.bold)),
+            style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold)),
         pw.Divider(thickness: 0.5),
       ],
     );
@@ -266,18 +429,15 @@ pw.Widget _pdfEntry({
                   style: pw.TextStyle(
                       fontSize: 10, fontWeight: pw.FontWeight.bold)),
               if (date != null)
-                pw.Text(date,
-                    style: const pw.TextStyle(fontSize: 9)),
+                pw.Text(date, style: const pw.TextStyle(fontSize: 9)),
             ],
           ),
           if (subtitle != null && subtitle.isNotEmpty)
             pw.Text(subtitle,
-                style: const pw.TextStyle(
-                    fontSize: 9,
-                    color: PdfColors.grey700)),
+                style:
+                    const pw.TextStyle(fontSize: 9, color: PdfColors.grey700)),
           if (detail != null && detail.isNotEmpty)
-            pw.Text(detail,
-                style: const pw.TextStyle(fontSize: 9)),
+            pw.Text(detail, style: const pw.TextStyle(fontSize: 9)),
         ],
       ),
     );
@@ -287,12 +447,13 @@ class _ResumeEditor extends StatelessWidget {
   final ResumeData resume;
   final void Function(ResumeData Function(ResumeData)) onUpdate;
   const _ResumeEditor(
-      {required this.resume, required this.onUpdate});
+      {super.key, required this.resume, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(AppDimensions.md),
+      key: const PageStorageKey('resume-editor-list'),
+      padding: const EdgeInsets.only(bottom: AppDimensions.xxl),
       children: [
         _SectionCard(
           title: 'OBJECTIVE',
@@ -437,19 +598,16 @@ class _SectionCard extends StatelessWidget {
                 GestureDetector(
                   onTap: onAdd,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     color: AppColors.yellow,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.add,
-                            size: 14, color: AppColors.black),
+                        const Icon(Icons.add, size: 14, color: AppColors.black),
                         Text('ADD',
                             style: AppTextStyles.labelSmall
-                                .copyWith(
-                                    color: AppColors.black,
-                                    fontSize: 9)),
+                                .copyWith(color: AppColors.black, fontSize: 9)),
                       ],
                     ),
                   ),
@@ -573,9 +731,7 @@ class _ItemRow extends StatelessWidget {
   final String primary, secondary;
   final VoidCallback onDelete;
   const _ItemRow(
-      {required this.primary,
-      required this.secondary,
-      required this.onDelete});
+      {required this.primary, required this.secondary, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -600,8 +756,7 @@ class _ItemRow extends StatelessWidget {
                 size: 18, color: AppColors.red),
             onPressed: onDelete,
             padding: EdgeInsets.zero,
-            constraints:
-                const BoxConstraints(minWidth: 28, minHeight: 28),
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
           ),
         ],
       ),
@@ -664,8 +819,7 @@ void _showEducationDialog(BuildContext ctx, ResumeData resume,
               ResumeEducation(
                 institution: inst.text,
                 degree: deg.text,
-                fieldOfStudy:
-                    field.text.isEmpty ? null : field.text,
+                fieldOfStudy: field.text.isEmpty ? null : field.text,
                 startYear: start.text,
                 endYear: end.text.isEmpty ? null : end.text,
                 cgpa: double.tryParse(cgpa.text),
@@ -759,8 +913,7 @@ void _showSkillDialog(BuildContext ctx, ResumeData resume,
       fields: [_tf(skill, 'Skill *')],
       onSave: () {
         if (skill.text.isEmpty) return;
-        onUpdate(
-            (r) => r.copyWith(skills: [...r.skills, skill.text.trim()]));
+        onUpdate((r) => r.copyWith(skills: [...r.skills, skill.text.trim()]));
       },
     ),
   );
@@ -796,7 +949,7 @@ void _showCertDialog(BuildContext ctx, ResumeData resume,
 }
 
 Widget _tf(TextEditingController ctrl, String label,
-    [TextInputType? type, int maxLines = 1]) =>
+        [TextInputType? type, int maxLines = 1]) =>
     Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextField(
@@ -834,14 +987,12 @@ class _FormDialog extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel')),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.yellow),
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.yellow),
           onPressed: () {
             onSave();
             Navigator.pop(context);
           },
-          child:
-              Text('ADD', style: AppTextStyles.labelSmall),
+          child: Text('ADD', style: AppTextStyles.labelSmall),
         ),
       ],
     );

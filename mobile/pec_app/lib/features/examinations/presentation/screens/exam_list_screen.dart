@@ -6,13 +6,14 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/pec_card.dart';
 import '../../../../shared/widgets/pec_empty_state.dart';
-import '../../../../shared/widgets/pec_error_state.dart';
 import '../../../../shared/widgets/pec_shimmer.dart';
 import '../../data/models/exam_model.dart';
 import '../providers/exam_provider.dart';
 
 class ExamListScreen extends ConsumerStatefulWidget {
   const ExamListScreen({super.key});
+
+  static const double _maxContentWidth = 900;
 
   @override
   ConsumerState<ExamListScreen> createState() => _ExamListScreenState();
@@ -37,6 +38,12 @@ class _ExamListScreenState extends ConsumerState<ExamListScreen>
   @override
   Widget build(BuildContext context) {
     final examsAsync = ref.watch(examsProvider);
+    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = width >= 900
+        ? AppDimensions.lg
+        : width >= 600
+            ? AppDimensions.md
+            : AppDimensions.sm;
 
     return Scaffold(
       appBar: AppBar(
@@ -48,34 +55,95 @@ class _ExamListScreenState extends ConsumerState<ExamListScreen>
           tabs: const [Tab(text: 'UPCOMING'), Tab(text: 'PAST')],
         ),
       ),
-      body: examsAsync.when(
-        loading: () => _shimmer(),
-        error: (e, _) => PecErrorState(
-            message: e.toString(), onRetry: () => ref.invalidate(examsProvider)),
-        data: (exams) {
-          final upcoming = exams.where((e) => e.status != 'completed').toList()
-            ..sort((a, b) => a.examDate.compareTo(b.examDate));
-          final past = exams.where((e) => e.status == 'completed').toList()
-            ..sort((a, b) => b.examDate.compareTo(a.examDate));
+      body: SafeArea(
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints:
+                const BoxConstraints(maxWidth: ExamListScreen._maxContentWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: examsAsync.when(
+                loading: () => _shimmer(),
+                error: (_, __) => _ExamsLoadFallback(
+                  onRetry: () => ref.invalidate(examsProvider),
+                ),
+                data: (exams) {
+                  final upcoming = exams
+                      .where((e) => e.status != 'completed')
+                      .toList()
+                    ..sort((a, b) => a.examDate.compareTo(b.examDate));
+                  final past = exams
+                      .where((e) => e.status == 'completed')
+                      .toList()
+                    ..sort((a, b) => b.examDate.compareTo(a.examDate));
 
-          return TabBarView(
-            controller: _tab,
-            children: [
-              _ExamList(exams: upcoming, emptyLabel: 'No upcoming exams'),
-              _ExamList(exams: past, emptyLabel: 'No past exams'),
-            ],
-          );
-        },
+                  return TabBarView(
+                    controller: _tab,
+                    children: [
+                      _ExamList(
+                          exams: upcoming, emptyLabel: 'No upcoming exams'),
+                      _ExamList(exams: past, emptyLabel: 'No past exams'),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Widget _shimmer() => ListView.separated(
-        padding: const EdgeInsets.all(AppDimensions.md),
+        padding:
+            const EdgeInsets.fromLTRB(0, AppDimensions.md, 0, AppDimensions.md),
         itemCount: 4,
         separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.sm),
-        itemBuilder: (_, __) => const PecShimmerBox(height: 100, width: double.infinity),
+        itemBuilder: (_, __) =>
+            const PecShimmerBox(height: 100, width: double.infinity),
       );
+}
+
+class _ExamsLoadFallback extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _ExamsLoadFallback({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.assignment_outlined,
+            size: 42,
+            color: AppColors.textSecondaryDark,
+          ),
+          const SizedBox(height: AppDimensions.sm),
+          Text(
+            'Could not load examinations right now',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondaryDark,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppDimensions.md),
+          SizedBox(
+            width: 180,
+            child: FilledButton(
+              onPressed: onRetry,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.black,
+              ),
+              child: const Text('Retry'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _ExamList extends StatelessWidget {
@@ -93,7 +161,8 @@ class _ExamList extends StatelessWidget {
       );
     }
     return ListView.separated(
-      padding: const EdgeInsets.all(AppDimensions.md),
+      padding:
+          const EdgeInsets.fromLTRB(0, AppDimensions.md, 0, AppDimensions.md),
       itemCount: exams.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.sm),
       itemBuilder: (_, i) => _ExamCard(exam: exams[i]),
@@ -107,18 +176,25 @@ class _ExamCard extends StatelessWidget {
 
   Color get _typeColor {
     switch (exam.examType.toLowerCase()) {
-      case 'midterm': return AppColors.blue;
-      case 'endterm': return AppColors.red;
-      case 'quiz': return AppColors.green;
-      default: return AppColors.warning;
+      case 'midterm':
+        return AppColors.blue;
+      case 'endterm':
+        return AppColors.red;
+      case 'quiz':
+        return AppColors.green;
+      default:
+        return AppColors.warning;
     }
   }
 
   Color get _statusColor {
     switch (exam.status) {
-      case 'upcoming': return AppColors.blue;
-      case 'ongoing': return AppColors.green;
-      default: return AppColors.textSecondary;
+      case 'upcoming':
+        return AppColors.blue;
+      case 'ongoing':
+        return AppColors.green;
+      default:
+        return AppColors.textSecondary;
     }
   }
 
@@ -174,11 +250,15 @@ class _ExamCard extends StatelessWidget {
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                color: exam.status == 'completed' ? AppColors.bgSurface : _statusColor,
+                color: exam.status == 'completed'
+                    ? AppColors.bgSurface
+                    : _statusColor,
                 child: Text(
                   _countdownLabel,
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: exam.status == 'completed' ? AppColors.textSecondary : AppColors.black,
+                    color: exam.status == 'completed'
+                        ? AppColors.textSecondary
+                        : AppColors.black,
                     fontSize: 9,
                   ),
                 ),
@@ -203,8 +283,21 @@ class _ExamCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime d) {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final hour = d.hour > 12 ? d.hour - 12 : d.hour;
     final ampm = d.hour >= 12 ? 'PM' : 'AM';
     final min = d.minute.toString().padLeft(2, '0');
