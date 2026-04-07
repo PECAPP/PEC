@@ -33,23 +33,65 @@ class AppNotification {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'body': body,
+      'type': type,
+      'isRead': isRead,
+      'actionRoute': actionRoute,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  AppNotification copyWith({
+    String? id,
+    String? title,
+    String? body,
+    String? type,
+    bool? isRead,
+    String? actionRoute,
+    DateTime? createdAt,
+  }) {
+    return AppNotification(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      type: type ?? this.type,
+      isRead: isRead ?? this.isRead,
+      actionRoute: actionRoute ?? this.actionRoute,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   Color get dotColor {
     switch (type) {
-      case 'fee': return AppColors.warning;
-      case 'attendance': return AppColors.green;
-      case 'notice': return AppColors.blue;
-      case 'chat': return AppColors.yellow;
-      default: return AppColors.textSecondary;
+      case 'fee':
+        return AppColors.warning;
+      case 'attendance':
+        return AppColors.green;
+      case 'notice':
+        return AppColors.blue;
+      case 'chat':
+        return AppColors.yellow;
+      default:
+        return AppColors.textSecondary;
     }
   }
 
   IconData get icon {
     switch (type) {
-      case 'fee': return Icons.account_balance_wallet_outlined;
-      case 'attendance': return Icons.checklist_outlined;
-      case 'notice': return Icons.campaign_outlined;
-      case 'chat': return Icons.chat_bubble_outline;
-      default: return Icons.notifications_outlined;
+      case 'fee':
+        return Icons.account_balance_wallet_outlined;
+      case 'attendance':
+        return Icons.checklist_outlined;
+      case 'notice':
+        return Icons.campaign_outlined;
+      case 'chat':
+        return Icons.chat_bubble_outline;
+      default:
+        return Icons.notifications_outlined;
     }
   }
 }
