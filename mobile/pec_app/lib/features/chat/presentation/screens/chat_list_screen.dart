@@ -57,86 +57,111 @@ class ChatListScreen extends ConsumerStatefulWidget {
 class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   String _search = '';
 
+  static const double _maxListContentWidth = 720;
+
   @override
   Widget build(BuildContext context) {
     final roomsAsync = ref.watch(chatRoomsProvider);
+    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = width >= 900
+        ? AppDimensions.lg
+        : width >= 600
+            ? AppDimensions.md
+            : AppDimensions.sm;
 
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _TopBar(
-            onSearchChanged: (v) => setState(() => _search = v.toLowerCase()),
-            onPeopleTap: () => context.push('/clubs'),
-            onAddTap: () => _showNewChatDialog(context),
-          ),
-          Expanded(
-            child: roomsAsync.when(
-              loading: () => ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.md),
-                itemCount: 5,
-                separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.sm),
-                itemBuilder: (_, __) => const PecShimmerBox(height: 46, width: double.infinity),
-              ),
-              error: (e, _) => _DummyChatOptions(
-                onRoomTap: (roomId) => context.push('/chat/$roomId'),
-              ),
-              data: (rooms) {
-                final filtered = rooms.where((r) {
-                  return _search.isEmpty ||
-                      r.name.toLowerCase().contains(_search);
-                }).toList();
-
-                if (filtered.isEmpty) {
-                  return PecEmptyState(
-                    icon: Icons.chat_bubble_outline,
-                    title: _search.isEmpty ? 'No chats yet' : 'No results',
-                    subtitle: _search.isEmpty
-                        ? 'Start a conversation by tapping the pencil icon'
-                        : null,
-                  );
-                }
-
-                final community = filtered.where((r) {
-                  final n = r.name.toLowerCase();
-                  return n.contains('announcement') || n.contains('global') || n.contains('community');
-                }).toList();
-                final department = filtered.where((r) => !community.contains(r)).toList();
-
-                return ListView(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppDimensions.md,
-                    0,
-                    AppDimensions.md,
-                    AppDimensions.md,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxListContentWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _TopBar(
+                    onSearchChanged: (v) =>
+                        setState(() => _search = v.toLowerCase()),
+                    onPeopleTap: () => context.push('/clubs'),
+                    onAddTap: () => _showNewChatDialog(context),
                   ),
-                  children: [
-                    if (community.isNotEmpty) ...[
-                      const _SectionTitle('Community'),
-                      const SizedBox(height: AppDimensions.sm),
-                      ...community.map((room) => Padding(
-                            padding: const EdgeInsets.only(bottom: AppDimensions.sm),
-                            child: _RoomTile(
-                              room: room,
-                              highlighted: true,
-                            ),
-                          )),
-                      const SizedBox(height: AppDimensions.sm),
-                    ],
-                    if (department.isNotEmpty) ...[
-                      const _SectionTitle('Department Groups'),
-                      const SizedBox(height: AppDimensions.sm),
-                      ...department.map((room) => Padding(
-                            padding: const EdgeInsets.only(bottom: AppDimensions.sm),
-                            child: _RoomTile(room: room),
-                          )),
-                    ],
-                  ],
-                );
-              },
+                  Expanded(
+                    child: roomsAsync.when(
+                      loading: () => ListView.separated(
+                        padding:
+                            const EdgeInsets.only(bottom: AppDimensions.md),
+                        itemCount: 5,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: AppDimensions.sm),
+                        itemBuilder: (_, __) => const PecShimmerBox(
+                            height: 46, width: double.infinity),
+                      ),
+                      error: (e, _) => _DummyChatOptions(
+                        onRoomTap: (roomId) => context.push('/chat/$roomId'),
+                      ),
+                      data: (rooms) {
+                        final filtered = rooms.where((r) {
+                          return _search.isEmpty ||
+                              r.name.toLowerCase().contains(_search);
+                        }).toList();
+
+                        if (filtered.isEmpty) {
+                          return PecEmptyState(
+                            icon: Icons.chat_bubble_outline,
+                            title:
+                                _search.isEmpty ? 'No chats yet' : 'No results',
+                            subtitle: _search.isEmpty
+                                ? 'Start a conversation by tapping the pencil icon'
+                                : null,
+                          );
+                        }
+
+                        final community = filtered.where((r) {
+                          final n = r.name.toLowerCase();
+                          return n.contains('announcement') ||
+                              n.contains('global') ||
+                              n.contains('community');
+                        }).toList();
+                        final department = filtered
+                            .where((r) => !community.contains(r))
+                            .toList();
+
+                        return ListView(
+                          padding:
+                              const EdgeInsets.only(bottom: AppDimensions.md),
+                          children: [
+                            if (community.isNotEmpty) ...[
+                              const _SectionTitle('Community'),
+                              const SizedBox(height: AppDimensions.sm),
+                              ...community.map((room) => Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: AppDimensions.sm),
+                                    child: _RoomTile(
+                                      room: room,
+                                      highlighted: true,
+                                    ),
+                                  )),
+                              const SizedBox(height: AppDimensions.sm),
+                            ],
+                            if (department.isNotEmpty) ...[
+                              const _SectionTitle('Department Groups'),
+                              const SizedBox(height: AppDimensions.sm),
+                              ...department.map((room) => Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: AppDimensions.sm),
+                                    child: _RoomTile(room: room),
+                                  )),
+                            ],
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -167,11 +192,15 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final buttonSize = width < 360 ? 42.0 : 48.0;
+    final buttonGap = width < 360 ? AppDimensions.xs : AppDimensions.sm;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppDimensions.md,
-        AppDimensions.md,
-        AppDimensions.md,
+        0,
+        0,
         AppDimensions.md,
       ),
       child: Row(
@@ -181,7 +210,8 @@ class _TopBar extends StatelessWidget {
               onChanged: onSearchChanged,
               decoration: InputDecoration(
                 hintText: 'Search chats...',
-                hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondaryDark),
+                hintStyle: AppTextStyles.bodySmall
+                    .copyWith(color: AppColors.textSecondaryDark),
                 prefixIcon: const Icon(Icons.search, size: 20),
                 border: const OutlineInputBorder(
                     borderSide: BorderSide(color: AppColors.black, width: 2)),
@@ -196,10 +226,19 @@ class _TopBar extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: AppDimensions.sm),
-          _TopIconButton(icon: Icons.group_outlined, onTap: onPeopleTap),
-          const SizedBox(width: AppDimensions.sm),
-          _TopIconButton(icon: Icons.add, onTap: onAddTap, highlighted: true),
+          SizedBox(width: buttonGap),
+          _TopIconButton(
+            icon: Icons.group_outlined,
+            onTap: onPeopleTap,
+            size: buttonSize,
+          ),
+          SizedBox(width: buttonGap),
+          _TopIconButton(
+            icon: Icons.add,
+            onTap: onAddTap,
+            highlighted: true,
+            size: buttonSize,
+          ),
         ],
       ),
     );
@@ -210,11 +249,13 @@ class _TopIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final bool highlighted;
+  final double size;
 
   const _TopIconButton({
     required this.icon,
     required this.onTap,
     this.highlighted = false,
+    this.size = 48,
   });
 
   @override
@@ -222,15 +263,15 @@ class _TopIconButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 48,
-        height: 48,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           color: highlighted ? AppColors.yellow : AppColors.black,
           border: Border.all(color: AppColors.black, width: 2),
         ),
         child: Icon(
           icon,
-          size: 20,
+          size: size < 48 ? 18 : 20,
           color: highlighted ? AppColors.black : AppColors.white,
         ),
       ),
@@ -262,12 +303,7 @@ class _DummyChatOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.md,
-        0,
-        AppDimensions.md,
-        AppDimensions.md,
-      ),
+      padding: const EdgeInsets.only(bottom: AppDimensions.md),
       children: [
         Text(
           'Chat service is unavailable. Showing dummy chats.',
@@ -280,7 +316,8 @@ class _DummyChatOptions extends StatelessWidget {
         const SizedBox(height: AppDimensions.sm),
         ..._dummyRooms.map((room) => Padding(
               padding: const EdgeInsets.only(bottom: AppDimensions.sm),
-              child: _RoomTile(room: room, highlighted: room.id == 'dummy-pec-ai-assistant'),
+              child: _RoomTile(
+                  room: room, highlighted: room.id == 'dummy-pec-ai-assistant'),
             )),
       ],
     );
@@ -297,22 +334,25 @@ class _RoomTile extends StatelessWidget {
     return InkWell(
       onTap: () => context.push('/chat/${room.id}'),
       child: Container(
-        height: 46,
+        constraints: const BoxConstraints(minHeight: 46),
         decoration: BoxDecoration(
           color: highlighted ? AppColors.yellow : Colors.transparent,
           border: Border.all(
-            color: highlighted
-                ? AppColors.yellow
-                : Colors.transparent,
+            color: highlighted ? AppColors.yellow : Colors.transparent,
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.md,
+          vertical: AppDimensions.sm,
+        ),
         child: Row(
           children: [
             Icon(
               Icons.group_outlined,
               size: 18,
-              color: highlighted ? AppColors.black : AppColors.white.withValues(alpha: 0.75),
+              color: highlighted
+                  ? AppColors.black
+                  : AppColors.white.withValues(alpha: 0.75),
             ),
             const SizedBox(width: AppDimensions.md),
             Expanded(
@@ -398,8 +438,7 @@ class _NewChatDialogState extends ConsumerState<_NewChatDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          style:
-              ElevatedButton.styleFrom(backgroundColor: AppColors.yellow),
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.yellow),
           onPressed: _loading
               ? null
               : () async {
