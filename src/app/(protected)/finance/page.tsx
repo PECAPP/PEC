@@ -113,7 +113,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 };
 
 function fmt(n: number) {
-  return n.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  return (n ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 }
 
 function isOverdue(dueDate: string) {
@@ -635,7 +635,7 @@ function AdminCreateFeeDialog({ open, onClose, onSuccess }: {
 
 export default function FinancePage() {
   const { permissions, loading: permLoading } = usePermissions();
-  const isAdmin = permissions?.isAdmin || permissions?.isFaculty ? false : false; // set below
+  const isAdmin = permissions?.isAdmin || (permissions as any)?.role === 'college_admin';
   const [tab, setTab] = useState('overview');
   const [feeCategory, setFeeCategory] = useState('');
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -658,7 +658,8 @@ export default function FinancePage() {
   const fetchSummary = useCallback(async () => {
     try {
       const res = await api.get('/finance/summary');
-      setSummary((res as any).data);
+      const raw = (res as any).data;
+      setSummary(raw?.totalPending !== undefined ? raw : raw?.data ?? null);
     } catch { /* silent */ }
   }, []);
 
@@ -1003,17 +1004,17 @@ export default function FinancePage() {
                     onChange={(e) => setTxnSearch(e.target.value)}
                   />
                 </div>
-                <Select value={txnCat} onValueChange={setTxnCat}>
+                <Select value={txnCat || '__all__'} onValueChange={(v) => setTxnCat(v === '__all__' ? '' : v)}>
                   <SelectTrigger className="w-32 h-8 text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="__all__">All</SelectItem>
                     {CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                <Select value={txnStatus} onValueChange={setTxnStatus}>
+                <Select value={txnStatus || '__all__'} onValueChange={(v) => setTxnStatus(v === '__all__' ? '' : v)}>
                   <SelectTrigger className="w-28 h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="__all__">All</SelectItem>
                     <SelectItem value="success">Success</SelectItem>
                     <SelectItem value="failed">Failed</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>

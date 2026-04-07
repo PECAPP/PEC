@@ -14,8 +14,21 @@ class ExamRemoteDataSource {
         if (studentId != null) 'studentId': studentId,
       },
     );
-    final raw = resp.data as Map<String, dynamic>;
-    final items = raw['data'] as List<dynamic>? ?? raw['items'] as List<dynamic>? ?? [];
-    return items.map((e) => ExamModel.fromJson(e as Map<String, dynamic>)).toList();
+    final data = resp.data;
+    List<dynamic> items;
+    if (data is Map<String, dynamic>) {
+      items = data['data'] as List<dynamic>? ??
+          data['items'] as List<dynamic>? ??
+          <dynamic>[];
+    } else if (data is List) {
+      items = data;
+    } else {
+      items = <dynamic>[];
+    }
+
+    return items
+        .whereType<Map>()
+        .map((e) => ExamModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
   }
 }

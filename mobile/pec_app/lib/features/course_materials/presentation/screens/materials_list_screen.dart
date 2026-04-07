@@ -7,7 +7,6 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/pec_card.dart';
 import '../../../../shared/widgets/pec_empty_state.dart';
-import '../../../../shared/widgets/pec_error_state.dart';
 import '../../../../shared/widgets/pec_shimmer.dart';
 import '../../data/models/material_model.dart';
 import '../providers/materials_provider.dart';
@@ -31,7 +30,8 @@ class _MaterialsListScreenState extends ConsumerState<MaterialsListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.courseId != null ? 'COURSE MATERIALS' : 'ALL MATERIALS'),
+        title: Text(
+            widget.courseId != null ? 'COURSE MATERIALS' : 'ALL MATERIALS'),
       ),
       body: Column(
         children: [
@@ -46,11 +46,18 @@ class _MaterialsListScreenState extends ConsumerState<MaterialsListScreen> {
                     hintText: 'Search materials…',
                     hintStyle: AppTextStyles.bodySmall,
                     prefixIcon: const Icon(Icons.search, size: 20),
-                    border: const OutlineInputBorder(borderSide: BorderSide(color: AppColors.black, width: 2)),
-                    enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppColors.black, width: 2)),
-                    focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppColors.yellow, width: 2)),
+                    border: const OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: AppColors.black, width: 2)),
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: AppColors.black, width: 2)),
+                    focusedBorder: const OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: AppColors.yellow, width: 2)),
                     filled: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.sm),
@@ -59,12 +66,22 @@ class _MaterialsListScreenState extends ConsumerState<MaterialsListScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _TypeChip(label: 'ALL', value: '', current: _filterType, onTap: () => setState(() => _filterType = '')),
+                      _TypeChip(
+                          label: 'ALL',
+                          value: '',
+                          current: _filterType,
+                          onTap: () => setState(() => _filterType = '')),
                       const SizedBox(width: AppDimensions.xs),
                       for (final t in ['pdf', 'ppt', 'doc', 'video', 'other'])
                         Padding(
-                          padding: const EdgeInsets.only(right: AppDimensions.xs),
-                          child: _TypeChip(label: t.toUpperCase(), value: t, current: _filterType, onTap: () => setState(() => _filterType = _filterType == t ? '' : t)),
+                          padding:
+                              const EdgeInsets.only(right: AppDimensions.xs),
+                          child: _TypeChip(
+                              label: t.toUpperCase(),
+                              value: t,
+                              current: _filterType,
+                              onTap: () => setState(() =>
+                                  _filterType = _filterType == t ? '' : t)),
                         ),
                     ],
                   ),
@@ -75,15 +92,17 @@ class _MaterialsListScreenState extends ConsumerState<MaterialsListScreen> {
           Expanded(
             child: materialsAsync.when(
               loading: () => _shimmer(),
-              error: (e, _) => PecErrorState(
-                  message: e.toString(),
-                  onRetry: () => ref.invalidate(materialsProvider(widget.courseId))),
+              error: (e, _) => _MaterialsLoadFallback(
+                onRetry: () =>
+                    ref.invalidate(materialsProvider(widget.courseId)),
+              ),
               data: (materials) {
                 final filtered = materials.where((m) {
                   final matchSearch = _search.isEmpty ||
                       m.title.toLowerCase().contains(_search) ||
                       (m.courseName?.toLowerCase().contains(_search) ?? false);
-                  final matchType = _filterType.isEmpty || m.fileType == _filterType;
+                  final matchType =
+                      _filterType.isEmpty || m.fileType == _filterType;
                   return matchSearch && matchType;
                 }).toList()
                   ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -92,13 +111,17 @@ class _MaterialsListScreenState extends ConsumerState<MaterialsListScreen> {
                   return PecEmptyState(
                     icon: Icons.folder_open_outlined,
                     title: 'No materials found',
-                    subtitle: _search.isNotEmpty ? 'Try a different search' : 'Materials uploaded by faculty will appear here',
+                    subtitle: _search.isNotEmpty
+                        ? 'Try a different search'
+                        : 'Materials uploaded by faculty will appear here',
                   );
                 }
                 return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(AppDimensions.md, 0, AppDimensions.md, AppDimensions.md),
+                  padding: const EdgeInsets.fromLTRB(
+                      AppDimensions.md, 0, AppDimensions.md, AppDimensions.md),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.sm),
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(height: AppDimensions.sm),
                   itemBuilder: (_, i) => _MaterialCard(material: filtered[i]),
                 );
               },
@@ -113,14 +136,19 @@ class _MaterialsListScreenState extends ConsumerState<MaterialsListScreen> {
         padding: const EdgeInsets.all(AppDimensions.md),
         itemCount: 6,
         separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.sm),
-        itemBuilder: (_, __) => const PecShimmerBox(height: 72, width: double.infinity),
+        itemBuilder: (_, __) =>
+            const PecShimmerBox(height: 72, width: double.infinity),
       );
 }
 
 class _TypeChip extends StatelessWidget {
   final String label, value, current;
   final VoidCallback onTap;
-  const _TypeChip({required this.label, required this.value, required this.current, required this.onTap});
+  const _TypeChip(
+      {required this.label,
+      required this.value,
+      required this.current,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +160,13 @@ class _TypeChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: active ? AppColors.yellow : Colors.transparent,
           border: Border.all(color: AppColors.black, width: 2),
-          boxShadow: active ? const [BoxShadow(offset: Offset(2, 2), color: AppColors.black)] : null,
+          boxShadow: active
+              ? const [BoxShadow(offset: Offset(2, 2), color: AppColors.black)]
+              : null,
         ),
-        child: Text(label, style: AppTextStyles.labelSmall.copyWith(fontSize: 10, color: AppColors.black)),
+        child: Text(label,
+            style: AppTextStyles.labelSmall
+                .copyWith(fontSize: 10, color: AppColors.black)),
       ),
     );
   }
@@ -143,6 +175,14 @@ class _TypeChip extends StatelessWidget {
 class _MaterialCard extends StatelessWidget {
   final CourseMaterialModel material;
   const _MaterialCard({required this.material});
+
+  String get _createdLabel {
+    final d = material.createdAt;
+    final day = d.day.toString().padLeft(2, '0');
+    final month = d.month.toString().padLeft(2, '0');
+    final year = d.year.toString();
+    return '$day/$month/$year';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -184,14 +224,64 @@ class _MaterialCard extends StatelessWidget {
                             .copyWith(color: material.fileColor)),
                     if (material.fileSizeLabel.isNotEmpty) ...[
                       const Text(' · ', style: TextStyle(fontSize: 10)),
-                      Text(material.fileSizeLabel, style: AppTextStyles.caption),
+                      Text(material.fileSizeLabel,
+                          style: AppTextStyles.caption),
                     ],
                   ],
                 ),
+                if ((material.uploadedBy ?? '').isNotEmpty)
+                  Text(
+                    'By ${material.uploadedBy} · $_createdLabel',
+                    style: AppTextStyles.caption
+                        .copyWith(color: AppColors.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             ),
           ),
-          const Icon(Icons.open_in_new_outlined, size: 18, color: AppColors.textSecondary),
+          const Icon(Icons.open_in_new_outlined,
+              size: 18, color: AppColors.textSecondary),
+        ],
+      ),
+    );
+  }
+}
+
+class _MaterialsLoadFallback extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _MaterialsLoadFallback({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.folder_off_outlined,
+            size: 42,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(height: AppDimensions.sm),
+          Text(
+            'Could not load materials right now',
+            style: AppTextStyles.bodySmall
+                .copyWith(color: AppColors.textSecondary),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppDimensions.md),
+          SizedBox(
+            width: 160,
+            child: FilledButton(
+              onPressed: onRetry,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.black,
+              ),
+              child: const Text('Retry'),
+            ),
+          ),
         ],
       ),
     );

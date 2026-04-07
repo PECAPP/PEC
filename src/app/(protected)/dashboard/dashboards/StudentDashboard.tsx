@@ -12,6 +12,8 @@ import { EnrolledCoursesCard } from './components/EnrolledCoursesCard';
 import { TodayScheduleCard } from './components/TodayScheduleCard';
 import { AttendanceOverviewCard } from './components/AttendanceOverviewCard';
 import { NoticeboardCard } from './components/NoticeboardCard';
+import { FinanceSummaryCard } from './components/FinanceSummaryCard';
+import { MarketplaceCard } from './components/MarketplaceCard';
 
 const item = {
   hidden: { opacity: 0, y: 12 },
@@ -131,13 +133,13 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         />
       </div>
 
-      <motion.div 
-        variants={item} 
+      <motion.div
+        variants={item}
         initial="hidden"
         animate="show"
         className="grid gap-6 lg:grid-cols-3"
       >
-        <AttendanceOverviewCard 
+        <AttendanceOverviewCard
           className="lg:col-span-1"
           attendancePercentage={stats.attendancePercentage}
           onClick={() => window.location.href = getFullUrl('/attendance')}
@@ -147,6 +149,21 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
           className="lg:col-span-2"
           notices={noticeboardItems}
           onViewAll={() => window.location.href = getFullUrl('/noticeboard')}
+        />
+      </motion.div>
+
+      <motion.div
+        variants={item}
+        initial="hidden"
+        animate="show"
+        className="grid gap-6 lg:grid-cols-2"
+      >
+        <FinanceSummaryCard
+          onViewAll={() => window.location.href = getFullUrl('/finance')}
+        />
+        <MarketplaceCard
+          onViewAll={() => window.location.href = getFullUrl('/marketplace')}
+          onCreateListing={() => window.location.href = getFullUrl('/marketplace')}
         />
       </motion.div>
 

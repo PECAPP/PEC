@@ -600,7 +600,8 @@ function ChatPanel({
     }
   };
 
-  const activeChat = chats.find((c) => c.id === activeChatId);
+  const safeChats = Array.isArray(chats) ? chats : [];
+  const activeChat = safeChats.find((c) => c.id === activeChatId);
 
   return (
     <AnimatePresence>
@@ -681,14 +682,14 @@ function ChatPanel({
           ) : (
             /* Chat List */
             <div className="flex-1 overflow-y-auto">
-              {chats.length === 0 ? (
+              {safeChats.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-3 text-muted-foreground p-6 text-center">
                   <MessageCircle className="w-10 h-10" />
                   <p className="text-sm">No conversations yet.</p>
                   <p className="text-xs">Browse listings and click "Chat" to start a conversation.</p>
                 </div>
               ) : (
-                chats.map((chat) => {
+                safeChats.map((chat) => {
                   const lastMsg = chat.messages[0];
                   const otherPerson = chat.buyer.id === currentUserId
                     ? null
@@ -815,7 +816,8 @@ export default function MarketplacePage() {
   const fetchChats = useCallback(async () => {
     try {
       const res = await api.get('/marketplace/chats');
-      setChats((res as any).data ?? []);
+      const raw = (res as any).data;
+      setChats(Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : []);
     } catch {
       // silent
     }
@@ -1002,22 +1004,22 @@ export default function MarketplacePage() {
                     className="overflow-hidden"
                   >
                     <div className="flex flex-wrap gap-3 p-3 bg-muted/30 rounded-lg border border-border">
-                      <Select value={filterCategory} onValueChange={setFilterCategory}>
+                      <Select value={filterCategory || '__all__'} onValueChange={(v) => setFilterCategory(v === '__all__' ? '' : v)}>
                         <SelectTrigger className="w-36 h-8 text-xs">
                           <SelectValue placeholder="Category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Categories</SelectItem>
+                          <SelectItem value="__all__">All Categories</SelectItem>
                           {CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                         </SelectContent>
                       </Select>
 
-                      <Select value={filterCondition} onValueChange={setFilterCondition}>
+                      <Select value={filterCondition || '__all__'} onValueChange={(v) => setFilterCondition(v === '__all__' ? '' : v)}>
                         <SelectTrigger className="w-32 h-8 text-xs">
                           <SelectValue placeholder="Condition" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Any Condition</SelectItem>
+                          <SelectItem value="__all__">Any Condition</SelectItem>
                           {CONDITIONS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                         </SelectContent>
                       </Select>

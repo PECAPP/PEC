@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 ;
 import { motion } from 'framer-motion';
@@ -55,12 +55,6 @@ export default function RoleSelection() {
   const { user, token } = useAuth();
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
-  const apiUrl = useMemo(
-    () =>
-      (process.env.NEXT_PUBLIC_API_URL as string) ||
-      (process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'http://localhost:3001'),
-    [],
-  );
 
   const handleRoleSelect = async () => {
     if (!selectedRole || !token || !user?.id) return;
@@ -68,13 +62,14 @@ export default function RoleSelection() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${apiUrl}/auth/set-role`, {
+      const response = await fetch(`/api/auth/set-role`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ role: selectedRole }),
+        credentials: 'include',
       });
 
       if (!response.ok) {

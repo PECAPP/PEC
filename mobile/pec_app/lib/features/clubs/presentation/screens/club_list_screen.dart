@@ -7,13 +7,14 @@ import '../../../../core/constants/app_text_styles.dart';
 // import '../../../../shared/widgets/pec_avatar.dart';
 import '../../../../shared/widgets/pec_card.dart';
 import '../../../../shared/widgets/pec_empty_state.dart';
-import '../../../../shared/widgets/pec_error_state.dart';
 import '../../../../shared/widgets/pec_shimmer.dart';
 import '../../data/models/club_model.dart';
 import '../providers/clubs_provider.dart';
 
 class ClubListScreen extends ConsumerStatefulWidget {
   const ClubListScreen({super.key});
+
+  static const double _maxContentWidth = 900;
 
   @override
   ConsumerState<ClubListScreen> createState() => _ClubListScreenState();
@@ -40,6 +41,13 @@ class _ClubListScreenState extends ConsumerState<ClubListScreen>
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = width >= 900
+        ? AppDimensions.lg
+        : width >= 600
+            ? AppDimensions.md
+            : AppDimensions.sm;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('CLUBS'),
@@ -58,71 +66,99 @@ class _ClubListScreenState extends ConsumerState<ClubListScreen>
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppDimensions.md),
-            child: Column(
-              children: [
-                TextField(
-                  onChanged: (v) => setState(() => _search = v.toLowerCase()),
-                  decoration: InputDecoration(
-                    hintText: 'Search clubs…',
-                    hintStyle: AppTextStyles.bodySmall,
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    border: const OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.black, width: 2)),
-                    enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.black, width: 2)),
-                    focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.yellow, width: 2)),
-                    filled: true,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.sm),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _Chip(label: 'ALL', value: '', current: _filterCategory,
-                          onTap: () => setState(() => _filterCategory = '')),
-                      const SizedBox(width: AppDimensions.xs),
-                      for (final cat in ['technical', 'cultural', 'sports', 'academic', 'other'])
-                        Padding(
-                          padding: const EdgeInsets.only(right: AppDimensions.xs),
-                          child: _Chip(
-                            label: cat.toUpperCase(),
-                            value: cat,
-                            current: _filterCategory,
-                            onTap: () => setState(() =>
-                                _filterCategory =
-                                    _filterCategory == cat ? '' : cat),
+      body: SafeArea(
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints:
+                const BoxConstraints(maxWidth: ClubListScreen._maxContentWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Column(
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: AppDimensions.md),
+                    child: Column(
+                      children: [
+                        TextField(
+                          onChanged: (v) =>
+                              setState(() => _search = v.toLowerCase()),
+                          decoration: InputDecoration(
+                            hintText: 'Search clubs…',
+                            hintStyle: AppTextStyles.bodySmall,
+                            prefixIcon: const Icon(Icons.search, size: 20),
+                            border: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: AppColors.black, width: 2)),
+                            enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: AppColors.black, width: 2)),
+                            focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: AppColors.yellow, width: 2)),
+                            filled: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
                           ),
                         ),
-                    ],
+                        const SizedBox(height: AppDimensions.sm),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              _Chip(
+                                  label: 'ALL',
+                                  value: '',
+                                  current: _filterCategory,
+                                  onTap: () =>
+                                      setState(() => _filterCategory = '')),
+                              const SizedBox(width: AppDimensions.xs),
+                              for (final cat in [
+                                'technical',
+                                'cultural',
+                                'sports',
+                                'academic',
+                                'other'
+                              ])
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: AppDimensions.xs),
+                                  child: _Chip(
+                                    label: cat.toUpperCase(),
+                                    value: cat,
+                                    current: _filterCategory,
+                                    onTap: () => setState(() =>
+                                        _filterCategory =
+                                            _filterCategory == cat ? '' : cat),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tab,
+                      children: [
+                        _ClubsTab(
+                            search: _search,
+                            category: _filterCategory,
+                            memberOnly: false),
+                        _ClubsTab(
+                            search: _search,
+                            category: _filterCategory,
+                            memberOnly: true),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _tab,
-              children: [
-                _ClubsTab(
-                    search: _search,
-                    category: _filterCategory,
-                    memberOnly: false),
-                _ClubsTab(
-                    search: _search,
-                    category: _filterCategory,
-                    memberOnly: true),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -132,33 +168,36 @@ class _ClubsTab extends ConsumerWidget {
   final String search, category;
   final bool memberOnly;
   const _ClubsTab(
-      {required this.search,
-      required this.category,
-      required this.memberOnly});
+      {required this.search, required this.category, required this.memberOnly});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final clubsAsync = ref.watch(clubsProvider);
+    final width = MediaQuery.of(context).size.width;
+    final crossAxisCount = width >= 1000
+        ? 4
+        : width >= 700
+            ? 3
+            : 2;
 
     return clubsAsync.when(
       loading: () => GridView.builder(
-        padding: const EdgeInsets.all(AppDimensions.md),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, AppDimensions.md),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
             crossAxisSpacing: AppDimensions.sm,
             mainAxisSpacing: AppDimensions.sm,
             childAspectRatio: 0.85),
         itemCount: 6,
-        itemBuilder: (_, __) =>
-            const PecShimmerBox(height: double.infinity, width: double.infinity),
+        itemBuilder: (_, __) => const PecShimmerBox(
+            height: double.infinity, width: double.infinity),
       ),
-      error: (e, _) => PecErrorState(
-          message: e.toString(),
-          onRetry: () => ref.invalidate(clubsProvider)),
+      error: (_, __) =>
+          _ClubsLoadFallback(onRetry: () => ref.invalidate(clubsProvider)),
       data: (clubs) {
         final filtered = clubs.where((c) {
-          final matchSearch = search.isEmpty ||
-              c.name.toLowerCase().contains(search);
+          final matchSearch =
+              search.isEmpty || c.name.toLowerCase().contains(search);
           final matchCat = category.isEmpty || c.category == category;
           final matchMember = !memberOnly || c.isMember || c.isPending;
           return matchSearch && matchCat && matchMember;
@@ -173,10 +212,9 @@ class _ClubsTab extends ConsumerWidget {
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.fromLTRB(
-              AppDimensions.md, 0, AppDimensions.md, AppDimensions.md),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, AppDimensions.md),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
               crossAxisSpacing: AppDimensions.sm,
               mainAxisSpacing: AppDimensions.sm,
               childAspectRatio: 0.82),
@@ -184,6 +222,47 @@ class _ClubsTab extends ConsumerWidget {
           itemBuilder: (_, i) => _ClubCard(club: filtered[i]),
         );
       },
+    );
+  }
+}
+
+class _ClubsLoadFallback extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _ClubsLoadFallback({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.groups_outlined,
+            size: 42,
+            color: AppColors.textSecondaryDark,
+          ),
+          const SizedBox(height: AppDimensions.sm),
+          Text(
+            'Could not load clubs right now',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondaryDark,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppDimensions.md),
+          SizedBox(
+            width: 180,
+            child: FilledButton(
+              onPressed: onRetry,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.black,
+              ),
+              child: const Text('Retry'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -208,20 +287,17 @@ class _ClubCard extends ConsumerWidget {
             child: club.logoUrl != null
                 ? Image.network(club.logoUrl!,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) =>
-                        _defaultLogo(club))
+                    errorBuilder: (_, __, ___) => _defaultLogo(club))
                 : _defaultLogo(club),
           ),
           const SizedBox(height: AppDimensions.xs),
           Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.xs),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xs),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(club.name,
-                    style: AppTextStyles.labelLarge
-                        .copyWith(fontSize: 12),
+                    style: AppTextStyles.labelLarge.copyWith(fontSize: 12),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 2),
@@ -233,14 +309,11 @@ class _ClubCard extends ConsumerWidget {
                       color: club.categoryColor,
                       child: Text(club.categoryLabel,
                           style: AppTextStyles.labelSmall
-                              .copyWith(
-                                  color: AppColors.black,
-                                  fontSize: 7)),
+                              .copyWith(color: AppColors.black, fontSize: 7)),
                     ),
                     const SizedBox(width: 4),
                     Text('${club.memberCount} members',
-                        style: AppTextStyles.caption
-                            .copyWith(fontSize: 9)),
+                        style: AppTextStyles.caption.copyWith(fontSize: 9)),
                   ],
                 ),
                 const SizedBox(height: AppDimensions.xs),
@@ -257,8 +330,8 @@ class _ClubCard extends ConsumerWidget {
     return Center(
       child: Text(
         c.name.length > 2 ? c.name.substring(0, 2).toUpperCase() : c.name,
-        style: AppTextStyles.heading2.copyWith(
-            color: c.categoryColor, fontSize: 24),
+        style: AppTextStyles.heading2
+            .copyWith(color: c.categoryColor, fontSize: 24),
       ),
     );
   }
@@ -269,9 +342,7 @@ class _JoinButton extends StatelessWidget {
   final AsyncValue<void> joinAsync;
   final WidgetRef ref;
   const _JoinButton(
-      {required this.club,
-      required this.joinAsync,
-      required this.ref});
+      {required this.club, required this.joinAsync, required this.ref});
 
   @override
   Widget build(BuildContext context) {
@@ -320,8 +391,7 @@ class _JoinButton extends StatelessWidget {
                     width: 12,
                     height: 12,
                     child: CircularProgressIndicator(
-                        strokeWidth: 1.5,
-                        color: AppColors.black)))
+                        strokeWidth: 1.5, color: AppColors.black)))
             : Text('JOIN',
                 style: AppTextStyles.labelSmall
                     .copyWith(color: AppColors.black, fontSize: 9),
@@ -346,15 +416,12 @@ class _Chip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: active ? AppColors.yellow : Colors.transparent,
           border: Border.all(color: AppColors.black, width: 2),
           boxShadow: active
-              ? const [
-                  BoxShadow(offset: Offset(2, 2), color: AppColors.black)
-                ]
+              ? const [BoxShadow(offset: Offset(2, 2), color: AppColors.black)]
               : null,
         ),
         child: Text(label,

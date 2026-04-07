@@ -13,7 +13,6 @@ import '../../../../features/attendance/presentation/providers/attendance_provid
 import '../../../../features/courses/presentation/providers/courses_provider.dart';
 import '../../../../features/timetable/presentation/providers/timetable_provider.dart';
 import '../../../../features/timetable/data/models/timetable_model.dart';
-import '../../../../features/noticeboard/presentation/providers/notice_provider.dart';
 import '../../../../features/notifications/presentation/providers/notifications_provider.dart';
 import '../../../../shared/widgets/app_drawer.dart';
 import '../../../../shared/widgets/pec_avatar.dart';
@@ -932,8 +931,6 @@ class _StudentPrimaryCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
-  final bool showBadge;
-  final IconData? trailingIcon;
   final VoidCallback onTap;
 
   const _StudentPrimaryCard({
@@ -942,8 +939,6 @@ class _StudentPrimaryCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.onTap,
-    this.showBadge = false,
-    this.trailingIcon,
   });
 
   @override
@@ -972,38 +967,14 @@ class _StudentPrimaryCard extends StatelessWidget {
           children: [
             Container(width: 4, height: 74, color: accent),
             const SizedBox(width: AppDimensions.md),
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: 54,
-                  height: 54,
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, color: accent, size: 28),
-                ),
-                if (showBadge)
-                  Positioned(
-                    right: -8,
-                    top: -8,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: AppColors.red,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.black, width: 1),
-                      ),
-                      child: Center(
-                        child: Text('N',
-                            style: AppTextStyles.labelLarge
-                                .copyWith(color: AppColors.white)),
-                      ),
-                    ),
-                  ),
-              ],
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: accent, size: 28),
             ),
             const SizedBox(width: AppDimensions.md),
             Expanded(
@@ -1026,16 +997,6 @@ class _StudentPrimaryCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (trailingIcon != null)
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.yellow,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(trailingIcon, color: AppColors.black, size: 30),
-              ),
           ],
         ),
       ),
@@ -1796,6 +1757,75 @@ const List<_CoursePreviewItem> _demoEnrolledCourses = [
   ),
 ];
 
+// ── Pending attendance sessions (faculty) ────────────────────────────────
+class _PendingSessionsCard extends StatelessWidget {
+  const _PendingSessionsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return PecCard(
+      child: Text(
+        '— Connect backend to load pending sessions —',
+        style: AppTextStyles.bodySmall,
+      ),
+    );
+  }
+}
+
+// ── Admin stats grid ─────────────────────────────────────────────────────
+class _AdminStatsGrid extends StatelessWidget {
+  const _AdminStatsGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = [
+      _Stat('TOTAL USERS', '--', AppColors.yellow),
+      _Stat('ACTIVE TODAY', '--', AppColors.green),
+      _Stat('COURSES', '--', AppColors.blue),
+      _Stat('DEPARTMENTS', '--', AppColors.red),
+    ];
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: AppDimensions.sm,
+      mainAxisSpacing: AppDimensions.sm,
+      childAspectRatio: 2,
+      children: stats.map((s) => _AdminStatTile(stat: s)).toList(),
+    );
+  }
+}
+
+class _Stat {
+  final String label;
+  final String value;
+  final Color color;
+  const _Stat(this.label, this.value, this.color);
+}
+
+class _AdminStatTile extends StatelessWidget {
+  final _Stat stat;
+  const _AdminStatTile({required this.stat});
+
+  @override
+  Widget build(BuildContext context) {
+    return PecCard(
+      color: stat.color,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(stat.value,
+              style: AppTextStyles.heading2.copyWith(color: AppColors.black)),
+          Text(stat.label,
+              style: AppTextStyles.labelSmall
+                  .copyWith(color: AppColors.black, fontSize: 9)),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Timetable preview (real data) ────────────────────────────────────────
 class _TimetablePreview extends ConsumerWidget {
   const _TimetablePreview();
@@ -1894,144 +1924,6 @@ class _TimetablePreview extends ConsumerWidget {
     final now = DateTime.now();
     final nowMins = now.hour * 60 + now.minute;
     return nowMins >= e.startMinutes && nowMins < e.startMinutes + 60;
-  }
-}
-
-// ── Attendance summary (real data) ────────────────────────────────────────
-class _AttendanceSummary extends ConsumerWidget {
-  const _AttendanceSummary();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final statsAsync = ref.watch(overallAttendanceProvider);
-    return statsAsync.when(
-      loading: () => PecCard(
-        child: const Center(
-            child: CircularProgressIndicator(color: AppColors.yellow)),
-      ),
-      error: (_, __) => PecCard(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _StatPill(label: 'PRESENT', value: '--', color: AppColors.green),
-            _StatPill(label: 'ABSENT', value: '--', color: AppColors.red),
-            _StatPill(label: 'OVERALL', value: '--%', color: AppColors.blue),
-          ],
-        ),
-      ),
-      data: (stats) {
-        final pct = (stats['pct'] as double).toStringAsFixed(1);
-        return PecCard(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _StatPill(
-                  label: 'PRESENT',
-                  value: '${stats['present']}',
-                  color: AppColors.green),
-              _StatPill(
-                  label: 'ABSENT',
-                  value: '${stats['absent']}',
-                  color: AppColors.red),
-              _StatPill(
-                  label: 'OVERALL',
-                  value: '$pct%',
-                  color: (stats['pct'] as double) >= 75
-                      ? AppColors.green
-                      : AppColors.red),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _StatPill extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color color;
-  const _StatPill(
-      {required this.label, required this.value, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(value, style: AppTextStyles.heading2.copyWith(color: color)),
-        const SizedBox(height: AppDimensions.xs),
-        Text(label, style: AppTextStyles.labelSmall),
-      ],
-    );
-  }
-}
-
-// ── Pending attendance sessions (faculty) ────────────────────────────────
-class _PendingSessionsCard extends StatelessWidget {
-  const _PendingSessionsCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return PecCard(
-      child: Text(
-        '— Connect backend to load pending sessions —',
-        style: AppTextStyles.bodySmall,
-      ),
-    );
-  }
-}
-
-// ── Admin stats grid ─────────────────────────────────────────────────────
-class _AdminStatsGrid extends StatelessWidget {
-  const _AdminStatsGrid();
-
-  @override
-  Widget build(BuildContext context) {
-    final stats = [
-      _Stat('TOTAL USERS', '--', AppColors.yellow),
-      _Stat('ACTIVE TODAY', '--', AppColors.green),
-      _Stat('COURSES', '--', AppColors.blue),
-      _Stat('DEPARTMENTS', '--', AppColors.red),
-    ];
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: AppDimensions.sm,
-      mainAxisSpacing: AppDimensions.sm,
-      childAspectRatio: 2,
-      children: stats.map((s) => _AdminStatTile(stat: s)).toList(),
-    );
-  }
-}
-
-class _Stat {
-  final String label;
-  final String value;
-  final Color color;
-  const _Stat(this.label, this.value, this.color);
-}
-
-class _AdminStatTile extends StatelessWidget {
-  final _Stat stat;
-  const _AdminStatTile({required this.stat});
-
-  @override
-  Widget build(BuildContext context) {
-    return PecCard(
-      color: stat.color,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(stat.value,
-              style: AppTextStyles.heading2.copyWith(color: AppColors.black)),
-          Text(stat.label,
-              style: AppTextStyles.labelSmall
-                  .copyWith(color: AppColors.black, fontSize: 9)),
-        ],
-      ),
-    );
   }
 }
 
@@ -2377,93 +2269,3 @@ class _ScheduleClassCard extends StatelessWidget {
   }
 }
 
-// ── Recent notices (real data) ────────────────────────────────────────────
-class _RecentNotices extends ConsumerWidget {
-  const _RecentNotices();
-
-  Widget _shell({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppDimensions.md),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.yellow.withValues(alpha: 0.16)),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.yellow.withValues(alpha: 0.1),
-            AppColors.bgSurfaceDark.withValues(alpha: 0.96),
-          ],
-        ),
-      ),
-      child: child,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final noticesAsync = ref.watch(noticesProvider);
-    return noticesAsync.when(
-      loading: () => _shell(
-        child: const Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: AppDimensions.md),
-            child: CircularProgressIndicator(color: AppColors.yellow),
-          ),
-        ),
-      ),
-      error: (_, __) => const SizedBox.shrink(),
-      data: (notices) {
-        if (notices.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        final shown = notices.take(3).toList();
-        return _shell(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final n in shown)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppDimensions.sm),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.only(top: 4),
-                          color: n.dotColor),
-                      const SizedBox(width: AppDimensions.sm),
-                      Expanded(
-                        child: Text(
-                          n.title,
-                          style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.white.withValues(alpha: 0.82),
-                              fontSize: 15,
-                              height: 1.2),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              GestureDetector(
-                onTap: () => context.push('/noticeboard'),
-                child: Text(
-                  notices.length > 3
-                      ? 'View all ${notices.length} notices →'
-                      : 'View noticeboard →',
-                  style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.yellow,
-                      fontSize: 12,
-                      letterSpacing: 0.2),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}

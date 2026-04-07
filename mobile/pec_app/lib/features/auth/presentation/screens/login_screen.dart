@@ -6,7 +6,6 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/pec_button.dart';
-import '../providers/auth_provider.dart';
 import 'signing_in_splash_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -49,11 +48,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _useTestAccount() async {
-    await ref.read(authNotifierProvider.notifier).continueAsStudentFromSignUp(
-          email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
-        );
+    final email = _emailCtrl.text.trim();
+    final query = email.isEmpty ? '' : '?email=${Uri.encodeComponent(email)}';
     if (!mounted) return;
-    context.go('/dashboard');
+    context.go('/loading-splash$query');
   }
 
   @override

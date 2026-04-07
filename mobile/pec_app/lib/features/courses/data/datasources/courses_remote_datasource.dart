@@ -7,6 +7,32 @@ class CoursesRemoteDataSource {
   final ApiClient _client;
   CoursesRemoteDataSource(this._client);
 
+  List<dynamic> _extractItems(dynamic raw) {
+    if (raw is List) return raw;
+    if (raw is Map<String, dynamic>) {
+      final data = raw['data'];
+      if (data is List) return data;
+      if (data is Map<String, dynamic>) {
+        final nestedItems = data['items'];
+        if (nestedItems is List) return nestedItems;
+      }
+      final items = raw['items'];
+      if (items is List) return items;
+      final results = raw['results'];
+      if (results is List) return results;
+    }
+    return const [];
+  }
+
+  Map<String, dynamic> _extractObject(dynamic raw) {
+    if (raw is Map<String, dynamic>) {
+      final data = raw['data'];
+      if (data is Map<String, dynamic>) return data;
+      return raw;
+    }
+    return const {};
+  }
+
   Future<PaginatedResponse<CourseModel>> getCourses({
     String? department,
     int? semester,
@@ -26,15 +52,24 @@ class CoursesRemoteDataSource {
         if (facultyId != null) 'facultyId': facultyId,
       },
     );
-    return PaginatedResponse.fromJson(
-      resp.data as Map<String, dynamic>,
-      CourseModel.fromJson,
+    final raw = resp.data;
+    final root = raw is Map<String, dynamic> ? raw : const <String, dynamic>{};
+    final itemMaps = _extractItems(raw)
+        .whereType<Map<String, dynamic>>()
+        .toList(growable: false);
+    final items = itemMaps.map(CourseModel.fromJson).toList(growable: false);
+
+    return PaginatedResponse(
+      items: items,
+      total: (root['total'] as num?)?.toInt() ?? items.length,
+      limit: (root['limit'] as num?)?.toInt() ?? limit,
+      offset: (root['offset'] as num?)?.toInt() ?? offset,
     );
   }
 
   Future<CourseModel> getCourse(String id) async {
     final resp = await _client.dio.get(ApiEndpoints.course(id));
-    return CourseModel.fromJson(resp.data as Map<String, dynamic>);
+    return CourseModel.fromJson(_extractObject(resp.data));
   }
 
   Future<PaginatedResponse<EnrollmentModel>> getEnrollments({
@@ -50,9 +85,19 @@ class CoursesRemoteDataSource {
         if (courseId != null) 'courseId': courseId,
       },
     );
-    return PaginatedResponse.fromJson(
-      resp.data as Map<String, dynamic>,
-      EnrollmentModel.fromJson,
+    final raw = resp.data;
+    final root = raw is Map<String, dynamic> ? raw : const <String, dynamic>{};
+    final itemMaps = _extractItems(raw)
+        .whereType<Map<String, dynamic>>()
+        .toList(growable: false);
+    final items =
+        itemMaps.map(EnrollmentModel.fromJson).toList(growable: false);
+
+    return PaginatedResponse(
+      items: items,
+      total: (root['total'] as num?)?.toInt() ?? items.length,
+      limit: (root['limit'] as num?)?.toInt() ?? limit,
+      offset: (root['offset'] as num?)?.toInt() ?? 0,
     );
   }
 

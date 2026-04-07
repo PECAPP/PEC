@@ -371,19 +371,6 @@ class _RoomTile extends StatelessWidget {
       ),
     );
   }
-
-  String _timeLabel(DateTime dt) {
-    final now = DateTime.now();
-    final diff = now.difference(dt);
-    if (diff.inDays == 0) {
-      return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    }
-    if (diff.inDays < 7) {
-      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      return days[dt.weekday - 1];
-    }
-    return '${dt.day}/${dt.month}';
-  }
 }
 
 class _NewChatDialog extends ConsumerStatefulWidget {

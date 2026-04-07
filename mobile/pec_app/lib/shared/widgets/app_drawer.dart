@@ -98,6 +98,10 @@ class _DrawerContent extends StatelessWidget {
           _Item('Night Canteen', Icons.restaurant_menu_outlined, '/canteen'),
           _Item('Campus Map', Icons.map_outlined, '/campus-map'),
         ]),
+        _Section(label: 'SUPPORT', items: [
+          _Item('Help & Support', Icons.help_outline_rounded, '/help-support'),
+          _Item('Settings', Icons.settings_outlined, '/settings'),
+        ]),
       ];
     }
     if (user.isFaculty && !user.isAdmin) {
@@ -116,6 +120,10 @@ class _DrawerContent extends StatelessWidget {
           _Item('Buy & Sell', Icons.storefront_outlined, '/buy-sell'),
           _Item('Campus Map', Icons.map_outlined, '/campus-map'),
         ]),
+        _Section(label: 'SUPPORT', items: [
+          _Item('Help & Support', Icons.help_outline_rounded, '/help-support'),
+          _Item('Settings', Icons.settings_outlined, '/settings'),
+        ]),
       ];
     }
     // Admin
@@ -132,6 +140,10 @@ class _DrawerContent extends StatelessWidget {
       _Section(label: 'CAMPUS', items: [
         _Item('Buy & Sell', Icons.storefront_outlined, '/buy-sell'),
         _Item('Campus Map', Icons.map_outlined, '/campus-map'),
+      ]),
+      _Section(label: 'SUPPORT', items: [
+        _Item('Help & Support', Icons.help_outline_rounded, '/help-support'),
+        _Item('Settings', Icons.settings_outlined, '/settings'),
       ]),
     ];
   }
