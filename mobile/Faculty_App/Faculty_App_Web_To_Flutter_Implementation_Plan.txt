@@ -1,0 +1,330 @@
+PEC ERP FACULTY APP - NEXT.JS TO FLUTTER IMPLEMENTATION PLAN
+Location: mobile/Faculty_App
+Date: 2026-04-08
+
+OBJECTIVE
+- Build the Flutter Faculty_App UI to match the existing Next.js faculty web frontend as closely as possible.
+- Keep one common backend (NestJS) and one common database (PostgreSQL) for web + mobile.
+- Keep one common authentication/session model for Next.js and Flutter clients.
+- Ensure mobile frontend is responsive across phone and tablet form factors.
+
+NON-NEGOTIABLE ARCHITECTURE RULES
+1. Do not create a separate backend for Faculty_App.
+2. Do not connect Flutter directly to PostgreSQL.
+3. Keep NestJS APIs shared across Next.js, pec_app, and Faculty_App.
+4. Keep role-based authorization in backend guards, not only in UI.
+5. Any data contract change must be backward-compatible or versioned.
+
+SYSTEM ARCHITECTURE (FINAL TARGET)
+- Client 1: Next.js website (already implemented for faculty workflows).
+- Client 2: Flutter Faculty_App.
+- Client 3: Flutter pec_app.
+- Server: Common NestJS API layer in server/.
+- DB: Common PostgreSQL via Prisma schema in server/prisma/schema.prisma.
+
+API + AUTH + DB COMMONALITY REQUIREMENTS
+- Same auth endpoints for all clients: login, refresh, profile, logout.
+- Same JWT/refresh lifecycle for web and Flutter.
+- Same role mapping (faculty, admin, student, etc.).
+- Same API routes and payload semantics.
+- Same data source of truth (PostgreSQL).
+
+FACULTY WEB FRONTEND EXTRACTION APPROACH
+Goal: Recreate exact web behavior, hierarchy, and data semantics in Flutter.
+
+Step A: Screen inventory from Next.js faculty modules
+- Dashboard: faculty cards, header, quick actions, today schedule, stats.
+- Faculty bio system: profile, publications, awards, conferences, consultations.
+- Courses and course materials.
+- Attendance session flows and attendance analytics.
+- Timetable and room interactions (if faculty workflow requires).
+- Noticeboard and notifications.
+- Communication/chat modules used by faculty role.
+
+Step B: UI token extraction from web code
+- Typography scale, spacing scale, colors, border radius, elevation/shadows.
+- Card, badge, pill, chips, table/list styles.
+- Empty state, loading state, error state components.
+- Action hierarchy: primary, secondary, danger, ghost buttons.
+
+Step C: Interaction extraction
+- Form validation behavior.
+- Toast/snackbar and inline error behavior.
+- Pagination/filter/sort behavior.
+- Role-guarded sections and conditional rendering.
+
+Step D: Data contract extraction
+- Exact route path mapping.
+- Request/response field mapping.
+- Date/time formatting and timezone behavior.
+- File upload/download behavior.
+
+FLUTTER FACULTY_APP TARGET STRUCTURE
+- Keep feature-first foldering under mobile/Faculty_App/faculty/lib/
+- Add or align with:
+  core/
+    api/ (client, interceptors, endpoint constants)
+    auth/ (token storage, refresh handling, session bootstrap)
+    theme/ (web token parity)
+    errors/ (uniform typed failures)
+  features/
+    auth/
+    faculty_dashboard/
+    faculty_bio_system/
+    courses/
+    attendance/
+    timetable/
+    notices/
+    notifications/
+    chat/
+    settings/
+  shared/
+    widgets/ (cards, chips, list rows, skeletons)
+    models/ (shared DTO-compatible models)
+    routing/
+
+WEB-TO-FLUTTER PARITY PLAN
+Phase 1 - Foundation + Contracts
+- Set API base URL by environment (dev/staging/prod).
+- Implement auth interceptors and token refresh.
+- Define DTOs matching existing Next.js-consumed API shapes.
+- Add route guards for faculty role.
+
+Phase 2 - Dashboard Parity
+- Rebuild FacultyDashboard hierarchy from web module.
+- Match quick actions and today schedule cards.
+- Match stats widgets and loading/error states.
+- Verify navigation destinations against web behavior.
+
+Phase 3 - Faculty Bio System Parity
+- Implement profile read/edit.
+- Implement CRUD for publications, awards, conferences, consultations.
+- Reuse same backend endpoints currently used by web page.
+- Match owner vs non-owner permissions.
+
+Phase 4 - Academic Workflows Parity
+- Attendance session creation/management.
+- Course material upload/list/delete.
+- Course and timetable faculty views.
+- Notices/announcements actions available to faculty.
+
+Phase 5 - Communication + Notifications Parity
+- Chat list and room flows for faculty role.
+- Notification list, unread count, mark read/delete actions.
+- Real-time updates where backend supports sockets/events.
+
+Phase 6 - QA and Performance
+- Golden/widget tests for key faculty screens.
+- Integration tests for login, dashboard, profile edit, faculty bio CRUD.
+- Network resilience: retry/offline placeholders.
+
+RESPONSIVE REQUIREMENTS (MANDATORY)
+- Mobile breakpoint strategy:
+  Compact phones: <= 360 width
+  Standard phones: 361-600 width
+  Tablet portrait: 601-900 width
+  Tablet landscape/desktop-webview: > 900 width
+- Layout behavior:
+  1-column on compact phones
+  2-column adaptive cards on larger phones/tablets
+  Split panes for selected screens on tablets where meaningful
+- Typography and spacing:
+  Use scaled text styles with clamped min/max sizes
+  Use adaptive paddings and gutters
+- Inputs and accessibility:
+  Touch targets >= 44dp
+  High contrast and readable text hierarchy
+
+BACKEND INTEGRATION CHECKLIST
+- Auth
+  [ ] Flutter uses same login/refresh/logout endpoints as Next.js
+  [ ] Token refresh flow matches web behavior
+  [ ] Unauthorized flow redirects to login correctly
+- Faculty domain
+  [ ] All faculty APIs consumed from existing NestJS modules
+  [ ] No temporary mobile-only backend routes introduced
+- Data consistency
+  [ ] Same pagination/filtering semantics
+  [ ] Same enum/status labels and mapping
+  [ ] Same timezone/date rendering assumptions
+
+DATABASE CONSISTENCY CHECKLIST
+- [ ] No Flutter direct SQL/db access.
+- [ ] All reads/writes through NestJS service layer.
+- [ ] Prisma schema remains common for web + mobile use cases.
+- [ ] Migration order respected (schema -> backend -> clients).
+
+SECURITY AND AUTH REQUIREMENTS
+- [ ] Secure token storage on device.
+- [ ] No sensitive data persisted unencrypted in local cache.
+- [ ] Backend RBAC remains source of truth.
+- [ ] Faculty-only routes checked server-side.
+- [ ] Session invalidation handled consistently across clients.
+
+DELIVERY MILESTONES
+Milestone 1: Foundation complete
+- API client, auth flow, app shell, role guards, theme parity base.
+
+Milestone 2: Faculty dashboard + core navigation parity
+- Dashboard and faculty quick flows identical in behavior to web.
+
+Milestone 3: Faculty bio + academic workflows parity
+- CRUD modules and workflows functionally equivalent to Next.js.
+
+Milestone 4: Responsive polish + QA pass
+- Phone/tablet responsiveness and regression test suite green.
+
+Milestone 5: Production-ready integration
+- Common backend, auth, and DB verified for web + both Flutter apps.
+
+ACCEPTANCE CRITERIA
+1. Faculty user can complete all core faculty tasks in Flutter with same backend behavior as web.
+2. All faculty data shown in Flutter matches Next.js for the same account/session.
+3. No divergence in authorization outcomes between web and Flutter.
+4. UI is usable and visually coherent on compact phones, standard phones, and tablets.
+5. Backend and database remain shared and unchanged in ownership model.
+
+ROLL-OUT NOTES
+- Start by implementing exact parity for faculty dashboard and faculty-bio-system first.
+- Keep incremental releases behind feature flags if needed.
+- Avoid introducing mobile-only business rules unless explicitly approved.
+
+IMPLEMENTATION MATRIX (WEB -> FLUTTER)
+1) Faculty Dashboard
+- Web source:
+  src/app/(protected)/dashboard/dashboards/FacultyDashboard.tsx
+  src/app/(protected)/dashboard/slots/FacultyDataSlot.tsx
+  src/app/(protected)/dashboard/dashboards/components/FacultyHeader.tsx
+  src/app/(protected)/dashboard/dashboards/components/FacultyStatsGrid.tsx
+  src/app/(protected)/dashboard/dashboards/components/FacultyTodaySchedule.tsx
+  src/app/(protected)/dashboard/dashboards/components/FacultyCoursesGrid.tsx
+  src/app/(protected)/dashboard/dashboards/components/FacultyQuickActions.tsx
+- Flutter target:
+  mobile/Faculty_App/faculty/lib/features/faculty_dashboard/presentation/screens/faculty_dashboard_screen.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_dashboard/presentation/widgets/faculty_header.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_dashboard/presentation/widgets/faculty_stats_grid.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_dashboard/presentation/widgets/faculty_today_schedule.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_dashboard/presentation/widgets/faculty_courses_grid.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_dashboard/presentation/widgets/faculty_quick_actions.dart
+
+2) Faculty Bio System
+- Web source:
+  src/app/(protected)/faculty-bio-system/page.tsx
+- Flutter target:
+  mobile/Faculty_App/faculty/lib/features/faculty_bio_system/presentation/screens/faculty_bio_screen.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_bio_system/presentation/widgets/publications_tab.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_bio_system/presentation/widgets/awards_tab.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_bio_system/presentation/widgets/conferences_tab.dart
+  mobile/Faculty_App/faculty/lib/features/faculty_bio_system/presentation/widgets/consultations_tab.dart
+
+3) Shared Faculty Navigation + Auth Shell
+- Web source:
+  protected faculty routes and role checks through web auth/permissions hooks.
+- Flutter target:
+  mobile/Faculty_App/faculty/lib/core/router/app_router.dart
+  mobile/Faculty_App/faculty/lib/features/auth/presentation/providers/auth_provider.dart
+  mobile/Faculty_App/faculty/lib/core/auth/token_storage.dart
+
+API PARITY MATRIX (USE SAME ROUTES)
+Dashboard data routes used by web:
+- GET /courses?facultyId={uid}&limit=20
+- GET /attendance/faculty-stats
+- GET /auth/profile
+- GET /noticeboard?limit=5
+
+Faculty Bio System routes used by web:
+- GET /faculty-bio-system/{facultyId}
+
+Publication CRUD:
+- POST /faculty-bio-system/publications
+- PATCH /faculty-bio-system/publications/{id}
+- DELETE /faculty-bio-system/publications/{id}
+
+Award CRUD:
+- POST /faculty-bio-system/awards
+- PATCH /faculty-bio-system/awards/{id}
+- DELETE /faculty-bio-system/awards/{id}
+
+Conference CRUD:
+- POST /faculty-bio-system/conferences
+- PATCH /faculty-bio-system/conferences/{id}
+- DELETE /faculty-bio-system/conferences/{id}
+
+Consultation CRUD:
+- POST /faculty-bio-system/consultations
+- PATCH /faculty-bio-system/consultations/{id}
+- DELETE /faculty-bio-system/consultations/{id}
+
+IMPORTANT
+- Reuse these exact endpoints for Flutter.
+- Do not introduce duplicate /mobile/* routes.
+
+FLUTTER REPOSITORY CONTRACTS (RECOMMENDED)
+- FacultyDashboardRepository
+  fetchFacultyDashboard(uid)
+  fetchFacultyCourses(uid)
+  fetchFacultyStats()
+  fetchFacultyNotices(limit)
+
+- FacultyBioRepository
+  fetchFullProfile(facultyId)
+  createPublication(payload)
+  updatePublication(id, payload)
+  deletePublication(id)
+  createAward(payload)
+  updateAward(id, payload)
+  deleteAward(id)
+  createConference(payload)
+  updateConference(id, payload)
+  deleteConference(id)
+  createConsultation(payload)
+  updateConsultation(id, payload)
+  deleteConsultation(id)
+
+RESPONSIVE EXECUTION SPEC (PIXEL-PARITY GUIDELINE)
+- Faculty dashboard cards:
+  Phone: stacked cards, one column.
+  Tablet portrait: two columns.
+  Tablet landscape: 2/1 split similar to web desktop grouping.
+- Faculty bio tabs:
+  Phone: scrollable tabs with pinned action button.
+  Tablet: tabs + wider data cards and two-column section groups where possible.
+- Dialog-heavy web flows:
+  On phone, use full-screen modal pages/sheets.
+  On tablet, use centered dialogs similar to web behavior.
+
+SPRINT-WISE DELIVERY PLAN
+Sprint 1 (3-4 days): Foundation
+- Implement shared API client, interceptors, auth refresh, role guards.
+- Define DTOs for dashboard and faculty-bio endpoints.
+- Setup responsive design tokens and common widgets.
+
+Sprint 2 (4-5 days): Dashboard parity
+- Build FacultyHeader, StatsGrid, TodaySchedule, CoursesGrid, QuickActions.
+- Wire all dashboard widgets to live API via repositories/providers.
+- Verify exact navigation actions (/timetable, /courses, /attendance, /noticeboard).
+
+Sprint 3 (5-6 days): Faculty bio parity
+- Build overview + all CRUD tabs.
+- Add create/edit/delete flows with server validation handling.
+- Match owner/admin edit permissions with backend-driven logic.
+
+Sprint 4 (3-4 days): Hardening
+- Add loading/empty/error states matching web semantics.
+- Add widget tests + integration tests for faculty critical paths.
+- Run responsive QA on compact phone, normal phone, and tablet.
+
+DEFINITION OF DONE (ENGINEERING)
+- Flutter Faculty_App dashboard and faculty-bio flows are feature-equivalent to web.
+- API request/response payloads are identical in semantics to web usage.
+- No mobile-specific backend routes created.
+- Auth/refresh/logout flows work with same backend tokens.
+- Role checks enforced by backend and mirrored in client routing.
+- Responsive acceptance passes on at least 3 device widths.
+
+DEFINITION OF DONE (PRODUCT)
+- A faculty user can log in, view dashboard stats/schedule/notices, and perform faculty-bio CRUD entirely from Flutter.
+- Data visible on Flutter and Next.js for the same faculty account is consistent.
+- No regressions introduced for Next.js clients after mobile integration.
+
+END OF PLAN

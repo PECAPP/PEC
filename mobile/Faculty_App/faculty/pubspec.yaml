@@ -1,7 +1,7 @@
 name: faculty
-description: "A new Flutter project."
+description: PEC Campus ERP — Faculty mobile app for Android and iOS.
 publish_to: 'none'
-version: 0.1.0+1
+version: 1.0.0+1
 
 environment:
   sdk: ^3.11.1
@@ -9,6 +9,42 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # HTTP & Networking
+  dio: ^5.7.0
+  connectivity_plus: ^6.0.5
+  socket_io_client: ^2.0.3+1
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # Routing
+  go_router: ^14.2.7
+
+  # Local Storage
+  hive_flutter: ^1.1.0
+  hive: ^2.2.3
+
+  # Media
+  qr_flutter: ^4.1.0
+  image_picker: ^1.1.2
+  cached_network_image: ^3.4.1
+
+  # UI & Design
+  google_fonts: ^6.2.1
+  shimmer: ^3.0.0
+  fl_chart: ^0.69.0
+  intl: ^0.19.0
+
+  # Utilities
+  path_provider: ^2.1.4
+  url_launcher: ^6.3.1
+  package_info_plus: ^8.1.1
+  flutter_dotenv: ^5.2.1
+  equatable: ^2.0.7
+  share_plus: ^10.0.2
+  timeago: ^3.7.0
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +53,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - .env
