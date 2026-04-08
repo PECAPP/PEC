@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../shared/providers/biometric_provider.dart';
 import '../../../../shared/providers/theme_provider.dart';
 import '../../../../shared/widgets/pec_card.dart';
 
@@ -109,13 +110,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           // Security
           _SectionHeader(title: 'SECURITY'),
           const SizedBox(height: AppDimensions.sm),
-          PecCard(
-            child: _SettingsRow(
-              icon: Icons.fingerprint,
-              label: 'Biometric Unlock',
-              trailing: _ComingSoonBadge(),
-            ),
-          ),
+          _BiometricRow(),
           const SizedBox(height: AppDimensions.lg),
 
           // About
@@ -200,6 +195,51 @@ class _Divider extends StatelessWidget {
       child: Divider(
           height: 1,
           color: AppColors.white.withValues(alpha: 0.1)),
+    );
+  }
+}
+
+class _BiometricRow extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final available = ref.watch(biometricAvailableProvider);
+    final enabled = ref.watch(biometricPreferenceProvider);
+
+    return PecCard(
+      child: _SettingsRow(
+        icon: Icons.fingerprint,
+        label: 'Biometric Unlock',
+        trailing: available.when(
+          data: (isAvailable) => isAvailable
+              ? Switch(
+                  value: enabled,
+                  onChanged: (_) async {
+                    // Require a successful auth before enabling
+                    if (!enabled) {
+                      final notifier =
+                          ref.read(appLockProvider.notifier);
+                      final ok = await notifier.tryUnlock();
+                      if (!ok) return;
+                    }
+                    ref
+                        .read(biometricPreferenceProvider.notifier)
+                        .toggle();
+                  },
+                  activeColor: AppColors.yellow,
+                )
+              : Text(
+                  'NOT AVAILABLE',
+                  style: AppTextStyles.caption
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+          loading: () => const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          error: (_, __) => _ComingSoonBadge(),
+        ),
+      ),
     );
   }
 }

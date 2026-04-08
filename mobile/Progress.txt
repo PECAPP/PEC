@@ -1,8 +1,8 @@
 ================================================================================
          PEC CAMPUS ERP — FLUTTER APP IMPLEMENTATION PROGRESS
 ================================================================================
-Last Updated : 2026-04-04
-Current Phase: PHASE 2 — CORE ACADEMIC FEATURES (in progress)
+Last Updated : 2026-04-08
+Current Phase: PHASE 6 — POLISH & RELEASE (in progress)
 Flutter       : 3.41.3 | Dart 3.11.1
 Backend Target: http://10.0.2.2:8000 (configurable via .env / dart-define)
 
@@ -293,18 +293,63 @@ PHASE 5 — STUDENT PROFILE & ADVANCED  [✓ COMPLETE]
        [✓] App version via package_info_plus
 
 ================================================================================
-PHASE 6 — POLISH & RELEASE  [✗ NOT STARTED]
+PHASE 6 — POLISH & RELEASE  [~] IN PROGRESS
 ================================================================================
 
-  [ ] Offline support — TTL Hive cache, connectivity banner, mutation queue
-  [ ] Biometric unlock — local_auth FaceID/Fingerprint/PIN
-  [ ] Performance — compute() isolates for PDF, image cache audit
-  [ ] Accessibility — Semantics labels, WCAG AA contrast
-  [ ] Widget tests — PecCard/PecButton golden, LoginScreen form, Dashboard render
-  [ ] Integration tests — login flow, QR scan, chat send/receive
-  [ ] Android release — keystore, appbundle, Play Console
-  [ ] iOS release — cert, provisioning profile, TestFlight
-  [ ] CI/CD — GitHub Actions (analyze + test on PR, build on merge)
+  [✓] Offline support
+       [✓] connectivityStreamProvider — wraps connectivity_plus stream
+       [✓] isOnlineProvider — boolean convenience (true = any non-none result)
+       [✓] ConnectivityBanner widget — animated slide-down red banner when offline
+            Wired in MaterialApp.builder (app-wide, zero per-screen work)
+       [~] Mutation queue — deferred; Hive TTL cache already handles stale reads
+            Full offline queue (write-behind) deferred to post-launch iteration
+
+  [✓] Biometric unlock
+       [✓] BiometricService — LocalAuthentication wrapper (isAvailable, authenticate)
+       [✓] biometricPreferenceProvider — Hive-persisted on/off preference
+       [✓] biometricAvailableProvider — FutureProvider (hardware capability)
+       [✓] AppLockNotifier — lock() on pause, tryUnlock() on resume
+       [✓] BiometricLockOverlay widget — full-screen lock screen with UNLOCK button
+            Wired in MaterialApp.builder (wraps ConnectivityBanner)
+       [✓] SettingsScreen — biometric row now shows live Switch (not SOON badge)
+            Requires successful biometric auth to enable; falls back to
+            "NOT AVAILABLE" text if hardware not present
+
+  [~] Performance
+       [~] PDF compute() isolates — deferred (pdf package handles in isolate internally)
+       [~] Image cache audit — CachedNetworkImage defaults are sufficient for now
+
+  [✗] Accessibility — Semantics labels, WCAG AA contrast check
+
+  [✓] Widget tests
+       [✓] test/widget/pec_card_test.dart — renders child, border/shadow, onTap, colors
+       [✓] test/widget/pec_button_test.dart — label, loading state, onPressed,
+            disabled, fullWidth, outlined, prefix icon
+       [✓] test/widget/login_screen_test.dart — fields render, SIGN IN button,
+            forgot password, typing, password toggle, dark background
+       [✓] test/widget/dashboard_render_test.dart — renders without crash,
+            greeting with user name (uses auth provider override)
+
+  [✓] Integration tests
+       [✓] test/integration/login_flow_test.dart — cold-start check, email entry,
+            SIGN IN tap, splash transition
+       [~] QR scan integration test — deferred (requires physical device + camera)
+       [~] Chat send/receive integration test — deferred (requires live Socket.IO)
+
+  [✓] CI/CD — .github/workflows/flutter_ci.yml
+       [✓] Triggers: push/PR to main|develop|feat/**|fix/**|chore/** on mobile/ paths
+       [✓] analyze job — dart format + flutter analyze (ubuntu, fast)
+       [✓] test job — flutter test test/widget/ + test/unit/ with coverage upload
+       [✓] build-android job — appbundle --release, keystore from secrets (main only)
+       [✓] build-ios job — --no-codesign build for CI validation (main only, macos runner)
+
+  [✗] Android release — keystore signing setup, Play Console upload
+       Prerequisites: KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+       secrets added in GitHub repo settings before CI build will produce signed AAB.
+
+  [✗] iOS release — cert + provisioning profile, TestFlight
+       Prerequisites: Apple Developer account, cert + profile secrets in CI.
+       Current CI produces unsigned build for validation only.
 
 ================================================================================
 OPEN ITEMS (must resolve before features can be tested end-to-end)
@@ -349,11 +394,17 @@ Phase 3 Status : ████████████████████ 10
 Phase 4 Status : ████████████████████ 100% complete
                   Canteen (menu+cart+orders), Room booking, Hostel Issues
                   (raise+track+image), Campus Map (OSM + GeoJSON polygons).
-Phase 5 Status : ░░░░░░░░░░░░░░░░░░░░  0% — not started
-Phase 6 Status : ░░░░░░░░░░░░░░░░░░░░  0% — not started
+Phase 5 Status : ████████████████████ 100% complete
+                  Onboarding wizard, Edit Profile, Resume Builder, Student
+                  Portfolio, Settings (theme toggle) — all implemented.
 
-Files created  : 70+ Dart source files
-Packages       : 194 resolved dependencies
+Phase 6 Status : ████████████░░░░░░░░  60% in progress
+                  Connectivity banner ✓  Biometric unlock ✓  Widget tests ✓
+                  Integration tests (partial) ✓  CI/CD ✓
+                  Remaining: Accessibility, Android release signing, iOS TestFlight
+
+Files created  : 130+ Dart source files
+Packages       : 195 resolved dependencies (integration_test added)
 Compile errors : 0 real errors (Windows path false-positives in analyzer only)
 
 ================================================================================
