@@ -472,7 +472,10 @@ class _CampusMapScreenState extends ConsumerState<CampusMapScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth >= 900;
-            final mapHeight = math.max(520.0, constraints.maxHeight - 160);
+            // Reserve space for header (compact = 2 rows ~100px, wide = 1 row ~56px),
+            // legend (~38px), hint (~32px), and vertical padding (32px).
+            final headerReserve = isWide ? 158.0 : 202.0;
+            final mapHeight = math.max(340.0, constraints.maxHeight - headerReserve);
             final panelWidth = math.min(constraints.maxWidth, 1280.0);
             final fitScale = math.min(
               panelWidth / _canvasSize.width,
@@ -684,7 +687,16 @@ class _HeaderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = Row(
+    final controls = _TopActionGroup(
+      is3D: is3D,
+      zoomLabel: zoomLabel,
+      onToggle3D: onToggle3D,
+      onZoomOut: onZoomOut,
+      onZoomIn: onZoomIn,
+      compact: !isWide,
+    );
+
+    final titleRow = Row(
       children: [
         Container(
           width: 22,
@@ -693,8 +705,7 @@ class _HeaderRow extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.yellow, width: 2),
           ),
-          child: const Icon(Icons.place_outlined,
-              size: 12, color: AppColors.yellow),
+          child: const Icon(Icons.place_outlined, size: 12, color: AppColors.yellow),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -718,35 +729,20 @@ class _HeaderRow extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 12),
-        _TopActionGroup(
-          is3D: is3D,
-          zoomLabel: zoomLabel,
-          onToggle3D: onToggle3D,
-          onZoomOut: onZoomOut,
-          onZoomIn: onZoomIn,
-        ),
+        if (isWide) ...[const SizedBox(width: 12), controls],
       ],
     );
 
-    if (isWide) return content;
+    if (isWide) return titleRow;
 
+    // Mobile: title row on top, controls bar pinned to the right below.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        content,
-        const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerRight,
-          child: _TopActionGroup(
-            is3D: is3D,
-            zoomLabel: zoomLabel,
-            onToggle3D: onToggle3D,
-            onZoomOut: onZoomOut,
-            onZoomIn: onZoomIn,
-            compact: true,
-          ),
-        ),
+        titleRow,
+        const SizedBox(height: 10),
+        Align(alignment: Alignment.centerRight, child: controls),
       ],
     );
   }

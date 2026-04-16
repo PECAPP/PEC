@@ -111,6 +111,7 @@ class _CourseDropdown extends StatelessWidget {
     return Container(
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 12),
+      constraints: const BoxConstraints(minWidth: 140, maxWidth: 260),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.borderDark),
         borderRadius: BorderRadius.circular(AppDimensions.borderRadiusMd),
@@ -118,9 +119,10 @@ class _CourseDropdown extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: selected?.id,
+          isExpanded: true,
           dropdownColor: AppColors.cardDark,
           style: AppTextStyles.labelMedium.copyWith(color: AppColors.textPrimary),
-          hint: Text('Select course', style: AppTextStyles.labelMedium),
+          hint: Text('Select course', style: AppTextStyles.labelMedium, overflow: TextOverflow.ellipsis),
           icon: const Icon(Icons.keyboard_arrow_down, size: 18, color: AppColors.textMuted),
           isDense: true,
           items: courses.map((c) => DropdownMenuItem(

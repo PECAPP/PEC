@@ -42,6 +42,9 @@ class ApiEndpoints {
   static const String timetable = '/timetable';
   static String timetableEntry(String id) => '/timetable/$id';
 
+  // Examinations
+  static const String examinations = '/examinations';
+
   // Course Materials
   static const String courseMaterials = '/course-materials';
   static String courseMaterial(String id) => '/course-materials/$id';
@@ -49,6 +52,13 @@ class ApiEndpoints {
   // Noticeboard
   static const String noticeboard = '/noticeboard';
   static String notice(String id) => '/noticeboard/$id';
+
+  // Finance
+  static const String financeFees = '/finance/fees';
+  static const String financeTransactions = '/finance/transactions';
+
+  // Marketplace
+  static const String marketplaceListings = '/marketplace/listings';
 
   // Notifications
   static const String notifications = '/notifications';
