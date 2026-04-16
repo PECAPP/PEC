@@ -5,6 +5,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/faculty_card.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
@@ -13,10 +14,7 @@ class HelpSupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('Help & Support', style: AppTextStyles.heading3),
-      ),
+      appBar: const FacultyTopNavBar(),
       body: ListView(
         padding: const EdgeInsets.all(AppDimensions.md),
         children: [

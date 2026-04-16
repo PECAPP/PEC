@@ -6,7 +6,12 @@ class HiveCache {
 
   static const _boxName = 'cache';
 
-  static Future<Box> _box() => Hive.openBox(_boxName);
+  static Future<Box> _box() {
+    if (Hive.isBoxOpen(_boxName)) {
+      return Future.value(Hive.box(_boxName));
+    }
+    return Hive.openBox(_boxName);
+  }
 
   static Future<void> put(
     String key,

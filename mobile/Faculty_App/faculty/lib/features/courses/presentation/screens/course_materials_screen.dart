@@ -10,6 +10,7 @@ import '../../../../shared/widgets/faculty_card.dart';
 import '../../../../shared/widgets/faculty_empty_state.dart';
 import '../../../../shared/widgets/faculty_error_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../providers/course_materials_provider.dart';
 
 class CourseMaterialsScreen extends ConsumerWidget {
@@ -28,14 +29,7 @@ class CourseMaterialsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text(courseName, style: AppTextStyles.heading3),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      appBar: const FacultyTopNavBar(),
       body: state.loading
           ? FacultyShimmer(
               child: ListView(

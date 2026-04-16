@@ -6,6 +6,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/faculty_card.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../../faculty_dashboard/presentation/providers/dashboard_provider.dart';
 
 class AttendanceScreen extends ConsumerWidget {
@@ -18,10 +19,7 @@ class AttendanceScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('Attendance', style: AppTextStyles.heading3),
-      ),
+      appBar: const FacultyTopNavBar(),
       body: ListView(
         padding: const EdgeInsets.all(AppDimensions.md),
         children: [

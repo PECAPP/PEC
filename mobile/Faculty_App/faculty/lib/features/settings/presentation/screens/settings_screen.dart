@@ -7,6 +7,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/providers/theme_provider.dart';
 import '../../../../shared/widgets/faculty_card.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -32,10 +33,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('Settings', style: AppTextStyles.heading3),
-      ),
+      appBar: const FacultyTopNavBar(),
       body: ListView(
         padding: const EdgeInsets.all(AppDimensions.md),
         children: [

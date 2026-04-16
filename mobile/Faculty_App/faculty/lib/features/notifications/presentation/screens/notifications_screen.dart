@@ -8,6 +8,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/faculty_empty_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 final _notificationsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
@@ -30,19 +31,7 @@ class NotificationsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('Notifications', style: AppTextStyles.heading3),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Mark all read (would need actual API call)
-              ref.invalidate(_notificationsProvider);
-            },
-            child: Text('Mark all read', style: AppTextStyles.labelMedium.copyWith(color: AppColors.gold)),
-          ),
-        ],
-      ),
+      appBar: const FacultyTopNavBar(),
       body: async.when(
         loading: () => FacultyShimmer(
           child: ListView(
@@ -58,9 +47,25 @@ class NotificationsScreen extends ConsumerWidget {
             ? const FacultyEmptyState(title: 'No notifications', icon: Icons.notifications_off_outlined)
             : ListView.separated(
                 padding: const EdgeInsets.all(AppDimensions.md),
-                itemCount: items.length,
-                separatorBuilder: (_, _) => Divider(color: AppColors.borderDark, height: 1),
-                itemBuilder: (_, i) => _NotificationRow(data: items[i]),
+                itemCount: items.length + 1,
+                separatorBuilder: (_, i) => i == 0
+                    ? const SizedBox(height: 8)
+                    : Divider(color: AppColors.borderDark, height: 1),
+                itemBuilder: (_, i) {
+                  if (i == 0) {
+                    return Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => ref.invalidate(_notificationsProvider),
+                        child: Text(
+                          'Mark all read',
+                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.gold),
+                        ),
+                      ),
+                    );
+                  }
+                  return _NotificationRow(data: items[i - 1]);
+                },
               ),
       ),
     );

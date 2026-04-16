@@ -7,6 +7,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/faculty_error_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../providers/dashboard_provider.dart';
 import '../widgets/courses_grid_card.dart';
 import '../widgets/faculty_header.dart';
@@ -25,30 +26,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [AppColors.gold, AppColors.goldDark]),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.school_rounded, color: AppColors.bgDark, size: 18),
-            ),
-            const SizedBox(width: 10),
-            Text('PEC Faculty', style: AppTextStyles.labelLarge.copyWith(fontSize: 16)),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: AppColors.textSecondary),
-            onPressed: () => context.go('/notifications'),
-          ),
-        ],
-      ),
+      appBar: const FacultyTopNavBar(),
       body: state.loading
           ? _buildShimmer()
           : state.error != null
