@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Configuration for the Faculty app.
+  Allows cleartext (HTTP) traffic to support local backend development.
+  For production, replace with HTTPS-only config and remove cleartextTrafficPermitted.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

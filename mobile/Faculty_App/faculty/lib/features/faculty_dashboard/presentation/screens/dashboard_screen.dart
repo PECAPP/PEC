@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/faculty_error_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
 import '../../../../shared/widgets/faculty_top_nav_bar.dart';

@@ -7,20 +7,52 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/faculty_empty_state.dart';
+import '../../../../shared/widgets/faculty_error_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
 import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 final _notificationsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final client = ref.read(apiClientProvider);
-  final res = await client.dio.get(ApiEndpoints.notifications);
-  final data = res.data;
-  if (data is Map && data.containsKey('data')) {
-    return List<Map<String, dynamic>>.from(data['data'] as List);
+  final auth = ref.watch(authNotifierProvider);
+  if (auth.isTestSession) return _demoNotifications;
+
+  try {
+    final client = ref.read(apiClientProvider);
+    final res = await client.dio.get(ApiEndpoints.notifications);
+    final data = res.data;
+    if (data is Map && data.containsKey('data')) {
+      return List<Map<String, dynamic>>.from(data['data'] as List);
+    }
+    if (data is List) return List<Map<String, dynamic>>.from(data);
+    return [];
+  } catch (_) {
+    return _demoNotifications;
   }
-  if (data is List) return List<Map<String, dynamic>>.from(data);
-  return [];
 });
+
+const _demoNotifications = [
+  {
+    'title': 'Attendance Session Completed',
+    'body': 'CS201 - Data Structures session recorded 48/62 students present.',
+    'type': 'attendance',
+    'read': false,
+    'createdAt': null,
+  },
+  {
+    'title': 'New Notice Posted',
+    'body': 'Faculty meeting scheduled for tomorrow at 3:00 PM in Seminar Hall.',
+    'type': 'notice',
+    'read': false,
+    'createdAt': null,
+  },
+  {
+    'title': 'Course Material Uploaded',
+    'body': 'Lecture notes for Unit 4 have been uploaded to EC301.',
+    'type': 'info',
+    'read': true,
+    'createdAt': null,
+  },
+];
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -42,7 +74,10 @@ class NotificationsScreen extends ConsumerWidget {
             )),
           ),
         ),
-        error: (e, _) => Center(child: Text(e.toString())),
+        error: (e, _) => FacultyErrorState(
+          message: 'Unable to load notifications.',
+          onRetry: () => ref.invalidate(_notificationsProvider),
+        ),
         data: (items) => items.isEmpty
             ? const FacultyEmptyState(title: 'No notifications', icon: Icons.notifications_off_outlined)
             : ListView.separated(

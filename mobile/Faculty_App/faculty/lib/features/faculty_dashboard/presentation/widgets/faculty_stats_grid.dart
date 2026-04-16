@@ -11,43 +11,60 @@ class FacultyStatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: AppDimensions.sm + 4,
-      mainAxisSpacing: AppDimensions.sm + 4,
-      childAspectRatio: 1.55,
-      children: [
-        _StatTile(
-          icon: Icons.book_outlined,
-          iconColor: AppColors.gold,
-          label: 'Active Courses',
-          value: '${stats.activeCount}',
-          sub: 'This semester',
-        ),
-        _StatTile(
-          icon: Icons.people_outline,
-          iconColor: AppColors.info,
-          label: 'Total Students',
-          value: '${stats.studentCount}',
-          sub: 'Across all courses',
-        ),
-        _StatTile(
-          icon: Icons.check_circle_outline,
-          iconColor: AppColors.success,
-          label: 'Avg Attendance',
-          value: '${stats.avgAttendance}%',
-          sub: 'This month',
-        ),
-        _StatTile(
-          icon: Icons.description_outlined,
-          iconColor: AppColors.warning,
-          label: 'Pending Reviews',
-          value: '${stats.pendingReviews}',
-          sub: 'Assignments to grade',
-        ),
-      ],
+    const gap = AppDimensions.sm + 4.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth = (constraints.maxWidth - gap) / 2;
+        final tiles = [
+          _StatTile(
+            icon: Icons.book_outlined,
+            iconColor: AppColors.gold,
+            label: 'Active Courses',
+            value: '${stats.activeCount}',
+            sub: 'This semester',
+          ),
+          _StatTile(
+            icon: Icons.people_outline,
+            iconColor: AppColors.info,
+            label: 'Total Students',
+            value: '${stats.studentCount}',
+            sub: 'Across all courses',
+          ),
+          _StatTile(
+            icon: Icons.check_circle_outline,
+            iconColor: AppColors.success,
+            label: 'Avg Attendance',
+            value: '${stats.avgAttendance}%',
+            sub: 'This month',
+          ),
+          _StatTile(
+            icon: Icons.description_outlined,
+            iconColor: AppColors.warning,
+            label: 'Pending Reviews',
+            value: '${stats.pendingReviews}',
+            sub: 'Assignments to grade',
+          ),
+        ];
+        return Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(width: cardWidth, child: tiles[0]),
+                const SizedBox(width: gap),
+                SizedBox(width: cardWidth, child: tiles[1]),
+              ],
+            ),
+            const SizedBox(height: gap),
+            Row(
+              children: [
+                SizedBox(width: cardWidth, child: tiles[2]),
+                const SizedBox(width: gap),
+                SizedBox(width: cardWidth, child: tiles[3]),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -73,6 +90,7 @@ class _StatTile extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimensions.md - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 36,
@@ -83,7 +101,7 @@ class _StatTile extends StatelessWidget {
             ),
             child: Icon(icon, color: iconColor, size: 18),
           ),
-          const Spacer(),
+          const SizedBox(height: 8),
           Text(value, style: AppTextStyles.heading2),
           const SizedBox(height: 2),
           Text(label, style: AppTextStyles.bodySmall),

@@ -325,7 +325,7 @@ class _RoleDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: selectedRole,
+      initialValue: selectedRole,
       dropdownColor: AppColors.cardDark,
       style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
       iconEnabledColor: AppColors.textMuted,
@@ -371,7 +371,7 @@ class _UsersMobileList extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(AppDimensions.md),
       itemCount: users.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.sm),
+      separatorBuilder: (_, _) => const SizedBox(height: AppDimensions.sm),
       itemBuilder: (_, i) {
         final user = users[i];
         final roleColor = _roleColor(user.role);
@@ -467,7 +467,7 @@ class _UsersTable extends StatelessWidget {
                 Expanded(
                   child: ListView.separated(
                     itemCount: users.length,
-                    separatorBuilder: (_, __) => Divider(color: AppColors.borderDark, height: 1),
+                    separatorBuilder: (_, _) => Divider(color: AppColors.borderDark, height: 1),
                     itemBuilder: (_, i) {
                       final user = users[i];
                       final roleColor = _roleColor(user.role);

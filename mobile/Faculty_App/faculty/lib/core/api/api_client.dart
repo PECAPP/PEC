@@ -16,18 +16,7 @@ class ApiClient {
     var url = raw.trim();
     if (url.isEmpty) return url;
 
-    final isAndroid = defaultTargetPlatform == TargetPlatform.android;
-
-    // Emulator host mapping:
-    // Android emulator cannot use localhost of host machine.
-    if (isAndroid && url.contains('localhost')) {
-      url = url.replaceAll('localhost', '10.0.2.2');
-    }
-    if (!isAndroid && url.contains('10.0.2.2')) {
-      url = url.replaceAll('10.0.2.2', 'localhost');
-    }
-
-    // Backend exposes routes under /api/*
+    // Append /api suffix if not already present.
     if (!url.endsWith('/api')) {
       url = '${url.replaceAll(RegExp(r'/$'), '')}/api';
     }
@@ -44,10 +33,8 @@ class ApiClient {
     final envBaseUrl = dotenv.maybeGet('API_BASE_URL')?.trim() ?? '';
     if (envBaseUrl.isNotEmpty) return _normalizeBaseUrl(envBaseUrl);
 
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:4000/api';
-    }
-    return 'http://localhost:4000/api';
+    // Fallback — set API_BASE_URL in .env for real device usage.
+    return 'http://10.0.2.2:4000/api';
   }
 
   ApiClient(this._tokenStorage) {

@@ -39,18 +39,18 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
       items: [
         _DrawerNavItem(label: 'Courses', icon: Icons.menu_book_outlined, route: '/courses'),
         _DrawerNavItem(label: 'Timetable', icon: Icons.calendar_view_week_outlined, route: '/timetable'),
-        _DrawerNavItem(label: 'Academic Calendar', icon: Icons.event_note_outlined),
-        _DrawerNavItem(label: 'Examinations', icon: Icons.fact_check_outlined),
+        _DrawerNavItem(label: 'Academic Calendar', icon: Icons.event_note_outlined, route: '/academic-calendar'),
+        _DrawerNavItem(label: 'Examinations', icon: Icons.fact_check_outlined, route: '/examinations'),
         _DrawerNavItem(label: 'Attendance', icon: Icons.how_to_reg_outlined, route: '/attendance'),
-        _DrawerNavItem(label: 'Course Materials', icon: Icons.folder_open_outlined),
+          _DrawerNavItem(label: 'Course Materials', icon: Icons.folder_open_outlined, route: '/course-materials'),
       ],
     ),
     _DrawerSection(
       title: 'Campus',
       items: [
-        _DrawerNavItem(label: 'Finance', icon: Icons.account_balance_wallet_outlined),
-        _DrawerNavItem(label: 'Buy & Sell', icon: Icons.storefront_outlined),
-        _DrawerNavItem(label: 'Campus Map', icon: Icons.map_outlined),
+        _DrawerNavItem(label: 'Finance', icon: Icons.account_balance_wallet_outlined, route: '/finance'),
+        _DrawerNavItem(label: 'Buy & Sell', icon: Icons.storefront_outlined, route: '/buy-sell'),
+        _DrawerNavItem(label: 'Campus Map', icon: Icons.map_outlined, route: '/campus-map'),
       ],
     ),
     _DrawerSection(
