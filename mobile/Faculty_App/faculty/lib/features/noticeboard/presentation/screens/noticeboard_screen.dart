@@ -11,6 +11,7 @@ import '../../../../shared/widgets/faculty_card.dart';
 import '../../../../shared/widgets/faculty_empty_state.dart';
 import '../../../../shared/widgets/faculty_error_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 final _noticesProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
@@ -32,10 +33,7 @@ class NoticeboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('Noticeboard', style: AppTextStyles.heading3),
-      ),
+      appBar: const FacultyTopNavBar(),
       body: noticesAsync.when(
         loading: () => FacultyShimmer(
           child: ListView(

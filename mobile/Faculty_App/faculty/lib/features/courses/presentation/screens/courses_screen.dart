@@ -9,6 +9,7 @@ import '../../../../shared/widgets/faculty_badge.dart';
 import '../../../../shared/widgets/faculty_card.dart';
 import '../../../../shared/widgets/faculty_empty_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../../faculty_dashboard/data/models/course_card_model.dart';
 import '../../../faculty_dashboard/presentation/providers/dashboard_provider.dart';
 
@@ -22,10 +23,7 @@ class CoursesScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('My Courses', style: AppTextStyles.heading3),
-      ),
+      appBar: const FacultyTopNavBar(),
       body: state.loading
           ? FacultyShimmer(
               child: ListView(

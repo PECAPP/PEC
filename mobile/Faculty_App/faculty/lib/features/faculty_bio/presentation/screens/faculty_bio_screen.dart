@@ -10,6 +10,7 @@ import '../../../../shared/widgets/faculty_card.dart';
 import '../../../../shared/widgets/faculty_empty_state.dart';
 import '../../../../shared/widgets/faculty_error_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../data/models/publication_model.dart';
 import '../providers/bio_provider.dart';
 
@@ -42,52 +43,58 @@ class _FacultyBioScreenState extends ConsumerState<FacultyBioScreen>
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('Faculty Bio', style: AppTextStyles.heading3),
-        bottom: TabBar(
-          controller: _tabCtrl,
-          labelColor: AppColors.gold,
-          unselectedLabelColor: AppColors.textMuted,
-          indicatorColor: AppColors.gold,
-          indicatorSize: TabBarIndicatorSize.label,
-          tabs: [
-            _tab(Icons.book_outlined, 'Pubs', state.totalPublications),
-            _tab(Icons.emoji_events_outlined, 'Awards', state.totalAwards),
-            _tab(Icons.mic_outlined, 'Confs', state.totalConferences),
-            _tab(Icons.business_outlined, 'Consult', state.totalConsultations),
-          ],
-        ),
+      appBar: const FacultyTopNavBar(),
+      body: Column(
+        children: [
+          Container(
+            color: AppColors.bgDark,
+            child: TabBar(
+              controller: _tabCtrl,
+              labelColor: AppColors.gold,
+              unselectedLabelColor: AppColors.textMuted,
+              indicatorColor: AppColors.gold,
+              indicatorSize: TabBarIndicatorSize.label,
+              tabs: [
+                _tab(Icons.book_outlined, 'Pubs', state.totalPublications),
+                _tab(Icons.emoji_events_outlined, 'Awards', state.totalAwards),
+                _tab(Icons.mic_outlined, 'Confs', state.totalConferences),
+                _tab(Icons.business_outlined, 'Consult', state.totalConsultations),
+              ],
+            ),
+          ),
+          Expanded(
+            child: state.loading
+                ? FacultyShimmer(child: _shimmerList())
+                : state.error != null
+                    ? FacultyErrorState(message: state.error!, onRetry: () => ref.read(bioProvider.notifier).load())
+                    : TabBarView(
+                        controller: _tabCtrl,
+                        children: [
+                          _PublicationsTab(items: state.publications),
+                          _AwardsTab(items: state.awards),
+                          _ConferencesTab(
+                            items: state.conferences,
+                            onEdit: (item) => _showEditConferenceDialog(context, item),
+                            onDelete: (id) => _confirmDelete(
+                              context,
+                              title: 'Delete conference?',
+                              onConfirm: () => ref.read(bioProvider.notifier).deleteConference(id),
+                            ),
+                          ),
+                          _ConsultationsTab(
+                            items: state.consultations,
+                            onEdit: (item) => _showEditConsultationDialog(context, item),
+                            onDelete: (id) => _confirmDelete(
+                              context,
+                              title: 'Delete consultation?',
+                              onConfirm: () => ref.read(bioProvider.notifier).deleteConsultation(id),
+                            ),
+                          ),
+                        ],
+                      ),
+          ),
+        ],
       ),
-      body: state.loading
-          ? FacultyShimmer(child: _shimmerList())
-          : state.error != null
-              ? FacultyErrorState(message: state.error!, onRetry: () => ref.read(bioProvider.notifier).load())
-              : TabBarView(
-                  controller: _tabCtrl,
-                  children: [
-                    _PublicationsTab(items: state.publications),
-                    _AwardsTab(items: state.awards),
-                    _ConferencesTab(
-                      items: state.conferences,
-                      onEdit: (item) => _showEditConferenceDialog(context, item),
-                      onDelete: (id) => _confirmDelete(
-                        context,
-                        title: 'Delete conference?',
-                        onConfirm: () => ref.read(bioProvider.notifier).deleteConference(id),
-                      ),
-                    ),
-                    _ConsultationsTab(
-                      items: state.consultations,
-                      onEdit: (item) => _showEditConsultationDialog(context, item),
-                      onDelete: (id) => _confirmDelete(
-                        context,
-                        title: 'Delete consultation?',
-                        onConfirm: () => ref.read(bioProvider.notifier).deleteConsultation(id),
-                      ),
-                    ),
-                  ],
-                ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.gold,
         foregroundColor: AppColors.bgDark,

@@ -10,6 +10,7 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../shared/widgets/faculty_empty_state.dart';
 import '../../../../shared/widgets/faculty_shimmer.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 final _chatRoomsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
@@ -69,10 +70,7 @@ class ChatListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('Chat', style: AppTextStyles.heading3),
-      ),
+      appBar: const FacultyTopNavBar(),
       body: async.when(
         loading: () => FacultyShimmer(
           child: ListView(

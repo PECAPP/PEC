@@ -8,6 +8,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/faculty_card.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../../faculty_dashboard/presentation/providers/dashboard_provider.dart';
 
 class QrGenerateScreen extends ConsumerStatefulWidget {
@@ -74,10 +75,7 @@ class _QrGenerateScreenState extends ConsumerState<QrGenerateScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
-        title: Text('QR Attendance', style: AppTextStyles.heading3),
-      ),
+      appBar: const FacultyTopNavBar(),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppDimensions.lg),

@@ -241,7 +241,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 }
 
-class _InputField extends StatelessWidget {
+class _InputField extends StatefulWidget {
   final TextEditingController controller;
   final String hint;
   final IconData icon;
@@ -261,35 +261,89 @@ class _InputField extends StatelessWidget {
   });
 
   @override
+  State<_InputField> createState() => _InputFieldState();
+}
+
+class _InputFieldState extends State<_InputField> {
+  late final FocusNode _focusNode;
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode()
+      ..addListener(() {
+        if (mounted) {
+          setState(() => _isFocused = _focusNode.hasFocus);
+        }
+      });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
-        color: AppColors.surfaceDark,
-        borderRadius: BorderRadius.circular(AppDimensions.borderRadiusMd),
-        border: Border.all(color: AppColors.borderDark),
+        color: _isFocused
+            ? AppColors.cardHoverDark.withValues(alpha: 0.95)
+            : AppColors.surfaceDark,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: _isFocused
+              ? AppColors.gold.withValues(alpha: 0.55)
+              : AppColors.borderDark,
+          width: _isFocused ? 1.3 : 1,
+        ),
+        boxShadow: _isFocused
+            ? [
+                BoxShadow(
+                  color: AppColors.gold.withValues(alpha: 0.12),
+                  blurRadius: 16,
+                  spreadRadius: 0.5,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : const [],
       ),
       child: Row(
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 14),
-            child: Icon(icon, color: AppColors.textMuted, size: 20),
+            child: AnimatedScale(
+              scale: _isFocused ? 1.05 : 1,
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              child: Icon(
+                widget.icon,
+                color: _isFocused ? AppColors.gold : AppColors.textMuted,
+                size: 20,
+              ),
+            ),
           ),
           Expanded(
             child: TextField(
-              controller: controller,
-              obscureText: obscure,
-              keyboardType: keyboardType,
-              onSubmitted: onSubmitted,
+              controller: widget.controller,
+              focusNode: _focusNode,
+              obscureText: widget.obscure,
+              keyboardType: widget.keyboardType,
+              onSubmitted: widget.onSubmitted,
               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
               decoration: InputDecoration(
-                hintText: hint,
+                hintText: widget.hint,
                 hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textMuted),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
             ),
           ),
-          ?suffix,
+          if (widget.suffix != null) widget.suffix!,
         ],
       ),
     );

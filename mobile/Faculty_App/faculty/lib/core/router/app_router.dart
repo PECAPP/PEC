@@ -19,6 +19,7 @@ import '../../features/notifications/presentation/screens/notifications_screen.d
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/timetable/presentation/screens/timetable_screen.dart';
+import '../../features/users/presentation/screens/users_screen.dart';
 import '../../shared/widgets/app_scaffold.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -48,6 +49,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state, child) => AppScaffold(child: child),
         routes: [
           GoRoute(path: '/dashboard', builder: (_, _) => const DashboardScreen()),
+          GoRoute(path: '/users', builder: (_, _) => const UsersScreen()),
           GoRoute(
             path: '/courses',
             builder: (_, _) => const CoursesScreen(),

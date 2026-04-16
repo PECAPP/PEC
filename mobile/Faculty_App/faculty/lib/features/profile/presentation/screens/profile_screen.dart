@@ -6,6 +6,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../shared/widgets/faculty_card.dart';
+import '../../../../shared/widgets/faculty_top_nav_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -17,6 +18,7 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
+      appBar: const FacultyTopNavBar(),
       body: CustomScrollView(
         slivers: [
           // ── Profile Header ──
@@ -24,7 +26,7 @@ class ProfileScreen extends ConsumerWidget {
             child: Container(
               padding: EdgeInsets.fromLTRB(
                 AppDimensions.lg,
-                MediaQuery.of(context).padding.top + 24,
+                24,
                 AppDimensions.lg,
                 AppDimensions.xl,
               ),
