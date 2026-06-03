@@ -13,7 +13,7 @@ export declare const authContract: {
             email: string;
             password: string;
         }>;
-        path: "/auth/login";
+        path: "/api/auth/login";
         responses: {
             200: z.ZodObject<{
                 user: z.ZodObject<{
@@ -78,7 +78,7 @@ export declare const authContract: {
             password: string;
             role?: "student" | "faculty" | "college_admin" | undefined;
         }>;
-        path: "/auth/signup";
+        path: "/api/auth/signup";
         responses: {
             201: z.ZodObject<{
                 user: z.ZodObject<{
