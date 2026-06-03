@@ -62,9 +62,12 @@ export function MarketplaceCard({
           api.get('/marketplace/listings?limit=4&sortBy=createdAt&sortOrder=desc'),
           api.get('/marketplace/bookmarks/ids'),
         ]);
-        setListings((listingsRes as any).data ?? []);
-        const ids = (savedRes as any).data ?? [];
-        setSavedCount(Array.isArray(ids) ? ids.length : 0);
+        const rawListings = (listingsRes as any).data;
+        setListings(Array.isArray(rawListings) ? rawListings : (rawListings?.data ?? []));
+        
+        const rawIds = (savedRes as any).data;
+        const ids = Array.isArray(rawIds) ? rawIds : (rawIds?.data ?? []);
+        setSavedCount(ids.length);
       } catch {
         // silent
       } finally {
@@ -91,23 +94,22 @@ export function MarketplaceCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn('card-elevated ui-card-pad space-y-4', className)}
+      className={cn('card-elevated ui-card-pad flex h-full flex-col', className)}
     >
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-orange-500/10">
-            <ShoppingBag className="w-4 h-4 text-orange-600" />
-          </div>
-          <h3 className="font-semibold text-sm">Buy & Sell</h3>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+          <ShoppingBag className="h-5 w-5 text-orange-500" />
+          Buy & Sell
           {savedCount > 0 && (
-            <Badge variant="outline" className="text-[10px] h-5 gap-1">
-              <Heart className="w-2.5 h-2.5" /> {savedCount} saved
+            <Badge variant="outline" className="ml-2 text-[10px] h-5 gap-1 bg-background/40">
+              <Heart className="w-2.5 h-2.5 text-red-500" /> {savedCount}
             </Badge>
           )}
-        </div>
-        <Button variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={onViewAll}>
-          View all <ArrowRight className="w-3 h-3 ml-1" />
+        </h2>
+        <Button variant="ghost" size="sm" onClick={onViewAll}>
+          View All
+          <ArrowRight className="ml-1 h-4 w-4" />
         </Button>
       </div>
 
@@ -117,7 +119,7 @@ export function MarketplaceCard({
           {listings.map((listing) => (
             <div
               key={listing.id}
-              className="group relative border rounded-lg overflow-hidden cursor-pointer hover:border-primary/40 transition-colors"
+              className="group relative border border-border bg-secondary/10 rounded-lg overflow-hidden cursor-pointer hover:bg-secondary/20 hover:border-primary/40 transition-colors"
               onClick={onViewAll}
             >
               {/* Image */}
@@ -165,16 +167,16 @@ export function MarketplaceCard({
         </div>
       )}
 
-      {/* Quick action */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full text-xs"
-        onClick={onCreateListing}
-      >
-        <Plus className="w-3.5 h-3.5 mr-1.5" />
-        Sell something
-      </Button>
+      <div className="mt-auto pt-4">
+        {/* Quick action */}
+        <Button
+          className="w-full h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+          onClick={onCreateListing}
+        >
+          <Plus className="w-4 h-4" />
+          Sell something
+        </Button>
+      </div>
     </motion.div>
   );
 }

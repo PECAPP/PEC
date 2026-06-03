@@ -365,4 +365,28 @@ export async function seedMarketplace(students: StudentSeed[] = []) {
   }
 
   console.log(`  ✓ Created ${created} marketplace listings`);
+
+  // Seed some chats
+  const listings = await prisma.marketplaceListing.findMany({ take: 5, orderBy: { createdAt: 'desc' } });
+  let chatsCreated = 0;
+  for (const listing of listings) {
+    const buyer = studentPool.find(s => s.id !== listing.sellerId);
+    if (!buyer) continue;
+
+    const chat = await prisma.marketplaceChat.create({
+      data: {
+        listingId: listing.id,
+        buyerId: buyer.id,
+      }
+    });
+
+    await prisma.marketplaceMessage.createMany({
+      data: [
+        { chatId: chat.id, senderId: buyer.id, text: 'Hi, is this still available?' },
+        { chatId: chat.id, senderId: listing.sellerId, text: 'Yes, it is. Are you on campus?' },
+      ]
+    });
+    chatsCreated++;
+  }
+  console.log(`  ✓ Created ${chatsCreated} marketplace chats`);
 }
