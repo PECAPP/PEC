@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { Camera } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface StudentProfileSummary {
   enrollmentNumber?: string | null;
@@ -13,10 +12,9 @@ interface StudentProfileSummary {
 interface Props {
   firstName: string;
   profileData: StudentProfileSummary | null;
-  onShowScanner: () => void;
 }
 
-export function StudentWelcomeHeader({ firstName, profileData, onShowScanner }: Props) {
+export function StudentWelcomeHeader({ firstName, profileData }: Props) {
   const getTimePeriod = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -50,17 +48,6 @@ export function StudentWelcomeHeader({ firstName, profileData, onShowScanner }: 
         </div>
       </div>
       
-      <div className="flex items-center gap-3 z-10 shrink-0">
-        <Button 
-          onClick={onShowScanner} 
-          variant="gradient" 
-          size="lg"
-          className="w-full md:w-auto px-8 font-bold tracking-tight rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-0.5"
-        >
-          <Camera className="mr-2 h-5 w-5" />
-          Mark Attendance
-        </Button>
-      </div>
     </motion.div>
   );
 }

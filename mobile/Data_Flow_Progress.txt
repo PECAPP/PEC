@@ -1,0 +1,281 @@
+================================================================================
+       PEC CAMPUS ERP — DATA FLOW IMPLEMENTATION PROGRESS CHECKLIST
+       Upload → Filter/Audit → API → Mobile
+================================================================================
+Last Updated : 2026-04-16
+Reference    : mobile/Data_Flow_Architecture.txt
+
+Legend:
+  [✓] DONE       — Fully implemented and verified
+  [~] PARTIAL    — Implemented but not complete; reason noted
+  [✗] NOT STARTED— Not yet implemented
+  [!] BLOCKED    — Cannot proceed; dependency noted
+
+================================================================================
+STAGE 1 — DATA UPLOAD LAYER
+================================================================================
+
+BACKEND UPLOAD ENDPOINTS (NestJS)
+  [✗] POST /course-materials          — File + metadata upload (faculty)
+  [✗] POST /grade-entries/bulk        — CSV grade import
+  [✗] POST /noticeboard               — Admin notice creation
+  [✗] POST /academic-calendar         — Admin calendar event
+  [✗] POST /timetable/sessions        — Admin timetable management
+  [✗] POST /fees/structure            — Admin fee updates
+  [✗] POST /examinations              — Admin exam scheduling
+  [✗] POST /attendance/sessions       — Faculty opens QR session
+
+PUBLISH STATE FIELD
+  [✗] publishState enum on every uploadable entity
+       (DRAFT / PENDING_REVIEW / PUBLISHED / REJECTED / ARCHIVED)
+  [✗] State transition logic in service layer
+  [✗] Admin-only transition guard for PUBLISHED / REJECTED
+
+FILE STORAGE
+  [✗] Object storage integration (S3 / MinIO) for file uploads
+  [✗] File type whitelist validation (PDF, DOCX, XLSX, MP4, PNG, JPG)
+  [✗] File size limit enforcement (configurable per entity type)
+  [✗] Virus / malware scan hook (optional — mark as post-launch)
+
+FACULTY_APP — UPLOAD FROM MOBILE
+  [✗] Course material upload screen (file picker + metadata form)
+  [~] Attendance session creation — QR generation screen exists in Faculty_App
+       but is not connected to POST /attendance/sessions backend endpoint
+  [✗] Grade entry update form (PUT /grade-entries/:id)
+  [✗] PENDING badge on submitted content awaiting admin review
+  [✗] audit:approved WebSocket handler → remove PENDING badge
+
+================================================================================
+STAGE 2 — BACKEND PROCESSING
+================================================================================
+
+AUTH & ROLE GUARDS
+  [✓] JWT guard on all protected endpoints (NestJS)
+  [✓] Role-based access control (RBAC) decorator per endpoint
+  [✓] Token refresh rotation (access + refresh tokens)
+  [✓] Auth interceptor in Flutter apps (attaches token, handles 401 → refresh)
+
+DTO VALIDATION
+  [✓] class-validator on all POST/PUT DTOs
+  [✓] Validation error response follows standard error envelope
+  [✓] Flutter apps display backend validation messages inline
+
+AUDIT LOG
+  [✗] audit_logs table in Prisma schema
+  [✗] AuditLogService — append-only writes (no delete endpoint)
+  [✗] Fields: actor_id, actor_role, entity_type, entity_id, action,
+               payload_hash, ip_address, created_at
+  [✗] Audit write triggered in every service method that mutates data
+  [✗] Admin approval/rejection also logged in audit trail
+
+DATA STATE MACHINE
+  [✗] publishState transitions wired in each domain service
+  [✗] GET endpoints filter by publishState = PUBLISHED for non-admin roles
+  [✗] Rejection note field returned to uploader on REJECTED state
+  [✗] ARCHIVED state auto-trigger (cron job for past calendar events / exams)
+
+BACKGROUND JOBS
+  [✗] CGPA recomputation job triggered after grade batch approval
+  [✗] Notification dispatch job triggered after admin publishes a notice
+  [✗] Cron-based reminder jobs (fee due, exam upcoming)
+  [✗] Bulk CSV import validation and error report generation
+
+================================================================================
+STAGE 3 — WEB APP: FILTER & AUDIT LAYER (NEXT.JS)
+================================================================================
+
+ADMIN AUDIT DASHBOARD (/admin/audit)
+  [✗] Pending review queue view (grouped by entity type)
+  [✗] Detail view: full content, uploader, timestamp, payload
+  [✗] Approve action → sets publishState = PUBLISHED
+  [✗] Reject action → dialog for rejection note → sets REJECTED
+  [✗] Edit-and-approve inline flow
+  [✗] Audit history: filterable log (by actor / type / date range)
+  [✗] Role breakdown: student-targeted vs faculty-targeted content counts
+
+FACULTY UPLOAD PORTAL (/faculty/upload)
+  [✗] Upload forms per content type (material, grade, consultation)
+  [✗] Submission status tracker (DRAFT / PENDING / PUBLISHED / REJECTED)
+  [✗] Rejection note displayed inline with resubmit option
+
+STUDENT VIEW FILTERING (Next.js pages)
+  [~] Student pages exist but may not enforce publishState = PUBLISHED filter
+       Check each data-fetching call against backend scoping rules
+  [✗] Notice feed: enforce type = STUDENT or ALL filter
+  [✗] Course materials: restrict to enrolled courses only
+  [✗] Grades: own records only, not classmates
+
+FACULTY VIEW FILTERING (Next.js pages)
+  [✗] Notice feed: enforce type = FACULTY or ALL filter
+  [✗] Course materials: own courses for upload; all for reading
+  [✗] Grades: only courses faculty teaches
+  [✗] Attendance sessions: only sessions faculty created
+
+================================================================================
+STAGE 4 — API LAYER (SHARED CONTRACT)
+================================================================================
+
+RESPONSE ENVELOPE
+  [✗] Standardise all NestJS responses to:
+       { success, data, meta: { page, limit, total }, timestamp }
+  [✗] Standardise all error responses to:
+       { success: false, error: { code, message, fields }, timestamp }
+  [✓] Flutter API client parses typed response and maps errors to Failure types
+
+PAGINATION / SORTING / FILTERING
+  [~] Some endpoints support pagination; not all endpoints consistent
+  [✗] All list endpoints support: ?page, ?limit, ?sortBy, ?order, ?search
+  [✗] Flutter providers pass these params for paginated screens
+
+DATE / ID FORMATS
+  [✓] ISO-8601 date strings used in Flutter models (fromJson)
+  [✗] Confirm all NestJS endpoints return ISO-8601, not Unix timestamps
+  [✓] UUID strings used as IDs throughout Flutter models
+
+WEBSOCKET EVENTS
+  [✓] Socket.IO client in pec_app (WebSocketClient, auto-reconnect)
+  [~] Socket.IO client in Faculty_App — exists but not all events handled
+  [✗] chat:message — both apps: handled in ChatRoomScreen
+  [✗] notification:new — both apps: increment unread badge + list update
+  [✗] attendance:opened — pec_app: prompt student to scan QR
+  [✗] audit:approved — Faculty_App: remove PENDING badge on content
+  [✗] Server-side Socket.IO event emission in NestJS service layer
+
+RATE LIMITING
+  [✗] Per-user rate limiting on upload endpoints
+  [✗] Per-IP rate limiting on auth endpoints
+  [✗] Rate limit error (429) handled gracefully in Flutter and Next.js
+
+================================================================================
+STAGE 5 — FLUTTER MOBILE APPS
+================================================================================
+
+--- pec_app (STUDENT APP) ---
+
+READ FLOWS — PUBLISHED DATA ONLY
+  [~] Course materials screen — UI done; backend publishState filter not verified
+  [~] Noticeboard screen — UI done; student-scoped filter not verified against live API
+  [~] Exam list screen — UI done; published filter not verified
+  [~] Academic calendar — UI done; published filter not verified
+  [~] Score sheet — UI done; own-records filter not verified
+  [✓] Attendance history — student's own records (correct by design)
+  [✓] Timetable — department/section scoped (correct by design)
+
+WRITE FLOWS (student-allowed)
+  [✓] POST /attendance/mark — QR scan → mark present (wired)
+  [~] POST /canteen/orders — UI done; endpoint connection status unverified
+  [~] POST /rooms/bookings — UI done; endpoint connection status unverified
+  [~] POST /hostel-issues — UI done; endpoint connection status unverified
+  [✓] PATCH /users/me — edit profile wired
+
+REAL-TIME (pec_app)
+  [✓] Socket.IO client connected on login
+  [✗] notification:new event handler → badge + list update
+  [✗] attendance:opened event handler → QR scan prompt
+
+--- Faculty_App ---
+
+READ FLOWS
+  [~] Dashboard screen — UI done; not wired to live backend data
+  [~] Notifications screen — UI done; data source unverified
+  [~] Users screen — UI done; role-filtered list unverified
+  [✗] Course materials list (faculty view — own courses)
+  [✗] Attendance sessions list (own sessions)
+  [✗] Grade entries (courses faculty teaches)
+  [✗] Timetable (assigned sessions)
+
+WRITE / UPLOAD FLOWS (faculty-allowed)
+  [✗] POST /course-materials — file upload from Faculty_App
+  [✗] POST /attendance/sessions — open QR session from Faculty_App
+  [✗] PUT /grade-entries/:id — update grade draft
+  [✗] Upload status tracker (PENDING → PUBLISHED transition visible in app)
+
+REAL-TIME (Faculty_App)
+  [~] Socket.IO client — present but event handlers not confirmed
+  [✗] audit:approved event handler → toast + remove PENDING badge
+  [✗] notification:new event handler → badge + list update
+
+OFFLINE CACHE (both apps)
+  [✓] Hive boxes with TTL for timetable, courses, attendance, notices (pec_app)
+  [✗] Faculty_App offline cache (Hive / similar) — not yet implemented
+  [✗] Cache invalidation after write (optimistic update or provider refresh)
+  [✗] Reconnect reconciliation — refresh stale providers on connectivity restore
+
+================================================================================
+CROSS-CUTTING CONCERNS
+================================================================================
+
+SECURITY
+  [✓] JWT-based auth with refresh token rotation
+  [✓] Secure token storage (FlutterSecureStorage in both Flutter apps)
+  [✓] HTTPS required in production (config note in place)
+  [✗] CORS allow-list locked to Next.js origin + mobile app (no wildcard)
+  [✗] File upload type whitelist enforced in NestJS
+  [✗] Rate limiting on sensitive endpoints
+
+ENVIRONMENT CONFIG
+  [✓] API_BASE_URL configurable via --dart-define / .env in pec_app
+  [~] API_BASE_URL in Faculty_App — verify env config is implemented
+  [✗] Staging environment URL distinct from production
+  [✗] WebSocket URL (WS_URL) separately configurable
+
+TESTING
+  [✗] Upload flow: faculty uploads → admin reviews → student sees (E2E test)
+  [✗] Role filter test: student cannot fetch faculty-only notices via API
+  [✗] Audit log test: every state transition creates an audit_log row
+  [✗] publishState filter test: DRAFT / PENDING items not visible to students
+  [✗] WebSocket event integration test: audit:approved received by Faculty_App
+  [✓] Widget tests for pec_app shared components (PecCard, PecButton, Login)
+  [✓] Login flow integration test (pec_app)
+
+================================================================================
+IMPLEMENTATION PRIORITY ORDER
+================================================================================
+
+  Priority 1 — Backend foundation (unblocks everything else)
+    [ ] Add publishState + audit_logs to Prisma schema
+    [ ] Wire state machine in domain services
+    [ ] Add publishState filter to all GET list endpoints
+    [ ] Standardise response/error envelopes
+
+  Priority 2 — Admin audit web UI (unblocks content reaching students/faculty)
+    [ ] Build /admin/audit queue and detail view in Next.js
+    [ ] Approve/Reject actions with audit log write
+    [ ] Faculty upload portal with status tracker
+
+  Priority 3 — Faculty_App upload flows (closes the upload-from-mobile gap)
+    [ ] Course material upload screen
+    [ ] Attendance session creation wired to backend
+    [ ] PENDING badge + audit:approved WebSocket handler
+
+  Priority 4 — Role filter verification (confirms data scoping is correct)
+    [ ] Test each Flutter screen against live API with student + faculty accounts
+    [ ] Confirm publishState filter applied for student-facing screens
+    [ ] Confirm notice type scoping (STUDENT vs FACULTY vs ALL)
+
+  Priority 5 — Real-time events (improves live experience)
+    [ ] NestJS: emit notification:new, attendance:opened, audit:approved
+    [ ] pec_app: handle notification:new and attendance:opened
+    [ ] Faculty_App: handle audit:approved and notification:new
+
+  Priority 6 — Faculty_App offline cache and full data wiring
+    [ ] Add Hive TTL cache to Faculty_App
+    [ ] Wire all Faculty_App screens to live backend providers
+    [ ] Reconnect reconciliation in both apps
+
+================================================================================
+SUMMARY STATUS
+================================================================================
+
+  Stage 1 — Upload Layer       : [✗] NOT STARTED (backend endpoints needed)
+  Stage 2 — Backend Processing : [~] PARTIAL (auth/validation done; audit missing)
+  Stage 3 — Web Filter/Audit   : [✗] NOT STARTED (Next.js audit UI needed)
+  Stage 4 — API Contract       : [~] PARTIAL (client done; server envelope/WS gaps)
+  Stage 5 — Flutter Mobile     : [~] PARTIAL (pec_app ~70%; Faculty_App ~20%)
+
+  Overall Data Flow Completion : ~30%
+  Blocker                      : Prisma schema (publishState + audit_logs) not done
+
+================================================================================
+END OF PROGRESS CHECKLIST
+================================================================================

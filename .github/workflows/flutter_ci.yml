@@ -1,0 +1,172 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main, develop, 'feat/**', 'fix/**', 'chore/**']
+    paths:
+      - 'mobile/pec_app/**'
+      - '.github/workflows/flutter_ci.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'mobile/pec_app/**'
+
+defaults:
+  run:
+    working-directory: mobile/pec_app
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Analyze + format check (fast, no device needed)
+  # ─────────────────────────────────────────────────────────────────────────────
+  analyze:
+    name: Analyze & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Dart format check
+        run: dart format --output=none --set-exit-if-changed lib/ test/
+
+      - name: Flutter analyze
+        run: flutter analyze --no-fatal-infos
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Widget + unit tests
+  # ─────────────────────────────────────────────────────────────────────────────
+  test:
+    name: Widget & Unit Tests
+    runs-on: ubuntu-latest
+    needs: analyze
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Create stub .env
+        run: |
+          echo "API_BASE_URL=http://localhost:3000" > .env
+
+      - name: Run widget tests
+        run: flutter test test/widget/ --coverage
+
+      - name: Run unit tests
+        run: |
+          if [ -d "test/unit" ] && [ "$(ls -A test/unit)" ]; then
+            flutter test test/unit/ --coverage
+          else
+            echo "No unit tests yet — skipping"
+          fi
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: mobile/pec_app/coverage/lcov.info
+          flags: flutter
+          fail_ci_if_error: false
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Android release build (on merge to main only)
+  # ─────────────────────────────────────────────────────────────────────────────
+  build-android:
+    name: Android App Bundle
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Create stub .env
+        run: |
+          echo "API_BASE_URL=${{ secrets.API_BASE_URL || 'http://10.0.2.2:3000' }}" > .env
+
+      # Decode keystore from base64 secret (set KEYSTORE_BASE64 in repo secrets)
+      - name: Decode keystore
+        if: ${{ env.KEYSTORE_BASE64 != '' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/pec-release.jks
+
+      - name: Build App Bundle
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          flutter build appbundle --release \
+            --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL || 'http://10.0.2.2:3000' }}
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-${{ github.sha }}
+          path: mobile/pec_app/build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # iOS build (on merge to main, macOS runner required)
+  # ─────────────────────────────────────────────────────────────────────────────
+  build-ios:
+    name: iOS Build (no-codesign)
+    runs-on: macos-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Create stub .env
+        run: |
+          echo "API_BASE_URL=${{ secrets.API_BASE_URL || 'http://localhost:3000' }}" > .env
+
+      - name: Build iOS (no codesign — for CI validation)
+        run: |
+          flutter build ios --release --no-codesign \
+            --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL || 'http://localhost:3000' }}
+
+      - name: Upload iOS artifact (Runner.app)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-nosign-${{ github.sha }}
+          path: mobile/pec_app/build/ios/iphoneos/Runner.app
+          retention-days: 7

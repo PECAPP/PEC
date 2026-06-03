@@ -1,0 +1,159 @@
+PEC CAMPUS ERP - SHARED BACKEND + DATABASE INTEGRATION PLAN
+For Next.js Website + Faculty_App + pec_app
+
+GOAL
+- Keep one common backend for the entire product.
+- Use one PostgreSQL database and one NestJS API layer for all clients.
+- Next.js website, pec_app, and Faculty_App must consume the same API contracts.
+- Flutter apps must never read PostgreSQL directly.
+- All business rules must live in the backend so the web and mobile clients stay identical in behavior.
+
+CURRENT ARCHITECTURE INTENT
+- Next.js website is the primary web client.
+- pec_app and Faculty_App are Flutter clients with completed widget/presentation layers.
+- NestJS + Prisma + PostgreSQL is the single source of truth.
+- Shared domain modules already exist in the backend for auth, users, courses, attendance, timetable, exams, noticeboard, chat, finance, clubs, hostel, campus map, and related systems.
+- The Flutter apps should only add data adapters, repositories, and state management on top of the existing UI.
+
+CORE RULES
+1. Do not duplicate backend logic in Flutter.
+2. Do not create app-specific database tables unless a feature is truly client-specific.
+3. Use the same REST endpoints and response shapes for Next.js and Flutter.
+4. Keep role checks in the backend, not only in the UI.
+5. Any change to a domain model in Prisma must be reflected in shared contracts and both clients.
+
+SHARED DATA FLOW
+- User logs in from Next.js or Flutter.
+- Client sends credentials to NestJS auth endpoints.
+- Backend validates, creates JWT/refresh token session, and returns a normalized user payload.
+- Client stores tokens locally.
+- All feature data is fetched from the backend through the same API routes.
+- Any write action goes through backend validation, audit logging, and Prisma persistence.
+- PostgreSQL remains the only persistent data store for both web and mobile.
+
+COMMON BACKEND SURFACE
+- Auth: login, logout, refresh, profile, forgot password, reset password, verify email.
+- Users: profile data, roles, permissions, avatars, session status.
+- Academic: departments, courses, enrollment, timetable, exams, CGPA.
+- Attendance: sessions, scan/mark attendance, attendance history, summaries.
+- Communication: noticeboard, chat rooms, messages, notifications.
+- Campus services: canteen, hostel issues, campus map, rooms.
+- Finance: fees, transactions, payment records, receipts.
+- Student/Faculty extras: portfolio, resume, publications, awards, consultations.
+
+INTEGRATION STRATEGY FOR pec_app AND Faculty_App
+1. Keep the Flutter UI as it is, but connect each screen to a repository.
+2. Build a shared API client layer in Flutter using Dio or the current client used by the app.
+3. Mirror the Next.js feature boundaries in Flutter repositories and providers.
+4. Reuse the same DTO names and field semantics that the web app uses.
+5. Add token refresh, request interceptors, and error mapping in one central place.
+6. Make role-aware routing in Flutter match backend roles and permissions.
+
+API CONTRACT PARITY REQUIREMENTS
+- Endpoint paths must remain stable.
+- Query parameters must match between web and mobile.
+- Response envelopes must remain consistent.
+- Validation messages should come from the backend and be displayed consistently.
+- Date/time formats should be ISO-8601 everywhere.
+- IDs should remain UUID strings across all clients.
+- Pagination, sorting, and filtering should behave the same on Next.js and Flutter.
+
+FLUTTER IMPLEMENTATION PLAN
+Phase 1 - Foundation
+- Add a single API base configuration for dev, staging, and production.
+- Create a typed auth repository.
+- Create a normalized error model for HTTP, auth, validation, and network failures.
+- Add secure token storage.
+- Add session bootstrap on app startup.
+
+Phase 2 - Feature Repositories
+- Courses repository.
+- Attendance repository.
+- Timetable repository.
+- Examinations repository.
+- Noticeboard repository.
+- Chat repository.
+- Notifications repository.
+- Finance repository.
+- Campus services repositories.
+- Faculty-specific repositories for publications, awards, and consultations.
+
+Phase 3 - Shared State
+- Use Riverpod or the current state approach already in the app.
+- Cache read-heavy data locally.
+- Refresh data after writes so the UI stays in sync with the backend.
+- Keep feature state close to the feature folder.
+
+Phase 4 - Real-Time
+- Use Socket.IO for chat and live events.
+- Reconnect automatically after network loss.
+- Join/leave rooms based on authenticated user role.
+- Keep unread counts and typing state synced with the backend.
+
+Phase 5 - Offline and Sync
+- Cache timetable, attendance summaries, notices, and course data.
+- Keep only non-sensitive data offline.
+- On reconnect, refresh dirty views and reconcile server state.
+- Never cache secrets or raw tokens in plain storage.
+
+DATABASE INTEGRATION RULES
+- Prisma and PostgreSQL stay only in the backend.
+- Flutter and Next.js never query the database directly.
+- If the schema changes, update backend service logic first.
+- Then update response DTOs or shared contracts.
+- Then update Next.js consumers.
+- Then update Flutter repositories and models.
+
+NEXT.JS WEBSITE ALIGNMENT
+- The website remains the reference client for workflows, permissions, and routes.
+- Flutter should replicate the same data semantics and user permissions.
+- Any form, list, dashboard card, or action available in Next.js should map to the same backend route in Flutter.
+- UI may differ for mobile layout, but the underlying actions must stay identical.
+
+FEATURE PARITY RULES
+- Student actions in web must exist in pec_app.
+- Faculty actions in web must exist in Faculty_App.
+- Admin-only actions can stay web-only unless an admin mobile app is explicitly added later.
+- If a feature is only partially implemented on web, do not invent a different mobile-only version.
+- If the backend does not support a capability yet, add it once in NestJS and reuse it everywhere.
+
+ERROR HANDLING RULES
+- Backend validation errors should be shown directly in the client.
+- Network errors should show retry actions.
+- Auth expiration should trigger refresh, then logout if refresh fails.
+- Permission errors should route the user back to the correct allowed screen.
+- File upload or payment failures should preserve user input where possible.
+
+DEPLOYMENT CONFIGURATION
+- Web and Flutter must point to the same backend domain in production.
+- Use environment-based API base URLs.
+- Use HTTPS in production only.
+- Keep CORS allow-list aligned with the Next.js site and mobile app origins.
+- Use the same production database cluster for all backend traffic.
+
+TESTING PLAN
+- Verify each API from Next.js and Flutter with the same logged-in account.
+- Test student flow, faculty flow, and shared notifications flow.
+- Test attendance, timetable, noticeboard, chat, and finance against real API data.
+- Test refresh-token rotation and expired session recovery.
+- Test role-based access on both web and mobile.
+- Test backend schema changes against both clients before release.
+
+MIGRATION ORDER
+1. Confirm backend routes and Prisma schema are final.
+2. Wire Flutter repositories to the live endpoints.
+3. Match Flutter models to backend DTOs.
+4. Connect dashboards and feature screens to live data.
+5. Validate role-specific screens for student and faculty.
+6. Remove any temporary mock data after backend integration is complete.
+
+DELIVERY OUTPUT
+- pec_app becomes a Flutter client for the same ERP backend used by the website.
+- Faculty_App becomes the faculty-facing Flutter client for the same ERP backend.
+- Next.js website remains fully supported by the same NestJS + PostgreSQL system.
+- All three clients stay synchronized through a single backend contract.
+
+NOTES
+- This plan intentionally avoids a separate backend for mobile.
+- This plan intentionally avoids direct database access from Flutter.
+- This plan is meant to keep the system consistent with the Next.js website architecture while allowing mobile-specific UI.

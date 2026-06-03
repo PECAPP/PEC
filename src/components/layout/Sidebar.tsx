@@ -28,6 +28,8 @@ import {
   X,
   Users2,
   GripVertical,
+  ShoppingBag,
+  Wallet,
 } from "lucide-react";
 
 
@@ -160,6 +162,18 @@ const navItems: NavItem[] = [
   },
 
   {
+    icon: Wallet,
+    label: "Finance",
+    path: "/finance",
+    roles: ["student", "faculty", "college_admin"],
+  },
+  {
+    icon: ShoppingBag,
+    label: "Buy & Sell",
+    path: "/marketplace",
+    roles: ["student", "faculty", "college_admin"],
+  },
+  {
     icon: Building2,
     label: "Hostel Issues",
     path: "/hostel-issues",
@@ -272,7 +286,7 @@ export function Sidebar({
     },
     {
       title: 'Campus',
-      paths: ['/hostel-issues', '/canteen', '/campus-map', '/admin/canteen', '/admin/hostel'],
+      paths: ['/finance', '/marketplace', '/hostel-issues', '/canteen', '/campus-map', '/admin/canteen', '/admin/hostel'],
     },
     {
       title: 'System',

@@ -49,11 +49,18 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
 
  useEffect(() => {
   if (!authLoading && isAuthenticated && user) {
-   const redirectPath = 
-    !user?.role ? '/role-selection'
-    : !user?.profileComplete ? '/onboarding'
-    : '/dashboard';
-   
+   let redirectPath = '/dashboard';
+   if (!user?.role) {
+    redirectPath = '/role-selection';
+   } else if (!user?.profileComplete) {
+    redirectPath = '/onboarding';
+   } else if (user.role === 'student') {
+    redirectPath = '/dashboard';
+   } else if (user.role === 'faculty') {
+    redirectPath = '/dashboard';
+   } else if (user.role === 'college_admin') {
+    redirectPath = '/dashboard';
+   }
    router.replace(redirectPath);
   }
  }, [authLoading, isAuthenticated, user, router]);

@@ -11,6 +11,8 @@ import { seedNoticeboard } from './seeds/noticeboard';
 import { seedCommunicationAndActivity } from './seeds/communication';
 import { seedCampusFacilities } from './seeds/campus_facilities';
 import { seedAcademicCalendar } from './seeds/academic_calendar';
+import { seedMarketplace } from './seeds/marketplace';
+import { seedFinance } from './seeds/finance';
 
 async function main() {
   console.log('--- Starting Modular PEC Campus Seed ---');
@@ -53,6 +55,12 @@ async function main() {
 
     console.log('12. Seeding academic calendar...');
     await seedAcademicCalendar(admin.id);
+
+    console.log('13. Seeding marketplace listings...');
+    await seedMarketplace(students);
+
+    console.log('14. Seeding finance (fees & transactions)...');
+    await seedFinance(students);
 
     console.log('--- Seeding Completed Successfully ---');
   } catch (error) {

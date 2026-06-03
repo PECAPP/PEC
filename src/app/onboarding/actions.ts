@@ -36,13 +36,14 @@ export async function completeProfileStatefulAction(prevState: any, formData: Fo
     return { success: false, error: 'Invalid form data' };
   }
 
-  const API_URL = process.env.API_URL || "http://localhost:4000";
+  const API_URL = process.env.INTERNAL_API_URL || process.env.API_URL || "http://localhost:4000";
 
   try {
-    const response = await fetch(`${API_URL}/auth/complete-profile`, {
+    const response = await fetch(`${API_URL}/api/auth/complete-profile`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(session.token ? { Authorization: `Bearer ${session.token}` } : {}),
       },
       body: JSON.stringify({
         ...validated.data,

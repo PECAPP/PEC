@@ -12,7 +12,7 @@ const c = initContract();
 export const authContract = c.router({
   login: {
     method: 'POST',
-    path: '/auth/login',
+    path: '/api/auth/login',
     responses: {
       200: AuthResponseSchema,
       401: z.object({ message: z.string() }),
@@ -22,7 +22,7 @@ export const authContract = c.router({
   },
   signup: {
     method: 'POST',
-    path: '/auth/signup',
+    path: '/api/auth/signup',
     responses: {
       201: AuthResponseSchema,
       400: z.object({ message: z.string() }),

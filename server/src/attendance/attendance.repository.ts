@@ -4,11 +4,80 @@ import { AttendanceQueryDto } from './dto/attendance-query.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { BaseRepository } from '../common/repositories/base.repository';
+import { randomUUID } from 'crypto';
+
+type WaiverRequestRow = {
+  id: string;
+  student_id: string;
+  course_id: string | null;
+  course_code: string | null;
+  course_name: string | null;
+  from_date: Date;
+  to_date: Date;
+  reason: string;
+  supporting_doc_url: string | null;
+  status: string;
+  reviewer_note: string | null;
+  created_at: Date;
+  updated_at: Date;
+};
 
 @Injectable()
 export class AttendanceRepository extends BaseRepository {
+  private waiverTableReady: Promise<void> | null = null;
+
   constructor(private readonly prisma: PrismaService) {
     super();
+  }
+
+  private async ensureWaiverTable(): Promise<void> {
+    if (!this.waiverTableReady) {
+      this.waiverTableReady = this.prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS attendance_waiver_requests (
+          id TEXT PRIMARY KEY,
+          student_id TEXT NOT NULL,
+          course_id TEXT,
+          course_code TEXT,
+          course_name TEXT,
+          from_date DATE NOT NULL,
+          to_date DATE NOT NULL,
+          reason TEXT NOT NULL,
+          supporting_doc_url TEXT,
+          status TEXT NOT NULL DEFAULT 'pending',
+          reviewer_note TEXT,
+          reviewer_id TEXT,
+          reviewed_at TIMESTAMPTZ,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_attendance_waiver_student_created
+          ON attendance_waiver_requests(student_id, created_at DESC);
+
+        CREATE INDEX IF NOT EXISTS idx_attendance_waiver_status_created
+          ON attendance_waiver_requests(status, created_at DESC);
+      `).then(() => undefined);
+    }
+
+    await this.waiverTableReady;
+  }
+
+  private mapWaiverRow(row: WaiverRequestRow) {
+    return {
+      id: row.id,
+      studentId: row.student_id,
+      courseId: row.course_id,
+      courseCode: row.course_code,
+      courseName: row.course_name,
+      fromDate: row.from_date,
+      toDate: row.to_date,
+      reason: row.reason,
+      supportingDocUrl: row.supporting_doc_url,
+      status: row.status,
+      reviewerNote: row.reviewer_note,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
   }
 
   async create(data: CreateAttendanceDto) {
@@ -18,6 +87,64 @@ export class AttendanceRepository extends BaseRepository {
         date: new Date(data.date),
       },
     });
+  }
+
+  async createWaiverRequest(data: {
+    studentId: string;
+    courseId?: string;
+    courseCode?: string;
+    courseName?: string;
+    fromDate: string;
+    toDate: string;
+    reason: string;
+    supportingDocUrl?: string;
+  }) {
+    await this.ensureWaiverTable();
+
+    const id = randomUUID();
+
+    const rows = await this.prisma.$queryRaw<WaiverRequestRow[]>`
+      INSERT INTO attendance_waiver_requests (
+        id,
+        student_id,
+        course_id,
+        course_code,
+        course_name,
+        from_date,
+        to_date,
+        reason,
+        supporting_doc_url,
+        status
+      ) VALUES (
+        ${id},
+        ${data.studentId},
+        ${data.courseId ?? null},
+        ${data.courseCode ?? null},
+        ${data.courseName ?? null},
+        ${new Date(data.fromDate)},
+        ${new Date(data.toDate)},
+        ${data.reason},
+        ${data.supportingDocUrl ?? null},
+        'pending'
+      )
+      RETURNING *
+    `;
+
+    return this.mapWaiverRow(rows[0]);
+  }
+
+  async getWaiverRequestsForStudent(studentId: string) {
+    await this.ensureWaiverTable();
+
+    const rows = await this.prisma.$queryRaw<WaiverRequestRow[]>`
+      SELECT *
+      FROM attendance_waiver_requests
+      WHERE student_id = ${studentId}
+      ORDER BY created_at DESC
+      LIMIT 50
+    `;
+
+    return rows.map((row) => this.mapWaiverRow(row));
   }
 
   async findMany(query: AttendanceQueryDto) {

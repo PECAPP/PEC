@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
+import { isAuthError } from "@/lib/api";
 import { toast } from "sonner";
 import { usePermissions } from "@/hooks/usePermissions";
 import {
@@ -225,6 +226,12 @@ export default function Timetable() {
           }
         }
       } catch (error) {
+        if (isAuthError(error)) {
+          toast.error("Session expired. Please login again.");
+          router.replace('/auth');
+          return;
+        }
+
         console.error("Error:", error);
         toast.error("Failed to load data");
       } finally {
@@ -331,6 +338,12 @@ export default function Timetable() {
       setAvailableBatches(batchesFromData);
       setTimetable(timetableData);
     } catch (error) {
+      if (isAuthError(error)) {
+        toast.error("Session expired. Please login again.");
+        router.replace('/auth');
+        return;
+      }
+
       console.error("Error fetching data:", error);
       toast.error("Failed to load timetable data");
     }

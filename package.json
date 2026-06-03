@@ -4,13 +4,15 @@
   "version": "0.0.0",
   "packageManager": "npm@11.7.0",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "npm run dev:host",
+    "dev:turbo": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "frontend": "next dev -p 3000",
-    "api": "npm --prefix server run start:dev -- --swc",
+    "frontend": "next dev -p 3001",
+    "api": "npm --prefix server run start:dev",
     "db:reset": "npm --prefix server run db:clean && npm --prefix server run db:push && npm --prefix server run db:seed",
-    "dev:host": "concurrently --kill-others \"npm run frontend\" \"npm run api\"",
+    "predev:host": "npx kill-port 3001",
+    "dev:host": "concurrently --kill-others-on-fail \"npm run frontend\" \"npm run api\"",
     "check:env": "node tools/check_env.js",
     "dev:docker:logs": "docker compose -f docker-compose.dev.yml logs -f --tail=100",
     "dev:docker:restart": "docker compose -f docker-compose.dev.yml restart",
@@ -79,7 +81,7 @@
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.462.0",
-    "next": "^16.2.1",
+    "next": "^16.2.2",
     "next-safe-action": "^8.2.0",
     "next-themes": "^0.4.3",
     "nextjs-toploader": "^3.9.17",
@@ -111,20 +113,6 @@
     "tar": "^7.5.13",
     "undici": "^7.24.6",
     "path-to-regexp": "^8.4.1",
-    "@nestjs/core": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/platform-express": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/swagger": {
-      "path-to-regexp": "^8.4.1"
-    },
-    "@nestjs/cli": {
-      "@angular-devkit/core": {
-        "picomatch": "^4.0.4"
-      }
-    },
     "picomatch": "^4.0.4",
     "handlebars": "^4.7.9",
     "flatted": "^3.4.2",

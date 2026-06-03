@@ -1,6 +1,18 @@
 import { authClient } from "./auth-client";
 import { buildApiUrl } from "./api-base";
 
+export function isAuthError(error: unknown): boolean {
+  const status = (error as any)?.response?.status;
+  if (status === 401 || status === 403) return true;
+
+  const message = String((error as any)?.message || "").toLowerCase();
+  return (
+    message.includes("no active refresh session") ||
+    message.includes("unauthorized") ||
+    message.includes("token refresh failed")
+  );
+}
+
 function extractErrorMessage(value: unknown): string | undefined {
   if (value == null) return undefined;
 
@@ -43,8 +55,26 @@ function extractErrorMessage(value: unknown): string | undefined {
   return undefined;
 }
 
+function hasRefreshMarkerCookie(): boolean {
+  if (typeof document === "undefined") return false;
+
+  return document.cookie
+    .split(";")
+    .some((cookie) => cookie.trim().startsWith("refresh_present="));
+}
+
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const token = authClient.getAccessToken();
+  let token = authClient.getAccessToken();
+
+  // Recover access token once after a hard refresh when only refresh cookie exists.
+  if (!token && !url.includes('/auth/refresh') && hasRefreshMarkerCookie()) {
+    try {
+      token = await authClient.refreshAccessToken();
+    } catch {
+      // Keep request flow consistent and let the eventual response handling surface the error.
+    }
+  }
+
   const headers = new Headers(options.headers);
   
   if (token) {
@@ -62,7 +92,7 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   let response = await fetch(fullUrl, {
     ...options,
     headers,
-    credentials: 'include',
+    credentials: options.credentials ?? 'include',
   });
 
   // Handle 401 Unauthorized with Refresh Token rotation
@@ -76,11 +106,13 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
       response = await fetch(fullUrl, {
         ...options,
         headers,
-        credentials: 'include',
+        credentials: options.credentials ?? 'include',
       });
-    } catch (e) {
-      window.dispatchEvent(new CustomEvent("auth-failed"));
-      throw e;
+    } catch {
+      authClient.resetSession();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth-failed'));
+      }
     }
   }
 

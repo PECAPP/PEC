@@ -1,9 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { AttendanceRepository } from './attendance.repository';
 import { AttendanceQueryDto } from './dto/attendance-query.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { CreateWaiverRequestDto } from './dto/create-waiver-request.dto';
 import * as xlsx from 'xlsx';
+import { createReadStream } from 'fs';
+import { mkdir, stat, writeFile } from 'fs/promises';
+import { extname, join, resolve } from 'path';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AttendanceService {
@@ -11,6 +21,7 @@ export class AttendanceService {
 
   private readonly PEC_COORDINATES = { lat: 30.7673, lng: 76.7863 };
   private readonly MAX_DISTANCE_METERS = 100;
+  private readonly WAIVER_UPLOAD_DIR = resolve(process.cwd(), 'uploads', 'waivers');
 
   async create(data: CreateAttendanceDto) {
     if (data.lat && data.lng) {
@@ -27,6 +38,120 @@ export class AttendanceService {
     }
     
     return this.repo.create(data);
+  }
+
+  async createWaiverRequest(studentId: string, body: CreateWaiverRequestDto) {
+    const fromDate = new Date(body.fromDate);
+    const toDate = new Date(body.toDate);
+
+    if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) {
+      throw new BadRequestException('Invalid waiver date range');
+    }
+
+    if (toDate.getTime() < fromDate.getTime()) {
+      throw new BadRequestException('To date cannot be before from date');
+    }
+
+    const reason = body.reason?.trim();
+    if (!reason || reason.length < 10) {
+      throw new BadRequestException('Please provide a detailed reason (minimum 10 characters)');
+    }
+
+    return this.repo.createWaiverRequest({
+      studentId,
+      courseId: body.courseId,
+      courseCode: body.courseCode,
+      courseName: body.courseName,
+      fromDate: body.fromDate,
+      toDate: body.toDate,
+      reason,
+      supportingDocUrl: body.supportingDocUrl,
+    });
+  }
+
+  getWaiverRequestsForStudent(studentId: string) {
+    return this.repo.getWaiverRequestsForStudent(studentId);
+  }
+
+  async uploadWaiverDocument(file: Express.Multer.File, studentId: string) {
+    const maxBytes = 5 * 1024 * 1024;
+    if (!file.buffer || file.size <= 0) {
+      throw new BadRequestException('Uploaded file is empty');
+    }
+
+    if (file.size > maxBytes) {
+      throw new BadRequestException('File size exceeds 5 MB limit');
+    }
+
+    const allowedMimeTypes = new Set([
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+    ]);
+
+    if (!allowedMimeTypes.has(file.mimetype)) {
+      throw new BadRequestException('Only PDF, JPG, PNG and WEBP files are allowed');
+    }
+
+    await mkdir(this.WAIVER_UPLOAD_DIR, { recursive: true });
+
+    const ext = extname(file.originalname || '').toLowerCase();
+    const safeExt = ext && ext.length <= 8 ? ext : file.mimetype === 'application/pdf' ? '.pdf' : '.bin';
+    const fileName = `${studentId}_${Date.now()}_${randomUUID()}${safeExt}`;
+    const filePath = join(this.WAIVER_UPLOAD_DIR, fileName);
+
+    await writeFile(filePath, file.buffer);
+
+    return {
+      fileName,
+      url: `/api/attendance/waivers/files/${fileName}`,
+      originalName: file.originalname,
+      mimeType: file.mimetype,
+      size: file.size,
+    };
+  }
+
+  async getWaiverDocument(fileName: string, user: { sub: string; role?: string; roles?: string[] }) {
+    if (!fileName || fileName.includes('/') || fileName.includes('\\')) {
+      throw new BadRequestException('Invalid file name');
+    }
+
+    const roles = new Set([...(user.roles ?? []), user.role].filter(Boolean));
+    const isPrivileged = roles.has('college_admin') || roles.has('admin');
+    if (!isPrivileged && !fileName.startsWith(`${user.sub}_`)) {
+      throw new ForbiddenException('You are not allowed to access this document');
+    }
+
+    const filePath = join(this.WAIVER_UPLOAD_DIR, fileName);
+    let fileStats;
+    try {
+      fileStats = await stat(filePath);
+    } catch {
+      throw new NotFoundException('Document not found');
+    }
+
+    if (!fileStats.isFile()) {
+      throw new NotFoundException('Document not found');
+    }
+
+    const ext = extname(fileName).toLowerCase();
+    const mimeType =
+      ext === '.pdf'
+        ? 'application/pdf'
+        : ext === '.jpg' || ext === '.jpeg'
+          ? 'image/jpeg'
+          : ext === '.png'
+            ? 'image/png'
+            : ext === '.webp'
+              ? 'image/webp'
+              : 'application/octet-stream';
+
+    return {
+      stream: createReadStream(filePath),
+      mimeType,
+      contentDisposition: `inline; filename="${fileName}"`,
+    };
   }
 
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {

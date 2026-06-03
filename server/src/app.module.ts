@@ -36,6 +36,8 @@ import { CanteenModule } from './canteen/canteen.module';
 import { AdminModule } from './admin/admin.module';
 import { CollegeSettingsModule } from './college-settings/college-settings.module';
 import { ClubsModule } from './clubs/clubs.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
+import { FinanceModule } from './finance/finance.module';
 
 @Module({
   imports: [
@@ -68,6 +70,8 @@ import { ClubsModule } from './clubs/clubs.module';
     CollegeSettingsModule,
     ClubsModule,
     AcademicCalendarModule,
+    MarketplaceModule,
+    FinanceModule,
     ThrottlerModule.forRoot([{
       name: 'short',
       ttl: 60000,

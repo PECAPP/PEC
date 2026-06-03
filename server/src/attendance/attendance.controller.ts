@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -9,16 +10,21 @@ import {
   Query,
   ParseUUIDPipe,
   Request,
+  StreamableFile,
+  UploadedFile,
   UseGuards,
-  BadRequestException,
   Res,
+  UseInterceptors,
+  Header,
 } from '@nestjs/common';
 import { type Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Throttle } from '@nestjs/throttler';
 import { AttendanceService } from './attendance.service';
 import { AttendanceQueryDto } from './dto/attendance-query.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { CreateWaiverRequestDto } from './dto/create-waiver-request.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { attendanceSchema } from '@shared/schemas/erp';
 import { ok } from '../common/utils/api-response';
@@ -45,6 +51,56 @@ export class AttendanceController {
     if (!targetId) throw new BadRequestException('Student ID is required');
     const data = await this.attendanceService.getStudentSummary(targetId);
     return ok(data);
+  }
+
+  @Roles('student')
+  @Get('waivers/my')
+  async getMyWaiverRequests(@Request() req: any) {
+    const data = await this.attendanceService.getWaiverRequestsForStudent(req.user.sub);
+    return ok(data);
+  }
+
+  @Roles('student')
+  @Post('waivers')
+  @Throttle({ short: { limit: 10, ttl: 60000 } })
+  async createWaiverRequest(
+    @Request() req: any,
+    @Body() body: CreateWaiverRequestDto,
+  ) {
+    const data = await this.attendanceService.createWaiverRequest(req.user.sub, body);
+    return ok(data);
+  }
+
+  @Roles('student')
+  @Post('waivers/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadWaiverDocument(
+    @Request() req: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const data = await this.attendanceService.uploadWaiverDocument(file, req.user.sub);
+    return ok(data);
+  }
+
+  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @Get('waivers/files/:fileName')
+  async streamWaiverDocument(
+    @Param('fileName') fileName: string,
+    @Request() req: any,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { stream, mimeType, contentDisposition } = await this.attendanceService.getWaiverDocument(
+      fileName,
+      req.user,
+    );
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', contentDisposition);
+    return new StreamableFile(stream);
   }
 
   @Roles('faculty', 'college_admin', 'admin')

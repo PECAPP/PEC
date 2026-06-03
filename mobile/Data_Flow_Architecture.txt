@@ -1,0 +1,365 @@
+================================================================================
+       PEC CAMPUS ERP — UNIFIED DATA FLOW ARCHITECTURE
+       Upload → Web Filter/Audit → API → Mobile Apps
+================================================================================
+Document Version : 1.0
+Date             : 2026-04-16
+Applies To       : Next.js Web App + NestJS Backend + Faculty_App + pec_app
+
+================================================================================
+OVERVIEW
+================================================================================
+
+This document describes the single, unified data pipeline used across the
+entire PEC Campus ERP system. Data enters the system at one point, passes
+through a web-layer filter and admin audit, and is then served — via the same
+REST API — to the Next.js web app and both Flutter mobile apps (Faculty_App
+and pec_app). No data is stored or routed separately for mobile vs web.
+
+================================================================================
+ARCHITECTURE DIAGRAM (TEXT)
+================================================================================
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                        DATA SOURCES (UPLOAD LAYER)                      │
+  │                                                                         │
+  │  Faculty Upload    Admin Upload      System/Automation     File Import  │
+  │  (grades, notes,   (notices, events, (cron jobs, data      (CSV/Excel   │
+  │   materials,        policies, fee     migration, API        bulk import) │
+  │   timetables)       updates)          integrations)                     │
+  └────────────────────────────┬────────────────────────────────────────────┘
+                               │  HTTP POST / multipart / bulk import
+                               ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                     NestJS BACKEND (SINGLE SOURCE OF TRUTH)             │
+  │                                                                         │
+  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐ │
+  │  │ Auth Guard   │  │ Role Check   │  │ Validation   │  │ Audit Log  │ │
+  │  │ (JWT verify) │  │ (RBAC rules) │  │ (class-valid)│  │ (who/when/ │ │
+  │  └──────────────┘  └──────────────┘  └──────────────┘  │  what)     │ │
+  │                                                         └────────────┘ │
+  │  ┌─────────────────────────────────────────────────────────────────┐   │
+  │  │                    DOMAIN SERVICE LAYER                         │   │
+  │  │  Academic  │  Attendance  │  Noticeboard  │  Finance  │  Chat   │   │
+  │  │  Exams     │  Timetable   │  Clubs        │  Hostel   │  Notifs │   │
+  │  └─────────────────────────────────────────────────────────────────┘   │
+  │                                                                         │
+  │  ┌──────────────────────────────────────┐  ┌─────────────────────────┐ │
+  │  │ PUBLISH / DRAFT STATE ENGINE         │  │ PRISMA ORM              │ │
+  │  │  draft → pending_review → published  │  │ (schema migrations,     │ │
+  │  │  rejected → archived                 │  │  typed queries)         │ │
+  │  └──────────────────────────────────────┘  └─────────────────────────┘ │
+  └────────────────────────────┬────────────────────────────────────────────┘
+                               │  Prisma writes / reads
+                               ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                    POSTGRESQL DATABASE                                  │
+  │  Single cluster. Role-tagged rows. Audit trail table. Draft flag.      │
+  └───────┬───────────────────────────────────────────────────┬────────────┘
+          │ REST/WebSocket (same endpoints)                   │
+          ▼                                                   ▼
+  ┌────────────────────────┐                   ┌─────────────────────────────┐
+  │   NEXT.JS WEB APP      │                   │   FLUTTER MOBILE APPS       │
+  │                        │                   │                             │
+  │  Admin View            │                   │  Faculty_App                │
+  │  ┌──────────────────┐  │                   │  ┌─────────────────────┐   │
+  │  │ Audit Dashboard  │  │                   │  │ Faculty Dashboard   │   │
+  │  │ - Review queue   │  │                   │  │ Courses / Materials │   │
+  │  │ - Approve/Reject │  │                   │  │ Timetable / Exams   │   │
+  │  │ - Edit & Publish │  │                   │  │ Attendance (QR Gen) │   │
+  │  │ - Audit history  │  │                   │  │ Noticeboard         │   │
+  │  └──────────────────┘  │                   │  └─────────────────────┘   │
+  │                        │                   │                             │
+  │  Faculty View          │                   │  pec_app (Student)          │
+  │  ┌──────────────────┐  │                   │  ┌─────────────────────┐   │
+  │  │ Upload Portal    │  │                   │  │ Student Dashboard   │   │
+  │  │ - Add materials  │  │                   │  │ Courses / Timetable │   │
+  │  │ - Submit grades  │  │                   │  │ Attendance (QR Scan)│   │
+  │  │ - My submissions │  │                   │  │ Scores / Exams      │   │
+  │  └──────────────────┘  │                   │  │ Noticeboard / Chat  │   │
+  │                        │                   │  └─────────────────────┘   │
+  │  Student View          │                   └─────────────────────────────┘
+  │  ┌──────────────────┐  │
+  │  │ Filtered Feed    │  │
+  │  │ - Published only │  │
+  │  │ - Role-scoped    │  │
+  │  └──────────────────┘  │
+  └────────────────────────┘
+
+================================================================================
+STAGE 1 — DATA UPLOAD
+================================================================================
+
+WHO CAN UPLOAD
+  Faculty:
+    - Course materials (PDFs, slides, videos) via web portal or Faculty_App
+    - Grade sheets / exam results (CSV or form-based)
+    - Attendance session QR code generation
+    - Office hours / consultation slot availability
+    - Research publications, awards (own profile)
+
+  Admin:
+    - Notices and circulars (targeted: all / students / faculty / department)
+    - Academic calendar events
+    - Fee structures and payment due dates
+    - Timetable master (department-level)
+    - Hostel room assignments and hostel rules
+    - Campus announcements
+
+  System / Automation:
+    - CGPA recomputation triggered after grade approval
+    - Notification dispatch triggered after audit approval
+    - Cron-based reminders (fee due, exam upcoming)
+    - Bulk data import from legacy spreadsheets
+
+UPLOAD ENDPOINTS (NestJS)
+  POST /course-materials          — Faculty uploads a material file
+  POST /grade-entries/bulk        — Faculty submits grade CSV
+  POST /noticeboard               — Admin creates a notice
+  POST /academic-calendar         — Admin adds a calendar event
+  POST /timetable/sessions        — Admin sets timetable entries
+  POST /fees/structure            — Admin updates fee structure
+  POST /examinations              — Admin schedules an exam
+  POST /attendance/sessions       — Faculty opens an attendance session
+
+UPLOAD STATE
+  Every uploaded entity carries a publishState field:
+    DRAFT           — saved, visible only to uploader
+    PENDING_REVIEW  — submitted for admin audit
+    PUBLISHED       — approved and live to all eligible roles
+    REJECTED        — returned with a rejection reason
+    ARCHIVED        — unpublished after a set date or manually retired
+
+================================================================================
+STAGE 2 — BACKEND PROCESSING
+================================================================================
+
+REQUEST PIPELINE (per request)
+  1. JWT Guard             — Verifies Bearer token, extracts userId + roles
+  2. Role Guard            — Checks RBAC rules for the endpoint + action
+  3. DTO Validation        — class-validator checks types, lengths, required fields
+  4. Service Layer         — Business logic, state transitions, cross-entity checks
+  5. Audit Log Write       — Appends to audit_logs table: who, what, when, IP, payload hash
+  6. Prisma Persistence    — Writes to PostgreSQL
+  7. Event Emit            — Optional: triggers Socket.IO broadcast or notification queue
+
+AUDIT LOG SCHEMA (conceptual)
+  audit_logs {
+    id          UUID
+    actor_id    UUID (FK users)
+    actor_role  String
+    entity_type String (e.g. "CourseMaterial", "Notice", "GradeEntry")
+    entity_id   UUID
+    action      Enum (CREATE, UPDATE, DELETE, PUBLISH, REJECT, ARCHIVE)
+    payload_hash String (SHA-256 of submitted data, for tamper detection)
+    ip_address  String
+    created_at  DateTime
+  }
+
+DATA STATE MACHINE
+  Uploads begin as DRAFT (or immediately PENDING_REVIEW if auto-submit is on).
+  Only ADMIN can transition to PUBLISHED or REJECTED.
+  Any PUBLISHED entity becomes visible in the role-filtered API response.
+  REJECTED entities return to DRAFT with a rejection note for the uploader.
+
+================================================================================
+STAGE 3 — WEB APP: FILTER & AUDIT LAYER
+================================================================================
+
+ADMIN AUDIT DASHBOARD (Next.js /admin/audit)
+  - Queue view: lists all PENDING_REVIEW entities grouped by type
+  - Detail view: shows full content, uploader, upload time, payload
+  - Actions: Approve (→ PUBLISHED) | Reject with note (→ REJECTED) | Edit inline
+  - Audit history: filterable log of all past actions by actor/type/date
+  - Role breakdown: see how many items are targeted at students vs faculty
+
+FACULTY UPLOAD PORTAL (Next.js /faculty/upload)
+  - Upload forms for each content type (material, grade, consultation slot)
+  - Status tracker: DRAFT / PENDING / PUBLISHED / REJECTED per submission
+  - Rejection note visible inline so faculty can correct and resubmit
+
+STUDENT VIEW (Next.js /student/*)
+  - Only sees PUBLISHED content
+  - Role filter applied at query level: students get student-scoped notices,
+    course materials for enrolled courses only, own grades only
+
+FILTERING RULES (enforced in NestJS, not just in UI)
+  Entity            Student Access              Faculty Access
+  ────────────────  ──────────────────────────  ──────────────────────────────
+  Notices           type=STUDENT or ALL         type=FACULTY or ALL
+  Course Materials  enrolled courses only       own courses (upload) + all (read)
+  Grades            own records only            courses they teach
+  Timetable         own department/section      own assigned sessions
+  Attendance        own history                 sessions they created
+  Exams             enrolled courses only       courses they invigilate/set
+  Noticeboard       published + scoped          published + scoped
+  Finance           own fee records             N/A (admin only)
+  Chat              rooms they are member of    rooms they are member of
+
+================================================================================
+STAGE 4 — API LAYER (SHARED — WEB AND MOBILE)
+================================================================================
+
+KEY PRINCIPLE
+  The same NestJS REST endpoints serve Next.js and both Flutter apps.
+  Role-based filtering happens at the service layer — the client never sees
+  data it is not authorised to see regardless of what it requests.
+
+RESPONSE ENVELOPE (all endpoints)
+  {
+    "success": true,
+    "data": { ... } | [ ... ],
+    "meta": {
+      "page": 1,
+      "limit": 20,
+      "total": 145
+    },
+    "timestamp": "2026-04-16T10:30:00.000Z"
+  }
+
+ERROR ENVELOPE
+  {
+    "success": false,
+    "error": {
+      "code": "UNAUTHORIZED" | "FORBIDDEN" | "VALIDATION_ERROR" | "NOT_FOUND",
+      "message": "Human-readable reason",
+      "fields": { "fieldName": "validation message" }
+    },
+    "timestamp": "2026-04-16T10:30:00.000Z"
+  }
+
+PAGINATION / SORTING / FILTERING (consistent across all list endpoints)
+  Query params: ?page=1&limit=20&sortBy=createdAt&order=desc&search=...
+  All list endpoints support this shape. Flutter and Next.js use identical params.
+
+DATE FORMAT   : ISO-8601 everywhere (2026-04-16T10:30:00.000Z)
+ID FORMAT     : UUID v4 strings everywhere
+AUTH HEADER   : Authorization: Bearer <access_token>
+TOKEN REFRESH : POST /auth/refresh with refreshToken in body
+
+WEBSOCKET EVENTS (Socket.IO v4)
+  chat:message        — new chat message in a room
+  chat:typing         — typing indicator
+  notification:new    — push a new in-app notification to a user's socket room
+  attendance:opened   — faculty opened a session (student app listens)
+  audit:approved      — admin approved an item (faculty app listens, shows toast)
+
+================================================================================
+STAGE 5 — FLUTTER MOBILE APPS
+================================================================================
+
+SHARED API CLIENT (both apps)
+  - Dio instance with base URL from environment config
+  - AuthInterceptor: attaches Bearer token, handles 401 → refresh → retry
+  - ErrorInterceptor: maps HTTP status to typed Failure (NetworkFailure,
+    AuthFailure, ServerFailure, ValidationFailure)
+  - LoggingInterceptor: debug-only, redacts Authorization header
+
+DATA FLOW WITHIN FLUTTER (per feature)
+  Screen → Provider (Riverpod) → Repository → RemoteDataSource → Dio → NestJS
+                ↑                      ↓
+          UI rebuilds on        Response parsed into
+          state change          typed Model / Entity
+                                then cached in Hive (TTL-based)
+
+FACULTY_APP — ADDITIONAL DATA PATHS
+  Faculty can initiate UPLOADS from the mobile app:
+  - POST /course-materials (multipart file + metadata)
+  - POST /attendance/sessions (open a QR session)
+  - PUT  /grade-entries/:id (update a draft grade)
+  These go through the same NestJS pipeline and require admin approval
+  before students see them. Faculty app shows PENDING badge until approved.
+
+PEC_APP (STUDENT) — READ-ONLY FOR MOST CONTENT
+  Students consume published data only. The only writes are:
+  - POST /attendance/mark (scan QR, mark present)
+  - POST /canteen/orders (place a canteen order)
+  - POST /rooms/bookings (book a room)
+  - POST /hostel-issues (raise a hostel issue)
+  - PATCH /users/me (update own profile)
+
+OFFLINE CACHE STRATEGY
+  Hive boxes with TTL:
+    timetable     — 24h  (low change frequency)
+    notices       — 1h   (medium frequency)
+    courses       — 12h  (low frequency)
+    attendance    — 30m  (high frequency during class hours)
+    notifications — no cache (always fresh)
+  On reconnect: providers are invalidated; fresh data replaces stale cache.
+
+REAL-TIME SYNC
+  Faculty_App and pec_app both connect to Socket.IO on login.
+  Relevant events are handled to update Riverpod state without a full reload:
+    - New notification → badge increments, list updates
+    - Attendance session opened → QR scan prompt on student app
+    - Audit approved → faculty app removes PENDING badge on the content
+
+================================================================================
+DATA UPLOAD SCENARIOS — END-TO-END EXAMPLES
+================================================================================
+
+SCENARIO A: Faculty uploads course material from Faculty_App
+  1. Faculty taps "Upload Material" in Faculty_App
+  2. App sends POST /course-materials with file + metadata (JWT attached)
+  3. NestJS: auth guard ✓, role guard (FACULTY) ✓, DTO validation ✓
+  4. Material saved to DB with publishState = PENDING_REVIEW
+  5. Audit log entry created
+  6. Admin sees item in Next.js /admin/audit queue
+  7. Admin approves → publishState = PUBLISHED
+  8. WebSocket event audit:approved sent to faculty's socket room
+  9. Faculty_App shows success toast, PENDING badge removed
+  10. Student pec_app: next GET /course-materials returns the new material
+  11. Student sees material in Course Materials screen
+
+SCENARIO B: Admin posts a notice from Next.js
+  1. Admin fills notice form at /admin/noticeboard/new, sets target = STUDENTS
+  2. POST /noticeboard (admin JWT), publishState = PUBLISHED immediately
+     (Admin can self-approve; no audit queue for admin's own actions)
+  3. NestJS emits notification:new to all student socket rooms
+  4. pec_app shows red bell badge increment + notice in NotificationsScreen
+  5. Next.js student view shows notice in Noticeboard feed
+  6. Faculty_App does NOT show the notice (target = STUDENTS only)
+
+SCENARIO C: Bulk grade import from CSV
+  1. Admin/Faculty uploads CSV at /faculty/grades/import on Next.js
+  2. POST /grade-entries/bulk — NestJS parses, validates each row
+  3. All entries saved as PENDING_REVIEW
+  4. Admin reviews in audit queue, approves batch
+  5. CGPA recomputation triggered as a background job
+  6. Students see updated scores in ScoreSheetScreen (pec_app) and on web
+
+================================================================================
+SECURITY AND AUDIT RULES
+================================================================================
+
+  - All endpoints require a valid JWT. Unauthenticated requests are rejected.
+  - RBAC is enforced per endpoint; role is never trusted from the client.
+  - File uploads are validated for type (whitelist) and size (configurable max).
+  - Uploaded files stored in object storage (S3-compatible); DB stores URLs only.
+  - Audit log is append-only; no endpoint allows deleting audit entries.
+  - Admin approvals are themselves logged in the audit trail.
+  - Rate limiting applied per user per endpoint to prevent bulk spam.
+  - CORS allow-list covers Next.js origin + mobile app (no wildcard in prod).
+
+================================================================================
+ENVIRONMENT CONFIGURATION
+================================================================================
+
+  Variable              Dev Value                     Production Value
+  ──────────────────    ────────────────────────────  ──────────────────────────
+  API_BASE_URL          http://10.0.2.2:8000          https://api.pec.edu.in
+  WS_URL                ws://10.0.2.2:8000            wss://api.pec.edu.in
+  STORAGE_BUCKET        local/minio                   S3 bucket (prod)
+  JWT_SECRET            dev-secret                    Vault-managed secret
+  ALLOWED_ORIGINS       localhost:3000                https://pec.edu.in
+
+================================================================================
+INTEGRATION CHECKLIST REFERENCE
+================================================================================
+
+  See: mobile/Data_Flow_Progress.txt
+  That file tracks implementation status for every stage of this architecture.
+
+================================================================================
+END OF DOCUMENT
+================================================================================

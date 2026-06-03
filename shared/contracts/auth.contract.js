@@ -8,7 +8,7 @@ const c = (0, core_1.initContract)();
 exports.authContract = c.router({
     login: {
         method: 'POST',
-        path: '/auth/login',
+        path: '/api/auth/login',
         responses: {
             200: erp_1.AuthResponseSchema,
             401: zod_1.z.object({ message: zod_1.z.string() }),
@@ -18,7 +18,7 @@ exports.authContract = c.router({
     },
     signup: {
         method: 'POST',
-        path: '/auth/signup',
+        path: '/api/auth/signup',
         responses: {
             201: erp_1.AuthResponseSchema,
             400: zod_1.z.object({ message: zod_1.z.string() }),

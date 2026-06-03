@@ -83,6 +83,7 @@ export async function clearDatabase() {
     await prisma.job.deleteMany();
     await prisma.room.deleteMany();
     await prismaAny.department.deleteMany();
+    await (prisma as any).financeTransaction.deleteMany();
     await (prisma as any).feeRecord.deleteMany();
     await prisma.facultyProfile.deleteMany();
     await prisma.studentProfile.deleteMany();
@@ -91,6 +92,10 @@ export async function clearDatabase() {
     await prisma.refreshToken.deleteMany();
     await prisma.userRole.deleteMany();
     await prisma.role.deleteMany();
+    await (prisma as any).marketplaceMessage.deleteMany();
+    await (prisma as any).marketplaceChat.deleteMany();
+    await (prisma as any).marketplaceBookmark.deleteMany();
+    await (prisma as any).marketplaceListing.deleteMany();
     await (prisma as any).hostelIssue.deleteMany();
     await (prisma as any).canteenOrderItem.deleteMany();
     await (prisma as any).canteenOrder.deleteMany();

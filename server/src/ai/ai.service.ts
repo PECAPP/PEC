@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 
@@ -6,13 +10,18 @@ import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 export class AiService {
   private openaiClient: OpenAI | null = null;
   private geminiModel: GenerativeModel | null = null;
+  private readonly isGithubModelsProvider: boolean;
 
   constructor() {
+    this.isGithubModelsProvider = Boolean(process.env.GITHUB_AI_API_KEY);
+
     const openaiApiKey = process.env.GITHUB_AI_API_KEY || process.env.OPENAI_API_KEY;
     if (openaiApiKey) {
       this.openaiClient = new OpenAI({
         apiKey: openaiApiKey,
-        baseURL: process.env.GITHUB_AI_API_KEY ? "https://models.github.ai/inference" : undefined,
+        baseURL: this.isGithubModelsProvider
+          ? 'https://models.github.ai/inference'
+          : undefined,
       });
     }
 
@@ -25,18 +34,34 @@ export class AiService {
 
   async getCompletion(body: any) {
     if (!this.openaiClient) {
-      throw new InternalServerErrorException('AI API Key is not configured on the server.');
+      throw new ServiceUnavailableException(
+        'AI provider is not configured on the server.',
+      );
     }
 
     try {
+      const requestedModel =
+        typeof body?.model === 'string' && body.model.trim().length > 0
+          ? body.model.trim()
+          : this.isGithubModelsProvider
+            ? 'openai/gpt-4.1-mini'
+            : 'gpt-4o-mini';
+
+      const resolvedModel =
+        this.isGithubModelsProvider && !requestedModel.includes('/')
+          ? `openai/${requestedModel}`
+          : requestedModel;
+
       const response = await this.openaiClient.chat.completions.create({
         ...body,
-        model: body.model || "gpt-4o-mini",
+        model: resolvedModel,
       });
 
       return response;
     } catch (error) {
-      throw new InternalServerErrorException(error.message || 'Failed to communicate with AI service');
+      throw new InternalServerErrorException(
+        error.message || 'Failed to communicate with AI service',
+      );
     }
   }
 
