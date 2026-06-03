@@ -12,7 +12,7 @@ export async function FacultyDataSlot({ session }: { session: any }) {
     [stats, profile, notices] = await Promise.all([
       serverFetch('/attendance/faculty-stats'),
       serverFetch('/auth/profile'),
-      serverFetch('/noticeboard?limit=5'),
+      serverFetch('/noticeboard?limit=5&priorityLevel=3'),
     ]);
 
     const scopedCourses = await serverFetch(`/courses?facultyId=${session.uid}&limit=200`);

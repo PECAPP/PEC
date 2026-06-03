@@ -24,7 +24,7 @@ COPY server ./server
 # Prepare Prisma client for runtime. We intentionally skip `npm run build`
 # because this image runs `start:dev` (transpile-only) in docker-compose.
 WORKDIR /app/server
-RUN npx prisma generate
+RUN DATABASE_URL="postgresql://dummy" npx prisma generate
 
 EXPOSE 4000
 

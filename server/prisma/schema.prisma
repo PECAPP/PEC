@@ -416,6 +416,7 @@ model Notice {
   content     String
   category    String   @default("update")
   important   Boolean  @default(false)
+  priorityLevel Int    @default(1)
   pinned      Boolean  @default(false)
   mediaJson   String?
   authorId    String?
@@ -425,7 +426,7 @@ model Notice {
   updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
 
-  @@index([pinned, publishedAt])
+  @@index([pinned, priorityLevel, publishedAt])
   @@index([category, publishedAt])
   @@index([authorId])
   @@index([deletedAt, publishedAt])

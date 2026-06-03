@@ -33,6 +33,7 @@ type NoticeItem = {
   content: string;
   category: 'news' | 'update' | 'event' | 'alert';
   important: boolean;
+  priorityLevel: number;
   pinned: boolean;
   media: NoticeMedia[];
   authorName: string;
@@ -60,7 +61,7 @@ export default function NoticeboardPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState<NoticeItem['category']>('update');
-  const [important, setImportant] = useState(false);
+  const [priorityLevel, setPriorityLevel] = useState<number>(2);
   const [pinned, setPinned] = useState(false);
   const [media, setMedia] = useState<NoticeMedia[]>([]);
   const [posting, setPosting] = useState(false);
@@ -134,7 +135,8 @@ export default function NoticeboardPage() {
         title: trimmedTitle,
         content: trimmedContent,
         category,
-        important,
+        important: priorityLevel === 3,
+        priorityLevel,
         pinned,
         media: media.map((item) => ({
           url: item.url,
@@ -148,7 +150,7 @@ export default function NoticeboardPage() {
       setTitle('');
       setContent('');
       setCategory('update');
-      setImportant(false);
+      setPriorityLevel(2);
       setPinned(false);
       setMedia([]);
       await loadNotices();
@@ -262,8 +264,17 @@ export default function NoticeboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 py-2 border-y border-border/10">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
-                <Switch id="notice-important" checked={important} onCheckedChange={setImportant} />
-                <Label htmlFor="notice-important" className="text-[10px] font-bold uppercase tracking-widest opacity-80">High Priority</Label>
+                <Label htmlFor="notice-priority" className="text-[10px] font-bold uppercase tracking-widest opacity-80">Priority</Label>
+                <select
+                  id="notice-priority"
+                  className="h-8 rounded-lg border border-border/60 bg-background px-2 text-xs font-bold uppercase tracking-wider focus:ring-primary/20"
+                  value={priorityLevel}
+                  onChange={(e) => setPriorityLevel(Number(e.target.value))}
+                >
+                  <option value={3}>High</option>
+                  <option value={2}>Medium</option>
+                  <option value={1}>Low</option>
+                </select>
               </div>
 
               <div className="flex items-center gap-3">
@@ -298,7 +309,9 @@ export default function NoticeboardPage() {
               animate={{ opacity: 1, y: 0 }}
               className={cn(
                 "card-elevated p-6 bg-card/90 backdrop-blur-sm border-border hover:border-primary/40 transition-all group",
-                notice.important && "border-l-4 border-l-destructive shadow-lg shadow-destructive/5"
+                notice.priorityLevel === 3 && "border-l-4 border-l-destructive shadow-lg shadow-destructive/5",
+                notice.priorityLevel === 2 && "border-l-4 border-l-orange-500 shadow-lg shadow-orange-500/5",
+                notice.priorityLevel === 1 && "border-l-4 border-l-emerald-500 shadow-lg shadow-emerald-500/5"
               )}
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -317,9 +330,19 @@ export default function NoticeboardPage() {
                         <Pin className="h-3 w-3 mr-1.5" /> Pinned
                       </Badge>
                     )}
-                    {notice.important && (
+                    {notice.priorityLevel === 3 && (
                       <Badge className="px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-destructive text-destructive-foreground shadow-lg shadow-destructive/20">
                          High Priority
+                      </Badge>
+                    )}
+                    {notice.priorityLevel === 2 && (
+                      <Badge className="px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-orange-500 text-white shadow-lg shadow-orange-500/20">
+                         Medium Priority
+                      </Badge>
+                    )}
+                    {notice.priorityLevel === 1 && (
+                      <Badge className="px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                         Low Priority
                       </Badge>
                     )}
                   </div>

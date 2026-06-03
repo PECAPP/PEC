@@ -18,4 +18,11 @@ export class ListNoticesDto {
   @IsOptional()
   @IsIn(['news', 'update', 'event', 'alert'])
   category?: 'news' | 'update' | 'event' | 'alert';
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(3)
+  priorityLevel?: number;
 }

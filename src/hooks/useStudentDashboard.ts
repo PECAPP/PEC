@@ -163,7 +163,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       const [summaryRes, timetableRes, noticeboardRes] = await Promise.all([
         api.get('/attendance/summary'),
         api.get('/timetable'),
-        api.get('/noticeboard', { params: { limit: 4, offset: 0 } }),
+        api.get('/noticeboard', { params: { limit: 4, offset: 0, priorityLevel: 3 } }),
       ]);
 
       processDashboardData(
@@ -202,7 +202,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       } else {
         void (async () => {
           try {
-            const res = await api.get('/noticeboard', { params: { limit: 4, offset: 0 } });
+            const res = await api.get('/noticeboard', { params: { limit: 4, offset: 0, priorityLevel: 3 } });
             const notices = res?.data?.success ? res.data.data : res?.data;
             if (Array.isArray(notices)) setNoticeboardItems(notices);
           } catch {

@@ -7,7 +7,7 @@ export async function StudentDataSlot({ session }: { session: any }) {
     serverFetch('/attendance/summary'),
     serverFetch('/timetable'),
     serverFetch('/auth/profile'),
-    serverFetch('/noticeboard?limit=4&offset=0'),
+    serverFetch('/noticeboard?limit=4&offset=0&priorityLevel=3'),
   ]);
 
   return (
