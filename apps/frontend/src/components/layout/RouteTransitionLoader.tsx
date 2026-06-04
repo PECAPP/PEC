@@ -1,0 +1,161 @@
+'use client';
+
+import { usePathname, useSearchParams } from 'next/navigation';
+import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState, Suspense } from 'react';
+import { Loader } from '../ui/Loader';
+
+const isModifiedEvent = (event: MouseEvent | ReactMouseEvent) =>
+  event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+
+function RouteTransitionLoaderInner() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const currentRouteKey = useMemo(() => {
+    const params = searchParams.toString();
+    return `${pathname}${params ? `?${params}` : ''}`;
+  }, [pathname, searchParams]);
+
+  const previousRouteKeyRef = useRef(currentRouteKey);
+  const startTimerRef = useRef<number | null>(null);
+  const mountedRef = useRef(false);
+
+  const startNavigation = () => {
+    if (!mountedRef.current) return;
+    if (startTimerRef.current !== null) {
+      window.clearTimeout(startTimerRef.current);
+    }
+    // Defer state update so we don't flash for fast loads (200ms threshold)
+    startTimerRef.current = window.setTimeout(() => {
+      if (mountedRef.current) {
+        setIsNavigating(true);
+      }
+      startTimerRef.current = null;
+    }, 200);
+  };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (startTimerRef.current !== null) {
+        window.clearTimeout(startTimerRef.current);
+        startTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (previousRouteKeyRef.current !== currentRouteKey) {
+      setIsNavigating(false);
+      previousRouteKeyRef.current = currentRouteKey;
+      if (startTimerRef.current !== null) {
+        window.clearTimeout(startTimerRef.current);
+        startTimerRef.current = null;
+      }
+    }
+  }, [currentRouteKey]);
+
+  useEffect(() => {
+    if (!isNavigating) return;
+    const timeout = window.setTimeout(() => setIsNavigating(false), 15000);
+    return () => window.clearTimeout(timeout);
+  }, [isNavigating]);
+
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || isModifiedEvent(event)) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      const anchor = target?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!anchor) {
+        return;
+      }
+
+      if (anchor.target && anchor.target !== '_self') {
+        return;
+      }
+
+      if (anchor.hasAttribute('download') || anchor.getAttribute('rel')?.includes('external')) {
+        return;
+      }
+
+      const nextUrl = new URL(anchor.href, window.location.href);
+      const isInternal = nextUrl.origin === window.location.origin;
+      const isSameRoute =
+        nextUrl.pathname === window.location.pathname && nextUrl.search === window.location.search;
+
+      if (!isInternal || isSameRoute) {
+        return;
+      }
+
+      startNavigation();
+    };
+
+    const handlePopState = () => {
+      startNavigation();
+    };
+
+    document.addEventListener('click', handleDocumentClick, true);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      document.removeEventListener('click', handleDocumentClick, true);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  useEffect(() => {
+    const originalPushState = window.history.pushState;
+    const originalReplaceState = window.history.replaceState;
+
+    const shouldStartForUrl = (url: string | URL | null | undefined) => {
+      if (!url) return false;
+      const nextUrl = new URL(url.toString(), window.location.href);
+      const isInternal = nextUrl.origin === window.location.origin;
+      const isDifferentRoute =
+        nextUrl.pathname !== window.location.pathname || nextUrl.search !== window.location.search;
+      return isInternal && isDifferentRoute;
+    };
+
+    window.history.pushState = function (...args) {
+      if (shouldStartForUrl(args[2])) {
+        startNavigation();
+      }
+      return originalPushState.apply(this, args);
+    };
+
+    window.history.replaceState = function (...args) {
+      if (shouldStartForUrl(args[2])) {
+        startNavigation();
+      }
+      return originalReplaceState.apply(this, args);
+    };
+
+    return () => {
+      window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
+    };
+  }, []);
+
+  if (!isNavigating) {
+    return null;
+  }
+
+  return (
+    <div role="status" aria-live="polite" aria-label="Loading page">
+      <Loader />
+    </div>
+  );
+}
+
+export function RouteTransitionLoader() {
+  return (
+    <Suspense fallback={null}>
+      <RouteTransitionLoaderInner />
+    </Suspense>
+  );
+}

@@ -1,0 +1,17 @@
+{
+  "node": {
+    "601d39a3661f949534aa401d0f826f11a0acaa5c26": {
+      "workers": {
+        "app/onboarding/page": {
+          "moduleId": 368695,
+          "async": false,
+          "exportedName": "completeProfileStatefulAction",
+          "filename": "apps/frontend/src/app/onboarding/actions.ts"
+        }
+      },
+      "exportedName": "completeProfileStatefulAction",
+      "filename": "apps/frontend/src/app/onboarding/actions.ts"
+    }
+  },
+  "edge": {}
+}

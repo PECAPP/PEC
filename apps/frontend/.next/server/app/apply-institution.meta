@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/apply-institution/layout,_N_T_/apply-institution/page,_N_T_/apply-institution"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/apply-institution/__PAGE__",
+    "/apply-institution",
+    "/_index",
+    "/_head"
+  ]
+}

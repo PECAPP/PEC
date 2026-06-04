@@ -1,0 +1,29 @@
+{
+  "node": {
+    "60fae55712d58e62c3cbb232298e9b1e0fa24a3bad": {
+      "workers": {
+        "app/(protected)/courses/page": {
+          "moduleId": 439073,
+          "async": false,
+          "exportedName": "enrollInCourseAction",
+          "filename": "apps/frontend/src/app/(protected)/courses/actions.ts"
+        }
+      },
+      "exportedName": "enrollInCourseAction",
+      "filename": "apps/frontend/src/app/(protected)/courses/actions.ts"
+    },
+    "404b3ffb9c1278bdb5036516929bf40506b5277d1d": {
+      "workers": {
+        "app/(protected)/courses/page": {
+          "moduleId": 439073,
+          "async": false,
+          "exportedName": "dropCourseAction",
+          "filename": "apps/frontend/src/app/(protected)/courses/actions.ts"
+        }
+      },
+      "exportedName": "dropCourseAction",
+      "filename": "apps/frontend/src/app/(protected)/courses/actions.ts"
+    }
+  },
+  "edge": {}
+}
