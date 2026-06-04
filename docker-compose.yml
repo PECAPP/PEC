@@ -28,7 +28,7 @@ services:
       NODE_ENV: "development"
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
     command: >
-      sh -c " npx prisma db push --accept-data-loss && npm run db:seed && node dist/src/main "
+      sh -c " cd /app/packages/database && npx prisma db push --accept-data-loss && cd /app/apps/server && npm run db:seed && node dist/src/main "
     depends_on:
       - postgres
     healthcheck:

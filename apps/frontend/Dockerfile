@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY apps/frontend/package*.json ./apps/frontend/
 COPY packages/shared/package*.json ./packages/shared/
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY packages/shared ./packages/shared
 COPY apps/frontend ./apps/frontend

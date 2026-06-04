@@ -10,7 +10,7 @@ COPY packages/shared/package*.json ./packages/shared/
 COPY packages/protos/package*.json ./packages/protos/
 
 # Install dependencies at root
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy all source
 COPY packages ./packages
