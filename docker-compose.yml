@@ -1,3 +1,4 @@
+name: pec-erp
 services:
   postgres:
     image: postgres:16-alpine
@@ -16,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: ./server/Dockerfile
-    container_name: pec_backend
+    container_name: PECApp-Backend
     restart: always
     ports:
       - "4000:4000"
@@ -26,9 +27,28 @@ services:
       NODE_ENV: "development"
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
     command: >
-      sh -c " npx prisma db push --accept-data-loss && npm run db:seed && npm run start:dev "
+      sh -c " npx prisma db push --accept-data-loss && npm run db:seed && node dist/src/main "
     depends_on:
       - postgres
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: PECApp-Frontend
+    restart: always
+    ports:
+      - "3000:3001" # Host listens on 3000, forwards to container's 3001
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:4000/api"
+      INTERNAL_API_URL: "http://backend:4000"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:

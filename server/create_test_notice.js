@@ -13,7 +13,7 @@ async function main() {
 
     await prisma.notice.create({
         data: {
-            title: 'Welcome to OmniFlow ERP',
+            title: 'Welcome to PEC ERP',
             content: 'We are excited to have you on board. Explore the new dashboard features! Check your attendance and schedule.',
             category: 'news',
             important: true,

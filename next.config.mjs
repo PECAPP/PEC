@@ -10,6 +10,7 @@ const emptyModuleAlias = './src/lib/empty-module.ts';
 const nextConfig = {
   reactStrictMode: true,
   typedRoutes: false,
+  output: "standalone",
   transpilePackages: ['@shared'],
   typescript: {
     ignoreBuildErrors: true,

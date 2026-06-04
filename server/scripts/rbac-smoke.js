@@ -48,7 +48,7 @@ async function main() {
 
   const jobPayload = {
     title: 'RBAC Test Job',
-    company: 'Omnifow',
+    company: 'PEC',
     location: 'Remote',
     type: 'Internship',
     deadline: '2027-01-01T00:00:00.000Z',

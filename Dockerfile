@@ -1,15 +1,10 @@
-FROM node:25-alpine
+FROM node:20-alpine AS builder
 
 WORKDIR /app
-
-# Copy dependency manifests first for better layer caching
 COPY package*.json ./
 COPY tsconfig*.json ./
+RUN npm install --legacy-peer-deps
 
-# Install dependencies
-RUN npm install
-
-# Copy only files needed by the frontend runtime/build
 COPY shared ./shared
 COPY src ./src
 COPY public ./public
@@ -20,8 +15,29 @@ COPY postcss.config.js ./
 COPY tailwind.config.ts ./
 COPY components.json ./
 
-# Expose Next.js port
-EXPOSE 3000
+ENV NODE_ENV=production
+RUN npx next build
 
-# Run in Development mode to avoid strict production build checks as requested
-CMD ["npm", "run", "frontend"]
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Create a non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+COPY --from=builder /app/public ./public
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3001
+
+ENV PORT 3001
+
+CMD ["node", "server.js"]
