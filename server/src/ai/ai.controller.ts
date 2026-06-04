@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UseGuards, Req, Res } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { AiService } from './ai.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Throttle } from '@nestjs/throttler';

@@ -181,7 +181,12 @@ export class AiService {
   }
 
   // ── Tool: get_user_schedule ────────────────────────────────────────────────
-  private async toolGetSchedule(userId: string): Promise<string> {
+  private async toolGetSchedule(
+    userId: string,
+    day?: string,
+    courseCode?: string,
+    startTime?: string,
+  ): Promise<string> {
     // Fetch student profile for department + semester
     const profile = await this.prisma.studentProfile.findUnique({
       where: { userId },
@@ -234,9 +239,21 @@ export class AiService {
     const grouped: Record<string, any[]> = {};
 
     for (const entry of entries) {
-      const day = entry.day ?? 'Unknown';
-      if (!grouped[day]) grouped[day] = [];
-      grouped[day].push({
+      const entryDay = entry.day ?? 'Unknown';
+
+      // Apply dynamic filters based on user request
+      if (day && entryDay.toLowerCase() !== day.toLowerCase()) {
+        continue;
+      }
+      if (courseCode && entry.courseCode.toLowerCase() !== courseCode.toLowerCase()) {
+        continue;
+      }
+      if (startTime && !entry.startTime.includes(startTime)) {
+        continue;
+      }
+
+      if (!grouped[entryDay]) grouped[entryDay] = [];
+      grouped[entryDay].push({
         startTime: entry.startTime,
         endTime: entry.endTime,
         courseCode: entry.courseCode,
@@ -247,15 +264,85 @@ export class AiService {
     }
 
     // Sort entries within each day by startTime
-    for (const day of Object.keys(grouped)) {
-      grouped[day].sort((a, b) => a.startTime.localeCompare(b.startTime));
+    for (const d of Object.keys(grouped)) {
+      grouped[d].sort((a, b) => a.startTime.localeCompare(b.startTime));
     }
 
     const schedule = dayOrder
-      .filter((d) => grouped[d])
+      .filter((d) => grouped[d] && grouped[d].length > 0)
       .map((d) => ({ day: d, entries: grouped[d] }));
 
+    if (schedule.length === 0) {
+      return JSON.stringify({
+        message: 'No timetable entries found matching your specified filters.',
+        schedule: [],
+      });
+    }
+
     return JSON.stringify({ schedule });
+  }
+
+  // ── Tool: get_hostel_issues ────────────────────────────────────────────────
+  private async toolGetHostelIssues(userId: string): Promise<string> {
+    try {
+      const issues = await this.prisma.hostelIssue.findMany({
+        where: { studentId: userId },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        select: {
+          title: true,
+          category: true,
+          roomNumber: true,
+          status: true,
+          priority: true,
+          description: true,
+          createdAt: true,
+        },
+      });
+      return JSON.stringify({ issues });
+    } catch (err) {
+      return JSON.stringify({ error: 'Failed to fetch hostel issues: ' + err.message });
+    }
+  }
+
+  // ── Tool: get_canteen_menu ──────────────────────────────────────────────────
+  private async toolGetCanteenMenu(category?: string): Promise<string> {
+    try {
+      const items = await this.prisma.canteenItem.findMany({
+        where: {
+          isAvailable: true,
+          ...(category ? { category: { contains: category, mode: 'insensitive' } } : {}),
+        },
+        orderBy: [{ category: 'asc' }, { name: 'asc' }],
+        take: 25,
+        select: {
+          name: true,
+          price: true,
+          category: true,
+          description: true,
+          stock: true,
+        },
+      });
+      return JSON.stringify({ items });
+    } catch (err) {
+      return JSON.stringify({ error: 'Failed to fetch canteen menu: ' + err.message });
+    }
+  }
+
+  // ── Tool: get_clubs ────────────────────────────────────────────────────────
+  private async toolGetClubs(): Promise<string> {
+    try {
+      const clubs = await this.prisma.club.findMany({
+        orderBy: { name: 'asc' },
+        select: {
+          name: true,
+          createdAt: true,
+        },
+      });
+      return JSON.stringify({ clubs });
+    } catch (err) {
+      return JSON.stringify({ error: 'Failed to fetch clubs: ' + err.message });
+    }
   }
 
   // ── Main completion handler ────────────────────────────────────────────────
@@ -285,8 +372,24 @@ export class AiService {
           function: {
             name: 'get_user_schedule',
             description:
-              "Get the current student's weekly class timetable grouped by day, including course name, code, room, faculty, and time slots.",
-            parameters: { type: 'object', properties: {} },
+              "Get the current student's class timetable, with optional parameters to filter by day, course code, or start time.",
+            parameters: {
+              type: 'object',
+              properties: {
+                day: {
+                  type: 'string',
+                  description: 'Optional day of the week to get schedule for (e.g. "Monday", "Tuesday", etc.)',
+                },
+                courseCode: {
+                  type: 'string',
+                  description: 'Optional course code to filter by (e.g. "CS301")',
+                },
+                startTime: {
+                  type: 'string',
+                  description: 'Optional start time to filter by (e.g. "09:00", "10:30")',
+                },
+              },
+            },
           },
         },
         {
@@ -360,18 +463,39 @@ export class AiService {
                   enum: [
                     '/marketplace',
                     '/attendance',
-                    '/grades',
+                    '/score-sheet',
                     '/timetable',
                     '/noticeboard',
                     '/canteen',
                     '/finance',
                     '/profile',
                     '/clubs',
-                    '/hostel',
+                    '/hostel-issues',
                     '/academic-calendar',
                     '/dashboard',
+                    '/campus-map',
+                    '/resume-builder',
+                    '/student-portfolio',
+                    '/rooms',
                   ],
-                  description: 'The exact app path to navigate to',
+                  description:
+                    'The exact app path to navigate to. Maps informal requests as follows:\n' +
+                    '- /marketplace: Buy/sell items, bookstore, trading, or shopping.\n' +
+                    '- /attendance: View presence, skip classes limits, or attendance percentage.\n' +
+                    '- /score-sheet: Check SGPA/CGPA, exam scores, grades, marks, or transcripts.\n' +
+                    '- /timetable: Class schedule, lecture timings, daily lectures, or class slots.\n' +
+                    '- /noticeboard: College notices, bulletins, official announcements, or pinboard.\n' +
+                    '- /canteen: Order food, check canteen menu, snacks, or night canteen.\n' +
+                    '- /finance: Pay college/hostel/mess fees, view pending dues, billing, or transaction receipts.\n' +
+                    '- /profile: Update user profile, student bio, sync GitHub/LinkedIn.\n' +
+                    '- /clubs: Student clubs, joining requests, or student activities.\n' +
+                    '- /hostel-issues: Hostel maintenance reporting, file complaints (plumbing, electrical, wifi), or room issues.\n' +
+                    '- /academic-calendar: Holidays list, recess dates, semester dates, or calendar events.\n' +
+                    '- /campus-map: Look at campus 2D/3D maps, buildings, roads, or spatial navigation.\n' +
+                    '- /resume-builder: Build professional resumes with AI analyzer.\n' +
+                    '- /student-portfolio: Student project showcase, skills portfolio, or portfolio editor.\n' +
+                    '- /rooms: Check available rooms, lecture halls, labs, or building occupancy.\n' +
+                    '- /dashboard: Overview dashboard, central command center, or home page.',
                 },
                 pageName: {
                   type: 'string',
@@ -380,6 +504,41 @@ export class AiService {
               },
               required: ['path', 'pageName'],
             },
+          },
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'get_hostel_issues',
+            description:
+              "Get the list of hostel maintenance issues reported by the student, showing status, priority, description, and creation time.",
+            parameters: { type: 'object', properties: {} },
+          },
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'get_canteen_menu',
+            description:
+              "Get the current canteen menu with items, prices, and categories. Optionally filter by category.",
+            parameters: {
+              type: 'object',
+              properties: {
+                category: {
+                  type: 'string',
+                  description: 'Optional category of canteen items to filter by (e.g. "Beverages", "Snacks")',
+                },
+              },
+            },
+          },
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'get_clubs',
+            description:
+              "Get the list of college student clubs.",
+            parameters: { type: 'object', properties: {} },
           },
         },
       ] as const;
@@ -439,16 +598,31 @@ export class AiService {
             }
           } else if (functionName === 'get_user_schedule') {
             if (userId) {
-              functionResult = await this.toolGetSchedule(userId);
+              functionResult = await this.toolGetSchedule(
+                userId,
+                functionArgs.day,
+                functionArgs.courseCode,
+                functionArgs.startTime,
+              );
               // Push parsed data directly to frontend — no need for model to emit UI tags
               res.write(`data: ${JSON.stringify({ scheduleData: JSON.parse(functionResult) })}\n\n`);
               functionResult = JSON.stringify({
                 displayed: true,
-                message: 'The weekly timetable has been shown to the user in a formatted day-grouped schedule. Write a short 1-2 sentence summary (e.g. how many classes today). Do NOT repeat or list the raw data.',
+                message: 'The filtered weekly timetable has been shown to the user in a formatted day-grouped schedule. Write a short 1-2 sentence summary. Do NOT repeat or list the raw data.',
               });
             } else {
               functionResult = JSON.stringify({ error: 'User not authenticated' });
             }
+          } else if (functionName === 'get_hostel_issues') {
+            if (userId) {
+              functionResult = await this.toolGetHostelIssues(userId);
+            } else {
+              functionResult = JSON.stringify({ error: 'User not authenticated' });
+            }
+          } else if (functionName === 'get_canteen_menu') {
+            functionResult = await this.toolGetCanteenMenu(functionArgs.category);
+          } else if (functionName === 'get_clubs') {
+            functionResult = await this.toolGetClubs();
           } else if (functionName === 'search_college_notices') {
             const results = await this.ragService.getCollegeNotices(functionArgs.query);
             functionResult = JSON.stringify(results);
