@@ -1,16 +1,53 @@
+"use client";
+
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Send, Sparkles, X, Minimize2 } from "lucide-react";
+import { Bot, Send, Sparkles, X, Minimize2, Mic, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import api, { isAuthError } from "@/lib/api";
+import { buildApiUrl } from "@/lib/api-base";
+import { authClient } from "@/lib/auth-client";
+import { GradesTable, AttendanceTable, ScheduleTable, SuggestionChips } from "./GenerativeUI";
+import { useRouter } from "next/navigation";
 
 const SYSTEM_PROMPT = `
-You are the PEC AI Assistant. 
-Use user's name or its personal info in every response to give a personalized feel.
-Answer strictly based on the technical and academic context of the PEC ERP system.
+You are the PEC AI Assistant — an intelligent campus agent for PEC University.
+Always address the user by name when available. Be concise, helpful, and action-oriented.
+You have access to real backend tools that fetch live data. NEVER fabricate or invent data.
+
+TOOLS AND BEHAVIOR:
+
+1. GRADES — call tool get_user_grades. The data will be shown automatically in a table.
+   After the tool runs, write a short 1-2 sentence summary (CGPA, best/worst subject). Do NOT list or repeat raw data.
+
+2. ATTENDANCE — call tool get_user_attendance. The report will be shown automatically in a table.
+   After the tool runs, write a short 1-2 sentence summary (overall %, any courses at risk). Do NOT list or repeat raw data.
+
+3. SCHEDULE/TIMETABLE — call tool get_user_schedule. The timetable will be shown automatically.
+   After the tool runs, mention how many classes they have today. Do NOT list or repeat raw data.
+
+4. NAVIGATION — when user asks to go to, visit, open, or be taken to any page:
+   ALWAYS call the navigate_to_page tool. Do NOT write the path as text.
+   Valid pages: Marketplace, Attendance, Grades, Timetable, Noticeboard, Canteen, Finance, Profile, Clubs, Hostel, Dashboard.
+   After the tool runs, write a short friendly confirmation (e.g. "Taking you to the Marketplace now! 🛒").
+
+5. QUICK REPLIES — always end with 2-3 options:
+<UI:SuggestionChip>["option 1", "option 2", "option 3"]</UI>
+
+Rules:
+- Do NOT emit <UI:GradesTable>, <UI:AttendanceTable>, or <UI:ScheduleTable> tags — the system handles that automatically.
+- Do NOT invent any data. If a tool fails or returns empty, tell the user clearly.
+- Keep responses concise and helpful.
 `;
 
 interface Message {
@@ -20,21 +57,115 @@ interface Message {
   timestamp: Date;
 }
 
+const TypewriterText = ({ text, onType }: { text: string; onType?: () => void }) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const indexRef = useRef(0);
+
+  useEffect(() => {
+    if (text.length < indexRef.current) {
+      indexRef.current = 0;
+      setDisplayedText("");
+    }
+
+    const interval = setInterval(() => {
+      if (indexRef.current < text.length) {
+        indexRef.current++;
+        setDisplayedText(text.slice(0, indexRef.current));
+        onType?.();
+      } else {
+        clearInterval(interval);
+      }
+    }, 6);
+
+    return () => clearInterval(interval);
+  }, [text, onType]);
+
+  return <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayedText}</ReactMarkdown>;
+};
+
 const FloatingAIChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+  };
+
+  const [width, setWidth] = useState(400);
+  const [height, setHeight] = useState(600);
+
+  const minWidth = 320;
+  const minHeight = 400;
+
+  useEffect(() => {
+    const handleScreenResize = () => {
+      const maxW = window.innerWidth - 32;
+      const maxH = window.innerHeight - 100;
+      setWidth(prev => Math.min(prev, maxW));
+      setHeight(prev => Math.min(prev, maxH));
+    };
+    handleScreenResize();
+    window.addEventListener("resize", handleScreenResize);
+    return () => window.removeEventListener("resize", handleScreenResize);
+  }, []);
+
+  const handleResizeStart = (
+    e: React.MouseEvent | React.TouchEvent,
+    direction: "n" | "w" | "nw"
+  ) => {
+    e.preventDefault();
+    const startWidth = width;
+    const startHeight = height;
+    const startX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const startY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+    const handleMouseMove = (moveEvent: MouseEvent | TouchEvent) => {
+      const currentX = 'touches' in moveEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
+      const currentY = 'touches' in moveEvent ? moveEvent.touches[0].clientY : moveEvent.clientY;
+
+      const deltaX = currentX - startX;
+      const deltaY = currentY - startY;
+
+      const maxW = window.innerWidth - 32;
+      const maxH = window.innerHeight - 100;
+
+      if (direction === "w" || direction === "nw") {
+        const newWidth = Math.max(minWidth, Math.min(maxW, startWidth - deltaX));
+        setWidth(newWidth);
+      }
+      if (direction === "n" || direction === "nw") {
+        const newHeight = Math.max(minHeight, Math.min(maxH, startHeight - deltaY));
+        setHeight(newHeight);
+      }
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleMouseMove);
+      document.removeEventListener("touchend", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchmove", handleMouseMove, { passive: true });
+    document.addEventListener("touchend", handleMouseUp);
+  };
 
   useEffect(() => {
     setMessages([
       {
         id: "1",
         role: "assistant",
-        content: "Hello! I'm your **PEC AI Assistant**. How can I help you today?",
+        content: "Hello! I'm your **PEC AI Assistant**. How can I help you today?\n<UI:SuggestionChip>[\"Show me my grades\", \"What is my attendance?\", \"Take me to the marketplace\"]</UI>",
         timestamp: new Date(),
       },
     ]);
@@ -44,29 +175,61 @@ const FloatingAIChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || isTyping) return;
+  const speakText = (text: string) => {
+    if (!isVoiceEnabled || !window.speechSynthesis) return;
+    
+    // Clean up UI tags and markdown
+    const cleanText = text
+      .replace(/<UI:.*?>[\s\S]*?<\/UI>/g, '')
+      .replace(/[\*\#\_]/g, '')
+      .trim();
 
-    if (authLoading) return;
+    if (!cleanText) return;
 
-    if (!isAuthenticated) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          role: "assistant",
-          content: "Please sign in again to use the AI assistant.",
-          timestamp: new Date(),
-        },
-      ]);
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleMicClick = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert("Your browser does not support voice input.");
       return;
     }
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setInputValue((prev) => prev + (prev ? " " : "") + transcript);
+    };
+    
+    if (isListening) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
+  };
 
-    const userText = inputValue.trim();
+  const handleSend = async (overrideText?: string) => {
+    const textToSend = overrideText || inputValue;
+    if (!textToSend.trim() || isTyping) return;
+
+    if (authLoading) return;
+    // Allow cookie-based sessions even if the client-side token is not present.
+    // The server AuthGuard will validate credentials via Authorization header or cookies.
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: userText,
+      content: textToSend.trim(),
       timestamp: new Date(),
     };
 
@@ -75,27 +238,169 @@ const FloatingAIChat = () => {
     setIsTyping(true);
 
     try {
-      // In a real scenario, context would be fetched here. 
-      // For now, we use a clean structure hitting the NestJS backend.
-      const response = await api.post('/ai/completion', {
+      const requestBody = {
         messages: [
           {
             role: "system",
-            content: `${SYSTEM_PROMPT} \nUser Name: ${user?.fullName || "Student"}`,
+            content: SYSTEM_PROMPT,
           },
           ...messages.slice(-6).map((m) => ({ role: m.role, content: m.content })),
-          { role: "user", content: userText },
+          { role: "user", content: userMessage.content },
         ],
+      };
+
+      const aiResponseId = (Date.now() + 1).toString();
+      const fullUrl = buildApiUrl('/ai/completion');
+      const token = authClient.getAccessToken();
+
+      const fetchRes = await fetch(fullUrl, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(requestBody)
       });
 
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: response.data.choices[0]?.message?.content || "I couldn't process that request.",
-        timestamp: new Date(),
-      };
+      if (!fetchRes.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const reader = fetchRes.body?.getReader();
+      const decoder = new TextDecoder();
       
-      setMessages((prev) => [...prev, aiResponse]);
+      if (!reader) throw new Error('No readable stream');
+
+      let done = false;
+      let fullText = "";
+      let hasCreatedMessage = false;
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+              try {
+                const data = JSON.parse(line.slice(6));
+                
+                const ensureMessageExists = (initialContent: string = "") => {
+                  if (!hasCreatedMessage) {
+                    hasCreatedMessage = true;
+                    setIsTyping(false); // Hide thinking dots when content starts showing
+                    setMessages(prev => [
+                      ...prev,
+                      {
+                        id: aiResponseId,
+                        role: "assistant",
+                        content: initialContent,
+                        timestamp: new Date(),
+                      }
+                    ]);
+                  }
+                };
+
+                if (data.tool) {
+                  let thinkingText = "⚙️ Working...";
+                  if (data.tool === "get_user_grades") thinkingText = "📊 Fetching your academic transcript...";
+                  else if (data.tool === "get_user_attendance") thinkingText = "📅 Calculating your attendance & predictions...";
+                  else if (data.tool === "get_user_schedule") thinkingText = "🗓️ Loading your weekly timetable...";
+                  else if (data.tool === "navigate_to_page") thinkingText = "🚦 Navigating...";
+                  else if (data.tool === "search_marketplace") thinkingText = "🛍️ Searching the marketplace...";
+                  else if (data.tool === "get_upcoming_events") thinkingText = "🎉 Finding upcoming college events...";
+                  else if (data.tool === "search_college_notices") thinkingText = "🔍 Scanning college notices...";
+                  
+                  ensureMessageExists(`_${thinkingText}_`);
+                  setMessages(prev => 
+                    prev.map(msg => 
+                      msg.id === aiResponseId ? { ...msg, content: `_${thinkingText}_` } : msg
+                    )
+                  );
+                } else if (data.navigate) {
+                  // Backend fired navigate_to_page tool — perform immediate navigation
+                  const navPath = data.navigate as string;
+                  const navName = navPath.replace('/', '').replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || 'Page';
+                  ensureMessageExists(`↗️ Taking you to **${navName}**...`);
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId
+                        ? {
+                            ...msg,
+                            content: `↗️ Taking you to **${navName}**...`,
+                          }
+                        : msg
+                    )
+                  );
+                  setTimeout(() => router.push(navPath), 600);
+                } else if (data.gradesData) {
+                  ensureMessageExists();
+                  fullText += `<UI:GradesTable>${JSON.stringify(data.gradesData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.attendanceData) {
+                  ensureMessageExists();
+                  fullText += `<UI:AttendanceTable>${JSON.stringify(data.attendanceData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.scheduleData) {
+                  ensureMessageExists();
+                  fullText += `<UI:ScheduleTable>${JSON.stringify(data.scheduleData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.text) {
+                  ensureMessageExists();
+                  fullText += data.text;
+                  setMessages(prev => 
+                    prev.map(msg => 
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.error) {
+                  throw new Error(data.error);
+                }
+              } catch (e) {
+                // Ignore parse errors from chunk fragmentation
+              }
+            }
+          }
+        }
+      }
+
+      // ── Post-stream: auto-detect bare suggestion arrays the model forgot to tag ──
+      // Matches patterns like: some text... ["Option A", "Option B", "Option C"]
+      if (fullText) {
+        const bareChipsRegex = /(\[(?:\s*"[^"]*"\s*(?:,\s*"[^"]*"\s*)*)\])\s*$/;
+        const chipMatch = fullText.match(bareChipsRegex);
+
+        if (chipMatch && !fullText.includes('<UI:SuggestionChip>')) {
+          const arrayStr = chipMatch[1];
+          const beforeChips = fullText.slice(0, fullText.lastIndexOf(arrayStr)).trimEnd();
+          fullText = `${beforeChips}\n<UI:SuggestionChip>${arrayStr}</UI>`;
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+            )
+          );
+        }
+      }
+
+      // Attempt TTS read aloud
+      speakText(fullText);
+
+
     } catch (error) {
       console.error("AI Error:", error);
       const message = isAuthError(error)
@@ -144,8 +449,27 @@ const FloatingAIChat = () => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 0 }}
-            className="fixed bottom-20 lg:bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-2rem)] h-[600px] max-h-[calc(100vh-8rem)] flex flex-col rounded-2xl border bg-card shadow-2xl overflow-hidden glassmorphism"
+            style={{ width: `${width}px`, height: `${height}px` }}
+            className="fixed bottom-20 lg:bottom-6 right-6 z-50 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] flex flex-col rounded-2xl border bg-card shadow-2xl overflow-hidden glassmorphism"
           >
+            {/* Resize Handles (North, West, North-West) */}
+            <div
+              className="absolute top-0 left-0 right-0 h-1.5 cursor-ns-resize hover:bg-primary/20 transition-colors z-50"
+              onMouseDown={(e) => handleResizeStart(e, "n")}
+              onTouchStart={(e) => handleResizeStart(e, "n")}
+            />
+            <div
+              className="absolute top-0 bottom-0 left-0 w-1.5 cursor-ew-resize hover:bg-primary/20 transition-colors z-50"
+              onMouseDown={(e) => handleResizeStart(e, "w")}
+              onTouchStart={(e) => handleResizeStart(e, "w")}
+            />
+            <div
+              className="absolute top-0 left-0 w-4 h-4 cursor-nwse-resize hover:bg-primary/30 transition-colors z-50 flex items-center justify-center"
+              onMouseDown={(e) => handleResizeStart(e, "nw")}
+              onTouchStart={(e) => handleResizeStart(e, "nw")}
+            >
+              <div className="w-1.5 h-1.5 border-t border-l border-muted-foreground/60 rounded-tl-[1px] hover:border-primary" />
+            </div>
             <div className="p-4 border-b flex items-center justify-between bg-muted/30 backdrop-blur-md">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -161,14 +485,25 @@ const FloatingAIChat = () => {
                   </div>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsOpen(false)}
-                className="hover:rotate-90 transition-transform duration-200"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}
+                  className={`transition-colors ${isVoiceEnabled ? "text-primary" : "text-muted-foreground"}`}
+                  title="Toggle Voice Output"
+                >
+                  {isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsOpen(false)}
+                  className="hover:rotate-90 transition-transform duration-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -181,9 +516,93 @@ const FloatingAIChat = () => {
                     className={`max-w-[85%] ${message.role === "user" ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-none" : "bg-muted rounded-2xl rounded-tl-none"} px-4 py-2.5 shadow-sm`}
                   >
                     <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {message.content}
-                      </ReactMarkdown>
+                      {(() => {
+                        const content = message.content;
+                        // Regex to match <UI:ComponentType>DATA</UI>
+                        const uiRegex = /<UI:(GradesTable|AttendanceTable|ScheduleTable|SuggestionChip|Redirect)>([\s\S]*?)<\/UI>/g;
+                        const parts = [];
+                        let lastIndex = 0;
+                        let match;
+                        let hasTags = false;
+
+                        while ((match = uiRegex.exec(content)) !== null) {
+                          hasTags = true;
+                          if (match.index > lastIndex) {
+                            parts.push(content.substring(lastIndex, match.index));
+                          }
+                          
+                          try {
+                            const componentType = match[1];
+                            const payload = match[2];
+                            
+                            if (componentType === 'Redirect') {
+                              const targetPath = payload.trim();
+                              setTimeout(() => router.push(targetPath), 800);
+                              parts.push(
+                                <div key={match.index} className="flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-800/40 my-1">
+                                  <span className="animate-pulse">↗</span>
+                                  <span>Navigating to <span className="font-mono font-semibold">{targetPath}</span>...</span>
+                                </div>
+                              );
+                            } else {
+                              let cleanPayload = payload.replace(/```json/g, '').replace(/```/g, '').trim();
+                              
+                              // Extract valid JSON structure
+                              const firstBrace = cleanPayload.indexOf('{');
+                              const firstBracket = cleanPayload.indexOf('[');
+                              const lastBrace = cleanPayload.lastIndexOf('}');
+                              const lastBracket = cleanPayload.lastIndexOf(']');
+                              
+                              let startIdx = -1;
+                              let endIdx = -1;
+                              if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+                                startIdx = firstBrace;
+                                endIdx = lastBrace;
+                              } else if (firstBracket !== -1) {
+                                startIdx = firstBracket;
+                                endIdx = lastBracket;
+                              }
+                              
+                              if (startIdx !== -1 && endIdx !== -1) {
+                                cleanPayload = cleanPayload.substring(startIdx, endIdx + 1);
+                              }
+
+                              const jsonData = JSON.parse(cleanPayload);
+                              
+                              if (componentType === 'GradesTable') {
+                                parts.push(<GradesTable key={match.index} data={jsonData} />);
+                              } else if (componentType === 'AttendanceTable') {
+                                parts.push(<AttendanceTable key={match.index} data={jsonData} />);
+                              } else if (componentType === 'ScheduleTable') {
+                                parts.push(<ScheduleTable key={match.index} data={jsonData} />);
+                              } else if (componentType === 'SuggestionChip') {
+                                parts.push(<SuggestionChips key={match.index} chips={jsonData} onSelect={handleSend} />);
+                              }
+                            }
+                          } catch (e) {
+                            // If JSON parsing fails, just render the raw string
+                            parts.push(match[0]);
+                          }
+                          
+                          lastIndex = uiRegex.lastIndex;
+                        }
+
+                        if (lastIndex < content.length) {
+                          parts.push(content.substring(lastIndex));
+                        }
+
+                        if (parts.length === 0 && !hasTags) parts.push(content);
+
+                        return parts.map((part, i) => {
+                          if (typeof part === 'string') {
+                            if (message.role === 'assistant') {
+                              return <TypewriterText key={i} text={part} onType={scrollToBottom} />;
+                            }
+                            return <ReactMarkdown key={i} remarkPlugins={[remarkGfm]}>{part}</ReactMarkdown>;
+                          }
+                          return part;
+                        });
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -202,6 +621,15 @@ const FloatingAIChat = () => {
 
             <div className="p-4 border-t bg-background/50">
               <div className="flex items-end gap-2 bg-muted/50 p-2 rounded-xl border focus-within:ring-2 ring-primary/20 transition-all">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-9 w-9 shrink-0 rounded-lg ${isListening ? 'text-red-500 animate-pulse bg-red-100 dark:bg-red-900/30' : 'text-muted-foreground'}`}
+                  onClick={handleMicClick}
+                  title="Voice Input"
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
                 <textarea
                   ref={textareaRef}
                   value={inputValue}
@@ -211,13 +639,13 @@ const FloatingAIChat = () => {
                     e.target.style.height = e.target.scrollHeight + "px";
                   }}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask me anything about PEC..."
+                  placeholder={isListening ? "Listening..." : "Ask me anything..."}
                   className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 resize-none max-h-32"
                   rows={1}
                 />
                 <Button
-                  onClick={handleSend}
-                  disabled={isTyping || !inputValue.trim()}
+                  onClick={() => handleSend()}
+                  disabled={isTyping || (!inputValue.trim() && !isListening)}
                   size="icon"
                   className="h-9 w-9 rounded-lg shrink-0"
                 >
