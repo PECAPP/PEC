@@ -30,6 +30,7 @@ import { useRouter } from 'next/navigation';
 import { usePermissions } from '@/hooks/usePermissions';
 import BulkUpload from '@/components/BulkUpload';
 import { fetchAllPages } from '@/lib/fetchAllPages';
+import useSWR from 'swr';
 
 import { api } from '@/lib/api';
 
@@ -88,13 +89,10 @@ export default function CourseMaterials() {
 }
 
 function MaterialsManager({ userId, userRole }: { userId: string; userRole: string }) {
-  const [courses, setCourses] = useState<any[]>([]);
-  const [materials, setMaterials] = useState<CourseMaterial[]>([]);
   const [selectedCourse, setSelectedCourse] = useState('');
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [materialsApiAvailable, setMaterialsApiAvailable] = useState(true);
   const hasWarnedMissingMaterialsApi = useRef(false);
 
   const [materialForm, setMaterialForm] = useState({
@@ -107,63 +105,54 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
   const isAdmin = userRole.includes('admin');
 
-  useEffect(() => {
-    fetchCourses();
-  }, [userId]);
-
-  useEffect(() => {
-    if (courses.length > 0) {
-      fetchMaterials();
-    }
-  }, [courses, selectedCourse]);
-
-  const fetchCourses = async () => {
-    try {
-      if (isAdmin) {
-        const allCourses = await fetchAllPages<any>('/courses');
-        setCourses(allCourses);
-        return;
-      }
-
+  const fetcher = async () => {
+    let coursesData = [];
+    if (isAdmin) {
+      coursesData = await fetchAllPages<any>('/courses');
+    } else {
       const facultyCourses = await fetchAllPages<any>('/courses', { facultyId: userId });
       if (facultyCourses.length > 0) {
-        setCourses(facultyCourses);
-        return;
+        coursesData = facultyCourses;
+      } else {
+        const allCourses = await fetchAllPages<any>('/courses');
+        coursesData = allCourses.filter(
+          (course: any) => course.facultyId === userId || course.instructorId === userId
+        );
       }
-
-      const allCourses = await fetchAllPages<any>('/courses');
-      const scopedCourses = allCourses.filter(
-        (course: any) => course.facultyId === userId || course.instructorId === userId
-      );
-      setCourses(scopedCourses);
-    } catch (error) {
-      console.error('Error fetching courses:', error);
     }
-  };
 
-  const fetchMaterials = async () => {
-    try {
-      const courseIds = selectedCourse ? [selectedCourse] : courses.map(c => c.id);
-      if (courseIds.length === 0) return;
+    const courseIds = coursesData.map(c => c.id);
+    let materialsData: CourseMaterial[] = [];
+    let materialsApiAvailable = true;
 
-      const materialsData = (await fetchAllPages<CourseMaterial>('/course-materials'))
-        .filter((m: CourseMaterial) => courseIds.includes(m.courseId));
-      
-      setMaterials(materialsData);
-      setMaterialsApiAvailable(true);
-    } catch (error) {
-      if (error?.response?.status === 404) {
-        setMaterialsApiAvailable(false);
-        setMaterials([]);
-        if (!hasWarnedMissingMaterialsApi.current) {
-          toast.info('Course materials API is not available yet.');
-          hasWarnedMissingMaterialsApi.current = true;
+    if (courseIds.length > 0) {
+      try {
+        materialsData = (await fetchAllPages<CourseMaterial>('/course-materials'))
+          .filter((m: CourseMaterial) => courseIds.includes(m.courseId));
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          materialsApiAvailable = false;
+          if (!hasWarnedMissingMaterialsApi.current) {
+            toast.info('Course materials API is not available yet.');
+            hasWarnedMissingMaterialsApi.current = true;
+          }
+        } else {
+          throw error;
         }
-        return;
       }
-      console.error('Error fetching materials:', error);
     }
+
+    return { coursesData, materialsData, materialsApiAvailable };
   };
+
+  const { data, error, isLoading, mutate } = useSWR(`manager-materials-${userId}`, fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60000,
+  });
+
+  const courses = data?.coursesData || [];
+  const materials = data?.materialsData || [];
+  const materialsApiAvailable = data?.materialsApiAvailable ?? true;
 
   const handleUpload = async () => {
     if (!materialForm.title || !materialForm.courseId || !materialForm.fileURL) {
@@ -184,7 +173,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
       toast.success('Material uploaded successfully');
       setShowUploadDialog(false);
       resetForm();
-      fetchMaterials();
+      mutate();
     } catch (error) {
       console.error('Error uploading material:', error);
       toast.error('Failed to upload material');
@@ -199,7 +188,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
     try {
       await api.delete(`/course-materials/${id}`);
       toast.success('Material deleted');
-      fetchMaterials();
+      mutate();
     } catch (error) {
       console.error('Error deleting:', error);
       toast.error('Failed to delete');
@@ -233,7 +222,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
       }
     }
     
-    fetchMaterials();
+    mutate();
     return { success, failed, errors };
   };
 
@@ -260,6 +249,14 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
   const filteredMaterials = selectedCourse && selectedCourse !== 'all'
     ? materials.filter(m => m.courseId === selectedCourse)
     : materials;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -419,69 +416,64 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 }
 
 function StudentMaterialsView({ userId }: { userId: string }) {
-  const [loading, setLoading] = useState(true);
-  const [materials, setMaterials] = useState<CourseMaterial[]>([]);
   const [filterType, setFilterType] = useState('all');
   const [filterCourse, setFilterCourse] = useState('all');
-  const [courses, setCourses] = useState<any[]>([]);
-  const [materialsApiAvailable, setMaterialsApiAvailable] = useState(true);
   const hasWarnedMissingMaterialsApi = useRef(false);
 
-  useEffect(() => {
-    fetchData();
-  }, [userId]);
-
-  const fetchData = async () => {
+  const fetcher = async () => {
+    let enrollmentsResponse;
     try {
-      let enrollmentsResponse;
-      try {
-        const scopedEnrollments = await fetchAllPages<any>('/enrollments', {
-          studentId: userId,
-          status: 'active',
-        });
-        enrollmentsResponse = { data: scopedEnrollments };
-      } catch {
-        const allEnrollments = await fetchAllPages<any>('/enrollments');
-        enrollmentsResponse = { data: allEnrollments };
-      }
-      const enrolledCourseIds = (Array.isArray(enrollmentsResponse.data) ? enrollmentsResponse.data : [])
-        .filter((enrollment: any) => enrollment.studentId === userId && (enrollment.status ?? 'active') === 'active')
-        .map((enrollment: any) => enrollment.courseId);
+      const scopedEnrollments = await fetchAllPages<any>('/enrollments', {
+        studentId: userId,
+        status: 'active',
+      });
+      enrollmentsResponse = { data: scopedEnrollments };
+    } catch {
+      const allEnrollments = await fetchAllPages<any>('/enrollments');
+      enrollmentsResponse = { data: allEnrollments };
+    }
+    const enrolledCourseIds = (Array.isArray(enrollmentsResponse.data) ? enrollmentsResponse.data : [])
+      .filter((enrollment: any) => enrollment.studentId === userId && (enrollment.status ?? 'active') === 'active')
+      .map((enrollment: any) => enrollment.courseId);
 
-      if (enrolledCourseIds.length === 0) {
-        setLoading(false);
-        return;
-      }
+    if (enrolledCourseIds.length === 0) {
+      return { coursesData: [], materialsData: [] };
+    }
 
-      const coursesData = (await fetchAllPages<any>('/courses'))
-        .filter((course: any) => enrolledCourseIds.includes(course.id));
-      setCourses(coursesData);
+    const coursesData = (await fetchAllPages<any>('/courses'))
+      .filter((course: any) => enrolledCourseIds.includes(course.id));
 
-      try {
-        const materialsData = (await fetchAllPages<CourseMaterial>('/course-materials'))
-          .filter((m: CourseMaterial) => enrolledCourseIds.includes(m.courseId));
-        
-        setMaterials(materialsData);
-        setMaterialsApiAvailable(true);
-      } catch (error: any) {
-        if (error?.response?.status === 404) {
-          setMaterials([]);
-          setMaterialsApiAvailable(false);
-          if (!hasWarnedMissingMaterialsApi.current) {
-            toast.info('Course materials API is not available yet.');
-            hasWarnedMissingMaterialsApi.current = true;
-          }
-        } else {
-          throw error;
+    try {
+      const materialsData = (await fetchAllPages<CourseMaterial>('/course-materials'))
+        .filter((m: CourseMaterial) => enrolledCourseIds.includes(m.courseId));
+      
+      return { coursesData, materialsData, materialsApiAvailable: true };
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        if (!hasWarnedMissingMaterialsApi.current) {
+          toast.info('Course materials API is not available yet.');
+          hasWarnedMissingMaterialsApi.current = true;
         }
+        return { coursesData, materialsData: [], materialsApiAvailable: false };
+      } else {
+        throw error;
       }
-    } catch (error) {
-      console.error('Error fetching materials:', error);
-      toast.error('Failed to load materials');
-    } finally {
-      setLoading(false);
     }
   };
+
+  const { data, error, isLoading } = useSWR(`student-materials-${userId}`, fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60000,
+  });
+
+  const courses = data?.coursesData || [];
+  const materials = data?.materialsData || [];
+  const materialsApiAvailable = data?.materialsApiAvailable ?? true;
+  const loading = isLoading;
+
+  if (error) {
+    toast.error('Failed to load materials');
+  }
 
   const getTypeIcon = (type: string) => {
     switch (type) {

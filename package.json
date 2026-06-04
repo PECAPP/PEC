@@ -26,8 +26,8 @@
     "start:fresh": "npm run clean:next && next build && next start"
   },
   "workspaces": [
-    "server",
-    "shared"
+    "apps/*",
+    "packages/*"
   ],
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",

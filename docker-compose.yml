@@ -16,11 +16,12 @@ services:
   backend:
     build:
       context: .
-      dockerfile: ./server/Dockerfile
+      dockerfile: apps/server/Dockerfile
     container_name: PECApp-Backend
     restart: always
     ports:
       - "4000:4000"
+      - "50051:50051"
     environment:
       JWT_SECRET: "pec_secret_key_2026"
       PORT: "4000"
@@ -36,10 +37,21 @@ services:
       timeout: 5s
       retries: 5
 
+  envoy:
+    image: envoyproxy/envoy:v1.27-latest
+    container_name: pec_envoy
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    depends_on:
+      - backend
+
   frontend:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: apps/frontend/Dockerfile
     container_name: PECApp-Frontend
     restart: always
     ports:
