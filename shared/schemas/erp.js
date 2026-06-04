@@ -138,7 +138,7 @@ exports.timetableSchema = zod_1.z.object({
     department: zod_1.z.string().optional(),
     semester: zod_1.z.number().int().min(1).max(8).optional(),
     batch: zod_1.z.string().optional(),
-});
+}).passthrough();
 exports.examinationSchema = zod_1.z.object({
     id: zod_1.z.string().uuid().optional(),
     courseId: zod_1.z.string().uuid('Invalid course ID'),

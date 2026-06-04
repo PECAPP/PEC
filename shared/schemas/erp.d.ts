@@ -353,35 +353,35 @@ export declare const timetableSchema: z.ZodObject<{
     department: z.ZodOptional<z.ZodString>;
     semester: z.ZodOptional<z.ZodNumber>;
     batch: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
-    courseName: string;
-    startTime: string;
-    courseCode: string;
-    day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
-    endTime: string;
-    room: string;
-    id?: string | undefined;
-    department?: string | undefined;
-    courseId?: string | undefined;
-    facultyId?: string | undefined;
-    semester?: number | undefined;
-    batch?: string | undefined;
-    facultyName?: string | undefined;
-}, {
-    courseName: string;
-    startTime: string;
-    courseCode: string;
-    day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
-    endTime: string;
-    room: string;
-    id?: string | undefined;
-    department?: string | undefined;
-    courseId?: string | undefined;
-    facultyId?: string | undefined;
-    semester?: number | undefined;
-    batch?: string | undefined;
-    facultyName?: string | undefined;
-}>;
+}, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+    id: z.ZodOptional<z.ZodString>;
+    courseId: z.ZodOptional<z.ZodString>;
+    courseName: z.ZodString;
+    courseCode: z.ZodString;
+    facultyId: z.ZodOptional<z.ZodString>;
+    facultyName: z.ZodOptional<z.ZodString>;
+    day: z.ZodEnum<["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]>;
+    startTime: z.ZodString;
+    endTime: z.ZodString;
+    room: z.ZodString;
+    department: z.ZodOptional<z.ZodString>;
+    semester: z.ZodOptional<z.ZodNumber>;
+    batch: z.ZodOptional<z.ZodString>;
+}, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+    id: z.ZodOptional<z.ZodString>;
+    courseId: z.ZodOptional<z.ZodString>;
+    courseName: z.ZodString;
+    courseCode: z.ZodString;
+    facultyId: z.ZodOptional<z.ZodString>;
+    facultyName: z.ZodOptional<z.ZodString>;
+    day: z.ZodEnum<["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]>;
+    startTime: z.ZodString;
+    endTime: z.ZodString;
+    room: z.ZodString;
+    department: z.ZodOptional<z.ZodString>;
+    semester: z.ZodOptional<z.ZodNumber>;
+    batch: z.ZodOptional<z.ZodString>;
+}, z.ZodTypeAny, "passthrough">>;
 export declare const examinationSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     courseId: z.ZodString;

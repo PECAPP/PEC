@@ -20,11 +20,30 @@ const ThemeToggle = () => {
     );
   }
 
+  const toggleTheme = (event) => {
+    if (
+      typeof document === "undefined" ||
+      !document.startViewTransition ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setTheme(theme === "dark" ? "light" : "dark");
+      return;
+    }
+
+    // Set swipe center variables to center of the viewport
+    document.documentElement.style.setProperty("--swipe-x", "50%");
+    document.documentElement.style.setProperty("--swipe-y", "50%");
+
+    document.startViewTransition(() => {
+      setTheme(theme === "dark" ? "light" : "dark");
+    });
+  };
+
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={toggleTheme}
       className="h-9 w-9 rounded-none"
     >
       {theme === "dark" ? (
