@@ -91,9 +91,20 @@ const FloatingAIChat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
+  const [interimText, setInterimText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
@@ -191,30 +202,85 @@ const FloatingAIChat = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  const handleMicClick = () => {
+  const handleMicClick = async () => {
+    setMicError(null);
+
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert("Your browser does not support voice input.");
+      setMicError("Voice input isn't supported in this browser. Try Chrome or Edge.");
       return;
     }
-    
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setInputValue((prev) => prev + (prev ? " " : "") + transcript);
-    };
-    
+
     if (isListening) {
-      recognition.stop();
-    } else {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    // Explicitly request mic permission first so we can show a proper error
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch {
+      setMicError("Microphone access denied. Please allow mic permission in your browser and try again.");
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+
+    recognition.continuous = false;
+    recognition.interimResults = true;  // Show partial results as you speak
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setInterimText("");
+    };
+
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      let final = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          final += t;
+        } else {
+          interim += t;
+        }
+      }
+      if (interim) setInterimText(interim);
+      if (final) {
+        setInterimText("");
+        setInputValue((prev) => (prev ? prev + " " : "") + final.trim());
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      setInterimText("");
+      recognitionRef.current = null;
+      if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+        setMicError("Microphone access was blocked. Check browser permissions and reload.");
+      } else if (event.error === 'no-speech') {
+        setMicError("No speech detected. Tap the mic and speak clearly.");
+      } else if (event.error === 'network') {
+        setMicError("Network error during voice recognition. Check your connection.");
+      } else {
+        setMicError(`Voice error: ${event.error}`);
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      setInterimText("");
+      recognitionRef.current = null;
+    };
+
+    try {
       recognition.start();
+    } catch (err: any) {
+      setIsListening(false);
+      setMicError(`Could not start voice input: ${err?.message ?? "unknown error"}.`);
     }
   };
 
@@ -620,13 +686,24 @@ const FloatingAIChat = () => {
             </div>
 
             <div className="p-4 border-t bg-background/50">
+              {/* Mic error banner */}
+              {micError && (
+                <div className="mb-2 flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800/40">
+                  <span className="flex-1">{micError}</span>
+                  <button onClick={() => setMicError(null)} className="text-red-400 hover:text-red-600 font-bold leading-none ml-1">×</button>
+                </div>
+              )}
               <div className="flex items-end gap-2 bg-muted/50 p-2 rounded-xl border focus-within:ring-2 ring-primary/20 transition-all">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 shrink-0 rounded-lg ${isListening ? 'text-red-500 animate-pulse bg-red-100 dark:bg-red-900/30' : 'text-muted-foreground'}`}
+                  className={`h-9 w-9 shrink-0 rounded-lg transition-colors ${
+                    isListening
+                      ? 'text-red-500 animate-pulse bg-red-100 dark:bg-red-900/30'
+                      : 'text-muted-foreground hover:text-primary'
+                  }`}
                   onClick={handleMicClick}
-                  title="Voice Input"
+                  title={isListening ? "Stop listening" : "Voice Input"}
                 >
                   <Mic className="h-4 w-4" />
                 </Button>
@@ -639,13 +716,19 @@ const FloatingAIChat = () => {
                     e.target.style.height = e.target.scrollHeight + "px";
                   }}
                   onKeyDown={handleKeyDown}
-                  placeholder={isListening ? "Listening..." : "Ask me anything..."}
+                  placeholder={
+                    isListening
+                      ? interimText
+                        ? interimText  // show live partial transcript
+                        : "🎤 Listening… speak now"
+                      : "Ask me anything..."
+                  }
                   className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 resize-none max-h-32"
                   rows={1}
                 />
                 <Button
                   onClick={() => handleSend()}
-                  disabled={isTyping || (!inputValue.trim() && !isListening)}
+                  disabled={isTyping || (!inputValue.trim() && !interimText.trim())}
                   size="icon"
                   className="h-9 w-9 rounded-lg shrink-0"
                 >
