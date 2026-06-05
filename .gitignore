@@ -1,3 +1,6 @@
+.cph 
+.claude 
+
 # Dependencies
 node_modules
 server/node_modules
@@ -8,8 +11,9 @@ server/node_modules
 /coverage
 
 # Next.js
-/.next/
-/out/
+.next/
+.turbo
+out
 # next-env.d.ts # Often recommended to keep for CI, but common in gitignore
 
 # Production
