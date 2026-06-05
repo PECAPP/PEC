@@ -5,6 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { AttendanceRepository } from './attendance.repository';
+import { QueueService } from '../background-jobs/queue.service';
+import { MessagingService } from '../messaging/messaging.service';
 import { AttendanceQueryDto } from './dto/attendance-query.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
@@ -17,7 +19,11 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AttendanceService {
-  constructor(private readonly repo: AttendanceRepository) {}
+  constructor(
+    private readonly repo: AttendanceRepository,
+    private readonly queue: QueueService,
+    private readonly messaging: MessagingService,
+  ) {}
 
   private readonly PEC_COORDINATES = { lat: 30.7673, lng: 76.7863 };
   private readonly MAX_DISTANCE_METERS = 100;
@@ -37,7 +43,36 @@ export class AttendanceService {
       }
     }
     
-    return this.repo.create(data);
+    const created = await this.repo.create(data);
+
+    // enqueue a background job for async processing (notifications, analytics, etc.)
+    try {
+      await this.queue.addJob('attendance-created', {
+        attendanceId: created.id,
+        studentId: created.studentId,
+        courseId: created.courseId,
+        date: created.date,
+        status: created.status,
+      });
+    } catch (e) {
+      // Log and continue - background jobs should not block the main flow
+      console.error('Failed to enqueue attendance-created job', e?.message || e);
+    }
+
+    // Also publish via RabbitMQ for other services
+    try {
+      await this.messaging.emitAttendanceCreated({
+        attendanceId: created.id,
+        studentId: created.studentId,
+        courseId: created.courseId,
+        date: created.date,
+        status: created.status,
+      });
+    } catch (e) {
+      console.error('Failed to publish attendance.created event', e?.message || e);
+    }
+
+    return created;
   }
 
   async createWaiverRequest(studentId: string, body: CreateWaiverRequestDto) {
