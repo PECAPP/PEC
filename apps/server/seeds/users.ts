@@ -1,0 +1,81 @@
+import { prisma, daysAgo } from './utils';
+import * as bcrypt from 'bcrypt';
+
+export async function ensureRole(name: string) {
+  return prisma.role.upsert({
+    where: { name },
+    update: {},
+    create: { name },
+  });
+}
+
+export async function createUserWithRole(params: {
+  email: string;
+  name: string;
+  role: string;
+  passwordHash: string;
+  githubUsername?: string | null;
+  linkedinUsername?: string | null;
+  isPublicProfile?: boolean;
+}) {
+  const role = await ensureRole(params.role);
+
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.upsert({
+      where: { email: params.email },
+      update: {
+        name: params.name,
+        password: params.passwordHash,
+        role: params.role,
+        githubUsername: params.githubUsername ?? null,
+        linkedinUsername: params.linkedinUsername ?? null,
+        isPublicProfile: params.isPublicProfile ?? true,
+        profileComplete: true,
+        emailVerified: true,
+        emailVerifiedAt: daysAgo(90),
+        passwordChangedAt: daysAgo(30),
+      },
+      create: {
+        email: params.email,
+        name: params.name,
+        password: params.passwordHash,
+        role: params.role,
+        githubUsername: params.githubUsername ?? null,
+        linkedinUsername: params.linkedinUsername ?? null,
+        isPublicProfile: params.isPublicProfile ?? true,
+        profileComplete: true,
+        emailVerified: true,
+        emailVerifiedAt: daysAgo(90),
+        passwordChangedAt: daysAgo(30),
+      },
+    });
+
+    await tx.userRole.deleteMany({ where: { userId: user.id } });
+    await tx.userRole.create({
+      data: {
+        userId: user.id,
+        roleId: role.id,
+      },
+    });
+
+    return user;
+  });
+}
+
+export async function seedCoreUsers(passwordHash: string) {
+  const admin = await createUserWithRole({
+    email: 'admin@pec.edu',
+    name: 'PEC College Admin',
+    role: 'college_admin',
+    passwordHash,
+  });
+
+  await createUserWithRole({
+    email: 'ops.admin@pec.edu',
+    name: 'Operations Admin',
+    role: 'college_admin',
+    passwordHash,
+  });
+
+  return admin;
+}
