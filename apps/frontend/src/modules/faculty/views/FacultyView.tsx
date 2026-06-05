@@ -171,16 +171,34 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
  };
 
  const exportFaculty = async () => {
-  const { utils, writeFile } = await import('xlsx');
-  const data = faculty.map(f => ({
-   employeeId: f.employeeId, fullName: f.fullName, email: f.email,
-   department: f.department, designation: f.designation,
-   phone: f.phone, specialization: f.specialization, status: f.status || 'active',
-  }));
-  const ws = utils.json_to_sheet(data);
-  const wb = utils.book_new();
-  utils.book_append_sheet(wb, ws, 'Faculty');
-  writeFile(wb, `faculty_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+  const ExcelJS = await import('exceljs');
+  const fileSaver = await import('file-saver');
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Faculty');
+
+  worksheet.columns = [
+   { header: 'Employee ID', key: 'employeeId', width: 15 },
+   { header: 'Full Name', key: 'fullName', width: 30 },
+   { header: 'Email', key: 'email', width: 30 },
+   { header: 'Department', key: 'department', width: 20 },
+   { header: 'Designation', key: 'designation', width: 20 },
+   { header: 'Phone', key: 'phone', width: 15 },
+   { header: 'Specialization', key: 'specialization', width: 20 },
+   { header: 'Status', key: 'status', width: 15 },
+  ];
+
+  faculty.forEach(f => {
+   worksheet.addRow({
+    employeeId: f.employeeId, fullName: f.fullName, email: f.email,
+    department: f.department, designation: f.designation,
+    phone: f.phone, specialization: f.specialization, status: f.status || 'active',
+   });
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  fileSaver.saveAs(blob, `faculty_export_${new Date().toISOString().split('T')[0]}.xlsx`);
   toast.success('Exported!');
  };
 

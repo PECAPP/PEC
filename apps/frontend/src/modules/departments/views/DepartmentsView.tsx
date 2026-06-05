@@ -135,14 +135,28 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
  };
 
  const exportDepartments = async () => {
-  const { utils, writeFile } = await import('xlsx');
-  const exportData = departments.map(d => ({
-   name: d.name, code: d.code, hod: d.hod || '', description: d.description || '',
-  }));
-  const ws = utils.json_to_sheet(exportData);
-  const wb = utils.book_new();
-  utils.book_append_sheet(wb, ws, 'Departments');
-  writeFile(wb, `departments_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+  const ExcelJS = await import('exceljs');
+  const fileSaver = await import('file-saver');
+  
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Departments');
+  
+  worksheet.columns = [
+   { header: 'Name', key: 'name', width: 30 },
+   { header: 'Code', key: 'code', width: 15 },
+   { header: 'Head of Department', key: 'hod', width: 30 },
+   { header: 'Description', key: 'description', width: 40 },
+  ];
+  
+  departments.forEach(d => {
+   worksheet.addRow({
+    name: d.name, code: d.code, hod: d.hod || '', description: d.description || '',
+   });
+  });
+  
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  fileSaver.saveAs(blob, `departments_export_${new Date().toISOString().split('T')[0]}.xlsx`);
   toast.success('Exported!');
  };
 

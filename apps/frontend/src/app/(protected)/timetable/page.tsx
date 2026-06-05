@@ -22,7 +22,7 @@ import {
 import BulkUpload from "@/components/BulkUpload";
 
 import PDFExportButton from "@/components/common/PDFExportButton";
-import * as XLSX from "xlsx";
+import * as ExcelJS from "exceljs";
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -420,7 +420,7 @@ export default function Timetable() {
     return { success: successCount, failed: failCount, errors };
   };
 
-  const exportTimetable = () => {
+  const exportTimetable = async () => {
     const exportData = Object.values(timetable).flatMap((slotGroup: any) =>
       (Array.isArray(slotGroup) ? slotGroup : [slotGroup]).map((slot: any) => ({
         day: slot.day,
@@ -431,13 +431,27 @@ export default function Timetable() {
       })),
     );
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Timetable");
-    XLSX.writeFile(
-      workbook,
-      `timetable_export_${new Date().toISOString().split("T")[0]}.xlsx`
-    );
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Timetable");
+    
+    worksheet.columns = [
+      { header: 'day', key: 'day' },
+      { header: 'timeSlot', key: 'timeSlot' },
+      { header: 'courseCode', key: 'courseCode' },
+      { header: 'courseName', key: 'courseName' },
+      { header: 'room', key: 'room' },
+    ];
+    
+    exportData.forEach(row => worksheet.addRow(row));
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `timetable_export_${new Date().toISOString().split("T")[0]}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
     toast.success("Timetable exported successfully!");
   };
 

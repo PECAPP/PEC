@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import { Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -45,15 +45,31 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
       });
     } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = e.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      reader.onload = async (e) => {
+        const buffer = e.target?.result as ArrayBuffer;
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(buffer);
+        const worksheet = workbook.worksheets[0];
+        
+        const jsonData: any[] = [];
+        let headers: string[] = [];
+        
+        worksheet.eachRow((row, rowNumber) => {
+          if (rowNumber === 1) {
+            row.eachCell((cell, colNumber) => {
+              headers[colNumber] = cell.value?.toString() || `Column${colNumber}`;
+            });
+          } else {
+            const rowData: any = {};
+            row.eachCell((cell, colNumber) => {
+              rowData[headers[colNumber]] = cell.value;
+            });
+            jsonData.push(rowData);
+          }
+        });
         validateAndSetData(jsonData);
       };
-      reader.readAsBinaryString(file);
+      reader.readAsArrayBuffer(file);
     }
   }, []);
 
@@ -119,15 +135,25 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
     }
   };
 
-  const downloadTemplate = () => {
+  const downloadTemplate = async () => {
     const template = sampleData || [
       templateColumns.reduce((obj, col) => ({ ...obj, [col]: 'Sample' }), {})
     ];
 
-    const worksheet = XLSX.utils.json_to_sheet(template);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, entityType);
-    XLSX.writeFile(workbook, `${entityType}_template.xlsx`);
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(entityType);
+    
+    worksheet.columns = templateColumns.map(col => ({ header: col, key: col }));
+    template.forEach(row => worksheet.addRow(row));
+    
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${entityType}_template.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const resetUpload = () => {

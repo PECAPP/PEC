@@ -30,6 +30,7 @@ import {
   GripVertical,
   ShoppingBag,
   Wallet,
+  Activity,
 } from "lucide-react";
 
 
@@ -221,6 +222,12 @@ const navItems: NavItem[] = [
     path: "/help",
     roles: ["student", "faculty", "college_admin"],
   },
+  {
+    icon: Activity,
+    label: "Observability",
+    path: "/admin/observability",
+    roles: ["college_admin"],
+  },
 ];
 
 export function Sidebar({ 
@@ -290,7 +297,7 @@ export function Sidebar({
     },
     {
       title: 'System',
-      paths: ['/settings', '/help'],
+      paths: ['/settings', '/help', '/admin/observability'],
     },
   ];
 
