@@ -1,6 +1,7 @@
 import withBundleAnalyzerInit from '@next/bundle-analyzer';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import "./src/env.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -80,22 +81,23 @@ const nextConfig = {
   // SSR calls use INTERNAL_API_URL (localhost:8000) directly for speed.
   async rewrites() {
     const isProd = process.env.NODE_ENV === 'production';
-    const defaultTarget = isProd ? 'http://backend:4000/api' : 'http://localhost:4000/api';
-    
-    const configuredTarget =
-      process.env.INTERNAL_API_URL ??
-      process.env.NEXT_PUBLIC_API_URL ??
-      defaultTarget;
+    // The destination must be the backend server, never the frontend proxy itself.
+    const backendTarget = process.env.INTERNAL_API_URL || 
+      (isProd ? 'http://backend:4000/api' : 'http://localhost:4000/api');
       
-    const normalizedTarget = configuredTarget.replace(/\/$/, '');
+    const normalizedTarget = backendTarget.replace(/\/$/, '');
     const apiTarget = normalizedTarget.endsWith('/api')
       ? normalizedTarget
       : `${normalizedTarget}/api`;
 
     return [
       {
+        source: '/api/v1/:path*',
+        destination: `${apiTarget}/v1/:path*`,
+      },
+      {
         source: '/api/:path*',
-        destination: `${apiTarget}/:path*`,
+        destination: `${apiTarget}/v1/:path*`,
       },
     ];
   },
