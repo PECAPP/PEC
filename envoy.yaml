@@ -60,3 +60,4 @@ static_resources:
                     socket_address:
                       address: backend
                       port_value: 50051
+    

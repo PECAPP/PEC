@@ -4,7 +4,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 
-import sanitizeHtml from 'sanitize-html';
+import sanitizeHtml = require('sanitize-html');
 
 @Injectable()
 export class InputSanitizationMiddleware implements NestMiddleware {

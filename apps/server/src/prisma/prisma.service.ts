@@ -15,6 +15,9 @@ export class PrismaService
       adapter,
       log: [],
     });
+
+    // Soft-delete middleware removed for Prisma 5+ compatibility.
+    // Client extensions should be used instead if global soft delete is required.
   }
 
   async onModuleInit() {

@@ -19,6 +19,16 @@ async function bootstrap() {
     },
   });
 
+  // Also connect a RabbitMQ microservice listener so this app can consume events
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672'],
+      queue: process.env.RABBITMQ_QUEUE || 'pec_queue',
+      queueOptions: { durable: true },
+    },
+  });
+
   // Enable API docs in development
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
