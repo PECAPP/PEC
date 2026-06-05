@@ -29,8 +29,6 @@ import { FacultyBioSystemModule } from './faculty-bio-system/faculty-bio-system.
 import { CgpaEntriesModule } from './cgpa-entries/cgpa-entries.module';
 import { AcademicCalendarModule } from './academic-calendar/academic-calendar.module';
 
-import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -43,12 +41,6 @@ import { FinanceModule } from './finance/finance.module';
 
 @Module({
   imports: [
-    CacheModule.register({
-      isGlobal: true,
-      store: redisStore,
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
-      ttl: 60, // 60 seconds default cache TTL
-    }),
     AuthModule,
     UsersModule,
     PrismaModule,

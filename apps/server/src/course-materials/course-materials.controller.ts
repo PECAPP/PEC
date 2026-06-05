@@ -7,9 +7,7 @@ import {
   Post,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -23,9 +21,6 @@ export class CourseMaterialsController {
   constructor(private readonly service: CourseMaterialsService) {}
 
   @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin', 'super_admin')
-  @UseInterceptors(CacheInterceptor)
-  @CacheKey('course_materials_list')
-  @CacheTTL(120) // Cache for 2 minutes
   @Get()
   findMany(@Query() query: CourseMaterialQueryDto) {
     return this.service.findMany(query);
