@@ -8,8 +8,14 @@ import {
   isProduction,
 } from './config/runtime-config';
 
+import { VersioningType } from '@nestjs/common';
+
 export const configureApp = (app: INestApplication): void => {
   app.setGlobalPrefix('api');
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
   enforceLeastPrivilegeDatabaseUser();
   const corsConfig = getCorsConfig();
   const bodySizeLimit = getBodySizeLimit();

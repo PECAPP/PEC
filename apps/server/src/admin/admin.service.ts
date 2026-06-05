@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as xlsx from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -24,9 +24,26 @@ export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
   async processUserBulk(file: Express.Multer.File) {
-    const workbook = xlsx.read(file.buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(file.buffer as any);
+    const worksheet = workbook.worksheets[0];
+
+    const data: any[] = [];
+    let headers: string[] = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) {
+        row.eachCell((cell, colNumber) => {
+          headers[colNumber] = cell.value?.toString() || `Column${colNumber}`;
+        });
+      } else {
+        const rowData: any = {};
+        row.eachCell((cell, colNumber) => {
+          rowData[headers[colNumber]] = cell.value;
+        });
+        data.push(rowData);
+      }
+    });
 
     const results = { imported: 0, failed: 0, errors: [] as any[] };
 
@@ -66,9 +83,26 @@ export class AdminService {
   }
 
   async processAttendanceBulk(file: Express.Multer.File) {
-    const workbook = xlsx.read(file.buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(file.buffer as any);
+    const worksheet = workbook.worksheets[0];
+
+    const data: any[] = [];
+    let headers: string[] = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) {
+        row.eachCell((cell, colNumber) => {
+          headers[colNumber] = cell.value?.toString() || `Column${colNumber}`;
+        });
+      } else {
+        const rowData: any = {};
+        row.eachCell((cell, colNumber) => {
+          rowData[headers[colNumber]] = cell.value;
+        });
+        data.push(rowData);
+      }
+    });
 
     const results = { imported: 0, failed: 0, errors: [] as any[] };
 

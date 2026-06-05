@@ -1,20 +1,30 @@
-import 'dotenv/config';
+try { require('dotenv/config'); } catch (e) {}
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
   configureApp(app);
+
+  let protoPath = join(process.cwd(), '../../packages/protos/hello.proto');
+  if (!require('fs').existsSync(protoPath)) {
+    protoPath = join(process.cwd(), 'packages/protos/hello.proto');
+  }
+  if (!require('fs').existsSync(protoPath)) {
+    protoPath = '/app/packages/protos/hello.proto';
+  }
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
       package: 'hello',
-      protoPath: join(process.cwd(), '../../packages/protos/hello.proto'),
+      protoPath,
       url: '0.0.0.0:50051',
     },
   });
@@ -25,7 +35,13 @@ async function bootstrap() {
     options: {
       urls: [process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672'],
       queue: process.env.RABBITMQ_QUEUE || 'pec_queue',
-      queueOptions: { durable: true },
+      queueOptions: { 
+        durable: true,
+        arguments: {
+          'x-dead-letter-exchange': 'pec_dlx',
+          'x-dead-letter-routing-key': 'pec_dlq_routing_key'
+        }
+      },
     },
   });
 
@@ -41,6 +57,9 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
   }
+
+  // Graceful Shutdown implementation
+  app.enableShutdownHooks();
 
   await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 4000);

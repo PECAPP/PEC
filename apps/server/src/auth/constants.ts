@@ -1,4 +1,4 @@
-import 'dotenv/config';
+try { require('dotenv/config'); } catch (e) {}
 
 const jwtSecret = process.env.JWT_SECRET;
 

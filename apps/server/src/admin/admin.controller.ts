@@ -12,12 +12,15 @@ import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { ok } from '../common/utils/api-response';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 
 @Controller('admin')
 @UseGuards(AuthGuard, RolesGuard)
 @Roles('admin', 'college_admin')
 export class AdminController {
   @Get('dashboard-stats')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('dashboard-stats-cache')
   async getStats() {
     const data = await this.adminService.getDashboardStats();
     return ok(data);

@@ -25,7 +25,7 @@
         "./src/*"
       ],
       "@shared/*": [
-        "./shared/*"
+        "./packages/shared/*"
       ]
     },
     "plugins": [
@@ -49,6 +49,6 @@
     "archive"
   ],
   "references": [
-    { "path": "./shared" }
+    { "path": "./packages/shared" }
   ]
 }

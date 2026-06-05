@@ -1,6 +1,11 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { CqrsModule } from '@nestjs/cqrs';
+import { LoggerModule } from 'nestjs-pino';
+import Redis from 'ioredis';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -41,6 +46,7 @@ import { FinanceModule } from './finance/finance.module';
 
 @Module({
   imports: [
+    PrometheusModule.register(),
     AuthModule,
     UsersModule,
     PrismaModule,
@@ -72,15 +78,21 @@ import { FinanceModule } from './finance/finance.module';
     AcademicCalendarModule,
     MarketplaceModule,
     FinanceModule,
-    ThrottlerModule.forRoot([{
-      name: 'short',
-      ttl: 60000,
-      limit: 100,
-    }, {
-      name: 'long',
-      ttl: 600000,
-      limit: 1000,
-    }]),
+    CqrsModule,
+    LoggerModule.forRoot({
+      pinoHttp: {
+        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
+      },
+    }),
+    ThrottlerModule.forRootAsync({
+      useFactory: () => ({
+        storage: new ThrottlerStorageRedisService(new Redis(process.env.REDIS_URL || 'redis://localhost:6379')),
+        throttlers: [
+          { name: 'short', ttl: 60000, limit: 100 },
+          { name: 'long', ttl: 600000, limit: 1000 },
+        ],
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [

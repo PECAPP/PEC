@@ -54,6 +54,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     };
 
     if (status >= 500) {
+      import('@sentry/node').then((Sentry) => {
+        Sentry.captureException(exception, {
+          extra: {
+            reqId: requestId,
+            path: request?.url,
+            method: request?.method,
+          },
+        });
+      });
+
       this.logger.error(
         JSON.stringify({
           event: 'request:error',

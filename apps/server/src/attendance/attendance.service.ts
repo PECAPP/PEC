@@ -11,7 +11,7 @@ import { AttendanceQueryDto } from './dto/attendance-query.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { CreateWaiverRequestDto } from './dto/create-waiver-request.dto';
-import * as xlsx from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import { createReadStream } from 'fs';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import { extname, join, resolve } from 'path';
@@ -264,34 +264,53 @@ export class AttendanceService {
 
   async generateExcel(courseId: string) {
     const data = await this.repo.findMany({ courseId, limit: 1000 });
-    const records = data.items.map((item: any) => ({
-      'Student ID': item.studentId,
-      'Subject': item.subject,
-      'Date': item.date.toISOString().split('T')[0],
-      'Status': item.status.toUpperCase(),
-      'CreatedAt': item.createdAt ? new Date(item.createdAt).toISOString() : 'N/A'
-    }));
-
-    const worksheet = xlsx.utils.json_to_sheet(records);
-    const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Attendance');
     
-    return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    worksheet.columns = [
+      { header: 'Student ID', key: 'studentId' },
+      { header: 'Subject', key: 'subject' },
+      { header: 'Date', key: 'date' },
+      { header: 'Status', key: 'status' },
+      { header: 'CreatedAt', key: 'createdAt' },
+    ];
+
+    data.items.forEach((item: any) => {
+      worksheet.addRow({
+        studentId: item.studentId,
+        subject: item.subject,
+        date: item.date.toISOString().split('T')[0],
+        status: item.status.toUpperCase(),
+        createdAt: item.createdAt ? new Date(item.createdAt).toISOString() : 'N/A'
+      });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 
   async generateStudentExcel(studentId: string) {
     const data = await this.repo.findMany({ studentId, limit: 1000 });
-    const records = data.items.map((item: any) => ({
-      'Subject': item.subject,
-      'Date': item.date.toISOString().split('T')[0],
-      'Status': item.status.toUpperCase(),
-      'CreatedAt': item.createdAt ? new Date(item.createdAt).toISOString() : 'N/A'
-    }));
-
-    const worksheet = xlsx.utils.json_to_sheet(records);
-    const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, worksheet, 'My Attendance');
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('My Attendance');
     
-    return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    worksheet.columns = [
+      { header: 'Subject', key: 'subject' },
+      { header: 'Date', key: 'date' },
+      { header: 'Status', key: 'status' },
+      { header: 'CreatedAt', key: 'createdAt' },
+    ];
+
+    data.items.forEach((item: any) => {
+      worksheet.addRow({
+        subject: item.subject,
+        date: item.date.toISOString().split('T')[0],
+        status: item.status.toUpperCase(),
+        createdAt: item.createdAt ? new Date(item.createdAt).toISOString() : 'N/A'
+      });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 }
