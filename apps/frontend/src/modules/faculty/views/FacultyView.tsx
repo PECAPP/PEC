@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect, useOptimistic } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { facultySchema, FacultyInput } from '@shared/schemas/erp';
+import { facultySchema, FacultyInput } from '@/lib/schemas';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
