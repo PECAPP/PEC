@@ -26,7 +26,7 @@
     "start": "nest start",
     "start:dev": "node scripts/start-dev-safe.js",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/src/main",
+    "start:prod": "node -r tsconfig-paths/register dist/apps/server/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -74,7 +74,7 @@
     "swagger-ui-express": "^5.0.1",
     "tar": "^7.5.13",
     "undici": "^7.24.6",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {

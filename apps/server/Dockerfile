@@ -21,6 +21,9 @@ WORKDIR /app/packages/database
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN npx prisma generate
 
+WORKDIR /app/packages/shared
+RUN npm run build
+
 WORKDIR /app/apps/server
 RUN npm run build
 
@@ -37,6 +40,7 @@ COPY --from=builder /app/packages /app/packages
 # Copy built dist and necessary package files
 COPY --from=builder /app/apps/server/dist ./dist
 COPY --from=builder /app/apps/server/package.json ./
+COPY --from=builder /app/apps/server/tsconfig.json ./
 
 # Switch to non-root user for security
 USER node
@@ -44,4 +48,4 @@ USER node
 EXPOSE 4000
 EXPOSE 50051
 
-CMD ["node", "dist/src/main"]
+CMD ["node", "-r", "tsconfig-paths/register", "dist/apps/server/src/main.js"]

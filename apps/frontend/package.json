@@ -11,6 +11,9 @@
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",
     "@hookform/resolvers": "^3.10.0",
+    "@next/bundle-analyzer": "^15.1.7",
+    "@pec/database": "*",
+    "@pec/shared": "*",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -79,17 +82,15 @@
     "recharts": "^2.15.4",
     "remark-gfm": "^4.0.1",
     "sonner": "^1.7.4",
+    "swr": "^2.4.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "tar": "^7.5.13",
     "three": "^0.183.2",
     "undici": "^7.24.6",
     "vaul": "^0.9.9",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
-    "zod": "^3.24.1",
-    "@pec/shared": "*",
-    "@pec/database": "*",
-    "@next/bundle-analyzer": "^15.1.7"
+    "xlsx": "^0.18.5",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",

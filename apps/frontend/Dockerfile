@@ -4,10 +4,16 @@ WORKDIR /app
 COPY package*.json ./
 COPY apps/frontend/package*.json ./apps/frontend/
 COPY packages/shared/package*.json ./packages/shared/
+COPY packages/database/package*.json ./packages/database/
+COPY packages/protos/package*.json ./packages/protos/
 RUN npm install --legacy-peer-deps
 
-COPY packages/shared ./packages/shared
+COPY packages ./packages
 COPY apps/frontend ./apps/frontend
+
+WORKDIR /app/packages/database
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+RUN npx prisma generate
 
 WORKDIR /app/apps/frontend
 ENV NODE_ENV=production
