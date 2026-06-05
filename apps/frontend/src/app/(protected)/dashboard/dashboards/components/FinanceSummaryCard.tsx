@@ -57,9 +57,11 @@ export function FinanceSummaryCard({
           api.get('/finance/fees?status=pending&limit=3'),
         ]);
         const sumRaw = (sumRes as any).data;
-        setSummary(sumRaw?.data ?? sumRaw ?? null);
+        const sumData = sumRaw?.data ?? sumRaw;
+        setSummary(sumData && typeof sumData === 'object' && !Array.isArray(sumData) ? sumData : null);
         const feesRaw = (feesRes as any).data;
-        setPendingFees(feesRaw?.data ?? feesRaw ?? []);
+        const feesData = feesRaw?.data ?? feesRaw;
+        setPendingFees(Array.isArray(feesData) ? feesData : []);
       } catch {
         // silent
       } finally {

@@ -62,8 +62,11 @@ export function MarketplaceCard({
           api.get('/marketplace/listings?limit=4&sortBy=createdAt&sortOrder=desc'),
           api.get('/marketplace/bookmarks/ids'),
         ]);
-        setListings((listingsRes as any).data ?? []);
-        const ids = (savedRes as any).data ?? [];
+        const raw = (listingsRes as any).data;
+        const data = raw?.data ?? raw;
+        setListings(Array.isArray(data) ? data : []);
+        const idsRaw = (savedRes as any).data;
+        const ids = idsRaw?.data ?? idsRaw;
         setSavedCount(Array.isArray(ids) ? ids.length : 0);
       } catch {
         // silent

@@ -527,7 +527,9 @@ function AdminCreateFeeDialog({ open, onClose, onSuccess }: {
     setLoading(true);
     try {
       const res = await api.post('/finance/fees/bulk-monthly', { ...bulk, amount: parseFloat(bulk.amount) });
-      const { created, skipped } = (res as any).data ?? {};
+      const raw = (res as any).data;
+      const data = raw?.data ?? raw;
+      const { created, skipped } = data ?? {};
       toast.success(`Created ${created} fees (${skipped} skipped – already exists)`);
       onSuccess(); onClose();
     } catch { toast.error('Failed'); }
@@ -659,7 +661,8 @@ export default function FinancePage() {
     try {
       const res = await api.get('/finance/summary');
       const raw = (res as any).data;
-      setSummary(raw?.data ?? raw ?? null);
+      const data = raw?.data ?? raw;
+      setSummary(data && typeof data === 'object' && !Array.isArray(data) ? data : null);
     } catch { /* silent */ }
   }, []);
 
@@ -670,7 +673,8 @@ export default function FinancePage() {
       if (feeCategory) params.category = feeCategory;
       const res = await api.get(`/finance/fees?${new URLSearchParams(params)}`);
       const raw = (res as any).data;
-      setFees(raw?.data ?? raw ?? []);
+      const data = raw?.data ?? raw;
+      setFees(Array.isArray(data) ? data : []);
     } catch { toast.error('Failed to load fees'); }
     finally { setFeesLoading(false); }
   }, [feeCategory]);
@@ -685,7 +689,8 @@ export default function FinancePage() {
       if (txnTo) params.to = txnTo;
       const res = await api.get(`/finance/transactions?${new URLSearchParams(params)}`);
       const raw = (res as any).data;
-      setTransactions(raw?.data ?? raw ?? []);
+      const data = raw?.data ?? raw;
+      setTransactions(Array.isArray(data) ? data : []);
     } catch { toast.error('Failed to load transactions'); }
     finally { setTxnsLoading(false); }
   }, [txnCat, txnStatus, txnFrom, txnTo]);

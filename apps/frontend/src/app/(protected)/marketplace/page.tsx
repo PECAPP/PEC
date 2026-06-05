@@ -559,7 +559,8 @@ function ChatPanel({
     setLoadingChat(true);
     try {
       const res = await api.post(`/marketplace/chats/listing/${listingId}`, {});
-      const chat = (res as any).data;
+      const raw = (res as any).data;
+      const chat = raw?.data ?? raw;
       setActiveChatId(chat.id);
       await loadMessages(chat.id);
       onChatsRefresh();
@@ -578,7 +579,9 @@ function ChatPanel({
   const loadMessages = async (chatId: string) => {
     try {
       const res = await api.get(`/marketplace/chats/${chatId}/messages`);
-      setMessages((res as any).data ?? []);
+      const raw = (res as any).data;
+      const data = raw?.data ?? raw;
+      setMessages(Array.isArray(data) ? data : []);
     } catch {
       toast.error('Failed to load messages');
     }
@@ -589,7 +592,8 @@ function ChatPanel({
     setSending(true);
     try {
       const res = await api.post(`/marketplace/chats/${activeChatId}/messages`, { text: msgText.trim() });
-      const newMsg = (res as any).data;
+      const raw = (res as any).data;
+      const newMsg = raw?.data ?? raw;
       setMessages((prev) => [...prev, newMsg]);
       setMsgText('');
       onChatsRefresh();
@@ -776,9 +780,10 @@ export default function MarketplacePage() {
 
       const query = new URLSearchParams(params).toString();
       const res = await api.get(`/marketplace/listings?${query}`);
-      const { data, meta } = res as any;
-      setListings(data ?? []);
-      setTotal(meta?.total ?? 0);
+      const raw = (res as any).data;
+      const data = raw?.data ?? raw;
+      setListings(Array.isArray(data) ? data : []);
+      setTotal(raw?.meta?.total ?? 0);
     } catch {
       toast.error('Failed to load listings');
     } finally {
@@ -789,7 +794,9 @@ export default function MarketplacePage() {
   const fetchMyListings = useCallback(async () => {
     try {
       const res = await api.get('/marketplace/listings/my');
-      setMyListings((res as any).data ?? []);
+      const raw = (res as any).data;
+      const data = raw?.data ?? raw;
+      setMyListings(Array.isArray(data) ? data : []);
     } catch {
       // silent
     }
@@ -798,7 +805,9 @@ export default function MarketplacePage() {
   const fetchSavedListings = useCallback(async () => {
     try {
       const res = await api.get('/marketplace/bookmarks');
-      setSavedListings((res as any).data ?? []);
+      const raw = (res as any).data;
+      const data = raw?.data ?? raw;
+      setSavedListings(Array.isArray(data) ? data : []);
     } catch {
       // silent
     }
@@ -807,7 +816,9 @@ export default function MarketplacePage() {
   const fetchBookmarkedIds = useCallback(async () => {
     try {
       const res = await api.get('/marketplace/bookmarks/ids');
-      setBookmarkedIds(new Set((res as any).data ?? []));
+      const raw = (res as any).data;
+      const data = raw?.data ?? raw;
+      setBookmarkedIds(new Set(Array.isArray(data) ? data : []));
     } catch {
       // silent
     }
@@ -817,7 +828,8 @@ export default function MarketplacePage() {
     try {
       const res = await api.get('/marketplace/chats');
       const raw = (res as any).data;
-      setChats(Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : []);
+      const data = raw?.data ?? raw;
+      setChats(Array.isArray(data) ? data : []);
     } catch {
       // silent
     }
@@ -845,7 +857,9 @@ export default function MarketplacePage() {
   const handleBookmark = async (id: string) => {
     try {
       const res = await api.post(`/marketplace/bookmarks/${id}`, {});
-      const { bookmarked } = (res as any).data;
+      const raw = (res as any).data;
+      const data = raw?.data ?? raw;
+      const { bookmarked } = data;
       setBookmarkedIds((prev) => {
         const next = new Set(prev);
         if (bookmarked) next.add(id); else next.delete(id);
