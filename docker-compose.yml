@@ -5,14 +5,62 @@ services:
     container_name: pec_postgres
     restart: always
     environment:
-      POSTGRES_DB: "pec"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: pec
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
+    command: ["postgres", "-c", "statement_timeout=5000", "-c", "autovacuum_vacuum_scale_factor=0.05", "-c", "autovacuum_analyze_scale_factor=0.02", "-c", "wal_level=logical"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U postgres -d pec
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: pec_pgbouncer
+    environment:
+      AUTH_TYPE: scram-sha-256
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: postgres
+      DB_NAME: pec
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: "1000"
+      DEFAULT_POOL_SIZE: "20"
+      IGNORE_STARTUP_PARAMETERS: extra_float_digits
+    ports:
+      - 6432:5432
+    depends_on:
+      - postgres
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
   backend:
     build:
       context: .
@@ -20,51 +68,119 @@ services:
     container_name: PECApp-Backend
     restart: always
     ports:
-      - "4000:4000"
-      - "50051:50051"
+      - 4000:4000
+      - 50051:50051
     environment:
-      JWT_SECRET: "pec_secret_key_2026"
+      JWT_SECRET: pec_secret_key_2026
       PORT: "4000"
-      NODE_ENV: "development"
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/pec
+      REPLICA_URL: postgresql://postgres:postgres@postgres:5432/pec
+      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
+      REDIS_URL: redis://redis:6379
     command: >
-      sh -c " cd /app/packages/database && npx prisma db push --accept-data-loss && cd /app/apps/server && node -r tsconfig-paths/register dist/apps/server/src/main.js "
+      sh -c " cd /app/packages/database && npx prisma db push --accept-data-loss
+      && cd /app/apps/server && node -r tsconfig-paths/register
+      dist/apps/server/src/main.js "
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:4000/api"]
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - http://localhost:4000/api
       interval: 10s
       timeout: 5s
       retries: 5
-
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
   envoy:
     image: envoyproxy/envoy:v1.27-latest
     container_name: pec_envoy
     ports:
-      - "8080:8080"
-      - "9901:9901"
+      - 8080:8080
+      - 9901:9901
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
     depends_on:
       - backend
-
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
   redis:
     image: redis:7-alpine
     container_name: pec_redis
     restart: always
     ports:
-      - "6379:6379"
-
+      - 6379:6379
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
   rabbitmq:
     image: rabbitmq:3-management
     container_name: pec_rabbitmq
     restart: always
     ports:
-      - "5672:5672"
-      - "15672:15672"
-
-
-
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+    healthcheck:
+      test:
+        - CMD
+        - rabbitmq-diagnostics
+        - check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 5
   frontend:
     build:
       context: .
@@ -72,38 +188,80 @@ services:
     container_name: PECApp-Frontend
     restart: always
     ports:
-      - "3000:3001" # Host listens on 3000, forwards to container's 3001
+      - 3000:3001
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:4000/api"
-      INTERNAL_API_URL: "http://backend:4000/api"
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+      INTERNAL_API_URL: http://backend:4000/api
     depends_on:
       - backend
-
-  dev_seed:
-    image: node:20-alpine
-    container_name: pec_dev_seed
-    working_dir: /app
-    volumes:
-      - ./:/app
-    environment:
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
-    depends_on:
-      - postgres
-    command: sh -c "npm install --legacy-peer-deps && npx ts-node apps/server/seed.ts"
-
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+#  dev_seed:
+#    image: node:22-alpine
+#    container_name: pec_dev_seed
+#    working_dir: /app
+#    volumes:
+#      - ./:/app
+#    environment:
+#      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/pec
+#      REPLICA_URL: postgresql://postgres:postgres@postgres:5432/pec
+#      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
+#    depends_on:
+#      - postgres
+#    command: sh -c "corepack enable pnpm && pnpm install && npx ts-node apps/server/seed.ts"
+#    networks:
+#      - pec-network
+#    logging:
+#      driver: json-file
+#      options:
+#        max-size: 10m
+#        max-file: "3"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1.0"
+#          memory: 1024M
   dev_worker:
-    image: node:20-alpine
+    image: node:22-alpine
     container_name: pec_dev_worker
     working_dir: /app
     volumes:
       - ./:/app
     environment:
-      REDIS_URL: "redis://redis:6379"
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/pec
+      REPLICA_URL: postgresql://postgres:postgres@postgres:5432/pec
+      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
     depends_on:
-      - redis
-      - postgres
-    command: sh -c "npm install --legacy-peer-deps && npx ts-node apps/server/src/background-jobs/worker.ts"
-
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    command: sh -c "corepack enable pnpm && pnpm install && npx ts-node apps/server/src/background-jobs/worker.ts"
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
 volumes:
-  postgres_data:
+  postgres_data: null
+networks:
+  pec-network:
+    driver: bridge

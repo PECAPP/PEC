@@ -1,49 +1,56 @@
-FROM node:20-alpine AS builder
+# syntax=docker/dockerfile:1.4
+FROM node:22-alpine AS builder
+# Set working directory
+WORKDIR /app
+RUN npm install -g turbo
+COPY . .
+# Prune the workspace to just the backend server and its dependencies
+RUN turbo prune pec-server --docker
 
+# Add lockfile and package.json's of isolated subworkspace
+FROM node:22-alpine AS installer
 WORKDIR /app
 
-# Copy package manifests
-COPY package*.json ./
-COPY apps/server/package*.json ./apps/server/
-COPY packages/database/package*.json ./packages/database/
-COPY packages/shared/package*.json ./packages/shared/
-COPY packages/protos/package*.json ./packages/protos/
+# First install dependencies (as they change less often)
+COPY .gitignore .gitignore
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
-# Install dependencies at root
-RUN npm install --legacy-peer-deps
+# Build the project and its dependencies
+COPY --from=builder /app/out/full/ .
+COPY --from=builder /app/packages/protos ./packages/protos
+COPY turbo.json turbo.json
 
-# Copy all source
-COPY packages ./packages
-COPY apps/server ./apps/server
-
-# Generate Prisma and Build NestJS
+# Generate Prisma
 WORKDIR /app/packages/database
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN npx prisma generate
 
-WORKDIR /app/packages/shared
-RUN npm run build
+WORKDIR /app
+ARG TURBO_TOKEN
+ARG TURBO_TEAM
+ENV TURBO_TOKEN=$TURBO_TOKEN
+ENV TURBO_TEAM=$TURBO_TEAM
+RUN npx turbo run build --filter=pec-server...
 
-WORKDIR /app/apps/server
-RUN npm run build
-
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app/apps/server
 
 ENV NODE_ENV=production
 
-# Copy node modules and generated prisma client
-COPY --from=builder /app/node_modules /app/node_modules
-COPY --from=builder /app/apps/server/node_modules /app/apps/server/node_modules
-COPY --from=builder /app/packages /app/packages
+# Don't run production as root
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nestjs
+USER nestjs
 
-# Copy built dist and necessary package files
-COPY --from=builder /app/apps/server/dist ./dist
-COPY --from=builder /app/apps/server/package.json ./
-COPY --from=builder /app/apps/server/tsconfig.json ./
-
-# Switch to non-root user for security
-USER node
+# Copy dependencies and built files
+COPY --link --from=installer --chown=1001:1001 /app/node_modules /app/node_modules
+COPY --link --from=installer --chown=1001:1001 /app/apps/server/node_modules ./node_modules
+COPY --link --from=installer --chown=1001:1001 /app/packages /app/packages
+COPY --link --from=installer --chown=1001:1001 /app/apps/server/dist ./dist
+COPY --link --from=installer --chown=1001:1001 /app/apps/server/package.json ./
+COPY --link --from=installer --chown=1001:1001 /app/apps/server/tsconfig.json ./
 
 EXPOSE 4000
 EXPOSE 50051

@@ -13,7 +13,7 @@ services:
       - postgres_dev_data:/var/lib/postgresql/data
 
   backend:
-    image: node:20-alpine
+    image: node:22-alpine
     container_name: pec_backend_dev
     working_dir: /app
     restart: unless-stopped
@@ -28,20 +28,20 @@ services:
       NODE_PATH: "/app/node_modules"
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
     volumes:
-      - ./server:/app
-      - ./shared:/shared
+      - ./:/app
       - backend_node_modules:/app/node_modules
+      - /app/apps/frontend
     command: >
-      sh -c " npm install && npx prisma generate && npx prisma db push --accept-data-loss && npm run db:seed && npm run start:dev "
+      sh -c " corepack enable pnpm && pnpm install && npx prisma generate --schema packages/database/prisma/schema.prisma && npx prisma db push --schema packages/database/prisma/schema.prisma --accept-data-loss && cd apps/server && pnpm run start:dev "
     depends_on:
       - postgres
 
   frontend:
-    image: node:20-alpine
+    image: node:22-alpine
     container_name: pec_frontend_dev
     profiles:
       - frontend
-    working_dir: /app
+    working_dir: /app/apps/frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -53,12 +53,10 @@ services:
       NEXT_TELEMETRY_DISABLED: "1"
       CHOKIDAR_USEPOLLING: "true"
     volumes:
-      - ./:/app
-      - frontend_node_modules:/app/node_modules
-      - /app/archive
-      - /app/server
+      - ../../:/app
+      - frontend_node_modules:/app/apps/frontend/node_modules
     command: >
-      sh -c " if [ ! -d node_modules/next ]; then npm install --legacy-peer-deps; fi && npm run dev -- --turbopack --hostname 0.0.0.0 --port 3000 "
+      sh -c " corepack enable pnpm && if [ ! -d node_modules/next ]; then pnpm install; fi && pnpm run dev -- --turbopack --hostname 0.0.0.0 --port 3000 "
     depends_on:
       - backend
 
