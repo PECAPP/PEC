@@ -56,8 +56,10 @@ export function FinanceSummaryCard({
           api.get('/finance/summary'),
           api.get('/finance/fees?status=pending&limit=3'),
         ]);
-        setSummary((sumRes as any).data);
-        setPendingFees((feesRes as any).data ?? []);
+        const sumRaw = (sumRes as any).data;
+        setSummary(sumRaw?.data ?? sumRaw ?? null);
+        const feesRaw = (feesRes as any).data;
+        setPendingFees(feesRaw?.data ?? feesRaw ?? []);
       } catch {
         // silent
       } finally {
@@ -79,10 +81,10 @@ export function FinanceSummaryCard({
 
   if (!summary) return null;
 
-  const totalDue = summary.totalPending;
-  const categories = Object.entries(summary.byCategory);
-  const totalAll = summary.totalPending + summary.totalPaid;
-  const paidPct = totalAll > 0 ? Math.round((summary.totalPaid / totalAll) * 100) : 0;
+  const totalDue = summary.totalPending || 0;
+  const categories = Object.entries(summary.byCategory || {});
+  const totalAll = (summary.totalPending || 0) + (summary.totalPaid || 0);
+  const paidPct = totalAll > 0 ? Math.round(((summary.totalPaid || 0) / totalAll) * 100) : 0;
 
   return (
     <motion.div
@@ -111,11 +113,11 @@ export function FinanceSummaryCard({
         </div>
         <div className="text-center p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
           <p className="text-[10px] text-muted-foreground font-medium">Paid</p>
-          <p className="text-sm font-bold text-emerald-600">₹{fmt(summary.totalPaid)}</p>
+          <p className="text-sm font-bold text-emerald-600">₹{fmt(summary.totalPaid || 0)}</p>
         </div>
         <div className="text-center p-2 rounded-lg bg-red-500/10 border border-red-500/20">
           <p className="text-[10px] text-muted-foreground font-medium">Overdue</p>
-          <p className="text-sm font-bold text-red-600">{summary.overdue}</p>
+          <p className="text-sm font-bold text-red-600">{summary.overdue || 0}</p>
         </div>
       </div>
 
@@ -180,7 +182,7 @@ export function FinanceSummaryCard({
         </div>
       )}
 
-      {pendingFees.length === 0 && summary.totalPending === 0 && (
+      {pendingFees.length === 0 && (summary.totalPending || 0) === 0 && (
         <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <p className="text-xs text-emerald-600 font-medium">All fees paid! You're up to date.</p>

@@ -105,7 +105,7 @@ const CATEGORIES = [
   { value: 'other', label: 'Other', icon: Wallet, color: 'text-gray-600', bg: 'bg-gray-500/10 border-gray-500/20' },
 ];
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   pending: { label: 'Pending', color: 'bg-amber-500/15 text-amber-600 border-amber-500/20', icon: Clock },
   paid: { label: 'Paid', color: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/20', icon: CheckCircle2 },
   failed: { label: 'Failed', color: 'bg-red-500/15 text-red-600 border-red-500/20', icon: XCircle },
@@ -635,7 +635,7 @@ function AdminCreateFeeDialog({ open, onClose, onSuccess }: {
 
 export default function FinancePage() {
   const { permissions, loading: permLoading } = usePermissions();
-  const isAdmin = permissions?.isAdmin || (permissions as any)?.role === 'college_admin';
+  const isAdmin = (permissions as any)?.isAdmin || (permissions as any)?.role === 'college_admin';
   const [tab, setTab] = useState('overview');
   const [feeCategory, setFeeCategory] = useState('');
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -659,7 +659,7 @@ export default function FinancePage() {
     try {
       const res = await api.get('/finance/summary');
       const raw = (res as any).data;
-      setSummary(raw?.totalPending !== undefined ? raw : raw?.data ?? null);
+      setSummary(raw?.data ?? raw ?? null);
     } catch { /* silent */ }
   }, []);
 
@@ -669,7 +669,8 @@ export default function FinancePage() {
       const params: Record<string, any> = { limit: 100 };
       if (feeCategory) params.category = feeCategory;
       const res = await api.get(`/finance/fees?${new URLSearchParams(params)}`);
-      setFees((res as any).data ?? []);
+      const raw = (res as any).data;
+      setFees(raw?.data ?? raw ?? []);
     } catch { toast.error('Failed to load fees'); }
     finally { setFeesLoading(false); }
   }, [feeCategory]);
@@ -683,7 +684,8 @@ export default function FinancePage() {
       if (txnFrom) params.from = txnFrom;
       if (txnTo) params.to = txnTo;
       const res = await api.get(`/finance/transactions?${new URLSearchParams(params)}`);
-      setTransactions((res as any).data ?? []);
+      const raw = (res as any).data;
+      setTransactions(raw?.data ?? raw ?? []);
     } catch { toast.error('Failed to load transactions'); }
     finally { setTxnsLoading(false); }
   }, [txnCat, txnStatus, txnFrom, txnTo]);
@@ -814,7 +816,7 @@ export default function FinancePage() {
                 {[
                   {
                     label: 'Total Pending',
-                    value: summary ? `₹${fmt(summary.totalPending)}` : '—',
+                    value: summary ? `₹${fmt(summary.totalPending || 0)}` : '—',
                     icon: Clock,
                     color: 'text-amber-600',
                     bg: 'bg-amber-500/10',
@@ -822,7 +824,7 @@ export default function FinancePage() {
                   },
                   {
                     label: 'Total Paid',
-                    value: summary ? `₹${fmt(summary.totalPaid)}` : '—',
+                    value: summary ? `₹${fmt(summary.totalPaid || 0)}` : '—',
                     icon: CheckCircle2,
                     color: 'text-emerald-600',
                     bg: 'bg-emerald-500/10',
@@ -830,7 +832,7 @@ export default function FinancePage() {
                   },
                   {
                     label: 'Overdue',
-                    value: summary ? `${summary.overdue} fee${summary.overdue !== 1 ? 's' : ''}` : '—',
+                    value: summary ? `${summary.overdue || 0} fee${(summary.overdue || 0) !== 1 ? 's' : ''}` : '—',
                     icon: AlertTriangle,
                     color: 'text-red-600',
                     bg: 'bg-red-500/10',
@@ -861,11 +863,11 @@ export default function FinancePage() {
               </div>
 
               {/* Category breakdown */}
-              {summary && Object.keys(summary.byCategory).length > 0 && (
+              {summary && Object.keys(summary.byCategory || {}).length > 0 && (
                 <div className="space-y-3">
                   <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">By Category</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {Object.entries(summary.byCategory).map(([cat, vals]) => {
+                    {Object.entries(summary.byCategory || {}).map(([cat, vals]) => {
                       const catCfg = CATEGORIES.find((c) => c.value === cat) ?? CATEGORIES[5];
                       const Icon = catCfg.icon;
                       const total = vals.pending + vals.paid;
