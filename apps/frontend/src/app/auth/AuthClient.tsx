@@ -401,8 +401,8 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
 
       <div className="p-6 grid gap-3 bg-gradient-to-b from-background to-background/80">
        {[
-        { r: 'student', e: 'arjun@pec.edu', p: 'password123', i: GraduationCap, t: 'ARJUN SHARMA' },
-        { r: 'faculty', e: 'faculty@pec.edu', p: 'password123', i: Users, t: 'DR. PRIYA RAO' },
+        { r: 'student', e: 'student@pec.edu', p: 'password123', i: GraduationCap, t: 'TEST STUDENT' },
+        { r: 'faculty', e: 'faculty@pec.edu', p: 'password123', i: Users, t: 'TEST FACULTY' },
         { r: 'college_admin', e: 'admin@pec.edu', p: 'password123', i: Building2, t: 'SYSTEM REGISTRAR' }
        ].map((role) => (
         <button

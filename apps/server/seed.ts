@@ -71,6 +71,33 @@ async function main() {
 
   console.log('Student user seeded:', student.email);
 
+  const facultyRole = await prisma.role.findUnique({ where: { name: 'FACULTY' } });
+
+  // Create faculty user
+  const faculty = await prisma.user.upsert({
+    where: { email: 'faculty@pec.edu' },
+    update: {},
+    create: {
+      email: 'faculty@pec.edu',
+      password: hashedPassword,
+      name: 'Test Faculty',
+      roles: {
+        create: {
+          role: { connect: { id: facultyRole!.id } },
+        },
+      },
+      facultyProfile: {
+        create: {
+          employeeId: 'EMP12345',
+          department: 'CSE',
+          designation: 'Professor',
+        }
+      }
+    },
+  });
+
+  console.log('Faculty user seeded:', faculty.email);
+
   console.log('Database seeding complete!');
 }
 
