@@ -1,7 +1,8 @@
 export type UserRole =
   | "student"
   | "faculty"
-  | "college_admin";
+  | "college_admin"
+  | "admin";
 
 export interface RolePermissions {
   canViewDashboard: boolean;
@@ -74,6 +75,27 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessReports: true,
         canManageInstitution: true,
         canManageRecruiters: true,
+      };
+
+    case "admin":
+      return {
+        ...basePermissions,
+        canViewDashboard: true,
+        canEditProfile: true,
+        canAccessCourses: true,
+        canAccessFinance: true,
+        canAccessPlacements: true,
+        canManageUsers: true,
+        canManageCourses: true,
+        canManageFinance: true,
+        canManagePlacements: true,
+        canAccessAdmin: true,
+        canAccessReports: true,
+        canManageInstitution: true,
+        canManageRecruiters: true,
+        canSwitchOrganizations: true,
+        canViewAllOrganizations: true,
+        canManageSystemSettings: true,
       };
 
     default:

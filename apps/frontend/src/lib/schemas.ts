@@ -21,3 +21,35 @@ export const facultySchema = z.object({
 
 export type DepartmentInput = z.infer<typeof departmentSchema>;
 export type FacultyInput = z.infer<typeof facultySchema>;
+
+export const userSchema = z.object({
+  id: z.string().uuid().optional(),
+  email: z.string().email(),
+  role: z.string().optional(),
+  status: z.enum(['active', 'inactive', 'suspended']).optional()
+});
+export type UserInput = z.infer<typeof userSchema>;
+
+export const courseSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(2),
+  code: z.string().min(2)
+});
+export type CourseInput = z.infer<typeof courseSchema>;
+
+export const enrollmentSchema = z.object({
+  id: z.string().uuid().optional(),
+  studentId: z.string(),
+  courseId: z.string(),
+  status: z.string().optional()
+});
+export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
+
+export const attendanceSchema = z.object({
+  id: z.string().uuid().optional(),
+  studentId: z.string(),
+  courseId: z.string(),
+  date: z.string().or(z.date()).optional(),
+  status: z.string()
+});
+export type AttendanceInput = z.infer<typeof attendanceSchema>;

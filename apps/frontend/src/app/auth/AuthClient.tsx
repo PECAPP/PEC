@@ -302,6 +302,7 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
            placeholder="arjun@pec.edu"
            value={formData.email}
            onChange={handleInputChange}
+           autoComplete="username"
           className="pl-12 h-12 rounded-md border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
           />
          </div>
@@ -320,6 +321,7 @@ export default function AuthClient({ initialSessionStatus = false }: AuthClientP
            placeholder="••••••••"
            value={formData.password}
            onChange={handleInputChange}
+           autoComplete="current-password"
           className="pl-12 pr-12 h-12 rounded-md border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-3.5 text-muted-foreground hover:text-foreground">

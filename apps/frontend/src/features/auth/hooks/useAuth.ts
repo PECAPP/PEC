@@ -46,7 +46,7 @@ let inFlightRequest: Promise<CurrentUser | null> | null = null;
 let refreshAttemptedWithoutToken = false;
 
 const isAllowedRole = (role: string | null | undefined): role is UserRole => {
-  return ["student", "faculty", "college_admin"].includes(role as string);
+  return ["student", "faculty", "college_admin", "admin"].includes(role as string);
 };
 
 function clearAuthCache() {
