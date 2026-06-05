@@ -48,6 +48,23 @@ services:
     depends_on:
       - backend
 
+  redis:
+    image: redis:7-alpine
+    container_name: pec_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: pec_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+
+
   frontend:
     build:
       context: .
@@ -61,6 +78,32 @@ services:
       INTERNAL_API_URL: "http://backend:4000/api"
     depends_on:
       - backend
+
+  dev_seed:
+    image: node:20-alpine
+    container_name: pec_dev_seed
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
+    depends_on:
+      - postgres
+    command: sh -c "npm install --legacy-peer-deps && npx ts-node apps/server/seed.ts"
+
+  dev_worker:
+    image: node:20-alpine
+    container_name: pec_dev_worker
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      REDIS_URL: "redis://redis:6379"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
+    depends_on:
+      - redis
+      - postgres
+    command: sh -c "npm install --legacy-peer-deps && npx ts-node apps/server/src/background-jobs/worker.ts"
 
 volumes:
   postgres_data:
