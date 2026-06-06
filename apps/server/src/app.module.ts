@@ -43,10 +43,16 @@ import { CollegeSettingsModule } from './college-settings/college-settings.modul
 import { ClubsModule } from './clubs/clubs.module';
 import { MarketplaceModule } from './marketplace/marketplace.module';
 import { FinanceModule } from './finance/finance.module';
+import { RolesMgmtModule } from './roles/roles-mgmt.module';
+import { PermissionsModule } from './permissions/permissions.module';
+import { CaslModule } from './casl/casl.module';
 
 @Module({
   imports: [
     PrometheusModule.register(),
+    CaslModule,
+    PermissionsModule,
+    RolesMgmtModule,
     AuthModule,
     UsersModule,
     PrismaModule,

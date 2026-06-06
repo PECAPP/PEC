@@ -41,7 +41,6 @@ type UserWithRelations = {
   id: string;
   email: string;
   name: string;
-  role: string | null;
   avatar: string | null;
   profileComplete: boolean;
   emailVerified: boolean;
@@ -240,7 +239,7 @@ export class AuthService {
         uid: tokenRecord.user.id,
         email: tokenRecord.user.email,
         fullName: tokenRecord.user.name,
-        role: tokenRecord.user.role,
+        role: roles[0] ?? null,
         roles,
         avatar: tokenRecord.user.avatar,
         verified: tokenRecord.user.emailVerified,
@@ -422,7 +421,7 @@ export class AuthService {
       email: user.email,
       name: user.name,
       fullName: user.name,
-      role: user.role,
+      role: user.roles?.[0]?.role?.name ?? null,
       githubUsername: user.githubUsername,
       linkedinUsername: user.linkedinUsername,
       isPublic: user.isPublicProfile,
@@ -461,7 +460,8 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const role = profileData.role || user.role;
+    const existingRole = user.roles?.map((entry: any) => entry.role?.name).filter(Boolean)[0] ?? null;
+    const role = profileData.role || existingRole;
 
     if (!role || !APP_ROLES.includes(role as (typeof APP_ROLES)[number])) {
       throw new BadRequestException('Unsupported role');
@@ -547,7 +547,7 @@ export class AuthService {
       email: updated.email,
       name: updated.name,
       fullName: updated.name,
-      role: updated.role,
+      role: null,
       githubUsername: updated.githubUsername,
       linkedinUsername: updated.linkedinUsername,
       isPublic: updated.isPublicProfile,
@@ -585,7 +585,6 @@ export class AuthService {
       return tx.user.update({
         where: { id: userId },
         data: {
-          role,
           profileComplete: false,
         },
       });
@@ -598,7 +597,7 @@ export class AuthService {
       email: updated.email,
       name: updated.name,
       fullName: updated.name,
-      role: updated.role,
+      role,
       avatar: updated.avatar,
       verified: false,
       profileComplete: updated.profileComplete,
@@ -649,7 +648,7 @@ export class AuthService {
         uid: user.id,
         email: user.email,
         fullName: user.name,
-        role: user.role,
+        role: roles[0] ?? null,
         roles,
         avatar: user.avatar,
         verified: user.emailVerified,
@@ -667,14 +666,14 @@ export class AuthService {
       return user.roles.map((entry) => entry.role.name);
     }
 
-    return user.role ? [user.role] : [];
+    return [];
   }
 
   private async createAccessToken(
     user: NonNullable<UserWithRelations>,
   ): Promise<string> {
     const roles = this.extractRoles(user);
-    const primaryRole = user.role ?? roles[0] ?? null;
+    const primaryRole = roles[0] ?? null;
     const payload = {
       sub: user.id,
       email: user.email,

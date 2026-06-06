@@ -1,12 +1,9 @@
-"use client";
-import { useEffect, useState } from "react";
-import {
-  RolePermissions,
-  UserRole,
-  getRolePermissions,
-} from "@/features/auth/lib/rolePermissions";
-import { authClient } from "@/lib/auth-client";
-import { buildApiUrl } from "@/lib/api-base";
+'use client';
+import { useEffect, useState } from 'react';
+import { RolePermissions, UserRole, getRolePermissions } from '@/features/auth/lib/rolePermissions';
+import { authClient } from '@/lib/auth-client';
+import { buildApiUrl } from '@/lib/api-base';
+import { AppAbility, buildAbilityFor } from '@/lib/casl-ability';
 
 export interface CurrentUser {
   id: string;
@@ -20,6 +17,7 @@ export interface CurrentUser {
   department?: string;
   enrollmentNumber?: string;
   permissions: RolePermissions;
+  ability?: AppAbility;
   avatar: string | null;
   verified: boolean;
   profileComplete: boolean;
@@ -33,6 +31,7 @@ interface UseAuthResult {
   isLoading: boolean;
   error: string | null;
   isAuthenticated: boolean;
+  ability?: AppAbility;
   logout: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
 }
@@ -46,7 +45,7 @@ let inFlightRequest: Promise<CurrentUser | null> | null = null;
 let refreshAttemptedWithoutToken = false;
 
 const isAllowedRole = (role: string | null | undefined): role is UserRole => {
-  return ["student", "faculty", "college_admin", "admin"].includes(role as string);
+  return ['student', 'faculty', 'college_admin', 'admin'].includes(role as string);
 };
 
 function clearAuthCache() {
@@ -57,19 +56,13 @@ function clearAuthCache() {
 }
 
 function hasRefreshMarkerCookie(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.cookie
-    .split(";")
-    .some((cookie) => cookie.trim().startsWith("refresh_present="));
+  if (typeof document === 'undefined') return false;
+  return document.cookie.split(';').some((cookie) => cookie.trim().startsWith('refresh_present='));
 }
 
-async function fetchProfile(
-  token: string,
-  force = false,
-): Promise<CurrentUser | null> {
+async function fetchProfile(token: string, force = false): Promise<CurrentUser | null> {
   const now = Date.now();
-  const cacheValid =
-    !force && cachedToken === token && now - cachedAt < AUTH_CACHE_TTL_MS;
+  const cacheValid = !force && cachedToken === token && now - cachedAt < AUTH_CACHE_TTL_MS;
 
   if (cacheValid) {
     return cachedUser;
@@ -80,11 +73,11 @@ async function fetchProfile(
   }
 
   inFlightRequest = (async () => {
-    const res = await fetch(buildApiUrl("/auth/profile"), {
+    const res = await fetch(buildApiUrl('/auth/profile'), {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      credentials: "include",
+      credentials: 'include',
     });
 
     if (res.status === 401 || res.status === 403) {
@@ -94,18 +87,17 @@ async function fetchProfile(
     }
 
     if (!res.ok) {
-      throw new Error("Failed to fetch profile");
+      throw new Error('Failed to fetch profile');
     }
 
     const payload = await res.json();
     const userId = payload.id || payload.uid || payload.sub;
     const role = isAllowedRole(payload.role) ? payload.role : null;
-    const fullName = payload.fullName || payload.name || "User";
-    const roles = Array.isArray(payload.roles)
-      ? payload.roles
-      : role
-        ? [role]
-        : [];
+    const fullName = payload.fullName || payload.name || 'User';
+    const roles = Array.isArray(payload.roles) ? payload.roles : role ? [role] : [];
+
+    const caslPermissions = await authClient.fetchPermissions();
+    const ability = buildAbilityFor(caslPermissions);
 
     const user: CurrentUser = {
       id: userId,
@@ -118,9 +110,9 @@ async function fetchProfile(
       organizationId: payload.organizationId || undefined,
       department: payload.department || undefined,
       enrollmentNumber: payload.enrollmentNumber || undefined,
-      semester:
-        typeof payload.semester === "number" ? payload.semester : undefined,
-      permissions: getRolePermissions(role || "student"),
+      semester: typeof payload.semester === 'number' ? payload.semester : undefined,
+      permissions: getRolePermissions(role || 'student'),
+      ability,
       avatar: payload.avatar || null,
       verified: payload.verified || false,
       profileComplete: payload.profileComplete || false,
@@ -142,9 +134,7 @@ async function fetchProfile(
 
 export function useAuth(): UseAuthResult {
   const [user, setUser] = useState<CurrentUser | null>(null);
-  const [token, setToken] = useState<string | null>(() =>
-    authClient.getAccessToken(),
-  );
+  const [token, setToken] = useState<string | null>(() => authClient.getAccessToken());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -155,11 +145,7 @@ export function useAuth(): UseAuthResult {
       try {
         let currentToken = authClient.getAccessToken();
 
-        if (
-          !currentToken &&
-          (force || !refreshAttemptedWithoutToken) &&
-          hasRefreshMarkerCookie()
-        ) {
+        if (!currentToken && (force || !refreshAttemptedWithoutToken) && hasRefreshMarkerCookie()) {
           refreshAttemptedWithoutToken = true;
           try {
             currentToken = await authClient.refreshAccessToken();
@@ -190,7 +176,7 @@ export function useAuth(): UseAuthResult {
         }
       } catch (err) {
         if (mounted) {
-          setError(err instanceof Error ? err.message : "An error occurred");
+          setError(err instanceof Error ? err.message : 'An error occurred');
         }
         authClient.resetSession();
         clearAuthCache();
@@ -220,13 +206,13 @@ export function useAuth(): UseAuthResult {
       setToken(null);
     };
 
-    window.addEventListener("auth-change", onAuthChange);
-    window.addEventListener("auth-failed", onAuthFailed);
+    window.addEventListener('auth-change', onAuthChange);
+    window.addEventListener('auth-failed', onAuthFailed);
 
     return () => {
       mounted = false;
-      window.removeEventListener("auth-change", onAuthChange);
-      window.removeEventListener("auth-failed", onAuthFailed);
+      window.removeEventListener('auth-change', onAuthChange);
+      window.removeEventListener('auth-failed', onAuthFailed);
     };
   }, []);
 
@@ -236,7 +222,7 @@ export function useAuth(): UseAuthResult {
     clearAuthCache();
     setUser(null);
     setToken(null);
-    window.dispatchEvent(new Event("auth-failed"));
+    window.dispatchEvent(new Event('auth-failed'));
   };
 
   const login = async (email: string, password: string) => {
@@ -246,9 +232,9 @@ export function useAuth(): UseAuthResult {
       refreshAttemptedWithoutToken = false;
       const currentToken = authClient.getAccessToken();
       setToken(currentToken);
-      window.dispatchEvent(new Event("auth-change"));
+      window.dispatchEvent(new Event('auth-change'));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : 'Login failed');
       throw err;
     } finally {
       setLoading(false);
@@ -262,29 +248,24 @@ export function useAuth(): UseAuthResult {
     isLoading: loading,
     error,
     isAuthenticated: !!user,
+    ability: user?.ability,
     logout,
     login,
   };
 }
 
-export function useHasPermission(
-  requiredPermission: keyof RolePermissions,
-): boolean {
+export function useHasPermission(requiredPermission: keyof RolePermissions): boolean {
   const { user } = useAuth();
   return user?.permissions[requiredPermission] ?? false;
 }
 
-export function useHasAllPermissions(
-  requiredPermissions: (keyof RolePermissions)[],
-): boolean {
+export function useHasAllPermissions(requiredPermissions: (keyof RolePermissions)[]): boolean {
   const { user } = useAuth();
   if (!user) return false;
   return requiredPermissions.every((perm) => user.permissions[perm]);
 }
 
-export function useHasAnyPermission(
-  requiredPermissions: (keyof RolePermissions)[],
-): boolean {
+export function useHasAnyPermission(requiredPermissions: (keyof RolePermissions)[]): boolean {
   const { user } = useAuth();
   if (!user) return false;
   return requiredPermissions.some((perm) => user.permissions[perm]);
@@ -302,4 +283,9 @@ export function useIsRole(role: UserRole | UserRole[]): boolean {
     return role.includes(user.role);
   }
   return user.role === role;
+}
+
+export function useAbility() {
+  const { user } = useAuth();
+  return user?.ability;
 }

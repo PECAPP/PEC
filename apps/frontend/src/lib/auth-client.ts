@@ -3,7 +3,7 @@
  * Handles secure cookie + header-based token delivery for web + mobile clients
  */
 
-import { buildApiUrl } from "./api-base";
+import { buildApiUrl } from './api-base';
 
 const authUrl = (route: string) => buildApiUrl(`/auth/${route}`);
 
@@ -16,10 +16,7 @@ export interface SignUpCredentials {
   email: string;
   password: string;
   name: string;
-  role?:
-    | "student"
-    | "faculty"
-    | "college_admin";
+  role?: 'student' | 'faculty' | 'college_admin';
 }
 
 export interface AuthResponse {
@@ -104,13 +101,10 @@ class AuthClient {
     this.refreshSubscribers = [];
   }
 
-  private async parseErrorMessage(
-    response: Response,
-    fallback: string,
-  ): Promise<string> {
+  private async parseErrorMessage(response: Response, fallback: string): Promise<string> {
     try {
       const body = await response.json();
-      if (body && typeof body.message === "string") {
+      if (body && typeof body.message === 'string') {
         return body.message;
       }
       if (Array.isArray(body?.message) && body.message.length > 0) {
@@ -118,7 +112,7 @@ class AuthClient {
       }
       if (Array.isArray(body?.errors) && body.errors.length > 0) {
         const first = body.errors[0];
-        if (first && typeof first.message === "string") {
+        if (first && typeof first.message === 'string') {
           return first.message;
         }
       }
@@ -130,15 +124,15 @@ class AuthClient {
   }
 
   async login(credentials: AuthCredentials): Promise<AuthResponse> {
-    const response = await fetch(authUrl("login"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch(authUrl('login'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
-      credentials: "include",
+      credentials: 'include',
     });
 
     if (!response.ok) {
-      const message = await this.parseErrorMessage(response, "Login failed");
+      const message = await this.parseErrorMessage(response, 'Login failed');
       throw new Error(message);
     }
 
@@ -153,17 +147,17 @@ class AuthClient {
   }
 
   async signup(
-    credentials: SignUpCredentials,
+    credentials: SignUpCredentials
   ): Promise<AuthResponse & { emailVerificationToken?: string }> {
-    const response = await fetch(authUrl("register"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch(authUrl('register'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
-      credentials: "include",
+      credentials: 'include',
     });
 
     if (!response.ok) {
-      const message = await this.parseErrorMessage(response, "Signup failed");
+      const message = await this.parseErrorMessage(response, 'Signup failed');
       throw new Error(message);
     }
 
@@ -190,31 +184,21 @@ class AuthClient {
     this.isRefreshing = true;
 
     try {
-      const response = await fetch(authUrl("refresh"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch(authUrl('refresh'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
-        credentials: "include",
+        credentials: 'include',
       });
 
       if (!response.ok) {
-        if (
-          response.status === 400 ||
-          response.status === 401 ||
-          response.status === 403
-        ) {
+        if (response.status === 400 || response.status === 401 || response.status === 403) {
           this.clearSession();
-          const message = await this.parseErrorMessage(
-            response,
-            "No active refresh session",
-          );
+          const message = await this.parseErrorMessage(response, 'No active refresh session');
           throw new Error(message);
         }
 
-        const message = await this.parseErrorMessage(
-          response,
-          "Token refresh failed",
-        );
+        const message = await this.parseErrorMessage(response, 'Token refresh failed');
         throw new Error(message);
       }
 
@@ -229,8 +213,7 @@ class AuthClient {
       this.notifyRefreshSubscribers(this.accessToken);
       return this.accessToken;
     } catch (error) {
-      const normalizedError =
-        error instanceof Error ? error : new Error("Token refresh failed");
+      const normalizedError = error instanceof Error ? error : new Error('Token refresh failed');
       this.clearSession();
       this.notifyRefreshSubscribersError(normalizedError);
       throw normalizedError;
@@ -245,11 +228,11 @@ class AuthClient {
         ? JSON.stringify({ refreshToken: this.refreshToken })
         : JSON.stringify({});
 
-      await fetch(authUrl("logout"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      await fetch(authUrl('logout'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body,
-        credentials: "include",
+        credentials: 'include',
       });
     } catch {
       // Log to service but don't fail logout
@@ -259,18 +242,15 @@ class AuthClient {
   }
 
   async verifyEmail(token: string): Promise<{ verified: boolean }> {
-    const response = await fetch(authUrl("verify-email"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch(authUrl('verify-email'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
-      credentials: "include",
+      credentials: 'include',
     });
 
     if (!response.ok) {
-      const message = await this.parseErrorMessage(
-        response,
-        "Email verification failed",
-      );
+      const message = await this.parseErrorMessage(response, 'Email verification failed');
       throw new Error(message);
     }
 
@@ -278,70 +258,79 @@ class AuthClient {
   }
 
   async requestPasswordReset(email: string): Promise<{ accepted: boolean }> {
-    const response = await fetch(authUrl("request-password-reset"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch(authUrl('request-password-reset'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
-      credentials: "include",
+      credentials: 'include',
     });
 
     if (!response.ok) {
-      const message = await this.parseErrorMessage(
-        response,
-        "Password reset request failed",
-      );
+      const message = await this.parseErrorMessage(response, 'Password reset request failed');
       throw new Error(message);
     }
 
     return response.json();
   }
 
-  async resetPassword(
-    payload: ResetPasswordPayload,
-  ): Promise<{ reset: boolean }> {
-    const response = await fetch(authUrl("reset-password"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+  async resetPassword(payload: ResetPasswordPayload): Promise<{ reset: boolean }> {
+    const response = await fetch(authUrl('reset-password'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      credentials: "include",
+      credentials: 'include',
     });
 
     if (!response.ok) {
-      const message = await this.parseErrorMessage(
-        response,
-        "Password reset failed",
-      );
+      const message = await this.parseErrorMessage(response, 'Password reset failed');
       throw new Error(message);
     }
 
     return response.json();
   }
 
-  async changePassword(
-    payload: ChangePasswordPayload,
-  ): Promise<{ changed: boolean }> {
-    const response = await fetch(authUrl("change-password"), {
-      method: "POST",
+  async changePassword(payload: ChangePasswordPayload): Promise<{ changed: boolean }> {
+    const token = this.getAccessToken();
+    const response = await fetch(authUrl('change-password'), {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
-      credentials: "include",
+      credentials: 'include',
     });
 
     if (!response.ok) {
       if (response.status === 401) {
         this.clearSession();
       }
-      const message = await this.parseErrorMessage(
-        response,
-        "Password change failed",
-      );
+      const message = await this.parseErrorMessage(response, 'Password change failed');
       throw new Error(message);
     }
 
     return response.json();
+  }
+
+  async fetchPermissions(): Promise<any[]> {
+    const token = this.getAccessToken();
+    const response = await fetch(authUrl('me/permissions'), {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        this.clearSession();
+      }
+      return [];
+    }
+
+    const data = await response.json();
+    return data.permissions || [];
   }
 
   getAccessToken(): string | null {
