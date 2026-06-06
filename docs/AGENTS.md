@@ -5,6 +5,7 @@ Institutional standards and technical policies for contributing to the PEC APP E
 ## Engineering Scope
 
 These mandates apply to all developmental phases:
+
 - Engineering new React Server Components (RSC) or client-side interfaces.
 - Implementing high-concurrency data fetching strategies.
 - Reviewing architectural integrity and performance benchmarks.
@@ -12,21 +13,23 @@ These mandates apply to all developmental phases:
 
 ## Performance Prioritization Matrix
 
-1. **Waterfall Elimination (async-*)**: Absolute priority to ensure non-blocking data resolution.
-2. **Bundle Optimization (bundle-*)**: Critical focus on minimizing client-side JavaScript execution.
-3. **Server-Side Execution (server-*)**: High priority for moving logic to the institutional backend.
-4. **Hydration Efficiency (client-*)**: Medium-High priority for optimizing interactive components.
-5. **Layout Stability (rendering-*)**: Medium priority for preventing Cumulative Layout Shift (CLS).
+1. **Waterfall Elimination (async-\*)**: Absolute priority to ensure non-blocking data resolution.
+2. **Bundle Optimization (bundle-\*)**: Critical focus on minimizing client-side JavaScript execution.
+3. **Server-Side Execution (server-\*)**: High priority for moving logic to the institutional backend.
+4. **Hydration Efficiency (client-\*)**: Medium-High priority for optimizing interactive components.
+5. **Layout Stability (rendering-\*)**: Medium priority for preventing Cumulative Layout Shift (CLS).
 
 ## Critical Performance Mandates
 
 ### 1. Data Fetching and Waterfall Mitigation
+
 - **Deferred Await**: Position `await` statements as late as possible in the execution flow to maximize parallel processing.
 - **Parallel Resolution**: Utilize `Promise.all()` or `Promise.allSettled()` for all independent asynchronous operations.
 - **Response Streaming**: Implement Next.js 16 Suspense boundaries to stream content chunks as they resolve.
 - **Prefetching Strategy**: Start data fetches early in the lifecycle, even before the component tree fully initializes.
 
 ### 2. Strategic Bundle Optimization
+
 - **Direct Import Resolution**: Avoid broad barrel imports; point directly to the module to prevent unnecessary code inclusion.
 - **Dynamic Module Loading**: Utilize `next/dynamic` for heavy visual components (Charts, Maps, 3D Models) with appropriate loading skeletons.
 - **Third-Party Sanitization**: Defer non-critical SDKs (Analytics, Logging) until the primary thread is idle.
@@ -54,12 +57,20 @@ The PEC APP utilizes specific skill sets for development. AI Agents must leverag
 
 - **Next.js 16 Performance**: Advanced strategies for React 19 and Turbopack optimization.
 - **Enterprise App Router Patterns**: Implementation of complex routing, middleware, and layouts.
-- **Institutional Styling**: Adherence to the premium sepia/dark mode design system.
-- **Data Integrity**: Strict Zod-based validation across the full stack.
+- **Institutional Styling**: Adherence to the premium sepia/dark mode design system with `next-themes`.
+- **Data Integrity**: Strict Zod-based validation across the full stack via `@pec/shared`.
+- **pnpm Monorepo**: Understanding pnpm workspaces, `--filter` flags, and Turborepo task orchestration.
+- **Redis + Bull**: Background job queue patterns, queue service injection, and worker setup.
+- **gRPC + CQRS**: Proto-based inter-service communication and event-driven module design.
+- **Qdrant RAG**: Vector database integration for context-enriched AI responses via `rag.service.ts`.
+- **Prisma 7.x**: Schema design, migration strategy, repository pattern, and `@pec/database` shared package.
+- **Security Patterns**: JWT refresh rotation, field-level encryption, account lockout, throttling middleware.
+- **3D Rendering**: Three.js with `@react-three/fiber` and `@react-three/drei` for campus map features.
 
 ## Architecture and Styling Conventions
 
 ### Professional Component Structure
+
 ```typescript
 // 1. External dependencies followed by institutional utilities
 import { useMemo } from 'react';
@@ -84,6 +95,7 @@ export function AcademicProfile({ studentId, className }: AcademicProfileProps) 
 ```
 
 ### Standardized File Naming
+
 - **Components**: `PascalCase.tsx` (e.g., `CourseCard.tsx`)
 - **Hooks**: `camelCase.ts` (e.g., `useAcademicQuery.ts`)
 - **Utilities**: `camelCase.ts` (e.g., `formatInstitutionalDate.ts`)
@@ -98,6 +110,6 @@ export function AcademicProfile({ studentId, className }: AcademicProfileProps) 
 
 ---
 
-Last Updated: March 2026
+Last Updated: June 2026
 PEC Development Group
-Architectural Version: 3.1.0
+Architectural Version: 4.0.0
