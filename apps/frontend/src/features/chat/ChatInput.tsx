@@ -1,9 +1,9 @@
+import { Button, Textarea, ScrollArea } from "@pec/ui";
 import { useState, useRef, useEffect, KeyboardEvent, forwardRef, useImperativeHandle } from 'react';
 import { Send, Paperclip, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { toast } from 'sonner';
 import { getFileType, uploadMedia, validateFileSize } from '@/lib/cloudinary.service';
 import { sendMediaMessage } from '@/lib/messages.service';

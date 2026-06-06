@@ -1,4 +1,6 @@
 "use client";
+import { Button } from "@pec/ui";
+
 
 declare global {
   interface Window {
@@ -10,13 +12,13 @@ declare global {
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bot, Send, Sparkles, X, Minimize2, Mic, Volume2, VolumeX } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import api, { isAuthError } from "@/lib/api";
-import { buildApiUrl } from "@/lib/api-base";
-import { authClient } from "@/lib/auth-client";
+import api, {  isAuthError  } from "@pec/api";
+import {  buildApiUrl  } from "@pec/api";
+import {  authClient  } from "@pec/api";
 import { GradesTable, AttendanceTable, ScheduleTable, SuggestionChips } from "./GenerativeUI";
 import { useRouter } from "next/navigation";
 
@@ -465,7 +467,6 @@ const FloatingAIChat = () => {
 
       // Attempt TTS read aloud
       speakText(fullText);
-
 
     } catch (error) {
       console.error("AI Error:", error);

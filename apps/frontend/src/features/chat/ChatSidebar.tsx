@@ -1,9 +1,9 @@
+import { Input, Button } from "@pec/ui";
 import { Hash, Users, Building2, Search, Menu, Plus, MessageCircle } from "lucide-react";
-import { ChatRoom } from "@/types/chat";
-import { UserRole } from "@/types";
+import { ChatRoom } from '@pec/shared';
+import { UserRole } from '@pec/shared';
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+
 import { useState } from "react";
 import { NewChatDialog } from "@/features/chat/NewChatDialog";
 import { CreateGroupDialog } from "@/features/chat/CreateGroupDialog";

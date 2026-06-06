@@ -1,3 +1,4 @@
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Button } from "@pec/ui";
 import { cn } from '@/lib/utils';
 import { Download, FileText, Star, Trash2, Copy, MoreVertical, Reply } from 'lucide-react';
 import { ChatMessage as ChatMessageType } from '@/lib/messages.service';
@@ -6,13 +7,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { ImageLightbox } from '@/features/chat/ImageLightbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+
 import Link from 'next/link';
 
 // Generate consistent color for user based on their ID

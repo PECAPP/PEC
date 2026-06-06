@@ -1,4 +1,4 @@
-import api from "@/lib/api";
+import api from "@pec/api";
 
 export async function addMemberToGroup(roomId: string, userEmail: string) {
   try {
