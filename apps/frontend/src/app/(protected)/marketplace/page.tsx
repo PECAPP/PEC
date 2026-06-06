@@ -154,7 +154,7 @@ function ProductCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="group relative bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-200"
+      className="group relative bg-card/90 backdrop-blur-sm border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300"
     >
       {/* Image */}
       <div
@@ -174,10 +174,10 @@ function ProductCard({
             <Badge className="bg-red-500 text-white text-sm px-3 py-1">SOLD</Badge>
           </div>
         )}
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-3 right-3">
           <Badge
             variant="outline"
-            className={cn('text-xs border', CONDITION_COLORS[listing.condition] ?? '')}
+            className={cn('text-[10px] font-bold uppercase tracking-wider border shadow-sm backdrop-blur-md bg-background/80', CONDITION_COLORS[listing.condition] ?? '')}
           >
             {listing.condition}
           </Badge>
@@ -185,7 +185,7 @@ function ProductCard({
         {!isMine && (
           <button
             onClick={(e) => { e.stopPropagation(); onBookmark(listing.id); }}
-            className="absolute top-2 left-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute top-3 left-3 p-2 rounded-full bg-background/80 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:scale-110 active:scale-95"
           >
             <Heart
               className={cn('w-4 h-4 transition-colors', isBookmarked ? 'fill-red-500 text-red-500' : 'text-muted-foreground')}
@@ -195,47 +195,48 @@ function ProductCard({
       </div>
 
       {/* Content */}
-      <div className="p-3 space-y-2">
+      <div className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3
-            className="font-medium text-sm leading-tight line-clamp-2 cursor-pointer hover:text-primary transition-colors"
+            className="font-bold text-base leading-tight line-clamp-2 cursor-pointer hover:text-primary transition-colors text-foreground"
             onClick={() => onView(listing)}
           >
             {listing.title}
           </h3>
         </div>
 
-        <div className="flex items-center gap-1 text-primary font-bold">
-          <IndianRupee className="w-3.5 h-3.5" />
-          <span className="text-base">{listing.price.toLocaleString('en-IN')}</span>
+        <div className="flex items-center gap-1.5 text-primary font-bold bg-primary/10 w-fit px-2.5 py-1 rounded-lg">
+          <IndianRupee className="w-4 h-4" />
+          <span className="text-lg tracking-tight">{listing.price.toLocaleString('en-IN')}</span>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Tag className="w-3 h-3" />
-          {listing.category}
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <Badge variant="secondary" className="bg-secondary/20 text-secondary-foreground hover:bg-secondary/30 transition-colors">
+            {listing.category}
+          </Badge>
           <span className="text-border">·</span>
           <span className="truncate">{listing.seller.name}</span>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 pt-1">
+        <div className="flex gap-2 pt-2 border-t border-border/40">
           {isMine ? (
             <>
-              <Button size="sm" variant="outline" className="flex-1 h-7 text-xs" onClick={() => onEdit(listing)}>
-                <Edit2 className="w-3 h-3 mr-1" /> Edit
+              <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onEdit(listing)}>
+                <Edit2 className="w-3 h-3 mr-1.5" /> Edit
               </Button>
-              <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => onDelete(listing.id)}>
-                <Trash2 className="w-3 h-3" />
+              <Button size="sm" variant="ghost" className="h-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onDelete(listing.id)}>
+                <Trash2 className="w-4 h-4" />
               </Button>
             </>
           ) : (
             <>
-              <Button size="sm" variant="outline" className="flex-1 h-7 text-xs" onClick={() => onView(listing)}>
-                <Eye className="w-3 h-3 mr-1" /> View
+              <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onView(listing)}>
+                <Eye className="w-3 h-3 mr-1.5" /> View
               </Button>
               {listing.status !== 'Sold' && (
-                <Button size="sm" className="flex-1 h-7 text-xs" onClick={() => onChat(listing)}>
-                  <MessageCircle className="w-3 h-3 mr-1" /> Chat
+                <Button size="sm" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-primary shadow-glow transition-all" onClick={() => onChat(listing)}>
+                  <MessageCircle className="w-3 h-3 mr-1.5" /> Chat
                 </Button>
               )}
             </>
@@ -316,41 +317,42 @@ function ListingFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl">
         <DialogHeader>
-          <DialogTitle>{existing ? 'Edit Listing' : 'Create New Listing'}</DialogTitle>
+          <DialogTitle className="text-xl font-bold tracking-tight">{existing ? 'Edit Listing' : 'Create New Listing'}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Title *</label>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Title *</label>
             <Input
               placeholder="e.g. Physics textbook by H.C. Verma"
+              className="h-11 rounded-xl bg-background border-border/60 font-bold px-4 text-sm focus:ring-primary/20"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Category *</label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Category *</label>
               <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11 rounded-xl border-border/60 font-bold text-sm">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-xl">
                   {CATEGORIES.map((c) => (
                     <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Condition *</label>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Condition *</label>
               <Select value={form.condition} onValueChange={(v) => setForm({ ...form, condition: v })}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11 rounded-xl border-border/60 font-bold text-sm">
                   <SelectValue placeholder="Select condition" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-xl">
                   {CONDITIONS.map((c) => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
                   ))}
@@ -359,41 +361,44 @@ function ListingFormDialog({
             </div>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Price (₹) *</label>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Price (₹) *</label>
             <Input
               type="number"
               min="0"
               placeholder="e.g. 250"
+              className="h-11 rounded-xl bg-background border-border/60 font-bold px-4 text-sm focus:ring-primary/20"
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Description</label>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Description</label>
             <Textarea
               rows={3}
               placeholder="Describe your item — condition details, reason for selling, etc."
+              className="rounded-xl bg-background border-border/60 text-sm focus:ring-primary/20 p-4"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Image URLs (one per line)</label>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Image URLs (one per line)</label>
             <Textarea
               rows={2}
               placeholder="https://example.com/image.jpg"
+              className="rounded-xl bg-background border-border/60 text-sm focus:ring-primary/20 p-4"
               value={form.images}
               onChange={(e) => setForm({ ...form, images: e.target.value })}
             />
-            <p className="text-xs text-muted-foreground">Paste direct image links. Use Cloudinary or Imgur for uploads.</p>
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Paste direct image links. Use Cloudinary or Imgur for uploads.</p>
           </div>
 
-          <div className="flex gap-3 justify-end pt-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>Cancel</Button>
-            <Button type="submit" disabled={loading}>
+          <div className="flex gap-3 justify-end pt-4 border-t border-border/40">
+            <Button type="button" variant="outline" className="h-10 rounded-xl font-bold uppercase tracking-widest text-[10px]" onClick={onClose} disabled={loading}>Cancel</Button>
+            <Button type="submit" className="h-10 rounded-xl font-bold uppercase tracking-widest text-[10px] bg-primary shadow-glow transition-all" disabled={loading}>
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {existing ? 'Update' : 'Create Listing'}
             </Button>
@@ -428,13 +433,13 @@ function ListingDetailDialog({
 
   return (
     <Dialog open={!!listing} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl">
         {/* Image Carousel */}
-        <div className="relative bg-muted aspect-video overflow-hidden rounded-t-lg">
+        <div className="relative bg-muted/30 h-[250px] sm:h-[350px] w-full flex items-center justify-center overflow-hidden rounded-t-2xl">
           <img
             src={images[imgIdx]}
             alt={listing.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             onError={(e) => {
               (e.target as HTMLImageElement).src = `https://placehold.co/600x400/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category)}`;
             }}
@@ -457,20 +462,20 @@ function ListingDetailDialog({
           )}
         </div>
 
-        <div className="p-5 space-y-4">
-          <div className="flex items-start justify-between gap-3">
+        <div className="p-6 space-y-5">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold">{listing.title}</h2>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline" className={cn('text-xs', CONDITION_COLORS[listing.condition] ?? '')}>
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">{listing.title}</h2>
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <Badge variant="outline" className={cn('text-[10px] font-bold uppercase tracking-wider', CONDITION_COLORS[listing.condition] ?? '')}>
                   {listing.condition}
                 </Badge>
-                <Badge variant="secondary" className="text-xs">{listing.category}</Badge>
+                <Badge variant="secondary" className="bg-secondary/20 text-secondary-foreground text-[10px] font-bold uppercase tracking-wider hover:bg-secondary/30">{listing.category}</Badge>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-2xl font-bold text-primary shrink-0">
-              <IndianRupee className="w-5 h-5" />
-              {listing.price.toLocaleString('en-IN')}
+            <div className="flex items-center gap-1.5 text-3xl font-bold text-primary shrink-0 bg-primary/10 px-4 py-2 rounded-xl">
+              <IndianRupee className="w-6 h-6" />
+              <span className="tracking-tight">{listing.price.toLocaleString('en-IN')}</span>
             </div>
           </div>
 
@@ -479,34 +484,36 @@ function ListingDetailDialog({
           )}
 
           {/* Seller Info */}
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
+          <div className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg shrink-0">
               {listing.seller.avatar ? (
-                <img src={listing.seller.avatar} alt={listing.seller.name} className="w-10 h-10 rounded-full object-cover" />
+                <img src={listing.seller.avatar} alt={listing.seller.name} className="w-12 h-12 rounded-full object-cover" />
               ) : (
                 listing.seller.name.charAt(0).toUpperCase()
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm">{listing.seller.name}</p>
+              <p className="font-bold text-base text-foreground">{listing.seller.name}</p>
               {listing.seller.studentProfile?.phone && (
-                <p className="text-xs text-muted-foreground">📞 {listing.seller.studentProfile.phone}</p>
+                <p className="text-sm font-medium text-muted-foreground mt-0.5 flex items-center gap-1">
+                  📞 {listing.seller.studentProfile.phone}
+                </p>
               )}
             </div>
           </div>
 
           {/* Actions */}
           {!isMine && listing.status !== 'Sold' && (
-            <div className="flex gap-3">
+            <div className="flex gap-4 pt-2 border-t border-border/40">
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 h-11 rounded-xl font-bold uppercase tracking-widest text-[10px]"
                 onClick={() => onBookmark(listing.id)}
               >
                 <Heart className={cn('w-4 h-4 mr-2', isBookmarked ? 'fill-red-500 text-red-500' : '')} />
-                {isBookmarked ? 'Saved' : 'Save'}
+                {isBookmarked ? 'Saved' : 'Save Item'}
               </Button>
-              <Button className="flex-1" onClick={() => { onChat(listing); onClose(); }}>
+              <Button className="flex-1 h-11 rounded-xl font-bold uppercase tracking-widest text-[10px] bg-primary shadow-glow transition-all" onClick={() => { onChat(listing); onClose(); }}>
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Contact Seller
               </Button>
@@ -540,6 +547,7 @@ function ChatPanel({
   const [msgText, setMsgText] = useState('');
   const [sending, setSending] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -554,6 +562,14 @@ function ChatPanel({
       openChatForListing(listing.id);
     }
   }, [listing, open]);
+
+  useEffect(() => {
+    if (!open) {
+      setActiveChatId(null);
+      setMessages([]);
+      setSearchQuery('');
+    }
+  }, [open]);
 
   const openChatForListing = async (listingId: string) => {
     setLoadingChat(true);
@@ -605,134 +621,182 @@ function ChatPanel({
   };
 
   const safeChats = Array.isArray(chats) ? chats : [];
+  
+  // Filter chats by search query
+  const filteredChats = safeChats.filter(chat => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    const otherName = chat.buyer.id === currentUserId ? 'Seller' : chat.buyer.name;
+    return chat.listing.title.toLowerCase().includes(q) || otherName.toLowerCase().includes(q);
+  });
+
   const activeChat = safeChats.find((c) => c.id === activeChatId);
 
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ x: '100%', opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: '100%', opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed right-0 top-0 h-screen w-[380px] max-w-[95vw] bg-background border-l border-border shadow-2xl z-50 flex flex-col"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
-            <div className="flex items-center gap-2">
-              {activeChatId && (
-                <button onClick={() => { setActiveChatId(null); setMessages([]); }} className="p-1 hover:bg-muted rounded">
-                  <ChevronDown className="w-4 h-4 rotate-90" />
-                </button>
-              )}
-              <h3 className="font-semibold text-sm">
-                {activeChatId
-                  ? activeChat
-                    ? activeChat.listing.title.slice(0, 30) + (activeChat.listing.title.length > 30 ? '...' : '')
-                    : 'Chat'
-                  : 'Messages'}
-              </h3>
+    <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
+      <DialogContent className="max-w-4xl max-h-[85vh] h-[800px] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl flex flex-col md:flex-row gap-0">
+        <DialogTitle className="sr-only">Marketplace Chats</DialogTitle>
+        
+        {/* Left Pane: Chat List */}
+        <div className={cn("w-full md:w-[350px] flex-col border-r border-border/40 bg-card/30", activeChatId ? "hidden md:flex" : "flex")}>
+          <div className="p-4 border-b border-border/40 shrink-0 space-y-3 bg-background/50 backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-lg tracking-tight">Messages</h2>
+              <Button variant="ghost" size="icon" onClick={onClose} className="md:hidden">
+                <X className="w-5 h-5" />
+              </Button>
             </div>
-            <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-full transition-colors">
-              <X className="w-4 h-4" />
-            </button>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search chats..." 
+                className="pl-9 h-10 rounded-xl bg-background/50 border-border/60 focus:bg-background"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
+          
+          <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
+            {filteredChats.length === 0 ? (
+              <div className="text-center text-sm font-medium text-muted-foreground p-8">
+                {searchQuery ? "No matching chats found." : "No conversations yet."}
+              </div>
+            ) : (
+              filteredChats.map((chat) => {
+                const lastMsg = chat.messages[0];
+                const isActive = chat.id === activeChatId;
+                const otherPersonName = chat.buyer.id === currentUserId ? 'Seller' : chat.buyer.name;
+                const avatarLetter = otherPersonName.charAt(0).toUpperCase();
 
-          {loadingChat ? (
-            <div className="flex-1 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : activeChatId ? (
-            <>
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {messages.length === 0 && (
-                  <div className="text-center text-sm text-muted-foreground py-8">
-                    No messages yet. Say hello!
-                  </div>
-                )}
-                {messages.map((msg) => {
-                  const isMe = msg.senderId === currentUserId;
-                  return (
-                    <div key={msg.id} className={cn('flex gap-2', isMe && 'flex-row-reverse')}>
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold shrink-0">
-                        {msg.sender.name.charAt(0)}
+                return (
+                  <button
+                    key={chat.id}
+                    onClick={() => openExistingChat(chat.id)}
+                    className={cn(
+                      "w-full flex items-start gap-3 p-3 rounded-xl transition-all text-left",
+                      isActive ? "bg-primary/10 shadow-sm" : "hover:bg-muted/60"
+                    )}
+                  >
+                    <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-base font-bold shrink-0", isActive ? "bg-primary/20 text-primary" : "bg-secondary text-secondary-foreground")}>
+                      {avatarLetter}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={cn("text-sm font-bold truncate", isActive ? "text-primary" : "text-foreground")}>{chat.listing.title}</p>
+                        {lastMsg && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 opacity-60">
+                            {new Date(chat.updatedAt).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
-                      <div className={cn('max-w-[75%] rounded-2xl px-3 py-2 text-sm', isMe ? 'bg-primary text-primary-foreground rounded-tr-sm' : 'bg-muted rounded-tl-sm')}>
-                        {msg.text}
-                        <div className={cn('text-[10px] mt-1', isMe ? 'text-primary-foreground/60' : 'text-muted-foreground')}>
-                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
+                      <p className="text-xs font-medium text-muted-foreground truncate mt-0.5">
+                        <span className="text-foreground/70">{otherPersonName}:</span> {lastMsg ? lastMsg.text : 'No messages'}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <Badge variant="secondary" className="text-[9px] uppercase tracking-wider font-bold h-4 px-1.5 bg-primary/10 text-primary hover:bg-primary/20">
+                          ₹ {chat.listing.price.toLocaleString('en-IN')}
+                        </Badge>
                       </div>
                     </div>
-                  );
-                })}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Right Pane: Active Chat */}
+        <div className={cn("flex-1 flex-col bg-background/50 relative", !activeChatId ? "hidden md:flex" : "flex")}>
+          {activeChatId && activeChat ? (
+            <>
+              {/* Active Chat Header */}
+              <div className="px-4 md:px-5 py-3 md:py-4 border-b border-border/40 shrink-0 flex items-center gap-3 bg-card/40 backdrop-blur-md">
+                <button 
+                  className="md:hidden p-2 -ml-2 rounded-xl hover:bg-muted/80 text-muted-foreground"
+                  onClick={() => setActiveChatId(null)}
+                >
+                  <ChevronDown className="w-5 h-5 rotate-90" />
+                </button>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-lg truncate text-foreground leading-tight">{activeChat.listing.title}</h3>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mt-0.5">
+                    {activeChat.buyer.id === currentUserId ? 'Chatting with Seller' : `Chatting with ${activeChat.buyer.name}`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary shrink-0">
+                  <IndianRupee className="w-4 h-4" />
+                  <span className="font-bold tracking-tight">{activeChat.listing.price.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+
+              {/* Messages Area */}
+              <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4">
+                {loadingChat ? (
+                  <div className="flex-1 h-full flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary/50" />
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-60">
+                    <MessageCircle className="w-12 h-12 text-muted-foreground" />
+                    <p className="text-sm font-medium">Start the conversation!</p>
+                  </div>
+                ) : (
+                  messages.map((msg) => {
+                    const isMe = msg.senderId === currentUserId;
+                    return (
+                      <div key={msg.id} className={cn('flex gap-3', isMe && 'flex-row-reverse')}>
+                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-sm", isMe ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>
+                          {msg.sender.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className={cn('max-w-[70%] rounded-2xl px-4 py-2.5 text-sm font-medium shadow-sm', isMe ? 'bg-primary text-primary-foreground rounded-tr-sm shadow-glow' : 'bg-card border border-border/40 rounded-tl-sm text-foreground')}>
+                          {msg.text}
+                          <div className={cn('text-[9px] uppercase tracking-widest mt-1.5 font-bold', isMe ? 'text-primary-foreground/70' : 'text-muted-foreground opacity-70')}>
+                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
                 <div ref={messagesEndRef} />
               </div>
-              {/* Input */}
-              <div className="p-3 border-t border-border flex gap-2 shrink-0">
-                <Input
-                  placeholder="Type a message…"
-                  value={msgText}
-                  onChange={(e) => setMsgText(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                  className="flex-1"
-                />
-                <Button size="sm" onClick={handleSend} disabled={sending || !msgText.trim()}>
-                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send'}
-                </Button>
+
+              {/* Message Input Area */}
+              <div className="p-3 md:p-4 bg-card/40 backdrop-blur-md border-t border-border/40 shrink-0">
+                <div className="flex items-end gap-2 relative">
+                  <Textarea
+                    placeholder="Type your message..."
+                    value={msgText}
+                    onChange={(e) => setMsgText(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                    className="min-h-[52px] max-h-[120px] rounded-2xl resize-none bg-background/80 border-border/60 focus:ring-primary/20 p-3.5 pr-14 text-sm font-medium"
+                    rows={1}
+                  />
+                  <Button 
+                    size="icon" 
+                    onClick={handleSend} 
+                    disabled={sending || !msgText.trim()}
+                    className="absolute right-2 bottom-2 h-9 w-9 rounded-xl bg-primary shadow-glow transition-all"
+                  >
+                    {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4 fill-current" />}
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
-            /* Chat List */
-            <div className="flex-1 overflow-y-auto">
-              {safeChats.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full gap-3 text-muted-foreground p-6 text-center">
-                  <MessageCircle className="w-10 h-10" />
-                  <p className="text-sm">No conversations yet.</p>
-                  <p className="text-xs">Browse listings and click "Chat" to start a conversation.</p>
-                </div>
-              ) : (
-                safeChats.map((chat) => {
-                  const lastMsg = chat.messages[0];
-                  const otherPerson = chat.buyer.id === currentUserId
-                    ? null
-                    : chat.buyer;
-                  return (
-                    <button
-                      key={chat.id}
-                      onClick={() => openExistingChat(chat.id)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors border-b border-border/50 text-left"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold shrink-0">
-                        {chat.buyer.name.charAt(0)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1">
-                          <p className="text-sm font-medium truncate">{chat.listing.title}</p>
-                          {lastMsg && (
-                            <span className="text-[10px] text-muted-foreground shrink-0">
-                              {new Date(chat.updatedAt).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {lastMsg ? lastMsg.text : 'No messages yet'}
-                        </p>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <IndianRupee className="w-3 h-3 text-primary" />
-                          <span className="text-xs text-primary font-medium">{chat.listing.price.toLocaleString('en-IN')}</span>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })
-              )}
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 opacity-50 relative">
+              <Button variant="ghost" size="icon" onClick={onClose} className="absolute top-4 right-4 md:hidden">
+                <X className="w-5 h-5" />
+              </Button>
+              <MessageCircle className="w-16 h-16 text-muted-foreground mb-4" />
+              <h3 className="font-bold text-xl text-foreground">Your Messages</h3>
+              <p className="text-sm font-medium text-muted-foreground mt-2 max-w-[250px]">Select a conversation from the sidebar to view your messages.</p>
             </div>
           )}
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -912,60 +976,74 @@ export default function MarketplacePage() {
   const activeListings = tab === 'browse' ? listings : tab === 'my-listings' ? myListings : savedListings;
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      {/* Header */}
-      <div className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <ShoppingBag className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold">Campus Marketplace</h1>
-                <p className="text-xs text-muted-foreground">Buy & Sell within PEC</p>
-              </div>
+    <div className="container max-w-7xl animate-in fade-in duration-500 flex flex-col min-h-0">
+      {/* Institutional Header */}
+      <div className="pt-2 md:pt-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6">
+          <div className="flex items-center gap-5">
+            <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm relative overflow-hidden group">
+              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+              <ShoppingBag className="w-8 h-8 text-primary shadow-glow relative z-10" />
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="relative"
-                onClick={() => { setChatListing(null); setChatOpen(true); }}
-              >
-                <MessageCircle className="w-4 h-4 mr-1.5" />
-                Chats
-                {chats.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
-                    {chats.length > 9 ? '9+' : chats.length}
-                  </span>
-                )}
-              </Button>
-              <Button size="sm" onClick={() => { setEditingListing(null); setFormOpen(true); }}>
-                <Plus className="w-4 h-4 mr-1.5" />
-                Sell Item
-              </Button>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">Marketplace</h1>
+              <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">Buy & Sell within PEC campus</p>
             </div>
           </div>
+          
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              className="h-10 rounded-xl px-4 font-bold text-xs gap-2 relative transition-all"
+              onClick={() => { setChatListing(null); setChatOpen(true); }}
+            >
+              <MessageCircle className="w-4 h-4" />
+              Chats
+              {chats.length > 0 && (
+                <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">
+                  {chats.length > 9 ? '9+' : chats.length}
+                </span>
+              )}
+            </Button>
+            <Button 
+              className="h-10 rounded-xl px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+              onClick={() => { setEditingListing(null); setFormOpen(true); }}
+            >
+              <Plus className="w-4 h-4" />
+              Sell Item
+            </Button>
+          </div>
+        </div>
 
-          {/* Tabs */}
-          <div className="mt-4">
-            <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
-              <TabsList className="h-9">
-                <TabsTrigger value="browse" className="text-sm">Browse</TabsTrigger>
-                <TabsTrigger value="my-listings" className="text-sm">My Listings</TabsTrigger>
-                <TabsTrigger value="saved" className="text-sm">
-                  <Heart className="w-3.5 h-3.5 mr-1" />
-                  Saved
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
+        {/* Tabs */}
+        <div className="border-b border-border/40">
+          <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
+            <TabsList className="h-12 bg-transparent p-0 flex justify-start gap-6 rounded-none">
+              <TabsTrigger 
+                value="browse" 
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+              >
+                Browse
+              </TabsTrigger>
+              <TabsTrigger 
+                value="my-listings" 
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+              >
+                My Listings
+              </TabsTrigger>
+              <TabsTrigger 
+                value="saved" 
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+              >
+                <Heart className="w-3.5 h-3.5 mr-1.5" /> Saved
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-4 py-5 space-y-4">
+      <div className="flex-1 overflow-y-auto mt-6">
+        <div className="space-y-4">
 
           {/* Search + Filters (browse tab only) */}
           {tab === 'browse' && (

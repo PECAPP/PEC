@@ -28,6 +28,18 @@ export class EnrollmentsRepository extends BaseRepository {
         skip,
         orderBy: { enrolledAt: 'desc' },
         include: {
+          course: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              department: true,
+              semester: true,
+              credits: true,
+              instructor: true,
+              status: true,
+            },
+          },
           student: {
             select: {
               id: true,

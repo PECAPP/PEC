@@ -8,6 +8,9 @@ import {
   MaxLength,
   MinLength,
   ValidateNested,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
 
 class NoticeMediaDto {
@@ -52,6 +55,13 @@ export class CreateNoticeDto {
   @IsOptional()
   @IsBoolean()
   important?: boolean;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(3)
+  priorityLevel?: number;
 
   @IsOptional()
   @IsBoolean()

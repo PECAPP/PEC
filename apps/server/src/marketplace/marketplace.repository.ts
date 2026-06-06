@@ -72,7 +72,10 @@ export class MarketplaceRepository {
     return this.prisma.marketplaceListing.findMany({
       where: { sellerId, NOT: { status: 'Deleted' } },
       orderBy: { createdAt: 'desc' },
-      include: { _count: { select: { bookmarks: true } } },
+      include: {
+        seller: { select: { id: true, name: true, avatar: true, studentProfile: { select: { phone: true } } } },
+        _count: { select: { bookmarks: true } },
+      },
     });
   }
 

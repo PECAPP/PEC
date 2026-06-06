@@ -9,5 +9,6 @@ import { MessagingModule } from '../messaging/messaging.module';
   imports: [QueueModule, MessagingModule],
   controllers: [AttendanceController],
   providers: [AttendanceService, AttendanceRepository],
+  exports: [AttendanceService, AttendanceRepository],
 })
 export class AttendanceModule {}

@@ -57,11 +57,34 @@ class AuthClient {
     reject: (error: Error) => void;
   }> = [];
 
+  private readCookie(name: string): string | null {
+    if (typeof document === 'undefined') return null;
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = document.cookie.match(new RegExp(`(?:^|; )${escaped}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  private writeAccessTokenCookie(token: string | null): void {
+    if (typeof document === 'undefined') return;
+
+    if (!token) {
+      document.cookie = 'access_token=; path=/; max-age=0; samesite=strict;';
+      return;
+    }
+
+    // Keep access token available across full page reloads in the browser.
+    const oneHourSeconds = 60 * 60;
+    document.cookie = `access_token=${encodeURIComponent(token)}; path=/; max-age=${oneHourSeconds}; samesite=strict;`;
+  }
+
   private clearSession(): void {
     this.accessToken = null;
     this.refreshToken = null;
+    this.writeAccessTokenCookie(null);
     if (typeof document !== 'undefined') {
-      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = 'refresh_present=; path=/; max-age=0; samesite=strict;';
+      document.cookie = 'user_id=; path=/; max-age=0; samesite=strict;';
+      document.cookie = 'user_role=; path=/; max-age=0; samesite=strict;';
     }
   }
 
@@ -159,6 +182,11 @@ class AuthClient {
       return this.waitForRefresh();
     }
 
+    if (!this.hasRefreshSession()) {
+      this.clearSession();
+      throw new Error('No active refresh session');
+    }
+
     this.isRefreshing = true;
 
     try {
@@ -192,6 +220,7 @@ class AuthClient {
 
       const data: AuthResponse = await response.json();
       this.accessToken = data.access_token;
+      this.writeAccessTokenCookie(this.accessToken);
 
       if (data.refresh_token) {
         this.refreshToken = data.refresh_token;
@@ -317,12 +346,14 @@ class AuthClient {
 
   getAccessToken(): string | null {
     if (this.accessToken) return this.accessToken;
-    
-    // Recovery from cookie for SSR/Page Reloads
-    if (typeof document !== 'undefined') {
-      const match = document.cookie.match(new RegExp('(^| )access_token=([^;]+)'));
-      if (match) return match[2];
+
+    // Recovery after page reload.
+    const fromCookie = this.readCookie('access_token');
+    if (fromCookie) {
+      this.accessToken = fromCookie;
+      return fromCookie;
     }
+
     return null;
   }
 
@@ -331,15 +362,21 @@ class AuthClient {
   }
 
   isAuthenticated(): boolean {
-    return !!this.accessToken;
+    return !!this.getAccessToken();
   }
 
   setAccessToken(token: string): void {
     this.accessToken = token;
+    this.writeAccessTokenCookie(token);
   }
 
   setRefreshToken(token: string): void {
     this.refreshToken = token;
+  }
+
+  hasRefreshSession(): boolean {
+    if (this.refreshToken) return true;
+    return this.readCookie('refresh_present') === '1';
   }
 
   resetSession(): void {

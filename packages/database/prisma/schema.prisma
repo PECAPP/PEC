@@ -410,12 +410,13 @@ model ChatRoom {
 }
 
 model Notice {
-  id          String    @id @default(uuid())
-  title       String
-  content     String
-  category    String    @default("update")
-  important   Boolean   @default(false)
-  pinned      Boolean   @default(false)
+  id            String    @id @default(uuid())
+  title         String
+  content       String
+  category      String    @default("update")
+  important     Boolean   @default(false)
+  priorityLevel Int       @default(1)
+  pinned        Boolean   @default(false)
   mediaJson   String?
   authorId    String?
   author      User?     @relation("NoticeAuthor", fields: [authorId], references: [id], onDelete: SetNull)
@@ -424,7 +425,7 @@ model Notice {
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  @@index([pinned, publishedAt])
+  @@index([pinned, priorityLevel, publishedAt])
   @@index([category, publishedAt])
   @@index([authorId])
   @@index([deletedAt, publishedAt])

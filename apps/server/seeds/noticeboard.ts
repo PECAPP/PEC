@@ -6,6 +6,7 @@ type NoticeSeed = {
   content: string;
   category: 'news' | 'update' | 'event' | 'alert';
   important?: boolean;
+  priorityLevel?: number;
   pinned?: boolean;
   mediaJson?: string;
   authorId: string;
@@ -22,6 +23,7 @@ export async function seedNoticeboard(adminId: string, faculties: FacultySeed[])
         'All students are requested to attend the semester orientation in the main auditorium at 10:00 AM on Monday.',
       category: 'news',
       important: true,
+      priorityLevel: 3,
       pinned: true,
       authorId: adminId,
       publishedAt: daysAgo(1),
@@ -32,6 +34,7 @@ export async function seedNoticeboard(adminId: string, faculties: FacultySeed[])
         'Faculty and students should check revised lab slots before booking project sessions this week.',
       category: 'update',
       important: false,
+      priorityLevel: 1,
       pinned: false,
       authorId: fallbackAuthorId,
       publishedAt: daysAgo(2),
@@ -42,6 +45,7 @@ export async function seedNoticeboard(adminId: string, faculties: FacultySeed[])
         'Registrations are open for the annual tech event. Teams can submit entries through their department coordinators.',
       category: 'event',
       important: false,
+      priorityLevel: 2,
       pinned: false,
       authorId: adminId,
       publishedAt: daysAgo(3),
@@ -52,6 +56,7 @@ export async function seedNoticeboard(adminId: string, faculties: FacultySeed[])
         'A brief maintenance window is planned on Sunday from 01:00 AM to 03:00 AM. Some modules may be temporarily unavailable.',
       category: 'alert',
       important: true,
+      priorityLevel: 3,
       pinned: false,
       mediaJson: JSON.stringify([
         {
@@ -73,6 +78,7 @@ export async function seedNoticeboard(adminId: string, faculties: FacultySeed[])
       content: notice.content,
       category: notice.category,
       important: !!notice.important,
+      priorityLevel: notice.priorityLevel ?? (notice.important ? 3 : 2),
       pinned: !!notice.pinned,
       mediaJson: notice.mediaJson ?? null,
       authorId: notice.authorId,

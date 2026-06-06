@@ -60,7 +60,18 @@ services:
     depends_on:
       - backend
 
+  qdrant:
+    image: qdrant/qdrant
+    container_name: pec_qdrant_dev
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_dev_data:/qdrant/storage
+
 volumes:
   postgres_dev_data:
   backend_node_modules:
   frontend_node_modules:
+  qdrant_dev_data:

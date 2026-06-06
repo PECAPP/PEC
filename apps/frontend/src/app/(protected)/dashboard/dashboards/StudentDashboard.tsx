@@ -13,7 +13,6 @@ import { TodayScheduleCard } from './components/TodayScheduleCard';
 import { AttendanceOverviewCard } from './components/AttendanceOverviewCard';
 import { NoticeboardCard } from './components/NoticeboardCard';
 import { FinanceSummaryCard } from './components/FinanceSummaryCard';
-import { MarketplaceCard } from './components/MarketplaceCard';
 
 const item = {
   hidden: { opacity: 0, y: 12 },
@@ -156,14 +155,10 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         variants={item}
         initial="hidden"
         animate="show"
-        className="grid gap-6 lg:grid-cols-2"
+        className="grid gap-6"
       >
         <FinanceSummaryCard
           onViewAll={() => window.location.href = getFullUrl('/finance')}
-        />
-        <MarketplaceCard
-          onViewAll={() => window.location.href = getFullUrl('/marketplace')}
-          onCreateListing={() => window.location.href = getFullUrl('/marketplace')}
         />
       </motion.div>
 

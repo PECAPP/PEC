@@ -36,6 +36,7 @@ export class NoticeboardService {
     const where = {
       deletedAt: null,
       ...(query.category ? { category: query.category } : {}),
+      ...(query.priorityLevel ? { priorityLevel: query.priorityLevel } : {}),
     };
 
     const [items, total] = await this.prisma.$transaction([
@@ -43,7 +44,7 @@ export class NoticeboardService {
         where,
         take: limit,
         skip: offset,
-        orderBy: [{ pinned: 'desc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }],
+        orderBy: [{ pinned: 'desc' }, { priorityLevel: 'desc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }],
         include: {
           author: {
             select: {
@@ -64,6 +65,7 @@ export class NoticeboardService {
         content: item.content,
         category: item.category,
         important: item.important,
+        priorityLevel: item.priorityLevel,
         pinned: item.pinned,
         media: this.parseMedia(item.mediaJson),
         authorId: item.author?.id ?? null,
@@ -95,6 +97,7 @@ export class NoticeboardService {
         content: dto.content.trim(),
         category: dto.category ?? 'update',
         important: !!dto.important,
+        priorityLevel: dto.priorityLevel ?? 2,
         pinned: !!dto.pinned,
         mediaJson: media.length > 0 ? JSON.stringify(media) : null,
         authorId,
@@ -117,6 +120,7 @@ export class NoticeboardService {
       content: created.content,
       category: created.category,
       important: created.important,
+      priorityLevel: created.priorityLevel,
       pinned: created.pinned,
       media,
       authorId: created.author?.id ?? null,

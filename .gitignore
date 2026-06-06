@@ -92,3 +92,5 @@ PEC_ERP_Report.tex
 .agents/
 .qoder/
 skills-lock.json
+.next/
+.turbo/

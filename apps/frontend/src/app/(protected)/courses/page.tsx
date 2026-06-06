@@ -14,12 +14,40 @@ export default async function CoursesPage() {
   const session = await getServerSession();
   if (!session) redirect('/auth');
 
-  // Fetch initial data on server
-  const [courses, enrolledIds, profile] = await Promise.all([
-    serverFetch('/courses?limit=100'),
-    session.role === 'student' ? serverFetch(`/enrollments?studentId=${session.uid}&status=active`) : Promise.resolve([]),
-    session.role === 'student' ? serverFetch('/auth/profile') : Promise.resolve(null),
-  ]);
+  // Fetch role-specific initial data on server.
+  const profile = await serverFetch('/auth/profile');
+
+  let courses: any[] = [];
+  if (session.role === 'faculty') {
+    const scoped = await serverFetch(`/courses?facultyId=${session.uid}&limit=200`);
+    courses = Array.isArray(scoped) ? scoped : [];
+
+    if (!courses.length) {
+      const allCourses = await serverFetch('/courses?limit=200');
+      const facultyName = String(
+        profile?.fullName || profile?.name || session.fullName || ''
+      ).toLowerCase();
+      const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
+      courses = safeAllCourses.filter((course: any) => {
+        if (course.facultyId === session.uid || course.instructorId === session.uid) {
+          return true;
+        }
+        if (!facultyName) return false;
+        const instructor = String(
+          course.instructor || course.facultyName || course.instructorName || ''
+        ).toLowerCase();
+        return instructor.includes(facultyName);
+      });
+    }
+  } else {
+    const fetched = await serverFetch('/courses?limit=100');
+    courses = Array.isArray(fetched) ? fetched : [];
+  }
+
+  const enrollments =
+    session.role === 'student'
+      ? await serverFetch(`/enrollments?studentId=${session.uid}&status=active`)
+      : [];
 
   const sanitizedCourses = (courses || []).map((c: any) => ({
     ...c,
@@ -29,7 +57,28 @@ export default async function CoursesPage() {
     description: c.description || '',
   }));
 
-  const sanitizedEnrolledIds = (enrolledIds || []).map((e: any) => e.courseId);
+  const sanitizedEnrollments = Array.isArray(enrollments) ? enrollments : [];
+  const sanitizedEnrolledIds = sanitizedEnrollments.map((e: any) => e.courseId);
+  const initialEnrolledCourses = sanitizedEnrollments
+    .map((e: any) => {
+      const c = e?.course;
+      if (!c) return null;
+      return {
+        id: c.id,
+        code: c.code || 'COURSE',
+        name: c.name || 'Course',
+        department: c.department || 'General',
+        semester: Number(c.semester || 0),
+        credits: Number(c.credits || 0),
+        facultyName: c.instructor || 'TBA',
+        instructor: c.instructor || 'TBA',
+        maxStudents: 0,
+        enrolledStudents: 0,
+        description: '',
+        type: 'Core',
+      };
+    })
+    .filter(Boolean);
 
   return (
     <div className="container py-8 px-6 max-w-7xl animate-in fade-in duration-500 min-h-screen relative">
@@ -56,6 +105,7 @@ export default async function CoursesPage() {
           <CourseDirectory 
             initialCourses={sanitizedCourses} 
             initialEnrolledIds={sanitizedEnrolledIds} 
+            initialEnrolledCourses={initialEnrolledCourses as any}
             user={session}
             studentProfile={profile}
           />

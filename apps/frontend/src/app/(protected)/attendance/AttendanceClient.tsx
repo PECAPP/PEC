@@ -113,12 +113,9 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
   const fetchStudentAttendance = async () => {
     setLoading(true);
     try {
-      const [enrollmentsRes, usersRes, attendanceRes] = await Promise.all([
+      const [enrollmentsRes, attendanceRes] = await Promise.all([
         api.get<any>('/enrollments', {
           params: { courseId: selectedCourse, status: 'active', limit: 100, offset: 0 },
-        }),
-        api.get<any>('/users', {
-          params: { role: 'student', limit: 1000, offset: 0 },
         }),
         api.get<any>('/attendance', {
           params: { subject: selectedCourse, date: selectedDate },
@@ -126,21 +123,19 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
       ]);
 
       const enrolledStudents = (extractData<any[]>(enrollmentsRes) || []);
-      const allUsers = extractData<any[]>(usersRes) || [];
       const attendanceRows = extractData<any[]>(attendanceRes) || [];
-      
-      const usersById = new Map((allUsers || []).map((u: any) => [u.id, u]));
+
       const existingRecords = attendanceRows.reduce((acc: any, record: any) => {
         acc[record.studentId] = record;
         return acc;
       }, {});
 
       const merged = (enrolledStudents || []).map(en => {
-        const userDoc = usersById.get(en.studentId);
+        const student = en.student || null;
         return {
           id: en.studentId,
-          name: userDoc?.fullName || 'Unknown',
-          email: userDoc?.email || '',
+          name: student?.name || student?.fullName || 'Unknown',
+          email: student?.email || '',
           recordId: existingRecords[en.studentId]?.id,
           status: existingRecords[en.studentId]?.status || null
         };
@@ -193,7 +188,7 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground uppercase tracking-widest">Attendance Management</h1>
+          <h1 className="text-3xl font-black text-foreground uppercase tracking-widest">Attendance Management</h1>
           <p className="text-muted-foreground mt-1 font-medium italic">Protocol-level session verification and ledger control</p>
         </div>
         <div className="flex gap-2">
@@ -386,7 +381,7 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
     <div className="space-y-8 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground uppercase tracking-widest">Attendance Overview</h1>
+          <h1 className="text-3xl font-black text-foreground uppercase tracking-widest">Attendance Overview</h1>
           <p className="text-muted-foreground mt-1 font-medium italic">Detailed session analytics and eligibility tracking</p>
         </div>
         <div className="flex items-center gap-3">

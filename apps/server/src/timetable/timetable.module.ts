@@ -8,5 +8,6 @@ import { TimetableRepository } from './timetable.repository';
   imports: [PrismaModule],
   controllers: [TimetableController],
   providers: [TimetableService, TimetableRepository],
+  exports: [TimetableService, TimetableRepository],
 })
 export class TimetableModule {}

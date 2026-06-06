@@ -98,6 +98,9 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   // Handle 401 Unauthorized with Refresh Token rotation
   if (response.status === 401 && !url.includes('/auth/refresh')) {
     try {
+      if (!authClient.hasRefreshSession()) {
+        throw new Error('No active refresh session');
+      }
       const newToken = await authClient.refreshAccessToken();
       headers.set('Authorization', `Bearer ${newToken}`);
       response = await fetch(fullUrl, {

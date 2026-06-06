@@ -319,8 +319,6 @@ html {
     --muted-foreground: 40 20% 70%;
     --border: 40 25% 22%;
     --sidebar-border: 40 25% 22%;
-    --accent: 45 95% 15%;
-    --accent-foreground: 45 95% 55%;
   }
 
   .accent-pec-gold:not(.dark),
@@ -339,8 +337,6 @@ html {
     --muted-foreground: 42 15% 42%;
     --border: 40 22% 88%;
     --sidebar-border: 40 22% 88%;
-    --accent: 45 92% 92%;
-    --accent-foreground: 45 95% 35%;
   }
 
   /* Theme 2: Emerald (Deep Green Tint) */
@@ -1064,5 +1060,40 @@ html {
     content: '';
     @apply absolute bottom-0 left-0 w-full h-[1px];
     background: linear-gradient(to right, transparent, hsl(var(--primary) / 0.3), transparent);
+  }
+}
+
+/* Conic gradient circular wiper transition styling */
+@property --swipe-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: true;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+  mask-image: conic-gradient(from 0deg at var(--swipe-x, 50%) var(--swipe-y, 50%), #000 var(--swipe-angle, 0deg), transparent var(--swipe-angle, 0deg));
+  mask-repeat: no-repeat;
+  -webkit-mask-image: conic-gradient(from 0deg at var(--swipe-x, 50%) var(--swipe-y, 50%), #000 var(--swipe-angle, 0deg), transparent var(--swipe-angle, 0deg));
+  -webkit-mask-repeat: no-repeat;
+  animation: swipeWiper 850ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes swipeWiper {
+  from {
+    --swipe-angle: 0deg;
+  }
+  to {
+    --swipe-angle: 360deg;
   }
 }
