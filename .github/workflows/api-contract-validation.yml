@@ -1,0 +1,53 @@
+name: API Contract Validation
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-api-hooks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Boot Backend Services
+        run: |
+          # Start the backend infrastructure required to expose the Swagger/OpenAPI spec
+          docker compose -f docker-compose.dev.yml up -d postgres redis backend
+          
+          # Wait for the NestJS backend to fully initialize and expose the API endpoint
+          echo "Waiting for backend to boot..."
+          sleep 20
+        
+      - name: Generate API Hooks (Orval)
+        run: pnpm --filter pec-frontend generate-api
+
+      - name: Check for Uncommitted API Changes
+        run: |
+          # If 'git status --porcelain' returns any output, it means the generated files changed
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "::error::🚨 API Contract Violation! You modified the backend API but forgot to update the frontend hooks."
+            echo "::error::Please run 'pnpm --filter pec-frontend generate-api' locally and commit the updated hooks in this PR."
+            
+            echo "The following files are out of sync:"
+            git status --porcelain
+            
+            exit 1
+          else
+            echo "✅ API Contracts are in sync!"
+          fi
