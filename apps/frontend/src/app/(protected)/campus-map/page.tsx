@@ -471,16 +471,21 @@ export default function CampusMap() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <MapPin className="w-6 h-6 text-primary" />
-              Campus Map
-            </h1>
-            <p className="text-sm text-muted-foreground">Interactive campus layout</p>
+    <div className="container max-w-7xl animate-in fade-in duration-500">
+      {/* Institutional Header */}
+      <div className="pt-2 md:pt-6 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6">
+          <div className="flex items-center gap-5">
+            <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm relative overflow-hidden group">
+              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+              <MapPin className="w-8 h-8 text-primary relative z-10" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">Campus Map</h1>
+              <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">
+                Interactive campus layout
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -631,7 +636,7 @@ export default function CampusMap() {
       </div>
 
       {/* Legend */}
-      <div className="max-w-7xl mx-auto mb-3">
+      <div className="mb-4">
         <div className="flex flex-wrap gap-4">
           {categories.map((cat) => (
             <div key={cat.id} className="flex items-center gap-1.5">
@@ -647,7 +652,7 @@ export default function CampusMap() {
       </div>
 
       {/* Map */}
-      <div className="max-w-7xl mx-auto">
+      <div>
         {viewMode === '3d' ? (
           <Suspense
             fallback={

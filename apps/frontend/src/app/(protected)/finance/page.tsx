@@ -191,63 +191,81 @@ export default function FinancePage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      {/* Header */}
-      <div className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Wallet className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold">Finance</h1>
-                <p className="text-xs text-muted-foreground">Fees, Payments & Transactions</p>
-              </div>
+    <div className="container max-w-7xl animate-in fade-in duration-500 flex flex-col min-h-0">
+      {/* Institutional Header */}
+      <div className="pt-2 md:pt-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6">
+          <div className="flex items-center gap-5">
+            <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm relative overflow-hidden group">
+              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+              <Wallet className="w-8 h-8 text-primary relative z-10" />
             </div>
-            <div className="flex items-center gap-2">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">Finance</h1>
+              <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">
+                Fees, Payments &amp; Transactions
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="h-10 rounded-xl px-4 font-bold text-xs gap-2"
+              onClick={() => {
+                fetchFees();
+                fetchSummary();
+              }}
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </Button>
+            {adminRole && (
               <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  fetchFees();
-                  fetchSummary();
-                }}
+                className="h-10 rounded-xl px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+                onClick={() => setCreateFeeOpen(true)}
               >
-                <RefreshCw className="w-4 h-4" />
+                <Plus className="w-4 h-4" />
+                Create Fee
               </Button>
-              {adminRole && (
-                <Button size="sm" onClick={() => setCreateFeeOpen(true)}>
-                  <Plus className="w-4 h-4 mr-1.5" /> Create Fee
-                </Button>
-              )}
-            </div>
+            )}
           </div>
-          <div className="mt-4">
-            <Tabs value={tab} onValueChange={setTab}>
-              <TabsList className="h-9">
-                <TabsTrigger value="overview" className="text-sm">
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="fees" className="text-sm">
-                  My Fees
-                  {pendingFees.length > 0 && (
-                    <span className="ml-1.5 w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center">
-                      {pendingFees.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="transactions" className="text-sm">
-                  Transactions
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="border-b border-border/40">
+          <Tabs value={tab} onValueChange={setTab} className="w-full">
+            <TabsList className="h-12 bg-transparent p-0 flex justify-start gap-6 rounded-none">
+              <TabsTrigger
+                value="overview"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="fees"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+              >
+                My Fees
+                {pendingFees.length > 0 && (
+                  <span className="ml-1.5 w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">
+                    {pendingFees.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger
+                value="transactions"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+              >
+                Transactions
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-4 py-5 space-y-5">
+      <div className="flex-1 overflow-y-auto mt-6">
+        <div className="space-y-5">
           {/* ── OVERVIEW TAB ── */}
           {tab === 'overview' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
