@@ -1,0 +1,15 @@
+{
+  "name": "@pec/e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "install:browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.12.0",
+    "typescript": "^5.4.5"
+  }
+}
