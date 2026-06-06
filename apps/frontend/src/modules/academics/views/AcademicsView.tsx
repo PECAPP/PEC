@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,15 +8,7 @@ import {
  BookOpen, Plus, Edit, Trash2, Users, GraduationCap,
  Loader2, Download, ChevronRight
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import {
- Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from '@/components/ui/dialog';
-import {
- Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
