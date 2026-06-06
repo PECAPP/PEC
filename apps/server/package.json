@@ -9,10 +9,10 @@
     "api": "cd server && npx nest start --watch --swc",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "prisma:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
-    "db:push": "prisma db push",
+    "prisma:generate": "prisma generate --schema=../../packages/database/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=../../packages/database/prisma/schema.prisma",
+    "db:deploy": "prisma migrate deploy --schema=../../packages/database/prisma/schema.prisma",
+    "db:push": "prisma db push --schema=../../packages/database/prisma/schema.prisma",
     "seed": "npm run db:seed",
     "db:seed": "ts-node seed.ts",
     "db:check": "ts-node check_db.ts",
@@ -35,6 +35,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@casl/ability": "^7.0.0",
+    "@casl/prisma": "^2.0.1",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.2.0",
     "@fastify/formbody": "^8.0.2",

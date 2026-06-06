@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@casl/ability": "^7.0.0",
+    "@casl/react": "^7.0.0",
     "@fontsource/dm-sans": "^5.2.8",
     "@hookform/resolvers": "^3.10.0",
     "@next/bundle-analyzer": "^15.1.7",
@@ -91,6 +93,7 @@
     "three": "^0.183.2",
     "undici": "^7.24.6",
     "vaul": "^0.9.9",
+    "xlsx": "^0.18.5",
     "zod": "^3.25.76"
   },
   "devDependencies": {

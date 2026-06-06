@@ -1,75 +1,71 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   Calendar,
-  Clock,
   Loader2,
   Plus,
-  Trash2,
-  Edit,
-  Save,
   GripVertical,
   Upload,
   Download,
   FileText,
   ChevronDown,
   ChevronUp,
-  LayoutGrid,
   List,
-  Map as MapIcon,
-} from "lucide-react";
-import BulkUpload from "@/components/BulkUpload";
-
-import PDFExportButton from "@/components/common/PDFExportButton";
-import * as ExcelJS from "exceljs";
+} from 'lucide-react';
+import PDFExportButton from '@/components/common/PDFExportButton';
 import { useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import dynamic from 'next/dynamic';
+
+const BulkUpload = dynamic(() => import('@/components/BulkUpload'), {
+  loading: () => (
+    <div className="p-8 flex items-center justify-center">
+      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      <span className="ml-2 text-sm text-muted-foreground">Loading Uploader...</span>
+    </div>
+  ),
+  ssr: false,
+});
+
+const EditSlotDialog = dynamic(() => import('./components/EditSlotDialog'), {
+  ssr: false,
+});
+
+const ExtraClassDialog = dynamic(() => import('./components/ExtraClassDialog'), {
+  ssr: false,
+});
+
+import TimetableDesktopView from './components/TimetableDesktopView';
+import TimetableMobileView from './components/TimetableMobileView';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import api from "@/lib/api";
-import { isAuthError } from "@/lib/api";
-import { toast } from "sonner";
-import { usePermissions } from "@/hooks/usePermissions";
-import {
-  generateFullTimetable,
-  type CourseSchedule,
-} from "@/lib/timetableGenerator";
-import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
-import TimetableFilters, { type TimetableFilterValues } from "@/features/timetable/TimetableFilters";
+} from '@/components/ui/dialog';
+import api from '@/lib/api';
+import { isAuthError } from '@/lib/api';
+import { toast } from 'sonner';
+import { usePermissions } from '@/hooks/usePermissions';
+import { generateFullTimetable, type CourseSchedule } from '@/lib/timetableGenerator';
+import { LoadingGrid } from '@/components/common/AsyncState';
+import TimetableFilters, {
+  type TimetableFilterValues,
+} from '@/features/timetable/TimetableFilters';
 
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS = [
-  "08:00-09:00",
-  "09:00-10:00",
-  "10:00-11:00",
-  "11:00-12:00",
-  "12:00-13:00",
-  "13:00-14:00", // LUNCH
-  "14:00-15:00",
-  "15:00-16:00",
-  "16:00-17:00",
+  '08:00-09:00',
+  '09:00-10:00',
+  '10:00-11:00',
+  '11:00-12:00',
+  '12:00-13:00',
+  '13:00-14:00', // LUNCH
+  '14:00-15:00',
+  '15:00-16:00',
+  '16:00-17:00',
 ];
 
 type ApiResponse<T> = { success: boolean; data: T; meta?: any };
@@ -81,7 +77,7 @@ const extractData = <T,>(response: any): T => {
 };
 
 const parseTimeSlot = (timeSlot: string) => {
-  const [startTime, endTime] = timeSlot.split("-");
+  const [startTime, endTime] = timeSlot.split('-');
   return { startTime, endTime };
 };
 
@@ -91,21 +87,18 @@ const getAcademicYearFromSemester = (semester: unknown) => {
   return Math.ceil(numericSemester / 2);
 };
 
-const UUID_V4_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID_V4_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const getValidUuid = (value: unknown): string | undefined => {
-  if (typeof value !== "string") return undefined;
+  if (typeof value !== 'string') return undefined;
   const trimmed = value.trim();
   return UUID_V4_PATTERN.test(trimmed) ? trimmed : undefined;
 };
 
 const getFacultyPayload = (course: any) => {
   const facultyId = getValidUuid(course?.facultyId ?? course?.instructor);
-  const instructorName =
-    typeof course?.instructor === "string" ? course.instructor : "";
-  const facultyName =
-    course?.facultyName || course?.instructorName || instructorName || undefined;
+  const instructorName = typeof course?.instructor === 'string' ? course.instructor : '';
+  const facultyName = course?.facultyName || course?.instructorName || instructorName || undefined;
 
   return { facultyId, facultyName };
 };
@@ -115,7 +108,7 @@ const isAxiosStatus = (error: unknown, status: number) =>
 
 const fetchAllPages = async <T,>(
   path: string,
-  params: Record<string, unknown> = {},
+  params: Record<string, unknown> = {}
 ): Promise<T[]> => {
   const firstResponse = await api.get<ApiResponse<T[]>>(path, {
     params: { ...params, limit: MAX_PAGE_SIZE, offset: 0 },
@@ -136,8 +129,8 @@ const fetchAllPages = async <T,>(
     remainingOffsets.map((offset) =>
       api.get<ApiResponse<T[]>>(path, {
         params: { ...params, limit: MAX_PAGE_SIZE, offset },
-      }),
-    ),
+      })
+    )
   );
 
   return [
@@ -149,47 +142,47 @@ const fetchAllPages = async <T,>(
 export default function Timetable() {
   const router = useRouter();
   const { isFaculty, user, loading: authLoading } = usePermissions();
-  const userRole = user?.role || "";
-  const isCollegeAdmin = userRole === "college_admin";
+  const userRole = user?.role || '';
+  const isCollegeAdmin = userRole === 'college_admin';
   const canAutoGenerate = isCollegeAdmin;
   const canManageAllTimetable = isCollegeAdmin;
-  const canScheduleExtraClass = userRole === "faculty";
-  const facultyDisplayName = ((user as any)?.fullName || (user as any)?.name || "").trim();
+  const canScheduleExtraClass = userRole === 'faculty';
+  const facultyDisplayName = ((user as any)?.fullName || (user as any)?.name || '').trim();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<any[]>([]);
   const [timetable, setTimetable] = useState<any>({});
   const [draggedCourse, setDraggedCourse] = useState<any>(null);
   const [showSlotDialog, setShowSlotDialog] = useState(false);
-  
+
   // Smart Day Selection: Default to today if Mon-Sat, else Monday
   const todayIndex = new Date().getDay(); // 0=Sun, 1=Mon...
-  const initialDay = todayIndex > 0 && todayIndex <= 6 ? DAYS[todayIndex - 1] : "Monday";
+  const initialDay = todayIndex > 0 && todayIndex <= 6 ? DAYS[todayIndex - 1] : 'Monday';
   const [selectedDay, setSelectedDay] = useState(initialDay);
 
   const [generating, setGenerating] = useState(false);
   const [filterValues, setFilterValues] = useState<TimetableFilterValues>({
-    department: "all",
-    academicYear: "all",
-    batch: "all",
-    courseQuery: "",
-    facultyQuery: "",
-    roomQuery: "",
+    department: 'all',
+    academicYear: 'all',
+    batch: 'all',
+    courseQuery: '',
+    facultyQuery: '',
+    roomQuery: '',
   });
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
   const [slotForm, setSlotForm] = useState({
-    courseId: "",
-    room: "",
+    courseId: '',
+    room: '',
   });
   const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [isWeeklyView, setIsWeeklyView] = useState(false);
   const [showExtraClassDialog, setShowExtraClassDialog] = useState(false);
   const [extraClassForm, setExtraClassForm] = useState({
-    courseId: "",
-    slotKey: "",
-    room: "",
+    courseId: '',
+    slotKey: '',
+    room: '',
   });
   const [coursesWrapperOpen, setCoursesWrapperOpen] = useState(true);
-  const [facultyDepartment, setFacultyDepartment] = useState("");
+  const [facultyDepartment, setFacultyDepartment] = useState('');
   const [availableDepartments, setAvailableDepartments] = useState<string[]>([]);
   const [availableBatches, setAvailableBatches] = useState<string[]>([]);
 
@@ -207,33 +200,33 @@ export default function Timetable() {
     const loadData = async () => {
       try {
         await fetchData();
-        if (user.role === "student" && user.uid) {
+        if (user.role === 'student' && user.uid) {
           const [enrollments, attendanceRes] = await Promise.all([
             fetchAllPages<any>('/enrollments', {
               studentId: user.uid,
               status: 'active',
             }),
-            api.get<ApiResponse<any>>('/attendance/summary')
+            api.get<ApiResponse<any>>('/attendance/summary'),
           ]);
-          
+
           setStudentEnrollments(enrollments.map((e: any) => e.courseId));
-          
+
           const summary = extractData<any>(attendanceRes);
           if (summary && summary.courses) {
-             const attMap = new Map();
-             summary.courses.forEach((c: any) => attMap.set(c.courseId, c.percentage));
-             setStudentAttendanceMap(attMap);
+            const attMap = new Map();
+            summary.courses.forEach((c: any) => attMap.set(c.courseId, c.percentage));
+            setStudentAttendanceMap(attMap);
           }
         }
       } catch (error) {
         if (isAuthError(error)) {
-          toast.error("Session expired. Please login again.");
+          toast.error('Session expired. Please login again.');
           router.replace('/auth');
           return;
         }
 
-        console.error("Error:", error);
-        toast.error("Failed to load data");
+        console.error('Error:', error);
+        toast.error('Failed to load data');
       } finally {
         setLoading(false);
       }
@@ -248,8 +241,7 @@ export default function Timetable() {
       let facultyOwnedCourses =
         isFaculty && user?.uid
           ? allCourses.filter(
-              (course: any) =>
-                course.facultyId === user.uid || course.instructorId === user.uid
+              (course: any) => course.facultyId === user.uid || course.instructorId === user.uid
             )
           : [];
 
@@ -260,18 +252,18 @@ export default function Timetable() {
           return instructor.includes(name);
         });
       }
-      
+
       // Resolve faculty department from owned courses, or fall back to user's department
       const resolvedFacultyDepartment = (
         (user as any)?.department ||
         facultyOwnedCourses[0]?.department ||
-        ""
+        ''
       ).trim();
 
       if (isFaculty) {
         setFacultyDepartment(resolvedFacultyDepartment);
       } else {
-        setFacultyDepartment("");
+        setFacultyDepartment('');
       }
 
       // For faculty: show owned courses; if none, fall back to department courses
@@ -282,8 +274,7 @@ export default function Timetable() {
         } else if (resolvedFacultyDepartment) {
           // Fall back to all courses in faculty's department
           coursesData = allCourses.filter(
-            (course: any) => 
-              (course.department || "").trim() === resolvedFacultyDepartment
+            (course: any) => (course.department || '').trim() === resolvedFacultyDepartment
           );
         } else {
           // Last resort: show all courses
@@ -293,7 +284,7 @@ export default function Timetable() {
         // Non-faculty sees all courses
         coursesData = allCourses;
       }
-      
+
       setCourses(coursesData);
 
       const timetableItems = await fetchAllPages<any>('/timetable');
@@ -322,16 +313,12 @@ export default function Timetable() {
       const departmentsFromData = Array.from(
         new Set(
           [...allCourses, ...timetableItems]
-            .map((item: any) => String(item?.department || "").trim())
-            .filter(Boolean),
-        ),
+            .map((item: any) => String(item?.department || '').trim())
+            .filter(Boolean)
+        )
       ).sort();
       const batchesFromData = Array.from(
-        new Set(
-          timetableItems
-            .map((item: any) => String(item?.batch || "").trim())
-            .filter(Boolean),
-        ),
+        new Set(timetableItems.map((item: any) => String(item?.batch || '').trim()).filter(Boolean))
       ).sort();
 
       setAvailableDepartments(departmentsFromData);
@@ -339,13 +326,13 @@ export default function Timetable() {
       setTimetable(timetableData);
     } catch (error) {
       if (isAuthError(error)) {
-        toast.error("Session expired. Please login again.");
+        toast.error('Session expired. Please login again.');
         router.replace('/auth');
         return;
       }
 
-      console.error("Error fetching data:", error);
-      toast.error("Failed to load timetable data");
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load timetable data');
     }
   };
 
@@ -364,9 +351,7 @@ export default function Timetable() {
 
         if (existingSlot && existingSlot.length > 0) {
           // If a slot for this EXACT course/dept exists, update it, otherwise add new
-          const specificSlot = existingSlot.find(
-            (s: any) => s.courseCode === row.courseCode
-          );
+          const specificSlot = existingSlot.find((s: any) => s.courseCode === row.courseCode);
           const { startTime, endTime } = parseTimeSlot(row.timeSlot);
           if (specificSlot) {
             await api.patch(`/timetable/${specificSlot.id}`, {
@@ -376,7 +361,7 @@ export default function Timetable() {
               day: row.day,
               startTime,
               endTime,
-              room: row.room || "TBD",
+              room: row.room || 'TBD',
             });
           } else {
             const { facultyId, facultyName } = getFacultyPayload(course);
@@ -389,7 +374,7 @@ export default function Timetable() {
               courseCode: course.code,
               facultyId,
               facultyName,
-              room: row.room || "TBD",
+              room: row.room || 'TBD',
               department: course.department,
             });
           }
@@ -405,7 +390,7 @@ export default function Timetable() {
             courseCode: course.code,
             facultyId,
             facultyName,
-            room: row.room || "TBD",
+            room: row.room || 'TBD',
             department: course.department,
           });
         }
@@ -428,12 +413,13 @@ export default function Timetable() {
         courseCode: slot.courseCode,
         courseName: slot.courseName,
         room: slot.room,
-      })),
+      }))
     );
 
+    const ExcelJS = await import('exceljs');
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Timetable");
-    
+    const worksheet = workbook.addWorksheet('Timetable');
+
     worksheet.columns = [
       { header: 'day', key: 'day' },
       { header: 'timeSlot', key: 'timeSlot' },
@@ -441,30 +427,32 @@ export default function Timetable() {
       { header: 'courseName', key: 'courseName' },
       { header: 'room', key: 'room' },
     ];
-    
-    exportData.forEach(row => worksheet.addRow(row));
+
+    exportData.forEach((row) => worksheet.addRow(row));
 
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `timetable_export_${new Date().toISOString().split("T")[0]}.xlsx`;
+    a.download = `timetable_export_${new Date().toISOString().split('T')[0]}.xlsx`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Timetable exported successfully!");
+    toast.success('Timetable exported successfully!');
   };
 
-  const bulkUploadTemplate = ["day", "timeSlot", "courseCode", "room"];
+  const bulkUploadTemplate = ['day', 'timeSlot', 'courseCode', 'room'];
 
   const sampleBulkData = [
-    { day: "Monday", timeSlot: "09:00-10:00", courseCode: "MATH101", room: "101" },
-    { day: "Wednesday", timeSlot: "11:00-12:00", courseCode: "ENG202", room: "204" },
+    { day: 'Monday', timeSlot: '09:00-10:00', courseCode: 'MATH101', room: '101' },
+    { day: 'Wednesday', timeSlot: '11:00-12:00', courseCode: 'ENG202', room: '204' },
   ];
 
   const handleAutoGenerate = async () => {
     if (!canAutoGenerate) {
-      toast.error("Only college admins can auto-generate timetables");
+      toast.error('Only college admins can auto-generate timetables');
       return;
     }
 
@@ -477,24 +465,21 @@ export default function Timetable() {
           courseId: course.id,
           courseName: course.name,
           courseCode: course.code,
-          facultyId: facultyId || "",
-          facultyName: facultyName || "",
-          department: (course.department || "").trim(),
+          facultyId: facultyId || '',
+          facultyName: facultyName || '',
+          department: (course.department || '').trim(),
           semester: course.semester || 1,
           credits: course.credits || 3,
         };
       });
 
       // Get all unique departments
-      const departments = [
-        ...new Set(allCourses.map((c) => c.department)),
-      ].filter(Boolean) as string[];
+      const departments = [...new Set(allCourses.map((c) => c.department))].filter(
+        Boolean
+      ) as string[];
 
       // Generate timetable using the new grouping logic
-      const { entries, summary } = generateFullTimetable(
-        allCourses,
-        departments
-      );
+      const { entries, summary } = generateFullTimetable(allCourses, departments);
 
       const chunkArray = <T,>(array: T[], size: number): T[][] => {
         const result = [];
@@ -508,10 +493,10 @@ export default function Timetable() {
       const deleteChunks = chunkArray(existingTimetable, 20);
       for (const chunk of deleteChunks) {
         const deleteResults = await Promise.allSettled(
-          chunk.map((item: any) => api.delete(`/timetable/${item.id}`)),
+          chunk.map((item: any) => api.delete(`/timetable/${item.id}`))
         );
         const fatalDeleteErrors = deleteResults
-          .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+          .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
           .map((result) => result.reason)
           .filter((error) => !isAxiosStatus(error, 404));
 
@@ -545,13 +530,13 @@ export default function Timetable() {
       await fetchData(); // Refresh display
       toast.success(`Timetable generated! ${summary}`);
     } catch (error) {
-      console.error("Error generating timetable:", error);
+      console.error('Error generating timetable:', error);
       if (isAxiosStatus(error, 401)) {
-        toast.error("Session expired. Please login again.");
-        router.replace("/auth");
+        toast.error('Session expired. Please login again.');
+        router.replace('/auth');
         return;
       }
-      toast.error("Failed to generate timetable");
+      toast.error('Failed to generate timetable');
     } finally {
       setGenerating(false);
     }
@@ -560,16 +545,16 @@ export default function Timetable() {
   const handleDragStart = (e: React.DragEvent, course: any) => {
     if (!canManageAllTimetable) return;
     setDraggedCourse(course);
-    e.dataTransfer!.effectAllowed = "copy";
-    e.dataTransfer!.setData("text/plain", JSON.stringify(course));
+    e.dataTransfer!.effectAllowed = 'copy';
+    e.dataTransfer!.setData('text/plain', JSON.stringify(course));
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!canManageAllTimetable) return;
-    e.dataTransfer!.dropEffect = "copy";
-    
+    e.dataTransfer!.dropEffect = 'copy';
+
     // Auto-scroll when dragging near edges
     const scrollContainer = document.querySelector('.timetable-scroll-container');
     if (scrollContainer) {
@@ -591,11 +576,7 @@ export default function Timetable() {
     }
   };
 
-  const handleDrop = async (
-    e: React.DragEvent,
-    day: string,
-    timeSlot: string
-  ) => {
+  const handleDrop = async (e: React.DragEvent, day: string, timeSlot: string) => {
     e.preventDefault();
     if (!draggedCourse) return;
 
@@ -604,9 +585,7 @@ export default function Timetable() {
 
     try {
       // Check if this course already has a slot at this time
-      const existingEntry = existingSlot?.find(
-        (s: any) => s.courseId === draggedCourse.id
-      );
+      const existingEntry = existingSlot?.find((s: any) => s.courseId === draggedCourse.id);
 
       if (existingEntry) {
         const { startTime, endTime } = parseTimeSlot(timeSlot);
@@ -628,16 +607,16 @@ export default function Timetable() {
           facultyId,
           facultyName,
           department: draggedCourse.department || undefined,
-          room: "TBD",
+          room: 'TBD',
         });
       }
 
-      toast.success("Timetable updated!");
+      toast.success('Timetable updated!');
       await fetchData();
       setDraggedCourse(null);
     } catch (error) {
-      console.error("Error updating timetable:", error);
-      toast.error("Failed to update timetable");
+      console.error('Error updating timetable:', error);
+      toast.error('Failed to update timetable');
     }
   };
 
@@ -647,34 +626,37 @@ export default function Timetable() {
 
   const handleDragLeave = (e: React.DragEvent) => {
     // Only clear if actually leaving the table
-    if ((e.target as HTMLElement).tagName === 'TD' || (e.target as HTMLElement).tagName === 'TABLE') {
+    if (
+      (e.target as HTMLElement).tagName === 'TD' ||
+      (e.target as HTMLElement).tagName === 'TABLE'
+    ) {
       e.preventDefault();
     }
   };
 
   const handleDeleteSlot = async (slotId: string) => {
-    if (!confirm("Remove this class from timetable?")) return;
+    if (!confirm('Remove this class from timetable?')) return;
     try {
       await api.delete(`/timetable/${slotId}`);
-      toast.success("Slot removed!");
+      toast.success('Slot removed!');
       fetchData();
     } catch (error) {
-      console.error("Error deleting slot:", error);
-      toast.error("Failed to remove slot");
+      console.error('Error deleting slot:', error);
+      toast.error('Failed to remove slot');
     }
   };
 
   const openSlotDialog = (day: string, timeSlot: string) => {
     const key = `${day}-${timeSlot}`;
     const slotsInCell = timetable[key] || [];
-    
+
     // Only edit the first slot by default. If empty, starts a new form.
     const slot = slotsInCell.length > 0 ? slotsInCell[0] : null;
 
     setSelectedSlot({ day, timeSlot, ...slot });
     setSlotForm({
-      courseId: slot?.courseId || "",
-      room: slot?.room || "",
+      courseId: slot?.courseId || '',
+      room: slot?.room || '',
     });
     setShowSlotDialog(true);
   };
@@ -687,7 +669,7 @@ export default function Timetable() {
     const course = courses.find((c) => c.id === slotForm.courseId);
 
     if (!course) {
-      toast.error("Please select a course");
+      toast.error('Please select a course');
       return;
     }
 
@@ -723,12 +705,12 @@ export default function Timetable() {
         });
       }
 
-      toast.success("Slot saved!");
+      toast.success('Slot saved!');
       setShowSlotDialog(false);
       fetchData();
     } catch (error) {
-      console.error("Error saving slot:", error);
-      toast.error("Failed to save slot");
+      console.error('Error saving slot:', error);
+      toast.error('Failed to save slot');
     }
   };
 
@@ -740,16 +722,14 @@ export default function Timetable() {
     );
   };
 
-  const availableFacultySlots = DAYS
-    .flatMap((day) =>
-      TIME_SLOTS.filter((timeSlot) => timeSlot !== "13:00-14:00").map((timeSlot) => {
-        const key = `${day}-${timeSlot}`;
-        const slots = timetable[key] || [];
-        const hasFacultyClass = slots.some((slot: any) => isSlotOwnedByFaculty(slot));
-        return hasFacultyClass ? null : { key, label: `${day} ${timeSlot}` };
-      }),
-    )
-    .filter(Boolean) as Array<{ key: string; label: string }>;
+  const availableFacultySlots = DAYS.flatMap((day) =>
+    TIME_SLOTS.filter((timeSlot) => timeSlot !== '13:00-14:00').map((timeSlot) => {
+      const key = `${day}-${timeSlot}`;
+      const slots = timetable[key] || [];
+      const hasFacultyClass = slots.some((slot: any) => isSlotOwnedByFaculty(slot));
+      return hasFacultyClass ? null : { key, label: `${day} ${timeSlot}` };
+    })
+  ).filter(Boolean) as Array<{ key: string; label: string }>;
 
   const handleScheduleExtraClass = async () => {
     if (!canScheduleExtraClass) return;
@@ -757,32 +737,32 @@ export default function Timetable() {
     // Use selected course from form
     const course = courses.find((item) => item.id === extraClassForm.courseId);
     if (!course) {
-      toast.error("Please select a course");
-      return;
-    }
-    
-    if (!extraClassForm.slotKey || extraClassForm.slotKey.endsWith("-")) {
-      toast.error("Please select a time slot");
+      toast.error('Please select a course');
       return;
     }
 
-    const [day, ...timeSlotParts] = extraClassForm.slotKey.split("-");
-    const timeSlot = timeSlotParts.join("-");
+    if (!extraClassForm.slotKey || extraClassForm.slotKey.endsWith('-')) {
+      toast.error('Please select a time slot');
+      return;
+    }
+
+    const [day, ...timeSlotParts] = extraClassForm.slotKey.split('-');
+    const timeSlot = timeSlotParts.join('-');
     const { startTime, endTime } = parseTimeSlot(timeSlot);
     const slotsAtTime = timetable[extraClassForm.slotKey] || [];
 
     const hasFacultyClash = slotsAtTime.some((slot: any) => isSlotOwnedByFaculty(slot));
     if (hasFacultyClash) {
-      toast.error("You already have a class in this slot");
+      toast.error('You already have a class in this slot');
       return;
     }
 
-    const room = extraClassForm.room.trim() || "TBD";
+    const room = extraClassForm.room.trim() || 'TBD';
     const roomOccupied = slotsAtTime.some(
-      (slot: any) => String(slot.room || "").toLowerCase() === room.toLowerCase(),
+      (slot: any) => String(slot.room || '').toLowerCase() === room.toLowerCase()
     );
     if (roomOccupied) {
-      toast.error("Selected room is occupied in this slot");
+      toast.error('Selected room is occupied in this slot');
       return;
     }
 
@@ -793,7 +773,7 @@ export default function Timetable() {
         facultyName: facultyDisplayName || course.facultyName,
       });
 
-      await api.post("/timetable", {
+      await api.post('/timetable', {
         day,
         startTime,
         endTime,
@@ -807,30 +787,30 @@ export default function Timetable() {
         room,
       });
 
-      toast.success("Extra class scheduled");
+      toast.success('Extra class scheduled');
       setShowExtraClassDialog(false);
-      setExtraClassForm({ courseId: "", slotKey: "", room: "" });
+      setExtraClassForm({ courseId: '', slotKey: '', room: '' });
       await fetchData();
     } catch (error) {
-      console.error("Error scheduling extra class:", error);
-      toast.error("Failed to schedule extra class");
+      console.error('Error scheduling extra class:', error);
+      toast.error('Failed to schedule extra class');
     }
   };
 
   // Helper to determine status of a time slot relative to NOW
   const getTimeStatus = (slotTime: string, day: string) => {
-      const now = new Date();
-      const currentDayName = DAYS[now.getDay() - 1] || "Sunday"; // Mon=1 -> Index 0
-      
-      // If the selected day isn't today, everything is just "upcoming" (or normal)
-      if (day !== currentDayName) return "upcoming"; 
+    const now = new Date();
+    const currentDayName = DAYS[now.getDay() - 1] || 'Sunday'; // Mon=1 -> Index 0
 
-      const [start, end] = slotTime.split('-').map(t => parseInt(t.split(':')[0]));
-      const currentHour = now.getHours();
+    // If the selected day isn't today, everything is just "upcoming" (or normal)
+    if (day !== currentDayName) return 'upcoming';
 
-      if (currentHour >= end) return "completed"; // Class over
-      if (currentHour >= start && currentHour < end) return "live"; // Class in progress
-      return "upcoming";
+    const [start, end] = slotTime.split('-').map((t) => parseInt(t.split(':')[0]));
+    const currentHour = now.getHours();
+
+    if (currentHour >= end) return 'completed'; // Class over
+    if (currentHour >= start && currentHour < end) return 'live'; // Class in progress
+    return 'upcoming';
   };
 
   const handleFilterChange = (next: Partial<TimetableFilterValues>) => {
@@ -840,65 +820,57 @@ export default function Timetable() {
   const applySlotFilters = (slots: any[]) => {
     let filteredSlots = slots || [];
 
-    if (user.role === "student") {
+    if (user.role === 'student') {
       filteredSlots = filteredSlots.filter((slot: any) =>
-        studentEnrollments.includes(slot.courseId),
+        studentEnrollments.includes(slot.courseId)
       );
     }
 
-    if (user.role === "faculty" && facultyDepartment) {
+    if (user.role === 'faculty' && facultyDepartment) {
+      filteredSlots = filteredSlots.filter((slot: any) => slot.department === facultyDepartment);
+    }
+
+    if (canManageAllTimetable && filterValues.department !== 'all' && filteredSlots.length > 0) {
       filteredSlots = filteredSlots.filter(
-        (slot: any) => slot.department === facultyDepartment,
+        (slot: any) => slot.department === filterValues.department
       );
     }
 
-    if (
-      canManageAllTimetable &&
-      filterValues.department !== "all" &&
-      filteredSlots.length > 0
-    ) {
-      filteredSlots = filteredSlots.filter(
-        (slot: any) => slot.department === filterValues.department,
-      );
-    }
-
-    if (filterValues.academicYear !== "all" && filteredSlots.length > 0) {
+    if (filterValues.academicYear !== 'all' && filteredSlots.length > 0) {
       filteredSlots = filteredSlots.filter((slot: any) => {
         const year = getAcademicYearFromSemester(slot.semester);
         return year !== null && year === Number(filterValues.academicYear);
       });
     }
 
-    if (
-      canManageAllTimetable &&
-      filterValues.batch !== "all" &&
-      filteredSlots.length > 0
-    ) {
+    if (canManageAllTimetable && filterValues.batch !== 'all' && filteredSlots.length > 0) {
       filteredSlots = filteredSlots.filter(
-        (slot: any) => String(slot.batch || "").trim() === filterValues.batch,
+        (slot: any) => String(slot.batch || '').trim() === filterValues.batch
       );
     }
 
     const courseQuery = filterValues.courseQuery.trim().toLowerCase();
     if (canManageAllTimetable && courseQuery && filteredSlots.length > 0) {
       filteredSlots = filteredSlots.filter((slot: any) =>
-        `${slot.courseCode || ""} ${slot.courseName || ""}`
-          .toLowerCase()
-          .includes(courseQuery),
+        `${slot.courseCode || ''} ${slot.courseName || ''}`.toLowerCase().includes(courseQuery)
       );
     }
 
     const facultyQuery = filterValues.facultyQuery.trim().toLowerCase();
     if (canManageAllTimetable && facultyQuery && filteredSlots.length > 0) {
       filteredSlots = filteredSlots.filter((slot: any) =>
-        String(slot.facultyName || "").toLowerCase().includes(facultyQuery),
+        String(slot.facultyName || '')
+          .toLowerCase()
+          .includes(facultyQuery)
       );
     }
 
     const roomQuery = filterValues.roomQuery.trim().toLowerCase();
     if (canManageAllTimetable && roomQuery && filteredSlots.length > 0) {
       filteredSlots = filteredSlots.filter((slot: any) =>
-        String(slot.room || "").toLowerCase().includes(roomQuery),
+        String(slot.room || '')
+          .toLowerCase()
+          .includes(roomQuery)
       );
     }
 
@@ -909,7 +881,11 @@ export default function Timetable() {
     return (
       <div className="space-y-6 md:space-y-8">
         <div className="h-8 w-56 bg-muted rounded-md animate-pulse" />
-        <LoadingGrid count={3} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" itemClassName="h-28 rounded-md" />
+        <LoadingGrid
+          count={3}
+          className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+          itemClassName="h-28 rounded-md"
+        />
       </div>
     );
   }
@@ -927,14 +903,14 @@ export default function Timetable() {
           </p>
         </div>
         <div className="hidden md:flex flex-wrap items-center gap-2 md:gap-3">
-          <Button 
-            variant={isWeeklyView ? "default" : "outline"}
+          <Button
+            variant={isWeeklyView ? 'default' : 'outline'}
             size="sm"
             className="hidden sm:flex gap-2 font-bold uppercase tracking-wider text-[10px] border-2"
             onClick={() => setIsWeeklyView(!isWeeklyView)}
           >
             {isWeeklyView ? <List className="h-3 w-3" /> : <Calendar className="h-3 w-3" />}
-            {isWeeklyView ? "Show Today Only" : "Show Full Week Grid"}
+            {isWeeklyView ? 'Show Today Only' : 'Show Full Week Grid'}
           </Button>
 
           <PDFExportButton
@@ -942,21 +918,19 @@ export default function Timetable() {
               const { exportTimetablePDF } = await import('@/lib/pdfExport');
               const timetableData = Object.entries(timetable).flatMap(
                 ([key, slots]: [string, any]) => {
-                  const [day, ...timeSlotParts] = key.split("-");
-                  const timeSlot = timeSlotParts.join("-");
-                  return (Array.isArray(slots) ? slots : [slots]).map(
-                    (slot: any) => ({
-                      day,
-                      startTime: timeSlot.split("-")[0],
-                      endTime: timeSlot.split("-")[1],
-                      courseName: slot.courseName || slot.courseCode,
-                      room: slot.room,
-                      facultyName: slot.facultyName,
-                    })
-                  );
+                  const [day, ...timeSlotParts] = key.split('-');
+                  const timeSlot = timeSlotParts.join('-');
+                  return (Array.isArray(slots) ? slots : [slots]).map((slot: any) => ({
+                    day,
+                    startTime: timeSlot.split('-')[0],
+                    endTime: timeSlot.split('-')[1],
+                    courseName: slot.courseName || slot.courseCode,
+                    room: slot.room,
+                    facultyName: slot.facultyName,
+                  }));
                 }
               );
-              exportTimetablePDF(timetableData, "Weekly Timetable");
+              exportTimetablePDF(timetableData, 'Weekly Timetable');
             }}
             label="PDF"
             size="sm"
@@ -964,11 +938,7 @@ export default function Timetable() {
           />
           {canManageAllTimetable && (
             <>
-              <Button
-                onClick={handleAutoGenerate}
-                disabled={generating}
-                className="gap-2"
-              >
+              <Button onClick={handleAutoGenerate} disabled={generating} className="gap-2">
                 {generating ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -993,7 +963,12 @@ export default function Timetable() {
               Schedule Extra Class
             </Button>
           )}
-          <Button variant="outline" size="sm" className="text-[10px] font-bold uppercase" onClick={exportTimetable}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-[10px] font-bold uppercase"
+            onClick={exportTimetable}
+          >
             <Download className="w-3 h-3 mr-1.5" />
             Export
           </Button>
@@ -1030,36 +1005,34 @@ export default function Timetable() {
           </div>
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              coursesWrapperOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+              coursesWrapperOpen
+                ? 'max-h-[80vh] opacity-100'
+                : 'max-h-0 opacity-0 pointer-events-none'
             }`}
           >
-          <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
-            <div className="available-courses-wrapper rounded-lg border border-border/40 bg-background/30 p-3">
-              <div className="flex flex-wrap gap-3">
-                {courses.map((course) => (
-                  <div
-                    key={course.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, course)}
-                    onDragEnd={handleDragEnd}
-                    className="px-4 py-3 bg-primary/10 border-2 border-primary/20 rounded-lg cursor-move hover:bg-primary/20 active:bg-primary/30 transition-all select-none md:hover:shadow-md md:hover:border-primary/40 opacity-100 hover:opacity-95"
-                  >
-                    <div className="flex items-center gap-3">
-                      <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">
-                          {course.code}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {course.name}
-                        </p>
+            <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
+              <div className="available-courses-wrapper rounded-lg border border-border/40 bg-background/30 p-3">
+                <div className="flex flex-wrap gap-3">
+                  {courses.map((course) => (
+                    <div
+                      key={course.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, course)}
+                      onDragEnd={handleDragEnd}
+                      className="px-4 py-3 bg-primary/10 border-2 border-primary/20 rounded-lg cursor-move hover:bg-primary/20 active:bg-primary/30 transition-all select-none md:hover:shadow-md md:hover:border-primary/40 opacity-100 hover:opacity-95"
+                    >
+                      <div className="flex items-center gap-3">
+                        <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">{course.code}</p>
+                          <p className="text-xs text-muted-foreground">{course.name}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
       )}
@@ -1084,30 +1057,32 @@ export default function Timetable() {
 
       {/* Mobile Primary Actions Toolbar */}
       <div className="md:hidden grid grid-cols-3 gap-2 mb-6 p-2 rounded-2xl bg-muted/20 border border-border/40">
-        <Button 
+        <Button
           variant="outline"
           size="sm"
           className="h-10 text-[9px] font-black uppercase tracking-tighter rounded-xl"
           onClick={async () => {
-             const { exportTimetablePDF } = await import('@/lib/pdfExport');
-             const timetableData = Object.entries(timetable).flatMap(([key, slots]: [string, any]) => {
-                const [day, ...timeSlotParts] = key.split("-");
+            const { exportTimetablePDF } = await import('@/lib/pdfExport');
+            const timetableData = Object.entries(timetable).flatMap(
+              ([key, slots]: [string, any]) => {
+                const [day, ...timeSlotParts] = key.split('-');
                 return (Array.isArray(slots) ? slots : [slots]).map((slot: any) => ({
-                   day,
-                   startTime: timeSlotParts.join("-").split("-")[0],
-                   endTime: timeSlotParts.join("-").split("-")[1],
-                   courseName: slot.courseName || slot.courseCode,
-                   room: slot.room,
-                   facultyName: slot.facultyName,
+                  day,
+                  startTime: timeSlotParts.join('-').split('-')[0],
+                  endTime: timeSlotParts.join('-').split('-')[1],
+                  courseName: slot.courseName || slot.courseCode,
+                  room: slot.room,
+                  facultyName: slot.facultyName,
                 }));
-             });
-             exportTimetablePDF(timetableData, "Weekly Timetable");
+              }
+            );
+            exportTimetablePDF(timetableData, 'Weekly Timetable');
           }}
         >
           <FileText className="w-3.5 h-3.5 mr-1" />
           PDF
         </Button>
-        <Button 
+        <Button
           variant="outline"
           size="sm"
           className="h-10 text-[9px] font-black uppercase tracking-tighter rounded-xl"
@@ -1116,557 +1091,87 @@ export default function Timetable() {
           <Download className="w-3.5 h-3.5 mr-1" />
           EXPORT
         </Button>
-        <Button 
-          variant={isWeeklyView ? "default" : "outline"}
+        <Button
+          variant={isWeeklyView ? 'default' : 'outline'}
           size="sm"
           className={`h-10 text-[9px] font-black uppercase tracking-tighter rounded-xl ${isWeeklyView ? 'glow-primary ring-2 ring-primary/20' : ''}`}
           onClick={() => setIsWeeklyView(!isWeeklyView)}
         >
-          {isWeeklyView ? <List className="w-3.5 h-3.5 mr-1" /> : <Calendar className="w-3.5 h-3.5 mr-1" />}
-          {isWeeklyView ? "Daily" : "Weekly"}
+          {isWeeklyView ? (
+            <List className="w-3.5 h-3.5 mr-1" />
+          ) : (
+            <Calendar className="w-3.5 h-3.5 mr-1" />
+          )}
+          {isWeeklyView ? 'Daily' : 'Weekly'}
         </Button>
       </div>
 
-      <div className="md:hidden space-y-5">
-        {/* Day Selector (Hidden in Weekly View) */}
-        {!isWeeklyView && (
-          <div className="flex overflow-x-auto pb-4 gap-2 no-scrollbar snap-x overflow-y-hidden">
-            {DAYS.map((day) => (
-              <button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                className={`snap-center shrink-0 min-w-[70px] py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 flex flex-col items-center gap-1.5 ${
-                  selectedDay === day
-                    ? "bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary-rgb),0.35)] scale-105 z-10"
-                    : "bg-surface/60 backdrop-blur-sm text-muted-foreground border-border/50 hover:border-primary/30 hover:bg-muted/30"
-                }`}
-                style={selectedDay !== day ? { backgroundColor: `hsla(${30 + (DAYS.indexOf(day) * 40)}, 40%, 15%, 0.1)` } : {}}
-              >
-                <span className="opacity-50 text-[8px] tracking-normal">{day.slice(0, 3)}</span>
-                <span className={selectedDay === day ? "text-primary-foreground" : "text-foreground"}>
-                  {(() => {
-                    const now = new Date();
-                    const dayIndex = DAYS.indexOf(day);
-                    const todayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1; 
-                    const diff = dayIndex - todayIndex;
-                    const date = new Date(now);
-                    date.setDate(now.getDate() + diff);
-                    return date.getDate();
-                  })()}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
+      <TimetableMobileView
+        timetable={timetable}
+        DAYS={DAYS}
+        TIME_SLOTS={TIME_SLOTS}
+        isWeeklyView={isWeeklyView}
+        selectedDay={selectedDay}
+        setSelectedDay={setSelectedDay}
+        applySlotFilters={applySlotFilters}
+        getTimeStatus={getTimeStatus}
+        canManageAllTimetable={canManageAllTimetable}
+        openSlotDialog={openSlotDialog}
+        user={user}
+        studentAttendanceMap={studentAttendanceMap}
+        facultyDisplayName={facultyDisplayName}
+      />
 
-        {/* Timeline Feed or Weekly Matrix */}
-        {isWeeklyView ? (
-          <div className="space-y-6">
-            {DAYS.map((day) => (
-              <div key={day} className="space-y-3">
-                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary/70 px-1 border-l-2 border-primary ml-1">
-                  {day}
-                </h3>
-                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-                  {TIME_SLOTS.map((slot) => {
-                    const key = `${day}-${slot}`;
-                    const data = applySlotFilters(timetable[key] || []);
-                    if (data.length === 0) return null;
-                    return (
-                      <div key={slot} className="bg-card border border-border/60 rounded-xl p-3 flex items-center gap-3 hover:border-primary/40 transition-colors shadow-sm">
-                        <div className="flex flex-col items-center justify-center bg-muted/30 rounded-lg p-2 min-w-[60px]">
-                           <span className="text-[10px] font-bold text-foreground">{slot.split('-')[0]}</span>
-                           <span className="text-[8px] text-muted-foreground uppercase">{slot.split('-')[1]}</span>
-                        </div>
-                        <div className="flex-1">
-                          {data.map((s: any, i: number) => (
-                            <div key={i} className="text-xs">
-                              <p className="font-bold text-foreground line-clamp-1">{s.courseCode || s.courseName}</p>
-                              <p className="text-[10px] text-muted-foreground">{s.room}</p>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40 shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]"></div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-            {Object.keys(timetable).length === 0 && (
-               <div className="py-12 text-center text-muted-foreground/40 italic text-sm">
-                  No weekly schedule entries found.
-               </div>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {TIME_SLOTS.map((timeSlot) => {
-              const key = `${selectedDay}-${timeSlot}`;
-              const slotData = timetable[key];
-              const isLunch = timeSlot === "13:00-14:00";
-              const status = getTimeStatus(timeSlot, selectedDay);
-              const filteredSlots = applySlotFilters(slotData || []);
-
-              if (isLunch) {
-                return (
-                  <div key={timeSlot} className="flex items-center gap-4 opacity-50 my-4">
-                    <span className="text-xs font-mono text-muted-foreground w-12 text-right">{timeSlot.split('-')[0]}</span>
-                    <div className="h-[1px] flex-1 bg-border border-dashed border-b"></div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Lunch</span>
-                    <div className="h-[1px] flex-1 bg-border border-dashed border-b"></div>
-                  </div>
-                );
-              }
-
-              const isCompleted = status === "completed";
-              const isLive = status === "live";
-
-              if (!filteredSlots || filteredSlots.length === 0) {
-                return (
-                  <div key={timeSlot} className={`flex gap-4 group ${isCompleted ? 'opacity-40 grayscale' : ''}`}>
-                    <div className="flex flex-col items-end w-12 shrink-0">
-                      <span className="text-sm font-bold text-foreground">{timeSlot.split('-')[0]}</span>
-                      <span className="text-[10px] text-muted-foreground">{timeSlot.split('-')[1]}</span>
-                    </div>
-                    {isLive ? (
-                      <div className="flex-1 p-3 rounded-2xl border-2 border-primary bg-primary/5 flex items-center justify-center min-h-[80px] relative">
-                        <span className="absolute -top-3 left-4 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">NOW</span>
-                        <span className="text-xs text-primary font-medium">Free Slot</span>
-                      </div>
-                    ) : (
-                      <div className="flex-1 p-3 rounded-2xl border border-dashed border-border bg-muted/5 flex items-center justify-center min-h-[80px]">
-                        <span className="text-xs text-muted-foreground/40 font-medium">Free Slot</span>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              return (
-                <div key={timeSlot} className={`flex gap-4 ${isCompleted ? 'opacity-50' : ''}`}>
-                  <div className="flex flex-col items-end w-12 shrink-0">
-                    <span className={`text-sm font-bold ${isLive ? 'text-primary' : 'text-foreground'}`}>{timeSlot.split('-')[0]}</span>
-                    <span className="text-[10px] text-muted-foreground">{timeSlot.split('-')[1]}</span>
-                    <div className={`h-full w-[2px] my-2 rounded-full relative ${isLive ? 'bg-primary' : (isCompleted ? 'bg-primary/20' : 'bg-border')}`}>
-                      <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full ring-4 ring-background ${isLive ? 'bg-primary animate-ping' : (isCompleted ? 'bg-primary/50' : 'bg-primary')}`}></div>
-                      {isLive && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary ring-4 ring-background"></div>}
-                    </div>
-                  </div>
-                  <div className="flex-1 space-y-3 pb-6">
-                    {filteredSlots.map((slot: any, idx: number) => (
-                      <div 
-                        key={idx} 
-                        className={`relative overflow-hidden rounded-2xl border-l-4 p-4 transition-all
-                          ${isLive ? 'bg-card border-l-primary shadow-lg ring-1 ring-primary/20' : ''}
-                          ${!isLive && !isCompleted ? 'bg-card border-l-primary shadow-sm hover:shadow-md' : ''}
-                          ${isCompleted ? 'bg-muted/10 border-l-muted-foreground/30 shadow-none' : ''}
-                        `}
-                        onClick={() => canManageAllTimetable && openSlotDialog(selectedDay, timeSlot)}
-                      >
-                        {isLive && (
-                          <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-primary/10 px-2 py-1 rounded-full">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                            <span className="text-[10px] font-bold text-primary">LIVE</span>
-                          </div>
-                        )}
-                        {isCompleted && (
-                          <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-muted">
-                            <span className="text-[10px] font-bold text-muted-foreground">COMPLETED</span>
-                          </div>
-                        )}
-                        <div className="relative z-10">
-                          <h4 className={`font-bold text-lg line-clamp-1 ${isCompleted ? 'text-muted-foreground' : 'text-foreground'}`}>{slot.courseName}</h4>
-                          <div className="flex items-center gap-2 mt-1 mb-3">
-                            <Badge variant={isCompleted ? "outline" : "secondary"} className="text-[10px] uppercase tracking-wider font-bold">{slot.courseCode}</Badge>
-                            <span className="text-xs text-muted-foreground">|</span>
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded text-nowrap ${isLive ? 'text-primary bg-primary/10' : 'text-muted-foreground bg-muted'}`}>Room {slot.room}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1.5">
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white font-bold ${isCompleted ? 'bg-gray-400' : 'bg-gradient-to-br from-primary to-purple-600'}`}>
-                                {slot.facultyName?.[0] || "?"}
-                              </div>
-                              <span className="font-medium">{slot.facultyName || "TBD"}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Desktop Table View */}
-      <div className="hidden md:block card-elevated overflow-x-auto overflow-y-auto max-h-[70vh] timetable-scroll-container">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted/30">
-              <th className="border border-border p-3 text-left text-sm font-medium text-muted-foreground min-w-[100px]">
-                Time
-              </th>
-              {DAYS.map((day) => (
-                <th
-                  key={day}
-                  className="border border-border p-3 text-center text-sm font-medium text-muted-foreground min-w-[150px]"
-                >
-                  {day}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {TIME_SLOTS.map((timeSlot) => (
-              <tr key={timeSlot}>
-                <td className="border border-border p-3 text-sm font-medium text-muted-foreground bg-muted/20">
-                  {timeSlot}
-                </td>
-                {DAYS.map((day) => {
-                  const key = `${day}-${timeSlot}`;
-                  const slotData = timetable[key];
-                  const isLunch = timeSlot === "13:00-14:00";
-
-                  if (isLunch) {
-                    return (
-                      <td
-                        key={`${day}-${timeSlot}`}
-                        className="border border-border p-2 bg-muted/40 text-center align-middle"
-                      >
-                        {day === "Wednesday" && (
-                          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground/60 vertical-text block rotate-0">
-                            Lunch Break
-                          </span>
-                        )}
-                      </td>
-                    );
-                  }
-
-                  return (
-                    <td
-                      key={`${day}-${timeSlot}`}
-                      className={`border border-border p-2 relative group transition-colors min-h-[80px] ${
-                        canManageAllTimetable ? "hover:bg-muted/10 cursor-pointer" : ""
-                      } ${draggedCourse ? "drag-target" : ""}`}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, day, timeSlot)}
-                      onDragEnd={handleDragEnd}
-                      onClick={() => canManageAllTimetable && openSlotDialog(day, timeSlot)}
-                    >
-                      {(() => {
-                        if (!slotData || slotData.length === 0) {
-                          return (
-                            <div className="text-xs text-muted-foreground/30 text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              {canManageAllTimetable && "Drop here"}
-                            </div>
-                          );
-                        }
-
-                        const scopedSlots = applySlotFilters(slotData);
-
-                        if (scopedSlots.length === 0) {
-                          return (
-                            <div className="text-xs text-muted-foreground/30 text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              {canManageAllTimetable && "Drop here"}
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div className="space-y-1">
-                            {scopedSlots.map((slot: any, idx: number) => (
-                              <div
-                                key={idx}
-                                className="p-2 bg-primary/10 rounded-lg border border-primary/20 relative"
-                              >
-                                <div className="font-medium text-sm text-foreground">
-                                  {slot.courseCode || slot.courseName}
-                                </div>
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  {slot.facultyName}
-                                </div>
-                                {slot.room && (
-                                  <button 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      window.location.href = `/campus-map?search=${encodeURIComponent(slot.room)}`;
-                                    }}
-                                    className="flex items-center gap-1.5 mt-1.5 text-[10px] font-bold text-primary hover:underline group"
-                                  >
-                                    <span className="bg-primary/10 px-1.5 py-0.5 rounded uppercase tracking-tighter">
-                                      {slot.room}
-                                    </span>
-                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">→ MAP</span>
-                                  </button>
-                                )}
-                                
-                                {user.role === "student" && studentAttendanceMap.has(slot.courseId) && (
-                                  <div className={`mt-2 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
-                                    (studentAttendanceMap.get(slot.courseId) || 0) < 75 
-                                      ? "bg-destructive/10 text-destructive border border-destructive/20" 
-                                      : "bg-success/10 text-success border border-success/20"
-                                  }`}>
-                                    <div className={`w-1 h-1 rounded-full ${(studentAttendanceMap.get(slot.courseId) || 0) < 75 ? "bg-destructive" : "bg-success"}`} />
-                                    {studentAttendanceMap.get(slot.courseId)}% Attended
-                                  </div>
-                                )}
-
-                                {(user.role === "student" || filterValues.department === "all") && (
-                                  <div className="text-[9px] opacity-70 mt-1 font-medium">
-                                    {slot.department}
-                                  </div>
-                                )}
-                                
-                                {canManageAllTimetable && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteSlot(slot.id);
-                                    }}
-                                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 p-1 hover:bg-destructive/10 rounded text-destructive transition-all"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </button>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        );
-                      })()}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {Object.keys(timetable).length === 0 && (
-          <div className="p-4">
-            <EmptyState title="No timetable entries" description="Add slots manually or use auto-generate." />
-          </div>
-        )}
-      </div>
+      <TimetableDesktopView
+        timetable={timetable}
+        DAYS={DAYS}
+        TIME_SLOTS={TIME_SLOTS}
+        canManageAllTimetable={canManageAllTimetable}
+        draggedCourse={draggedCourse}
+        user={user}
+        studentAttendanceMap={studentAttendanceMap}
+        filterValues={filterValues}
+        handleDragOver={handleDragOver}
+        handleDragLeave={handleDragLeave}
+        handleDrop={handleDrop}
+        handleDragEnd={handleDragEnd}
+        openSlotDialog={openSlotDialog}
+        applySlotFilters={applySlotFilters}
+        handleDeleteSlot={handleDeleteSlot}
+      />
 
       {/* Edit Slot Dialog (Admin) */}
-      <Dialog open={showSlotDialog} onOpenChange={setShowSlotDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Timetable Slot</DialogTitle>
-            <DialogDescription>
-              {selectedSlot?.day} - {selectedSlot?.timeSlot}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Course</label>
-              <Select
-                value={slotForm.courseId}
-                onValueChange={(val) =>
-                  setSlotForm((prev) => ({ ...prev, courseId: val }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select course" />
-                </SelectTrigger>
-                <SelectContent>
-                  {courses.map((course) => (
-                    <SelectItem key={course.id} value={course.id}>
-                      {course.code} - {course.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Room</label>
-              <Input
-                placeholder="e.g. 101, Lab 2"
-                value={slotForm.room}
-                onChange={(e) =>
-                  setSlotForm((prev) => ({ ...prev, room: e.target.value }))
-                }
-              />
-            </div>
-            <Button onClick={handleSaveSlot} className="w-full">
-              <Save className="w-4 h-4 mr-2" />
-              Save Changes
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {showSlotDialog && (
+        <EditSlotDialog
+          open={showSlotDialog}
+          onOpenChange={setShowSlotDialog}
+          selectedSlot={selectedSlot}
+          courses={courses}
+          slotForm={slotForm}
+          setSlotForm={setSlotForm}
+          onSave={handleSaveSlot}
+        />
+      )}
 
       {/* Faculty Extra Class Dialog */}
-      <Dialog open={showExtraClassDialog} onOpenChange={setShowExtraClassDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Schedule Extra Class</DialogTitle>
-            <DialogDescription>
-              Add an extra class session to your timetable
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            {/* Course Selection */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Course *</label>
-              <Select
-                value={extraClassForm.courseId}
-                onValueChange={(value) =>
-                  setExtraClassForm((prev) => ({ 
-                    ...prev, 
-                    courseId: value,
-                    slotKey: "" // Reset slot when course changes
-                  }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your course" />
-                </SelectTrigger>
-                <SelectContent>
-                  {courses.length > 0 ? (
-                    courses.map((course) => (
-                      <SelectItem key={course.id} value={course.id}>
-                        {course.code} - {course.name}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <div className="p-2 text-sm text-muted-foreground">
-                      No courses assigned
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Day Selection */}
-            {extraClassForm.courseId && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Day *</label>
-                <Select
-                  value={extraClassForm.slotKey?.split("-")[0] || ""}
-                  onValueChange={(day) => {
-                    setExtraClassForm((prev) => ({
-                      ...prev,
-                      slotKey: `${day}-`, // Placeholder for time selection
-                    }));
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a day" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DAYS.map((day) => (
-                      <SelectItem key={day} value={day}>
-                        {day}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {/* Time Slot Selection */}
-            {extraClassForm.courseId && extraClassForm.slotKey?.split("-")[0] && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Time Slot *</label>
-                <Select
-                  value={extraClassForm.slotKey || ""}
-                  onValueChange={(value) =>
-                    setExtraClassForm((prev) => ({ ...prev, slotKey: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select available time" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIME_SLOTS.filter((t) => t !== "13:00-14:00").map((timeSlot) => {
-                      const selectedDay = extraClassForm.slotKey?.split("-")[0];
-                      const key = `${selectedDay}-${timeSlot}`;
-                      const slots = timetable[key] || [];
-                      const hasFacultyClass = slots.some((slot: any) => isSlotOwnedByFaculty(slot));
-                      const isAvailable = !hasFacultyClass;
-
-                      return (
-                        <SelectItem key={key} value={key} disabled={!isAvailable}>
-                          <span>
-                            {timeSlot}
-                            {!isAvailable && " (Busy)"}
-                          </span>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {/* Room Input */}
-            {extraClassForm.courseId && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Room</label>
-                <Input
-                  placeholder="e.g. L-10, Lab 2, or leave blank for TBD"
-                  value={extraClassForm.room}
-                  onChange={(e) =>
-                    setExtraClassForm((prev) => ({ ...prev, room: e.target.value }))
-                  }
-                />
-              </div>
-            )}
-
-            {/* Auto-populated Fields Info */}
-            {extraClassForm.courseId && extraClassForm.slotKey && !extraClassForm.slotKey.endsWith("-") && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg space-y-2 text-sm">
-                <p className="font-medium text-blue-900">Auto-populated from course:</p>
-                <div className="text-xs text-blue-800 space-y-1">
-                  {(() => {
-                    const course = courses.find(c => c.id === extraClassForm.courseId);
-                    return (
-                      <>
-                        <div>• <strong>Program:</strong> {course?.department || "N/A"}</div>
-                        <div>• <strong>Semester:</strong> {course?.semester || "N/A"}</div>
-                        {course?.batch && <div>• <strong>Batch:</strong> {course.batch}</div>}
-                        <div>• <strong>Slot:</strong> {extraClassForm.slotKey.replace("-", " at ")}</div>
-                        <div>• <strong>Room:</strong> {extraClassForm.room || "TBD"}</div>
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowExtraClassDialog(false);
-                  setExtraClassForm({ courseId: "", slotKey: "", room: "" });
-                }}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleScheduleExtraClass} 
-                className="flex-1"
-                disabled={
-                  !extraClassForm.courseId || 
-                  !extraClassForm.slotKey || 
-                  extraClassForm.slotKey.endsWith("-") ||
-                  courses.length === 0
-                }
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Schedule
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {showExtraClassDialog && (
+        <ExtraClassDialog
+          open={showExtraClassDialog}
+          onOpenChange={setShowExtraClassDialog}
+          extraClassForm={extraClassForm}
+          setExtraClassForm={setExtraClassForm}
+          courses={courses}
+          timetable={timetable}
+          days={DAYS}
+          timeSlots={TIME_SLOTS}
+          isSlotOwnedByFaculty={isSlotOwnedByFaculty}
+          onSchedule={handleScheduleExtraClass}
+          onCancel={() => {
+            setShowExtraClassDialog(false);
+            setExtraClassForm({ courseId: '', slotKey: '', room: '' });
+          }}
+        />
+      )}
 
       {/* Bulk Upload Dialog */}
       <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
@@ -1674,8 +1179,7 @@ export default function Timetable() {
           <DialogHeader>
             <DialogTitle>Bulk Upload Timetable</DialogTitle>
             <DialogDescription>
-              Upload Excel/CSV file with columns: day, timeSlot,
-              courseCode, room
+              Upload Excel/CSV file with columns: day, timeSlot, courseCode, room
             </DialogDescription>
           </DialogHeader>
           <BulkUpload
@@ -1689,4 +1193,3 @@ export default function Timetable() {
     </div>
   );
 }
-

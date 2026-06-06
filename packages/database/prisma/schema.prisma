@@ -16,6 +16,7 @@ model User {
   linkedinUsername         String?
   isPublicProfile          Boolean                  @default(true)
   profileComplete          Boolean                  @default(false)
+  role                     String                   @default("student")
   password                 String                   @default("password")
   emailVerified            Boolean                  @default(false)
   emailVerifiedAt          DateTime?
