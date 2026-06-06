@@ -21,6 +21,24 @@ PEC App is built on a High-Concurrency Modular Architecture. The primary design 
 
 The platform utilizes a **pnpm workspace monorepo** managed by **Turborepo**, organized as a decoupled, three-tier architecture ensuring localized scalability and fault tolerance:
 
+```mermaid
+graph TD
+    Client["Web/Mobile Client"] -->|"HTTPS/TLS"| Frontend["Next.js 16 Frontend App"]
+    Frontend -->|"Internal API Bridge"| Backend["NestJS 11 Backend API"]
+    Client -->|"REST API / WebSockets"| Backend
+    
+    subgraph "Backend Tier"
+        Backend -->|"gRPC/REST"| Microservices["Internal Domain Modules"]
+        Backend -->|"Cache/PubSub"| Redis[("Redis")]
+        Backend -->|"Job Queue"| Bull["Bull Workers"]
+    end
+    
+    subgraph "Data Persistence Tier"
+        Backend -->|"Prisma Client"| DB[("PostgreSQL 16")]
+        Microservices -->|"Prisma"| DB
+    end
+```
+
 - **Frontend Architecture Layer** (`apps/frontend/`): A Next.js 16.2.x application with App Router, providing elastic scalability to handle varying academic loads. During peak enrollment or registration periods, the system automatically allocates additional resources.
 - **Backend API Orchestration Tier** (`apps/server/`): Powered by NestJS 11.x on Express (with Fastify adapter available), managing millions of academic records while maintaining fast query performance through advanced b-tree indexing.
 - **Persistence and Data Sovereignty Tier**: A private relational cloud (PostgreSQL 16) adhering to strict institutional data protection standards. Managed via the `packages/database/` shared Prisma package.

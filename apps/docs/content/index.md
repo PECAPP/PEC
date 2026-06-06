@@ -4,7 +4,7 @@ Comprehensive technical documentation and operational guides for the PEC APP ERP
 
 ## Core Developmental Documentation
 
-### [System Architecture](./ARCHITECTURE.md)
+### [System Architecture](./architecture.md)
 Detailed technical blueprint of the PEC platform including:
 - Frontend Architecture (Next.js 16.2.1 with Turbopack)
 - Backend Orchestration (NestJS 11.x + Prisma 6.x)
@@ -12,7 +12,7 @@ Detailed technical blueprint of the PEC platform including:
 - Institutional Security and Role-Based Access Control
 - Sub-second Performance Optimization Strategies
 
-### [Institutional Setup](./SETUP.md)
+### [Institutional Setup](./setup.md)
 Complete installation and operational reference for PEC APP:
 - System Requirements and Institutional Prerequisites
 - Integrated Installation Lifecycle (npm / Bun)
@@ -20,7 +20,7 @@ Complete installation and operational reference for PEC APP:
 - Database Engineering and High-Fidelity Seeding
 - Operational Execution (Ports 3000/4000)
 
-### [Development and Operations](./DEVELOPMENT.md)
+### [Development and Operations](./development.md)
 Complete lifecycle management and environment setup:
 - Institutional Prerequisites and Dependencies
 - Secure Environment Configuration
@@ -28,7 +28,7 @@ Complete lifecycle management and environment setup:
 - Accelerated Development Workflow (Ports 3000/4000)
 - Deployment and CI/CD Protocols
 
-### [Platform Features](./FEATURES.md)
+### [Platform Features](./features.md)
 Detailed functional specification of the institutional ecosystem:
 - Academic Governance (Courses, Timetables, Attendance, Grading)
 - Campus Services (Infrastructure Maintenance, Spatial Navigation, Canteen)
@@ -36,15 +36,7 @@ Detailed functional specification of the institutional ecosystem:
 - Identity Services (Profile Management, AI Resume Analysis)
 - Administrative Oversight (User Governance, Financial Reporting)
 
-### [Quick Reference Guide](./QUICK_REFERENCE.md)
-Accelerated reference for developers and system operators:
-- Standardized Development Commands
-- Institutional Coding Patterns and DTOs
-- Critical Path and Module Locations
-- Environment Specification
-- Stability and Troubleshooting Logs
-
-### [Scaling and Infrastructure](./SCALING_AND_PLATFORM.md)
+### [Scaling and Infrastructure](./scaling-and-platform.md)
 Advanced infrastructure considerations for large-scale institutional deployments:
 - Database Indexing and Optimization
 - Edge-Runtime Caching Strategies
@@ -86,6 +78,6 @@ When contributing to the institutional knowledge base:
 
 ---
 
-Last Updated: March 2026
+Last Updated: June 2026
 PEC Documentation Governance Group
 Registry: PEC-DOC-001
