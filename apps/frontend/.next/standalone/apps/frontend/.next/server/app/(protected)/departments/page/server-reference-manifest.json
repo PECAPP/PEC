@@ -1,0 +1,41 @@
+{
+  "node": {
+    "7f56a26d6d0b99a5681b2500ae895cffd12e6db9a0": {
+      "workers": {
+        "app/(protected)/departments/page": {
+          "moduleId": 49680,
+          "async": false,
+          "exportedName": "createDepartmentAction",
+          "filename": "apps/frontend/src/modules/departments/actions.ts"
+        }
+      },
+      "exportedName": "createDepartmentAction",
+      "filename": "apps/frontend/src/modules/departments/actions.ts"
+    },
+    "7f04e85a7e30dafb37f8aadace5ff2e2035a497469": {
+      "workers": {
+        "app/(protected)/departments/page": {
+          "moduleId": 49680,
+          "async": false,
+          "exportedName": "updateDepartmentAction",
+          "filename": "apps/frontend/src/modules/departments/actions.ts"
+        }
+      },
+      "exportedName": "updateDepartmentAction",
+      "filename": "apps/frontend/src/modules/departments/actions.ts"
+    },
+    "7f4a38d4bf1dacd1d46b3d91044ceaa2f9b2e4477b": {
+      "workers": {
+        "app/(protected)/departments/page": {
+          "moduleId": 49680,
+          "async": false,
+          "exportedName": "deleteDepartmentAction",
+          "filename": "apps/frontend/src/modules/departments/actions.ts"
+        }
+      },
+      "exportedName": "deleteDepartmentAction",
+      "filename": "apps/frontend/src/modules/departments/actions.ts"
+    }
+  },
+  "edge": {}
+}

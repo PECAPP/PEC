@@ -2,7 +2,6 @@ node_modules
 server/node_modules
 npm-debug.log
 .git
-.gitignore
 README.md
 docs/
 .env.local

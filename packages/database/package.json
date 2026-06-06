@@ -1,0 +1,15 @@
+{
+  "name": "@pec/database",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "dependencies": {
+    "@prisma/client": "^7.8.0"
+  },
+  "devDependencies": {
+    "pg": "^8.11.0",
+    "prisma": "^7.8.0",
+    "ts-node": "^10.9.1"
+  }
+}

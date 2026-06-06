@@ -2,7 +2,7 @@
   "name": "pec-campus-erp",
   "private": true,
   "version": "0.0.0",
-  "packageManager": "npm@11.7.0",
+  "packageManager": "pnpm@9.12.3",
   "scripts": {
     "dev": "npm run dev:host",
     "dev:turbo": "turbo run dev",
@@ -21,13 +21,14 @@
     "setup": "npm install --legacy-peer-deps && cd server && npm install --legacy-peer-deps && npx prisma db push --accept-data-loss && npx prisma generate && npm run db:seed && cd ..",
     "clean:full": "node -e \"const fs=require('fs');['node_modules','server/node_modules','.next','server/dist'].forEach(p=>fs.rmSync(p,{recursive:true,force:true})); console.log('Cleaned all artifacts.')\"",
     "clean:next": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});console.log('cleaned .next')\"",
-    "prisma:studio": "npx prisma studio --config server/prisma.config.ts --browser none",
+    "db:studio": "npx prisma studio --schema packages/database/prisma/schema.prisma",
     "start": "next start",
-    "start:fresh": "npm run clean:next && next build && next start"
+    "start:fresh": "npm run clean:next && next build && next start",
+    "prepare": "husky"
   },
   "workspaces": [
-    "server",
-    "shared"
+    "apps/*",
+    "packages/*"
   ],
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",
@@ -71,6 +72,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
+    "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "flatted": "^3.4.2",
     "framer-motion": "^12.23.26",
@@ -106,10 +108,12 @@
     "three": "^0.183.2",
     "undici": "^7.24.6",
     "vaul": "^0.9.9",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^3.24.1"
   },
   "overrides": {
+    "uuid": "^11.1.1",
+    "postcss": "^8.5.10",
+    "@hono/node-server": "^1.19.13",
     "tar": "^7.5.13",
     "undici": "^7.24.6",
     "path-to-regexp": "^8.4.1",
@@ -131,9 +135,19 @@
     "eslint": "^10.1.0",
     "eslint-config-next": "^16.2.1",
     "globals": "^17.4.0",
-    "postcss": "^8.5.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "postcss": "^8.5.10",
     "tailwindcss": "^3.4.17",
     "turbo": "^2.9.3",
     "typescript": "^5.8.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

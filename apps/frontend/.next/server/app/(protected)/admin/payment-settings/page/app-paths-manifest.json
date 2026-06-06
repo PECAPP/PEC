@@ -1,0 +1,3 @@
+{
+  "/(protected)/admin/payment-settings/page": "app/(protected)/admin/payment-settings/page.js"
+}

@@ -1,0 +1,53 @@
+{
+  "node": {
+    "7f3b254cf67d6a7aec430769f9c793065f4c19e125": {
+      "workers": {
+        "app/(protected)/faculty/page": {
+          "moduleId": 905361,
+          "async": false,
+          "exportedName": "createFacultyAction",
+          "filename": "apps/frontend/src/modules/faculty/actions.ts"
+        }
+      },
+      "exportedName": "createFacultyAction",
+      "filename": "apps/frontend/src/modules/faculty/actions.ts"
+    },
+    "7f4263db6108a0bd581fb5781d496aecf900df942e": {
+      "workers": {
+        "app/(protected)/faculty/page": {
+          "moduleId": 905361,
+          "async": false,
+          "exportedName": "updateFacultyAction",
+          "filename": "apps/frontend/src/modules/faculty/actions.ts"
+        }
+      },
+      "exportedName": "updateFacultyAction",
+      "filename": "apps/frontend/src/modules/faculty/actions.ts"
+    },
+    "7f51773e7b9c578412d6227dd337f5a3a921e3796b": {
+      "workers": {
+        "app/(protected)/faculty/page": {
+          "moduleId": 905361,
+          "async": false,
+          "exportedName": "deleteFacultyAction",
+          "filename": "apps/frontend/src/modules/faculty/actions.ts"
+        }
+      },
+      "exportedName": "deleteFacultyAction",
+      "filename": "apps/frontend/src/modules/faculty/actions.ts"
+    },
+    "7fe3c03d032a985a277df2b142bdcc2d4a018b85a8": {
+      "workers": {
+        "app/(protected)/faculty/page": {
+          "moduleId": 905361,
+          "async": false,
+          "exportedName": "promoteToHODAction",
+          "filename": "apps/frontend/src/modules/faculty/actions.ts"
+        }
+      },
+      "exportedName": "promoteToHODAction",
+      "filename": "apps/frontend/src/modules/faculty/actions.ts"
+    }
+  },
+  "edge": {}
+}

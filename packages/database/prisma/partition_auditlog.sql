@@ -1,0 +1,15 @@
+-- Scaffold: Partition audit_log by year
+BEGIN;
+
+-- Create partitioned parent table using the original table structure
+CREATE TABLE IF NOT EXISTS audit_log_partitioned (LIKE audit_log INCLUDING ALL) PARTITION BY RANGE (createdAt);
+
+DO $$
+BEGIN
+  -- create current year partition
+  IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = format('audit_log_y_%s', date_part('year', CURRENT_DATE)::int)) THEN
+    EXECUTE format('CREATE TABLE IF NOT EXISTS audit_log_y_%s PARTITION OF audit_log_partitioned FOR VALUES FROM (''%s-01-01'') TO (''%s-01-01'')', date_part('year', CURRENT_DATE)::int, date_part('year', CURRENT_DATE)::int, date_part('year', CURRENT_DATE)::int+1);
+  END IF;
+END$$;
+
+COMMIT;

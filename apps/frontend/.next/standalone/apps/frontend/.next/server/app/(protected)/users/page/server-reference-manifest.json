@@ -1,0 +1,53 @@
+{
+  "node": {
+    "7fd81a5c72da76e35e9b1ac0c0a93ec34708d91796": {
+      "workers": {
+        "app/(protected)/users/page": {
+          "moduleId": 968021,
+          "async": false,
+          "exportedName": "createUserAction",
+          "filename": "apps/frontend/src/modules/users/actions.ts"
+        }
+      },
+      "exportedName": "createUserAction",
+      "filename": "apps/frontend/src/modules/users/actions.ts"
+    },
+    "7f520ab70776b8c90fda43a0eb976015c72430ff74": {
+      "workers": {
+        "app/(protected)/users/page": {
+          "moduleId": 968021,
+          "async": false,
+          "exportedName": "updateUserAction",
+          "filename": "apps/frontend/src/modules/users/actions.ts"
+        }
+      },
+      "exportedName": "updateUserAction",
+      "filename": "apps/frontend/src/modules/users/actions.ts"
+    },
+    "7fe7b10b1b9da180bff57b02543c93cbdfd5e9aa73": {
+      "workers": {
+        "app/(protected)/users/page": {
+          "moduleId": 968021,
+          "async": false,
+          "exportedName": "deleteUserAction",
+          "filename": "apps/frontend/src/modules/users/actions.ts"
+        }
+      },
+      "exportedName": "deleteUserAction",
+      "filename": "apps/frontend/src/modules/users/actions.ts"
+    },
+    "7fae40d903ad265cf68788cab11b7e22861bbf6640": {
+      "workers": {
+        "app/(protected)/users/page": {
+          "moduleId": 968021,
+          "async": false,
+          "exportedName": "changeStatusAction",
+          "filename": "apps/frontend/src/modules/users/actions.ts"
+        }
+      },
+      "exportedName": "changeStatusAction",
+      "filename": "apps/frontend/src/modules/users/actions.ts"
+    }
+  },
+  "edge": {}
+}
