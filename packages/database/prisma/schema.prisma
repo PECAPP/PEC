@@ -1,17 +1,16 @@
 generator client {
   provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-
 model User {
   id                       String                   @id @default(uuid())
   email                    String                   @unique
   name                     String
-  role                     String?
   avatar                   String?
   githubUsername           String?
   linkedinUsername         String?
@@ -24,31 +23,29 @@ model User {
   sessionVersion           Int                      @default(0)
   failedLoginAttempts      Int                      @default(0)
   lockedUntil              DateTime?
-  studentProfile           StudentProfile?
-  facultyProfile           FacultyProfile?
-  messages                 Message[]                @relation("UserMessages")
-  chatRooms                UserChatRoom[]
   attendances              Attendance[]             @relation("StudentAttendance")
-  feeRecords               FeeRecord[]
   canteenOrders            CanteenOrder[]
-  enrollments              Enrollment[]             @relation("StudentEnrollments")
-  roles                    UserRole[]
-  refreshTokens            RefreshToken[]
-  emailVerificationTokens  EmailVerificationToken[]
-  passwordResetTokens      PasswordResetToken[]
+  cgpaEntries              CgpaEntry[]
+  createdClubs             Club[]                   @relation("ClubCreator")
   clubJoinRequests         ClubJoinRequest[]        @relation("ClubJoinRequester")
   reviewedClubJoinRequests ClubJoinRequest[]        @relation("ClubJoinReviewer")
-  createdClubs             Club[]                   @relation("ClubCreator")
-  notices                  Notice[]                 @relation("NoticeAuthor")
-  cgpaEntries              CgpaEntry[]
-  notifications            Notification[]
+  emailVerificationTokens  EmailVerificationToken[]
+  enrollments              Enrollment[]             @relation("StudentEnrollments")
+  facultyProfile           FacultyProfile?
+  feeRecords               FeeRecord[]
   financeTransactions      FinanceTransaction[]     @relation("FinanceTransactions")
-  marketplaceListings      MarketplaceListing[]     @relation("MarketplaceListings")
   marketplaceBookmarks     MarketplaceBookmark[]    @relation("MarketplaceBookmarks")
   marketplaceBuyerChats    MarketplaceChat[]        @relation("MarketplaceBuyerChats")
+  marketplaceListings      MarketplaceListing[]     @relation("MarketplaceListings")
   marketplaceMessages      MarketplaceMessage[]     @relation("MarketplaceMessages")
-
-  @@index([role])
+  messages                 Message[]                @relation("UserMessages")
+  notices                  Notice[]                 @relation("NoticeAuthor")
+  notifications            Notification[]
+  passwordResetTokens      PasswordResetToken[]
+  refreshTokens            RefreshToken[]
+  studentProfile           StudentProfile?
+  chatRooms                UserChatRoom[]
+  roles                    UserRole[]
   @@index([emailVerified])
   @@index([lockedUntil])
 }
@@ -56,18 +53,18 @@ model User {
 model CgpaEntry {
   id          String    @id @default(uuid())
   userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseId    String?
   subjectName String
   courseCode  String?
   semester    Int
   credits     Float
   gradePoint  Float
-  courseType  String    @default("core") // core | elective | minor | honors
+  courseType  String    @default("core")
   examDate    DateTime?
   notes       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, semester])
   @@index([userId, createdAt])
@@ -80,10 +77,10 @@ model HostelIssue {
   studentName    String?
   hostelName     String   @default("Hostel")
   roomNumber     String
-  category       String // "Plumbing", "Electrical", "Internet", "Furniture", "Other"
+  category       String
   description    String
-  status         String   @default("Open") // "Open", "InProgress", "Resolved", "Closed"
-  priority       String   @default("Medium") // "Low", "Medium", "High", "Critical"
+  status         String   @default("Open")
+  priority       String   @default("Medium")
   organizationId String?
   responses      Json?
   createdAt      DateTime @default(now())
@@ -104,7 +101,7 @@ model CampusMapRegion {
   y              Float
   width          Float
   height         Float
-  type           String // 'building' | 'gate' | 'landmark'
+  type           String
   color          String?
   category       String   @default("general")
   link           String?
@@ -163,17 +160,43 @@ model CourseMaterial {
 }
 
 model Role {
-  id        String     @id @default(uuid())
-  name      String     @unique
-  users     UserRole[]
-  createdAt DateTime   @default(now())
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  isSystem    Boolean          @default(false)
+  hierarchy   Int              @default(1)
+  createdAt   DateTime         @default(now())
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  action      String           // e.g. "create", "read", "update", "delete", "manage"
+  subject     String           // e.g. "HostelIssue", "all"
+  conditions  Json?            // e.g. { "studentId": "{{id}}" }
+  description String?
+  createdAt   DateTime         @default(now())
+  roles       RolePermission[]
+
+  @@unique([action, subject])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
 }
 
 model UserRole {
   userId String
   roleId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
   @@index([roleId])
@@ -224,7 +247,6 @@ model PasswordResetToken {
 model StudentProfile {
   id               String    @id @default(uuid())
   userId           String    @unique
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   enrollmentNumber String    @unique
   department       String
   semester         Int
@@ -234,6 +256,7 @@ model StudentProfile {
   bio              String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([department, semester])
 }
@@ -241,7 +264,6 @@ model StudentProfile {
 model FacultyProfile {
   id             String   @id @default(uuid())
   userId         String   @unique
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   employeeId     String   @unique
   department     String
   designation    String
@@ -251,6 +273,7 @@ model FacultyProfile {
   bio            String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([department, designation])
 }
@@ -281,28 +304,29 @@ model Course {
   facultyId        String?
   capacity         Int            @default(60)
   prerequisiteIds  String[]       @default([])
-  examSchedules    ExamSchedule[]
-  enrollments      Enrollment[]   @relation("CourseEnrollments")
-  timetableEntries Timetable[]    @relation("CourseTimetable")
   deletedAt        DateTime?
+  enrollments      Enrollment[]   @relation("CourseEnrollments")
+  examSchedules    ExamSchedule[]
+  timetableEntries Timetable[]    @relation("CourseTimetable")
 
   @@index([department, semester])
   @@index([status])
   @@index([deletedAt])
+  @@index([status], map: "idx_course_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model Enrollment {
   id         String   @id @default(uuid())
   studentId  String
-  student    User     @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
   courseId   String
-  course     Course   @relation("CourseEnrollments", fields: [courseId], references: [id], onDelete: Cascade)
   courseName String
   courseCode String
   semester   Int?
   batch      String?
   status     String   @default("active")
   enrolledAt DateTime @default(now())
+  course     Course   @relation("CourseEnrollments", fields: [courseId], references: [id], onDelete: Cascade)
+  student    User     @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, courseId])
   @@index([studentId, status])
@@ -313,14 +337,13 @@ model Enrollment {
 model FeeRecord {
   id                      String               @id @default(uuid())
   studentId               String
-  student                 User                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
   amount                  Float
   description             String
   dueDate                 DateTime
-  category                String // college | mess | hostel | library | exam | other
-  status                  String               @default("pending") // pending | paid | failed | waived
+  category                String
+  status                  String               @default("pending")
   semester                String?
-  month                   String? // e.g. "2024-03" for mess/hostel monthly
+  month                   String?
   lateFeeApplied          Boolean              @default(false)
   lateFeeAmount           Float                @default(0)
   paidDate                DateTime?
@@ -328,30 +351,32 @@ model FeeRecord {
   paymentTransactionId    String?
   lastPaymentAttempt      DateTime?
   verificationSubmittedAt DateTime?
-  transactions            FinanceTransaction[]
   createdAt               DateTime             @default(now())
   updatedAt               DateTime             @updatedAt
   deletedAt               DateTime?
+  student                 User                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  transactions            FinanceTransaction[]
 
   @@index([studentId, status])
   @@index([category, status])
   @@index([dueDate])
   @@index([deletedAt])
+  @@index([studentId, status], map: "idx_feerecord_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model FinanceTransaction {
   id            String    @id @default(uuid())
   studentId     String
-  student       User      @relation("FinanceTransactions", fields: [studentId], references: [id], onDelete: Cascade)
   feeRecordId   String
-  feeRecord     FeeRecord @relation(fields: [feeRecordId], references: [id], onDelete: Cascade)
   amount        Float
-  paymentMethod String    @default("online") // online | cash | dd | neft | upi
-  status        String // success | failed | pending | refunded
-  gatewayTxnId  String? // Razorpay/Stripe order/payment ID
+  paymentMethod String    @default("online")
+  status        String
+  gatewayTxnId  String?
   receiptNo     String    @unique
   notes         String?
   createdAt     DateTime  @default(now())
+  feeRecord     FeeRecord @relation(fields: [feeRecordId], references: [id], onDelete: Cascade)
+  student       User      @relation("FinanceTransactions", fields: [studentId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([feeRecordId])
@@ -362,7 +387,6 @@ model FinanceTransaction {
 model Timetable {
   id          String   @id @default(uuid())
   courseId    String?
-  course      Course?  @relation("CourseTimetable", fields: [courseId], references: [id])
   courseName  String
   courseCode  String
   facultyId   String?
@@ -375,6 +399,7 @@ model Timetable {
   semester    Int?
   batch       String?
   createdAt   DateTime @default(now())
+  course      Course?  @relation("CourseTimetable", fields: [courseId], references: [id])
 
   @@index([courseId])
   @@index([department, semester, batch])
@@ -388,7 +413,7 @@ model Room {
   capacity    Int
   building    String
   floor       Int
-  facilities  String // JSON array stored as string
+  facilities  String
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
 
@@ -401,9 +426,9 @@ model ChatRoom {
   name         String
   isGroup      Boolean        @default(true)
   createdAt    DateTime       @default(now())
+  club         Club?
   messages     Message[]
   participants UserChatRoom[]
-  club         Club?
 
   @@unique([name, isGroup])
   @@index([createdAt])
@@ -419,28 +444,28 @@ model Notice {
   pinned        Boolean   @default(false)
   mediaJson   String?
   authorId    String?
-  author      User?     @relation("NoticeAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   publishedAt DateTime  @default(now())
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  author      User?     @relation("NoticeAuthor", fields: [authorId], references: [id])
 
   @@index([pinned, priorityLevel, publishedAt])
   @@index([category, publishedAt])
   @@index([authorId])
   @@index([deletedAt, publishedAt])
+  @@index([category], map: "idx_notice_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model Club {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  chatRoomId  String   @unique
-  createdById String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  id           String            @id @default(uuid())
+  name         String            @unique
+  chatRoomId   String            @unique
+  createdById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
   chatRoom     ChatRoom          @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
-  createdBy    User?             @relation("ClubCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy    User?             @relation("ClubCreator", fields: [createdById], references: [id])
   joinRequests ClubJoinRequest[]
 
   @@index([createdById])
@@ -458,10 +483,9 @@ model ClubJoinRequest {
   reviewedAt   DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-
-  club       Club  @relation(fields: [clubId], references: [id], onDelete: Cascade)
-  requester  User  @relation("ClubJoinRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  reviewedBy User? @relation("ClubJoinReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  club         Club      @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  requester    User      @relation("ClubJoinRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  reviewedBy   User?     @relation("ClubJoinReviewer", fields: [reviewedById], references: [id])
 
   @@unique([clubId, requesterId])
   @@index([clubId, status])
@@ -472,14 +496,14 @@ model ClubJoinRequest {
 model Notification {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   message   String
-  type      String   @default("info") // info | alert | success | error
-  link      String? // Optional path to redirect to
+  type      String   @default("info")
+  link      String?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, read, createdAt])
 }
@@ -489,9 +513,9 @@ model Message {
   content    String
   createdAt  DateTime @default(now())
   senderId   String
-  sender     User     @relation("UserMessages", fields: [senderId], references: [id], onDelete: Cascade)
   chatRoomId String
   chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  sender     User     @relation("UserMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([chatRoomId, createdAt])
   @@index([senderId, createdAt])
@@ -500,30 +524,28 @@ model Message {
 model UserChatRoom {
   userId     String
   chatRoomId String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, chatRoomId])
   @@index([chatRoomId])
 }
 
 model Attendance {
-  id        String   @id @default(uuid())
+  id        String             @id @default(uuid())
   date      DateTime
-  status    String // "present" | "absent" | "late"
+  status    String
   subject   String
   studentId String
-  student   User     @relation("StudentAttendance", fields: [studentId], references: [id], onDelete: Cascade)
-
-  // QR Attendance fields
   sessionId String?
-  session   AttendanceSession? @relation("SessionAttendance", fields: [sessionId], references: [id], onDelete: SetNull)
   markedAt  DateTime?          @default(now())
-  method    String?            @default("manual") // "manual" or "qr"
+  method    String?            @default("manual")
   courseId  String?
   facultyId String?
   lat       Float?
   lng       Float?
+  session   AttendanceSession? @relation("SessionAttendance", fields: [sessionId], references: [id])
+  student   User               @relation("StudentAttendance", fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, date, subject])
   @@index([date])
@@ -554,7 +576,6 @@ model AttendanceSession {
 model ExamSchedule {
   id         String    @id @default(uuid())
   courseId   String
-  course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseName String
   courseCode String
   examType   String
@@ -565,6 +586,7 @@ model ExamSchedule {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
+  course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@index([courseId, date])
   @@index([deletedAt])
@@ -586,6 +608,7 @@ model Job {
   @@index([company])
   @@index([deletedAt, deadline])
   @@index([deletedAt])
+  @@index([deadline], map: "idx_job_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model AuditLog {
@@ -654,9 +677,9 @@ model CanteenItem {
   image       String?
   isAvailable Boolean            @default(true)
   stock       Int                @default(100)
-  orders      CanteenOrderItem[]
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
+  orders      CanteenOrderItem[]
 
   @@index([category, isAvailable])
 }
@@ -664,13 +687,13 @@ model CanteenItem {
 model CanteenOrder {
   id          String             @id @default(uuid())
   studentId   String
-  student     User               @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentName String?
   hostelRoom  String
   totalAmount Float
-  status      String             @default("Pending") // "Pending", "Delivered", "Cancelled"
-  items       CanteenOrderItem[]
+  status      String             @default("Pending")
   timestamp   DateTime           @default(now())
+  student     User               @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  items       CanteenOrderItem[]
 
   @@index([studentId, status])
   @@index([timestamp])
@@ -679,12 +702,12 @@ model CanteenOrder {
 model CanteenOrderItem {
   id       String       @id @default(uuid())
   orderId  String
-  order    CanteenOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
   itemId   String
-  item     CanteenItem  @relation(fields: [itemId], references: [id])
-  name     String // De-normalized name for history
+  name     String
   quantity Int
   price    Float
+  item     CanteenItem  @relation(fields: [itemId], references: [id])
+  order    CanteenOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
 }
@@ -726,7 +749,7 @@ model StudentProject {
   studentId   String
   title       String
   description String
-  techStack   String // JSON array of technologies
+  techStack   String
   githubUrl   String?
   liveUrl     String?
   imageUrl    String?
@@ -744,8 +767,8 @@ model StudentSkill {
   id        String   @id @default(uuid())
   studentId String
   name      String
-  level     Int      @default(50) // 0-100
-  category  String   @default("technical") // "technical", "soft", "language", "tool"
+  level     Int      @default(50)
+  category  String   @default("technical")
   createdAt DateTime @default(now())
 
   @@unique([studentId, name])
@@ -763,7 +786,7 @@ model FacultyPublication {
   url        String?
   abstract   String?
   citations  Int      @default(0)
-  coAuthors  String? // JSON array
+  coAuthors  String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -778,7 +801,7 @@ model FacultyAward {
   description String?
   awardedBy   String?
   year        Int
-  category    String   @default("academic") // "academic", "research", "teaching", "service"
+  category    String   @default("academic")
   createdAt   DateTime @default(now())
 
   @@index([facultyId])
@@ -792,7 +815,7 @@ model FacultyConference {
   location          String?
   startDate         DateTime?
   endDate           DateTime?
-  role              String?   @default("presenter") // "presenter", "attendee", "organizer", "keynote"
+  role              String?   @default("presenter")
   presentationTitle String?
   description       String?
   createdAt         DateTime  @default(now())
@@ -808,7 +831,7 @@ model FacultyConsultation {
   description  String?
   startDate    DateTime?
   endDate      DateTime?
-  status       String    @default("active") // "active", "completed", "ongoing"
+  status       String    @default("active")
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -824,11 +847,11 @@ model AcademicCalendarEvent {
   endDate        DateTime?
   startTime      String?
   endTime        String?
-  eventType      String // holiday|exam|event|deadline|working-day|orientation|registration|result|recess
-  category       String    @default("academic") // academic|examination|holiday|administrative|cultural|sports|technical
+  eventType      String
+  category       String    @default("academic")
   location       String?
-  importance     String    @default("medium") // high|medium|low
-  targetAudience String? // all|students|faculty|specific-department
+  importance     String    @default("medium")
+  targetAudience String?
   rawData        Json?
   isEditable     Boolean   @default(true)
   createdBy      String?
@@ -841,25 +864,21 @@ model AcademicCalendarEvent {
   @@index([date])
 }
 
-// ──────────────────────────────────────────────
-// Buy & Sell Marketplace
-// ──────────────────────────────────────────────
-
 model MarketplaceListing {
   id          String                @id @default(uuid())
   title       String
   description String                @default("")
   price       Float
-  category    String // Books|Electronics|Furniture|Clothing|Sports|Stationery|Other
-  condition   String // New|Like New|Good|Used|Poor
+  category    String
+  condition   String
   images      String[]
-  status      String                @default("Available") // Available|Sold|Deleted
+  status      String                @default("Available")
   sellerId    String
-  seller      User                  @relation("MarketplaceListings", fields: [sellerId], references: [id], onDelete: Cascade)
-  bookmarks   MarketplaceBookmark[]
-  chats       MarketplaceChat[]
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
+  bookmarks   MarketplaceBookmark[]
+  chats       MarketplaceChat[]
+  seller      User                  @relation("MarketplaceListings", fields: [sellerId], references: [id], onDelete: Cascade)
 
   @@index([sellerId])
   @@index([category])
@@ -870,10 +889,10 @@ model MarketplaceListing {
 model MarketplaceBookmark {
   id        String             @id @default(uuid())
   userId    String
-  user      User               @relation("MarketplaceBookmarks", fields: [userId], references: [id], onDelete: Cascade)
   listingId String
-  listing   MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   createdAt DateTime           @default(now())
+  listing   MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User               @relation("MarketplaceBookmarks", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, listingId])
   @@index([userId])
@@ -882,12 +901,12 @@ model MarketplaceBookmark {
 model MarketplaceChat {
   id        String               @id @default(uuid())
   listingId String
-  listing   MarketplaceListing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
   buyerId   String
-  buyer     User                 @relation("MarketplaceBuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
-  messages  MarketplaceMessage[]
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
+  buyer     User                 @relation("MarketplaceBuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
+  listing   MarketplaceListing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  messages  MarketplaceMessage[]
 
   @@unique([listingId, buyerId])
   @@index([listingId])
@@ -897,11 +916,11 @@ model MarketplaceChat {
 model MarketplaceMessage {
   id        String          @id @default(uuid())
   chatId    String
-  chat      MarketplaceChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   senderId  String
-  sender    User            @relation("MarketplaceMessages", fields: [senderId], references: [id], onDelete: Cascade)
   text      String
   createdAt DateTime        @default(now())
+  chat      MarketplaceChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender    User            @relation("MarketplaceMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([chatId])
   @@index([senderId])

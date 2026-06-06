@@ -16,8 +16,8 @@ import type {
 } from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
-import { RolesGuard } from './roles.guard';
-import { Roles } from './roles.decorator';
+import { PoliciesGuard } from './guards/policies.guard';
+import { CheckPolicies } from './decorators/check-policies.decorator';
 import { Throttle } from '@nestjs/throttler';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import {
@@ -164,22 +164,25 @@ export class AuthController {
     return this.authService.resetPassword(body.token, body.password);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator')
+  @UseGuards(AuthGuard)
+  @Get('me/permissions')
+  getPermissions(@Request() req: any) {
+    return { permissions: req.user.permissions || [] };
+  }
+
+  @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req: any) {
     return this.authService.getProfile(req.user.sub);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator')
+  @UseGuards(AuthGuard)
   @Post('complete-profile')
   completeProfile(@Request() req: any, @Body() body: Record<string, any>) {
     return this.authService.completeProfile(req.user.sub, body);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator')
+  @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('change-password')
   async changePassword(
@@ -198,8 +201,8 @@ export class AuthController {
   }
 
   @Post('set-role')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(AuthGuard, PoliciesGuard)
+  @CheckPolicies((ability) => ability.can('manage', 'User'))
   @Throttle({ short: { limit: 10, ttl: 60000 } })
   async setRole(
     @Request() req: any,
