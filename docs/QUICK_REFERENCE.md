@@ -4,9 +4,30 @@ Quick reference for common tasks and patterns in the PEC APP Campus ERP applicat
 
 ## Development Commands
 
+### Root Monorepo Commands (pnpm)
+
+```bash
+pnpm run dev            # Start frontend + backend concurrently (kills port 3001 first)
+pnpm run frontend       # Start Next.js dev server only (port 3000)
+pnpm run api            # Start NestJS dev server only (port 4000)
+pnpm run build          # Build all workspaces via Turbo
+pnpm run lint           # Run ESLint across all workspaces
+pnpm run setup          # Full setup: install + db:push + prisma:generate + db:seed
+pnpm run db:reset       # Wipe DB, push schema, re-seed
+pnpm run db:studio      # Open Prisma Studio UI
+pnpm run clean:full     # Remove all node_modules and build artifacts
+pnpm run clean:next     # Remove only apps/frontend/.next cache
+pnpm run check:env      # Validate all required environment variables
+pnpm run start:fresh    # Clean .next + build + start production server
+```
+
 ### Frontend (Next.js 16)
 
 ```bash
+# Run via root (preferred)
+pnpm run frontend
+
+# Or in apps/frontend/ directly
 npm run dev          # Start development server with Turbopack
 npm run build        # Production build
 npm run lint         # Run ESLint for code quality
@@ -16,20 +37,28 @@ npm run lint:fix     # Auto-fix linting issues
 ### Backend (NestJS)
 
 ```bash
-cd server
-npm run start:dev    # Start NestJS with hot reload
-npm run build        # Production build
-npm run prisma:generate  # Generate Prisma client
-npm run prisma:migrate   # Run database migrations
-npm run seed         # Seed database with initial data
+# Run via root (preferred)
+pnpm run api
+
+# Or in apps/server/ directly
+npm run start:dev        # start-dev-safe.js: checks port 4000, starts ts-node
+npm run build            # Production NestJS build
+npm run prisma:generate  # Generate Prisma client (@pec/database)
+npm run db:migrate       # Run prisma migrate dev
+npm run db:push          # Direct schema push (dev only)
+npm run db:seed          # Seed database with institutional data
+npm run db:backup        # Backup PostgreSQL database
+npm run db:restore       # Restore from backup
+npm run db:clean         # Clean all data (requires --force flag)
 ```
 
 ### Docker Integration
 
 ```bash
-npm run dev:docker:backend   # Start Postgres + Backend in Docker
-npm run dev:docker:frontend  # Start Frontend in Docker
-npm run prod:docker         # Full production deployment
+pnpm run prod:docker          # Full production stack (docker-compose up -d --build)
+pnpm run prod:docker:down     # Stop production stack
+pnpm run dev:docker:logs      # Stream Docker Compose logs
+pnpm run dev:docker:restart   # Restart Docker Compose services
 ```
 
 ## Common Patterns
@@ -37,6 +66,7 @@ npm run prod:docker         # Full production deployment
 ### Creating a New Page
 
 1. Create the page file in `app/(protected)/`:
+
 ```typescript
 // app/(protected)/example/page.tsx
 import { redirect } from 'next/navigation';
@@ -64,7 +94,7 @@ import { Button } from '@/components/ui/button';
 
 export function ExampleClient() {
   const [count, setCount] = useState(0);
-  
+
   return (
     <Button variant="outline" onClick={() => setCount(count + 1)}>
       Interactions: {count}
@@ -79,7 +109,7 @@ export function ExampleClient() {
 // Server-side (Standard Fetch)
 async function getAcademicData() {
   const res = await fetch('http://localhost:4000/courses', {
-    next: { revalidate: 3600 } // Cache for 1 hour
+    next: { revalidate: 3600 }, // Cache for 1 hour
   });
   if (!res.ok) throw new Error('Query failure');
   return res.json();
@@ -148,68 +178,103 @@ export function UIExample() {
 
 ## Project Directory Map
 
-| Resource | Primary Location |
-|------|-----------|
+| Resource         | Primary Location                     |
+| ---------------- | ------------------------------------ |
 | Protected Routes | `app/(protected)/[feature]/page.tsx` |
-| UI Components | `src/components/ui/` |
-| Business Hooks | `src/hooks/` |
-| Shared Types | `src/types/` |
-| API Utilities | `src/lib/` |
-| Rewrite Proxy | `app/api/` |
-| Backend Modules | `server/src/[module]/` |
-| Data Schema | `server/prisma/schema.prisma` |
+| UI Components    | `src/components/ui/`                 |
+| Business Hooks   | `src/hooks/`                         |
+| Shared Types     | `src/types/`                         |
+| API Utilities    | `src/lib/`                           |
+| Rewrite Proxy    | `app/api/`                           |
+| Backend Modules  | `server/src/[module]/`               |
+| Data Schema      | `server/prisma/schema.prisma`        |
 
 ## Key Navigation Routes
 
-| Route | Purpose |
-|-------|---------|
-| `/` | Institutional Landing Page |
-| `/auth` | Authentication Entry |
-| `/dashboard` | Role-Aware Command Center |
-| `/courses` | Academic Course Management |
-| `/attendance` | Real-Time Attendance Engine |
-| `/timetable` | Academic Scheduling |
-| `/chat` | Secure Messaging Interface |
-| `/canteen` | Night Canteen Ordering |
-| `/resume-builder` | AI Career Suite |
-| `/profile` | User Identity Management |
-| `/admin/*` | System Administration |
+| Route                 | Purpose                                        |
+| --------------------- | ---------------------------------------------- |
+| `/`                   | Institutional Landing Page                     |
+| `/auth`               | Authentication Entry (Login / Register)        |
+| `/onboarding`         | New user onboarding flow                       |
+| `/role-selection`     | Role selection after registration              |
+| `/dashboard`          | Role-Aware Command Center                      |
+| `/courses`            | Academic Course Management                     |
+| `/attendance`         | Real-Time Attendance Engine                    |
+| `/timetable`          | Academic Scheduling                            |
+| `/academic-calendar`  | Academic Calendar and Events                   |
+| `/examinations`       | Examination Schedule                           |
+| `/course-materials`   | Digital Learning Resources                     |
+| `/score-sheet`        | Student Score Sheet (backend-persisted)        |
+| `/chat`               | Secure Messaging Interface                     |
+| `/canteen`            | Canteen Ordering                               |
+| `/noticeboard`        | Campus Announcements                           |
+| `/hostel-issues`      | Hostel Maintenance Reporting                   |
+| `/campus-map`         | 2D / 3D Campus Map                             |
+| `/rooms`              | Room Management                                |
+| `/clubs`              | Student Clubs                                  |
+| `/marketplace`        | Campus Peer-to-Peer Marketplace                |
+| `/finance`            | Fee Records and Transactions                   |
+| `/faculty`            | Faculty Directory                              |
+| `/faculty-bio-system` | Faculty Professional Profiles                  |
+| `/student-portfolio`  | Student Portfolio (Projects + Skills + GitHub) |
+| `/resume-builder`     | AI-Powered Resume Builder                      |
+| `/profile`            | User Identity Management                       |
+| `/settings`           | User Settings                                  |
+| `/search`             | Global Campus Search                           |
+| `/users`              | User Management (Admin)                        |
+| `/departments`        | Department Management (Admin)                  |
+| `/admin/*`            | System Administration                          |
+| `/help`               | Help and Support Center                        |
 
 ## Environment Configuration
 
-### Frontend (.env.local)
+### Frontend (`apps/frontend/.env`)
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 BACKEND_API_URL=http://localhost:4000
 NEXT_PUBLIC_GEMINI_API_KEY=your_secure_key
+GEMINI_API_KEY=your_secure_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-### Backend (server/.env)
+### Backend (`apps/server/.env`)
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pec_db
-JWT_SECRET=institutional_encryption_secret
+JWT_SECRET=your_64_char_institutional_secret
+FIELD_ENCRYPTION_KEY=your_32_char_encryption_key
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_TTL_DAYS=7
 PORT=4000
+NODE_ENV=development
+CORS_ORIGINS=http://localhost:3000
+CORS_ALLOW_CREDENTIALS=true
+REDIS_URL=redis://localhost:6379
+OPENAI_API_KEY=your_openai_key           # For AI completion endpoints
+GITHUB_TOKEN=your_github_token          # Optional, for higher GitHub API rate limits
+BACKGROUND_JOB_WORKER_ENABLED=true
+SENTRY_DSN=your_sentry_dsn              # Optional, for production error tracking
+AUTH_LOCK_THRESHOLD=5                   # Failed attempts before account lock
+AUTH_LOCK_MINUTES=15                    # Lock duration in minutes
+REQUEST_BODY_LIMIT=1mb
 ```
 
 ## Database Operations
 
 ```bash
-# Refresh Prisma client types
-cd server && npm run prisma:generate
+# From root — preferred approach
+pnpm run db:reset            # Wipe + push schema + seed
+pnpm run db:studio           # Open Prisma Studio
 
-# Synchronize schema and generate migration
-npm run prisma:migrate dev --name update_schema
-
-# Direct schema push (development only)
-npm run prisma:push
-
-# Reset database to seed state
-npm run prisma:migrate reset
-
-# Graphical database browser
-npm run prisma:studio
+# From apps/server/ directory
+npm run prisma:generate      # Regenerate @pec/database Prisma client
+npm run db:migrate           # Run prisma migrate dev (dev only)
+npm run db:push              # Direct schema push (dev only)
+npm run db:seed              # Seed database
+npm run db:backup            # Backup to dump file
+npm run db:restore           # Restore from backup
+npm run db:clean             # Clean all data (dangerous! use --force)
 ```
 
 ## Performance and Maintenance
@@ -259,19 +324,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 function useUserRecords() {
   return useQuery({
     queryKey: ['users', 'records'],
-    queryFn: () => fetch('/api/users').then(res => res.json()),
+    queryFn: () => fetch('/api/users').then((res) => res.json()),
   });
 }
 
 // Data Mutation
 function useAddUserRecord() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (payload) => fetch('/api/users', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
+    mutationFn: (payload) =>
+      fetch('/api/users', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
@@ -281,15 +347,41 @@ function useAddUserRecord() {
 
 ## Primary Infrastructure Dependencies
 
-| Module | Implementation |
-|---------|---------|
-| `next` | Next.js 16 Core |
-| `react-hook-form` | Enterprise Form Engine |
-| `zod` | Runtime Type Validation |
-| `@tanstack/react-query` | Server-State Management |
-| `framer-motion` | Motion Design System |
-| `tailwindcss` | Design Tokens and Layout |
-| `lucide-react` | Institutional Iconography |
+| Module                          | Implementation                      |
+| ------------------------------- | ----------------------------------- |
+| `next`                          | Next.js 16 Core                     |
+| `react` + `react-dom`           | React 19                            |
+| `react-hook-form`               | Enterprise Form Engine              |
+| `zod`                           | Runtime Type Validation             |
+| `@tanstack/react-query`         | Server-State Management             |
+| `framer-motion`                 | Motion Design System                |
+| `tailwindcss`                   | Design Tokens and Layout            |
+| `lucide-react`                  | Institutional Iconography           |
+| `@radix-ui/*`                   | Accessible Headless UI Primitives   |
+| `three` + `@react-three/fiber`  | 3D Campus Map Rendering             |
+| `recharts`                      | Analytics Charts and Graphs         |
+| `qrcode.react` + `html5-qrcode` | QR Code Generation and Scanning     |
+| `jspdf` + `jspdf-autotable`     | PDF Export (reports, transcripts)   |
+| `exceljs`                       | Excel/CSV Export                    |
+| `papaparse`                     | CSV Parsing for Import              |
+| `pdfjs-dist`                    | PDF Viewer for course materials     |
+| `sonner`                        | Toast Notifications                 |
+| `date-fns`                      | Date Formatting and Manipulation    |
+| `react-markdown` + `remark-gfm` | Markdown Rendering for AI responses |
+| `next-themes`                   | Dark/Light Theme Switching          |
+| `cmdk`                          | Command Palette Search              |
+| `@nestjs/common` etc.           | NestJS 11 Backend Framework         |
+| `@nestjs/swagger`               | OpenAPI/Swagger Documentation       |
+| `bull`                          | Redis-backed Job Queue              |
+| `ioredis`                       | Redis Client for Node.js            |
+| `@google/generative-ai`         | Google Gemini AI Integration        |
+| `openai`                        | OpenAI GPT Integration              |
+| `@qdrant/js-client-rest`        | Qdrant Vector DB Client (RAG)       |
+| `@grpc/grpc-js`                 | gRPC Client/Server                  |
+| `@sentry/node`                  | Error Tracking and Performance      |
+| `prom-client`                   | Prometheus Metrics                  |
+| `nestjs-pino`                   | Structured Logging                  |
+| `sanitize-html`                 | HTML Sanitization Middleware        |
 
 ## Internal Links
 
