@@ -14,20 +14,23 @@ import { TimetableQueryDto } from './dto/timetable-query.dto';
 import { CreateTimetableDto } from './dto/create-timetable.dto';
 import { UpdateTimetableDto } from './dto/update-timetable.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { timetableSchema } from '@shared/schemas/erp';
+import { timetableSchema } from '@pec/shared';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { RateLimit } from '../common/decorators/rate-limit-options.decorator';
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @RateLimit({ limit: 2000, windowMs: 60_000, banAfterExceeded: 5 })
 @Controller('timetable')
 export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Timetable'))
   @Get()
   async findAll(@Query() query: TimetableQueryDto) {
     const result = await this.timetableService.findAll(query);
@@ -38,7 +41,7 @@ export class TimetableController {
     });
   }
 
-  @Roles('faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('create', 'Timetable'))
   @Post()
   async create(
     @Body(new ZodValidationPipe(timetableSchema))
@@ -48,7 +51,7 @@ export class TimetableController {
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('update', 'Timetable'))
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -59,10 +62,11 @@ export class TimetableController {
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('delete', 'Timetable'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const data = await this.timetableService.remove(id);
     return ok(data);
   }
 }
+
