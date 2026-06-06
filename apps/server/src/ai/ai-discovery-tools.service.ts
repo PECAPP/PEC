@@ -62,7 +62,14 @@ export class AiDiscoveryToolsService {
         importance: true,
       },
     });
-    return { functionResult: JSON.stringify(events) };
+    return {
+      functionResult: JSON.stringify({
+        displayed: true,
+        message:
+          'The upcoming events timeline has been shown to the user. Write a short 1-2 sentence summary. Do NOT repeat or list the raw data.',
+      }),
+      sseEvents: [{ eventsData: { events } }],
+    };
   }
 
   // ── Finance Summary ──────────────────────────────────────────────────────
@@ -71,7 +78,15 @@ export class AiDiscoveryToolsService {
     if (!userId) {
       return { functionResult: JSON.stringify({ error: 'User not authenticated' }) };
     }
-    return { functionResult: await this.fetchFinanceSummary(userId) };
+    const raw = await this.fetchFinanceSummary(userId);
+    return {
+      functionResult: JSON.stringify({
+        displayed: true,
+        message:
+          'The fee payment summary has been shown to the user in a formatted dashboard widget. Write a short 1-2 sentence summary of their dues. Do NOT repeat or list the raw data.',
+      }),
+      sseEvents: [{ financeData: JSON.parse(raw) }],
+    };
   }
 
   // ── Private data-fetching helpers ─────────────────────────────────────────

@@ -22,25 +22,57 @@ export class AiCampusToolsService {
     if (!userId) {
       return { functionResult: JSON.stringify({ error: 'User not authenticated' }) };
     }
-    return { functionResult: await this.fetchHostelIssues(userId) };
+    const raw = await this.fetchHostelIssues(userId);
+    return {
+      functionResult: JSON.stringify({
+        displayed: true,
+        message:
+          'The list of reported hostel issues has been shown to the user in a formatted dashboard widget. Write a short 1-2 sentence summary. Do NOT repeat or list the raw data.',
+      }),
+      sseEvents: [{ hostelIssuesData: JSON.parse(raw) }],
+    };
   }
 
   // ── Canteen Menu ─────────────────────────────────────────────────────────
 
   async getCanteenMenu(category?: string): Promise<ToolCallResult> {
-    return { functionResult: await this.fetchCanteenMenu(category) };
+    const raw = await this.fetchCanteenMenu(category);
+    return {
+      functionResult: JSON.stringify({
+        displayed: true,
+        message:
+          'The canteen menu has been shown to the user in a formatted interactive grid. Write a short 1-2 sentence summary. Do NOT repeat or list the raw data.',
+      }),
+      sseEvents: [{ canteenData: JSON.parse(raw) }],
+    };
   }
 
   // ── Clubs ────────────────────────────────────────────────────────────────
 
   async getClubs(): Promise<ToolCallResult> {
-    return { functionResult: await this.fetchClubs() };
+    const raw = await this.fetchClubs();
+    return {
+      functionResult: JSON.stringify({
+        displayed: true,
+        message:
+          'The list of student clubs has been shown to the user. Write a short 1-2 sentence summary. Do NOT repeat or list the raw data.',
+      }),
+      sseEvents: [{ clubsData: JSON.parse(raw) }],
+    };
   }
 
   // ── Night Canteen Menu ────────────────────────────────────────────────────
 
   async getNightCanteenMenu(category?: string): Promise<ToolCallResult> {
-    return { functionResult: await this.fetchNightCanteenMenu(category) };
+    const raw = await this.fetchNightCanteenMenu(category);
+    return {
+      functionResult: JSON.stringify({
+        displayed: true,
+        message:
+          'The night canteen menu has been shown to the user in a formatted interactive grid. Write a short 1-2 sentence summary. Do NOT repeat or list the raw data.',
+      }),
+      sseEvents: [{ nightCanteenData: JSON.parse(raw) }],
+    };
   }
 
   // ── Navigation ───────────────────────────────────────────────────────────
