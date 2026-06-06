@@ -10,6 +10,7 @@
     "lint": "turbo run lint",
     "frontend": "pnpm --filter pec-frontend dev",
     "api": "pnpm --filter pec-server start:dev",
+    "sync:api": "pnpm --filter @pec/api generate",
     "db:reset": "pnpm --filter pec-server db:clean && pnpm --filter pec-server db:push && pnpm --filter pec-server db:seed",
     "predev:host": "npx kill-port 3001",
     "dev:host": "concurrently --kill-others-on-fail \"npm run frontend\" \"npm run api\"",
@@ -142,7 +143,7 @@
     "lint-staged": "^17.0.7",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.17",
-    "turbo": "^2.9.3",
+    "turbo": "^2.9.16",
     "typescript": "^5.8.3"
   },
   "lint-staged": {
