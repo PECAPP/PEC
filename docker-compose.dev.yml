@@ -1,64 +1,230 @@
+name: pec-erp-dev
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: pec_postgres_dev
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
+    restart: always
     environment:
-      POSTGRES_DB: "pec"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: pec
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    command: ["postgres", "-c", "statement_timeout=5000", "-c", "autovacuum_vacuum_scale_factor=0.05", "-c", "autovacuum_analyze_scale_factor=0.02", "-c", "wal_level=logical"]
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U postgres -d pec
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  backend:
-    image: node:22-alpine
-    container_name: pec_backend_dev
-    working_dir: /app
-    restart: unless-stopped
-    ports:
-      - "4000:4000"
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: pec_pgbouncer_dev
     environment:
-      JWT_SECRET: "pec_secret_key_2026"
-      PORT: "4000"
-      NODE_ENV: "development"
-      CORS_ORIGINS: "http://localhost:3000,http://localhost:3001"
-      DB_HOST: "postgres"
-      NODE_PATH: "/app/node_modules"
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/pec"
-    volumes:
-      - ./:/app
-      - backend_node_modules:/app/node_modules
-      - /app/apps/frontend
-    command: >
-      sh -c " corepack enable pnpm && pnpm install && npx prisma generate --schema packages/database/prisma/schema.prisma && npx prisma db push --schema packages/database/prisma/schema.prisma --accept-data-loss && cd apps/server && pnpm run start:dev "
+      AUTH_TYPE: scram-sha-256
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: postgres
+      DB_NAME: pec
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: "1000"
+      DEFAULT_POOL_SIZE: "20"
+      IGNORE_STARTUP_PARAMETERS: extra_float_digits
+    ports:
+      - 6432:5432
     depends_on:
       - postgres
+    networks:
+      - pec-network
+    logging: *default-logging
+
+  redis:
+    image: redis:7-alpine
+    container_name: pec_redis_dev
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: pec_rabbitmq_dev
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD
+        - rabbitmq-diagnostics
+        - check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  deps_installer:
+    image: node:22-bookworm-slim
+    container_name: pec_deps_installer_dev
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - root_node_modules:/app/node_modules
+      - pnpm_store_dev:/app/.pnpm-store
+    command: sh -c "corepack enable pnpm && pnpm config set store-dir /app/.pnpm-store && pnpm install --config.confirmModulesPurge=false"
+    networks:
+      - pec-network
+
+  backend:
+    image: node:22-bookworm-slim
+    container_name: PECApp-Backend-Dev
+    working_dir: /app
+    restart: always
+    ports:
+      - 4000:4000
+      - 50052:50051
+    environment:
+      JWT_SECRET: pec_secret_key_2026
+      PORT: "4000"
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@pgbouncer:5432/pec?pgbouncer=true
+      REPLICA_URL: postgresql://postgres:postgres@pgbouncer:5432/pec?pgbouncer=true
+      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    volumes:
+      - ./:/app
+      - root_node_modules:/app/node_modules
+    command: >
+      sh -c "apt-get update -y && apt-get install -y openssl && corepack enable pnpm && cd /app/packages/database && pnpm exec prisma generate && DATABASE_URL=$$DIRECT_URL pnpm exec prisma db push --accept-data-loss && 
+      cd /app/apps/server && pnpm exec nest start --watch"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_started
+      deps_installer:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:4000/api/v1', (res) => res.statusCode === 200 ? process.exit(0) : process.exit(1)).on('error', () => process.exit(1))"
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 180s
+    networks:
+      - pec-network
+    logging: *default-logging
+
+  envoy:
+    image: envoyproxy/envoy:v1.27-latest
+    container_name: pec_envoy_dev
+    ports:
+      - 8080:8080
+      - 9901:9901
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - pec-network
 
   frontend:
-    image: node:22-alpine
-    container_name: pec_frontend_dev
-    profiles:
-      - frontend
-    working_dir: /app/apps/frontend
-    restart: unless-stopped
+    image: node:22-bookworm-slim
+    container_name: PECApp-Frontend-Dev
+    working_dir: /app
+    restart: always
     ports:
-      - "3000:3000"
+      - 3001:3001
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:3000/api"
-      INTERNAL_API_URL: "http://backend:4000"
-      GITHUB_AI_API_KEY: "${GITHUB_AI_API_KEY:-}"
-      VITE_API_URL: "http://localhost:4000"
-      NEXT_TELEMETRY_DISABLED: "1"
-      CHOKIDAR_USEPOLLING: "true"
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+      INTERNAL_API_URL: http://backend:4000/api
+      NODE_ENV: development
+      NODE_OPTIONS: "--max-old-space-size=3072"
+      WATCHPACK_POLLING: "true"
     volumes:
-      - ../../:/app
-      - frontend_node_modules:/app/apps/frontend/node_modules
+      - ./:/app
+      - root_node_modules:/app/node_modules
+    tmpfs:
+      - /app/apps/frontend/.next
     command: >
-      sh -c " corepack enable pnpm && if [ ! -d node_modules/next ]; then pnpm install; fi && pnpm run dev -- --turbopack --hostname 0.0.0.0 --port 3000 "
+      sh -c "corepack enable pnpm && cd apps/frontend && pnpm exec next dev --turbopack -H 0.0.0.0 -p 3001"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+      deps_installer:
+        condition: service_completed_successfully
+    networks:
+      - pec-network
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  dev_worker:
+    image: node:22-bookworm-slim
+    container_name: pec_dev_worker_dev
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - root_node_modules:/app/node_modules
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://postgres:postgres@pgbouncer:5432/pec?pgbouncer=true
+      REPLICA_URL: postgresql://postgres:postgres@pgbouncer:5432/pec?pgbouncer=true
+      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_started
+      deps_installer:
+        condition: service_completed_successfully
+    command: >
+      sh -c "apt-get update -y && apt-get install -y openssl &&
+      corepack enable pnpm &&
+      cd /app/packages/database && pnpm exec prisma generate &&
+      cd /app && pnpm exec tsx watch apps/server/src/background-jobs/worker.ts"
+    networks:
+      - pec-network
+    logging: *default-logging
 
   qdrant:
     image: qdrant/qdrant
@@ -72,6 +238,10 @@ services:
 
 volumes:
   postgres_dev_data:
-  backend_node_modules:
-  frontend_node_modules:
   qdrant_dev_data:
+  root_node_modules:
+  pnpm_store_dev:
+
+networks:
+  pec-network:
+    driver: bridge

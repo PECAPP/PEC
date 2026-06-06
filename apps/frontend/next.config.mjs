@@ -8,12 +8,15 @@ const __dirname = path.dirname(__filename);
 const emptyModulePath = path.resolve(__dirname, 'src/lib/empty-module.ts');
 const emptyModuleAlias = './src/lib/empty-module.ts';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   typedRoutes: false,
-  output: "standalone",
-  transpilePackages: ['@shared'],
+  // standalone is only needed for production Docker images, skip in dev
+  ...(isProd && { output: 'standalone' }),
+  transpilePackages: ['@pec/shared', '@pec/database'],
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -21,12 +24,21 @@ const nextConfig = {
   // ─── Experimental ────────────────────────────────────────────────────────────
   experimental: {
     workerThreads: true,
-    // Tree-shake large icon libraries at import time
+    // Tree-shake barrel-heavy packages at import time — massive dev speedup
     optimizePackageImports: [
       'lucide-react',
       'date-fns',
       'recharts',
       'framer-motion',
+      '@radix-ui/react-icons',
+      'react-day-picker',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-select',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-tooltip',
+      'class-variance-authority',
     ],
   },
 
