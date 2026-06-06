@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { User, Course, DashboardStats, AdminDashboardData } from '../../shared/types';
+import { User, Course, DashboardStats, AdminDashboardData } from '@pec/shared';
 import api from '@/lib/api';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import { toast } from 'sonner';
@@ -11,15 +11,17 @@ import { toast } from 'sonner';
 export function useAdminDashboard(initialData?: AdminDashboardData) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  
+
   const [loading, setLoading] = useState(!initialData);
   const [courses, setCourses] = useState<Course[]>(initialData?.courses || []);
   const [users, setUsers] = useState<User[]>(initialData?.users || []);
-  const [stats, setStats] = useState<DashboardStats>(initialData?.stats || {
-    totalStudents: 0,
-    totalFaculty: 0,
-    totalCourses: 0,
-  });
+  const [stats, setStats] = useState<DashboardStats>(
+    initialData?.stats || {
+      totalStudents: 0,
+      totalFaculty: 0,
+      totalCourses: 0,
+    }
+  );
 
   // Course Dialog states
   const [showCourseDialog, setShowCourseDialog] = useState(false);
@@ -78,10 +80,10 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
         fetchAllPages<any>('/users'),
         api.get('/admin/dashboard-stats'),
       ]);
-      
+
       setCourses(coursesData);
       setUsers(usersData);
-      
+
       const serverStats = statsRes.data?.success ? statsRes.data.data : statsRes.data;
       if (serverStats) {
         setStats(serverStats);
