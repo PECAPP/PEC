@@ -1,12 +1,13 @@
 'use client';
+import { Badge, Button } from "@pec/ui";
+
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Wallet, Clock, CheckCircle2, AlertTriangle, IndianRupee, ArrowRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+
 import { cn } from '@/lib/utils';
-import api from '@/lib/api';
+import api from "@pec/api";
 
 interface FinanceSummary {
   totalPending: number;

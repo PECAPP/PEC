@@ -1,12 +1,7 @@
+'use client';
+import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogHeader, DialogTitle, Card, useToast } from "@pec/ui";
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card } from '@/components/ui/card';
-import { collection, addDoc, updateDoc, doc, query, where, getDocs, serverTimestamp, writeBatch } from '@/lib/dataClient';
-import { useToast } from '@/hooks/use-toast';
+import { useTimetableControllerCreateV1 } from '@pec/api';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Calendar, Clock, MapPin, Plus, Edit, Bell } from 'lucide-react';
 
@@ -16,6 +11,7 @@ interface FacultyScheduleManagerProps {
 }
 
 export function FacultyScheduleManager({ courses, onScheduleAdded }: FacultyScheduleManagerProps) {
+  const createTimetable = useTimetableControllerCreateV1();
   const { toast } = useToast();
   const { user } = usePermissions();
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -47,83 +43,18 @@ export function FacultyScheduleManager({ courses, onScheduleAdded }: FacultySche
       const course = courses.find(c => c.id === formData.courseId);
       if (!course) return;
 
-      // Check for conflicts
-      const conflictQuery = query(
-        collection(({} as any), 'timetable'),
-        where('facultyId', '==', user.uid),
-        where('date', '==', formData.date),
-        where('startTime', '<=', formData.endTime),
-        where('endTime', '>=', formData.startTime)
-      );
-
-      const conflictSnapshot = await getDocs(conflictQuery);
-      if (!conflictSnapshot.empty) {
-        toast({
-          title: 'Schedule Conflict',
-          description: 'You have another class scheduled at this time',
-          variant: 'destructive',
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Add to timetable
-      await addDoc(collection(({} as any), 'timetable'), {
-        courseId: formData.courseId,
-        courseName: course.name,
-        facultyId: user.uid,
-        facultyName: user.fullName || user.name || 'Faculty',
-        date: formData.date,
-        day: new Date(formData.date).toLocaleDateString('en-US', { weekday: 'long' }),
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        room: formData.room,
-        type: formData.type,
-        reason: formData.reason,
-        notificationSent: false,
-        createdAt: serverTimestamp(),
-        department: course.department || "General",
-        semester: course.semester || 1,
+      // Conflict checking and notifications are handled by the backend
+      await createTimetable.mutateAsync({
+        data: {
+          courseId: formData.courseId,
+          date: formData.date,
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          room: formData.room,
+          type: formData.type,
+          reason: formData.reason,
+        } as any,
       });
-
-      // Try to send notifications, but ignore if the backend doesn't support it yet
-      try {
-        const batch = writeBatch();
-        
-        if (course.department && course.semester) {
-          const studentsQuery = query(
-            collection(({} as any), 'users'),
-            where('role', '==', 'student'),
-            where('department', '==', course.department),
-            where('semester', '==', course.semester)
-          );
-          
-          const studentsSnap = await getDocs(studentsQuery);
-          
-          if (!studentsSnap.empty) {
-            studentsSnap.docs.forEach((item: any) => {
-              const studentDoc = typeof item.data === 'function' ? item.data() : item;
-              const notifRef = doc(collection(({} as any), 'notifications'));
-              batch.set(notifRef, {
-                userId: studentDoc.id || item.id,
-                title: `${formData.type === 'extra' ? 'Extra Class' : 'Makeup Class'} Scheduled`,
-                message: `${course.name}: ${formData.type === 'extra' ? 'Extra' : 'Makeup'} class on ${new Date(formData.date).toLocaleDateString()} at ${formData.startTime}`,
-                type: 'agenda',
-                read: false,
-                createdAt: serverTimestamp(),
-                relatedId: formData.courseId
-              });
-            });
-            await batch.commit();
-            toast({
-                title: "Notifications Sent",
-                description: `Notified ${studentsSnap.size} students.`,
-            });
-          }
-        }
-      } catch (err) {
-        console.warn("Notifications not supported or failed", err);
-      }
 
       toast({
         title: 'Class Added',
@@ -296,9 +227,9 @@ export function FacultyScheduleManager({ courses, onScheduleAdded }: FacultySche
               <Button
                 onClick={handleAddExtraClass}
                 className="flex-1"
-                disabled={loading}
+                disabled={loading || createTimetable.isPending}
               >
-                {loading ? 'Adding...' : 'Add Class'}
+                {loading || createTimetable.isPending ? 'Adding...' : 'Add Class'}
               </Button>
             </div>
           </div>

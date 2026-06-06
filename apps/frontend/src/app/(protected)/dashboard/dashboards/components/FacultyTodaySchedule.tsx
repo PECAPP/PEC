@@ -1,12 +1,14 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
-import { Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Clock, CheckCircle, ArrowUpRight, QrCode } from 'lucide-react';
 
 interface Props {
   schedule?: {
     id: string;
+    courseId: string;
     time: string;
     course: string;
     section: string;
@@ -15,6 +17,7 @@ interface Props {
     status: 'completed' | 'ongoing' | 'upcoming';
   }[];
   onViewFull: () => void;
+  onGenerateQR?: (courseId: string) => void;
 }
 
 const item = {
@@ -45,7 +48,9 @@ export function FacultyTodaySchedule({ schedule, onViewFull }: Props) {
               section={slot.section}
               room={slot.room}
               students={slot.students}
+              courseId={slot.courseId}
               status={slot.status}
+              onGenerateQR={onGenerateQR}
             />
           ))
         )}
@@ -54,7 +59,7 @@ export function FacultyTodaySchedule({ schedule, onViewFull }: Props) {
   );
 }
 
-function ScheduleItem({ time, course, section, room, students, status }: any) {
+function ScheduleItem({ courseId,  time, course, section, room, students, status , onGenerateQR }: any) {
   const statusStyles: any = {
     completed: 'bg-muted text-muted-foreground',
     ongoing: 'bg-accent/10 border-accent/30 text-foreground',
@@ -72,7 +77,14 @@ function ScheduleItem({ time, course, section, room, students, status }: any) {
         <p className="text-sm text-muted-foreground">{section} - {room} - {students} students</p>
       </div>
       {status === 'completed' && <CheckCircle className="w-4 h-4 text-success shrink-0" />}
-      {status === 'ongoing' && <span className="px-2 py-0.5 text-xs font-medium bg-accent text-accent-foreground rounded-full">Live</span>}
+      {status === 'ongoing' && (
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="px-2 py-0.5 text-xs font-medium bg-accent text-accent-foreground rounded-full hidden sm:inline-flex">Live</span>
+          <Button size="sm" onClick={() => onGenerateQR?.(courseId)} className="h-7 text-xs shadow-md shadow-primary/20">
+            <QrCode className="w-3 h-3 mr-1" /> QR Attend
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

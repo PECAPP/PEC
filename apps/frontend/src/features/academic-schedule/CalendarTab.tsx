@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { InteractiveCalendar } from "@/features/academic-calendar/InteractiveCalendar";
 import AdminAcademicCalendarPage from "@/app/(protected)/admin/academic-calendar/page";
-import api from "@/lib/api";
+import api from "@pec/api";
 
 export default function CalendarTab() {
   const { user, loading: authLoading } = useAuth();

@@ -1,7 +1,9 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import { Users, BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import Link from 'next/link';
 
 export function CollegeAdminHeader() {

@@ -1,8 +1,10 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import { useState } from 'react';
 import { X, Upload, Image as ImageIcon, FileText, Mic, Video } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import { toast } from 'sonner';
 
 export type MediaType = 'image' | 'audio' | 'video' | 'file';

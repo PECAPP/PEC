@@ -1,4 +1,6 @@
 'use client';
+import { Button, Textarea, Badge, Progress } from "@pec/ui";
+
 
 import { Dispatch, SetStateAction } from 'react';
 import { motion } from 'framer-motion';
@@ -14,10 +16,7 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+
 import { EmptyState, StatePanel } from '@/components/common/AsyncState';
 import { cn } from '@/lib/utils';
 

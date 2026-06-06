@@ -1,8 +1,10 @@
 'use client';
+import { Button, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, Loader2 } from 'lucide-react';
+import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, Loader2, Lock } from 'lucide-react';
 import { 
   Area, 
   XAxis, 
@@ -14,13 +16,10 @@ import {
   Legend,
   ComposedChart
 } from 'recharts';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { usePermissions } from '@/hooks/usePermissions';
-import { fetchAllPages } from '@/lib/fetchAllPages';
-import api from '@/lib/api';
+
+import api from "@pec/api";
 import { extractData } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -87,6 +86,8 @@ export default function ScoreSheetPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
+  const [financeLocked, setFinanceLocked] = useState(false);
+  const [financeLoading, setFinanceLoading] = useState(true);
 
   useEffect(() => {
     if (loading) return;
@@ -113,7 +114,23 @@ export default function ScoreSheetPage() {
       }
     };
 
+    
+    const checkFinanceStatus = async () => {
+      try {
+        const res = await api.get('/finance/summary');
+        const raw = (res as any).data;
+        const data = raw?.data ?? raw;
+        if (data?.totalPending > 0) {
+          if (active) setFinanceLocked(true);
+        }
+      } catch (error) {
+      } finally {
+        if (active) setFinanceLoading(false);
+      }
+    };
+
     void loadEntries();
+    void checkFinanceStatus();
     return () => {
       active = false;
     };
@@ -126,7 +143,7 @@ export default function ScoreSheetPage() {
     const loadCourses = async () => {
       try {
         setCoursesLoading(true);
-        const allCourses = await fetchAllPages<any>('/courses');
+        const allCourses = extractData<any>((await api.get('/courses', { params: { limit: 2000 } })).data);
         if (!active) return;
         const normalized = (allCourses || []).map((course: any) => {
           const semester =

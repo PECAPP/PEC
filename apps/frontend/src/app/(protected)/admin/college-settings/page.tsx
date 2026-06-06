@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Textarea, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -19,23 +21,14 @@ import {
   Database,
   Wand2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useRouter } from 'next/navigation';
 import { uploadToCloudinary } from '@/lib/cloudinaryManager';
 import { processLogoImage } from '@/lib/logoProcessor';
-import { doc, getDoc, setDoc, serverTimestamp } from '@/lib/dataClient';
-import type { CollegeSettings as CollegeSettingsType } from '@/types';
+import { useFeatureFlagsControllerGetByKeyV1, useFeatureFlagsControllerUpsertV1 } from '@pec/api';
+import type { CollegeSettings as CollegeSettingsType } from '@pec/shared';
 
 type CollegeSettings = CollegeSettingsType;
 
@@ -46,6 +39,9 @@ export default function CollegeSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<CollegeSettings | null>(null);
+
+  const { refetch: refetchSettings } = useFeatureFlagsControllerGetByKeyV1('college-settings', { query: { enabled: false } });
+  const { mutateAsync: upsertFeatureFlag } = useFeatureFlagsControllerUpsertV1();
 
   // Form fields
   const [collegeName, setCollegeName] = useState('');
@@ -97,11 +93,13 @@ export default function CollegeSettings() {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const settingsRef = doc(null as any, 'collegeSettings', 'main');
-      const settingsSnap = await getDoc(settingsRef);
+      const res = await refetchSettings();
+      const responseData = res.data as any;
+      const featureFlag = responseData?.data || responseData;
+      const parsedData = featureFlag?.payload ? JSON.parse(featureFlag.payload) : null;
 
-      if (settingsSnap.exists()) {
-        const data = settingsSnap.data() as CollegeSettings;
+      if (parsedData) {
+        const data = parsedData as CollegeSettings;
         setSettings(data);
         setCollegeName(data.collegeName || '');
         setCollegeShortName(data.collegeShortName || '');
@@ -261,12 +259,18 @@ export default function CollegeSettings() {
         cloudinaryCloudName: (cloudinaryCloudName || '').trim(),
         cloudinaryPreset: (cloudinaryPreset || '').trim(),
         attendanceRequiredPercentage: Math.max(0, Math.min(100, Math.round(attendanceRequiredPercentage || 75))),
-        lastUpdated: serverTimestamp(),
+        lastUpdated: new Date().toISOString(),
         updatedBy: user?.email || 'unknown',
       };
 
-      const settingsRef = doc(null as any, 'collegeSettings', 'main');
-      await setDoc(settingsRef, newSettings, { merge: true });
+      await upsertFeatureFlag({
+        key: 'college-settings',
+        data: {
+          enabled: true,
+          description: 'College settings',
+          payload: JSON.stringify(newSettings),
+        }
+      });
 
       setSettings(newSettings);
       setLogoFile(null);

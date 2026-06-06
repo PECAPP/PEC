@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where } from '@/lib/dataClient';
+import { AXIOS_INSTANCE } from "@pec/api";
 
 const normalizeCourse = (doc: any) => {
   const data = doc?.data ? doc.data() : doc;
@@ -9,11 +9,8 @@ const normalizeCourse = (doc: any) => {
 };
 
 const fetchFacultyCourses = async (facultyId: string) => {
-  const coursesQuery = query(
-    collection(({} as any), 'courses'),
-    where('facultyId', '==', facultyId)
-  );
-  const snapshot = await getDocs(coursesQuery);
+  const { data: snapshotData } = await AXIOS_INSTANCE.get(`/api/v1/courses?facultyId=${facultyId}`);
+  const snapshot = { docs: snapshotData.map((d: any) => ({ id: d.id, data: () => d })) };
   return snapshot.docs
     .map((doc: any) => normalizeCourse(doc))
     .filter(Boolean) as Array<{ id: string; courseId: string; [key: string]: any }>;
@@ -39,11 +36,8 @@ export async function checkFacultyAccess(
 
       if (courseIds.size === 0) return false;
 
-      const enrollmentQuery = query(
-        collection(({} as any), 'enrollments'),
-        where('studentId', '==', resourceId)
-      );
-      const snapshot = await getDocs(enrollmentQuery);
+      const { data: snapshotData } = await AXIOS_INSTANCE.get(`/api/v1/enrollments?studentId=${resourceId}`);
+      const snapshot = { docs: snapshotData.map((d: any) => ({ id: d.id, data: () => d })) };
       const enrollments = snapshot.docs.map((doc: any) => doc.data?.() ?? doc.data);
       return enrollments.some((en: any) => courseIds.has(en?.courseId));
     }
@@ -169,14 +163,8 @@ export async function isFacultyStudent(
     
     if (courseIds.length === 0) return false;
     
-    const enrollmentsQuery = query(
-      collection(({} as any), 'enrollments'),
-      where('studentId', '==', studentId),
-      where('courseId', 'in', courseIds.slice(0, 10)),
-      where('status', '==', 'active')
-    );
-    
-    const snapshot = await getDocs(enrollmentsQuery);
+    const { data: snapshotData } = await AXIOS_INSTANCE.get(`/api/v1/enrollments?studentId=${studentId}&courseIds=${courseIds.slice(0, 10).join(',')}`);
+    const snapshot = { empty: snapshotData.length === 0, docs: snapshotData.map((d: any) => ({ id: d.id, data: () => d })) };
     return !snapshot.empty;
   } catch (error) {
     console.error('Error checking faculty student:', error);
@@ -252,12 +240,8 @@ export async function isFacultyResource(
     const courseIds = await getFacultyCourseIds(facultyId);
     
     // Query the resource collection
-    const resourceQuery = query(
-      collection(({} as any), `${resourceType}s`),
-      where('id', '==', resourceId)
-    );
-    
-    const snapshot = await getDocs(resourceQuery);
+    const { data: snapshotData } = await AXIOS_INSTANCE.get(`/api/v1/${resourceType}s/${resourceId}`);
+    const snapshot = { empty: !snapshotData, docs: snapshotData ? [{ data: () => snapshotData }] : [] };
     if (snapshot.empty) return false;
     
     const resource = snapshot.docs[0].data();

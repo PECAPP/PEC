@@ -1,9 +1,9 @@
 'use client';
+import { Button, Progress } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import { Users, ArrowUpRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 
 interface Props {
   courses?: {

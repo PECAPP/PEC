@@ -1,4 +1,8 @@
 'use client';
+import { extractData } from "@/lib/utils";
+import api from "@pec/api";
+import { Button, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
@@ -14,25 +18,15 @@ import {
   File,
   ClipboardList,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { usePermissions } from '@/hooks/usePermissions';
 import BulkUpload from '@/components/BulkUpload';
-import { fetchAllPages } from '@/lib/fetchAllPages';
+
 import useSWR from 'swr';
 
-import { api } from '@/lib/api';
+
 
 interface CourseMaterial {
   id: string;
@@ -108,13 +102,13 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
   const fetcher = async () => {
     let coursesData = [];
     if (isAdmin) {
-      coursesData = await fetchAllPages<any>('/courses');
+      coursesData = extractData<any>((await api.get('/courses', { params: { limit: 2000 } })).data);
     } else {
-      const facultyCourses = await fetchAllPages<any>('/courses', { facultyId: userId });
+      const facultyCourses = extractData<any>((await api.get('/courses', { params: { ...{ facultyId: userId }, limit: 2000 } })).data);
       if (facultyCourses.length > 0) {
         coursesData = facultyCourses;
       } else {
-        const allCourses = await fetchAllPages<any>('/courses');
+        const allCourses = extractData<any>((await api.get('/courses', { params: { limit: 2000 } })).data);
         coursesData = allCourses.filter(
           (course: any) => course.facultyId === userId || course.instructorId === userId
         );
@@ -127,7 +121,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
     if (courseIds.length > 0) {
       try {
-        materialsData = (await fetchAllPages<CourseMaterial>('/course-materials'))
+        materialsData = (extractData<any>((await api.get('/course-materials', { params: { limit: 2000 } })).data))
           .filter((m: CourseMaterial) => courseIds.includes(m.courseId));
       } catch (error: any) {
         if (error?.response?.status === 404) {
@@ -423,13 +417,13 @@ function StudentMaterialsView({ userId }: { userId: string }) {
   const fetcher = async () => {
     let enrollmentsResponse;
     try {
-      const scopedEnrollments = await fetchAllPages<any>('/enrollments', {
+      const scopedEnrollments = extractData<any>((await api.get('/enrollments', { params: { ...{
         studentId: userId,
         status: 'active',
-      });
+      }, limit: 2000 } })).data);
       enrollmentsResponse = { data: scopedEnrollments };
     } catch {
-      const allEnrollments = await fetchAllPages<any>('/enrollments');
+      const allEnrollments = extractData<any>((await api.get('/enrollments', { params: { limit: 2000 } })).data);
       enrollmentsResponse = { data: allEnrollments };
     }
     const enrolledCourseIds = (Array.isArray(enrollmentsResponse.data) ? enrollmentsResponse.data : [])
@@ -440,11 +434,11 @@ function StudentMaterialsView({ userId }: { userId: string }) {
       return { coursesData: [], materialsData: [] };
     }
 
-    const coursesData = (await fetchAllPages<any>('/courses'))
+    const coursesData = (extractData<any>((await api.get('/courses', { params: { limit: 2000 } })).data))
       .filter((course: any) => enrolledCourseIds.includes(course.id));
 
     try {
-      const materialsData = (await fetchAllPages<CourseMaterial>('/course-materials'))
+      const materialsData = (extractData<any>((await api.get('/course-materials', { params: { limit: 2000 } })).data))
         .filter((m: CourseMaterial) => enrolledCourseIds.includes(m.courseId));
       
       return { coursesData, materialsData, materialsApiAvailable: true };

@@ -1,8 +1,8 @@
+import { Loader } from "@pec/ui";
 import { Suspense } from 'react';
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
 import { ProtectedLayoutClient } from './ProtectedLayoutClient';
-import { Loader } from '@/components/ui/Loader';
 
 export const dynamic = 'force-dynamic';
 

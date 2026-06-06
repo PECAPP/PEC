@@ -21,12 +21,12 @@ export function ResumePreview({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       className={cn(
-        "xl:col-span-6",
+        "xl:col-span-6 flex justify-center w-full overflow-x-auto pb-10",
         preview ? "xl:col-span-12 relative mx-auto max-w-5xl" : "",
       )}
     >
       <div
-        className="bg-white text-black shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-2 border-black/5 origin-top-left transition-all duration-300 ease-out"
+        className="bg-white text-black shadow-[0_25px_65px_rgba(0,0,0,0.5)] border-2 border-black/5 origin-top-left transition-all duration-300 ease-out"
         style={{
           width: "8.5in",
           minHeight: "11in",
@@ -37,10 +37,7 @@ export function ResumePreview({
         id="resume-preview-document"
       >
         <div className="p-[0.6in] relative">
-          {/* Subtle Institutional Watermark */}
-          <div className="absolute top-10 right-10 opacity-[0.03] pointer-events-none select-none">
-             <FileText className="w-32 h-32 rotate-12" />
-          </div>
+          
 
           {/* Resume Header */}
           <div className="text-center border-b-2 border-black pb-6 mb-8">
@@ -180,16 +177,10 @@ export function ResumePreview({
             </section>
           </div>
           
-          <div className="mt-12 pt-6 border-t border-black/5 text-[8px] font-black uppercase tracking-[0.4em] text-center opacity-20 italic">
-            Electronically Generated Verification Factor: {resumeData.personalInfo.name.substring(0,3).toUpperCase()}-{Math.random().toString(36).substring(7).toUpperCase()}
-          </div>
+          
         </div>
       </div>
-      {!preview && (
-        <p className="text-center text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-6 italic opacity-50">
-          Neural Preview Processed • {Math.round(zoom * 100)}% Scaling Meta
-        </p>
-      )}
+      
     </motion.div>
   );
 }

@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import api from '@/lib/api';
-import { isAuthError } from '@/lib/api';
+import api from "@pec/api";
+import {  isAuthError  } from "@pec/api";
 import { toast } from 'sonner';
 
 export function useFacultyDashboard(initialData?: any, serverUser?: any) {
@@ -49,7 +49,7 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
       type ApiResponse<T> = { success: boolean; data: T; meta?: any };
       const [coursesRes, noticesRes, timetableRes] = await Promise.all([
         api.get<ApiResponse<any>>('/courses', { params: { facultyId: user.uid, limit: 200, offset: 0 } }),
-        api.get<ApiResponse<any>>('/noticeboard', { params: { limit: 5, priorityLevel: 3 } }).catch(() => ({ data: { data: [] } }) as any),
+        api.get<ApiResponse<any>>('/noticeboard', { params: { limit: 5 } }).catch(() => ({ data: { data: [] } }) as any),
         api.get<ApiResponse<any>>('/timetable').catch(() => ({ data: { data: [] } }) as any),
       ]);
 

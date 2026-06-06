@@ -1,30 +1,13 @@
 'use client';
+import { Button, Badge, Input, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@pec/ui";
+
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, Loader2, Eye, Save, Trash2, Plus, Edit, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+
 import { toast } from 'sonner';
-import api from '@/lib/api';
+import api from "@pec/api";
 import { InteractiveCalendar } from '@/features/academic-calendar/InteractiveCalendar';
 import { EventDetailModal } from '@/features/academic-calendar/EventDetailModal';
 import { getEventLabel, EVENT_LABELS, CATEGORY_LABELS } from '@/features/academic-calendar/calendar-utils';

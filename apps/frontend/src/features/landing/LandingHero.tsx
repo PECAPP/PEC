@@ -1,11 +1,12 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRef, useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const container = {
   hidden: { opacity: 0 },

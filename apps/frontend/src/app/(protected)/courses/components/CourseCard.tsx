@@ -1,12 +1,12 @@
 'use client';
+import { Badge, Button, ImageWithBlur } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import { CheckCircle, Users, GraduationCap, Plus, X, ArrowRight, BookOpen } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ImageWithBlur } from '@/components/ui/image-with-blur';
+
 import { cn } from '@/lib/utils';
-import { Course } from '@/types/course';
+import { Course } from '@pec/shared';
 
 interface CourseCardProps {
   course: Course;

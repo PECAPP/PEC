@@ -1,3 +1,4 @@
+import { Button, Input, Textarea, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@pec/ui";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -17,23 +18,14 @@ import {
   Database,
   Wand2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useRouter } from 'next/navigation';
 import { uploadToCloudinary } from '@/lib/cloudinaryManager';
 import { processLogoImage } from '@/lib/logoProcessor';
-import { doc, getDoc, setDoc, serverTimestamp } from '@/lib/dataClient';
-import type { CollegeSettings as CollegeSettingsType } from '@/types';
+import { AXIOS_INSTANCE } from "@pec/api";
+import type { CollegeSettings as CollegeSettingsType } from '@pec/shared';
 
 type CollegeSettings = CollegeSettingsType;
 
@@ -95,8 +87,8 @@ export default function CollegeSettings() {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const settingsRef = doc(null as any, 'collegeSettings', 'main');
-      const settingsSnap = await getDoc(settingsRef);
+      const { data: settingsRes } = await AXIOS_INSTANCE.get('/api/v1/college-settings/main');
+      const settingsSnap = { exists: () => !!settingsRes?.data || !!settingsRes, data: () => settingsRes?.data || settingsRes };
 
       if (settingsSnap.exists()) {
         const data = settingsSnap.data() as CollegeSettings;
@@ -259,12 +251,11 @@ export default function CollegeSettings() {
         cloudinaryCloudName: (cloudinaryCloudName || '').trim(),
         cloudinaryPreset: (cloudinaryPreset || '').trim(),
         attendanceRequiredPercentage: Math.max(0, Math.min(100, Math.round(attendanceRequiredPercentage || 75))),
-        lastUpdated: serverTimestamp(),
+        lastUpdated: new Date().toISOString(),
         updatedBy: user?.email || 'unknown',
       };
 
-      const settingsRef = doc(null as any, 'collegeSettings', 'main');
-      await setDoc(settingsRef, newSettings, { merge: true });
+      await AXIOS_INSTANCE.put('/api/v1/college-settings/main', newSettings);
 
       setSettings(newSettings);
       setLogoFile(null);

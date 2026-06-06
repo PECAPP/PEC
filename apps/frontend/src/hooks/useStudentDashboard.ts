@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import api from '@/lib/api';
+import api from "@pec/api";
 import type { 
   StudentProfile, 
   Course, 
-} from '@/types';
+} from '@pec/shared';
 
 type NoticeboardItem = {
   id: string;
@@ -49,10 +49,11 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
   const [scheduleDay, setScheduleDay] = useState<string>('Today');
   const [enrolledCoursesList, setEnrolledCoursesList] = useState<Course[]>(initialData?.summary?.courses || []);
   const [noticeboardItems, setNoticeboardItems] = useState<NoticeboardItem[]>(initialData?.noticeboard || initialData?.notices || []);
+  const [todayEvents, setTodayEvents] = useState<any[]>([]);
   const [requiredAttendancePercentage, setRequiredAttendancePercentage] = useState<number>(75);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[], noticeboardData: any[] = []) => {
+  const processDashboardData = useCallback((summary: any, allCourses: Course[], timetableData: any[], noticeboardData: any[] = [], calendarData: any[] = []) => {
     setNoticeboardItems(Array.isArray(noticeboardData) ? noticeboardData : []);
     if (summary && typeof summary === 'object') {
       const statsObj = summary.totalSummary || {};
@@ -111,10 +112,21 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
           .sort((a: any, b: any) => (a.startTime || '').localeCompare(b.startTime || ''));
       };
 
+      // Process today's calendar events
+      let tEvents: any[] = [];
+      if (Array.isArray(calendarData)) {
+        const localTodayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+        tEvents = calendarData.filter((e: any) => {
+          if (!e.date) return false;
+          return e.date.startsWith(localTodayStr);
+        });
+        setTodayEvents(tEvents);
+      }
+
       let activeSchedule = getScheduleForDay(todayStr);
       let displayLabel = 'Today';
 
-      if (activeSchedule.length === 0) {
+      if (activeSchedule.length === 0 && tEvents.length === 0) {
         const todayIndex = daysOfWeek.indexOf(todayStr);
         for (let i = 1; i < 7; i++) {
           const nextDayIndex = (todayIndex + i) % 7;
@@ -160,17 +172,19 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         return res;
       };
 
-      const [summaryRes, timetableRes, noticeboardRes] = await Promise.all([
+      const [summaryRes, timetableRes, noticeboardRes, calendarRes] = await Promise.all([
         api.get('/attendance/summary'),
         api.get('/timetable'),
-        api.get('/noticeboard', { params: { limit: 4, offset: 0, priorityLevel: 3 } }),
+        api.get('/noticeboard', { params: { limit: 4, offset: 0 } }),
+        api.get('/academic-calendar').catch(() => ({ data: [] })),
       ]);
 
       processDashboardData(
         getData(summaryRes),
         [], // allCourses no longer needed for details
         getData(timetableRes) || [],
-        getData(noticeboardRes) || []
+        getData(noticeboardRes) || [],
+        getData(calendarRes) || []
       );
 
       const notices = getData(noticeboardRes);
@@ -192,7 +206,8 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         initialData.summary,
         [], // allCourses no longer provided/needed
         initialData.timetable || [],
-        initialData.noticeboard || initialData.notices || []
+        initialData.noticeboard || initialData.notices || [],
+        initialData.calendar || []
       );
       void fetchCollegeSettings();
       
@@ -202,7 +217,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       } else {
         void (async () => {
           try {
-            const res = await api.get('/noticeboard', { params: { limit: 4, offset: 0, priorityLevel: 3 } });
+            const res = await api.get('/noticeboard', { params: { limit: 4, offset: 0 } });
             const notices = res?.data?.success ? res.data.data : res?.data;
             if (Array.isArray(notices)) setNoticeboardItems(notices);
           } catch {
@@ -237,12 +252,32 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     }
   }, [authLoading, user, router, fetchStudentStats, initialData, fetchCollegeSettings]);
 
+  // Inject urgent attendance alert if below threshold
+  useEffect(() => {
+    if (stats.attendancePercentage > 0 && stats.attendancePercentage < requiredAttendancePercentage) {
+      setNoticeboardItems(prev => {
+        if (prev.some(n => n.id === 'attendance-alert-system')) return prev;
+        return [{
+          id: 'attendance-alert-system',
+          title: 'CRITICAL: Low Attendance',
+          content: `Your attendance is currently ${stats.attendancePercentage}%, which is below the required ${requiredAttendancePercentage}%. Please attend upcoming classes to avoid debarment.`,
+          category: 'alert',
+          important: true,
+          publishedAt: new Date().toISOString()
+        }, ...prev];
+      });
+    } else {
+      setNoticeboardItems(prev => prev.filter(n => n.id !== 'attendance-alert-system'));
+    }
+  }, [stats.attendancePercentage, requiredAttendancePercentage]);
+
   return {
     loading,
     firstName,
     profileData,
     stats,
     todayClasses,
+    todayEvents,
     scheduleDay,
     enrolledCoursesList,
     noticeboardItems,

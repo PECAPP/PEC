@@ -1,19 +1,11 @@
 "use client";
+import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle, Checkbox } from "@pec/ui";
+
 
 import { useEffect, useState } from "react";
 import { useAbility } from "@/features/auth/hooks/useAuth";
-import { buildApiUrl } from "@/lib/api-base";
-import { authClient } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+import {  buildApiUrl  } from "@pec/api";
+import {  authClient  } from "@pec/api";
 
 interface Permission {
   id: string;

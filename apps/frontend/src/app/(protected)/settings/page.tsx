@@ -1,4 +1,6 @@
 "use client";
+import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Label } from "@pec/ui";
+
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,10 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import { useTheme } from "next-themes";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";

@@ -1,13 +1,11 @@
+import { Button, Card, Dialog, DialogContent, DialogHeader, DialogTitle, useToast, Progress } from "@pec/ui";
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { collection, addDoc, updateDoc, doc, query, where, getDocs, serverTimestamp } from '@/lib/dataClient';
-import { useToast } from '@/hooks/use-toast';
+
+import { AXIOS_INSTANCE } from "@pec/api";
+
 import { usePermissions } from '@/hooks/usePermissions';
 import { QrCode, Users, Clock, X, RefreshCw, ShieldCheck } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 
 interface QRAttendanceGeneratorProps {
   courseId: string;
@@ -38,18 +36,13 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
       const uniqueId = `${courseId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
       // Create attendance session in backend
-      const sessionRef = await addDoc(collection(({} as any), 'attendanceSessions'), {
-        facultyId: user.uid,
+      const res = await AXIOS_INSTANCE.post('/api/v1/attendance-session', {
         courseId,
         courseName,
-        date: now.toISOString().split('T')[0],
-        startTime: now.toTimeString().split(' ')[0],
-        qrCode: uniqueId,
-        active: true,
-        createdAt: serverTimestamp(),
-        expiresAt: expiry.toISOString(),
-        attendanceCount: 0,
+        duration,
+        qrCode: uniqueId
       });
+      const sessionRef = { id: res.data.id };
 
       setSessionId(sessionRef.id);
       // Initial QR with timestamp
@@ -76,10 +69,7 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
   const endSession = async () => {
     try {
       if (sessionId) {
-        await updateDoc(doc(({} as any), 'attendanceSessions', sessionId), {
-          active: false,
-          endedAt: serverTimestamp(),
-        });
+        await AXIOS_INSTANCE.patch(`/api/v1/attendance-session/${sessionId}`, { active: false });
         setIsActive(false);
         toast({
           title: 'Session Ended',

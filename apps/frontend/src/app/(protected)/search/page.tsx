@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger, Badge, SearchResultsSkeleton } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import { 
@@ -7,11 +9,7 @@ import {
   LayoutDashboard,
   BookOpen
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { SearchResultsSkeleton } from '@/components/ui/skeletons';
+
 import { useSearchPage } from '@/hooks/useSearchPage';
 
 // Components

@@ -1,5 +1,8 @@
 'use client';
 
+import { Button, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from "@pec/ui";
+
+
 import { useEffect, useState } from "react";
 import {
   Calendar,
@@ -24,25 +27,9 @@ import BulkUpload from "@/components/BulkUpload";
 import PDFExportButton from "@/components/common/PDFExportButton";
 import * as ExcelJS from "exceljs";
 import { useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import api from "@/lib/api";
-import { isAuthError } from "@/lib/api";
+
+import api from "@pec/api";
+import {  isAuthError  } from "@pec/api";
 import { toast } from "sonner";
 import { usePermissions } from "@/hooks/usePermissions";
 import {
@@ -244,7 +231,7 @@ export default function TimetableTab() {
 
   const fetchData = async () => {
     try {
-      const allCourses = await fetchAllPages<any>('/courses');
+      const allCourses = await api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
       let facultyOwnedCourses =
         isFaculty && user?.uid
           ? allCourses.filter(
@@ -296,7 +283,7 @@ export default function TimetableTab() {
       
       setCourses(coursesData);
 
-      const timetableItems = await fetchAllPages<any>('/timetable');
+      const timetableItems = await api.get('/timetable', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
       const timetableData: any = {};
 
       timetableItems.forEach((item: any) => {
@@ -470,7 +457,7 @@ export default function TimetableTab() {
 
     setGenerating(true);
     try {
-      const allCoursesRaw = await fetchAllPages<any>('/courses');
+      const allCoursesRaw = await api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
       const allCourses: CourseSchedule[] = allCoursesRaw.map((course: any) => {
         const { facultyId, facultyName } = getFacultyPayload(course);
         return {
@@ -504,7 +491,7 @@ export default function TimetableTab() {
         return result;
       };
 
-      const existingTimetable = await fetchAllPages<any>('/timetable');
+      const existingTimetable = await api.get('/timetable', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
       const deleteChunks = chunkArray(existingTimetable, 20);
       for (const chunk of deleteChunks) {
         const deleteResults = await Promise.allSettled(

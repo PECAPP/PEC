@@ -1,4 +1,6 @@
 'use client';
+import { Button, Badge } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -17,10 +19,8 @@ import {
   Loader2,
   ChevronRight,
 } from 'lucide-react';
-import { doc, getDoc, collection, query, where, getDocs } from '@/lib/dataClient';
+import { AXIOS_INSTANCE } from "@pec/api";
 
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 export default function DepartmentDetail() {

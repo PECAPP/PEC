@@ -1,8 +1,9 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import { motion } from "framer-motion";
 import { Cloud, Server, Cpu, Code2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export function IntegrationsSection() {
   return (

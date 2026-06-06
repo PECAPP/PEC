@@ -2,6 +2,7 @@ import withBundleAnalyzerInit from '@next/bundle-analyzer';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import "./src/env.mjs";
+import { withSentryConfig } from '@sentry/nextjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,7 +17,7 @@ const nextConfig = {
   typedRoutes: false,
   // standalone is only needed for production Docker images, skip in dev
   ...(isProd && { output: 'standalone' }),
-  transpilePackages: ['@pec/shared', '@pec/database'],
+  transpilePackages: ['@pec/shared', '@pec/database', '@pec/ui'],
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -57,9 +58,6 @@ const nextConfig = {
     root: path.join(__dirname, '../../'),
     resolveAlias: {
       canvas: emptyModuleAlias,
-      fs: emptyModuleAlias,
-      net: emptyModuleAlias,
-      tls: emptyModuleAlias,
     },
   },
 
@@ -116,4 +114,18 @@ const nextConfig = {
 };
 
 const withBundleAnalyzer = withBundleAnalyzerInit({ enabled: process.env.ANALYZE === 'true' });
-export default withBundleAnalyzer(nextConfig);
+
+export default withSentryConfig(
+  withBundleAnalyzer(nextConfig),
+  {
+    silent: true,
+    org: "pec",
+    project: "pec-frontend",
+  },
+  {
+    widenClientFileUpload: true,
+    transpileClientSDK: true,
+    hideSourceMaps: true,
+    disableLogger: true,
+  }
+);

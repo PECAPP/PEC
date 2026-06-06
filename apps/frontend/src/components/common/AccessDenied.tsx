@@ -1,6 +1,7 @@
+import { Button } from "@pec/ui";
 import React from 'react';
 import { AlertTriangle, ArrowLeft, Home, Mail } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import { useRouter } from 'next/navigation';
 
 interface AccessDeniedProps {

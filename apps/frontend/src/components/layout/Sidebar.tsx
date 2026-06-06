@@ -34,7 +34,7 @@ import {
 import { cn } from '@/lib/utils';
 import ThemeToggler from '@/components/ThemeToggler';
 import { LandingColorTheme } from '@/components/LandingColorTheme';
-import type { UserRole } from '@/types';
+import type { UserRole } from '@pec/shared';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { GoogleTranslate } from '@/components/GoogleTranslate';
 

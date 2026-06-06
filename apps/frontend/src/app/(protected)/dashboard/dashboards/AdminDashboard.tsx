@@ -1,12 +1,13 @@
 'use client';
+import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
+
 
 import { useState } from 'react';
 
 import dynamic from 'next/dynamic';
 import { Settings, Loader2, BookOpen, Users, BarChart3 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 
 // Types
@@ -154,7 +155,6 @@ export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
           />
         </TabsContent>
       </Tabs>
-
 
       <CourseDialog 
         open={showCourseDialog}

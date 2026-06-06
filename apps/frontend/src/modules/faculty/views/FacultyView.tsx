@@ -1,25 +1,18 @@
 'use client';
+import { Button, Badge, Input, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@pec/ui";
+
 
 import { useState, useTransition, useEffect, useOptimistic } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { facultySchema, FacultyInput } from '@/lib/schemas';
+import { facultySchema, FacultyInput } from '@pec/shared';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
  Users, UserPlus, Edit, Trash2, Upload, Download,
  Crown, MoreVertical, BookOpen, Loader2, Search
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import {
- Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from '@/components/ui/dialog';
-import {
- DropdownMenu, DropdownMenuContent, DropdownMenuItem,
- DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import { toast } from 'sonner';
 import BulkUpload from '@/components/BulkUpload';
 import { useAction } from 'next-safe-action/hooks';

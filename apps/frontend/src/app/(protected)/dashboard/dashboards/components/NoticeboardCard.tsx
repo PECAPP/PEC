@@ -1,6 +1,6 @@
+import { Button, Badge } from "@pec/ui";
 import { Bell, ArrowUpRight, Pin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+
 import { EmptyState } from '@/components/common/AsyncState';
 
 export interface NoticeboardItem {

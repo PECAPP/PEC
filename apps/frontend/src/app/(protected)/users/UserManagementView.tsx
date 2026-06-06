@@ -1,4 +1,6 @@
 'use client';
+import { Button, Badge, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, VirtualList } from "@pec/ui";
+
 
 import { useDeferredValue, useMemo, useState } from 'react';
 import {
@@ -9,18 +11,9 @@ import {
   Edit,
   Trash2
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { EmptyState } from '@/components/common/AsyncState';
-import { VirtualList } from '@/components/ui/virtual-list';
+
 import { toast } from 'sonner';
 
 interface UserManagementProps {

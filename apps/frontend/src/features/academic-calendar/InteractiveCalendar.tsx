@@ -1,4 +1,6 @@
 'use client';
+import { Button, Badge, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { useState, useMemo, useEffect } from 'react';
 import { 
@@ -25,10 +27,7 @@ import {
   Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { EventDetailModal } from './EventDetailModal';
 import { getEventDotColor, getEventLabel, getEventColor, EVENT_LABELS, CATEGORY_LABELS } from './calendar-utils';
 import { cn } from '@/lib/utils';

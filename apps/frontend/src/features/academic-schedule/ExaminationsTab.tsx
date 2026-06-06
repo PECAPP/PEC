@@ -1,4 +1,7 @@
 'use client';
+import { extractData } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@pec/ui";
+
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -6,17 +9,10 @@ import { Calendar, Loader2, Plus, Trash2, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import BulkUpload from '@/components/BulkUpload';
 
-import api from '@/lib/api';
-import { fetchAllPages } from '@/lib/fetchAllPages';
+import api from "@pec/api";
+
 import { useAuth } from '@/features/auth/hooks/useAuth';
 
 type Course = {
@@ -130,7 +126,7 @@ function CollegeAdminExaminations() {
       ...(departmentFilter !== 'all' ? { department: departmentFilter } : {}),
       ...(dateScope === 'upcoming' ? { upcoming: true } : {}),
     };
-    const rows = await fetchAllPages<ExamSchedule>('/examinations/schedules', params);
+    const rows = extractData<any>((await api.get('/examinations/schedules', { params: { ...params, limit: 2000 } })).data);
     setSchedules(rows);
   };
 
@@ -138,8 +134,8 @@ function CollegeAdminExaminations() {
     try {
       setLoading(true);
       const [allCourses, allDepartments] = await Promise.all([
-        fetchAllPages<Course>('/courses'),
-        fetchAllPages<Department>('/departments'),
+        api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
+        api.get('/departments', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
       ]);
       setCourses(allCourses);
       setDepartments(allDepartments);
@@ -435,9 +431,9 @@ function DepartmentUpcomingExams({
     void (async () => {
       try {
         setLoading(true);
-        const rows = await fetchAllPages<ExamSchedule>('/examinations/schedules', {
+        const rows = extractData<any>((await api.get('/examinations/schedules', { params: { ...{
           upcoming: true,
-        });
+        }, limit: 2000 } })).data);
         setSchedules(rows);
       } catch (error) {
         console.error(error);

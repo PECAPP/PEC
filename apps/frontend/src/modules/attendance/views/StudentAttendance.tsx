@@ -1,4 +1,6 @@
 'use client';
+import { Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Textarea, Button } from "@pec/ui";
+
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
@@ -14,22 +16,13 @@ import {
   Paperclip,
   CheckCircle2
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import api, { isAuthError } from '@/lib/api';
+
+import api, {  isAuthError  } from "@pec/api";
 import { extractData, cn } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+
 import { 
   RadialBarChart, 
   RadialBar, 

@@ -1,11 +1,12 @@
 'use client';
+import { Button, Textarea } from "@pec/ui";
+
 
 import { useState } from 'react';
 import { Loader2, Send, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+
 import { toast } from 'sonner';
-import api from '@/lib/api';
+import api from "@pec/api";
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { uploadMedia } from '@/lib/cloudinary.service';
 import {

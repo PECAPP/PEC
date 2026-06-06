@@ -1,4 +1,6 @@
 'use client';
+import { Tabs, TabsContent, TabsList, TabsTrigger, Badge, ImageWithBlur, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Button } from "@pec/ui";
+
 
 import { useState, useTransition, useOptimistic } from 'react';
 import { 
@@ -14,30 +16,12 @@ import {
   Layers,
   ChevronRight
 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { ImageWithBlur } from '@/components/ui/image-with-blur';
-import { Input } from '@/components/ui/input';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+
 import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
 import { CourseCard } from './CourseCard';
 import { toast } from 'sonner';
 import { enrollInCourseAction, dropCourseAction } from '../actions';
-import { Course } from '@/types/course';
+import { Course } from '@pec/shared';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 

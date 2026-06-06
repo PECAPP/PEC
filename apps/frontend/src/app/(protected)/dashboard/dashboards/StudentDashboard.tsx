@@ -13,6 +13,7 @@ import { TodayScheduleCard } from './components/TodayScheduleCard';
 import { AttendanceOverviewCard } from './components/AttendanceOverviewCard';
 import { NoticeboardCard } from './components/NoticeboardCard';
 import { FinanceSummaryCard } from './components/FinanceSummaryCard';
+import { MarketplaceCard } from './components/MarketplaceCard';
 
 const item = {
   hidden: { opacity: 0, y: 12 },
@@ -33,6 +34,7 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
     profileData,
     stats,
     todayClasses,
+    todayEvents,
     scheduleDay,
     enrolledCoursesList,
     noticeboardItems,
@@ -127,6 +129,7 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         <TodayScheduleCard 
           scheduleDay={scheduleDay} 
           todayClasses={todayClasses} 
+          todayEvents={todayEvents}
           onViewFull={() => window.location.href = getFullUrl('/timetable')}
           containerHeight={scheduleCardHeight}
         />
@@ -157,9 +160,15 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
         animate="show"
         className="grid gap-6"
       >
-        <FinanceSummaryCard
-          onViewAll={() => window.location.href = getFullUrl('/finance')}
-        />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <FinanceSummaryCard
+            onViewAll={() => window.location.href = getFullUrl('/finance')}
+          />
+          <MarketplaceCard 
+            onViewAll={() => window.location.href = getFullUrl('/marketplace')}
+            onCreateListing={() => window.location.href = getFullUrl('/marketplace/sell')}
+          />
+        </div>
       </motion.div>
 
     </div>

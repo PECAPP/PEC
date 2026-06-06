@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import api from "@/lib/api";
-import type { CollegeSettings } from "@/types";
+import api from "@pec/api";
+import type { CollegeSettings } from '@pec/shared';
 
 export function useCollegeSettings() {
   const [settings, setSettings] = useState<CollegeSettings | null>(null);

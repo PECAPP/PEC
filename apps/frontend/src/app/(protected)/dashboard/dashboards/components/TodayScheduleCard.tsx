@@ -1,9 +1,9 @@
 'use client';
 
 import { Calendar, ArrowUpRight, User, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button, Badge } from '@pec/ui';
 import { EmptyState } from '@/components/common/AsyncState';
+import Link from 'next/link';
 
 interface ScheduleCardItem {
   id: string;
@@ -18,11 +18,12 @@ interface ScheduleCardItem {
 interface Props {
   scheduleDay: string;
   todayClasses: ScheduleCardItem[];
+  todayEvents?: any[];
   onViewFull: () => void;
   containerHeight?: number | null;
 }
 
-export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull, containerHeight }: Props) {
+export function TodayScheduleCard({ scheduleDay, todayClasses, todayEvents = [], onViewFull, containerHeight }: Props) {
   return (
     <div
       className="card-elevated ui-card-pad flex h-fit flex-col"
@@ -40,8 +41,23 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull, conta
       </div>
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+        {todayEvents.length > 0 && (
+          <div className="mb-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Badge className="bg-primary hover:bg-primary text-primary-foreground text-[10px] px-1.5 h-4">
+                {todayEvents[0].eventType === 'holiday' ? 'HOLIDAY' : todayEvents[0].eventType === 'exam' ? 'EXAM' : 'EVENT'}
+              </Badge>
+              <span className="text-sm font-bold text-foreground">{todayEvents[0].title}</span>
+            </div>
+            <p className="text-xs text-muted-foreground line-clamp-1">{todayEvents[0].description}</p>
+          </div>
+        )}
+
         {todayClasses.length === 0 ? (
-          <EmptyState title="No classes scheduled" description="You are all clear for this day." />
+          <EmptyState 
+            title={todayEvents.length > 0 ? "No classes scheduled" : "No classes scheduled"} 
+            description={todayEvents.length > 0 ? "Enjoy your day!" : "You are all clear for this day."} 
+          />
         ) : (
           todayClasses.map((cls, index) => {
             const now = new Date();
@@ -53,11 +69,11 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull, conta
                 key={`${cls.id || 'class'}-${index}`} 
                 className={`rounded-lg border p-3 transition-all duration-300 ${isOngoing ? 'border-primary bg-primary/5 shadow-md shadow-primary/10 ring-1 ring-primary/20' : 'border-border bg-secondary/10'}`}
               >
-                <div className="mb-2 flex items-start justify-between">
-                  <div>
+                <div className="mb-2 flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-foreground">{cls.courseCode}</span>
-                      <span className="line-clamp-1 border-l border-border pl-2 text-xs text-muted-foreground">
+                      <span className="text-sm font-bold text-foreground whitespace-nowrap shrink-0">{cls.courseCode}</span>
+                      <span className="truncate border-l border-border pl-2 text-xs text-muted-foreground">
                         {cls.courseName}
                       </span>
                       {isOngoing && (
@@ -66,18 +82,19 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, onViewFull, conta
                         </Badge>
                       )}
                     </div>
-                    <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
-                      <User className="h-3 w-3" /> {cls.instructor}
+                    <p className="mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <User className="h-3 w-3 opacity-70" /> 
+                      <span className="truncate">{cls.instructor}</span>
                     </p>
                   </div>
-                  <Badge variant="outline" className={`whitespace-nowrap text-[10px] ${isOngoing ? 'bg-primary/20 border-primary/30 text-primary font-bold' : 'bg-background'}`}>
+                  <Badge variant="outline" className={`shrink-0 whitespace-nowrap text-[10px] ${isOngoing ? 'bg-primary/20 border-primary/30 text-primary font-bold' : 'bg-background'}`}>
                     {cls.startTime} - {cls.endTime}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
+                <Link href={`/rooms`} className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors cursor-pointer group/room">
+                  <MapPin className="h-3 w-3 group-hover/room:scale-110 transition-transform" />
                   {cls.room}
-                </div>
+                </Link>
               </div>
             );
           })

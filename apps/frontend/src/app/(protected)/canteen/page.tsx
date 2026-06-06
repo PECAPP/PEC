@@ -1,35 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ShoppingBag,
-  Trash2,
-  Plus,
-  Minus,
-  Clock,
-  MapPin,
-  CheckCircle2,
-  Loader2,
-  UtensilsCrossed,
-  Search,
-  Filter,
-} from "lucide-react";
-import {
-  collection,
-  query,
-  getDocs,
-  addDoc,
-  serverTimestamp,
-  where,
-  onSnapshot,
-} from "@/lib/dataClient";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ImageWithBlur } from "@/components/ui/image-with-blur";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { usePermissions } from "@/hooks/usePermissions";
 
 interface CanteenItem {
@@ -64,11 +36,8 @@ export default function NightCanteen() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const q = query(
-          collection({} as any, "canteenItems"),
-          where("isAvailable", "==", true),
-        );
-        const snapshot = await getDocs(q);
+        const { data: itemsData } = await customInstance.get('/api/v1/canteen');
+        const snapshot = { docs: itemsData.map((d: any) => ({ id: d.id, data: () => d })) };
         const fetchedItems = snapshot.docs.map(
           (doc) => ({ id: doc.id, ...doc.data() }) as CanteenItem,
         );
@@ -91,21 +60,16 @@ export default function NightCanteen() {
 
   useEffect(() => {
     if (view === "orders" && user) {
-      const q = query(
-        collection({} as any, "canteenOrders"),
-        where("studentId", "==", user.uid),
-      );
-
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const orders = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          timestamp: doc.data().timestamp?.toDate(),
-        }));
-        setMyOrders(orders.sort((a, b) => b.timestamp - a.timestamp));
-      });
-
-      return () => unsubscribe();
+      const fetchOrders = async () => {
+        try {
+          const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/night-canteen/orders/my');
+          const ordersArr = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
+          setMyOrders(ordersArr.sort((a: any, b: any) => new Date(b.timestamp || b.createdAt).getTime() - new Date(a.timestamp || a.createdAt).getTime()));
+        } catch (e) { console.error(e); }
+      };
+      fetchOrders();
+      const interval = setInterval(fetchOrders, 10000);
+      return () => clearInterval(interval);
     }
   }, [view, user]);
 
@@ -168,10 +132,10 @@ export default function NightCanteen() {
         })),
         totalAmount: cartTotal,
         status: "Pending",
-        timestamp: serverTimestamp(),
+        timestamp: new Date().toISOString(),
       };
 
-      await addDoc(collection({} as any, "canteenOrders"), orderData);
+      await customInstance.post('/api/v1/canteen/orders', orderData);
       setCart([]);
       setHostelRoom("");
       toast.success("Order placed successfully!");

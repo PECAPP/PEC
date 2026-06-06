@@ -1,9 +1,9 @@
-
 'use client';
+
+import { Button } from "@pec/ui";
 
 import { useEffect } from 'react';
 import { AlertCircle, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export default function ProtectedError({
   error,

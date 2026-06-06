@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -17,18 +19,9 @@ import {
   CheckCircle,
   Upload,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { toast } from 'sonner';
-import { authClient } from '@/lib/auth-client';
+import {  authClient  } from "@pec/api";
 const container = {
   hidden: { opacity: 0 },
   show: {

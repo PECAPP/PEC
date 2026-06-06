@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState, Suspense } from 'react';
-import { Loader } from '../ui/Loader';
+import { Loader } from '@pec/ui';
 
 const isModifiedEvent = (event: MouseEvent | ReactMouseEvent) =>
   event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;

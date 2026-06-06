@@ -1,4 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@pec/ui";
+
 import { cn } from "@/lib/utils";
 
 /**

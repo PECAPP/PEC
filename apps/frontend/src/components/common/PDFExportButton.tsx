@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
+import { Button, useToast } from "@pec/ui";
+
 import { FileDown, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
 
 interface PDFExportButtonProps {
   onExport: () => Promise<void> | void;

@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@pec/ui";
+
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,28 +32,11 @@ import {
   Eye,
   IndianRupee,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import api from '@/lib/api';
+import api from "@pec/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -148,7 +133,8 @@ function ProductCard({
   onDelete: (id: string) => void;
 }) {
   const isMine = listing.sellerId === currentUserId;
-  const imgSrc = listing.images[0] || '/placeholder-product.png';
+  const fallbackSrc = `https://placehold.co/400x300/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category || 'Product')}`;
+  const imgSrc = listing.images[0] || fallbackSrc;
 
   return (
     <motion.div
@@ -217,22 +203,22 @@ function ProductCard({
             {listing.category}
           </Badge>
           <span className="text-border">·</span>
-          <span className="truncate">{listing.seller.name}</span>
+          <span className="truncate">{(listing.seller?.name || 'Unknown Seller')}</span>
         </div>
 
         {/* Actions */}
         <div className="flex gap-2 pt-2 border-t border-border/40">
-          {(isMine || ability?.can('update', 'MarketplaceListing')) ? (
+          {(isMine) ? (
             <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onEdit(listing)}>
               <Edit2 className="w-3 h-3 mr-1.5" /> Edit
             </Button>
           ) : null}
-          {(isMine || ability?.can('delete', 'MarketplaceListing')) ? (
+          {(isMine) ? (
             <Button size="sm" variant="ghost" className="h-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onDelete(listing.id)}>
               <Trash2 className="w-4 h-4" />
             </Button>
           ) : null}
-          {!(isMine || ability?.can('update', 'MarketplaceListing')) ? (
+          {!(isMine) ? (
             <>
               <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onView(listing)}>
                 <Eye className="w-3 h-3 mr-1.5" /> View
@@ -320,7 +306,7 @@ function ListingFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl">
+      <DialogContent aria-describedby={undefined} className="max-w-lg max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold tracking-tight">{existing ? 'Edit Listing' : 'Create New Listing'}</DialogTitle>
         </DialogHeader>
@@ -436,7 +422,8 @@ function ListingDetailDialog({
 
   return (
     <Dialog open={!!listing} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl">
+      <DialogContent aria-describedby={undefined} className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl">
+        <DialogTitle className="sr-only">{listing.title}</DialogTitle>
         {/* Image Carousel */}
         <div className="relative bg-muted/30 h-[250px] sm:h-[350px] w-full flex items-center justify-center overflow-hidden rounded-t-2xl">
           <img
@@ -489,17 +476,17 @@ function ListingDetailDialog({
           {/* Seller Info */}
           <div className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border shadow-sm">
             <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg shrink-0">
-              {listing.seller.avatar ? (
-                <img src={listing.seller.avatar} alt={listing.seller.name} className="w-12 h-12 rounded-full object-cover" />
+              {listing.seller?.avatar ? (
+                <img src={listing.seller?.avatar} alt={(listing.seller?.name || 'Unknown Seller')} className="w-12 h-12 rounded-full object-cover" />
               ) : (
-                listing.seller.name.charAt(0).toUpperCase()
+                (listing.seller?.name || 'Unknown Seller').charAt(0).toUpperCase()
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-base text-foreground">{listing.seller.name}</p>
-              {listing.seller.studentProfile?.phone && (
+              <p className="font-bold text-base text-foreground">{(listing.seller?.name || 'Unknown Seller')}</p>
+              {listing.seller?.studentProfile?.phone && (
                 <p className="text-sm font-medium text-muted-foreground mt-0.5 flex items-center gap-1">
-                  📞 {listing.seller.studentProfile.phone}
+                  📞 {listing.seller?.studentProfile.phone}
                 </p>
               )}
             </div>
@@ -637,7 +624,7 @@ function ChatPanel({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[85vh] h-[800px] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl flex flex-col md:flex-row gap-0">
+      <DialogContent aria-describedby={undefined} className="max-w-4xl max-h-[85vh] h-[800px] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl flex flex-col md:flex-row gap-0">
         <DialogTitle className="sr-only">Marketplace Chats</DialogTitle>
         
         {/* Left Pane: Chat List */}
@@ -922,11 +909,22 @@ export default function MarketplacePage() {
   }, [search]);
 
   const handleBookmark = async (id: string) => {
+    // Optimistic Update
+    const isCurrentlyBookmarked = bookmarkedIds.has(id);
+    
+    setBookmarkedIds((prev) => {
+      const next = new Set(prev);
+      if (isCurrentlyBookmarked) next.delete(id); else next.add(id);
+      return next;
+    });
+
     try {
       const res = await api.post(`/marketplace/bookmarks/${id}`, {});
       const raw = (res as any).data;
       const data = raw?.data ?? raw;
       const { bookmarked } = data;
+      
+      // Sync with server source of truth
       setBookmarkedIds((prev) => {
         const next = new Set(prev);
         if (bookmarked) next.add(id); else next.delete(id);
@@ -935,6 +933,12 @@ export default function MarketplacePage() {
       toast.success(bookmarked ? 'Saved to bookmarks' : 'Removed from bookmarks');
       if (tab === 'saved') fetchSavedListings();
     } catch {
+      // Revert if API fails
+      setBookmarkedIds((prev) => {
+        const next = new Set(prev);
+        if (isCurrentlyBookmarked) next.add(id); else next.delete(id);
+        return next;
+      });
       toast.error('Failed to update bookmark');
     }
   };
@@ -1269,10 +1273,10 @@ export default function MarketplacePage() {
                           <Badge variant="outline" className={cn('text-[10px] h-4', CONDITION_COLORS[listing.condition] ?? '')}>{listing.condition}</Badge>
                           <Badge variant="secondary" className="text-[10px] h-4">{listing.category}</Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">{listing.seller.name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{(listing.seller?.name || 'Unknown Seller')}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {!(listing.sellerId === currentUserId || ability?.can('update', 'MarketplaceListing')) ? (
+                        {!(listing.sellerId === currentUserId) ? (
                           <>
                             <button onClick={() => handleBookmark(listing.id)} className="p-1.5 hover:bg-muted rounded">
                               <Heart className={cn('w-4 h-4', bookmarkedIds.has(listing.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground')} />
@@ -1285,17 +1289,17 @@ export default function MarketplacePage() {
                           </>
                         ) : (
                           <div className="flex gap-1">
-                            {listing.status === 'Available' && (listing.sellerId === currentUserId || ability?.can('update', 'MarketplaceListing')) && (
+                            {listing.status === 'Available' && (listing.sellerId === currentUserId) && (
                               <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleMarkSold(listing.id)}>
                                 <CheckCircle2 className="w-3 h-3 mr-1" /> Sold
                               </Button>
                             )}
-                            {(listing.sellerId === currentUserId || ability?.can('update', 'MarketplaceListing')) && (
+                            {(listing.sellerId === currentUserId) && (
                               <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditingListing(listing); setFormOpen(true); }}>
                                 <Edit2 className="w-3 h-3" />
                               </Button>
                             )}
-                            {(listing.sellerId === currentUserId || ability?.can('delete', 'MarketplaceListing')) && (
+                            {(listing.sellerId === currentUserId) && (
                               <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDelete(listing.id)}>
                                 <Trash2 className="w-3 h-3" />
                               </Button>

@@ -1,12 +1,12 @@
 'use client';
+import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { 
  Mail, Lock, Eye, EyeOff, Loader, 
  AlertCircle, CheckCircle, X, 
