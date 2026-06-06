@@ -48,53 +48,8 @@ import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 import api from '@/lib/api';
 
-interface Project {
-  id: string;
-  studentId: string;
-  title: string;
-  description: string;
-  techStack: string;
-  githubUrl: string | null;
-  liveUrl: string | null;
-  imageUrl: string | null;
-  startDate: string | null;
-  endDate: string | null;
-  isFeatured: boolean;
-  createdAt: string;
-}
-
-interface Skill {
-  id: string;
-  studentId: string;
-  name: string;
-  level: number;
-  category: string;
-}
-
-const skillCategories = [
-  { id: 'technical', label: 'Technical', icon: Code2 },
-  { id: 'soft', label: 'Soft Skills', icon: Sparkles },
-  { id: 'tool', label: 'Tools', icon: Wrench },
-  { id: 'language', label: 'Languages', icon: Languages },
-];
-
-const emptyProjectForm = {
-  title: '',
-  description: '',
-  techStack: '',
-  githubUrl: '',
-  liveUrl: '',
-  imageUrl: '',
-  startDate: '',
-  endDate: '',
-  isFeatured: false,
-};
-
-const emptySkillForm = {
-  name: '',
-  level: 50,
-  category: 'technical',
-};
+import { Project, Skill } from './types';
+import { skillCategories, emptyProjectForm, emptySkillForm } from './constants';
 
 export default function StudentPortfolioPage() {
   const router = useRouter();
@@ -208,7 +163,12 @@ export default function StudentPortfolioPage() {
       const payload = {
         studentId: user?.uid,
         ...projectForm,
-        techStack: JSON.stringify(projectForm.techStack.split(',').map((t) => t.trim()).filter(Boolean)),
+        techStack: JSON.stringify(
+          projectForm.techStack
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+        ),
         startDate: projectForm.startDate || null,
         endDate: projectForm.endDate || null,
         githubUrl: projectForm.githubUrl || null,
@@ -302,12 +262,15 @@ export default function StudentPortfolioPage() {
     }
   };
 
-  const skillsByCategory = skills.reduce((acc, skill) => {
-    const cat = skill.category || 'technical';
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(skill);
-    return acc;
-  }, {} as Record<string, Skill[]>);
+  const skillsByCategory = skills.reduce(
+    (acc, skill) => {
+      const cat = skill.category || 'technical';
+      if (!acc[cat]) acc[cat] = [];
+      acc[cat].push(skill);
+      return acc;
+    },
+    {} as Record<string, Skill[]>
+  );
 
   if (loading) {
     return (
@@ -383,11 +346,13 @@ export default function StudentPortfolioPage() {
 
                 {getTechStack(project.techStack).length > 0 && (
                   <div className="flex flex-wrap gap-1">
-                    {getTechStack(project.techStack).slice(0, 4).map((tech: string, i: number) => (
-                      <Badge key={i} variant="secondary" className="text-xs">
-                        {tech}
-                      </Badge>
-                    ))}
+                    {getTechStack(project.techStack)
+                      .slice(0, 4)
+                      .map((tech: string, i: number) => (
+                        <Badge key={i} variant="secondary" className="text-xs">
+                          {tech}
+                        </Badge>
+                      ))}
                     {getTechStack(project.techStack).length > 4 && (
                       <Badge variant="outline" className="text-xs">
                         +{getTechStack(project.techStack).length - 4}
@@ -414,7 +379,11 @@ export default function StudentPortfolioPage() {
                   <Button variant="outline" size="sm" onClick={() => openEditProject(project)}>
                     <Edit2 className="w-3 h-3" />
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDeleteProject(project.id)}>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteProject(project.id)}
+                  >
                     <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>
@@ -455,10 +424,20 @@ export default function StudentPortfolioPage() {
                           <span className="text-sm font-medium">{skill.name}</span>
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-muted-foreground">{skill.level}%</span>
-                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => openEditSkill(skill)}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0"
+                              onClick={() => openEditSkill(skill)}
+                            >
                               <Edit2 className="w-3 h-3" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-destructive" onClick={() => handleDeleteSkill(skill.id)}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 text-destructive"
+                              onClick={() => handleDeleteSkill(skill.id)}
+                            >
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
@@ -475,7 +454,9 @@ export default function StudentPortfolioPage() {
           {skills.length === 0 && (
             <div className="card-elevated p-12 text-center">
               <Code2 className="w-12 h-12 mx-auto mb-4 opacity-20" />
-              <p className="text-muted-foreground">No skills added yet. Start building your skill profile!</p>
+              <p className="text-muted-foreground">
+                No skills added yet. Start building your skill profile!
+              </p>
             </div>
           )}
         </TabsContent>
@@ -503,7 +484,12 @@ export default function StudentPortfolioPage() {
               >
                 <div className="flex items-start justify-between">
                   <h3 className="font-semibold truncate flex-1">{repo.name}</h3>
-                  <Button variant="ghost" size="sm" onClick={() => importRepo(repo)} title="Import to portfolio">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => importRepo(repo)}
+                    title="Import to portfolio"
+                  >
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
@@ -511,7 +497,9 @@ export default function StudentPortfolioPage() {
                   {repo.description || 'No description'}
                 </p>
                 {repo.language && (
-                  <Badge variant="secondary" className="text-xs">{repo.language}</Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    {repo.language}
+                  </Badge>
                 )}
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
@@ -535,7 +523,9 @@ export default function StudentPortfolioPage() {
           {githubRepos.length === 0 && (
             <div className="card-elevated p-12 text-center">
               <Github className="w-12 h-12 mx-auto mb-4 opacity-20" />
-              <p className="text-muted-foreground">No GitHub repos loaded. Configure your GitHub username in profile settings and sync.</p>
+              <p className="text-muted-foreground">
+                No GitHub repos loaded. Configure your GitHub username in profile settings and sync.
+              </p>
             </div>
           )}
         </TabsContent>
@@ -626,14 +616,20 @@ export default function StudentPortfolioPage() {
                 onChange={(e) => setProjectForm({ ...projectForm, isFeatured: e.target.checked })}
                 className="rounded"
               />
-              <label htmlFor="featured" className="text-sm">Featured Project</label>
+              <label htmlFor="featured" className="text-sm">
+                Featured Project
+              </label>
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowProjectDialog(false)}>
                 Cancel
               </Button>
               <Button onClick={handleSaveProject} disabled={savingProject}>
-                {savingProject ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+                {savingProject ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4 mr-2" />
+                )}
                 {savingProject ? 'Saving...' : 'Save'}
               </Button>
             </div>
@@ -659,13 +655,18 @@ export default function StudentPortfolioPage() {
             </div>
             <div>
               <label className="text-sm font-medium">Category</label>
-              <Select value={skillForm.category} onValueChange={(v) => setSkillForm({ ...skillForm, category: v })}>
+              <Select
+                value={skillForm.category}
+                onValueChange={(v) => setSkillForm({ ...skillForm, category: v })}
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {skillCategories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -686,7 +687,11 @@ export default function StudentPortfolioPage() {
                 Cancel
               </Button>
               <Button onClick={handleSaveSkill} disabled={savingSkill}>
-                {savingSkill ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+                {savingSkill ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4 mr-2" />
+                )}
                 {savingSkill ? 'Saving...' : 'Save'}
               </Button>
             </div>

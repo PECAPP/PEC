@@ -118,7 +118,7 @@ export default function ListingFormDialog({
                 <SelectTrigger className="h-11 rounded-xl border-border/60 font-bold text-sm">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl">
+                <SelectContent className="rounded-xl" portaled={false}>
                   {CATEGORIES.map((c) => (
                     <SelectItem key={c.value} value={c.value}>
                       {c.label}
@@ -138,7 +138,7 @@ export default function ListingFormDialog({
                 <SelectTrigger className="h-11 rounded-xl border-border/60 font-bold text-sm">
                   <SelectValue placeholder="Select condition" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl">
+                <SelectContent className="rounded-xl" portaled={false}>
                   {CONDITIONS.map((c) => (
                     <SelectItem key={c} value={c}>
                       {c}

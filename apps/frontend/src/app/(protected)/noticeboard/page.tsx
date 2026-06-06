@@ -3,7 +3,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Loader2, Megaphone, Pin, Trash2, Calendar, User, Tag, Plus, Settings2 } from 'lucide-react';
+import {
+  Loader2,
+  Megaphone,
+  Pin,
+  Trash2,
+  Calendar,
+  User,
+  Tag,
+  Plus,
+  Settings2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import api from '@/lib/api';
@@ -18,27 +28,7 @@ import { MediaUpload, UploadedMedia } from '@/features/clubs/MediaUpload';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type NoticeMedia = {
-  id?: string;
-  url: string;
-  kind: 'image' | 'audio' | 'video' | 'file';
-  name?: string;
-  mimeType?: string;
-  sizeBytes?: number;
-};
-
-type NoticeItem = {
-  id: string;
-  title: string;
-  content: string;
-  category: 'news' | 'update' | 'event' | 'alert';
-  important: boolean;
-  priorityLevel: number;
-  pinned: boolean;
-  media: NoticeMedia[];
-  authorName: string;
-  publishedAt: string;
-};
+import { NoticeMedia, NoticeItem } from './types';
 
 const categories: Array<NoticeItem['category']> = ['news', 'update', 'event', 'alert'];
 
@@ -189,7 +179,9 @@ export default function NoticeboardPage() {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
         <Loader2 className="h-10 w-10 animate-spin text-primary/40" />
-        <p className="text-sm font-medium text-muted-foreground animate-pulse">Syncing Noticeboard...</p>
+        <p className="text-sm font-medium text-muted-foreground animate-pulse">
+          Syncing Noticeboard...
+        </p>
       </div>
     );
   }
@@ -199,35 +191,44 @@ export default function NoticeboardPage() {
       {/* Institutional Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
         <div className="flex items-center gap-5">
-           <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm relative overflow-hidden group">
-             <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-             <Megaphone className="w-8 h-8 text-primary shadow-glow relative z-10" />
-           </div>
-           <div>
-             <h1 className="text-3xl font-bold tracking-tight text-foreground">Noticeboard</h1>
-             <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">Campus-wide announcements and academic updates</p>
-           </div>
+          <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm relative overflow-hidden group">
+            <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+            <Megaphone className="w-8 h-8 text-primary shadow-glow relative z-10" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Noticeboard</h1>
+            <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">
+              Campus-wide announcements and academic updates
+            </p>
+          </div>
         </div>
         {isAdmin && (
-           <Button 
-             className="h-10 rounded-xl px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
-             onClick={() => document.getElementById('post-notice-form')?.scrollIntoView({ behavior: 'smooth' })}
-           >
-             <Plus className="w-4 h-4" /> New Announcement
-           </Button>
+          <Button
+            className="h-10 rounded-xl px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+            onClick={() =>
+              document.getElementById('post-notice-form')?.scrollIntoView({ behavior: 'smooth' })
+            }
+          >
+            <Plus className="w-4 h-4" /> New Announcement
+          </Button>
         )}
       </div>
 
       {isAdmin && (
-        <div id="post-notice-form" className="card-elevated p-6 bg-card/60 backdrop-blur-sm border-primary/10 space-y-4">
+        <div
+          id="post-notice-form"
+          className="card-elevated p-6 bg-card/60 backdrop-blur-sm border-primary/10 space-y-4"
+        >
           <div className="flex items-center gap-3">
-             <Settings2 className="w-5 h-5 text-primary" />
-             <h2 className="text-lg font-bold tracking-tight">Create Announcement</h2>
+            <Settings2 className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold tracking-tight">Create Announcement</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Title</Label>
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+                Title
+              </Label>
               <Input
                 placeholder="Enter notice title"
                 className="h-11 rounded-xl bg-background border-border/60 font-bold px-4 text-sm"
@@ -237,21 +238,27 @@ export default function NoticeboardPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Category</Label>
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+                Category
+              </Label>
               <select
                 className="h-11 w-full rounded-xl border border-border/60 bg-background px-4 text-xs font-bold uppercase tracking-wider focus:ring-primary/20"
                 value={category}
                 onChange={(event) => setCategory(event.target.value as NoticeItem['category'])}
               >
                 {categories.map((item) => (
-                  <option key={item} value={item}>{item.toUpperCase()}</option>
+                  <option key={item} value={item}>
+                    {item.toUpperCase()}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Content</Label>
+            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+              Content
+            </Label>
             <Textarea
               rows={3}
               placeholder="Write the announcement details..."
@@ -264,7 +271,12 @@ export default function NoticeboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 py-2 border-y border-border/10">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
-                <Label htmlFor="notice-priority" className="text-[10px] font-bold uppercase tracking-widest opacity-80">Priority</Label>
+                <Label
+                  htmlFor="notice-priority"
+                  className="text-[10px] font-bold uppercase tracking-widest opacity-80"
+                >
+                  Priority
+                </Label>
                 <select
                   id="notice-priority"
                   className="h-8 rounded-lg border border-border/60 bg-background px-2 text-xs font-bold uppercase tracking-wider focus:ring-primary/20"
@@ -279,7 +291,12 @@ export default function NoticeboardPage() {
 
               <div className="flex items-center gap-3">
                 <Switch id="notice-pinned" checked={pinned} onCheckedChange={setPinned} />
-                <Label htmlFor="notice-pinned" className="text-[10px] font-bold uppercase tracking-widest opacity-80">Pin to Top</Label>
+                <Label
+                  htmlFor="notice-pinned"
+                  className="text-[10px] font-bold uppercase tracking-widest opacity-80"
+                >
+                  Pin to Top
+                </Label>
               </div>
             </div>
 
@@ -287,12 +304,16 @@ export default function NoticeboardPage() {
           </div>
 
           <div className="flex justify-end pt-2">
-            <Button 
-              onClick={createNotice} 
+            <Button
+              onClick={createNotice}
               disabled={posting}
               className="h-11 px-10 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all"
             >
-              {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Megaphone className="h-4 w-4 mr-2" />}
+              {posting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Megaphone className="h-4 w-4 mr-2" />
+              )}
               Publish Announcement
             </Button>
           </div>
@@ -308,78 +329,92 @@ export default function NoticeboardPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               className={cn(
-                "card-elevated p-6 bg-card/90 backdrop-blur-sm border-border hover:border-primary/40 transition-all group",
-                notice.priorityLevel === 3 && "border-l-4 border-l-destructive shadow-lg shadow-destructive/5",
-                notice.priorityLevel === 2 && "border-l-4 border-l-orange-500 shadow-lg shadow-orange-500/5",
-                notice.priorityLevel === 1 && "border-l-4 border-l-emerald-500 shadow-lg shadow-emerald-500/5"
+                'card-elevated p-6 bg-card/90 backdrop-blur-sm border-border hover:border-primary/40 transition-all group',
+                notice.priorityLevel === 3 &&
+                  'border-l-4 border-l-destructive shadow-lg shadow-destructive/5',
+                notice.priorityLevel === 2 &&
+                  'border-l-4 border-l-orange-500 shadow-lg shadow-orange-500/5',
+                notice.priorityLevel === 1 &&
+                  'border-l-4 border-l-emerald-500 shadow-lg shadow-emerald-500/5'
               )}
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <Badge className={cn(
-                      "px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider",
-                      notice.category === 'alert' ? "bg-destructive/10 text-destructive" :
-                      notice.category === 'event' ? "bg-primary/10 text-primary" :
-                      "bg-muted/80 text-muted-foreground"
-                    )}>
+                    <Badge
+                      className={cn(
+                        'px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider',
+                        notice.category === 'alert'
+                          ? 'bg-destructive/10 text-destructive'
+                          : notice.category === 'event'
+                            ? 'bg-primary/10 text-primary'
+                            : 'bg-muted/80 text-muted-foreground'
+                      )}
+                    >
                       {notice.category}
                     </Badge>
                     {notice.pinned && (
-                      <Badge variant="secondary" className="px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider border border-primary/20 text-primary">
+                      <Badge
+                        variant="secondary"
+                        className="px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider border border-primary/20 text-primary"
+                      >
                         <Pin className="h-3 w-3 mr-1.5" /> Pinned
                       </Badge>
                     )}
                     {notice.priorityLevel === 3 && (
                       <Badge className="px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-destructive text-destructive-foreground shadow-lg shadow-destructive/20">
-                         High Priority
+                        High Priority
                       </Badge>
                     )}
                     {notice.priorityLevel === 2 && (
                       <Badge className="px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-orange-500 text-white shadow-lg shadow-orange-500/20">
-                         Medium Priority
+                        Medium Priority
                       </Badge>
                     )}
                     {notice.priorityLevel === 1 && (
                       <Badge className="px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
-                         Low Priority
+                        Low Priority
                       </Badge>
                     )}
                   </div>
-                  
+
                   <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
                     {notice.title}
                   </h3>
-                  
+
                   <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap font-medium font-sans">
                     {notice.content}
                   </p>
 
                   <div className="flex flex-wrap items-center gap-4 pt-3 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 border-t border-border/10">
-                     <div className="flex items-center gap-2">
-                       <User className="w-3 h-3 text-primary/60" />
-                       Authored by <span className="text-foreground/80">{notice.authorName}</span>
-                     </div>
-                     <div className="flex items-center gap-2">
-                       <Calendar className="w-3 h-3 text-primary/60" />
-                       {new Date(notice.publishedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                     </div>
+                    <div className="flex items-center gap-2">
+                      <User className="w-3 h-3 text-primary/60" />
+                      Authored by <span className="text-foreground/80">{notice.authorName}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-3 h-3 text-primary/60" />
+                      {new Date(notice.publishedAt).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </div>
                   </div>
                 </div>
 
                 {isAdmin && (
                   <div className="flex md:flex-col gap-2 shrink-0">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => togglePin(notice.id, !notice.pinned)}
                       className="h-10 px-4 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all"
                     >
                       {notice.pinned ? 'Unpin' : 'Pin'}
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => removeNotice(notice.id)}
                       className="h-10 px-4 rounded-xl font-bold text-[10px] uppercase tracking-widest text-destructive hover:bg-destructive/5 transition-all"
                     >
@@ -392,9 +427,17 @@ export default function NoticeboardPage() {
               {notice.media.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mt-4">
                   {notice.media.map((item, index) => (
-                    <div key={`${notice.id}-${index}`} className="group/media relative aspect-video rounded-xl overflow-hidden border border-border/40 bg-muted/20 hover:border-primary/30 transition-all shadow-sm">
+                    <div
+                      key={`${notice.id}-${index}`}
+                      className="group/media relative aspect-video rounded-xl overflow-hidden border border-border/40 bg-muted/20 hover:border-primary/30 transition-all shadow-sm"
+                    >
                       {item.kind === 'image' ? (
-                        <a href={item.url} target="_blank" rel="noreferrer" className="block w-full h-full">
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block w-full h-full"
+                        >
                           <Image
                             src={item.url}
                             alt={item.name || 'Notice attachment'}
@@ -405,10 +448,17 @@ export default function NoticeboardPage() {
                         </a>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center p-2 text-center bg-background/40">
-                           <a href={item.url} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1.5">
-                              <Tag className="w-4 h-4 text-primary" />
-                              <span className="text-[8px] font-bold uppercase tracking-widest text-primary truncate max-w-full px-1">{item.name || 'View'}</span>
-                           </a>
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex flex-col items-center gap-1.5"
+                          >
+                            <Tag className="w-4 h-4 text-primary" />
+                            <span className="text-[8px] font-bold uppercase tracking-widest text-primary truncate max-w-full px-1">
+                              {item.name || 'View'}
+                            </span>
+                          </a>
                         </div>
                       )}
                     </div>
@@ -425,8 +475,13 @@ export default function NoticeboardPage() {
               <Megaphone className="w-8 h-8 text-primary/40" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-xl font-bold tracking-tight text-foreground/80">No Active Announcements</h3>
-              <p className="text-sm text-center text-muted-foreground font-medium italic max-w-sm">The noticeboard is currently synchronized but empty. Check back later for campus updates.</p>
+              <h3 className="text-xl font-bold tracking-tight text-foreground/80">
+                No Active Announcements
+              </h3>
+              <p className="text-sm text-center text-muted-foreground font-medium italic max-w-sm">
+                The noticeboard is currently synchronized but empty. Check back later for campus
+                updates.
+              </p>
             </div>
           </div>
         )}

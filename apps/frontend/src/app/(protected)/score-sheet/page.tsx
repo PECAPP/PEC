@@ -2,40 +2,46 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, Loader2 } from 'lucide-react';
-import { 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  Calculator,
+  Plus,
+  Trash2,
+  Save,
+  X,
+  TrendingUp,
+  BookOpen,
+  Sigma,
+  Download,
+  Loader2,
+} from 'lucide-react';
+import {
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   Line,
   Legend,
-  ComposedChart
+  ComposedChart,
 } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { usePermissions } from '@/hooks/usePermissions';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import api from '@/lib/api';
 import { extractData } from '@/lib/utils';
 import { toast } from 'sonner';
 
-type CgpaEntry = {
-  id: string;
-  courseId?: string;
-  subjectName: string;
-  courseCode: string;
-  semester: number;
-  credits: number;
-  gradePoint: number;
-  examDate: string;
-  notes: string;
-  createdAt: string;
-};
+import { CgpaEntry, CourseOption } from './types';
 
 const emptyForm: Omit<CgpaEntry, 'id' | 'createdAt'> = {
   subjectName: '',
@@ -46,14 +52,6 @@ const emptyForm: Omit<CgpaEntry, 'id' | 'createdAt'> = {
   gradePoint: 8,
   examDate: '',
   notes: '',
-};
-
-type CourseOption = {
-  id: string;
-  code: string;
-  name: string;
-  semester?: number;
-  credits?: number;
 };
 
 const toNumber = (value: unknown, fallback = 0) => {
@@ -172,7 +170,10 @@ export default function ScoreSheetPage() {
     const latestSemester = Math.max(...entries.map((item) => item.semester));
     const latestSemesterEntries = entries.filter((item) => item.semester === latestSemester);
     const latestCredits = latestSemesterEntries.reduce((sum, item) => sum + item.credits, 0);
-    const latestPoints = latestSemesterEntries.reduce((sum, item) => sum + item.gradePoint * item.credits, 0);
+    const latestPoints = latestSemesterEntries.reduce(
+      (sum, item) => sum + item.gradePoint * item.credits,
+      0
+    );
     const latestSgpa = latestCredits > 0 ? latestPoints / latestCredits : 0;
 
     return {
@@ -326,13 +327,17 @@ export default function ScoreSheetPage() {
     <div className="space-y-8">
       <div className="card-elevated ui-card-pad flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Academic Utilities</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
+            Academic Utilities
+          </p>
           <h1 className="text-3xl font-black tracking-tight text-foreground">CGPA Calculator</h1>
-          <p className="text-sm text-muted-foreground">Add subjects with credits and grade points to compute SGPA, CGPA, and trends.</p>
+          <p className="text-sm text-muted-foreground">
+            Add subjects with credits and grade points to compute SGPA, CGPA, and trends.
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="gap-2 border-primary/20 hover:bg-primary/5 transition-all font-bold"
             onClick={async () => {
               if (entries.length === 0) {
@@ -367,7 +372,9 @@ export default function ScoreSheetPage() {
               <Icon className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</p>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                {label}
+              </p>
               <p className="text-2xl font-black text-foreground">{value}</p>
             </div>
           </div>
@@ -377,7 +384,9 @@ export default function ScoreSheetPage() {
       <div className="card-elevated ui-card-pad space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Entry Form</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              Entry Form
+            </p>
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <Calculator className="h-5 w-5 text-primary" />
               {editingId ? 'Edit Subject' : 'Add Subject'}
@@ -419,13 +428,18 @@ export default function ScoreSheetPage() {
           <Select
             value={form.courseId || ''}
             onValueChange={(courseId) => {
-              const selectedCourse = filteredCoursesBySemester.find((course) => course.id === courseId);
+              const selectedCourse = filteredCoursesBySemester.find(
+                (course) => course.id === courseId
+              );
               setForm((prev) => ({
                 ...prev,
                 courseId,
                 subjectName: selectedCourse?.name || '',
                 courseCode: selectedCourse?.code || '',
-                credits: selectedCourse?.credits && selectedCourse.credits > 0 ? selectedCourse.credits : prev.credits,
+                credits:
+                  selectedCourse?.credits && selectedCourse.credits > 0
+                    ? selectedCourse.credits
+                    : prev.credits,
               }));
             }}
             disabled={form.semester <= 0 || coursesLoading}
@@ -449,7 +463,8 @@ export default function ScoreSheetPage() {
               ) : (
                 filteredCoursesBySemester.map((course) => (
                   <SelectItem key={course.id} value={course.id}>
-                    {course.code ? `${course.code} - ` : ''}{course.name}
+                    {course.code ? `${course.code} - ` : ''}
+                    {course.name}
                   </SelectItem>
                 ))
               )}
@@ -472,7 +487,9 @@ export default function ScoreSheetPage() {
             step={0.5}
             placeholder="Credits *"
             value={form.credits}
-            onChange={(event) => setForm((prev) => ({ ...prev, credits: toNumber(event.target.value, 3) }))}
+            onChange={(event) =>
+              setForm((prev) => ({ ...prev, credits: toNumber(event.target.value, 3) }))
+            }
           />
           <Input
             type="number"
@@ -481,7 +498,9 @@ export default function ScoreSheetPage() {
             step={0.01}
             placeholder="Grade point (0-10) *"
             value={form.gradePoint}
-            onChange={(event) => setForm((prev) => ({ ...prev, gradePoint: toNumber(event.target.value, 0) }))}
+            onChange={(event) =>
+              setForm((prev) => ({ ...prev, gradePoint: toNumber(event.target.value, 0) }))
+            }
           />
         </div>
 
@@ -494,7 +513,13 @@ export default function ScoreSheetPage() {
 
         <div className="flex justify-end">
           <Button onClick={handleSave} className="gap-2" disabled={savingEntry}>
-            {savingEntry ? <Loader2 className="h-4 w-4 animate-spin" /> : editingId ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {savingEntry ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : editingId ? (
+              <Save className="h-4 w-4" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
             {savingEntry ? 'Saving...' : editingId ? 'Update Subject' : 'Add Subject'}
           </Button>
         </div>
@@ -504,48 +529,67 @@ export default function ScoreSheetPage() {
         <div className="card-elevated ui-card-pad space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-foreground">Semester Trends</h3>
-            <p className="text-xs text-muted-foreground font-black">Best SGPA: {bestSgpa.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground font-black">
+              Best SGPA: {bestSgpa.toFixed(2)}
+            </p>
           </div>
           <div className="h-[250px] w-full pt-4 glow-primary/5 rounded-2xl overflow-hidden transition-all hover:bg-primary/[0.02] border border-primary/5">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={trend}>
                 <defs>
                   <linearGradient id="colorSgpa" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
-                <XAxis 
-                  dataKey="semester" 
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="rgba(255,255,255,0.1)"
+                />
+                <XAxis
+                  dataKey="semester"
                   fontSize={10}
                   tick={{ fill: 'var(--muted-foreground)' }}
                   axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                 />
-                <YAxis 
-                  domain={[0, 10]} 
-                  fontSize={10} 
+                <YAxis
+                  domain={[0, 10]}
+                  fontSize={10}
                   tick={{ fill: 'var(--muted-foreground)' }}
                   axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                 />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px' }}
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#111',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                  }}
                 />
-                <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}/>
-                <Area 
-                  type="monotone" 
-                  dataKey="sgpa" 
-                  stroke="var(--primary)" 
+                <Legend
+                  verticalAlign="top"
+                  height={36}
+                  wrapperStyle={{
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="sgpa"
+                  stroke="var(--primary)"
                   strokeWidth={3}
-                  fillOpacity={1} 
-                  fill="url(#colorSgpa)" 
+                  fillOpacity={1}
+                  fill="url(#colorSgpa)"
                   name="SGPA"
                   animationDuration={1500}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="cumulativeCgpa" 
-                  stroke="#fbbf24" 
+                <Line
+                  type="monotone"
+                  dataKey="cumulativeCgpa"
+                  stroke="#fbbf24"
                   strokeWidth={4}
                   dot={{ r: 4, fill: '#fbbf24', strokeWidth: 2 }}
                   activeDot={{ r: 6, fill: '#fbbf24' }}
@@ -566,8 +610,12 @@ export default function ScoreSheetPage() {
               {semesterStats.map((semesterData) => (
                 <div key={semesterData.semester} className="rounded-lg border border-border p-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-foreground">Semester {semesterData.semester}</p>
-                    <p className="text-sm font-bold text-primary">SGPA {semesterData.sgpa.toFixed(2)}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      Semester {semesterData.semester}
+                    </p>
+                    <p className="text-sm font-bold text-primary">
+                      SGPA {semesterData.sgpa.toFixed(2)}
+                    </p>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     Subjects: {semesterData.totalSubjects} | Credits: {semesterData.totalCredits}
@@ -590,60 +638,64 @@ export default function ScoreSheetPage() {
             .slice()
             .sort((a, b) => a.semester - b.semester || a.subjectName.localeCompare(b.subjectName))
             .map((entry) => {
-            const creditPoints = entry.gradePoint * entry.credits;
+              const creditPoints = entry.gradePoint * entry.credits;
 
-            return (
-              <div key={entry.id} className="card-elevated ui-card-pad space-y-3">
-                <div className="grid gap-4 md:grid-cols-[1.6fr_0.8fr_0.8fr] md:items-center">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">
-                      {entry.subjectName}
-                      {entry.courseCode ? ` (${entry.courseCode})` : ''}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      Semester {entry.semester}
-                      {entry.examDate ? ` - ${new Date(entry.examDate).toLocaleDateString()}` : ''}
-                    </p>
-                    {entry.notes && (
-                      <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
-                        {entry.notes}
+              return (
+                <div key={entry.id} className="card-elevated ui-card-pad space-y-3">
+                  <div className="grid gap-4 md:grid-cols-[1.6fr_0.8fr_0.8fr] md:items-center">
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground">
+                        {entry.subjectName}
+                        {entry.courseCode ? ` (${entry.courseCode})` : ''}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        Semester {entry.semester}
+                        {entry.examDate
+                          ? ` - ${new Date(entry.examDate).toLocaleDateString()}`
+                          : ''}
                       </p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Performance</p>
-                    <p className="text-xl font-bold text-foreground">
-                      GP {entry.gradePoint.toFixed(2)}
-                    </p>
-                    <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full bg-primary transition-all"
-                        style={{ width: `${(entry.gradePoint / 10) * 100}%` }}
-                      />
+                      {entry.notes && (
+                        <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
+                          {entry.notes}
+                        </p>
+                      )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Credits {entry.credits} | Credit Points {creditPoints.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between md:justify-end gap-2">
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(entry.id)}
-                        disabled={deletingId === entry.id}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div className="space-y-1">
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                        Performance
+                      </p>
+                      <p className="text-xl font-bold text-foreground">
+                        GP {entry.gradePoint.toFixed(2)}
+                      </p>
+                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full bg-primary transition-all"
+                          style={{ width: `${(entry.gradePoint / 10) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Credits {entry.credits} | Credit Points {creditPoints.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between md:justify-end gap-2">
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(entry.id)}
+                          disabled={deletingId === entry.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })
         )}
       </div>
     </div>
