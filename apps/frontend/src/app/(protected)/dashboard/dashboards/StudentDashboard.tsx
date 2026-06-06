@@ -43,6 +43,29 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
     orgSlug,
   } = useStudentDashboard(initialData, initialUser);
 
+  const getFullUrl = (path: string) => orgSlug ? `/${orgSlug}${path}` : path;
+
+  useEffect(() => {
+    const node = enrolledCardRef.current;
+    if (!node) return;
+
+    const updateHeight = () => {
+      const nextHeight = node.offsetHeight;
+      if (nextHeight > 0) setScheduleCardHeight(nextHeight);
+    };
+
+    updateHeight();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateHeight);
+      return () => window.removeEventListener('resize', updateHeight);
+    }
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   if (loading) {
     return (
        <div className="space-y-6 md:space-y-8">
@@ -75,29 +98,6 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
       />
     );
   }
-
-  const getFullUrl = (path: string) => orgSlug ? `/${orgSlug}${path}` : path;
-
-  useEffect(() => {
-    const node = enrolledCardRef.current;
-    if (!node) return;
-
-    const updateHeight = () => {
-      const nextHeight = node.offsetHeight;
-      if (nextHeight > 0) setScheduleCardHeight(nextHeight);
-    };
-
-    updateHeight();
-
-    if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', updateHeight);
-      return () => window.removeEventListener('resize', updateHeight);
-    }
-
-    const observer = new ResizeObserver(updateHeight);
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div className="space-y-6 md:space-y-8">

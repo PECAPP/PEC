@@ -187,7 +187,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
 
   // Handle hydration or manual refresh
   useEffect(() => {
-    if (initialData) {
+    if (initialData && initialData.summary) {
       processDashboardData(
         initialData.summary,
         [], // allCourses no longer provided/needed
@@ -197,7 +197,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
       void fetchCollegeSettings();
       
       const dashboardNotices = initialData.noticeboard || initialData.notices;
-      if (Array.isArray(dashboardNotices)) {
+      if (Array.isArray(dashboardNotices) && dashboardNotices.length > 0) {
         setNoticeboardItems(dashboardNotices);
       } else {
         void (async () => {
@@ -211,8 +211,11 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
         })();
       }
       setLoading(false);
+    } else if (initialData && !initialData.summary) {
+      // If SSR passed initialData but it's empty (e.g. serverFetch failed), we must fetch client-side!
+      void fetchStudentStats();
     }
-  }, [initialData, processDashboardData, fetchCollegeSettings]);
+  }, [initialData, processDashboardData, fetchCollegeSettings, fetchStudentStats]);
 
   useEffect(() => {
     if (authLoading) return;

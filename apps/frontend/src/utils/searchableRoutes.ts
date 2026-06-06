@@ -14,110 +14,112 @@ import {
   Coffee,
   Shield,
   LayoutDashboard,
-} from "lucide-react";
+} from 'lucide-react';
 
 export const searchableRoutes = [
   // Core
   {
-    title: "Dashboard",
-    path: "/dashboard",
+    title: 'Dashboard',
+    path: '/dashboard',
     icon: LayoutDashboard,
-    keywords: ["home", "main", "overview"],
+    keywords: ['home', 'main', 'overview'],
   },
   {
-    title: "Profile",
-    path: "/profile",
+    title: 'Profile',
+    path: '/profile',
     icon: User,
-    keywords: ["account", "me", "avatar"],
+    keywords: ['account', 'me', 'avatar'],
   },
   {
-    title: "Settings",
-    path: "/settings",
+    title: 'Settings',
+    path: '/settings',
     icon: Settings,
-    keywords: ["config", "preferences", "security", "admin"],
+    keywords: ['config', 'preferences', 'security', 'admin'],
   },
-
 
   // Academics
   {
-    title: "Courses",
-    path: "/courses",
+    title: 'Courses',
+    path: '/courses',
     icon: BookOpen,
-    keywords: ["classes", "subjects", "learning"],
+    keywords: ['classes', 'subjects', 'learning'],
   },
   {
-    title: "Timetable",
-    path: "/timetable",
+    title: 'Academic Schedule',
+    path: '/academic-schedule',
     icon: Calendar,
-    keywords: ["schedule", "routine"],
+    keywords: [
+      'timetable',
+      'schedule',
+      'routine',
+      'calendar',
+      'events',
+      'holidays',
+      'dates',
+      'examinations',
+      'exams',
+      'assessments',
+      'academic',
+    ],
   },
   {
-    title: "Academic Calendar",
-    path: "/academic-calendar",
+    title: 'Attendance',
+    path: '/attendance',
     icon: Calendar,
-    keywords: ["calendar", "events", "holidays", "dates", "schedule"],
+    keywords: ['present', 'absent'],
   },
   {
-    title: "Attendance",
-    path: "/attendance",
-    icon: Calendar,
-    keywords: ["present", "absent"],
-  },
-  {
-    title: "Score Sheet",
-    path: "/score-sheet",
+    title: 'Score Sheet',
+    path: '/score-sheet',
     icon: FileText,
-    keywords: ["marks", "grades", "results", "gpa"],
+    keywords: ['marks', 'grades', 'results', 'gpa'],
   },
-
-
-
 
   // Admin
   {
-    title: "User Management",
-    path: "/users",
+    title: 'User Management',
+    path: '/users',
     icon: Users,
-    keywords: ["students", "faculty", "staff", "people"],
+    keywords: ['students', 'faculty', 'staff', 'people'],
   },
   {
-    title: "College Settings",
-    path: "/admin/college-settings",
+    title: 'College Settings',
+    path: '/admin/college-settings',
     icon: Building2,
-    keywords: ["config", "institution"],
+    keywords: ['config', 'institution'],
   },
 
   // Campus
   {
-    title: "Campus Map",
-    path: "/campus-map",
+    title: 'Campus Map',
+    path: '/campus-map',
     icon: MapPin,
-    keywords: ["location", "directions", "buildings"],
+    keywords: ['location', 'directions', 'buildings'],
   },
   {
-    title: "Night Canteen",
-    path: "/canteen",
+    title: 'Night Canteen',
+    path: '/canteen',
     icon: Coffee,
-    keywords: ["food", "order", "snacks"],
+    keywords: ['food', 'order', 'snacks'],
   },
   {
-    title: "Hostel Issues",
-    path: "/hostel-issues",
+    title: 'Hostel Issues',
+    path: '/hostel-issues',
     icon: Home,
-    keywords: ["complaints", "support", "maintenance"],
+    keywords: ['complaints', 'support', 'maintenance'],
   },
 
   // Help
   {
-    title: "Help Center",
-    path: "/help",
+    title: 'Help Center',
+    path: '/help',
     icon: HelpCircle,
-    keywords: ["support", "faq", "docs"],
+    keywords: ['support', 'faq', 'docs'],
   },
   {
-    title: "Privacy Policy",
-    path: "/privacy",
+    title: 'Privacy Policy',
+    path: '/privacy',
     icon: Shield,
-    keywords: ["legal", "gdpr", "data"],
+    keywords: ['legal', 'gdpr', 'data'],
   },
 ];

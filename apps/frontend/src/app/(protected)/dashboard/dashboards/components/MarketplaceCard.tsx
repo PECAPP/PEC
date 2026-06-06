@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
+import { Can } from '@/lib/casl-context';
 
 interface Listing {
   id: string;
@@ -169,13 +170,15 @@ export function MarketplaceCard({
 
       <div className="mt-auto pt-4">
         {/* Quick action */}
-        <Button
-          className="w-full h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
-          onClick={onCreateListing}
-        >
-          <Plus className="w-4 h-4" />
-          Sell something
-        </Button>
+        <Can I="create" a="MarketplaceListing">
+          <Button
+            className="w-full h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+            onClick={onCreateListing}
+          >
+            <Plus className="w-4 h-4" />
+            Sell something
+          </Button>
+        </Can>
       </div>
     </motion.div>
   );

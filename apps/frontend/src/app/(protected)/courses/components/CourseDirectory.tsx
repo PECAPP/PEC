@@ -159,16 +159,16 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
     <div className="space-y-8 pb-10">
       <Tabs defaultValue="enrolled" className="space-y-10 group/tabs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <TabsList className="h-14 p-1.5 bg-muted/30 rounded-2xl border border-border/40 gap-1">
+          <TabsList className="h-14 p-1.5 bg-muted/20 backdrop-blur-md rounded-2xl border border-border/20 gap-1 relative overflow-hidden">
             <TabsTrigger 
               value="enrolled" 
-              className="rounded-xl px-8 h-full font-bold text-[10px] uppercase tracking-widest data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all"
+              className="rounded-xl px-8 h-full font-bold text-[10px] uppercase tracking-widest data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-inner transition-all duration-300"
             >
               My Curriculum ({enrolled.length})
             </TabsTrigger>
             <TabsTrigger 
               value="available" 
-              className="rounded-xl px-8 h-full font-bold text-[10px] uppercase tracking-widest data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all"
+              className="rounded-xl px-8 h-full font-bold text-[10px] uppercase tracking-widest data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-inner transition-all duration-300"
             >
               Open Enrollment ({available.length})
             </TabsTrigger>
@@ -176,22 +176,22 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
           
           <div className="flex items-center gap-3">
              <div className="relative group/search flex-1 md:w-64">
-               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40 transition-colors group-focus-within/search:text-primary" />
+               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 transition-colors group-focus-within/search:text-primary" />
                <Input 
                 placeholder="Search catalog..." 
-                className="h-14 pl-11 rounded-2xl bg-muted/20 border-border/40 focus:bg-background transition-all font-bold placeholder:font-normal"
+                className="h-14 pl-11 rounded-2xl bg-white/5 border-border/20 focus:bg-white/10 hover:bg-white/10 transition-all font-bold placeholder:font-normal placeholder:text-muted-foreground/60 shadow-inner"
                 value={searchTerm} 
                 onChange={e => setSearchTerm(e.target.value)} 
                />
              </div>
              
              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-               <SelectTrigger className="h-14 w-[180px] rounded-2xl bg-muted/20 border-border/40 font-bold transition-all">
-                 <div className="flex items-center gap-2"><Filter className="w-3.5 h-3.5" /><SelectValue placeholder="Org" /></div>
+               <SelectTrigger className="h-14 w-[180px] rounded-2xl bg-white/5 border-border/20 hover:bg-white/10 font-bold transition-all shadow-inner">
+                 <div className="flex items-center gap-2"><Filter className="w-3.5 h-3.5 text-muted-foreground/80" /><SelectValue placeholder="Org" /></div>
                </SelectTrigger>
-               <SelectContent className="rounded-xl border-border/40 shadow-xl">
-                  <SelectItem value="all" className="font-bold text-[10px] uppercase tracking-widest">All Departments</SelectItem>
-                  {departments.map(d => <SelectItem key={d} value={d} className="font-bold text-[10px] uppercase tracking-widest">{d}</SelectItem>)}
+               <SelectContent className="rounded-2xl border-border/20 shadow-2xl bg-card/95 backdrop-blur-xl">
+                  <SelectItem value="all" className="font-bold text-[10px] uppercase tracking-widest py-3">All Departments</SelectItem>
+                  {departments.map(d => <SelectItem key={d} value={d} className="font-bold text-[10px] uppercase tracking-widest py-3">{d}</SelectItem>)}
                </SelectContent>
              </Select>
           </div>
@@ -248,48 +248,52 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
       </Tabs>
 
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-3xl border-border/40 bg-card/95 backdrop-blur-xl">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-3xl border-border/20 bg-card/95 backdrop-blur-2xl shadow-2xl">
+           <DialogHeader className="sr-only">
+             <DialogTitle>{selectedCourse?.name || 'Course Details'}</DialogTitle>
+             <DialogDescription>View course catalog information and syllabus details</DialogDescription>
+           </DialogHeader>
            {selectedCourse && (
              <div className="space-y-0">
-                <div className="relative h-48 w-full">
+                <div className="relative h-40 w-full">
                    <ImageWithBlur src={getCourseImage(selectedCourse.department, selectedCourse.name)} alt={selectedCourse.name} className="w-full h-full object-cover" />
-                   <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
-                   <div className="absolute bottom-6 left-8 right-8 flex items-end justify-between">
-                      <div className="space-y-1">
-                        <Badge className="bg-primary/20 text-primary border-primary/20 backdrop-blur-sm px-3 py-1 font-bold text-[10px] tracking-widest uppercase mb-1">{selectedCourse.code}</Badge>
-                        <h2 className="text-2xl font-bold tracking-tight text-foreground">{selectedCourse.name}</h2>
+                   <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent opacity-90" />
+                   <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between">
+                      <div className="space-y-1.5">
+                        <Badge className="bg-primary/20 text-primary border-primary/30 backdrop-blur-md px-2.5 py-0.5 font-bold text-[9px] tracking-widest uppercase shadow-glow">{selectedCourse.code}</Badge>
+                        <h2 className="text-2xl font-bold tracking-tight text-foreground drop-shadow-md">{selectedCourse.name}</h2>
                       </div>
                    </div>
                 </div>
                 
-                <div className="p-8 space-y-8">
-                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-6 border-y border-border/20">
-                      <div className="space-y-1">
-                         <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Faculty lead</span>
-                         <p className="text-sm font-bold text-foreground/80">{selectedCourse.facultyName}</p>
+                <div className="p-6 space-y-6">
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
+                         <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Faculty Lead</span>
+                         <p className="text-xs font-semibold text-foreground/90">{selectedCourse.facultyName.replace(/\b[A-Z]+\b/g, m => m.charAt(0) + m.slice(1).toLowerCase())}</p>
                       </div>
-                      <div className="space-y-1">
-                         <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Academic Units</span>
-                         <p className="text-sm font-bold text-foreground/80">{selectedCourse.credits} Credits</p>
+                      <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
+                         <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Academic Units</span>
+                         <p className="text-xs font-semibold text-foreground/90">{selectedCourse.credits} Credits</p>
                       </div>
-                      <div className="space-y-1">
-                         <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Institutional Level</span>
-                         <p className="text-sm font-bold text-foreground/80">Semester {selectedCourse.semester}</p>
+                      <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
+                         <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Level</span>
+                         <p className="text-xs font-semibold text-foreground/90">Semester {selectedCourse.semester}</p>
                       </div>
                    </div>
 
-                   <div className="space-y-3">
-                      <h4 className="text-xs font-bold uppercase tracking-widest text-primary">Catalog Description</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                   <div className="space-y-2 px-1">
+                      <h4 className="text-[9px] font-bold uppercase tracking-widest text-primary">Catalog Description</h4>
+                      <p className="text-sm text-foreground/80 leading-relaxed font-medium">
                         {selectedCourse.description || "Comprehensive curriculum details for this institutional module will be provided during the orientation session."}
                       </p>
                    </div>
                    
-                   <div className="flex gap-4 pt-4">
-                      <Button className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-glow" onClick={() => setShowDetailsDialog(false)}>
-                         Acknowledge
+                   <div className="flex gap-3 pt-4 mt-4 border-t border-border/10">
+                      <Button className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all" onClick={() => setShowDetailsDialog(false)}>
+                         Go to Course Materials
                       </Button>
-                      <Button variant="outline" className="h-12 rounded-xl px-12 font-bold text-[10px] uppercase tracking-widest" onClick={() => setShowDetailsDialog(false)}>Close</Button>
+                      <Button variant="outline" className="h-11 rounded-xl px-8 font-bold text-[10px] uppercase tracking-widest border-border/20 hover:bg-white/5" onClick={() => setShowDetailsDialog(false)}>Close</Button>
                    </div>
                 </div>
              </div>

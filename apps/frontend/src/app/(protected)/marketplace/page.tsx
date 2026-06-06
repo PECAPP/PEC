@@ -130,6 +130,7 @@ function ProductCard({
   listing,
   isBookmarked,
   currentUserId,
+  ability,
   onBookmark,
   onChat,
   onView,
@@ -139,6 +140,7 @@ function ProductCard({
   listing: Listing;
   isBookmarked: boolean;
   currentUserId: string;
+  ability: any;
   onBookmark: (id: string) => void;
   onChat: (listing: Listing) => void;
   onView: (listing: Listing) => void;
@@ -220,16 +222,17 @@ function ProductCard({
 
         {/* Actions */}
         <div className="flex gap-2 pt-2 border-t border-border/40">
-          {isMine ? (
-            <>
-              <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onEdit(listing)}>
-                <Edit2 className="w-3 h-3 mr-1.5" /> Edit
-              </Button>
-              <Button size="sm" variant="ghost" className="h-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onDelete(listing.id)}>
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </>
-          ) : (
+          {(isMine || ability?.can('update', 'MarketplaceListing')) ? (
+            <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onEdit(listing)}>
+              <Edit2 className="w-3 h-3 mr-1.5" /> Edit
+            </Button>
+          ) : null}
+          {(isMine || ability?.can('delete', 'MarketplaceListing')) ? (
+            <Button size="sm" variant="ghost" className="h-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onDelete(listing.id)}>
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          ) : null}
+          {!(isMine || ability?.can('update', 'MarketplaceListing')) ? (
             <>
               <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onView(listing)}>
                 <Eye className="w-3 h-3 mr-1.5" /> View
@@ -240,7 +243,7 @@ function ProductCard({
                 </Button>
               )}
             </>
-          )}
+          ) : null}
         </div>
       </div>
     </motion.div>
@@ -803,7 +806,7 @@ function ChatPanel({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function MarketplacePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, ability, loading: authLoading } = useAuth();
 
   const [tab, setTab] = useState<'browse' | 'my-listings' | 'saved'>('browse');
   const [listings, setListings] = useState<Listing[]>([]);
@@ -1229,6 +1232,7 @@ export default function MarketplacePage() {
                       listing={listing}
                       isBookmarked={bookmarkedIds.has(listing.id)}
                       currentUserId={currentUserId}
+                      ability={ability}
                       onBookmark={handleBookmark}
                       onChat={openChat}
                       onView={setViewingListing}
@@ -1268,7 +1272,7 @@ export default function MarketplacePage() {
                         <p className="text-xs text-muted-foreground mt-0.5">{listing.seller.name}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {listing.sellerId !== currentUserId ? (
+                        {!(listing.sellerId === currentUserId || ability?.can('update', 'MarketplaceListing')) ? (
                           <>
                             <button onClick={() => handleBookmark(listing.id)} className="p-1.5 hover:bg-muted rounded">
                               <Heart className={cn('w-4 h-4', bookmarkedIds.has(listing.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground')} />
@@ -1281,17 +1285,21 @@ export default function MarketplacePage() {
                           </>
                         ) : (
                           <div className="flex gap-1">
-                            {listing.status === 'Available' && (
+                            {listing.status === 'Available' && (listing.sellerId === currentUserId || ability?.can('update', 'MarketplaceListing')) && (
                               <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleMarkSold(listing.id)}>
                                 <CheckCircle2 className="w-3 h-3 mr-1" /> Sold
                               </Button>
                             )}
-                            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditingListing(listing); setFormOpen(true); }}>
-                              <Edit2 className="w-3 h-3" />
-                            </Button>
-                            <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDelete(listing.id)}>
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
+                            {(listing.sellerId === currentUserId || ability?.can('update', 'MarketplaceListing')) && (
+                              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditingListing(listing); setFormOpen(true); }}>
+                                <Edit2 className="w-3 h-3" />
+                              </Button>
+                            )}
+                            {(listing.sellerId === currentUserId || ability?.can('delete', 'MarketplaceListing')) && (
+                              <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDelete(listing.id)}>
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            )}
                           </div>
                         )}
                       </div>
