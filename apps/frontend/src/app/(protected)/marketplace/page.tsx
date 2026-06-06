@@ -845,12 +845,8 @@ export default function MarketplacePage() {
       const query = new URLSearchParams(params).toString();
       const res = await api.get(`/marketplace/listings?${query}`);
       const raw = (res as any).data;
-<<<<<<< HEAD:src/app/(protected)/marketplace/page.tsx
-      setListings(Array.isArray(raw) ? raw : (raw?.data ?? []));
-=======
       const data = raw?.data ?? raw;
       setListings(Array.isArray(data) ? data : []);
->>>>>>> main:apps/frontend/src/app/(protected)/marketplace/page.tsx
       setTotal(raw?.meta?.total ?? 0);
     } catch {
       toast.error('Failed to load listings');
@@ -863,12 +859,8 @@ export default function MarketplacePage() {
     try {
       const res = await api.get('/marketplace/listings/my');
       const raw = (res as any).data;
-<<<<<<< HEAD:src/app/(protected)/marketplace/page.tsx
-      setMyListings(Array.isArray(raw) ? raw : (raw?.data ?? []));
-=======
       const data = raw?.data ?? raw;
       setMyListings(Array.isArray(data) ? data : []);
->>>>>>> main:apps/frontend/src/app/(protected)/marketplace/page.tsx
     } catch {
       // silent
     }
@@ -878,12 +870,8 @@ export default function MarketplacePage() {
     try {
       const res = await api.get('/marketplace/bookmarks');
       const raw = (res as any).data;
-<<<<<<< HEAD:src/app/(protected)/marketplace/page.tsx
-      setSavedListings(Array.isArray(raw) ? raw : (raw?.data ?? []));
-=======
       const data = raw?.data ?? raw;
       setSavedListings(Array.isArray(data) ? data : []);
->>>>>>> main:apps/frontend/src/app/(protected)/marketplace/page.tsx
     } catch {
       // silent
     }
@@ -893,12 +881,8 @@ export default function MarketplacePage() {
     try {
       const res = await api.get('/marketplace/bookmarks/ids');
       const raw = (res as any).data;
-<<<<<<< HEAD:src/app/(protected)/marketplace/page.tsx
-      setBookmarkedIds(new Set(Array.isArray(raw) ? raw : (raw?.data ?? [])));
-=======
       const data = raw?.data ?? raw;
       setBookmarkedIds(new Set(Array.isArray(data) ? data : []));
->>>>>>> main:apps/frontend/src/app/(protected)/marketplace/page.tsx
     } catch {
       // silent
     }
