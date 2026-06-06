@@ -1,16 +1,18 @@
 import { Controller, Get, Post, Body, Req, Patch, Param, UseGuards } from '@nestjs/common';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 import { HostelService } from './hostel.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+
+
 import { ok } from '../common/utils/api-response';
 
 @Controller('hostelIssues')
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 export class HostelController {
   constructor(private readonly hostelService: HostelService) {}
 
-  @Roles('student', 'moderator', 'admin', 'college_admin')
+  @CheckPolicies((ability) => ability.can('read', 'HostelIssue'))
   @Get()
   async getIssues(@Req() req: any) {
     const userId = req.user.id || req.user.sub || req.user.userId;
@@ -24,7 +26,7 @@ export class HostelController {
     return ok(data);
   }
 
-  @Roles('student')
+  @CheckPolicies((ability) => ability.can('create', 'HostelIssue'))
   @Post()
   async createIssue(@Body() data: any, @Req() req: any) {
     const userId = req.user.id || req.user.sub || req.user.userId;
@@ -32,7 +34,7 @@ export class HostelController {
     return ok(res);
   }
 
-  @Roles('moderator', 'admin', 'college_admin')
+  @CheckPolicies((ability) => ability.can('update', 'HostelIssue'))
   @Patch(':id')
   async updateIssue(@Param('id') id: string, @Body() data: any) {
     const res = await this.hostelService.update(id, data);

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { attendanceSchema } from '@shared/schemas/erp';
+import { attendanceSchema } from '@pec/shared';
 
 // Plain class for NestJS/Swagger compatibility
 // Runtime validation still uses the shared Zod schema (attendanceSchema)

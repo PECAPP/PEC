@@ -328,7 +328,7 @@ export async function seedMarketplace(students: StudentSeed[] = []) {
     students.length > 0
       ? students
       : await prisma.user.findMany({
-          where: { role: 'student' },
+          where: { roles: { some: { role: { name: 'student' } } } },
           select: { id: true, email: true, name: true },
         });
 

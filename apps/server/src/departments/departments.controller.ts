@@ -14,18 +14,21 @@ import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { departmentSchema } from '@shared/schemas/erp';
+import { departmentSchema } from '@pec/shared';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 
-@UseGuards(AuthGuard, RolesGuard)
+
+
+
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
-  @Roles('student', 'faculty', 'college_admin')
+  @CheckPolicies((ability) => ability.can('read', 'Department'))
   @Get()
   async findAll(@Query() query: DepartmentQueryDto) {
     const result = await this.departmentsService.findMany(query);
@@ -36,14 +39,14 @@ export class DepartmentsController {
     });
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @CheckPolicies((ability) => ability.can('read', 'Department'))
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const data = await this.departmentsService.findOne(id);
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin', 'admin', 'moderator')
+  @CheckPolicies((ability) => ability.can('create', 'Department'))
   @Post()
   async create(
     @Body(new ZodValidationPipe(departmentSchema))
@@ -53,7 +56,7 @@ export class DepartmentsController {
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin', 'admin', 'moderator')
+  @CheckPolicies((ability) => ability.can('update', 'Department'))
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -64,10 +67,11 @@ export class DepartmentsController {
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin', 'admin', 'moderator')
+  @CheckPolicies((ability) => ability.can('delete', 'Department'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const data = await this.departmentsService.remove(id);
     return ok(data);
   }
 }
+

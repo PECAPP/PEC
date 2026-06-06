@@ -1,8 +1,10 @@
 import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 import { CollegeSettingsService } from './college-settings.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+
+
 import { ok } from '../common/utils/api-response';
 
 @Controller('college-settings')
@@ -15,8 +17,8 @@ export class CollegeSettingsController {
     return ok(data);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('college_admin', 'admin')
+  @UseGuards(AuthGuard, PoliciesGuard)
+  @CheckPolicies((ability) => ability.can('update', 'all'))
   @Patch()
   async updateSettings(@Body() data: any) {
     const updated = await this.service.updateSettings(data);

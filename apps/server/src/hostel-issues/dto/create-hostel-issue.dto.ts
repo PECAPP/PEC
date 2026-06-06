@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { hostelIssueSchema } from '@shared/schemas/erp';
+import { hostelIssueSchema } from '@pec/shared';
 
 export class CreateHostelIssueDto {
   @ApiProperty({ example: 'Broken Fan' })

@@ -276,7 +276,6 @@ export class ChatService {
           id: true,
           name: true,
           email: true,
-          role: true,
         },
         orderBy: { name: 'asc' },
         take: 20,
@@ -294,7 +293,6 @@ export class ChatService {
         id: true,
         name: true,
         email: true,
-        role: true,
       },
       take: 10,
     });
@@ -400,7 +398,7 @@ export class ChatService {
     }
 
     const adminUsers = await this.prisma.user.findMany({
-      where: { role: { in: ['college_admin'] } },
+      where: { roles: { some: { role: { name: 'college_admin' } } } },
       select: { id: true },
     });
 
@@ -552,7 +550,7 @@ export class ChatService {
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
       include: {
         club: { select: { id: true, name: true, chatRoomId: true } },
-        requester: { select: { id: true, name: true, email: true, role: true } },
+        requester: { select: { id: true, name: true, email: true, roles: { select: { role: { select: { name: true } } } } } },
         reviewedBy: { select: { id: true, name: true } },
       },
     });
@@ -575,7 +573,7 @@ export class ChatService {
         requesterId: request.requesterId,
         requesterName: request.requester.name,
         requesterEmail: request.requester.email,
-        requesterRole: request.requester.role,
+        requesterRole: request.requester.roles?.[0]?.role?.name ?? 'student',
         clubId: request.club.id,
         roomId: request.club.chatRoomId,
         clubName: request.club.name,

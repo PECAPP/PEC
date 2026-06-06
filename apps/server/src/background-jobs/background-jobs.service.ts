@@ -262,7 +262,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
 
     // 2. Simple but effective logic: iterate over active students
     const students = await this.prisma.user.findMany({
-      where: { role: 'student' },
+      where: { roles: { some: { role: { name: 'student' } } } },
       select: { id: true, name: true }
     });
 

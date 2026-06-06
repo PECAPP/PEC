@@ -12,20 +12,23 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { ok } from '../common/utils/api-response';
 import { NoticeboardService } from './noticeboard.service';
 import { CreateNoticeDto } from './dto/create-notice.dto';
 import { ListNoticesDto } from './dto/list-notices.dto';
 import { TogglePinDto } from './dto/toggle-pin.dto';
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('noticeboard')
 export class NoticeboardController {
   constructor(private readonly service: NoticeboardService) {}
 
-  @Roles('college_admin', 'faculty', 'student')
+  @CheckPolicies((ability) => ability.can('read', 'Notice'))
   @Get()
   async list(@Query() query: ListNoticesDto) {
     const result = await this.service.list(query);
@@ -36,14 +39,14 @@ export class NoticeboardController {
     });
   }
 
-  @Roles('college_admin')
+  @CheckPolicies((ability) => ability.can('create', 'Notice'))
   @Post()
   async create(@Body() body: CreateNoticeDto, @Request() req: any) {
     const data = await this.service.create(body, req.user?.sub);
     return ok(data);
   }
 
-  @Roles('college_admin')
+  @CheckPolicies((ability) => ability.can('update', 'Notice'))
   @Patch(':id/pin')
   async togglePin(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -53,10 +56,11 @@ export class NoticeboardController {
     return ok(data);
   }
 
-  @Roles('college_admin')
+  @CheckPolicies((ability) => ability.can('delete', 'Notice'))
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.service.remove(id);
     return ok(data);
   }
 }
+

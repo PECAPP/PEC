@@ -10,8 +10,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { ok } from '../common/utils/api-response';
 import { CampusMapService } from './campus-map.service';
 import { CampusMapQueryDto } from './dto/campus-map-query.dto';
@@ -20,12 +23,12 @@ import { UpdateCampusMapRegionDto } from './dto/update-campus-map-region.dto';
 import { CreateCampusMapRoadDto } from './dto/create-campus-map-road.dto';
 import { UpdateCampusMapRoadDto } from './dto/update-campus-map-road.dto';
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('campusMapRegions')
 export class CampusMapController {
   constructor(private readonly service: CampusMapService) {}
 
-  @Roles('student', 'faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'CampusMap'))
   @Get()
   async listRegions(@Query() query: CampusMapQueryDto) {
     const result = await this.service.findRegions(query);
@@ -36,21 +39,21 @@ export class CampusMapController {
     });
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'CampusMap'))
   @Get(':id')
   async getRegion(@Param('id') id: string) {
     const data = await this.service.findRegionById(id);
     return ok(data);
   }
 
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('create', 'CampusMap'))
   @Post()
   async createRegion(@Body() body: CreateCampusMapRegionDto) {
     const data = await this.service.createRegion(body);
     return ok(data);
   }
 
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('update', 'CampusMap'))
   @Patch(':id')
   async updateRegion(
     @Param('id') id: string,
@@ -60,7 +63,7 @@ export class CampusMapController {
     return ok(data);
   }
 
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('delete', 'CampusMap'))
   @Delete(':id')
   async deleteRegion(@Param('id') id: string) {
     const data = await this.service.deleteRegion(id);
@@ -68,12 +71,12 @@ export class CampusMapController {
   }
 }
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('campusMapRoads')
 export class CampusMapRoadsController {
   constructor(private readonly service: CampusMapService) {}
 
-  @Roles('student', 'faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'CampusMap'))
   @Get()
   async listRoads(@Query() query: CampusMapQueryDto) {
     const result = await this.service.findRoads(query);
@@ -84,21 +87,21 @@ export class CampusMapRoadsController {
     });
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'CampusMap'))
   @Get(':id')
   async getRoad(@Param('id') id: string) {
     const data = await this.service.findRoadById(id);
     return ok(data);
   }
 
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('create', 'CampusMap'))
   @Post()
   async createRoad(@Body() body: CreateCampusMapRoadDto) {
     const data = await this.service.createRoad(body);
     return ok(data);
   }
 
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('update', 'CampusMap'))
   @Patch(':id')
   async updateRoad(
     @Param('id') id: string,
@@ -108,10 +111,11 @@ export class CampusMapRoadsController {
     return ok(data);
   }
 
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('delete', 'CampusMap'))
   @Delete(':id')
   async deleteRoad(@Param('id') id: string) {
     const data = await this.service.deleteRoad(id);
     return ok(data);
   }
 }
+

@@ -10,24 +10,27 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomQueryDto } from './dto/room-query.dto';
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('rooms')
 export class RoomsController {
   constructor(private readonly service: RoomsService) {}
 
-  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
+  @CheckPolicies((ability) => ability.can('read', 'Room'))
   @Get()
   findMany(@Query() query: RoomQueryDto) {
     return this.service.findMany(query);
   }
 
-  @Roles('student', 'faculty', 'admin', 'moderator', 'college_admin')
+  @CheckPolicies((ability) => ability.can('read', 'Room'))
   @Get('availability')
   getAvailability(
     @Query('building') building: string,
@@ -36,27 +39,28 @@ export class RoomsController {
     return this.service.getAvailability(building, floor ? parseInt(floor as any) : undefined);
   }
 
-  @Roles('faculty', 'admin', 'moderator', 'college_admin')
+  @CheckPolicies((ability) => ability.can('read', 'Room'))
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.service.findOne(id);
   }
 
-  @Roles('admin', 'college_admin')
+  @CheckPolicies((ability) => ability.can('create', 'Room'))
   @Post()
   create(@Body() body: CreateRoomDto) {
     return this.service.create(body);
   }
 
-  @Roles('admin', 'college_admin')
+  @CheckPolicies((ability) => ability.can('update', 'Room'))
   @Patch(':id')
   update(@Param('id') id: string, @Body() body: Partial<CreateRoomDto>) {
     return this.service.update(id, body);
   }
 
-  @Roles('admin', 'college_admin')
+  @CheckPolicies((ability) => ability.can('delete', 'Room'))
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.delete(id);
   }
 }
+

@@ -26,16 +26,19 @@ import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { CreateWaiverRequestDto } from './dto/create-waiver-request.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { attendanceSchema } from '@shared/schemas/erp';
+import { attendanceSchema } from '@pec/shared';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 
-@UseGuards(AuthGuard, RolesGuard)
+
+
+
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('attendance')
 export class AttendanceController {
-  @Roles('faculty', 'college_admin')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('faculty-stats')
   async getFacultyStats(@Request() req: any) {
     const data = await this.attendanceService.getFacultyStats(req.user.sub);
@@ -44,7 +47,7 @@ export class AttendanceController {
 
   constructor(private readonly attendanceService: AttendanceService) {}
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('summary')
   async getSummary(@Request() req: any, @Query('studentId') studentId?: string) {
     const targetId = req.user?.role === 'student' ? req.user.sub : studentId;
@@ -53,14 +56,14 @@ export class AttendanceController {
     return ok(data);
   }
 
-  @Roles('student')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('waivers/my')
   async getMyWaiverRequests(@Request() req: any) {
     const data = await this.attendanceService.getWaiverRequestsForStudent(req.user.sub);
     return ok(data);
   }
 
-  @Roles('student')
+  @CheckPolicies((ability) => ability.can('create', 'Attendance'))
   @Post('waivers')
   @Throttle({ short: { limit: 10, ttl: 60000 } })
   async createWaiverRequest(
@@ -71,7 +74,7 @@ export class AttendanceController {
     return ok(data);
   }
 
-  @Roles('student')
+  @CheckPolicies((ability) => ability.can('create', 'Attendance'))
   @Post('waivers/upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadWaiverDocument(
@@ -86,7 +89,7 @@ export class AttendanceController {
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('waivers/files/:fileName')
   async streamWaiverDocument(
     @Param('fileName') fileName: string,
@@ -103,7 +106,7 @@ export class AttendanceController {
     return new StreamableFile(stream);
   }
 
-  @Roles('faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('export/:courseId')
   async exportExcel(
     @Param('courseId') courseId: string,
@@ -115,7 +118,7 @@ export class AttendanceController {
     res.send(buffer);
   }
 
-  @Roles('student')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('my/export')
   async exportMyExcel(
     @Request() req: any,
@@ -127,7 +130,7 @@ export class AttendanceController {
     res.send(buffer);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('predict')
   @Throttle({ short: { limit: 20, ttl: 60000 } })
   async getPrediction(@Request() req: any, @Query('studentId') studentId?: string, @Query('target') target?: string) {
@@ -138,7 +141,7 @@ export class AttendanceController {
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('create', 'Attendance'))
   @Post()
   async create(
     @Body(new ZodValidationPipe(attendanceSchema))
@@ -148,7 +151,7 @@ export class AttendanceController {
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get()
   async findAll(@Request() req: any, @Query() query: AttendanceQueryDto) {
     const effectiveQuery = { ...query };
@@ -164,14 +167,14 @@ export class AttendanceController {
     });
   }
 
-  @Roles('faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.attendanceService.findOne(id);
     return ok(data);
   }
 
-  @Roles('faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('update', 'Attendance'))
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -182,10 +185,11 @@ export class AttendanceController {
     return ok(data);
   }
 
-  @Roles('faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('delete', 'Attendance'))
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.attendanceService.remove(id);
     return ok(data);
   }
 }
+

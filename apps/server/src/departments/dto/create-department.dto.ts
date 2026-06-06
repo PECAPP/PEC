@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { departmentSchema } from '@shared/schemas/erp';
+import { departmentSchema } from '@pec/shared';
 
 export class CreateDepartmentDto {
   @ApiProperty({ example: 'Computer Science' })

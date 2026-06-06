@@ -14,12 +14,14 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/auth.guard';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserQueryDto } from './dto/user-query.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { userSchema } from '@shared/schemas/erp';
+import { userSchema } from '@pec/shared';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('users')

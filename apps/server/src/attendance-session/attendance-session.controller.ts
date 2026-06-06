@@ -11,18 +11,21 @@ import {
 } from '@nestjs/common';
 import { AttendanceSessionService } from './attendance-session.service';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { attendanceSessionSchema } from '@shared/schemas/erp';
+import { attendanceSessionSchema } from '@pec/shared';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { ok } from '../common/utils/api-response';
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('attendanceSessions')
 export class AttendanceSessionController {
   constructor(private readonly service: AttendanceSessionService) {}
 
-  @Roles('faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('create', 'AttendanceSession'))
   @Post()
   async create(
     @Body(new ZodValidationPipe(attendanceSessionSchema as any))
@@ -32,21 +35,21 @@ export class AttendanceSessionController {
     return ok(result);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'AttendanceSession'))
   @Get()
   async findAll(@Query() query: any) {
     const result = await this.service.findAll(query);
     return ok(result);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'AttendanceSession'))
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const result = await this.service.findOne(id);
     return ok(result);
   }
 
-  @Roles('faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('update', 'AttendanceSession'))
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -57,10 +60,11 @@ export class AttendanceSessionController {
     return ok(result);
   }
 
-  @Roles('faculty', 'admin')
+  @CheckPolicies((ability) => ability.can('delete', 'AttendanceSession'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const result = await this.service.remove(id);
     return ok(result);
   }
 }
+

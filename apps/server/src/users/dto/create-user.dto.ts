@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { userSchema } from '@shared/schemas/erp';
+import { userSchema } from '@pec/shared';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'John Doe' })
