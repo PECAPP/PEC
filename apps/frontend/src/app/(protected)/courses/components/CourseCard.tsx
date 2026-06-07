@@ -1,12 +1,12 @@
 'use client';
+import { Badge, Button, ImageWithBlur } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import { CheckCircle, Users, GraduationCap, Plus, X, ArrowRight, BookOpen } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ImageWithBlur } from '@/components/ui/image-with-blur';
+
 import { cn } from '@/lib/utils';
-import { Course } from '@/types/course';
+import { Course } from '@pec/shared';
 
 interface CourseCardProps {
   course: Course;
@@ -33,23 +33,23 @@ export function CourseCard({
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-20px" }}
-      className="card-elevated group overflow-hidden bg-card/90 backdrop-blur-sm border-border hover:border-primary/40 transition-all duration-300"
+      className="card-elevated group overflow-hidden bg-black/40 backdrop-blur-2xl border border-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all duration-500 rounded-3xl"
     >
-      <div className="h-44 w-full relative overflow-hidden bg-muted/20">
+      <div className="h-40 w-full relative overflow-hidden bg-black/50">
         <ImageWithBlur 
           src={image}
           alt={course.name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 group-hover:opacity-100" />
         
         <div className="absolute top-4 left-4 flex gap-2 z-10">
-          <Badge className="bg-background/80 backdrop-blur-md border-border/40 text-[10px] font-bold tracking-widest uppercase py-1 px-3">
+          <Badge className="bg-black/60 text-white backdrop-blur-md border border-white/10 text-[10px] font-bold tracking-widest uppercase py-1 px-3 shadow-sm">
              {course.code}
           </Badge>
           {enrolled && (
-            <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-bold tracking-widest uppercase py-1 px-3 backdrop-blur-md">
-              <CheckCircle className="w-3 h-3 mr-1.5" /> Enrolled
+            <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold tracking-widest uppercase py-1 px-3 backdrop-blur-xl shadow-sm rounded-full">
+              <CheckCircle className="w-3.5 h-3.5 mr-1.5" /> Enrolled
             </Badge>
           )}
         </div>
@@ -63,42 +63,42 @@ export function CourseCard({
         )}
       </div>
       
-      <div className="p-6 space-y-5">
+      <div className="p-5 space-y-5 relative">
         <div>
-          <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-1">
+          <h3 className="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors line-clamp-1 drop-shadow-md">
             {course.name}
           </h3>
-          <div className="flex items-center gap-2 mt-1.5 text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
-             <User className="w-3.5 h-3.5" />
-             <span className="truncate">{course.facultyName}</span>
+          <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-zinc-400 transition-colors group-hover:text-zinc-300">
+             <User className="w-3.5 h-3.5 opacity-70" />
+             <span className="truncate">{course.facultyName.replace(/\b[A-Z]+\b/g, m => m.charAt(0) + m.slice(1).toLowerCase())}</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 pb-1">
+        <div className="grid grid-cols-2 gap-4 pb-2">
           <div className="flex flex-col gap-1">
-             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Credits</span>
+             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Credits</span>
              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-primary/60" />
-                <span className="text-sm font-bold text-foreground/80">{course.credits} Units</span>
+                <BookOpen className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-zinc-200">{course.credits} Units</span>
              </div>
           </div>
           <div className="flex flex-col gap-1">
-             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Schedule</span>
+             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Schedule</span>
              <div className="flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-primary/60" />
-                <span className="text-sm font-bold text-foreground/80">Sem {course.semester}</span>
+                <GraduationCap className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-zinc-200">Sem {course.semester}</span>
              </div>
           </div>
         </div>
 
-        <div className="space-y-2.5 pt-4 border-t border-border/20">
-           <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-muted-foreground/60">
+        <div className="space-y-3 pt-4 border-t border-white/10">
+           <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-zinc-400">
               <span>Enrollment Status</span>
-              <span className={cn(isFull ? "text-destructive" : "text-primary")}>
+              <span className={cn(isFull ? "text-destructive font-extrabold" : "text-primary font-extrabold")}>
                 {course.enrolledStudents} / {course.maxStudents}
               </span>
            </div>
-           <div className="h-1.5 w-full bg-muted/40 rounded-full overflow-hidden border border-border/10 p-[1px]">
+           <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
               <motion.div 
                 initial={{ width: 0 }}
                 whileInView={{ width: `${Math.min(enrollmentRatio, 100)}%` }}
@@ -111,31 +111,32 @@ export function CourseCard({
            </div>
         </div>
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-2 pt-3 relative z-20">
           {!enrolled && !isFull && onEnroll && (
              <Button 
               onClick={() => onEnroll(course)}
-              className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all"
+              className="flex-1 h-10 rounded-xl bg-primary text-primary-foreground font-bold text-[9px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all"
             >
               Enroll Now
             </Button>
           )}
           
           <Button 
-            variant="outline" 
+            variant="ghost" 
             onClick={() => onView(course)} 
             className={cn(
-              "h-12 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all",
-              (enrolled || isFull) ? "flex-1" : "px-6"
+              "h-10 rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all group/btn bg-white/5 hover:bg-white/10 text-white border border-white/10",
+              (enrolled || isFull) ? "flex-1" : "px-5"
             )}
           >
              Catalog Details
+             <ArrowRight className="w-3 h-3 ml-2 opacity-0 -translate-x-2 transition-all group-hover/btn:opacity-100 group-hover/btn:translate-x-0 text-primary" />
           </Button>
 
           {enrolled && onDrop && (
             <Button 
-              variant="destructive"
-              className="h-12 w-12 rounded-xl text-destructive hover:bg-destructive/5 shrink-0"
+              variant="ghost"
+              className="h-10 w-10 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive hover:text-white border border-destructive/20 shrink-0 transition-all"
               onClick={() => onDrop(course.id)}
             >
               <X className="w-4 h-4" />

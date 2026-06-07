@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@pec/ui";
+
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,10 +8,20 @@ import {
   ShoppingBag,
   Plus,
   Search,
+  Filter,
   X,
   Heart,
   MessageCircle,
+  ChevronDown,
+  Tag,
+  Package,
   Loader2,
+  BookOpen,
+  Laptop,
+  Sofa,
+  Shirt,
+  Trophy,
+  PenTool,
   Grid3X3,
   List,
   SlidersHorizontal,
@@ -18,37 +30,768 @@ import {
   Edit2,
   Trash2,
   IndianRupee,
+  Eye,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import api from '@/lib/api';
+import api from "@pec/api";
 
-// Shared types and constants
-import { Listing, Chat } from './types';
-import { CATEGORIES, CONDITIONS, SORT_OPTIONS, CONDITION_COLORS } from './constants';
+// ─── Types ────────────────────────────────────────────────────────────────────
+interface Seller {
+  id: string;
+  name: string;
+  avatar?: string;
+  studentProfile?: { phone?: string };
+}
 
-// Subcomponents
-import ProductCard from './components/ProductCard';
-import ListingFormDialog from './components/ListingFormDialog';
-import ListingDetailDialog from './components/ListingDetailDialog';
-import ChatPanel from './components/ChatPanel';
+interface Listing {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  condition: string;
+  images: string[];
+  status: string;
+  sellerId: string;
+  seller: Seller;
+  _count?: { bookmarks: number };
+  createdAt: string;
+}
+
+interface ChatMessage {
+  id: string;
+  senderId: string;
+  text: string;
+  createdAt: string;
+  sender: { id: string; name: string; avatar?: string };
+}
+
+interface Chat {
+  id: string;
+  listingId: string;
+  buyerId: string;
+  listing: { id: string; title: string; images: string[]; price: number; sellerId: string };
+  buyer: { id: string; name: string; avatar?: string };
+  messages: ChatMessage[];
+  updatedAt: string;
+}
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const CATEGORIES = [
+  { value: 'Books', label: 'Books', icon: BookOpen },
+  { value: 'Electronics', label: 'Electronics', icon: Laptop },
+  { value: 'Furniture', label: 'Furniture', icon: Sofa },
+  { value: 'Clothing', label: 'Clothing', icon: Shirt },
+  { value: 'Sports', label: 'Sports', icon: Trophy },
+  { value: 'Stationery', label: 'Stationery', icon: PenTool },
+  { value: 'Other', label: 'Other', icon: Package },
+];
+
+const CONDITIONS = ['New', 'Like New', 'Good', 'Used', 'Poor'];
+
+const SORT_OPTIONS = [
+  { value: 'createdAt_desc', label: 'Newest First' },
+  { value: 'createdAt_asc', label: 'Oldest First' },
+  { value: 'price_asc', label: 'Price: Low to High' },
+  { value: 'price_desc', label: 'Price: High to Low' },
+];
+
+const CONDITION_COLORS: Record<string, string> = {
+  New: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/20',
+  'Like New': 'bg-blue-500/15 text-blue-600 border-blue-500/20',
+  Good: 'bg-yellow-500/15 text-yellow-600 border-yellow-500/20',
+  Used: 'bg-orange-500/15 text-orange-600 border-orange-500/20',
+  Poor: 'bg-red-500/15 text-red-600 border-red-500/20',
+};
+
+// ─── ProductCard ──────────────────────────────────────────────────────────────
+
+function ProductCard({
+  listing,
+  isBookmarked,
+  currentUserId,
+  ability,
+  onBookmark,
+  onChat,
+  onView,
+  onEdit,
+  onDelete,
+}: {
+  listing: Listing;
+  isBookmarked: boolean;
+  currentUserId: string;
+  ability: any;
+  onBookmark: (id: string) => void;
+  onChat: (listing: Listing) => void;
+  onView: (listing: Listing) => void;
+  onEdit: (listing: Listing) => void;
+  onDelete: (id: string) => void;
+}) {
+  const isMine = listing.sellerId === currentUserId;
+  const fallbackSrc = `https://placehold.co/400x300/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category || 'Product')}`;
+  const imgSrc = listing.images[0] || fallbackSrc;
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="group relative bg-card/90 backdrop-blur-sm border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300"
+    >
+      {/* Image */}
+      <div
+        className="relative aspect-[4/3] bg-muted cursor-pointer overflow-hidden"
+        onClick={() => onView(listing)}
+      >
+        <img
+          src={imgSrc}
+          alt={listing.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = `https://placehold.co/400x300/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category)}`;
+          }}
+        />
+        {listing.status === 'Sold' && (
+          <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+            <Badge className="bg-red-500 text-white text-sm px-3 py-1">SOLD</Badge>
+          </div>
+        )}
+        <div className="absolute top-3 right-3">
+          <Badge
+            variant="outline"
+            className={cn('text-[10px] font-bold uppercase tracking-wider border shadow-sm backdrop-blur-md bg-background/80', CONDITION_COLORS[listing.condition] ?? '')}
+          >
+            {listing.condition}
+          </Badge>
+        </div>
+        {!isMine && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onBookmark(listing.id); }}
+            className="absolute top-3 left-3 p-2 rounded-full bg-background/80 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:scale-110 active:scale-95"
+          >
+            <Heart
+              className={cn('w-4 h-4 transition-colors', isBookmarked ? 'fill-red-500 text-red-500' : 'text-muted-foreground')}
+            />
+          </button>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-4 space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <h3
+            className="font-bold text-base leading-tight line-clamp-2 cursor-pointer hover:text-primary transition-colors text-foreground"
+            onClick={() => onView(listing)}
+          >
+            {listing.title}
+          </h3>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-primary font-bold bg-primary/10 w-fit px-2.5 py-1 rounded-lg">
+          <IndianRupee className="w-4 h-4" />
+          <span className="text-lg tracking-tight">{listing.price.toLocaleString('en-IN')}</span>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <Badge variant="secondary" className="bg-secondary/20 text-secondary-foreground hover:bg-secondary/30 transition-colors">
+            {listing.category}
+          </Badge>
+          <span className="text-border">·</span>
+          <span className="truncate">{(listing.seller?.name || 'Unknown Seller')}</span>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-2 border-t border-border/40">
+          {(isMine) ? (
+            <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onEdit(listing)}>
+              <Edit2 className="w-3 h-3 mr-1.5" /> Edit
+            </Button>
+          ) : null}
+          {(isMine) ? (
+            <Button size="sm" variant="ghost" className="h-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onDelete(listing.id)}>
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          ) : null}
+          {!(isMine) ? (
+            <>
+              <Button size="sm" variant="outline" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider" onClick={() => onView(listing)}>
+                <Eye className="w-3 h-3 mr-1.5" /> View
+              </Button>
+              {listing.status !== 'Sold' && (
+                <Button size="sm" className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-primary shadow-glow transition-all" onClick={() => onChat(listing)}>
+                  <MessageCircle className="w-3 h-3 mr-1.5" /> Chat
+                </Button>
+              )}
+            </>
+          ) : null}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── ListingFormDialog ────────────────────────────────────────────────────────
+
+function ListingFormDialog({
+  open,
+  onClose,
+  onSuccess,
+  existing,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  existing?: Listing | null;
+}) {
+  const [form, setForm] = useState({
+    title: existing?.title ?? '',
+    description: existing?.description ?? '',
+    price: existing?.price?.toString() ?? '',
+    category: existing?.category ?? '',
+    condition: existing?.condition ?? '',
+    images: existing?.images?.join('\n') ?? '',
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setForm({
+        title: existing?.title ?? '',
+        description: existing?.description ?? '',
+        price: existing?.price?.toString() ?? '',
+        category: existing?.category ?? '',
+        condition: existing?.condition ?? '',
+        images: existing?.images?.join('\n') ?? '',
+      });
+    }
+  }, [open, existing]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title || !form.price || !form.category || !form.condition) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+    setLoading(true);
+    try {
+      const payload = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        price: parseFloat(form.price),
+        category: form.category,
+        condition: form.condition,
+        images: form.images.split('\n').map((s) => s.trim()).filter(Boolean),
+      };
+      if (existing) {
+        await api.patch(`/marketplace/listings/${existing.id}`, payload);
+        toast.success('Listing updated!');
+      } else {
+        await api.post('/marketplace/listings', payload);
+        toast.success('Listing created!');
+      }
+      onSuccess();
+      onClose();
+    } catch {
+      toast.error('Failed to save listing');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent aria-describedby={undefined} className="max-w-lg max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold tracking-tight">{existing ? 'Edit Listing' : 'Create New Listing'}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Title *</label>
+            <Input
+              placeholder="e.g. Physics textbook by H.C. Verma"
+              className="h-11 rounded-xl bg-background border-border/60 font-bold px-4 text-sm focus:ring-primary/20"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Category *</label>
+              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                <SelectTrigger className="h-11 rounded-xl border-border/60 font-bold text-sm">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Condition *</label>
+              <Select value={form.condition} onValueChange={(v) => setForm({ ...form, condition: v })}>
+                <SelectTrigger className="h-11 rounded-xl border-border/60 font-bold text-sm">
+                  <SelectValue placeholder="Select condition" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {CONDITIONS.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Price (₹) *</label>
+            <Input
+              type="number"
+              min="0"
+              placeholder="e.g. 250"
+              className="h-11 rounded-xl bg-background border-border/60 font-bold px-4 text-sm focus:ring-primary/20"
+              value={form.price}
+              onChange={(e) => setForm({ ...form, price: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Description</label>
+            <Textarea
+              rows={3}
+              placeholder="Describe your item — condition details, reason for selling, etc."
+              className="rounded-xl bg-background border-border/60 text-sm focus:ring-primary/20 p-4"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Image URLs (one per line)</label>
+            <Textarea
+              rows={2}
+              placeholder="https://example.com/image.jpg"
+              className="rounded-xl bg-background border-border/60 text-sm focus:ring-primary/20 p-4"
+              value={form.images}
+              onChange={(e) => setForm({ ...form, images: e.target.value })}
+            />
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Paste direct image links. Use Cloudinary or Imgur for uploads.</p>
+          </div>
+
+          <div className="flex gap-3 justify-end pt-4 border-t border-border/40">
+            <Button type="button" variant="outline" className="h-10 rounded-xl font-bold uppercase tracking-widest text-[10px]" onClick={onClose} disabled={loading}>Cancel</Button>
+            <Button type="submit" className="h-10 rounded-xl font-bold uppercase tracking-widest text-[10px] bg-primary shadow-glow transition-all" disabled={loading}>
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {existing ? 'Update' : 'Create Listing'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── ListingDetailDialog ──────────────────────────────────────────────────────
+
+function ListingDetailDialog({
+  listing,
+  isBookmarked,
+  currentUserId,
+  onClose,
+  onBookmark,
+  onChat,
+}: {
+  listing: Listing | null;
+  isBookmarked: boolean;
+  currentUserId: string;
+  onClose: () => void;
+  onBookmark: (id: string) => void;
+  onChat: (listing: Listing) => void;
+}) {
+  const [imgIdx, setImgIdx] = useState(0);
+  if (!listing) return null;
+  const isMine = listing.sellerId === currentUserId;
+  const images = listing.images.length > 0 ? listing.images : [`https://placehold.co/600x400/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category)}`];
+
+  return (
+    <Dialog open={!!listing} onOpenChange={onClose}>
+      <DialogContent aria-describedby={undefined} className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl">
+        <DialogTitle className="sr-only">{listing.title}</DialogTitle>
+        {/* Image Carousel */}
+        <div className="relative bg-muted/30 h-[250px] sm:h-[350px] w-full flex items-center justify-center overflow-hidden rounded-t-2xl">
+          <img
+            src={images[imgIdx]}
+            alt={listing.title}
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = `https://placehold.co/600x400/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category)}`;
+            }}
+          />
+          {images.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setImgIdx(i)}
+                  className={cn('w-2 h-2 rounded-full transition-colors', i === imgIdx ? 'bg-white' : 'bg-white/50')}
+                />
+              ))}
+            </div>
+          )}
+          {listing.status === 'Sold' && (
+            <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+              <Badge className="bg-red-500 text-white text-lg px-4 py-1.5">SOLD</Badge>
+            </div>
+          )}
+        </div>
+
+        <div className="p-6 space-y-5">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">{listing.title}</h2>
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <Badge variant="outline" className={cn('text-[10px] font-bold uppercase tracking-wider', CONDITION_COLORS[listing.condition] ?? '')}>
+                  {listing.condition}
+                </Badge>
+                <Badge variant="secondary" className="bg-secondary/20 text-secondary-foreground text-[10px] font-bold uppercase tracking-wider hover:bg-secondary/30">{listing.category}</Badge>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-3xl font-bold text-primary shrink-0 bg-primary/10 px-4 py-2 rounded-xl">
+              <IndianRupee className="w-6 h-6" />
+              <span className="tracking-tight">{listing.price.toLocaleString('en-IN')}</span>
+            </div>
+          </div>
+
+          {listing.description && (
+            <p className="text-sm text-muted-foreground leading-relaxed">{listing.description}</p>
+          )}
+
+          {/* Seller Info */}
+          <div className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg shrink-0">
+              {listing.seller?.avatar ? (
+                <img src={listing.seller?.avatar} alt={(listing.seller?.name || 'Unknown Seller')} className="w-12 h-12 rounded-full object-cover" />
+              ) : (
+                (listing.seller?.name || 'Unknown Seller').charAt(0).toUpperCase()
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-base text-foreground">{(listing.seller?.name || 'Unknown Seller')}</p>
+              {listing.seller?.studentProfile?.phone && (
+                <p className="text-sm font-medium text-muted-foreground mt-0.5 flex items-center gap-1">
+                  📞 {listing.seller?.studentProfile.phone}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Actions */}
+          {!isMine && listing.status !== 'Sold' && (
+            <div className="flex gap-4 pt-2 border-t border-border/40">
+              <Button
+                variant="outline"
+                className="flex-1 h-11 rounded-xl font-bold uppercase tracking-widest text-[10px]"
+                onClick={() => onBookmark(listing.id)}
+              >
+                <Heart className={cn('w-4 h-4 mr-2', isBookmarked ? 'fill-red-500 text-red-500' : '')} />
+                {isBookmarked ? 'Saved' : 'Save Item'}
+              </Button>
+              <Button className="flex-1 h-11 rounded-xl font-bold uppercase tracking-widest text-[10px] bg-primary shadow-glow transition-all" onClick={() => { onChat(listing); onClose(); }}>
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Contact Seller
+              </Button>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── ChatPanel ────────────────────────────────────────────────────────────────
+
+function ChatPanel({
+  open,
+  onClose,
+  listing,
+  currentUserId,
+  chats,
+  onChatsRefresh,
+}: {
+  open: boolean;
+  onClose: () => void;
+  listing: Listing | null;
+  currentUserId: string;
+  chats: Chat[];
+  onChatsRefresh: () => void;
+}) {
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [msgText, setMsgText] = useState('');
+  const [sending, setSending] = useState(false);
+  const [loadingChat, setLoadingChat] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
+
+  // When a listing is passed, auto-open that chat
+  useEffect(() => {
+    if (listing && open) {
+      openChatForListing(listing.id);
+    }
+  }, [listing, open]);
+
+  useEffect(() => {
+    if (!open) {
+      setActiveChatId(null);
+      setMessages([]);
+      setSearchQuery('');
+    }
+  }, [open]);
+
+  const openChatForListing = async (listingId: string) => {
+    setLoadingChat(true);
+    try {
+      const res = await api.post(`/marketplace/chats/listing/${listingId}`, {});
+      const raw = (res as any).data;
+      const chat = raw?.data ?? raw;
+      setActiveChatId(chat.id);
+      await loadMessages(chat.id);
+      onChatsRefresh();
+    } catch {
+      toast.error('Failed to open chat');
+    } finally {
+      setLoadingChat(false);
+    }
+  };
+
+  const openExistingChat = async (chatId: string) => {
+    setActiveChatId(chatId);
+    await loadMessages(chatId);
+  };
+
+  const loadMessages = async (chatId: string) => {
+    try {
+      const res = await api.get(`/marketplace/chats/${chatId}/messages`);
+      const raw = (res as any).data;
+      const data = raw?.data ?? raw;
+      setMessages(Array.isArray(data) ? data : []);
+    } catch {
+      toast.error('Failed to load messages');
+    }
+  };
+
+  const handleSend = async () => {
+    if (!msgText.trim() || !activeChatId) return;
+    setSending(true);
+    try {
+      const res = await api.post(`/marketplace/chats/${activeChatId}/messages`, { text: msgText.trim() });
+      const raw = (res as any).data;
+      const newMsg = raw?.data ?? raw;
+      setMessages((prev) => [...prev, newMsg]);
+      setMsgText('');
+      onChatsRefresh();
+    } catch {
+      toast.error('Failed to send message');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const safeChats = Array.isArray(chats) ? chats : [];
+  
+  // Filter chats by search query
+  const filteredChats = safeChats.filter(chat => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    const otherName = chat.buyer.id === currentUserId ? 'Seller' : chat.buyer.name;
+    return chat.listing.title.toLowerCase().includes(q) || otherName.toLowerCase().includes(q);
+  });
+
+  const activeChat = safeChats.find((c) => c.id === activeChatId);
+
+  return (
+    <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
+      <DialogContent aria-describedby={undefined} className="max-w-4xl max-h-[85vh] h-[800px] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl flex flex-col md:flex-row gap-0">
+        <DialogTitle className="sr-only">Marketplace Chats</DialogTitle>
+        
+        {/* Left Pane: Chat List */}
+        <div className={cn("w-full md:w-[350px] flex-col border-r border-border/40 bg-card/30", activeChatId ? "hidden md:flex" : "flex")}>
+          <div className="p-4 border-b border-border/40 shrink-0 space-y-3 bg-background/50 backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-lg tracking-tight">Messages</h2>
+              <Button variant="ghost" size="icon" onClick={onClose} className="md:hidden">
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search chats..." 
+                className="pl-9 h-10 rounded-xl bg-background/50 border-border/60 focus:bg-background"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
+            {filteredChats.length === 0 ? (
+              <div className="text-center text-sm font-medium text-muted-foreground p-8">
+                {searchQuery ? "No matching chats found." : "No conversations yet."}
+              </div>
+            ) : (
+              filteredChats.map((chat) => {
+                const lastMsg = chat.messages[0];
+                const isActive = chat.id === activeChatId;
+                const otherPersonName = chat.buyer.id === currentUserId ? 'Seller' : chat.buyer.name;
+                const avatarLetter = otherPersonName.charAt(0).toUpperCase();
+
+                return (
+                  <button
+                    key={chat.id}
+                    onClick={() => openExistingChat(chat.id)}
+                    className={cn(
+                      "w-full flex items-start gap-3 p-3 rounded-xl transition-all text-left",
+                      isActive ? "bg-primary/10 shadow-sm" : "hover:bg-muted/60"
+                    )}
+                  >
+                    <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-base font-bold shrink-0", isActive ? "bg-primary/20 text-primary" : "bg-secondary text-secondary-foreground")}>
+                      {avatarLetter}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={cn("text-sm font-bold truncate", isActive ? "text-primary" : "text-foreground")}>{chat.listing.title}</p>
+                        {lastMsg && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 opacity-60">
+                            {new Date(chat.updatedAt).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs font-medium text-muted-foreground truncate mt-0.5">
+                        <span className="text-foreground/70">{otherPersonName}:</span> {lastMsg ? lastMsg.text : 'No messages'}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <Badge variant="secondary" className="text-[9px] uppercase tracking-wider font-bold h-4 px-1.5 bg-primary/10 text-primary hover:bg-primary/20">
+                          ₹ {chat.listing.price.toLocaleString('en-IN')}
+                        </Badge>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Right Pane: Active Chat */}
+        <div className={cn("flex-1 flex-col bg-background/50 relative", !activeChatId ? "hidden md:flex" : "flex")}>
+          {activeChatId && activeChat ? (
+            <>
+              {/* Active Chat Header */}
+              <div className="px-4 md:px-5 py-3 md:py-4 border-b border-border/40 shrink-0 flex items-center gap-3 bg-card/40 backdrop-blur-md">
+                <button 
+                  className="md:hidden p-2 -ml-2 rounded-xl hover:bg-muted/80 text-muted-foreground"
+                  onClick={() => setActiveChatId(null)}
+                >
+                  <ChevronDown className="w-5 h-5 rotate-90" />
+                </button>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-lg truncate text-foreground leading-tight">{activeChat.listing.title}</h3>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mt-0.5">
+                    {activeChat.buyer.id === currentUserId ? 'Chatting with Seller' : `Chatting with ${activeChat.buyer.name}`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary shrink-0">
+                  <IndianRupee className="w-4 h-4" />
+                  <span className="font-bold tracking-tight">{activeChat.listing.price.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+
+              {/* Messages Area */}
+              <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4">
+                {loadingChat ? (
+                  <div className="flex-1 h-full flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary/50" />
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-60">
+                    <MessageCircle className="w-12 h-12 text-muted-foreground" />
+                    <p className="text-sm font-medium">Start the conversation!</p>
+                  </div>
+                ) : (
+                  messages.map((msg) => {
+                    const isMe = msg.senderId === currentUserId;
+                    return (
+                      <div key={msg.id} className={cn('flex gap-3', isMe && 'flex-row-reverse')}>
+                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-sm", isMe ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>
+                          {msg.sender.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className={cn('max-w-[70%] rounded-2xl px-4 py-2.5 text-sm font-medium shadow-sm', isMe ? 'bg-primary text-primary-foreground rounded-tr-sm shadow-glow' : 'bg-card border border-border/40 rounded-tl-sm text-foreground')}>
+                          {msg.text}
+                          <div className={cn('text-[9px] uppercase tracking-widest mt-1.5 font-bold', isMe ? 'text-primary-foreground/70' : 'text-muted-foreground opacity-70')}>
+                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Message Input Area */}
+              <div className="p-3 md:p-4 bg-card/40 backdrop-blur-md border-t border-border/40 shrink-0">
+                <div className="flex items-end gap-2 relative">
+                  <Textarea
+                    placeholder="Type your message..."
+                    value={msgText}
+                    onChange={(e) => setMsgText(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                    className="min-h-[52px] max-h-[120px] rounded-2xl resize-none bg-background/80 border-border/60 focus:ring-primary/20 p-3.5 pr-14 text-sm font-medium"
+                    rows={1}
+                  />
+                  <Button 
+                    size="icon" 
+                    onClick={handleSend} 
+                    disabled={sending || !msgText.trim()}
+                    className="absolute right-2 bottom-2 h-9 w-9 rounded-xl bg-primary shadow-glow transition-all"
+                  >
+                    {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4 fill-current" />}
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 opacity-50 relative">
+              <Button variant="ghost" size="icon" onClick={onClose} className="absolute top-4 right-4 md:hidden">
+                <X className="w-5 h-5" />
+              </Button>
+              <MessageCircle className="w-16 h-16 text-muted-foreground mb-4" />
+              <h3 className="font-bold text-xl text-foreground">Your Messages</h3>
+              <p className="text-sm font-medium text-muted-foreground mt-2 max-w-[250px]">Select a conversation from the sidebar to view your messages.</p>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function MarketplacePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, ability, loading: authLoading } = useAuth();
 
   const [tab, setTab] = useState<'browse' | 'my-listings' | 'saved'>('browse');
   const [listings, setListings] = useState<Listing[]>([]);
@@ -166,11 +909,22 @@ export default function MarketplacePage() {
   }, [search]);
 
   const handleBookmark = async (id: string) => {
+    // Optimistic Update
+    const isCurrentlyBookmarked = bookmarkedIds.has(id);
+    
+    setBookmarkedIds((prev) => {
+      const next = new Set(prev);
+      if (isCurrentlyBookmarked) next.delete(id); else next.add(id);
+      return next;
+    });
+
     try {
       const res = await api.post(`/marketplace/bookmarks/${id}`, {});
       const raw = (res as any).data;
       const data = raw?.data ?? raw;
       const { bookmarked } = data;
+      
+      // Sync with server source of truth
       setBookmarkedIds((prev) => {
         const next = new Set(prev);
         if (bookmarked) next.add(id);
@@ -180,6 +934,12 @@ export default function MarketplacePage() {
       toast.success(bookmarked ? 'Saved to bookmarks' : 'Removed from bookmarks');
       if (tab === 'saved') fetchSavedListings();
     } catch {
+      // Revert if API fails
+      setBookmarkedIds((prev) => {
+        const next = new Set(prev);
+        if (isCurrentlyBookmarked) next.add(id); else next.delete(id);
+        return next;
+      });
       toast.error('Failed to update bookmark');
     }
   };
@@ -546,6 +1306,7 @@ export default function MarketplacePage() {
                       listing={listing}
                       isBookmarked={bookmarkedIds.has(listing.id)}
                       currentUserId={currentUserId}
+                      ability={ability}
                       onBookmark={handleBookmark}
                       onChat={openChat}
                       onView={setViewingListing}
@@ -607,12 +1368,10 @@ export default function MarketplacePage() {
                             {listing.category}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {listing.seller.name}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{(listing.seller?.name || 'Unknown Seller')}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {listing.sellerId !== currentUserId ? (
+                        {!(listing.sellerId === currentUserId) ? (
                           <>
                             <button
                               onClick={() => handleBookmark(listing.id)}
@@ -639,35 +1398,21 @@ export default function MarketplacePage() {
                           </>
                         ) : (
                           <div className="flex gap-1">
-                            {listing.status === 'Available' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-7 text-xs"
-                                onClick={() => handleMarkSold(listing.id)}
-                              >
+                            {listing.status === 'Available' && (listing.sellerId === currentUserId) && (
+                              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleMarkSold(listing.id)}>
                                 <CheckCircle2 className="w-3 h-3 mr-1" /> Sold
                               </Button>
                             )}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-7 text-xs"
-                              onClick={() => {
-                                setEditingListing(listing);
-                                setFormOpen(true);
-                              }}
-                            >
-                              <Edit2 className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-7 text-xs text-destructive hover:text-destructive"
-                              onClick={() => handleDelete(listing.id)}
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
+                            {(listing.sellerId === currentUserId) && (
+                              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditingListing(listing); setFormOpen(true); }}>
+                                <Edit2 className="w-3 h-3" />
+                              </Button>
+                            )}
+                            {(listing.sellerId === currentUserId) && (
+                              <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDelete(listing.id)}>
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            )}
                           </div>
                         )}
                       </div>

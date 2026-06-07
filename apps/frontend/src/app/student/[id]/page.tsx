@@ -1,6 +1,7 @@
+import { Button } from "@pec/ui";
 import { StudentProfileView } from './ProfileView';
 import { User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import Link from 'next/link';
 import { getServerSession } from '@/lib/server-auth';
 

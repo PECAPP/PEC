@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Textarea, Badge, Switch, Label } from "@pec/ui";
+
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,14 +18,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import api from '@/lib/api';
+import api from "@pec/api";
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+
 import { MediaUpload, UploadedMedia } from '@/features/clubs/MediaUpload';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';

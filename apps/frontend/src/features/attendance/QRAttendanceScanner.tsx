@@ -1,11 +1,12 @@
+import { Button, Card, useToast } from "@pec/ui";
 import { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { collection, addDoc, query, where, getDocs, serverTimestamp } from '@/lib/dataClient';
-import { useToast } from '@/hooks/use-toast';
+
+import { useAttendanceControllerCreateV1 } from '@pec/api';
+
 import { usePermissions } from '@/hooks/usePermissions';
 import { Camera, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { AXIOS_INSTANCE } from "@pec/api";
 
 interface QRAttendanceScannerProps {
   onSuccess?: () => void;
@@ -99,49 +100,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
       // Yes, generator stored `uniqueId` in backend, but displays `uniqueId:timestamp` in QR.
       // So we query by `uniqueId`.
       
-      const sessionsQuery = query(
-        collection(({} as any), 'attendanceSessions'),
-        where('qrCode', '==', uniqueId), 
-        where('active', '==', true)
-      );
-
-      const sessionsSnapshot = await getDocs(sessionsQuery);
-
-      if (sessionsSnapshot.empty) {
-        setResult('error');
-        setMessage('Invalid or expired QR code');
-        toast({
-          title: 'Invalid QR Code',
-          description: 'This QR code is not valid or has expired',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      const sessionDoc = sessionsSnapshot.docs[0];
-      const sessionData = sessionDoc.data();
-
-      // Check if session is still valid (not expired)
-      const expiresAt = new Date(sessionData.expiresAt);
-      if (expiresAt < new Date()) {
-        setResult('error');
-        setMessage('Session has expired');
-        toast({
-          title: 'Session Expired',
-          description: 'This attendance session has ended',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // Check if student already marked attendance for this session
-      const attendanceQuery = query(
-        collection(({} as any), 'attendance'),
-        where('sessionId', '==', sessionDoc.id),
-        where('studentId', '==', user.uid)
-      );
-
-      const attendanceSnapshot = await getDocs(attendanceQuery);
+      // Session and attendance checks are handled by the backend API.
 
       if (!attendanceSnapshot.empty) {
         setResult('error');

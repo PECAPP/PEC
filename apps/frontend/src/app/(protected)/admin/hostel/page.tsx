@@ -1,36 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  AlertCircle, 
-  CheckCircle2, 
-  MessageSquare, 
-  Search, 
-  Send,
-  User,
-  MapPin,
-  RefreshCcw,
-  ShieldCheck,
-  Building2,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import { 
-  collection, 
-  query, 
-  where, 
-  onSnapshot, 
-  updateDoc, 
-  doc, 
-  serverTimestamp,
-  arrayUnion
-} from '@/lib/dataClient';
-
 interface HostelIssue {
   id: string;
   title: string;
@@ -56,40 +25,21 @@ export default function HostelAdmin() {
 
   useEffect(() => {
     // Simplified query without orderBy to avoid composite index requirement
-    const q = query(
-      collection(null as any, 'hostelIssues'),
-      where('status', '!=', 'archived')
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const issuesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as HostelIssue[];
-      
-      // Sort on client side
-      const sortedIssues = issuesData.sort((a, b) => {
-        const timeA = a.createdAt?.seconds || 0;
-        const timeB = b.createdAt?.seconds || 0;
-        return timeB - timeA;
-      });
-
-      setIssues(sortedIssues);
+    const fetchIssues = async () => {
+      const { data } = await customInstance.get('/api/v1/hostel-issues');
+      setIssues(data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
       setLoading(false);
-    }, (error) => {
-      console.error("Error fetching hostel issues:", error);
-      setLoading(false);
-    });
+    };
+    fetchIssues();
+    const intervalId = setInterval(fetchIssues, 5000);
+    const unsubscribe = () => clearInterval(intervalId);
 
-    return () => unsubscribe();
+      return () => unsubscribe();
   }, [selectedIssue?.id]);
 
   const updateStatus = async (issueId: string, newStatus: string) => {
     try {
-      await updateDoc(doc(null as any, 'hostelIssues', issueId), {
-        status: newStatus,
-        updatedAt: serverTimestamp()
-      });
+      await customInstance.patch(`/api/v1/hostel-issues/${issueId}`, { status: newStatus });
       toast.success(`Issue marked as ${newStatus}`);
     } catch (err) {
       toast.error('Failed to update status');
@@ -100,14 +50,9 @@ export default function HostelAdmin() {
     if (!newMessage.trim() || !selectedIssue) return;
 
     try {
-      await updateDoc(doc(null as any, 'hostelIssues', selectedIssue.id), {
-        responses: arrayUnion({
-          from: 'Maintenance Team',
-          message: newMessage,
-          timestamp: new Date()
-        }),
-        updatedAt: serverTimestamp()
-      });
+      await customInstance.post(`/api/v1/hostel-issues/${selectedIssue.id}/reply`, {
+          message: newMessage
+        });
       setNewMessage('');
       toast.success('Reply sent');
     } catch (err) {

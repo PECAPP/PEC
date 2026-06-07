@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Dialog, DialogContent } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -8,22 +10,9 @@ import {
   Clock,
   Upload,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-} from '@/components/ui/dialog';
+
 import { toast } from 'sonner';
-import api from '@/lib/api';
+import api from "@pec/api";
 import { extractData } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
 import PDFExportButton from '@/components/common/PDFExportButton';

@@ -1,4 +1,6 @@
 'use client';
+import { Button, Progress, Badge, Avatar, AvatarFallback, AvatarImage, Tabs, TabsContent, TabsList, TabsTrigger, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Textarea } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import {
@@ -14,18 +16,11 @@ import {
   Clock,
   Zap,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
-import api from '@/lib/api';
+import api from "@pec/api";
 import { extractData } from '@/lib/utils';
 
 export default function StudentProfile() {

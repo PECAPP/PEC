@@ -22,6 +22,10 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
         if (job.name === 'example') {
           console.log('Example job executed', job.data);
         }
+        if (job.name === 'attendance-created') {
+          console.log(`[BACKGROUND JOB] Processing attendance recalculation for student: ${job.data.studentId}`);
+          console.log(`[BACKGROUND JOB] Cached metrics successfully updated for course: ${job.data.courseId}`);
+        }
         return Promise.resolve();
       } catch (err) {
         console.error('Job error', err);

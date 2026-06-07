@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { attendanceSchema } from '@shared/schemas/erp';
+import { attendanceSchema } from '@pec/shared';
 
 export class UpdateAttendanceDto {
   @ApiPropertyOptional({ enum: ['present', 'absent', 'late'] })

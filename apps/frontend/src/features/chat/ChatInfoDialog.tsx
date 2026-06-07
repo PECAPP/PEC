@@ -1,3 +1,4 @@
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Button, Input, Textarea, Badge, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
 import { useState, useEffect } from "react";
 import { 
   Users, 
@@ -11,18 +12,8 @@ import {
   Hash,
   MessageCircle
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChatRoom } from "@/types/chat";
+
+import { ChatRoom } from '@pec/shared';
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { 
   getMembersForGroup,

@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { 
@@ -15,22 +17,16 @@ import {
   Filter,
   Activity
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
 import { toast } from 'sonner';
 import { useAction } from 'next-safe-action/hooks';
-import api from '@/lib/api';
+import api from "@pec/api";
 import { extractData, cn } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
 import PDFExportButton from '@/components/common/PDFExportButton';
 import BulkUpload from '@/components/BulkUpload';
 import { markBulkAttendanceAction } from '../actions';
 import { motion, AnimatePresence } from 'framer-motion';
-
 
 export default function AttendanceManager({ userId, userRole, initialData }: any) {
   const [courses, setCourses] = useState<any[]>(initialData?.courses || []);

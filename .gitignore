@@ -6,12 +6,13 @@ node_modules
 server/node_modules
 /.pnp
 .pnp.js
+.pnpm-store
 
 # Testing
 /coverage
 
 # Next.js
-.next/
+.next
 .turbo
 out
 # next-env.d.ts # Often recommended to keep for CI, but common in gitignore

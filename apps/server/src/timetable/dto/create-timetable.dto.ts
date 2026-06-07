@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { timetableSchema } from '@shared/schemas/erp';
+import { timetableSchema } from '@pec/shared';
 
 export class CreateTimetableDto {
   @ApiPropertyOptional({ example: 'uuid-course-id' })

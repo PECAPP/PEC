@@ -1,12 +1,13 @@
 'use client';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@pec/ui";
+
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 ;
 import { motion } from 'framer-motion';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { 
   GraduationCap, 
   Users, 
@@ -16,7 +17,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { toast } from 'sonner';
-import type { UserRole } from '@/types';
+import type { UserRole } from '@pec/shared';
 
 interface RoleOption {
   value: UserRole;

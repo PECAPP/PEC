@@ -1,52 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  ShoppingBag, 
-  Trash2, 
-  Edit2, 
-  Plus, 
-  Clock, 
-  XCircle, 
-  Loader2,
-  Package,
-  IndianRupee,
-  Search,
-  Truck,
-  MapPin,
-} from 'lucide-react';
-import { 
-  collection, 
-  query, 
-  onSnapshot, 
-  orderBy, 
-  doc, 
-  setDoc, 
-  deleteDoc, 
-  updateDoc, 
-  serverTimestamp 
-} from '@/lib/dataClient';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger,
-  DialogFooter
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 
 interface CanteenItem {
   id: string;
@@ -69,17 +23,24 @@ export default function CanteenManager() {
 
   useEffect(() => {
     // Real-time orders
-    const qOrders = query(collection(({} as any), 'canteenOrders'), orderBy('timestamp', 'desc'));
-    const unsubscribeOrders = onSnapshot(qOrders, (snapshot) => {
-      setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    const fetchOrders = async () => {
+      const { data } = await AXIOS_INSTANCE.get('/api/v1/canteen/orders');
+      setOrders(data);
+    };
+    fetchOrders();
+    const intervalId = setInterval(fetchOrders, 5000);
+    const unsubscribeOrders = () => clearInterval(intervalId);
 
     // Menu items
-    const qItems = query(collection(({} as any), 'canteenItems'));
-    const unsubscribeItems = onSnapshot(qItems, (snapshot) => {
-      setItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as CanteenItem)));
+    const fetchItems = async () => {
+      try {
+        const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/night-canteen/items');
+        setItems(Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []));
+      } catch(e) { console.error(e); }
       setLoading(false);
-    });
+    };
+    fetchItems();
+    const unsubscribeItems = () => {};
 
     return () => {
       unsubscribeOrders();
@@ -95,13 +56,11 @@ export default function CanteenManager() {
 
     try {
       const id = editingItem.id || editingItem.name.toLowerCase().replace(/\s+/g, '_');
-      await setDoc(doc(({} as any), 'canteenItems', id), {
-        ...editingItem,
-        id,
-        isAvailable: editingItem.isAvailable ?? true,
-        stock: editingItem.stock ?? 100,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
+      if (editingItem.id) {
+        await AXIOS_INSTANCE.patch('/api/v1/night-canteen/items/' + id, { ...editingItem, id, isAvailable: editingItem.isAvailable ?? true, stock: editingItem.stock ?? 100 });
+      } else {
+        await AXIOS_INSTANCE.post('/api/v1/night-canteen/items', { ...editingItem, id, isAvailable: editingItem.isAvailable ?? true, stock: editingItem.stock ?? 100 });
+      }
       
       toast.success(editingItem.id ? 'Item updated' : 'Item added');
       setIsDialogOpen(false);
@@ -114,7 +73,7 @@ export default function CanteenManager() {
   const handleDeleteItem = async (id: string) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
     try {
-      await deleteDoc(doc(({} as any), 'canteenItems', id));
+      await AXIOS_INSTANCE.delete('/api/v1/night-canteen/items/' + id);
       toast.success('Item deleted');
     } catch (error) {
       toast.error('Failed to delete item');
@@ -123,9 +82,7 @@ export default function CanteenManager() {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      await updateDoc(doc(({} as any), 'canteenOrders', orderId), {
-        status: newStatus
-      });
+      await AXIOS_INSTANCE.patch('/api/v1/night-canteen/orders/' + orderId, { status: newStatus });
       toast.success(`Order marked as ${newStatus}`);
     } catch (error) {
       toast.error('Failed to update status');
@@ -416,7 +373,7 @@ export default function CanteenManager() {
                         <Switch 
                           checked={item.isAvailable} 
                           onCheckedChange={async (v) => {
-                            await updateDoc(doc(({} as any), 'canteenItems', item.id), { isAvailable: v });
+                            await AXIOS_INSTANCE.patch('/api/v1/night-canteen/items/' + item.id, { isAvailable: v });
                             toast.info(`${item.name} is now ${v ? 'Available' : 'Unavailable'}`);
                           }}
                         />

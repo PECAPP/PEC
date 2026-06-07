@@ -26,7 +26,6 @@ export async function createUserWithRole(params: {
       update: {
         name: params.name,
         password: params.passwordHash,
-        role: params.role,
         githubUsername: params.githubUsername ?? null,
         linkedinUsername: params.linkedinUsername ?? null,
         isPublicProfile: params.isPublicProfile ?? true,
@@ -39,7 +38,6 @@ export async function createUserWithRole(params: {
         email: params.email,
         name: params.name,
         password: params.passwordHash,
-        role: params.role,
         githubUsername: params.githubUsername ?? null,
         linkedinUsername: params.linkedinUsername ?? null,
         isPublicProfile: params.isPublicProfile ?? true,

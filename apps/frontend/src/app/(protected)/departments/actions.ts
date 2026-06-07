@@ -4,7 +4,7 @@ import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { logActivity } from '@/lib/logger';
 import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
-import { departmentSchema } from '@/lib/schemas';
+import { departmentSchema } from '@pec/shared';
 
 const API = resolveInternalApiBaseUrl();
 

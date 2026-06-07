@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { RolePermissions, UserRole, getRolePermissions } from '@/features/auth/lib/rolePermissions';
-import { authClient } from '@/lib/auth-client';
-import { buildApiUrl } from '@/lib/api-base';
+import {  authClient  } from "@pec/api";
+import {  buildApiUrl  } from "@pec/api";
 import { AppAbility, buildAbilityFor } from '@/lib/casl-ability';
 
 export interface CurrentUser {

@@ -1,4 +1,6 @@
 'use client';
+import { Button, Badge } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import {
@@ -15,8 +17,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+
 import { toast } from 'sonner';
 
 const container = {

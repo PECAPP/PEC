@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Textarea, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -18,31 +20,12 @@ import {
   Loader2,
   RefreshCw,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { extractData, cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
-import api from '@/lib/api';
-import { fetchAllPages } from '@/lib/fetchAllPages';
+import api from "@pec/api";
+
 
 import { HostelIssue } from './types';
 
@@ -129,9 +112,9 @@ export default function HostelIssuesPage() {
 
     try {
       setLoading(true);
-      const data = await fetchAllPages<HostelIssue>('/hostelIssues', {
+      const data = extractData<any>((await api.get('/hostelIssues', { params: { ...{
         studentId: user.uid,
-      });
+      }, limit: 2000 } })).data);
       setIssues(Array.isArray(data) ? data : []);
       setAuthFailed(false);
     } catch (error: any) {

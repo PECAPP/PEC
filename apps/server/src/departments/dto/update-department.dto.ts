@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { departmentSchema } from '@shared/schemas/erp';
+import { departmentSchema } from '@pec/shared';
 
 export class UpdateDepartmentDto {
   @ApiPropertyOptional() name?: string;

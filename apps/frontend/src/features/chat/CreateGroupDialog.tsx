@@ -1,16 +1,8 @@
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Button, Badge } from "@pec/ui";
 import { useState, useEffect } from "react";
 import { Search, Loader2, X, Check } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import api from "@/lib/api";
+
+import api from "@pec/api";
 import { createGroupRoom } from "@/lib/chatRooms.service";
 import { toast } from "sonner";
 

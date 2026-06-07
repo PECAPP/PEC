@@ -3,7 +3,7 @@
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { actionClient } from '@/lib/safe-action';
-import { departmentSchema } from '@/lib/schemas';
+import { departmentSchema } from '@pec/shared';
 import { logActivity } from '@/lib/logger';
 import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
 import { z } from 'zod';

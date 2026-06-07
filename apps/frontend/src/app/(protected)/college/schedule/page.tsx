@@ -1,4 +1,6 @@
 'use client';
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -10,14 +12,6 @@ import {
   MapPin,
   Users,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const scheduleData = [
   {

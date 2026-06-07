@@ -1,4 +1,6 @@
 "use client";
+import { Button } from "@pec/ui";
+
 
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -8,7 +10,7 @@ import { ChatSidebar } from "@/features/chat/ChatSidebar";
 import { ChatMessage } from "@/features/chat/ChatMessage";
 import { ChatInput } from "@/features/chat/ChatInput";
 import { ChatInfoDialog } from "@/features/chat/ChatInfoDialog";
-import { Button } from "@/components/ui/button";
+
 import { EmptyState, StatePanel } from "@/components/common/AsyncState";
 
 import { useChatRooms } from "@/hooks/use-chat-rooms";

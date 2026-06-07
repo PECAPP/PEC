@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Textarea, Badge, Progress, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
+
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -24,29 +26,10 @@ import {
   Calendar,
   Eye,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
-import api from '@/lib/api';
+import api from "@pec/api";
 
 import { Project, Skill } from './types';
 import { skillCategories, emptyProjectForm, emptySkillForm } from './constants';

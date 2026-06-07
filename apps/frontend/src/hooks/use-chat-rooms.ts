@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChatRoom } from "@/types/chat";
+import { ChatRoom } from '@pec/shared';
 import { fetchChatRooms } from "@/lib/chatRooms.service";
 
 export function useChatRooms(user: any, initialRooms?: ChatRoom[]) {

@@ -1,11 +1,11 @@
 'use client';
+import { extractData } from "@/lib/utils";
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { User, Course, DashboardStats, AdminDashboardData } from '@pec/shared';
-import api from '@/lib/api';
-import { fetchAllPages } from '@/lib/fetchAllPages';
+import { User, Course, DashboardStats, AdminDashboardData } from '../../shared/types';
+import api from "@pec/api";
 import { toast } from 'sonner';
 
 export function useAdminDashboard(initialData?: AdminDashboardData) {
@@ -76,8 +76,8 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
   const fetchAdminData = useCallback(async () => {
     try {
       const [coursesData, usersData, statsRes] = await Promise.all([
-        fetchAllPages<any>('/courses'),
-        fetchAllPages<any>('/users'),
+        api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
+        api.get('/users', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
         api.get('/admin/dashboard-stats'),
       ]);
 

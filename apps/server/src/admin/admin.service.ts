@@ -7,8 +7,8 @@ import * as bcrypt from 'bcrypt';
 export class AdminService {
   async getDashboardStats() {
     const [students, faculty, courses, departments] = await Promise.all([
-      this.prisma.user.count({ where: { role: 'student' } }),
-      this.prisma.user.count({ where: { role: 'faculty' } }),
+      this.prisma.user.count({ where: { roles: { some: { role: { name: 'student' } } } } }),
+      this.prisma.user.count({ where: { roles: { some: { role: { name: 'faculty' } } } } }),
       this.prisma.course.count({ where: { deletedAt: null } }),
       this.prisma.department.count(),
     ]);

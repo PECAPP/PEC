@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Textarea, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -21,12 +23,10 @@ import {
   FileText,
   Clock,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
-import api from '@/lib/api';
+import api from "@pec/api";
 
 // Shared types
 import { Publication, Award as FacultyAward, Conference, Consultation, FullProfile } from './types';

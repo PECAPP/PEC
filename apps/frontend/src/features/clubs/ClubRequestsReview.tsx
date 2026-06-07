@@ -1,12 +1,12 @@
 'use client';
+import { Button, Textarea, Badge } from "@pec/ui";
+
 
 import { useEffect, useState } from 'react';
 import { Loader2, Check, X, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+
 import { toast } from 'sonner';
-import api from '@/lib/api';
+import api from "@pec/api";
 
 interface ClubJoinRequest {
   id: string;

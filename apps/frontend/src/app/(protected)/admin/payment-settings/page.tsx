@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, RadioGroup, RadioGroupItem } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -12,22 +14,12 @@ import {
   EyeOff,
   Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import api from '@/lib/api';
+import api from "@pec/api";
 
 type PaymentMethod = 'razorpay' | 'upi' | 'bank';
 

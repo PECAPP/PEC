@@ -1,4 +1,6 @@
 'use client';
+import { Card, CardContent, Button } from "@pec/ui";
+
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,8 +22,7 @@ import {
   CalendarDays,
   BookMarked
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+
 import { HelpContent } from '@/features/help/HelpContent';
 import Link from 'next/link';
 

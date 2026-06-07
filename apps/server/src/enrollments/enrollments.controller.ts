@@ -18,11 +18,14 @@ import { EnrollmentQueryDto } from './dto/enrollment-query.dto';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
 import { UpdateEnrollmentDto } from './dto/update-enrollment.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { enrollmentSchema } from '@shared/schemas/erp';
+import { enrollmentSchema } from '@pec/shared';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 
 interface AuthenticatedRequest {
   user?: {
@@ -32,12 +35,12 @@ interface AuthenticatedRequest {
   };
 }
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('enrollments')
 export class EnrollmentsController {
   constructor(private readonly enrollmentsService: EnrollmentsService) {}
 
-  @Roles('student', 'faculty', 'college_admin')
+  @CheckPolicies((ability) => ability.can('read', 'Enrollment'))
   @Get()
   async findAll(@Request() req: AuthenticatedRequest, @Query() query: EnrollmentQueryDto) {
     const effectiveQuery = { ...query };
@@ -53,7 +56,7 @@ export class EnrollmentsController {
     });
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('create', 'Enrollment'))
   @Post()
   async create(
     @Request() req: AuthenticatedRequest,
@@ -70,7 +73,7 @@ export class EnrollmentsController {
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('update', 'Enrollment'))
   @Patch(':id')
   async update(
     @Request() req: AuthenticatedRequest,
@@ -93,7 +96,7 @@ export class EnrollmentsController {
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'college_admin')
+  @CheckPolicies((ability) => ability.can('delete', 'Enrollment'))
   @Delete()
   async remove(
     @Request() req: any, 
@@ -105,3 +108,4 @@ export class EnrollmentsController {
     return ok(result);
   }
 }
+

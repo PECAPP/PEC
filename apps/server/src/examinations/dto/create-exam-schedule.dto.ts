@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { examinationSchema } from '@shared/schemas/erp';
+import { examinationSchema } from '@pec/shared';
 
 export class CreateExamScheduleDto {
   @ApiProperty({ example: 'uuid-course-id' })

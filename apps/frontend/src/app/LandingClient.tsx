@@ -1,4 +1,6 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import dynamic from 'next/dynamic';
 import { motion } from "framer-motion";
@@ -17,7 +19,6 @@ const IntegrationsSection = dynamic(() => import('@/features/landing/Integration
   loading: () => <div className="h-screen bg-black animate-pulse" />,
 });
 
-
 const FAQSection = dynamic(() => import('@/features/landing/FAQSection').then(mod => mod.FAQSection), {
   loading: () => <div className="h-[50vh] bg-black animate-pulse" />,
 });
@@ -26,7 +27,6 @@ const Footer = dynamic(() => import('@/features/landing/Footer').then(mod => mod
   loading: () => <div className="h-64 bg-black animate-pulse" />,
 });
 
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 

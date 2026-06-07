@@ -1,4 +1,4 @@
-import { User } from "@/types";
+import { User } from '@pec/shared';
 
 /**
  * Permission utility functions for role-based access control

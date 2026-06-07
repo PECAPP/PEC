@@ -1,5 +1,6 @@
+import { Button } from "@pec/ui";
 import { ChevronLeft, ChevronRight, Palette } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 

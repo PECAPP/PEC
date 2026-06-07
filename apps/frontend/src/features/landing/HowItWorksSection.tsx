@@ -1,10 +1,11 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { CheckCircle, Zap, ArrowRight } from "lucide-react";
 import { stepsData } from "@/data/landingData";
-import { Button } from "@/components/ui/button";
 
 export function HowItWorksSection() {
   return (

@@ -1,4 +1,6 @@
 'use client';
+import { Button, Badge, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@pec/ui";
+
 
 import { useDeferredValue, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,19 +8,7 @@ import {
  Users as UsersIcon, UserPlus, Edit, Trash2, Download,
  Shield, ShieldOff, ShieldCheck, Loader2, Search
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import {
- Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
-import {
- Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from '@/components/ui/dialog';
-import {
- DropdownMenu, DropdownMenuContent, DropdownMenuItem,
- DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';

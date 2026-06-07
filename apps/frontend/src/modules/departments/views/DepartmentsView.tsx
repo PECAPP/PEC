@@ -1,20 +1,18 @@
 'use client';
+import { Button, Input, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@pec/ui";
+
 
 import { useState, useTransition, useEffect, useOptimistic } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { departmentSchema, DepartmentInput } from '@/lib/schemas';
+import { departmentSchema, DepartmentInput } from '@pec/shared';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
  Building2, Users, GraduationCap,
  Plus, Edit, Trash2, Upload, Download, Loader2, Search
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
- Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog';
+
 import { toast } from 'sonner';
 import BulkUpload from '@/components/BulkUpload';
 import { useAction } from 'next-safe-action/hooks';

@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -12,15 +14,6 @@ import {
   Download,
   Eye,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const admissions = [
   {

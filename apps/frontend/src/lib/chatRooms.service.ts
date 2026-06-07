@@ -1,5 +1,5 @@
-import api from "@/lib/api";
-import { ChatRoom } from "@/types/chat";
+import api from "@pec/api";
+import { ChatRoom } from '@pec/shared';
 
 export async function findUserByEmail(email: string) {
   try {

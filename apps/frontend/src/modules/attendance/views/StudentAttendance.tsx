@@ -1,4 +1,6 @@
 'use client';
+import { Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Textarea, Button } from "@pec/ui";
+
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
@@ -14,22 +16,13 @@ import {
   Paperclip,
   CheckCircle2
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import api, { isAuthError } from '@/lib/api';
+
+import api, {  isAuthError  } from "@pec/api";
 import { extractData, cn } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+
 import { 
   RadialBarChart, 
   RadialBar, 
@@ -314,13 +307,13 @@ export default function StudentAttendance({ userId, initialData }: any) {
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-success/5 border border-success/10 space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-success/70">Attended</p>
-                  <p className="text-2xl font-bold font-display">{totalPresent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
+                <div className="p-4 rounded-xl bg-success/5 border border-success/20 space-y-1">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-success">Attended</p>
+                  <p className="text-xl font-bold font-display">{totalPresent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
                 </div>
-                <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/10 space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-destructive/70">Missed</p>
-                  <p className="text-2xl font-bold font-display">{totalAbsent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
+                <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20 space-y-1">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-destructive">Missed</p>
+                  <p className="text-xl font-bold font-display">{totalAbsent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
                 </div>
               </div>
             </div>
@@ -342,9 +335,9 @@ export default function StudentAttendance({ userId, initialData }: any) {
           <div className="pt-6">
             <button
               onClick={() => setIsWaiverDialogOpen(true)}
-              className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-glow hover:scale-[1.02] transition-all"
+              className="w-full h-10 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
             >
-              Request Waiver <ArrowRight className="w-4 h-4" />
+              Request Waiver <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -519,18 +512,20 @@ export default function StudentAttendance({ userId, initialData }: any) {
         <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-xl">
            <table className="w-full border-collapse">
              <thead>
-               <tr className="bg-muted/40 border-b border-border/40">
-                 <th className="py-4 px-8 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Code</th>
-                 <th className="py-4 px-8 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Course Name</th>
-                 <th className="py-4 px-8 text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Attended / Absent</th>
-                 <th className="py-4 px-8 text-right font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Percentage</th>
+               <tr className="border-b border-white/10">
+                 <th className="py-4 px-6 text-left font-bold text-[9px] uppercase tracking-widest text-zinc-400">Code</th>
+                 <th className="py-4 px-6 text-left font-bold text-[9px] uppercase tracking-widest text-zinc-400">Course Name</th>
+                 <th className="py-4 px-6 text-center font-bold text-[9px] uppercase tracking-widest text-zinc-400">Attended / Absent</th>
+                 <th className="py-4 px-6 text-right font-bold text-[9px] uppercase tracking-widest text-zinc-400">Percentage</th>
                </tr>
              </thead>
-             <tbody className="divide-y divide-border/20">
+             <tbody className="divide-y divide-white/5">
                {Array.isArray(courseAttendance) && courseAttendance.map(c => (
-                 <tr key={c.courseId} className="hover:bg-primary/[0.02] transition-colors group">
-                   <td className="py-5 px-8 font-mono text-xs font-bold text-primary/80">{c.courseCode}</td>
-                   <td className="py-5 px-8">
+                 <tr key={c.courseId} className="hover:bg-white/5 transition-colors group">
+                   <td className="py-4 px-6">
+                      <Badge className="bg-black/60 text-white border-white/10 px-2 py-0.5 text-[9px] font-bold tracking-widest">{c.courseCode}</Badge>
+                   </td>
+                   <td className="py-4 px-6">
                       {(() => {
                         const present = Number(c.present) || 0;
                         const absent = Number(c.absent) || 0;
@@ -540,18 +535,18 @@ export default function StudentAttendance({ userId, initialData }: any) {
 
                         return (
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{c.courseName}</span>
-                        <span className="text-[11px] font-semibold text-muted-foreground mt-1">
-                          Leaves left: {perCourseLeavesLeft}
+                        <span className="text-sm font-bold text-white transition-colors">{c.courseName}</span>
+                        <span className="text-[10px] font-semibold text-zinc-500 mt-0.5">
+                          Leaves left: <span className="text-zinc-300">{perCourseLeavesLeft}</span>
                         </span>
                       </div>
                         );
                       })()}
                    </td>
-                   <td className="py-5 px-8 text-center text-sm">
-                      <div className="inline-flex items-center gap-3 bg-muted/30 px-4 py-1.5 rounded-full border border-border/40 font-bold">
+                   <td className="py-4 px-6 text-center text-sm">
+                      <div className="inline-flex items-center gap-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/10 font-bold">
                         <span className="text-success">{c.present}</span>
-                        <span className="w-[1px] h-3 bg-border/60" />
+                        <span className="w-[1px] h-3 bg-white/20" />
                         <span className="text-destructive">{c.absent}</span>
                       </div>
                    </td>

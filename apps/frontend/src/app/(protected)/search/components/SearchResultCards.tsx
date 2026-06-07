@@ -1,7 +1,7 @@
 'use client';
+import { Card, CardContent, Badge } from "@pec/ui";
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+
 import { Calendar, Building2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

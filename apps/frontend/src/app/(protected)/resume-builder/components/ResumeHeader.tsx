@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@pec/ui";
 
 import { 
   FileText, 
@@ -9,7 +10,7 @@ import {
   ZoomOut, 
   Loader2 
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import { cn } from "@/lib/utils";
 
 interface ResumeHeaderProps {
@@ -77,61 +78,68 @@ export function ResumeHeader({
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {activeTab === "builder" && (
-              <>
-                <div className="flex items-center gap-1 bg-muted/30 rounded-sm border-2 border-border p-1 h-11">
+              <div className="flex items-center bg-muted/20 p-1.5 rounded-xl border border-border/50 shadow-sm gap-1">
+                {/* Zoom Controls */}
+                <div className="flex items-center gap-1 border-r border-border/50 pr-2 mr-1">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 hover:bg-primary/10"
+                    className="h-8 w-8 hover:bg-primary/10 rounded-lg"
                     onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))}
                   >
                     <ZoomOut className="w-4 h-4" />
                   </Button>
-                  <span className="text-[10px] font-bold w-12 text-center font-mono">
+                  <span className="text-[10px] font-bold w-10 text-center font-mono text-muted-foreground">
                     {Math.round(zoom * 100)}%
                   </span>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 hover:bg-primary/10"
+                    className="h-8 w-8 hover:bg-primary/10 rounded-lg"
                     onClick={() => setZoom((z) => Math.min(1.5, z + 0.1))}
                   >
                     <ZoomIn className="w-4 h-4" />
                   </Button>
                 </div>
                 
+                {/* Mode Toggle */}
                 <Button
-                  variant="outline"
-                  className="h-11 border font-semibold px-4 rounded-sm text-xs"
+                  variant={preview ? "secondary" : "ghost"}
+                  className={cn("h-8 px-3 rounded-lg text-xs font-semibold", preview && "bg-primary/10 text-primary")}
                   onClick={() => setPreview(!preview)}
                 >
-                  <Eye className="w-4 h-4 mr-2" />
-                  {preview ? "Edit Mode" : "Preview Mode"}
+                  <Eye className="w-3.5 h-3.5 mr-1.5" />
+                  {preview ? "Edit Mode" : "Preview"}
                 </Button>
 
+                {/* Save Button */}
                 <Button
-                  variant="outline"
-                  className="h-11 border font-semibold px-4 rounded-sm text-xs"
+                  variant="ghost"
+                  className={cn("h-8 px-3 rounded-lg text-xs font-semibold", hasUnsavedResumeChanges && "text-primary bg-primary/5")}
                   disabled={!hasUnsavedResumeChanges || isSavingResume}
                   onClick={handleSaveResume}
                 >
                   {isSavingResume ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   ) : (
                     <>
-                      <Save className={cn("w-4 h-4 mr-2", hasUnsavedResumeChanges && "text-primary")} />
-                      {hasUnsavedResumeChanges ? "Save Changes" : "Saved"}
+                      <Save className={cn("w-3.5 h-3.5 mr-1.5", hasUnsavedResumeChanges && "text-primary")} />
+                      {hasUnsavedResumeChanges ? "Save" : "Saved"}
                     </>
                   )}
                 </Button>
 
-                <Button className="h-11 bg-primary text-primary-foreground font-bold text-xs rounded-sm px-6 shadow-md hover:translate-y-[-1px] transition-all" onClick={downloadPDF}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Export PDF
+                {/* Export Button */}
+                <Button 
+                  className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-lg px-4 ml-1 shadow-md transition-all" 
+                  onClick={downloadPDF}
+                >
+                  <Download className="w-3.5 h-3.5 mr-1.5" />
+                  Export
                 </Button>
-              </>
+              </div>
             )}
           </div>
         </div>

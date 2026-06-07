@@ -43,7 +43,6 @@ export class UsersService {
         data: {
           name: data.fullName,
           email: data.email,
-          role: data.role,
           password: passwordHash,
           passwordChangedAt: new Date(),
           profileComplete: true,
@@ -117,7 +116,6 @@ export class UsersService {
         data: {
           ...(data.fullName ? { name: data.fullName } : {}),
           ...(data.email ? { email: data.email } : {}),
-          ...(data.role ? { role: data.role } : {}),
           ...(data.status
             ? {
                 lockedUntil:
@@ -233,7 +231,7 @@ export class UsersService {
     }
 
     const where: Prisma.UserWhereInput = {
-      ...(params?.role ? { role: params.role } : {}),
+      ...(params?.role ? { roles: { some: { role: { name: params.role } } } } : {}),
       ...(scopedDepartment || params?.semester
         ? {
             OR: [
@@ -354,7 +352,7 @@ export class UsersService {
       email: user.email,
       name: user.name,
       fullName: user.name,
-      role: user.role,
+      role: user.roles?.[0]?.role?.name ?? null,
       roles: user.roles.map((entry) => entry.role.name),
       avatar: user.avatar,
       profileComplete: user.profileComplete,

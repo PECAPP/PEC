@@ -1,11 +1,12 @@
 'use client';
+import { Button, Badge } from "@pec/ui";
+
 
 import type { Ref } from 'react';
 import { BookOpen, ArrowUpRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+
 import { EmptyState } from '@/components/common/AsyncState';
-import { Course } from '@/types';
+import { Course } from '@pec/shared';
 
 interface Props {
   enrolledCoursesList: Course[];

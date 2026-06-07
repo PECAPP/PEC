@@ -1,16 +1,14 @@
 'use client';
+import { Button, Input, Textarea, Badge } from "@pec/ui";
+
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Plus, Send, MessageSquare, Users, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import api from '@/lib/api';
+import api from "@pec/api";
 import { ClubProposalDialog } from '@/features/clubs/ClubProposalDialog';
 import { ClubRequestsReview } from '@/features/clubs/ClubRequestsReview';
 

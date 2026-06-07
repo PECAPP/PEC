@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@pec/ui";
+
 
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,11 +9,7 @@ import {
   Building2, Users, GraduationCap,
   Plus, Edit, Trash2, Upload, Download, Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog';
+
 import { toast } from 'sonner';
 import BulkUpload from '@/components/BulkUpload';
 import {

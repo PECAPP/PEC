@@ -1,8 +1,9 @@
+import { Button, Input, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@pec/ui";
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import api from "@pec/api";
 import {
   Bell,
   Search,
@@ -13,21 +14,12 @@ import {
   Menu,
 } from 'lucide-react';
 
-
 // import { auth } from '@/config/storage';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import { cn } from '@/lib/utils';
-import { authClient } from '@/lib/auth-client';
-import type { User as UserType } from '@/types';
+import {  authClient  } from "@pec/api";
+import type { User as UserType } from '@pec/shared';
 
 const CommandMenu = dynamic(() => import('@/components/layout/CommandMenu'), {
   ssr: false,
@@ -181,9 +173,6 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, sidebarW
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-
-
-
 
           {/* User Menu */}
           <DropdownMenu>

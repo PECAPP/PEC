@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCollegeSettings } from "@/hooks/useCollegeSettings";
-import api from "@/lib/api";
-import { doc, getDoc, updateDoc } from "@/lib/postgres-bridge";
+import api from "@pec/api";
+import { AXIOS_INSTANCE } from "@pec/api";
 import {
   ResumeData,
   PersonalInfo,
@@ -142,7 +142,14 @@ export function useResumeBuilder() {
     const fetchProfile = async () => {
       try {
         const localDraft = readLocalResumeDraft(user.uid);
-        const profileDoc = await getDoc(doc(({} as any), "studentProfiles", user.uid));
+        let profileDoc: any = { exists: () => false, data: () => ({}) };
+        try {
+          const { data: pRes } = await AXIOS_INSTANCE.get('/api/v1/student-portfolio?userId=' + user.uid);
+          const pData = pRes?.data || pRes;
+          if (pData) {
+            profileDoc = { exists: () => true, data: () => pData };
+          }
+        } catch (e) { /* no profile yet */ }
         if (profileDoc.exists()) {
           const profile = profileDoc.data();
           setResumeData((prev) => {
@@ -203,10 +210,10 @@ export function useResumeBuilder() {
     try {
       writeLocalResumeDraft(resumeData, user?.uid || null);
       if (user?.uid) {
-        await updateDoc(doc(({} as any), "studentProfiles", user.uid), {
-          phone: resumeData.personalInfo.phone || null,
-          address: resumeData.personalInfo.location || null,
-        });
+        await AXIOS_INSTANCE.patch('/api/v1/student-portfolio/' + user.uid, {
+            phone: resumeData.personalInfo.phone || null,
+            address: resumeData.personalInfo.location || null,
+          });
       }
       lastSavedResumeSnapshotRef.current = JSON.stringify(resumeData);
       setHasUnsavedResumeChanges(false);

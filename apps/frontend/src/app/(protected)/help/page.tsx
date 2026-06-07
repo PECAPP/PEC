@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle, Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@pec/ui";
+
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -17,15 +19,6 @@ import {
   Users,
   Settings
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 
 const faqs = [
   {

@@ -1,13 +1,15 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+
+
 import { ok } from '../common/utils/api-response';
 import { BackgroundJobsService } from './background-jobs.service';
 import { CreateBackgroundJobDto } from './dto/create-background-job.dto';
 
-@UseGuards(AuthGuard, RolesGuard)
-@Roles('admin')
+@UseGuards(AuthGuard, PoliciesGuard)
+  @CheckPolicies((ability) => ability.can('manage', 'all'))
 @Controller('background-jobs')
 export class BackgroundJobsController {
   constructor(private readonly backgroundJobsService: BackgroundJobsService) {}

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { enrollmentSchema } from '@shared/schemas/erp';
+import { enrollmentSchema } from '@pec/shared';
 
 export class CreateEnrollmentDto {
   @ApiProperty({ example: 'uuid-student-id' })

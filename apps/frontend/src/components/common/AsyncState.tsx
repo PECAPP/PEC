@@ -1,6 +1,6 @@
+import { Button, Skeleton } from "@pec/ui";
 import { CheckCircle2, AlertCircle, Inbox } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+
 import { cn } from '@/lib/utils';
 
 interface StatePanelProps {

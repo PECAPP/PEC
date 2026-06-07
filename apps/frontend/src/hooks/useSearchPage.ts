@@ -1,8 +1,10 @@
 'use client';
+import { extractData } from "@/lib/utils";
+import api from "@pec/api";
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { fetchAllPages } from '@/lib/fetchAllPages';
+
 import { searchableRoutes } from '@/utils/searchableRoutes';
 
 export function useSearchPage() {
@@ -25,9 +27,9 @@ export function useSearchPage() {
 
     try {
       const [usersRes, jobsRes, subjectsRes] = await Promise.allSettled([
-        fetchAllPages<any>('/users'),
-        fetchAllPages<any>('/jobs'),
-        fetchAllPages<any>('/courses'),
+        api.get('/users', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
+        api.get('/jobs', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
+        api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
       ]);
 
       const lowerTerm = term.trim().toLowerCase();

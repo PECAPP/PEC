@@ -1,4 +1,6 @@
 'use client';
+import { Button, Progress, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -12,15 +14,6 @@ import {
   PieChart,
   Calendar,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const feeBreakdown = [
   { category: 'Tuition Fee', collected: 28000000, total: 35000000 },

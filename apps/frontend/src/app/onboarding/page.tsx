@@ -1,25 +1,15 @@
- 'use client';
-
+'use client';
+import { Button, Input, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@pec/ui";
+ 
 import { useEffect, useActionState, useOptimistic } from 'react';
 import type { ElementType } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { GraduationCap, Users, Building2, Loader2, CheckCircle2, Shield, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
-import type { UserRole } from '@/types';
+import type { UserRole } from '@pec/shared';
 import { completeProfileStatefulAction } from './actions';
 
 const roleIcons: Record<UserRole, ElementType> = {

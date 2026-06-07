@@ -1,4 +1,6 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
@@ -14,8 +16,8 @@ import {
   MapPin,
   Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import api from '@/lib/api';
+
+import api from "@pec/api";
 import { extractData } from '@/lib/utils';
 import { EmptyState } from '@/components/common/AsyncState';
 

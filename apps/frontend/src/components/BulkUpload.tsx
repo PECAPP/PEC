@@ -1,16 +1,10 @@
+'use client';
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@pec/ui";
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Papa from 'papaparse';
 import * as ExcelJS from 'exceljs';
 import { Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 
 interface BulkUploadProps {
   entityType: 'users' | 'courses' | 'departments' | 'faculty' | 'fees' | 'timetable' | 'attendance' | 'grades' | 'exams' | 'assignments' | 'materials' | 'jobs';

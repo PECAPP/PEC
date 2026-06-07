@@ -1,14 +1,7 @@
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Button } from "@pec/ui";
 import { useState } from "react";
 import { Search, Loader2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+
 import { findUserByEmail, createOrFindDMRoom } from "@/lib/chatRooms.service";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { toast } from "sonner";

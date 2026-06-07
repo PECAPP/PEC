@@ -9,14 +9,17 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminService } from './admin.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { ok } from '../common/utils/api-response';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 
 @Controller('admin')
-@UseGuards(AuthGuard, RolesGuard)
-@Roles('admin', 'college_admin')
+@UseGuards(AuthGuard, PoliciesGuard)
+  @CheckPolicies((ability) => ability.can('read', 'Admin'))
 export class AdminController {
   @Get('dashboard-stats')
   @UseInterceptors(CacheInterceptor)
@@ -42,3 +45,4 @@ export class AdminController {
     return ok(results);
   }
 }
+

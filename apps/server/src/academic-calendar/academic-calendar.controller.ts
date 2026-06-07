@@ -16,12 +16,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AcademicCalendarService } from './academic-calendar.service';
 import { AiService } from '../ai/ai.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { CreateAcademicCalendarEventDto, UpdateAcademicCalendarEventDto } from './dto/create-academic-calendar-event.dto';
 
 @Controller('academic-calendar')
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 export class AcademicCalendarController {
   constructor(
     private readonly calendarService: AcademicCalendarService,
@@ -29,7 +32,7 @@ export class AcademicCalendarController {
   ) {}
 
   @Post('upload-pdf')
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('manage', 'all'))
   @UseInterceptors(FileInterceptor('file'))
   async uploadPdf(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
@@ -46,7 +49,7 @@ export class AcademicCalendarController {
   }
 
   @Post('upload-pdf-base64')
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('manage', 'all'))
   async uploadPdfBase64(@Body() body: { pdfBase64: string }) {
     const events = await this.aiService.parseAcademicCalendarPdf(body.pdfBase64);
 
@@ -57,7 +60,7 @@ export class AcademicCalendarController {
   }
 
   @Post('bulk-import')
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('manage', 'all'))
   async bulkImport(@Body() body: { events: CreateAcademicCalendarEventDto[] }, @Query('userId') userId?: string) {
     const createdEvents = await this.calendarService.replaceAll(body.events, userId);
 
@@ -93,26 +96,27 @@ export class AcademicCalendarController {
   }
 
   @Post()
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('manage', 'all'))
   async create(@Body() data: CreateAcademicCalendarEventDto, @Query('userId') userId?: string) {
     return this.calendarService.create(data, userId);
   }
 
   @Patch(':id')
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('manage', 'all'))
   async update(@Param('id') id: string, @Body() data: UpdateAcademicCalendarEventDto) {
     return this.calendarService.update(id, data);
   }
 
   @Delete(':id')
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('manage', 'all'))
   async delete(@Param('id') id: string) {
     return this.calendarService.delete(id);
   }
 
   @Delete()
-  @Roles('admin')
+  @CheckPolicies((ability) => ability.can('manage', 'all'))
   async deleteAll() {
     return this.calendarService.deleteAll();
   }
 }
+

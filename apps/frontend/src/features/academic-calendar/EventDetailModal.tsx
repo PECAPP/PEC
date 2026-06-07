@@ -1,9 +1,9 @@
 'use client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Badge, Button } from "@pec/ui";
+
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+
 import { 
   Calendar as CalendarIcon, 
   Clock, 
@@ -25,7 +25,7 @@ import {
   CATEGORY_LABELS,
   IMPORTANCE_COLORS,
 } from './calendar-utils';
-import api from '@/lib/api';
+import api from "@pec/api";
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -85,7 +85,6 @@ export function EventDetailModal({
       setIsDeleting(false);
     }
   };
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

@@ -1,7 +1,9 @@
 'use client';
+import { Button } from "@pec/ui";
+
 
 import { useActionState, useOptimistic, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+
 import { FileText, Loader2, Plus, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { enrollInCourseAction } from '../actions';

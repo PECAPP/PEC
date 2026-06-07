@@ -1,10 +1,11 @@
 'use client';
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@pec/ui";
+
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Server, Database, Clock, RefreshCcw, Cpu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { toast } from 'sonner';
 
 export default function ObservabilityAdmin() {

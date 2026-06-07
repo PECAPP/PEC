@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -19,17 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import {
-  addDoc,
-  collection,
-  db,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-} from '@/lib/dataClient';
+import { AXIOS_INSTANCE } from '@pec/api';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
@@ -99,26 +88,20 @@ export default function CampusMap() {
       try {
         const orgId = user?.organizationId;
 
-        // Fetch regions
-        let regionsQuery = collection(db, 'campusMapRegions');
-        if (orgId) {
-          regionsQuery = query(
-            collection(db, 'campusMapRegions'),
-            where('organizationId', '==', orgId)
-          ) as any;
-        }
-        const regionsSnap = await getDocs(regionsQuery);
-
+        let regionsSnap: any = { empty: true, docs: [] };
+        try {
+          const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/campus-map' + (orgId ? '?organizationId=' + orgId : ''));
+          const arr = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
+          regionsSnap = { empty: arr.length === 0, docs: arr.map((d: any) => ({ id: d.id, data: () => d })) };
+        } catch(e) { console.error('regions fetch err', e); }
+        
         // Fetch roads
-        let roadsQuery = collection(db, 'campusMapRoads');
-        if (orgId) {
-          roadsQuery = query(
-            collection(db, 'campusMapRoads'),
-            where('organizationId', '==', orgId)
-          ) as any;
-        }
-        const roadsSnap = await getDocs(roadsQuery);
-
+        let roadsSnap: any = { empty: true, docs: [] };
+        try {
+          const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/campus-map-roads' + (orgId ? '?organizationId=' + orgId : ''));
+          const arr = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
+          roadsSnap = { empty: arr.length === 0, docs: arr.map((d: any) => ({ id: d.id, data: () => d })) };
+        } catch(e) { console.error('roads fetch err', e); }
         if (regionsSnap.empty) {
           setRegions(
             defaultRegions.map((r, i) => ({
@@ -323,17 +306,15 @@ export default function CampusMap() {
 
       if (editingRegion.id && !editingRegion.id.startsWith('default-')) {
         // Update existing region record
-        await updateDoc(doc(db, 'campusMapRegions', editingRegion.id), regionData);
-        setRegions((prev) =>
-          prev.map((r) => (r.id === editingRegion.id ? { ...regionData, id: editingRegion.id } : r))
-        );
+        await AXIOS_INSTANCE.patch('/api/v1/campus-map/' + editingRegion.id, regionData);
+        setRegions(prev => prev.map(r => r.id === editingRegion.id ? { ...regionData, id: editingRegion.id } : r));
         toast.success('Region updated!');
       } else {
         // Create new region (replace only THIS default region, keep others)
-        const docRef = await addDoc(collection(db, 'campusMapRegions'), regionData);
-        setRegions((prev) => [
-          ...prev.filter((r) => r.id !== editingRegion.id), // Remove only the one being saved
-          { ...regionData, id: docRef.id },
+        const { data: docRef } = await AXIOS_INSTANCE.post('/api/v1/campus-map', regionData);
+        setRegions(prev => [
+          ...prev.filter(r => r.id !== editingRegion.id), // Remove only the one being saved
+          { ...regionData, id: (docRef?.id || docRef?.data?.id || "new-" + Date.now()) }
         ]);
         toast.success('Region added!');
       }
@@ -386,29 +367,23 @@ export default function CampusMap() {
       const orgId = user.organizationId;
 
       // First, delete all existing regions and roads for this org
-      const existingRegions = await getDocs(
-        query(collection(db, 'campusMapRegions'), where('organizationId', '==', orgId))
-      );
-      const existingRoads = await getDocs(
-        query(collection(db, 'campusMapRoads'), where('organizationId', '==', orgId))
-      );
-
+      const { data: existingRegionsRaw } = await AXIOS_INSTANCE.get('/api/v1/campus-map?organizationId=' + orgId);
+      const existingRegions = { docs: (Array.isArray(existingRegionsRaw?.data) ? existingRegionsRaw.data : existingRegionsRaw || []).map((d: any) => ({ id: d.id })) };
+      const { data: existingRoadsRaw } = await AXIOS_INSTANCE.get('/api/v1/campus-map-roads?organizationId=' + orgId);
+      const existingRoads = { docs: (Array.isArray(existingRoadsRaw?.data) ? existingRoadsRaw.data : existingRoadsRaw || []).map((d: any) => ({ id: d.id })) };
       for (const docSnap of existingRegions.docs) {
-        await deleteDoc(doc(db, 'campusMapRegions', docSnap.id));
+        await AXIOS_INSTANCE.delete('/api/v1/campus-map/' + docSnap.id);
       }
       for (const docSnap of existingRoads.docs) {
-        await deleteDoc(doc(db, 'campusMapRoads', docSnap.id));
+        await AXIOS_INSTANCE.delete('/api/v1/campus-map-roads/' + docSnap.id);
       }
 
       // Now save all current regions
       const savedRegions: MapRegion[] = [];
       for (const region of regions) {
         const { id, ...data } = region;
-        const newDoc = await addDoc(collection(db, 'campusMapRegions'), {
-          ...data,
-          organizationId: orgId,
-        });
-        savedRegions.push({ ...data, id: newDoc.id, organizationId: orgId });
+        const { data: newDoc } = await AXIOS_INSTANCE.post('/api/v1/campus-map', { ...data, organizationId: orgId });
+        savedRegions.push({ ...data, id: (newDoc?.id || newDoc?.data?.id || "new-" + Date.now()), organizationId: orgId });
       }
 
       // Save all current roads
@@ -416,11 +391,8 @@ export default function CampusMap() {
       for (const road of roads) {
         if (!road.points || road.points.length < 2) continue;
         const { id, ...data } = road;
-        const newDoc = await addDoc(collection(db, 'campusMapRoads'), {
-          ...data,
-          organizationId: orgId,
-        });
-        savedRoads.push({ ...data, id: newDoc.id, organizationId: orgId });
+        const { data: newDoc } = await AXIOS_INSTANCE.post('/api/v1/campus-map-roads', { ...data, organizationId: orgId });
+        savedRoads.push({ ...data, id: (newDoc?.id || newDoc?.data?.id || "new-" + Date.now()), organizationId: orgId });
       }
 
       // Update local state with new IDs
@@ -438,7 +410,7 @@ export default function CampusMap() {
   const deleteRoad = async (id: string) => {
     try {
       if (!id.startsWith('road-')) {
-        await deleteDoc(doc(db, 'campusMapRoads', id));
+        await AXIOS_INSTANCE.delete('/api/v1/campus-map-roads/' + id);
       }
       setRoads((prev) => prev.filter((r) => r.id !== id));
       toast.success('Road deleted');
@@ -451,7 +423,7 @@ export default function CampusMap() {
   const deleteRegion = async (id: string) => {
     try {
       if (!id.startsWith('default-')) {
-        await deleteDoc(doc(db, 'campusMapRegions', id));
+        await AXIOS_INSTANCE.delete('/api/v1/campus-map/' + id);
       }
       setRegions((prev) => prev.filter((r) => r.id !== id));
       setSelectedRegion(null);

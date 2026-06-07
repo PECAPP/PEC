@@ -298,7 +298,7 @@ export class FinanceRepository {
 
   async bulkCreateMonthlyFees(body: { category: string; amount: number; month: string; dueDate: string; description: string }) {
     const students = await this.prisma.user.findMany({
-      where: { role: 'student' },
+      where: { roles: { some: { role: { name: 'student' } } } },
       select: { id: true },
     });
 

@@ -1,9 +1,9 @@
 'use client';
 
+
 import { motion } from "framer-motion";
 import Link from 'next/link';
 import { Twitter, Linkedin, Facebook, Instagram } from "lucide-react";
-import GradualBlur from "@/components/ui/GradualBlur";
 
 const footerLinks = [
   {
@@ -93,17 +93,6 @@ export function Footer() {
         </div>
       </footer>
 
-      <GradualBlur
-        target="page"
-        position="bottom"
-        height="4rem"
-        strength={1.5}
-        divCount={4}
-        curve="bezier"
-        exponential={false}
-        opacity={0.8}
-        zIndex={500}
-      />
-    </>
+          </>
   );
 }

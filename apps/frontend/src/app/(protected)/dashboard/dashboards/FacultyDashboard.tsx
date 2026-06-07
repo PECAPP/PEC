@@ -1,8 +1,10 @@
 'use client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@pec/ui";
+
 
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
 import QRAttendanceGenerator from '@/features/attendance/QRAttendanceGenerator';
 import FacultyScheduleManager from '@/features/timetable/FacultyScheduleManager';
 import { useFacultyDashboard } from '@/hooks/useFacultyDashboard';
@@ -75,9 +77,10 @@ export function FacultyDashboard({ initialData, user: serverUser }: FacultyDashb
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <FacultyTodaySchedule
-            schedule={todaySchedule}
-            onViewFull={() => router.push('/timetable')}
-          />
+              schedule={todaySchedule}
+              onViewFull={() => router.push('/timetable')}
+              onGenerateQR={handleGenerateQR}
+            />
           <FacultyCoursesGrid courses={courseCards} onManage={() => router.push('/courses')} />
         </div>
 

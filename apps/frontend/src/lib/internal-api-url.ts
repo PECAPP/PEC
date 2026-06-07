@@ -1,4 +1,4 @@
-const DEFAULT_INTERNAL_API_BASE = 'http://localhost:4000/api';
+const DEFAULT_INTERNAL_API_BASE = 'http://localhost:4000/api/v1';
 
 export const resolveInternalApiBaseUrl = (): string => {
   const configured =
@@ -11,5 +11,7 @@ export const resolveInternalApiBaseUrl = (): string => {
     return DEFAULT_INTERNAL_API_BASE;
   }
 
-  return normalized.endsWith('/api') ? normalized : `${normalized}/api`;
+  if (normalized.includes('/api/v1')) return normalized;
+  if (normalized.endsWith('/api')) return `${normalized}/v1`;
+  return `${normalized}/api/v1`;
 };

@@ -1,5 +1,5 @@
-import { useAuth } from '@/features/auth/hooks/useAuth';
-import { User } from '@/types/auth';
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { User } from '@pec/shared';
 import {
   getUserPermissions,
   UserPermissions,

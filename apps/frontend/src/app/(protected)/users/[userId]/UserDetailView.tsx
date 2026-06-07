@@ -1,8 +1,9 @@
 'use client';
+import { Button, Badge } from "@pec/ui";
+
 
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+
 import { 
   ArrowLeft, 
   Building2, 

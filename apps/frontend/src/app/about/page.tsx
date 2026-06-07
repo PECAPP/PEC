@@ -1,8 +1,10 @@
 'use client';
+import { Button, Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@pec/ui";
+
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+
 import {
   ArrowLeft,
   GraduationCap,
@@ -23,12 +25,6 @@ import {
   Lightbulb,
   Heart,
 } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 const container = {
   hidden: { opacity: 0 },

@@ -12,20 +12,23 @@ import {
 } from '@nestjs/common';
 import { ExaminationsService } from './examinations.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { ok } from '../common/utils/api-response';
 import { CreateExamScheduleDto } from './dto/create-exam-schedule.dto';
 import { ExamQueryDto } from './dto/exam-query.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { examinationSchema } from '@shared/schemas/erp';
+import { examinationSchema } from '@pec/shared';
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('examinations')
 export class ExaminationsController {
   constructor(private readonly service: ExaminationsService) {}
 
-  @Roles('college_admin', 'admin', 'moderator')
+  @CheckPolicies((ability) => ability.can('create', 'Examination'))
   @Post('schedules')
   async createSchedule(
     @Body(new ZodValidationPipe(examinationSchema))
@@ -35,7 +38,7 @@ export class ExaminationsController {
     return ok(data);
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty', 'student')
+  @CheckPolicies((ability) => ability.can('read', 'Examination'))
   @Get('schedules')
   async listSchedules(@Request() req: any, @Query() query: ExamQueryDto) {
     const userRoles = Array.isArray(req.user?.roles)
@@ -54,7 +57,7 @@ export class ExaminationsController {
     });
   }
 
-  @Roles('college_admin', 'admin', 'moderator')
+  @CheckPolicies((ability) => ability.can('delete', 'Examination'))
   @Delete('schedules/:id')
   async deleteSchedule(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -63,3 +66,4 @@ export class ExaminationsController {
     return ok(data);
   }
 }
+

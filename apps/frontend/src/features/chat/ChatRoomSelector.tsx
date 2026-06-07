@@ -1,15 +1,8 @@
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@pec/ui";
 import { Hash, Users, Building2, ShieldCheck } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ChatRoom } from "@/types/chat";
-import { UserRole } from "@/types";
+
+import { ChatRoom } from '@pec/shared';
+import { UserRole } from '@pec/shared';
 
 interface Props {
   rooms: ChatRoom[];

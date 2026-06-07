@@ -1,3 +1,3 @@
-import { AttendanceSessionInput } from '@shared/schemas/erp';
+import { AttendanceSessionInput } from '@pec/shared';
 
 export type UpdateAttendanceSessionDto = Partial<AttendanceSessionInput>;

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { courseSchema } from '@shared/schemas/erp';
+import { courseSchema } from '@pec/shared';
 
 export class CreateCourseDto {
   @ApiProperty({ example: 'CS101' })

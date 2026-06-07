@@ -15,18 +15,21 @@ import { CourseQueryDto } from './dto/course-query.dto';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { courseSchema } from '@shared/schemas/erp';
+import { courseSchema } from '@pec/shared';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 
-@UseGuards(AuthGuard, RolesGuard)
+
+
+
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
-  @Roles('faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('create', 'Course'))
   @Post()
   async create(
     @Body(new ZodValidationPipe(courseSchema))
@@ -36,7 +39,7 @@ export class CoursesController {
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Course'))
   @Get()
   async findAll(@Query() query: CourseQueryDto) {
     const result = await this.coursesService.findAll(query);
@@ -47,14 +50,14 @@ export class CoursesController {
     });
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'Course'))
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.coursesService.findOne(id);
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('update', 'Course'))
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -65,10 +68,11 @@ export class CoursesController {
     return ok(data);
   }
 
-  @Roles('faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('delete', 'Course'))
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.coursesService.remove(id);
     return ok(data);
   }
 }
+

@@ -13,8 +13,11 @@ import {
 import { Request } from 'express';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+
+
+
 import { NightCanteenService } from './night-canteen.service';
 import {
   NightCanteenItemQueryDto,
@@ -25,12 +28,12 @@ import { UpdateCanteenItemDto } from './dto/update-canteen-item.dto';
 import { CreateCanteenOrderDto } from './dto/create-canteen-order.dto';
 import { UpdateCanteenOrderDto } from './dto/update-canteen-order.dto';
 
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PoliciesGuard)
 @Controller('night-canteen')
 export class NightCanteenController {
   constructor(private readonly service: NightCanteenService) {}
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'CanteenItem'))
   @Get('items')
   async listItems(@Query() query: NightCanteenItemQueryDto) {
     const result = await this.service.findItems(query);
@@ -41,21 +44,21 @@ export class NightCanteenController {
     });
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'CanteenItem'))
   @Get('items/:id')
   async getItem(@Param('id') id: string) {
     const data = await this.service.findItemById(id);
     return ok(data);
   }
 
-  @Roles('college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('create', 'CanteenItem'))
   @Post('items')
   async createItem(@Body() body: CreateCanteenItemDto) {
     const data = await this.service.createItem(body);
     return ok(data);
   }
 
-  @Roles('college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('create', 'CanteenItem'))
   @Post('items/:id')
   async upsertItem(
     @Param('id') id: string,
@@ -65,7 +68,7 @@ export class NightCanteenController {
     return ok(data);
   }
 
-  @Roles('college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('update', 'CanteenItem'))
   @Patch('items/:id')
   async updateItem(
     @Param('id') id: string,
@@ -75,14 +78,14 @@ export class NightCanteenController {
     return ok(data);
   }
 
-  @Roles('college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('delete', 'CanteenItem'))
   @Delete('items/:id')
   async deleteItem(@Param('id') id: string) {
     const data = await this.service.deleteItem(id);
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'CanteenItem'))
   @Get('orders')
   async listOrders(
     @Req() req: Request & { user?: { sub?: string; role?: string } },
@@ -104,14 +107,14 @@ export class NightCanteenController {
     });
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('read', 'CanteenItem'))
   @Get('orders/:id')
   async getOrder(@Param('id') id: string) {
     const data = await this.service.findOrderById(id);
     return ok(data);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('create', 'CanteenItem'))
   @Post('orders')
   async createOrder(
     @Req() req: Request & { user?: { sub?: string; role?: string } },
@@ -126,7 +129,7 @@ export class NightCanteenController {
     return ok(data);
   }
 
-  @Roles('college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('update', 'CanteenItem'))
   @Patch('orders/:id')
   async updateOrder(
     @Param('id') id: string,
@@ -136,10 +139,11 @@ export class NightCanteenController {
     return ok(data);
   }
 
-  @Roles('college_admin', 'admin')
+  @CheckPolicies((ability) => ability.can('delete', 'CanteenItem'))
   @Delete('orders/:id')
   async deleteOrder(@Param('id') id: string) {
     const data = await this.service.deleteOrder(id);
     return ok(data);
   }
 }
+

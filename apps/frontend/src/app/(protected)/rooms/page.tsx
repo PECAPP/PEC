@@ -1,4 +1,7 @@
 'use client';
+import { extractData } from "@/lib/utils";
+import { Button, Input, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,27 +19,11 @@ import {
   X,
   Check,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
-import api from '@/lib/api';
-import { fetchAllPages } from '@/lib/fetchAllPages';
+import api from "@pec/api";
+
 
 interface Room {
   id: string;
@@ -87,7 +74,7 @@ export default function RoomsPage() {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const data = await fetchAllPages<Room>('/rooms');
+      const data = extractData<any>((await api.get('/rooms', { params: { limit: 2000 } })).data);
       setRooms(data);
     } catch (error) {
       console.error('Error fetching rooms:', error);

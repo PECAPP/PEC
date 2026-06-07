@@ -10,12 +10,14 @@
     "lint": "turbo run lint",
     "frontend": "pnpm --filter pec-frontend dev",
     "api": "pnpm --filter pec-server start:dev",
+    "sync:api": "pnpm --filter @pec/api generate",
     "db:reset": "pnpm --filter pec-server db:clean && pnpm --filter pec-server db:push && pnpm --filter pec-server db:seed",
     "predev:host": "npx kill-port 3001",
     "dev:host": "concurrently --kill-others-on-fail \"npm run frontend\" \"npm run api\"",
     "check:env": "node scripts/check_env.js",
     "dev:docker:logs": "docker compose -f docker-compose.dev.yml logs -f --tail=100",
     "dev:docker:restart": "docker compose -f docker-compose.dev.yml restart",
+    "dev:local": "docker compose -f docker-compose.dev.yml up -d postgres pgbouncer redis rabbitmq deps_installer backend envoy dev_worker && cd apps/frontend && npx next dev --turbopack -p 3001",
     "prod:docker": "docker compose up -d --build",
     "prod:docker:down": "docker compose down",
     "setup": "pnpm install && pnpm --filter pec-server db:push && pnpm --filter pec-server prisma:generate && pnpm --filter pec-server db:seed",
@@ -71,6 +73,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
+    "dotenv": "^17.4.2",
     "embla-carousel-react": "^8.6.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
@@ -108,6 +111,7 @@
     "three": "^0.183.2",
     "undici": "^7.24.6",
     "vaul": "^0.9.9",
+    "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   },
   "overrides": {
@@ -139,7 +143,7 @@
     "lint-staged": "^17.0.7",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.17",
-    "turbo": "^2.9.3",
+    "turbo": "^2.9.16",
     "typescript": "^5.8.3"
   },
   "lint-staged": {

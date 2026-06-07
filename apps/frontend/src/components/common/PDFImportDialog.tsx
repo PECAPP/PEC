@@ -1,13 +1,7 @@
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@pec/ui";
 import React, { useState, useCallback } from 'react';
 import { Upload, X, FileText, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+
 import { toast } from 'sonner';
 import Papa from 'papaparse';
 

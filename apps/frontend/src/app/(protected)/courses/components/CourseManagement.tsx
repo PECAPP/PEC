@@ -1,4 +1,6 @@
 'use client';
+import { Button, Input, Badge } from "@pec/ui";
+
 
 import { useState } from 'react';
 import { 
@@ -12,10 +14,8 @@ import {
   Settings2,
   FileText
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Course } from '@/types/course';
+
+import { Course } from '@pec/shared';
 import { cn } from '@/lib/utils';
 
 interface CourseManagementProps {
