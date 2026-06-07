@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CreditCard, Info, Loader2, CheckCircle2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button, Input, Dialog, DialogContent, DialogHeader, DialogTitle } from '@pec/ui';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { FeeRecord } from '../types';
 import { fmt } from '../constants';
-import api from '@/lib/api';
+import api from '@pec/api';
 
 export default function PaymentDialog({
   fee,

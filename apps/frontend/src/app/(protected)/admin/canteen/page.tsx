@@ -1,6 +1,38 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import {
+  Package,
+  Plus,
+  Clock,
+  Truck,
+  IndianRupee,
+  MapPin,
+  ShoppingBag,
+  Search,
+  Edit2,
+  Trash2,
+} from 'lucide-react';
 import { toast } from 'sonner';
+
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  Input,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  Switch,
+  Badge,
+} from '@pec/ui';
+import { AXIOS_INSTANCE } from '@pec/api';
 
 interface CanteenItem {
   id: string;
@@ -24,8 +56,12 @@ export default function CanteenManager() {
   useEffect(() => {
     // Real-time orders
     const fetchOrders = async () => {
-      const { data } = await AXIOS_INSTANCE.get('/api/v1/canteen/orders');
-      setOrders(data);
+      try {
+        const { data: raw } = await AXIOS_INSTANCE.get('/night-canteen/orders');
+        setOrders(Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []));
+      } catch (e) {
+        console.error("Error fetching orders:", e);
+      }
     };
     fetchOrders();
     const intervalId = setInterval(fetchOrders, 5000);
@@ -34,7 +70,7 @@ export default function CanteenManager() {
     // Menu items
     const fetchItems = async () => {
       try {
-        const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/night-canteen/items');
+        const { data: raw } = await AXIOS_INSTANCE.get('/night-canteen/items');
         setItems(Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []));
       } catch(e) { console.error(e); }
       setLoading(false);
@@ -57,9 +93,9 @@ export default function CanteenManager() {
     try {
       const id = editingItem.id || editingItem.name.toLowerCase().replace(/\s+/g, '_');
       if (editingItem.id) {
-        await AXIOS_INSTANCE.patch('/api/v1/night-canteen/items/' + id, { ...editingItem, id, isAvailable: editingItem.isAvailable ?? true, stock: editingItem.stock ?? 100 });
+        await AXIOS_INSTANCE.patch('/night-canteen/items/' + id, { ...editingItem, id, isAvailable: editingItem.isAvailable ?? true, stock: editingItem.stock ?? 100 });
       } else {
-        await AXIOS_INSTANCE.post('/api/v1/night-canteen/items', { ...editingItem, id, isAvailable: editingItem.isAvailable ?? true, stock: editingItem.stock ?? 100 });
+        await AXIOS_INSTANCE.post('/night-canteen/items', { ...editingItem, id, isAvailable: editingItem.isAvailable ?? true, stock: editingItem.stock ?? 100 });
       }
       
       toast.success(editingItem.id ? 'Item updated' : 'Item added');
@@ -73,7 +109,7 @@ export default function CanteenManager() {
   const handleDeleteItem = async (id: string) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
     try {
-      await AXIOS_INSTANCE.delete('/api/v1/night-canteen/items/' + id);
+      await AXIOS_INSTANCE.delete('/night-canteen/items/' + id);
       toast.success('Item deleted');
     } catch (error) {
       toast.error('Failed to delete item');
@@ -82,7 +118,7 @@ export default function CanteenManager() {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      await AXIOS_INSTANCE.patch('/api/v1/night-canteen/orders/' + orderId, { status: newStatus });
+      await AXIOS_INSTANCE.patch('/night-canteen/orders/' + orderId, { status: newStatus });
       toast.success(`Order marked as ${newStatus}`);
     } catch (error) {
       toast.error('Failed to update status');
@@ -373,7 +409,7 @@ export default function CanteenManager() {
                         <Switch 
                           checked={item.isAvailable} 
                           onCheckedChange={async (v) => {
-                            await AXIOS_INSTANCE.patch('/api/v1/night-canteen/items/' + item.id, { isAvailable: v });
+                            await AXIOS_INSTANCE.patch('/night-canteen/items/' + item.id, { isAvailable: v });
                             toast.info(`${item.name} is now ${v ? 'Available' : 'Unavailable'}`);
                           }}
                         />

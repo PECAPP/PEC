@@ -2,7 +2,7 @@
 import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@pec/ui";
 
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShoppingBag,

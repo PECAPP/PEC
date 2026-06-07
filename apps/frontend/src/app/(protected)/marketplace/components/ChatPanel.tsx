@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Search, ChevronDown, IndianRupee, Loader2, MessageCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Button, Input, Badge, Textarea, Dialog, DialogContent, DialogTitle } from '@pec/ui';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Listing, Chat, ChatMessage } from '../types';
-import api from '@/lib/api';
+import api from '@pec/api';
 
 export default function ChatPanel({
   open,

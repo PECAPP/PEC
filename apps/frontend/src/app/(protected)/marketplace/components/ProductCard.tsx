@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Heart, MessageCircle, Edit2, Trash2, Eye, IndianRupee } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button, Badge } from '@pec/ui';
 import { cn } from '@/lib/utils';
 import { Listing } from '../types';
 import { CONDITION_COLORS } from '../constants';

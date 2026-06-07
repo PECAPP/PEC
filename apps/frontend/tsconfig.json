@@ -21,6 +21,12 @@
     "isolatedModules": true,
     "incremental": true,
     "paths": {
+      "@/components/ui/*": [
+        "../../packages/ui/src/*"
+      ],
+      "@/lib/api": [
+        "../../packages/api/src/index.ts"
+      ],
       "@/*": [
         "./src/*"
       ],

@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
+  Button,
+  Input,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@pec/ui';
 import { toast } from 'sonner';
 import { CATEGORIES } from '../constants';
-import api from '@/lib/api';
+import api from '@pec/api';
 
 export default function AdminCreateFeeDialog({
   open,
