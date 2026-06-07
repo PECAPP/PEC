@@ -1,5 +1,32 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Building2,
+  AlertCircle,
+  RefreshCcw,
+  CheckCircle2,
+  Search,
+  MapPin,
+  User,
+  MessageSquare,
+  Send,
+  ShieldCheck,
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+import {
+  Button,
+  Input,
+  Badge,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@pec/ui';
+import { cn } from '@/lib/utils';
+import { AXIOS_INSTANCE } from '@pec/api';
+
 interface HostelIssue {
   id: string;
   title: string;
@@ -26,7 +53,7 @@ export default function HostelAdmin() {
   useEffect(() => {
     // Simplified query without orderBy to avoid composite index requirement
     const fetchIssues = async () => {
-      const { data } = await customInstance.get('/api/v1/hostel-issues');
+      const { data } = await AXIOS_INSTANCE.get('/hostelIssues');
       setIssues(data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
       setLoading(false);
     };
@@ -39,7 +66,7 @@ export default function HostelAdmin() {
 
   const updateStatus = async (issueId: string, newStatus: string) => {
     try {
-      await customInstance.patch(`/api/v1/hostel-issues/${issueId}`, { status: newStatus });
+      await AXIOS_INSTANCE.patch(`/hostelIssues/${issueId}`, { status: newStatus });
       toast.success(`Issue marked as ${newStatus}`);
     } catch (err) {
       toast.error('Failed to update status');
@@ -50,7 +77,7 @@ export default function HostelAdmin() {
     if (!newMessage.trim() || !selectedIssue) return;
 
     try {
-      await customInstance.post(`/api/v1/hostel-issues/${selectedIssue.id}/reply`, {
+      await AXIOS_INSTANCE.post(`/hostelIssues/${selectedIssue.id}/reply`, {
           message: newMessage
         });
       setNewMessage('');

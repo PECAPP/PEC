@@ -27,6 +27,18 @@ export class TimetableRepository extends BaseRepository {
     });
   }
 
+  /**
+   * Fetch timetable entries for multiple courses in a single IN query.
+   * Use this instead of calling findMany() in a loop (N+1 anti-pattern).
+   */
+  async findManyByCourseIds(courseIds: string[]) {
+    if (courseIds.length === 0) return [];
+    return this.prisma.timetable.findMany({
+      where: { courseId: { in: courseIds } },
+      orderBy: [{ day: 'asc' }, { startTime: 'asc' }],
+    });
+  }
+
   async findConflicts(params: {
     room?: string | null;
     day: string;

@@ -1,7 +1,22 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  UtensilsCrossed,
+  Search,
+  Plus,
+  ShoppingBag,
+  MapPin,
+  Loader2,
+  Clock,
+  Trash2,
+  Minus,
+} from "lucide-react";
 import { toast } from "sonner";
 
+import { Badge, Button, ImageWithBlur, Input, Skeleton } from "@pec/ui";
+import { AXIOS_INSTANCE } from "@pec/api";
 import { usePermissions } from "@/hooks/usePermissions";
 
 interface CanteenItem {
@@ -36,11 +51,8 @@ export default function NightCanteen() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const { data: itemsData } = await customInstance.get('/api/v1/canteen');
-        const snapshot = { docs: itemsData.map((d: any) => ({ id: d.id, data: () => d })) };
-        const fetchedItems = snapshot.docs.map(
-          (doc) => ({ id: doc.id, ...doc.data() }) as CanteenItem,
-        );
+        const { data: raw } = await AXIOS_INSTANCE.get('/night-canteen/items');
+        const fetchedItems = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
         // Idempotent state update to prevent duplicates from strict mode or bridge polling
         setItems((prev) => {
           const combined = [...prev, ...fetchedItems];
@@ -62,7 +74,7 @@ export default function NightCanteen() {
     if (view === "orders" && user) {
       const fetchOrders = async () => {
         try {
-          const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/night-canteen/orders/my');
+          const { data: raw } = await AXIOS_INSTANCE.get('/night-canteen/orders');
           const ordersArr = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
           setMyOrders(ordersArr.sort((a: any, b: any) => new Date(b.timestamp || b.createdAt).getTime() - new Date(a.timestamp || a.createdAt).getTime()));
         } catch (e) { console.error(e); }
@@ -135,7 +147,7 @@ export default function NightCanteen() {
         timestamp: new Date().toISOString(),
       };
 
-      await customInstance.post('/api/v1/canteen/orders', orderData);
+      await AXIOS_INSTANCE.post('/night-canteen/orders', orderData);
       setCart([]);
       setHostelRoom("");
       toast.success("Order placed successfully!");

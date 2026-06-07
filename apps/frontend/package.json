@@ -51,6 +51,8 @@
     "tar": "^7.5.13",
     "three": "^0.183.2",
     "undici": "^7.24.6",
+    "vaul": "^0.9.9",
+    "xlsx": "^0.18.5",
     "zod": "^3.25.76",
     "@pec/api": "workspace:*",
     "@pec/env": "workspace:*"

@@ -1,6 +1,6 @@
 import { prisma } from './seeds/utils';
 
-async function main() {
+export async function seedPermissions() {
   console.log('Seeding all permissions...');
 
   // Every subject used across all controllers
@@ -156,9 +156,9 @@ async function main() {
     console.log('WARNING: student role not found!');
   }
 
-  // Admin/SuperAdmin gets ALL permissions
+  // Admin/SuperAdmin/CollegeAdmin gets ALL permissions
   const adminRoles = await prisma.role.findMany({
-    where: { name: { in: ['admin', 'superadmin', 'faculty'] } },
+    where: { name: { in: ['admin', 'superadmin', 'faculty', 'college_admin'] } },
   });
   for (const role of adminRoles) {
     for (const perm of createdPerms) {
@@ -172,4 +172,11 @@ async function main() {
   }
 }
 
-main().catch(console.error).finally(() => prisma.$disconnect());
+if (require.main === module) {
+  seedPermissions()
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    })
+    .finally(() => prisma.$disconnect());
+}

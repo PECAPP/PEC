@@ -21,6 +21,9 @@ import {  buildApiUrl  } from "@pec/api";
 import {  authClient  } from "@pec/api";
 import { GradesTable, AttendanceTable, ScheduleTable, SuggestionChips } from "./GenerativeUI";
 import { useRouter } from "next/navigation";
+import { useResizable } from "./hooks/useResizable";
+import { useSpeechToText } from "./hooks/useSpeechToText";
+import { ChatMessageItem } from "./components/ChatMessageItem";
 
 const SYSTEM_PROMPT = `
 You are the PEC AI Assistant — an intelligent campus agent for PEC University.
@@ -38,16 +41,31 @@ TOOLS AND BEHAVIOR:
 3. SCHEDULE/TIMETABLE — call tool get_user_schedule. The timetable will be shown automatically.
    After the tool runs, mention how many classes they have today. Do NOT list or repeat raw data.
 
-4. NAVIGATION — when user asks to go to, visit, open, or be taken to any page:
+4. HOSTEL ISSUES — call tool get_hostel_issues. The issues list will be shown automatically.
+   After the tool runs, write a short 1-2 sentence summary. Do NOT repeat or list raw data.
+
+5. CANTEEN MENU — call tool get_canteen_menu or get_night_canteen_menu. The menu will be shown automatically.
+   After the tool runs, write a short 1-2 sentence summary. Do NOT repeat or list raw data.
+
+6. CLUBS — call tool get_clubs. The clubs list will be shown automatically.
+   After the tool runs, write a short 1-2 sentence summary. Do NOT repeat or list raw data.
+
+7. FINANCE/FEES — call tool get_finance_summary. The summary card will be shown automatically.
+   After the tool runs, write a short 1-2 sentence summary. Do NOT repeat or list raw data.
+
+8. EVENTS/CALENDAR — call tool get_upcoming_events. The events list will be shown automatically.
+   After the tool runs, write a short 1-2 sentence summary of the next upcoming event. Do NOT repeat or list raw data.
+
+9. NAVIGATION — when user asks to go to, visit, open, or be taken to any page:
    ALWAYS call the navigate_to_page tool. Do NOT write the path as text.
    Valid pages: Marketplace, Attendance, Grades, Timetable, Noticeboard, Canteen, Finance, Profile, Clubs, Hostel, Dashboard.
    After the tool runs, write a short friendly confirmation (e.g. "Taking you to the Marketplace now! 🛒").
 
-5. QUICK REPLIES — always end with 2-3 options:
+10. QUICK REPLIES — always end with 2-3 options:
 <UI:SuggestionChip>["option 1", "option 2", "option 3"]</UI>
 
 Rules:
-- Do NOT emit <UI:GradesTable>, <UI:AttendanceTable>, or <UI:ScheduleTable> tags — the system handles that automatically.
+- Do NOT emit components like <UI:GradesTable>, <UI:HostelIssuesList>, or <UI:CanteenMenuList> tags — the system handles that automatically.
 - Do NOT invent any data. If a tool fails or returns empty, tell the user clearly.
 - Keep responses concise and helpful.
 `;
@@ -59,32 +77,6 @@ interface Message {
   timestamp: Date;
 }
 
-const TypewriterText = ({ text, onType }: { text: string; onType?: () => void }) => {
-  const [displayedText, setDisplayedText] = useState("");
-  const indexRef = useRef(0);
-
-  useEffect(() => {
-    if (text.length < indexRef.current) {
-      indexRef.current = 0;
-      setDisplayedText("");
-    }
-
-    const interval = setInterval(() => {
-      if (indexRef.current < text.length) {
-        indexRef.current++;
-        setDisplayedText(text.slice(0, indexRef.current));
-        onType?.();
-      } else {
-        clearInterval(interval);
-      }
-    }, 6);
-
-    return () => clearInterval(interval);
-  }, [text, onType]);
-
-  return <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayedText}</ReactMarkdown>;
-};
-
 const FloatingAIChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -92,85 +84,21 @@ const FloatingAIChat = () => {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [micError, setMicError] = useState<string | null>(null);
-  const [interimText, setInterimText] = useState("");
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<any>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
-  }, []);
+  // Sizing physics extracted to custom hook
+  const { width, height, handleResizeStart } = useResizable();
+
+  // Speech-to-text logic extracted to custom hook
+  const { isListening, micError, setMicError, interimText, handleMicClick } = useSpeechToText(
+    (finalText) => setInputValue((prev) => (prev ? prev + " " : "") + finalText)
+  );
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-  };
-
-  const [width, setWidth] = useState(400);
-  const [height, setHeight] = useState(600);
-
-  const minWidth = 320;
-  const minHeight = 400;
-
-  useEffect(() => {
-    const handleScreenResize = () => {
-      const maxW = window.innerWidth - 32;
-      const maxH = window.innerHeight - 100;
-      setWidth(prev => Math.min(prev, maxW));
-      setHeight(prev => Math.min(prev, maxH));
-    };
-    handleScreenResize();
-    window.addEventListener("resize", handleScreenResize);
-    return () => window.removeEventListener("resize", handleScreenResize);
-  }, []);
-
-  const handleResizeStart = (
-    e: React.MouseEvent | React.TouchEvent,
-    direction: "n" | "w" | "nw"
-  ) => {
-    e.preventDefault();
-    const startWidth = width;
-    const startHeight = height;
-    const startX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const startY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-
-    const handleMouseMove = (moveEvent: MouseEvent | TouchEvent) => {
-      const currentX = 'touches' in moveEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
-      const currentY = 'touches' in moveEvent ? moveEvent.touches[0].clientY : moveEvent.clientY;
-
-      const deltaX = currentX - startX;
-      const deltaY = currentY - startY;
-
-      const maxW = window.innerWidth - 32;
-      const maxH = window.innerHeight - 100;
-
-      if (direction === "w" || direction === "nw") {
-        const newWidth = Math.max(minWidth, Math.min(maxW, startWidth - deltaX));
-        setWidth(newWidth);
-      }
-      if (direction === "n" || direction === "nw") {
-        const newHeight = Math.max(minHeight, Math.min(maxH, startHeight - deltaY));
-        setHeight(newHeight);
-      }
-    };
-
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("touchmove", handleMouseMove);
-      document.removeEventListener("touchend", handleMouseUp);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-    document.addEventListener("touchmove", handleMouseMove, { passive: true });
-    document.addEventListener("touchend", handleMouseUp);
   };
 
   useEffect(() => {
@@ -204,95 +132,11 @@ const FloatingAIChat = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  const handleMicClick = async () => {
-    setMicError(null);
-
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      setMicError("Voice input isn't supported in this browser. Try Chrome or Edge.");
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current?.stop();
-      return;
-    }
-
-    // Explicitly request mic permission first so we can show a proper error
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch {
-      setMicError("Microphone access denied. Please allow mic permission in your browser and try again.");
-      return;
-    }
-
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognitionRef.current = recognition;
-
-    recognition.continuous = false;
-    recognition.interimResults = true;  // Show partial results as you speak
-    recognition.lang = 'en-US';
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => {
-      setIsListening(true);
-      setInterimText("");
-    };
-
-    recognition.onresult = (event: any) => {
-      let interim = "";
-      let final = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const t = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          final += t;
-        } else {
-          interim += t;
-        }
-      }
-      if (interim) setInterimText(interim);
-      if (final) {
-        setInterimText("");
-        setInputValue((prev) => (prev ? prev + " " : "") + final.trim());
-      }
-    };
-
-    recognition.onerror = (event: any) => {
-      setIsListening(false);
-      setInterimText("");
-      recognitionRef.current = null;
-      if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-        setMicError("Microphone access was blocked. Check browser permissions and reload.");
-      } else if (event.error === 'no-speech') {
-        setMicError("No speech detected. Tap the mic and speak clearly.");
-      } else if (event.error === 'network') {
-        setMicError("Network error during voice recognition. Check your connection.");
-      } else {
-        setMicError(`Voice error: ${event.error}`);
-      }
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-      setInterimText("");
-      recognitionRef.current = null;
-    };
-
-    try {
-      recognition.start();
-    } catch (err: any) {
-      setIsListening(false);
-      setMicError(`Could not start voice input: ${err?.message ?? "unknown error"}.`);
-    }
-  };
-
   const handleSend = async (overrideText?: string) => {
     const textToSend = overrideText || inputValue;
     if (!textToSend.trim() || isTyping) return;
 
     if (authLoading) return;
-    // Allow cookie-based sessions even if the client-side token is not present.
-    // The server AuthGuard will validate credentials via Authorization header or cookies.
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -343,13 +187,17 @@ const FloatingAIChat = () => {
       let done = false;
       let fullText = "";
       let hasCreatedMessage = false;
+      let buffer = ""; // Buffer to handle network data splitting / fragmentation
 
       while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
         if (value) {
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
+          // Stream decoding
+          const chunk = decoder.decode(value, { stream: !done });
+          const text = buffer + chunk;
+          const lines = text.split('\n');
+          buffer = lines.pop() || ""; // Save partial line for next iteration
           
           for (const line of lines) {
             if (line.startsWith('data: ') && line !== 'data: [DONE]') {
@@ -381,6 +229,11 @@ const FloatingAIChat = () => {
                   else if (data.tool === "search_marketplace") thinkingText = "🛍️ Searching the marketplace...";
                   else if (data.tool === "get_upcoming_events") thinkingText = "🎉 Finding upcoming college events...";
                   else if (data.tool === "search_college_notices") thinkingText = "🔍 Scanning college notices...";
+                  else if (data.tool === "get_hostel_issues") thinkingText = "🔧 Loading reported hostel issues...";
+                  else if (data.tool === "get_canteen_menu") thinkingText = "🍔 Fetching day canteen menu...";
+                  else if (data.tool === "get_night_canteen_menu") thinkingText = "🌙 Fetching night canteen menu...";
+                  else if (data.tool === "get_clubs") thinkingText = "👥 Retrieving list of student clubs...";
+                  else if (data.tool === "get_finance_summary") thinkingText = "💳 Gathering your pending dues & fee status...";
                   
                   ensureMessageExists(`_${thinkingText}_`);
                   setMessages(prev => 
@@ -389,7 +242,6 @@ const FloatingAIChat = () => {
                     )
                   );
                 } else if (data.navigate) {
-                  // Backend fired navigate_to_page tool — perform immediate navigation
                   const navPath = data.navigate as string;
                   const navName = navPath.replace('/', '').replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || 'Page';
                   ensureMessageExists(`↗️ Taking you to **${navName}**...`);
@@ -428,6 +280,54 @@ const FloatingAIChat = () => {
                       msg.id === aiResponseId ? { ...msg, content: fullText } : msg
                     )
                   );
+                } else if (data.hostelIssuesData) {
+                  ensureMessageExists();
+                  fullText += `<UI:HostelIssuesList>${JSON.stringify(data.hostelIssuesData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.canteenData) {
+                  ensureMessageExists();
+                  fullText += `<UI:CanteenMenuList>${JSON.stringify(data.canteenData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.nightCanteenData) {
+                  ensureMessageExists();
+                  fullText += `<UI:NightCanteenMenuList>${JSON.stringify(data.nightCanteenData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.clubsData) {
+                  ensureMessageExists();
+                  fullText += `<UI:ClubsList>${JSON.stringify(data.clubsData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.financeData) {
+                  ensureMessageExists();
+                  fullText += `<UI:FinanceSummaryCard>${JSON.stringify(data.financeData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
+                } else if (data.eventsData) {
+                  ensureMessageExists();
+                  fullText += `<UI:EventsList>${JSON.stringify(data.eventsData)}</UI>`;
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === aiResponseId ? { ...msg, content: fullText } : msg
+                    )
+                  );
                 } else if (data.text) {
                   ensureMessageExists();
                   fullText += data.text;
@@ -447,8 +347,7 @@ const FloatingAIChat = () => {
         }
       }
 
-      // ── Post-stream: auto-detect bare suggestion arrays the model forgot to tag ──
-      // Matches patterns like: some text... ["Option A", "Option B", "Option C"]
+      // If the model printed suggest arrays, tag them
       if (fullText) {
         const bareChipsRegex = /(\[(?:\s*"[^"]*"\s*(?:,\s*"[^"]*"\s*)*)\])\s*$/;
         const chipMatch = fullText.match(bareChipsRegex);
@@ -465,7 +364,6 @@ const FloatingAIChat = () => {
         }
       }
 
-      // Attempt TTS read aloud
       speakText(fullText);
 
     } catch (error) {
@@ -575,104 +473,12 @@ const FloatingAIChat = () => {
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => (
-                <div
+                <ChatMessageItem
                   key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[85%] ${message.role === "user" ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-none" : "bg-muted rounded-2xl rounded-tl-none"} px-4 py-2.5 shadow-sm`}
-                  >
-                    <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
-                      {(() => {
-                        const content = message.content;
-                        // Regex to match <UI:ComponentType>DATA</UI>
-                        const uiRegex = /<UI:(GradesTable|AttendanceTable|ScheduleTable|SuggestionChip|Redirect)>([\s\S]*?)<\/UI>/g;
-                        const parts = [];
-                        let lastIndex = 0;
-                        let match;
-                        let hasTags = false;
-
-                        while ((match = uiRegex.exec(content)) !== null) {
-                          hasTags = true;
-                          if (match.index > lastIndex) {
-                            parts.push(content.substring(lastIndex, match.index));
-                          }
-                          
-                          try {
-                            const componentType = match[1];
-                            const payload = match[2];
-                            
-                            if (componentType === 'Redirect') {
-                              const targetPath = payload.trim();
-                              setTimeout(() => router.push(targetPath), 800);
-                              parts.push(
-                                <div key={match.index} className="flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-800/40 my-1">
-                                  <span className="animate-pulse">↗</span>
-                                  <span>Navigating to <span className="font-mono font-semibold">{targetPath}</span>...</span>
-                                </div>
-                              );
-                            } else {
-                              let cleanPayload = payload.replace(/```json/g, '').replace(/```/g, '').trim();
-                              
-                              // Extract valid JSON structure
-                              const firstBrace = cleanPayload.indexOf('{');
-                              const firstBracket = cleanPayload.indexOf('[');
-                              const lastBrace = cleanPayload.lastIndexOf('}');
-                              const lastBracket = cleanPayload.lastIndexOf(']');
-                              
-                              let startIdx = -1;
-                              let endIdx = -1;
-                              if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
-                                startIdx = firstBrace;
-                                endIdx = lastBrace;
-                              } else if (firstBracket !== -1) {
-                                startIdx = firstBracket;
-                                endIdx = lastBracket;
-                              }
-                              
-                              if (startIdx !== -1 && endIdx !== -1) {
-                                cleanPayload = cleanPayload.substring(startIdx, endIdx + 1);
-                              }
-
-                              const jsonData = JSON.parse(cleanPayload);
-                              
-                              if (componentType === 'GradesTable') {
-                                parts.push(<GradesTable key={match.index} data={jsonData} />);
-                              } else if (componentType === 'AttendanceTable') {
-                                parts.push(<AttendanceTable key={match.index} data={jsonData} />);
-                              } else if (componentType === 'ScheduleTable') {
-                                parts.push(<ScheduleTable key={match.index} data={jsonData} />);
-                              } else if (componentType === 'SuggestionChip') {
-                                parts.push(<SuggestionChips key={match.index} chips={jsonData} onSelect={handleSend} />);
-                              }
-                            }
-                          } catch (e) {
-                            // If JSON parsing fails, just render the raw string
-                            parts.push(match[0]);
-                          }
-                          
-                          lastIndex = uiRegex.lastIndex;
-                        }
-
-                        if (lastIndex < content.length) {
-                          parts.push(content.substring(lastIndex));
-                        }
-
-                        if (parts.length === 0 && !hasTags) parts.push(content);
-
-                        return parts.map((part, i) => {
-                          if (typeof part === 'string') {
-                            if (message.role === 'assistant') {
-                              return <TypewriterText key={i} text={part} onType={scrollToBottom} />;
-                            }
-                            return <ReactMarkdown key={i} remarkPlugins={[remarkGfm]}>{part}</ReactMarkdown>;
-                          }
-                          return part;
-                        });
-                      })()}
-                    </div>
-                  </div>
-                </div>
+                  message={message}
+                  onSend={handleSend}
+                  scrollToBottom={scrollToBottom}
+                />
               ))}
               {isTyping && (
                 <div className="flex justify-start">
@@ -687,7 +493,6 @@ const FloatingAIChat = () => {
             </div>
 
             <div className="p-4 border-t bg-background/50">
-              {/* Mic error banner */}
               {micError && (
                 <div className="mb-2 flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800/40">
                   <span className="flex-1">{micError}</span>
@@ -720,7 +525,7 @@ const FloatingAIChat = () => {
                   placeholder={
                     isListening
                       ? interimText
-                        ? interimText  // show live partial transcript
+                        ? interimText
                         : "🎤 Listening… speak now"
                       : "Ask me anything..."
                   }

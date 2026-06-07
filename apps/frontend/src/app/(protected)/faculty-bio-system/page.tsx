@@ -14,8 +14,6 @@ import {
   Edit2,
   Trash2,
   Loader2,
-  X,
-  Check,
   ExternalLink,
   Quote,
   Calendar,
@@ -30,85 +28,14 @@ import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 import api from "@pec/api";
 
-interface Publication {
-  id: string;
-  facultyId: string;
-  title: string;
-  journal: string | null;
-  conference: string | null;
-  year: number;
-  doi: string | null;
-  url: string | null;
-  abstract: string | null;
-  citations: number;
-  coAuthors: string | null;
-  createdAt: string;
-}
+// Shared types
+import { Publication, Award as FacultyAward, Conference, Consultation, FullProfile } from './types';
 
-interface Award {
-  id: string;
-  facultyId: string;
-  title: string;
-  description: string | null;
-  awardedBy: string | null;
-  year: number;
-  category: string;
-  createdAt: string;
-}
-
-interface Conference {
-  id: string;
-  facultyId: string;
-  name: string;
-  location: string | null;
-  startDate: string | null;
-  endDate: string | null;
-  role: string | null;
-  presentationTitle: string | null;
-  description: string | null;
-  createdAt: string;
-}
-
-interface Consultation {
-  id: string;
-  facultyId: string;
-  organization: string;
-  description: string | null;
-  startDate: string | null;
-  endDate: string | null;
-  status: string;
-  createdAt: string;
-}
-
-interface FacultyProfile {
-  id: string;
-  userId: string;
-  name: string;
-  email: string;
-  avatar: string | null;
-  employeeId: string;
-  department: string;
-  designation: string;
-  phone: string | null;
-  specialization: string | null;
-  qualifications: string | null;
-  bio: string | null;
-}
-
-interface FullProfile {
-  faculty: FacultyProfile | null;
-  publications: Publication[];
-  awards: Award[];
-  conferences: Conference[];
-  consultations: Consultation[];
-  stats: {
-    totalPublications: number;
-    totalAwards: number;
-    totalConferences: number;
-    totalConsultations: number;
-    totalCitations: number;
-  };
-}
+// Subcomponents
+import PublicationDialog from './components/PublicationDialog';
+import AwardDialog from './components/AwardDialog';
+import ConferenceDialog from './components/ConferenceDialog';
+import ConsultationDialog from './components/ConsultationDialog';
 
 const emptyPublicationForm = {
   title: '',
@@ -162,7 +89,7 @@ export default function FacultyBioSystemPage() {
   const [savingPublication, setSavingPublication] = useState(false);
 
   const [showAwardDialog, setShowAwardDialog] = useState(false);
-  const [editingAward, setEditingAward] = useState<Award | null>(null);
+  const [editingAward, setEditingAward] = useState<FacultyAward | null>(null);
   const [awardForm, setAwardForm] = useState(emptyAwardForm);
   const [savingAward, setSavingAward] = useState(false);
 
@@ -281,7 +208,7 @@ export default function FacultyBioSystemPage() {
     setShowAwardDialog(true);
   };
 
-  const openEditAward = (award: Award) => {
+  const openEditAward = (award: FacultyAward) => {
     setEditingAward(award);
     setAwardForm({
       title: award.title,
@@ -495,7 +422,9 @@ export default function FacultyBioSystemPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-2xl font-bold">{profile.faculty.name}</h1>
-              <p className="text-muted-foreground">{profile.faculty.designation} - {profile.faculty.department}</p>
+              <p className="text-muted-foreground">
+                {profile.faculty.designation} - {profile.faculty.department}
+              </p>
               {profile.faculty.specialization && (
                 <p className="text-sm text-primary mt-1">{profile.faculty.specialization}</p>
               )}
@@ -627,7 +556,9 @@ export default function FacultyBioSystemPage() {
                       )}
                     </div>
                     {pub.abstract && (
-                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{pub.abstract}</p>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                        {pub.abstract}
+                      </p>
                     )}
                     {pub.coAuthors && (
                       <p className="text-xs text-muted-foreground mt-1">
@@ -645,10 +576,18 @@ export default function FacultyBioSystemPage() {
                     )}
                     {canEdit && (
                       <>
-                        <Button variant="outline" size="sm" onClick={() => openEditPublication(pub)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditPublication(pub)}
+                        >
                           <Edit2 className="w-3 h-3" />
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleDeletePublication(pub.id)}>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeletePublication(pub.id)}
+                        >
                           <Trash2 className="w-3 h-3" />
                         </Button>
                       </>
@@ -691,7 +630,9 @@ export default function FacultyBioSystemPage() {
                     <div className="flex items-center gap-2">
                       <Award className="w-5 h-5 text-amber-500" />
                       <h3 className="font-semibold">{award.title}</h3>
-                      <Badge variant="outline" className="text-xs">{award.category}</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {award.category}
+                      </Badge>
                     </div>
                     {award.description && (
                       <p className="text-sm text-muted-foreground mt-2">{award.description}</p>
@@ -712,7 +653,11 @@ export default function FacultyBioSystemPage() {
                       <Button variant="outline" size="sm" onClick={() => openEditAward(award)}>
                         <Edit2 className="w-3 h-3" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteAward(award.id)}>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteAward(award.id)}
+                      >
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>
@@ -755,7 +700,9 @@ export default function FacultyBioSystemPage() {
                       <Mic2 className="w-5 h-5 text-primary" />
                       <h3 className="font-semibold">{conf.name}</h3>
                       {conf.role && (
-                        <Badge variant="secondary" className="text-xs capitalize">{conf.role}</Badge>
+                        <Badge variant="secondary" className="text-xs capitalize">
+                          {conf.role}
+                        </Badge>
                       )}
                     </div>
                     {conf.presentationTitle && (
@@ -774,7 +721,8 @@ export default function FacultyBioSystemPage() {
                       )}
                       {conf.startDate && (
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" /> {new Date(conf.startDate).toLocaleDateString()}
+                          <Calendar className="w-3 h-3" />{' '}
+                          {new Date(conf.startDate).toLocaleDateString()}
                         </span>
                       )}
                     </div>
@@ -784,7 +732,11 @@ export default function FacultyBioSystemPage() {
                       <Button variant="outline" size="sm" onClick={() => openEditConference(conf)}>
                         <Edit2 className="w-3 h-3" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteConference(conf.id)}>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteConference(conf.id)}
+                      >
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>
@@ -827,7 +779,13 @@ export default function FacultyBioSystemPage() {
                       <Briefcase className="w-5 h-5 text-primary" />
                       <h3 className="font-semibold">{consult.organization}</h3>
                       <Badge
-                        variant={consult.status === 'active' ? 'default' : consult.status === 'ongoing' ? 'secondary' : 'outline'}
+                        variant={
+                          consult.status === 'active'
+                            ? 'default'
+                            : consult.status === 'ongoing'
+                              ? 'secondary'
+                              : 'outline'
+                        }
                         className="text-xs capitalize"
                       >
                         {consult.status}
@@ -839,22 +797,32 @@ export default function FacultyBioSystemPage() {
                     <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
                       {consult.startDate && (
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" /> From {new Date(consult.startDate).toLocaleDateString()}
+                          <Calendar className="w-3 h-3" /> From{' '}
+                          {new Date(consult.startDate).toLocaleDateString()}
                         </span>
                       )}
                       {consult.endDate && (
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> To {new Date(consult.endDate).toLocaleDateString()}
+                          <Clock className="w-3 h-3" /> To{' '}
+                          {new Date(consult.endDate).toLocaleDateString()}
                         </span>
                       )}
                     </div>
                   </div>
                   {canEdit && (
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button variant="outline" size="sm" onClick={() => openEditConsultation(consult)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openEditConsultation(consult)}
+                      >
                         <Edit2 className="w-3 h-3" />
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteConsultation(consult.id)}>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteConsultation(consult.id)}
+                      >
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>
@@ -874,213 +842,48 @@ export default function FacultyBioSystemPage() {
       </Tabs>
 
       {/* Publication Dialog */}
-      <Dialog open={showPublicationDialog} onOpenChange={setShowPublicationDialog}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingPublication ? 'Edit Publication' : 'Add Publication'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Title *</label>
-              <Input value={publicationForm.title} onChange={(e) => setPublicationForm({ ...publicationForm, title: e.target.value })} className="mt-1" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Journal</label>
-                <Input value={publicationForm.journal} onChange={(e) => setPublicationForm({ ...publicationForm, journal: e.target.value })} className="mt-1" />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Conference</label>
-                <Input value={publicationForm.conference} onChange={(e) => setPublicationForm({ ...publicationForm, conference: e.target.value })} className="mt-1" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Year</label>
-                <Input type="number" value={publicationForm.year} onChange={(e) => setPublicationForm({ ...publicationForm, year: Number(e.target.value) })} className="mt-1" />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Citations</label>
-                <Input type="number" value={publicationForm.citations} onChange={(e) => setPublicationForm({ ...publicationForm, citations: Number(e.target.value) })} className="mt-1" />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium">DOI</label>
-              <Input value={publicationForm.doi} onChange={(e) => setPublicationForm({ ...publicationForm, doi: e.target.value })} className="mt-1" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">URL</label>
-              <Input value={publicationForm.url} onChange={(e) => setPublicationForm({ ...publicationForm, url: e.target.value })} className="mt-1" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Abstract</label>
-              <Textarea value={publicationForm.abstract} onChange={(e) => setPublicationForm({ ...publicationForm, abstract: e.target.value })} className="mt-1" rows={3} />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Co-Authors (comma-separated)</label>
-              <Input value={publicationForm.coAuthors} onChange={(e) => setPublicationForm({ ...publicationForm, coAuthors: e.target.value })} className="mt-1" />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowPublicationDialog(false)}>Cancel</Button>
-              <Button onClick={handleSavePublication} disabled={savingPublication}>
-                {savingPublication ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
-                {savingPublication ? 'Saving...' : 'Save'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PublicationDialog
+        isOpen={showPublicationDialog}
+        onClose={() => setShowPublicationDialog(false)}
+        editingPublication={editingPublication}
+        publicationForm={publicationForm}
+        setPublicationForm={setPublicationForm}
+        onSave={handleSavePublication}
+        saving={savingPublication}
+      />
 
       {/* Award Dialog */}
-      <Dialog open={showAwardDialog} onOpenChange={setShowAwardDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingAward ? 'Edit Award' : 'Add Award'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Title *</label>
-              <Input value={awardForm.title} onChange={(e) => setAwardForm({ ...awardForm, title: e.target.value })} className="mt-1" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Awarded By</label>
-              <Input value={awardForm.awardedBy} onChange={(e) => setAwardForm({ ...awardForm, awardedBy: e.target.value })} className="mt-1" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Year</label>
-                <Input type="number" value={awardForm.year} onChange={(e) => setAwardForm({ ...awardForm, year: Number(e.target.value) })} className="mt-1" />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Category</label>
-                <Select value={awardForm.category} onValueChange={(v) => setAwardForm({ ...awardForm, category: v })}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="academic">Academic</SelectItem>
-                    <SelectItem value="research">Research</SelectItem>
-                    <SelectItem value="teaching">Teaching</SelectItem>
-                    <SelectItem value="service">Service</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Description</label>
-              <Textarea value={awardForm.description} onChange={(e) => setAwardForm({ ...awardForm, description: e.target.value })} className="mt-1" rows={3} />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowAwardDialog(false)}>Cancel</Button>
-              <Button onClick={handleSaveAward} disabled={savingAward}>
-                {savingAward ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
-                {savingAward ? 'Saving...' : 'Save'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AwardDialog
+        isOpen={showAwardDialog}
+        onClose={() => setShowAwardDialog(false)}
+        editingAward={editingAward}
+        awardForm={awardForm}
+        setAwardForm={setAwardForm}
+        onSave={handleSaveAward}
+        saving={savingAward}
+      />
 
       {/* Conference Dialog */}
-      <Dialog open={showConferenceDialog} onOpenChange={setShowConferenceDialog}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingConference ? 'Edit Conference' : 'Add Conference'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Conference Name *</label>
-              <Input value={conferenceForm.name} onChange={(e) => setConferenceForm({ ...conferenceForm, name: e.target.value })} className="mt-1" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Location</label>
-              <Input value={conferenceForm.location} onChange={(e) => setConferenceForm({ ...conferenceForm, location: e.target.value })} className="mt-1" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Start Date</label>
-                <Input type="date" value={conferenceForm.startDate} onChange={(e) => setConferenceForm({ ...conferenceForm, startDate: e.target.value })} className="mt-1" />
-              </div>
-              <div>
-                <label className="text-sm font-medium">End Date</label>
-                <Input type="date" value={conferenceForm.endDate} onChange={(e) => setConferenceForm({ ...conferenceForm, endDate: e.target.value })} className="mt-1" />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Role</label>
-              <Select value={conferenceForm.role} onValueChange={(v) => setConferenceForm({ ...conferenceForm, role: v })}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="presenter">Presenter</SelectItem>
-                  <SelectItem value="keynote">Keynote Speaker</SelectItem>
-                  <SelectItem value="organizer">Organizer</SelectItem>
-                  <SelectItem value="attendee">Attendee</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Presentation Title</label>
-              <Input value={conferenceForm.presentationTitle} onChange={(e) => setConferenceForm({ ...conferenceForm, presentationTitle: e.target.value })} className="mt-1" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Description</label>
-              <Textarea value={conferenceForm.description} onChange={(e) => setConferenceForm({ ...conferenceForm, description: e.target.value })} className="mt-1" rows={3} />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowConferenceDialog(false)}>Cancel</Button>
-              <Button onClick={handleSaveConference} disabled={savingConference}>
-                {savingConference ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
-                {savingConference ? 'Saving...' : 'Save'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ConferenceDialog
+        isOpen={showConferenceDialog}
+        onClose={() => setShowConferenceDialog(false)}
+        editingConference={editingConference}
+        conferenceForm={conferenceForm}
+        setConferenceForm={setConferenceForm}
+        onSave={handleSaveConference}
+        saving={savingConference}
+      />
 
       {/* Consultation Dialog */}
-      <Dialog open={showConsultationDialog} onOpenChange={setShowConsultationDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingConsultation ? 'Edit Consultation' : 'Add Consultation'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Organization *</label>
-              <Input value={consultationForm.organization} onChange={(e) => setConsultationForm({ ...consultationForm, organization: e.target.value })} className="mt-1" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Description</label>
-              <Textarea value={consultationForm.description} onChange={(e) => setConsultationForm({ ...consultationForm, description: e.target.value })} className="mt-1" rows={3} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Start Date</label>
-                <Input type="date" value={consultationForm.startDate} onChange={(e) => setConsultationForm({ ...consultationForm, startDate: e.target.value })} className="mt-1" />
-              </div>
-              <div>
-                <label className="text-sm font-medium">End Date</label>
-                <Input type="date" value={consultationForm.endDate} onChange={(e) => setConsultationForm({ ...consultationForm, endDate: e.target.value })} className="mt-1" />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Status</label>
-              <Select value={consultationForm.status} onValueChange={(v) => setConsultationForm({ ...consultationForm, status: v })}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="ongoing">Ongoing</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowConsultationDialog(false)}>Cancel</Button>
-              <Button onClick={handleSaveConsultation} disabled={savingConsultation}>
-                {savingConsultation ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
-                {savingConsultation ? 'Saving...' : 'Save'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ConsultationDialog
+        isOpen={showConsultationDialog}
+        onClose={() => setShowConsultationDialog(false)}
+        editingConsultation={editingConsultation}
+        consultationForm={consultationForm}
+        setConsultationForm={setConsultationForm}
+        onSave={handleSaveConsultation}
+        saving={savingConsultation}
+      />
     </div>
   );
 }

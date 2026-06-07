@@ -27,21 +27,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import api from "@pec/api";
 
 
-interface HostelIssue {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  priority: string;
-  status: string;
-  roomNumber: string;
-  studentId: string;
-  studentName: string;
-  organizationId?: string;
-  createdAt: string;
-  updatedAt: string;
-  responses?: { from: string; message: string; timestamp: string }[];
-}
+import { HostelIssue } from './types';
 
 const categoryIcons: Record<string, any> = {
   electrical: Zap,
@@ -59,11 +45,16 @@ const normalizeStatus = (status: string) => {
 
 const getStatusConfig = (status: string) => {
   switch (normalizeStatus(status)) {
-    case 'pending': return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Pending' };
-    case 'assigned': return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Assigned' };
-    case 'resolved': return { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Resolved' };
-    case 'closed': return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Closed' };
-    default: return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
+    case 'pending':
+      return { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Pending' };
+    case 'assigned':
+      return { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Assigned' };
+    case 'resolved':
+      return { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Resolved' };
+    case 'closed':
+      return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Closed' };
+    default:
+      return { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
   }
 };
 
@@ -72,9 +63,12 @@ const getPriorityConfig = (priority: string) => {
     case 'emergency':
     case 'urgent':
       return { color: 'text-red-500', bg: 'bg-red-500/10' };
-    case 'high': return { color: 'text-orange-500', bg: 'bg-orange-500/10' };
-    case 'medium': return { color: 'text-blue-500', bg: 'bg-blue-500/10' };
-    default: return { color: 'text-green-500', bg: 'bg-green-500/10' };
+    case 'high':
+      return { color: 'text-orange-500', bg: 'bg-orange-500/10' };
+    case 'medium':
+      return { color: 'text-blue-500', bg: 'bg-blue-500/10' };
+    default:
+      return { color: 'text-green-500', bg: 'bg-green-500/10' };
   }
 };
 
@@ -90,12 +84,12 @@ export default function HostelIssuesPage() {
   const [newMessage, setNewMessage] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     category: 'electrical',
-      priority: 'medium',
+    priority: 'medium',
     roomNumber: '',
   });
 
@@ -121,7 +115,7 @@ export default function HostelIssuesPage() {
       const data = extractData<any>((await api.get('/hostelIssues', { params: { ...{
         studentId: user.uid,
       }, limit: 2000 } })).data);
-    setIssues(Array.isArray(data) ? data : []);
+      setIssues(Array.isArray(data) ? data : []);
       setAuthFailed(false);
     } catch (error: any) {
       if (error?.response?.status === 401) {
@@ -194,19 +188,16 @@ export default function HostelIssuesPage() {
 
     setSendingMessage(true);
     try {
-      const response = await api.patch(
-        `/hostelIssues/${selectedIssue.id}`,
-        {
-          responses: {
-            _op: 'arrayUnion',
-            val: {
-              from: 'Student',
-              message: newMessage,
-              timestamp: new Date().toISOString(),
-            },
+      const response = await api.patch(`/hostelIssues/${selectedIssue.id}`, {
+        responses: {
+          _op: 'arrayUnion',
+          val: {
+            from: 'Student',
+            message: newMessage,
+            timestamp: new Date().toISOString(),
           },
-        }
-      );
+        },
+      });
 
       if (response.data?.data) {
         setSelectedIssue(response.data.data);
@@ -222,16 +213,17 @@ export default function HostelIssuesPage() {
     }
   };
 
-  const filteredIssues = issues.filter(issue => {
+  const filteredIssues = issues.filter((issue) => {
     if (activeTab === 'all') return true;
     return normalizeStatus(issue.status) === activeTab;
   });
 
   const stats = {
     total: issues.length,
-    open: issues.filter(i => normalizeStatus(i.status) === 'pending').length,
-    inProgress: issues.filter(i => normalizeStatus(i.status) === 'assigned').length,
-    resolved: issues.filter(i => ['resolved', 'closed'].includes(normalizeStatus(i.status))).length,
+    open: issues.filter((i) => normalizeStatus(i.status) === 'pending').length,
+    inProgress: issues.filter((i) => normalizeStatus(i.status) === 'assigned').length,
+    resolved: issues.filter((i) => ['resolved', 'closed'].includes(normalizeStatus(i.status)))
+      .length,
   };
 
   if (!user) {
@@ -258,12 +250,7 @@ export default function HostelIssuesPage() {
           <p className="text-muted-foreground">Report and track maintenance issues</p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchIssues}
-            disabled={loading}
-          >
+          <Button variant="outline" size="sm" onClick={fetchIssues} disabled={loading}>
             <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
             Refresh
           </Button>
@@ -277,7 +264,9 @@ export default function HostelIssuesPage() {
             <DialogContent className="max-w-lg">
               <DialogHeader>
                 <DialogTitle>Report New Issue</DialogTitle>
-                <DialogDescription>Describe the issue you&apos;re facing in your hostel room</DialogDescription>
+                <DialogDescription>
+                  Describe the issue you&apos;re facing in your hostel room
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div>
@@ -301,7 +290,10 @@ export default function HostelIssuesPage() {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground">Category *</label>
-                    <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                    <Select
+                      value={formData.category}
+                      onValueChange={(v) => setFormData({ ...formData, category: v })}
+                    >
                       <SelectTrigger className="mt-1">
                         <SelectValue />
                       </SelectTrigger>
@@ -317,7 +309,10 @@ export default function HostelIssuesPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground">Priority</label>
-                  <Select value={formData.priority} onValueChange={(v) => setFormData({ ...formData, priority: v })}>
+                  <Select
+                    value={formData.priority}
+                    onValueChange={(v) => setFormData({ ...formData, priority: v })}
+                  >
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
@@ -411,10 +406,18 @@ export default function HostelIssuesPage() {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <div className="p-4 border-b border-border">
                 <TabsList className="w-full">
-                  <TabsTrigger value="all" className="flex-1">All</TabsTrigger>
-                  <TabsTrigger value="pending" className="flex-1">Pending</TabsTrigger>
-                  <TabsTrigger value="assigned" className="flex-1">Assigned</TabsTrigger>
-                  <TabsTrigger value="resolved" className="flex-1">Resolved</TabsTrigger>
+                  <TabsTrigger value="all" className="flex-1">
+                    All
+                  </TabsTrigger>
+                  <TabsTrigger value="pending" className="flex-1">
+                    Pending
+                  </TabsTrigger>
+                  <TabsTrigger value="assigned" className="flex-1">
+                    Assigned
+                  </TabsTrigger>
+                  <TabsTrigger value="resolved" className="flex-1">
+                    Resolved
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
@@ -449,11 +452,21 @@ export default function HostelIssuesPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-medium text-foreground truncate">{issue.title}</h3>
+                              <h3 className="font-medium text-foreground truncate">
+                                {issue.title}
+                              </h3>
                             </div>
-                            <p className="text-sm text-muted-foreground line-clamp-1">{issue.description}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-1">
+                              {issue.description}
+                            </p>
                             <div className="flex items-center gap-2 mt-2">
-                              <Badge className={cn(statusConfig.bg, statusConfig.color, 'border-0 text-xs')}>
+                              <Badge
+                                className={cn(
+                                  statusConfig.bg,
+                                  statusConfig.color,
+                                  'border-0 text-xs'
+                                )}
+                              >
                                 {statusConfig.label}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
@@ -485,9 +498,17 @@ export default function HostelIssuesPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <h2 className="text-lg font-semibold text-foreground">{selectedIssue.title}</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Room: {selectedIssue.roomNumber}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Room: {selectedIssue.roomNumber}
+                    </p>
                   </div>
-                  <Badge className={cn(getStatusConfig(selectedIssue.status).bg, getStatusConfig(selectedIssue.status).color, 'border-0')}>
+                  <Badge
+                    className={cn(
+                      getStatusConfig(selectedIssue.status).bg,
+                      getStatusConfig(selectedIssue.status).color,
+                      'border-0'
+                    )}
+                  >
                     {getStatusConfig(selectedIssue.status).label}
                   </Badge>
                 </div>
@@ -512,7 +533,9 @@ export default function HostelIssuesPage() {
                         )}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium text-foreground">{response.from}</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {response.from}
+                          </span>
                           <span className="text-xs text-muted-foreground">
                             {formatTime(response.timestamp)}
                           </span>
