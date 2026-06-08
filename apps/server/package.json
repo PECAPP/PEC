@@ -9,6 +9,7 @@
     "api": "cd server && npx nest start --watch --swc",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+
     "seed": "npm run db:seed",
     "db:seed": "ts-node seed.ts",
     "db:seed-permissions": "ts-node seed-permissions.ts",
