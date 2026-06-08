@@ -21,11 +21,16 @@ export class CaslAbilityFactory {
         
         if (conditions && typeof conditions === 'object') {
           // Replace placeholders like "{{id}}" with actual user properties
-          const conditionsString = JSON.stringify(conditions).replace(
-            /\{\{id\}\}/g,
-            user.uid || user.id,
-          );
-          conditions = JSON.parse(conditionsString);
+          try {
+            const conditionsString = JSON.stringify(conditions).replace(
+              /\{\{id\}\}/g,
+              user.uid || user.id,
+            );
+            conditions = JSON.parse(conditionsString);
+          } catch (e) {
+            console.error('Failed to parse CASL conditions', e);
+            conditions = {};
+          }
         }
 
         can(perm.action, perm.subject, conditions);

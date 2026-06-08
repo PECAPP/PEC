@@ -1,6 +1,11 @@
-import { IsString } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class ParsePdfDto {
-  @IsString()
-  pdfBase64: string;
+export const parsePdfSchema = z.object({
+  pdfBase64: z.string(),
+});
+
+
+
+export class ParsePdfDto extends createZodDto(parsePdfSchema) {
 }

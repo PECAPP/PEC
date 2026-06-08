@@ -17,7 +17,7 @@ import {
   UseInterceptors,
   Header,
 } from '@nestjs/common';
-import { type Response } from 'express';
+import type { FastifyReply } from 'fastify';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Throttle } from '@nestjs/throttler';
 import { AttendanceService } from './attendance.service';
@@ -76,7 +76,7 @@ export class AttendanceController {
 
   @CheckPolicies((ability) => ability.can('create', 'Attendance'))
   @Post('waivers/upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
   async uploadWaiverDocument(
     @Request() req: any,
     @UploadedFile() file: Express.Multer.File,
@@ -94,40 +94,38 @@ export class AttendanceController {
   async streamWaiverDocument(
     @Param('fileName') fileName: string,
     @Request() req: any,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
-    const { stream, mimeType, contentDisposition } = await this.attendanceService.getWaiverDocument(
+    const { url } = await this.attendanceService.getWaiverDocument(
       fileName,
       req.user,
     );
 
-    res.setHeader('Content-Type', mimeType);
-    res.setHeader('Content-Disposition', contentDisposition);
-    return new StreamableFile(stream);
+    return res.redirect(302, url);
   }
 
   @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('export/:courseId')
   async exportExcel(
     @Param('courseId') courseId: string,
-    @Res() res: Response
+    @Res() res: FastifyReply
   ) {
-    const buffer = await this.attendanceService.generateExcel(courseId);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename=attendance_${courseId}.xlsx`);
-    res.send(buffer);
+    res.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.header('Content-Disposition', `attachment; filename=attendance_${courseId}.xlsx`);
+    await this.attendanceService.generateExcel(courseId, res.raw);
+    res.raw.end();
   }
 
   @CheckPolicies((ability) => ability.can('read', 'Attendance'))
   @Get('my/export')
   async exportMyExcel(
     @Request() req: any,
-    @Res() res: Response
+    @Res() res: FastifyReply
   ) {
-    const buffer = await this.attendanceService.generateStudentExcel(req.user.sub);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename=my_attendance.xlsx`);
-    res.send(buffer);
+    res.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.header('Content-Disposition', `attachment; filename=my_attendance.xlsx`);
+    await this.attendanceService.generateStudentExcel(req.user.sub, res.raw);
+    res.raw.end();
   }
 
   @CheckPolicies((ability) => ability.can('read', 'Attendance'))

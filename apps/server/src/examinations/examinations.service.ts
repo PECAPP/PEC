@@ -84,8 +84,8 @@ export class ExaminationsService {
     }
 
     const where = {
-      deletedAt: null,
       ...(query.courseId ? { courseId: query.courseId } : {}),
+      ...(query.examType ? { examType: query.examType } : {}),
       ...(scopedDepartment
         ? {
             course: {

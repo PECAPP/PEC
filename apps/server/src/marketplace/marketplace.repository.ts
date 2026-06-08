@@ -43,13 +43,13 @@ export class MarketplaceRepository {
 
     const [total, items] = await Promise.all([
       this.prisma.marketplaceListing.count({ where }),
-      this.prisma.marketplaceListing.findMany({
+      this.prisma.marketplaceListing.findMany({ take: 1000, 
         where,
         orderBy: { [sortBy]: sortOrder },
         take: limit,
         skip: offset,
         include: {
-          seller: { select: { id: true, name: true, avatar: true, studentProfile: { select: { phone: true } } } },
+          seller: { select: { id: true, name: true, avatar: true } },
           _count: { select: { bookmarks: true } },
         },
       }),
@@ -62,18 +62,18 @@ export class MarketplaceRepository {
     return this.prisma.marketplaceListing.findUnique({
       where: { id },
       include: {
-        seller: { select: { id: true, name: true, avatar: true, studentProfile: { select: { phone: true } } } },
+        seller: { select: { id: true, name: true, avatar: true } },
         _count: { select: { bookmarks: true } },
       },
     });
   }
 
   async findMyListings(sellerId: string) {
-    return this.prisma.marketplaceListing.findMany({
+    return this.prisma.marketplaceListing.findMany({ take: 1000, 
       where: { sellerId, NOT: { status: 'Deleted' } },
       orderBy: { createdAt: 'desc' },
       include: {
-        seller: { select: { id: true, name: true, avatar: true, studentProfile: { select: { phone: true } } } },
+        seller: { select: { id: true, name: true, avatar: true } },
         _count: { select: { bookmarks: true } },
       },
     });
@@ -134,7 +134,7 @@ export class MarketplaceRepository {
   }
 
   async getBookmarks(userId: string) {
-    const bookmarks = await this.prisma.marketplaceBookmark.findMany({
+    const bookmarks = await this.prisma.marketplaceBookmark.findMany({ take: 1000, 
       where: { userId },
       include: {
         listing: {
@@ -150,7 +150,7 @@ export class MarketplaceRepository {
   }
 
   async getBookmarkedIds(userId: string) {
-    const bookmarks = await this.prisma.marketplaceBookmark.findMany({
+    const bookmarks = await this.prisma.marketplaceBookmark.findMany({ take: 1000, 
       where: { userId },
       select: { listingId: true },
     });
@@ -177,7 +177,7 @@ export class MarketplaceRepository {
   }
 
   async getMyChats(userId: string) {
-    return this.prisma.marketplaceChat.findMany({
+    return this.prisma.marketplaceChat.findMany({ take: 1000, 
       where: { OR: [{ buyerId: userId }, { listing: { sellerId: userId } }] },
       include: {
         listing: { select: { id: true, title: true, images: true, price: true, sellerId: true } },
@@ -197,7 +197,7 @@ export class MarketplaceRepository {
     if (chat.buyerId !== userId && chat.listing.sellerId !== userId) {
       throw new ForbiddenException('Not a participant');
     }
-    return this.prisma.marketplaceMessage.findMany({
+    return this.prisma.marketplaceMessage.findMany({ take: 1000, 
       where: { chatId },
       orderBy: { createdAt: 'asc' },
       include: { sender: { select: { id: true, name: true, avatar: true } } },

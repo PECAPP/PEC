@@ -17,66 +17,40 @@ import { ChatService } from './chat.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { SendMessageDto } from './dto/send-message.dto';
-import {
-  IsArray,
-  IsIn,
-  IsOptional,
-  IsString,
-  MinLength,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
 
-class CreateClubDto {
-  @IsString()
-  @MinLength(2)
-  name!: string;
-}
 
-class PostClubMessageDto {
-  @IsString()
-  @MinLength(1)
-  content!: string;
-}
+import { z } from 'zod';
+import { createZodDto } from 'nestjs-zod';
 
-class ClubJoinMediaDto {
-  @IsString()
-  url!: string;
+const createClubSchema = z.object({
+  name: z.string().min(2),
+});
+export class CreateClubDto extends createZodDto(createClubSchema) {}
 
-  @IsString()
-  @IsIn(['image', 'audio', 'video', 'file'])
-  kind!: 'image' | 'audio' | 'video' | 'file';
+const postClubMessageSchema = z.object({
+  content: z.string().min(1),
+});
+export class PostClubMessageDto extends createZodDto(postClubMessageSchema) {}
 
-  @IsOptional()
-  @IsString()
-  name?: string;
+const clubJoinMediaSchema = z.object({
+  url: z.string(),
+  kind: z.enum(['image', 'audio', 'video', 'file']),
+  name: z.string().optional(),
+  mimeType: z.string().optional(),
+});
+export class ClubJoinMediaDto extends createZodDto(clubJoinMediaSchema) {}
 
-  @IsOptional()
-  @IsString()
-  mimeType?: string;
-}
+const clubJoinRequestSchema = z.object({
+  proposalText: z.string().min(10),
+  media: z.array(clubJoinMediaSchema).optional(),
+});
+export class ClubJoinRequestDto extends createZodDto(clubJoinRequestSchema) {}
 
-class ClubJoinRequestDto {
-  @IsString()
-  @MinLength(10)
-  proposalText!: string;
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ClubJoinMediaDto)
-  media?: ClubJoinMediaDto[];
-}
-
-class ClubJoinRequestDecisionDto {
-  @IsString()
-  @IsIn(['approve', 'reject'])
-  action!: 'approve' | 'reject';
-
-  @IsOptional()
-  @IsString()
-  reviewNote?: string;
-}
+const clubJoinRequestDecisionSchema = z.object({
+  action: z.enum(['approve', 'reject']),
+  reviewNote: z.string().optional(),
+});
+export class ClubJoinRequestDecisionDto extends createZodDto(clubJoinRequestDecisionSchema) {}
 
 @UseGuards(AuthGuard)
 @Controller('chat')

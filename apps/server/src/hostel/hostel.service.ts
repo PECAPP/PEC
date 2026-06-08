@@ -9,16 +9,26 @@ export class HostelService {
     return this.prisma as any;
   }
 
-  findAllForStudent(studentId: string) {
+  findAllForStudent(studentId: string, skip: number = 0, take: number = 50) {
     return this.prismaAny.hostelIssue.findMany({
+      skip: Number(skip),
+      take: Number(take),
       where: { studentId },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  findAll() {
+  findAll(skip: number = 0, take: number = 50) {
     return this.prismaAny.hostelIssue.findMany({
+      skip: Number(skip),
+      take: Number(take),
       orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  findById(id: string) {
+    return this.prismaAny.hostelIssue.findUnique({
+      where: { id },
     });
   }
 

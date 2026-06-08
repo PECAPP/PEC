@@ -11,6 +11,7 @@ import {
   UseGuards,
   ForbiddenException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
@@ -114,6 +115,7 @@ export class MarketplaceController {
   }
 
   @Post('chats/:chatId/messages')
+  @Throttle({ short: { limit: 5, ttl: 60000 } }) // 5 messages per minute
   async sendMessage(
     @Param('chatId') chatId: string,
     @Request() req: any,

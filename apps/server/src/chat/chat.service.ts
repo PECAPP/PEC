@@ -72,7 +72,7 @@ export class ChatService {
       return this.findDefaultRoomsForCollegeAdmin(userId);
     }
 
-    const userChatRooms = await this.prisma.userChatRoom.findMany({
+    const userChatRooms = await this.prisma.userChatRoom.findMany({ take: 1000, 
       where: { userId },
       include: {
         chatRoom: {
@@ -96,7 +96,7 @@ export class ChatService {
     const rooms = userChatRooms.map((ucr) => ucr.chatRoom);
 
     if (isFaculty) {
-      const clubs = await this.prisma.club.findMany({
+      const clubs = await this.prisma.club.findMany({ take: 1000, 
         select: { chatRoomId: true },
       });
       const clubRoomIds = new Set(clubs.map((club) => club.chatRoomId));
@@ -109,7 +109,7 @@ export class ChatService {
   }
 
   private async findDefaultRoomsForCollegeAdmin(userId: string) {
-    const departments = await this.prisma.department.findMany({
+    const departments = await this.prisma.department.findMany({ take: 1000, 
       select: {
         name: true,
         timetableLabel: true,
@@ -126,12 +126,12 @@ export class ChatService {
     });
 
     const clubRoomIds = (
-      await this.prisma.club.findMany({
+      await this.prisma.club.findMany({ take: 1000, 
         select: { chatRoomId: true },
       })
     ).map((club) => club.chatRoomId);
 
-    const rooms = await this.prisma.chatRoom.findMany({
+    const rooms = await this.prisma.chatRoom.findMany({ take: 1000, 
       where: {
         OR: [
           {
@@ -164,7 +164,7 @@ export class ChatService {
 
     const roomIds = rooms.map((room) => room.id);
     if (roomIds.length > 0) {
-      const existingMemberships = await this.prisma.userChatRoom.findMany({
+      const existingMemberships = await this.prisma.userChatRoom.findMany({ take: 1000, 
         where: {
           userId,
           chatRoomId: { in: roomIds },
@@ -199,7 +199,7 @@ export class ChatService {
       throw new ForbiddenException('You are not a participant of this room');
     }
 
-    return this.prisma.message.findMany({
+    return this.prisma.message.findMany({ take: 1000, 
       where: { chatRoomId: roomId },
       orderBy: { createdAt: 'asc' },
       take: limit,
@@ -271,7 +271,7 @@ export class ChatService {
 
   async getChatUsers(query: string) {
     if (!query || query.trim().length === 0) {
-      return this.prisma.user.findMany({
+      return this.prisma.user.findMany({ take: 1000, 
         select: {
           id: true,
           name: true,
@@ -282,7 +282,7 @@ export class ChatService {
       });
     }
 
-    return this.prisma.user.findMany({
+    return this.prisma.user.findMany({ take: 1000, 
       where: {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
@@ -324,7 +324,7 @@ export class ChatService {
       return [];
     }
 
-    const clubs = await this.prisma.club.findMany({
+    const clubs = await this.prisma.club.findMany({ take: 1000, 
       include: {
         chatRoom: {
           include: {
@@ -397,7 +397,7 @@ export class ChatService {
       throw new BadRequestException('Club already exists');
     }
 
-    const adminUsers = await this.prisma.user.findMany({
+    const adminUsers = await this.prisma.user.findMany({ take: 1000, 
       where: { roles: { some: { role: { name: 'college_admin' } } } },
       select: { id: true },
     });
@@ -545,7 +545,7 @@ export class ChatService {
       return [];
     }
 
-    const requests = await this.prisma.clubJoinRequest.findMany({
+    const requests = await this.prisma.clubJoinRequest.findMany({ take: 1000, 
       where: isAdmin ? {} : { requesterId: userId },
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
       include: {

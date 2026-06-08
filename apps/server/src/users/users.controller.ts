@@ -34,7 +34,7 @@ export class UsersController {
     @Body(new ZodValidationPipe(userSchema))
     body: CreateUserDto,
   ) {
-    const data = await this.usersService.createAdminUser(body);
+    const data = await this.usersService.createAdminUser(body as any);
     return { success: true, data };
   }
 

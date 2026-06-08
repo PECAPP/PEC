@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import type { FastifyReply } from 'fastify';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 
@@ -61,7 +62,7 @@ export class AiService {
       select: { name: true },
     });
 
-    const entries = await this.prisma.cgpaEntry.findMany({
+    const entries = await this.prisma.cgpaEntry.findMany({ take: 1000, 
       where: { userId },
       orderBy: [{ semester: 'asc' }, { createdAt: 'desc' }],
       select: {
@@ -194,7 +195,7 @@ export class AiService {
     });
 
     // Also fetch enrolled course IDs so we can match timetable entries
-    const enrollments = await this.prisma.enrollment.findMany({
+    const enrollments = await this.prisma.enrollment.findMany({ take: 1000, 
       where: { studentId: userId, status: 'active' },
       select: { courseId: true, courseCode: true, courseName: true, batch: true },
     });
@@ -207,14 +208,14 @@ export class AiService {
       const allEntries: any[] = [];
 
       for (const courseId of courseIds) {
-        const result = await this.timetableRepo.findMany({ courseId } as any);
+        const result = await this.timetableRepo.findMany({ take: 1000,  courseId } as any);
         allEntries.push(...(result as any).items);
       }
 
       timetableResult = { items: allEntries };
     } else if (profile) {
       // Fallback: fetch by department + semester
-      timetableResult = await this.timetableRepo.findMany({
+      timetableResult = await this.timetableRepo.findMany({ take: 1000, 
         department: profile.department,
         semester: profile.semester,
       } as any) as any;
@@ -285,7 +286,7 @@ export class AiService {
   // ── Tool: get_hostel_issues ────────────────────────────────────────────────
   private async toolGetHostelIssues(userId: string): Promise<string> {
     try {
-      const issues = await this.prisma.hostelIssue.findMany({
+      const issues = await this.prisma.hostelIssue.findMany({ take: 1000, 
         where: { studentId: userId },
         orderBy: { createdAt: 'desc' },
         take: 10,
@@ -308,7 +309,7 @@ export class AiService {
   // ── Tool: get_canteen_menu ──────────────────────────────────────────────────
   private async toolGetCanteenMenu(category?: string): Promise<string> {
     try {
-      const items = await this.prisma.canteenItem.findMany({
+      const items = await this.prisma.canteenItem.findMany({ take: 1000, 
         where: {
           isAvailable: true,
           ...(category ? { category: { contains: category, mode: 'insensitive' } } : {}),
@@ -332,7 +333,7 @@ export class AiService {
   // ── Tool: get_clubs ────────────────────────────────────────────────────────
   private async toolGetClubs(): Promise<string> {
     try {
-      const clubs = await this.prisma.club.findMany({
+      const clubs = await this.prisma.club.findMany({ take: 1000, 
         orderBy: { name: 'asc' },
         select: {
           name: true,
@@ -346,7 +347,7 @@ export class AiService {
   }
 
   // ── Main completion handler ────────────────────────────────────────────────
-  async getCompletion(body: any, res: any, userId?: string) {
+  async getCompletion(body: any, res: FastifyReply, userId?: string) {
     if (!this.openaiClient) {
       throw new ServiceUnavailableException(
         'AI provider is not configured on the server.',
@@ -565,10 +566,15 @@ export class AiService {
           if (toolCall.type !== 'function') continue;
 
           const functionName = toolCall.function.name;
-          const functionArgs = JSON.parse(toolCall.function.arguments || '{}');
+          let functionArgs: any = {};
+          try {
+            functionArgs = JSON.parse(toolCall.function.arguments || '{}');
+          } catch (e) {
+            console.error('[AI] Failed to parse tool arguments:', e);
+          }
 
           // Notify the frontend which tool is running
-          res.write(`data: ${JSON.stringify({ tool: functionName })}\n\n`);
+          res.raw.write(`data: ${JSON.stringify({ tool: functionName })}\n\n`);
 
           let functionResult = '';
 
@@ -576,7 +582,9 @@ export class AiService {
             if (userId) {
               functionResult = await this.toolGetGrades(userId);
               // Push parsed data directly to frontend — no need for model to emit UI tags
-              res.write(`data: ${JSON.stringify({ gradesData: JSON.parse(functionResult) })}\n\n`);
+              let parsedResult = null;
+              try { parsedResult = JSON.parse(functionResult); } catch (e) { parsedResult = null; }
+              res.raw.write(`data: ${JSON.stringify({ gradesData: parsedResult })}\n\n`);
               functionResult = JSON.stringify({
                 displayed: true,
                 message: 'The grades have been shown to the user in a formatted table. Write a short 1-2 sentence summary (e.g. CGPA, strongest subject). Do NOT repeat or list the raw data.',
@@ -588,7 +596,9 @@ export class AiService {
             if (userId) {
               functionResult = await this.toolGetAttendance(userId);
               // Push parsed data directly to frontend — no need for model to emit UI tags
-              res.write(`data: ${JSON.stringify({ attendanceData: JSON.parse(functionResult) })}\n\n`);
+              let parsedResult = null;
+              try { parsedResult = JSON.parse(functionResult); } catch (e) { parsedResult = null; }
+              res.raw.write(`data: ${JSON.stringify({ attendanceData: parsedResult })}\n\n`);
               functionResult = JSON.stringify({
                 displayed: true,
                 message: 'The attendance report has been shown to the user in a formatted table with per-subject breakdown and skip/attend predictions. Write a short 1-2 sentence summary of their overall status. Do NOT repeat or list the raw data.',
@@ -605,7 +615,9 @@ export class AiService {
                 functionArgs.startTime,
               );
               // Push parsed data directly to frontend — no need for model to emit UI tags
-              res.write(`data: ${JSON.stringify({ scheduleData: JSON.parse(functionResult) })}\n\n`);
+              let parsedResult = null;
+              try { parsedResult = JSON.parse(functionResult); } catch (e) { parsedResult = null; }
+              res.raw.write(`data: ${JSON.stringify({ scheduleData: parsedResult })}\n\n`);
               functionResult = JSON.stringify({
                 displayed: true,
                 message: 'The filtered weekly timetable has been shown to the user in a formatted day-grouped schedule. Write a short 1-2 sentence summary. Do NOT repeat or list the raw data.',
@@ -627,7 +639,7 @@ export class AiService {
             const results = await this.ragService.getCollegeNotices(functionArgs.query);
             functionResult = JSON.stringify(results);
           } else if (functionName === 'search_marketplace') {
-            const listings = await this.prisma.marketplaceListing.findMany({
+            const listings = await this.prisma.marketplaceListing.findMany({ take: 1000, 
               where: {
                 title: { contains: functionArgs.query, mode: 'insensitive' },
                 status: 'Available',
@@ -644,7 +656,7 @@ export class AiService {
             });
             functionResult = JSON.stringify(listings);
           } else if (functionName === 'get_upcoming_events') {
-            const events = await this.prisma.academicCalendarEvent.findMany({
+            const events = await this.prisma.academicCalendarEvent.findMany({ take: 1000, 
               where: { date: { gte: new Date() } },
               orderBy: { date: 'asc' },
               take: 8,
@@ -661,7 +673,7 @@ export class AiService {
             const path = functionArgs.path ?? '/dashboard';
             const pageName = functionArgs.pageName ?? path;
             // Immediately fire the navigation event to the frontend
-            res.write(`data: ${JSON.stringify({ navigate: path })}\n\n`);
+            res.raw.write(`data: ${JSON.stringify({ navigate: path })}\n\n`);
             functionResult = JSON.stringify({ navigated: true, path, pageName });
           } else {
             functionResult = JSON.stringify({ error: `Unknown tool: ${functionName}` });
@@ -696,7 +708,7 @@ export class AiService {
       const finalContent = responseMessage.content ?? '';
 
       if (finalContent.trim()) {
-        res.write(`data: ${JSON.stringify({ text: finalContent })}\n\n`);
+        res.raw.write(`data: ${JSON.stringify({ text: finalContent })}\n\n`);
       } else {
         // Fallback: no cached content (shouldn't happen) — make a real streaming call
         const stream = await this.openaiClient.chat.completions.create({
@@ -710,18 +722,18 @@ export class AiService {
         for await (const chunk of stream as any) {
           const content = chunk.choices[0]?.delta?.content ?? '';
           if (content) {
-            res.write(`data: ${JSON.stringify({ text: content })}\n\n`);
+            res.raw.write(`data: ${JSON.stringify({ text: content })}\n\n`);
           }
         }
       }
 
-      res.write('data: [DONE]\n\n');
-      res.end();
+      res.raw.write('data: [DONE]\n\n');
+      res.raw.end();
     } catch (error) {
       console.error('[AI] Error:', error);
-      res.write(`data: ${JSON.stringify({ error: error.message || 'AI request failed' })}\n\n`);
-      res.write('data: [DONE]\n\n');
-      res.end();
+      res.raw.write(`data: ${JSON.stringify({ error: error.message || 'AI request failed' })}\n\n`);
+      res.raw.write('data: [DONE]\n\n');
+      res.raw.end();
     }
   }
 

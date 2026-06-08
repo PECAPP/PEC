@@ -26,7 +26,7 @@ export class AcademicCalendarService {
       where.category = category;
     }
 
-    return this.prisma.academicCalendarEvent.findMany({
+    return this.prisma.academicCalendarEvent.findMany({ take: 1000, 
       where,
       orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
     });
@@ -48,7 +48,7 @@ export class AcademicCalendarService {
     return this.prisma.academicCalendarEvent.create({
       data: {
         ...data,
-        date: new Date(data.date),
+        date: new Date(data.startDate),
         endDate: data.endDate ? new Date(data.endDate) : null,
         createdBy: userId,
       },
@@ -64,7 +64,7 @@ export class AcademicCalendarService {
           tx.academicCalendarEvent.create({
             data: {
               ...event,
-              date: new Date(event.date),
+              date: new Date(event.startDate),
               endDate: event.endDate ? new Date(event.endDate) : null,
               createdBy: userId,
             },
@@ -80,8 +80,8 @@ export class AcademicCalendarService {
     await this.findOne(id);
 
     const updateData: any = { ...data };
-    if (data.date) {
-      updateData.date = new Date(data.date);
+    if (data.startDate) {
+      updateData.date = new Date(data.startDate);
     }
     if (data.endDate) {
       updateData.endDate = new Date(data.endDate);
@@ -109,7 +109,7 @@ export class AcademicCalendarService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return this.prisma.academicCalendarEvent.findMany({
+    return this.prisma.academicCalendarEvent.findMany({ take: 1000, 
       where: {
         date: {
           gte: today,
@@ -121,7 +121,7 @@ export class AcademicCalendarService {
   }
 
   async getEventsByDateRange(startDate: string, endDate: string) {
-    return this.prisma.academicCalendarEvent.findMany({
+    return this.prisma.academicCalendarEvent.findMany({ take: 1000, 
       where: {
         date: {
           gte: new Date(startDate),

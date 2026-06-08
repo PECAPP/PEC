@@ -31,18 +31,17 @@ export class AdminController {
 
   constructor(private readonly adminService: AdminService) {}
 
-  @Post('bulk/users')
-  @UseInterceptors(FileInterceptor('file'))
-  async bulkUsers(@UploadedFile() file: Express.Multer.File) {
+  @Post('upload-students')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
+  async uploadStudents(@UploadedFile() file: Express.Multer.File) {
     const results = await this.adminService.processUserBulk(file);
     return ok(results);
   }
 
-  @Post('bulk/attendance')
-  @UseInterceptors(FileInterceptor('file'))
-  async bulkAttendance(@UploadedFile() file: Express.Multer.File) {
+  @Post('upload-timetable')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
+  async uploadTimetable(@UploadedFile() file: Express.Multer.File) {
     const results = await this.adminService.processAttendanceBulk(file);
     return ok(results);
   }
 }
-

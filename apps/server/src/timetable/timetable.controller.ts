@@ -8,7 +8,9 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { TimetableService } from './timetable.service';
 import { TimetableQueryDto } from './dto/timetable-query.dto';
 import { CreateTimetableDto } from './dto/create-timetable.dto';
@@ -19,9 +21,6 @@ import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
-
-
-
 import { RateLimit } from '../common/decorators/rate-limit-options.decorator';
 
 @UseGuards(AuthGuard, PoliciesGuard)
@@ -31,6 +30,8 @@ export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
 
   @CheckPolicies((ability) => ability.can('read', 'Timetable'))
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300) // 5 minutes
   @Get()
   async findAll(@Query() query: TimetableQueryDto) {
     const result = await this.timetableService.findAll(query);

@@ -11,7 +11,9 @@ import {
   UseInterceptors,
   UploadedFile,
   ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AcademicCalendarService } from './academic-calendar.service';
 import { AiService } from '../ai/ai.service';
@@ -20,8 +22,8 @@ import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 
 
-
 import { CreateAcademicCalendarEventDto, UpdateAcademicCalendarEventDto } from './dto/create-academic-calendar-event.dto';
+import { ClamavService } from '../common/services/clamav.service';
 
 @Controller('academic-calendar')
 @UseGuards(AuthGuard, PoliciesGuard)
@@ -29,15 +31,19 @@ export class AcademicCalendarController {
   constructor(
     private readonly calendarService: AcademicCalendarService,
     private readonly aiService: AiService,
+    private readonly clamav: ClamavService,
   ) {}
 
   @Post('upload-pdf')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute per IP for AI parsing
   @CheckPolicies((ability) => ability.can('manage', 'all'))
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
   async uploadPdf(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new Error('No file uploaded');
     }
+
+    await this.clamav.scanBuffer(file.buffer, file.originalname);
 
     const pdfBase64 = file.buffer.toString('base64');
     const events = await this.aiService.parseAcademicCalendarPdf(pdfBase64);
@@ -49,8 +55,17 @@ export class AcademicCalendarController {
   }
 
   @Post('upload-pdf-base64')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute per IP
   @CheckPolicies((ability) => ability.can('manage', 'all'))
   async uploadPdfBase64(@Body() body: { pdfBase64: string }) {
+    // Restrict Base64 payload size (approx 5MB binary = ~6.8MB Base64)
+    if (!body.pdfBase64 || body.pdfBase64.length > 7 * 1024 * 1024) {
+      throw new BadRequestException('Payload too large. Maximum size is 5MB.');
+    }
+
+    const buffer = Buffer.from(body.pdfBase64, 'base64');
+    await this.clamav.scanBuffer(buffer, 'base64-upload');
+
     const events = await this.aiService.parseAcademicCalendarPdf(body.pdfBase64);
 
     return {

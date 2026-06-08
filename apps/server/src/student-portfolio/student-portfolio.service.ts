@@ -13,11 +13,11 @@ export class StudentPortfolioService {
 
   async getPortfolio(studentId: string) {
     const [projects, skills] = await Promise.all([
-      this.prisma.studentProject.findMany({
+      this.prisma.studentProject.findMany({ take: 1000, 
         where: { studentId },
         orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
       }),
-      this.prisma.studentSkill.findMany({
+      this.prisma.studentSkill.findMany({ take: 1000, 
         where: { studentId },
         orderBy: [{ category: 'asc' }, { level: 'desc' }],
       }),
@@ -34,7 +34,7 @@ export class StudentPortfolioService {
   }
 
   async getProjects(studentId: string) {
-    return this.prisma.studentProject.findMany({
+    return this.prisma.studentProject.findMany({ take: 1000, 
       where: { studentId },
       orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
     });
@@ -59,7 +59,7 @@ export class StudentPortfolioService {
   }
 
   async getSkills(studentId: string) {
-    return this.prisma.studentSkill.findMany({
+    return this.prisma.studentSkill.findMany({ take: 1000, 
       where: { studentId },
       orderBy: [{ category: 'asc' }, { level: 'desc' }],
     });

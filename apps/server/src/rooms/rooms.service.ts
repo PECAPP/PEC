@@ -14,7 +14,7 @@ export class RoomsService {
     if (query.floor !== undefined) where.floor = query.floor;
     if (query.isAvailable !== undefined) where.isAvailable = query.isAvailable;
 
-    return this.prisma.room.findMany({
+    return this.prisma.room.findMany({ take: 1000, 
       where,
       orderBy: { building: 'asc' },
       take: query.limit,
@@ -48,7 +48,7 @@ export class RoomsService {
     const where: any = { building, isAvailable: true };
     if (floor !== undefined) where.floor = floor;
 
-    return this.prisma.room.findMany({
+    return this.prisma.room.findMany({ take: 1000, 
       where,
       orderBy: { name: 'asc' },
     });

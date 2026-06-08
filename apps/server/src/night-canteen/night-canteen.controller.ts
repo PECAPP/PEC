@@ -10,7 +10,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { ok } from '../common/utils/api-response';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
@@ -88,7 +88,7 @@ export class NightCanteenController {
   @CheckPolicies((ability) => ability.can('read', 'CanteenItem'))
   @Get('orders')
   async listOrders(
-    @Req() req: Request & { user?: { sub?: string; role?: string } },
+    @Req() req: FastifyRequest & { user?: { sub?: string; role?: string } },
     @Query() query: NightCanteenOrderQueryDto,
   ) {
     const role = req.user?.role;
@@ -117,7 +117,7 @@ export class NightCanteenController {
   @CheckPolicies((ability) => ability.can('create', 'CanteenItem'))
   @Post('orders')
   async createOrder(
-    @Req() req: Request & { user?: { sub?: string; role?: string } },
+    @Req() req: FastifyRequest & { user?: { sub?: string; role?: string } },
     @Body() body: CreateCanteenOrderDto,
   ) {
     const role = req.user?.role;

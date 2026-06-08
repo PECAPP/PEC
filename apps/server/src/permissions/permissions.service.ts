@@ -5,8 +5,10 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PermissionsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.permission.findMany({
+  async findAll(query?: { limit?: number; offset?: number }) {
+    return this.prisma.permission.findMany({ 
+      take: query?.limit || 1000, 
+      skip: query?.offset || 0,
       orderBy: [{ subject: 'asc' }, { action: 'asc' }],
     });
   }

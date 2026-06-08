@@ -17,19 +17,19 @@ export class FacultyBioSystemService {
         where: { userId: facultyId },
         include: { user: true },
       }),
-      this.prisma.facultyPublication.findMany({
+      this.prisma.facultyPublication.findMany({ take: 1000, 
         where: { facultyId },
         orderBy: { year: 'desc' },
       }),
-      this.prisma.facultyAward.findMany({
+      this.prisma.facultyAward.findMany({ take: 1000, 
         where: { facultyId },
         orderBy: { year: 'desc' },
       }),
-      this.prisma.facultyConference.findMany({
+      this.prisma.facultyConference.findMany({ take: 1000, 
         where: { facultyId },
         orderBy: { startDate: 'desc' },
       }),
-      this.prisma.facultyConsultation.findMany({
+      this.prisma.facultyConsultation.findMany({ take: 1000, 
         where: { facultyId },
         orderBy: { createdAt: 'desc' },
       }),
@@ -52,9 +52,10 @@ export class FacultyBioSystemService {
   }
 
   async getPublications(facultyId: string) {
-    return this.prisma.facultyPublication.findMany({
+    return this.prisma.facultyPublication.findMany({ take: 1000, 
       where: { facultyId },
       orderBy: { year: 'desc' },
+      take: 50,
     });
   }
 
@@ -76,9 +77,10 @@ export class FacultyBioSystemService {
   }
 
   async getAwards(facultyId: string) {
-    return this.prisma.facultyAward.findMany({
+    return this.prisma.facultyAward.findMany({ take: 1000, 
       where: { facultyId },
       orderBy: { year: 'desc' },
+      take: 50,
     });
   }
 
@@ -95,9 +97,10 @@ export class FacultyBioSystemService {
   }
 
   async getConferences(facultyId: string) {
-    return this.prisma.facultyConference.findMany({
+    return this.prisma.facultyConference.findMany({ take: 1000, 
       where: { facultyId },
       orderBy: { startDate: 'desc' },
+      take: 50,
     });
   }
 
@@ -114,9 +117,10 @@ export class FacultyBioSystemService {
   }
 
   async getConsultations(facultyId: string) {
-    return this.prisma.facultyConsultation.findMany({
+    return this.prisma.facultyConsultation.findMany({ take: 1000, 
       where: { facultyId },
       orderBy: { createdAt: 'desc' },
+      take: 50,
     });
   }
 

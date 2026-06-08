@@ -10,6 +10,7 @@ import { FeeQueryDto } from './dto/fee-query.dto';
 import { CreateFeeDto } from './dto/create-fee.dto';
 import { PayFeeDto } from './dto/pay-fee.dto';
 import { TxnQueryDto } from './dto/txn-query.dto';
+import { randomUUID } from 'crypto';
 
 function generateReceiptNo(): string {
   const ts = Date.now().toString(36).toUpperCase();
@@ -26,8 +27,8 @@ export class FinanceRepository {
   // ─── Summary ─────────────────────────────────────────────────────────────────
 
   async getSummary(studentId: string) {
-    const fees = await this.prisma.feeRecord.findMany({
-      where: { studentId, deletedAt: null },
+    const fees = await this.prisma.feeRecord.findMany({ take: 1000, 
+      where: { studentId },
     });
 
     const totalPending = fees
@@ -60,7 +61,6 @@ export class FinanceRepository {
     const offset = Number(query.offset ?? 0);
 
     const where: Prisma.FeeRecordWhereInput = {
-      deletedAt: null,
       ...(studentId ? { studentId } : {}),
       ...(query.category ? { category: query.category } : {}),
       ...(query.status ? { status: query.status } : {}),
@@ -69,7 +69,7 @@ export class FinanceRepository {
 
     const [total, items] = await Promise.all([
       this.prisma.feeRecord.count({ where }),
-      this.prisma.feeRecord.findMany({
+      this.prisma.feeRecord.findMany({ take: 1000, 
         where,
         orderBy: { dueDate: 'asc' },
         take: limit,
@@ -137,6 +137,10 @@ export class FinanceRepository {
   // ─── Payment ──────────────────────────────────────────────────────────────────
 
   async payFee(dto: PayFeeDto, studentId: string) {
+    // In a real scenario, this would be a webhook handler verifying a signature.
+    // For now, we lock it down to only accept trusted internal mocked values, 
+    // rather than letting the frontend dictate 'paymentMethod' or 'gatewayTxnId' freely.
+
     const fee = await this.prisma.feeRecord.findUnique({
       where: { id: dto.feeRecordId },
     });
@@ -145,63 +149,74 @@ export class FinanceRepository {
     if (fee.status === 'paid') throw new BadRequestException('Fee already paid');
     if (fee.deletedAt) throw new BadRequestException('Fee record deleted');
 
-    // Apply late fee if overdue
-    let lateFee = 0;
-    if (new Date(fee.dueDate) < new Date() && !fee.lateFeeApplied) {
-      const monthsOverdue = Math.max(
-        1,
-        Math.ceil((Date.now() - new Date(fee.dueDate).getTime()) / (30 * 24 * 3600 * 1000)),
-      );
-      const pct = Math.min(monthsOverdue * LATE_FEE_PERCENT, 20) / 100;
-      lateFee = Math.round(fee.amount * pct);
-    }
+    // Use transaction to prevent late fee race condition
+    return this.prisma.$transaction(async (tx) => {
+      // Re-fetch inside tx to lock it (conceptually, or rely on serializability if configured)
+      const currentFee = await tx.feeRecord.findUnique({
+        where: { id: dto.feeRecordId },
+      });
+      if (!currentFee || currentFee.status === 'paid') {
+        throw new BadRequestException('Fee state changed during processing');
+      }
 
-    const totalAmount = fee.amount + (lateFee > 0 ? lateFee : fee.lateFeeAmount);
-    const receiptNo = generateReceiptNo();
+      // Apply late fee if overdue
+      let lateFee = 0;
+      if (new Date(currentFee.dueDate) < new Date() && !currentFee.lateFeeApplied) {
+        const monthsOverdue = Math.max(
+          1,
+          Math.ceil((Date.now() - new Date(currentFee.dueDate).getTime()) / (30 * 24 * 3600 * 1000)),
+        );
+        const pct = Math.min(monthsOverdue * LATE_FEE_PERCENT, 20) / 100;
+        lateFee = Math.round(currentFee.amount * pct);
+      }
 
-    // Simulate gateway: in production replace this with real Razorpay/Stripe call
-    const gatewayTxnId = dto.gatewayTxnId ?? `SIM-${Date.now()}`;
-    const paymentStatus = 'success'; // Simulated; set 'failed' on real gateway error
+      const totalAmount = currentFee.amount + (lateFee > 0 ? lateFee : currentFee.lateFeeAmount);
+      const receiptNo = generateReceiptNo();
 
-    const [transaction] = await this.prisma.$transaction([
-      this.prisma.financeTransaction.create({
+      // Secure Gateway Generation (Backend generated, not trusted from frontend)
+      const gatewayTxnId = `SIM-${randomUUID()}`; 
+      const paymentMethod = 'online'; // Hardcoded for this simulated flow
+      const paymentStatus = 'success'; 
+
+      const transaction = await tx.financeTransaction.create({
         data: {
           studentId,
-          feeRecordId: fee.id,
+          feeRecordId: currentFee.id,
           amount: totalAmount,
-          paymentMethod: dto.paymentMethod ?? 'online',
+          paymentMethod: paymentMethod,
           status: paymentStatus,
           gatewayTxnId,
           receiptNo,
-          notes: dto.notes,
+          notes: dto.notes, // Only notes are trusted from DTO
         },
-      }),
-      this.prisma.feeRecord.update({
-        where: { id: fee.id },
+      });
+
+      const updatedFee = await tx.feeRecord.update({
+        where: { id: currentFee.id },
         data: {
           status: paymentStatus === 'success' ? 'paid' : 'failed',
           paidDate: paymentStatus === 'success' ? new Date() : null,
           paymentTransactionId: gatewayTxnId,
           lastPaymentAttempt: new Date(),
-          lateFeeApplied: lateFee > 0 ? true : fee.lateFeeApplied,
-          lateFeeAmount: lateFee > 0 ? lateFee : fee.lateFeeAmount,
-        },
-      }),
-    ]);
-
-    if (paymentStatus === 'success') {
-      await this.prisma.notification.create({
-        data: {
-          userId: studentId,
-          title: '✅ Payment Successful',
-          message: `₹${totalAmount.toLocaleString('en-IN')} paid for ${fee.category} fee. Receipt: ${receiptNo}`,
-          type: 'success',
-          link: '/finance',
+          lateFeeApplied: lateFee > 0 ? true : currentFee.lateFeeApplied,
+          lateFeeAmount: lateFee > 0 ? lateFee : currentFee.lateFeeAmount,
         },
       });
-    }
 
-    return { transaction, fee: await this.prisma.feeRecord.findUnique({ where: { id: fee.id } }) };
+      if (paymentStatus === 'success') {
+        await tx.notification.create({
+          data: {
+            userId: studentId,
+            title: '✅ Payment Successful',
+            message: `₹${totalAmount.toLocaleString('en-IN')} paid for ${currentFee.category} fee. Receipt: ${receiptNo}`,
+            type: 'success',
+            link: '/finance',
+          },
+        });
+      }
+
+      return { transaction, fee: updatedFee };
+    });
   }
 
   async adminMarkPaid(feeId: string, notes?: string) {
@@ -266,7 +281,7 @@ export class FinanceRepository {
 
     const [total, items] = await Promise.all([
       this.prisma.financeTransaction.count({ where }),
-      this.prisma.financeTransaction.findMany({
+      this.prisma.financeTransaction.findMany({ take: 1000, 
         where,
         orderBy: { createdAt: 'desc' },
         take: limit,
@@ -303,7 +318,7 @@ export class FinanceRepository {
     });
 
     const existing = await this.prisma.feeRecord.findMany({
-      where: { category: body.category, month: body.month, deletedAt: null },
+      where: { category: body.category, month: body.month },
       select: { studentId: true },
     });
     const existingIds = new Set(existing.map((e) => e.studentId));
@@ -311,28 +326,34 @@ export class FinanceRepository {
 
     if (toCreate.length === 0) return { created: 0, skipped: students.length };
 
-    await this.prisma.feeRecord.createMany({
-      data: toCreate.map((s) => ({
-        studentId: s.id,
-        amount: Number(body.amount),
-        description: body.description,
-        category: body.category,
-        dueDate: new Date(body.dueDate),
-        month: body.month,
-        status: 'pending',
-      })),
-    });
-
-    // Bulk notifications
-    await this.prisma.notification.createMany({
-      data: toCreate.map((s) => ({
-        userId: s.id,
-        title: `🧾 ${body.category.charAt(0).toUpperCase() + body.category.slice(1)} Fee for ${body.month}`,
-        message: `₹${body.amount} due by ${new Date(body.dueDate).toLocaleDateString('en-IN')}.`,
-        type: 'alert',
-        link: '/finance',
-      })),
-    });
+    const BATCH_SIZE = 500;
+    
+    for (let i = 0; i < toCreate.length; i += BATCH_SIZE) {
+      const batch = toCreate.slice(i, i + BATCH_SIZE);
+      
+      await this.prisma.$transaction([
+        this.prisma.feeRecord.createMany({
+          data: batch.map((s) => ({
+            studentId: s.id,
+            amount: Number(body.amount),
+            description: body.description,
+            category: body.category,
+            dueDate: new Date(body.dueDate),
+            month: body.month,
+            status: 'pending',
+          })),
+        }),
+        this.prisma.notification.createMany({
+          data: batch.map((s) => ({
+            userId: s.id,
+            title: `🧾 ${body.category.charAt(0).toUpperCase() + body.category.slice(1)} Fee for ${body.month}`,
+            message: `₹${body.amount} due by ${new Date(body.dueDate).toLocaleDateString('en-IN')}.`,
+            type: 'alert',
+            link: '/finance',
+          })),
+        })
+      ]);
+    }
 
     return { created: toCreate.length, skipped: existingIds.size };
   }

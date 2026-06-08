@@ -9,7 +9,7 @@ export class AdminService {
     const [students, faculty, courses, departments] = await Promise.all([
       this.prisma.user.count({ where: { roles: { some: { role: { name: 'student' } } } } }),
       this.prisma.user.count({ where: { roles: { some: { role: { name: 'faculty' } } } } }),
-      this.prisma.course.count({ where: { deletedAt: null } }),
+      this.prisma.course.count(),
       this.prisma.department.count(),
     ]);
 
@@ -23,7 +23,7 @@ export class AdminService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async processUserBulk(file: Express.Multer.File) {
+  async processUserBulk(file: any) {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(file.buffer as any);
     const worksheet = workbook.worksheets[0];
@@ -82,7 +82,7 @@ export class AdminService {
     return results;
   }
 
-  async processAttendanceBulk(file: Express.Multer.File) {
+  async processAttendanceBulk(file: any) {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(file.buffer as any);
     const worksheet = workbook.worksheets[0];

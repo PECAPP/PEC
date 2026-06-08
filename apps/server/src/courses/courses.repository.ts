@@ -13,7 +13,6 @@ export class CoursesRepository extends BaseRepository {
 
   async findMany(query: CourseQueryDto) {
     const where = {
-      deletedAt: null,
       ...(query.department ? { department: query.department } : {}),
       ...(query.facultyId ? { facultyId: query.facultyId } : {}),
       ...(query.semester ? { semester: query.semester } : {}),
@@ -28,7 +27,7 @@ export class CoursesRepository extends BaseRepository {
     const sortOrder = query.sortOrder ?? 'asc';
 
     const [items, total] = await Promise.all([
-      this.prisma.course.findMany({
+      this.prisma.course.findMany({ take: 1000, 
         where,
         take,
         skip,
@@ -55,8 +54,8 @@ export class CoursesRepository extends BaseRepository {
   }
 
   findById(id: string) {
-    return this.prisma.course.findFirst({
-      where: { id, deletedAt: null },
+    return this.prisma.course.findUnique({
+      where: { id },
     });
   }
 

@@ -34,7 +34,6 @@ export class NoticeboardService {
     const offset = Math.max(query.offset ?? 0, 0);
 
     const where = {
-      deletedAt: null,
       ...(query.category ? { category: query.category } : {}),
       ...(query.priorityLevel ? { priorityLevel: query.priorityLevel } : {}),
     };

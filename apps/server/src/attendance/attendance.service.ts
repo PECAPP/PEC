@@ -17,12 +17,17 @@ import { mkdir, stat, writeFile } from 'fs/promises';
 import { extname, join, resolve } from 'path';
 import { randomUUID } from 'crypto';
 
+import { ClamavService } from '../common/services/clamav.service';
+import { S3Service } from '../common/services/s3.service';
+
 @Injectable()
 export class AttendanceService {
   constructor(
     private readonly repo: AttendanceRepository,
     private readonly queue: QueueService,
     private readonly messaging: MessagingService,
+    private readonly clamav: ClamavService,
+    private readonly s3: S3Service,
   ) {}
 
   private readonly PEC_COORDINATES = { lat: 30.7673, lng: 76.7863 };
@@ -30,47 +35,51 @@ export class AttendanceService {
   private readonly WAIVER_UPLOAD_DIR = resolve(process.cwd(), 'uploads', 'waivers');
 
   async create(data: CreateAttendanceDto) {
-    if (data.lat && data.lng) {
+    if (data.lat !== undefined && data.lng !== undefined) {
+      const lat = Number(data.lat);
+      const lng = Number(data.lng);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        throw new BadRequestException('Invalid coordinates provided.');
+      }
+
       const distance = this.calculateDistance(
-        data.lat,
-        data.lng,
+        lat,
+        lng,
         this.PEC_COORDINATES.lat,
         this.PEC_COORDINATES.lng
       );
       
-      if (distance > this.MAX_DISTANCE_METERS) {
-        throw new Error(`Location mismatch: You must be on PEC Campus to mark attendance (Current distance: ${Math.round(distance)}m)`);
+      if (isNaN(distance) || distance > this.MAX_DISTANCE_METERS) {
+        throw new BadRequestException(`Location mismatch: You must be on PEC Campus to mark attendance (Current distance: ${isNaN(distance) ? 'unknown' : Math.round(distance)}m)`);
       }
     }
     
     const created = await this.repo.create(data);
 
     // enqueue a background job for async processing (notifications, analytics, etc.)
-    try {
-      await this.queue.addJob('attendance-created', {
-        attendanceId: created.id,
-        studentId: created.studentId,
-        courseId: created.courseId,
-        date: created.date,
-        status: created.status,
-      });
-    } catch (e) {
-      // Log and continue - background jobs should not block the main flow
+    // Fire and forget so we don't block the main flow if RabbitMQ is slow
+    this.queue.addJob('attendance-created', {
+      attendanceId: created.id,
+      studentId: created.studentId,
+      courseId: created.courseId,
+      date: created.date,
+      status: created.status,
+    }).catch(e => {
+      // In a real production app we'd fall back to an outbox pattern (saving event to DB table)
       console.error('Failed to enqueue attendance-created job', e?.message || e);
-    }
+    });
 
-    // Also publish via RabbitMQ for other services
-    try {
-      await this.messaging.emitAttendanceCreated({
-        attendanceId: created.id,
-        studentId: created.studentId,
-        courseId: created.courseId,
-        date: created.date,
-        status: created.status,
-      });
-    } catch (e) {
+    // Also publish via RabbitMQ for other services (Fire and forget)
+    this.messaging.emitAttendanceCreated({
+      attendanceId: created.id,
+      studentId: created.studentId,
+      courseId: created.courseId,
+      date: created.date,
+      status: created.status,
+    }).catch(e => {
       console.error('Failed to publish attendance.created event', e?.message || e);
-    }
+    });
 
     return created;
   }
@@ -108,7 +117,7 @@ export class AttendanceService {
     return this.repo.getWaiverRequestsForStudent(studentId);
   }
 
-  async uploadWaiverDocument(file: Express.Multer.File, studentId: string) {
+  async uploadWaiverDocument(file: any, studentId: string) {
     const maxBytes = 5 * 1024 * 1024;
     if (!file.buffer || file.size <= 0) {
       throw new BadRequestException('Uploaded file is empty');
@@ -129,18 +138,29 @@ export class AttendanceService {
       throw new BadRequestException('Only PDF, JPG, PNG and WEBP files are allowed');
     }
 
-    await mkdir(this.WAIVER_UPLOAD_DIR, { recursive: true });
+    // Magic number validation to prevent spoofing
+    const header = file.buffer.subarray(0, 4).toString('hex').toUpperCase();
+    let isValidMagic = false;
+    
+    if (file.mimetype === 'application/pdf' && header === '25504446') isValidMagic = true;
+    else if (file.mimetype === 'image/jpeg' && header.startsWith('FFD8FF')) isValidMagic = true;
+    else if (file.mimetype === 'image/png' && header === '89504E47') isValidMagic = true;
+    else if (file.mimetype === 'image/webp' && header === '52494646') {
+      const webpHeader = file.buffer.subarray(8, 12).toString('utf8');
+      if (webpHeader === 'WEBP') isValidMagic = true;
+    }
 
-    const ext = extname(file.originalname || '').toLowerCase();
-    const safeExt = ext && ext.length <= 8 ? ext : file.mimetype === 'application/pdf' ? '.pdf' : '.bin';
-    const fileName = `${studentId}_${Date.now()}_${randomUUID()}${safeExt}`;
-    const filePath = join(this.WAIVER_UPLOAD_DIR, fileName);
+    if (!isValidMagic) {
+      throw new BadRequestException('Invalid file content signature. File appears to be spoofed.');
+    }
 
-    await writeFile(filePath, file.buffer);
+    await this.clamav.scanBuffer(file.buffer, file.originalname);
+
+    const key = await this.s3.uploadFile(file.buffer, file.originalname, file.mimetype);
 
     return {
-      fileName,
-      url: `/api/attendance/waivers/files/${fileName}`,
+      fileName: key,
+      url: `/api/attendance/waivers/files/${key}`,
       originalName: file.originalname,
       mimeType: file.mimetype,
       size: file.size,
@@ -158,35 +178,8 @@ export class AttendanceService {
       throw new ForbiddenException('You are not allowed to access this document');
     }
 
-    const filePath = join(this.WAIVER_UPLOAD_DIR, fileName);
-    let fileStats;
-    try {
-      fileStats = await stat(filePath);
-    } catch {
-      throw new NotFoundException('Document not found');
-    }
-
-    if (!fileStats.isFile()) {
-      throw new NotFoundException('Document not found');
-    }
-
-    const ext = extname(fileName).toLowerCase();
-    const mimeType =
-      ext === '.pdf'
-        ? 'application/pdf'
-        : ext === '.jpg' || ext === '.jpeg'
-          ? 'image/jpeg'
-          : ext === '.png'
-            ? 'image/png'
-            : ext === '.webp'
-              ? 'image/webp'
-              : 'application/octet-stream';
-
-    return {
-      stream: createReadStream(filePath),
-      mimeType,
-      contentDisposition: `inline; filename="${fileName}"`,
-    };
+    const url = await this.s3.getSignedDownloadUrl(fileName);
+    return { url };
   }
 
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -262,7 +255,7 @@ export class AttendanceService {
     return this.repo.remove(id);
   }
 
-  async generateExcel(courseId: string) {
+  async generateExcel(courseId: string, stream: any) {
     const data = await this.repo.findMany({ courseId, limit: 1000 });
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Attendance');
@@ -285,11 +278,10 @@ export class AttendanceService {
       });
     });
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    return Buffer.from(buffer);
+    await workbook.xlsx.write(stream);
   }
 
-  async generateStudentExcel(studentId: string) {
+  async generateStudentExcel(studentId: string, stream: any) {
     const data = await this.repo.findMany({ studentId, limit: 1000 });
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('My Attendance');
@@ -310,7 +302,6 @@ export class AttendanceService {
       });
     });
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    return Buffer.from(buffer);
+    await workbook.xlsx.write(stream);
   }
 }

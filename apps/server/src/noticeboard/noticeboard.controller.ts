@@ -10,7 +10,9 @@ import {
   Query,
   Request,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
@@ -29,6 +31,8 @@ export class NoticeboardController {
   constructor(private readonly service: NoticeboardService) {}
 
   @CheckPolicies((ability) => ability.can('read', 'Notice'))
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300) // 5 minutes
   @Get()
   async list(@Query() query: ListNoticesDto) {
     const result = await this.service.list(query);

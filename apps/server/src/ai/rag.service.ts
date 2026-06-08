@@ -11,6 +11,7 @@ export class RagService {
     this.qdrantClient = new QdrantClient({
       url: process.env.QDRANT_URL || 'http://localhost:6333',
       apiKey: process.env.QDRANT_API_KEY,
+      timeout: 5000, // 5 seconds timeout to prevent event loop starvation
     });
 
     const openaiApiKey = process.env.GITHUB_AI_API_KEY || process.env.OPENAI_API_KEY;

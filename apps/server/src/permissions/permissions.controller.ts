@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
@@ -17,8 +17,11 @@ export class PermissionsController {
 
   @Get()
   @CheckPolicies((ability) => ability.can('read', 'Permission'))
-  findAll() {
-    return this.permissionsService.findAll();
+  findAll(@Query() query: { limit?: string; offset?: string }) {
+    return this.permissionsService.findAll({
+      limit: query.limit ? parseInt(query.limit, 10) : undefined,
+      offset: query.offset ? parseInt(query.offset, 10) : undefined,
+    });
   }
 
   @Get(':id')

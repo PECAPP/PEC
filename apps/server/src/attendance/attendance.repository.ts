@@ -172,8 +172,8 @@ export class AttendanceRepository extends BaseRepository {
   }
 
   async getFacultyStats(facultyId: string) {
-    const courses = await this.prisma.course.findMany({
-      where: { facultyId, deletedAt: null },
+    const courses = await this.prisma.course.findMany({ take: 1000, 
+      where: { facultyId },
       include: { _count: { select: { enrollments: true } } }
     });
 
@@ -205,7 +205,7 @@ export class AttendanceRepository extends BaseRepository {
 
   async getStudentSummary(studentId: string) {
     const [enrollments, aggregates] = await Promise.all([
-      this.prisma.enrollment.findMany({
+      this.prisma.enrollment.findMany({ take: 1000, 
         where: { studentId, status: 'active' },
         include: { 
           course: {
