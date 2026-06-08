@@ -6,21 +6,22 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { User, Course, DashboardStats, AdminDashboardData } from '../../shared/types';
 import api from "@pec/api";
-
 import { toast } from 'sonner';
 
 export function useAdminDashboard(initialData?: AdminDashboardData) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  
+
   const [loading, setLoading] = useState(!initialData);
   const [courses, setCourses] = useState<Course[]>(initialData?.courses || []);
   const [users, setUsers] = useState<User[]>(initialData?.users || []);
-  const [stats, setStats] = useState<DashboardStats>(initialData?.stats || {
-    totalStudents: 0,
-    totalFaculty: 0,
-    totalCourses: 0,
-  });
+  const [stats, setStats] = useState<DashboardStats>(
+    initialData?.stats || {
+      totalStudents: 0,
+      totalFaculty: 0,
+      totalCourses: 0,
+    }
+  );
 
   // Course Dialog states
   const [showCourseDialog, setShowCourseDialog] = useState(false);
@@ -79,10 +80,10 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
         api.get('/users', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
         api.get('/admin/dashboard-stats'),
       ]);
-      
+
       setCourses(coursesData);
       setUsers(usersData);
-      
+
       const serverStats = statsRes.data?.success ? statsRes.data.data : statsRes.data;
       if (serverStats) {
         setStats(serverStats);

@@ -7,9 +7,8 @@ const emptyAbility = createMongoAbility();
 
 export const Can = (props: any) => {
   const { ability } = useAuth();
-  return createElement(
-    AbilityProvider,
-    { value: ability || emptyAbility },
-    createElement(CaslCan, props)
-  );
+  return createElement(AbilityProvider, {
+    value: ability || emptyAbility,
+    children: createElement(CaslCan, props),
+  });
 };

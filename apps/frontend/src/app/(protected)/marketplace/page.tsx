@@ -29,17 +29,15 @@ import {
   CheckCircle2,
   Edit2,
   Trash2,
-  Eye,
   IndianRupee,
+  Eye,
 } from 'lucide-react';
-
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import api from "@pec/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
 interface Seller {
   id: string;
   name: string;
@@ -900,7 +898,9 @@ export default function MarketplacePage() {
 
   // Debounce search
   useEffect(() => {
-    const t = setTimeout(() => { fetchListings(); }, 400);
+    const t = setTimeout(() => {
+      fetchListings();
+    }, 400);
     return () => clearTimeout(t);
   }, [search]);
 
@@ -923,7 +923,8 @@ export default function MarketplacePage() {
       // Sync with server source of truth
       setBookmarkedIds((prev) => {
         const next = new Set(prev);
-        if (bookmarked) next.add(id); else next.delete(id);
+        if (bookmarked) next.add(id);
+        else next.delete(id);
         return next;
       });
       toast.success(bookmarked ? 'Saved to bookmarks' : 'Removed from bookmarks');
@@ -976,7 +977,8 @@ export default function MarketplacePage() {
   }
 
   const currentUserId = (user as any)?.id ?? '';
-  const activeListings = tab === 'browse' ? listings : tab === 'my-listings' ? myListings : savedListings;
+  const activeListings =
+    tab === 'browse' ? listings : tab === 'my-listings' ? myListings : savedListings;
 
   return (
     <div className="container max-w-7xl animate-in fade-in duration-500 flex flex-col min-h-0">
@@ -990,15 +992,20 @@ export default function MarketplacePage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-foreground">Marketplace</h1>
-              <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">Buy & Sell within PEC campus</p>
+              <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">
+                Buy & Sell within PEC campus
+              </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
               className="h-10 rounded-xl px-4 font-bold text-xs gap-2 relative transition-all"
-              onClick={() => { setChatListing(null); setChatOpen(true); }}
+              onClick={() => {
+                setChatListing(null);
+                setChatOpen(true);
+              }}
             >
               <MessageCircle className="w-4 h-4" />
               Chats
@@ -1008,9 +1015,12 @@ export default function MarketplacePage() {
                 </span>
               )}
             </Button>
-            <Button 
+            <Button
               className="h-10 rounded-xl px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
-              onClick={() => { setEditingListing(null); setFormOpen(true); }}
+              onClick={() => {
+                setEditingListing(null);
+                setFormOpen(true);
+              }}
             >
               <Plus className="w-4 h-4" />
               Sell Item
@@ -1022,20 +1032,20 @@ export default function MarketplacePage() {
         <div className="border-b border-border/40">
           <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
             <TabsList className="h-12 bg-transparent p-0 flex justify-start gap-6 rounded-none">
-              <TabsTrigger 
-                value="browse" 
+              <TabsTrigger
+                value="browse"
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
               >
                 Browse
               </TabsTrigger>
-              <TabsTrigger 
-                value="my-listings" 
+              <TabsTrigger
+                value="my-listings"
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
               >
                 My Listings
               </TabsTrigger>
-              <TabsTrigger 
-                value="saved" 
+              <TabsTrigger
+                value="saved"
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
               >
                 <Heart className="w-3.5 h-3.5 mr-1.5" /> Saved
@@ -1047,7 +1057,6 @@ export default function MarketplacePage() {
 
       <div className="flex-1 overflow-y-auto mt-6">
         <div className="space-y-4">
-
           {/* Search + Filters (browse tab only) */}
           {tab === 'browse' && (
             <div className="space-y-3">
@@ -1061,7 +1070,10 @@ export default function MarketplacePage() {
                     onChange={(e) => setSearch(e.target.value)}
                   />
                   {search && (
-                    <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <button
+                      onClick={() => setSearch('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                    >
                       <X className="w-3.5 h-3.5 text-muted-foreground" />
                     </button>
                   )}
@@ -1099,30 +1111,58 @@ export default function MarketplacePage() {
                     className="overflow-hidden"
                   >
                     <div className="flex flex-wrap gap-3 p-3 bg-muted/30 rounded-lg border border-border">
-                      <Select value={filterCategory || '__all__'} onValueChange={(v) => setFilterCategory(v === '__all__' ? '' : v)}>
+                      <Select
+                        value={filterCategory || '__all__'}
+                        onValueChange={(v) => setFilterCategory(v === '__all__' ? '' : v)}
+                      >
                         <SelectTrigger className="w-36 h-8 text-xs">
                           <SelectValue placeholder="Category" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="__all__">All Categories</SelectItem>
-                          {CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                          {CATEGORIES.map((c) => (
+                            <SelectItem key={c.value} value={c.value}>
+                              {c.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
 
-                      <Select value={filterCondition || '__all__'} onValueChange={(v) => setFilterCondition(v === '__all__' ? '' : v)}>
+                      <Select
+                        value={filterCondition || '__all__'}
+                        onValueChange={(v) => setFilterCondition(v === '__all__' ? '' : v)}
+                      >
                         <SelectTrigger className="w-32 h-8 text-xs">
                           <SelectValue placeholder="Condition" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="__all__">Any Condition</SelectItem>
-                          {CONDITIONS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                          {CONDITIONS.map((c) => (
+                            <SelectItem key={c} value={c}>
+                              {c}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
 
                       <div className="flex items-center gap-1">
-                        <Input placeholder="Min ₹" value={filterMinPrice} onChange={(e) => setFilterMinPrice(e.target.value)} className="w-20 h-8 text-xs" type="number" min="0" />
+                        <Input
+                          placeholder="Min ₹"
+                          value={filterMinPrice}
+                          onChange={(e) => setFilterMinPrice(e.target.value)}
+                          className="w-20 h-8 text-xs"
+                          type="number"
+                          min="0"
+                        />
                         <span className="text-muted-foreground text-xs">–</span>
-                        <Input placeholder="Max ₹" value={filterMaxPrice} onChange={(e) => setFilterMaxPrice(e.target.value)} className="w-20 h-8 text-xs" type="number" min="0" />
+                        <Input
+                          placeholder="Max ₹"
+                          value={filterMaxPrice}
+                          onChange={(e) => setFilterMaxPrice(e.target.value)}
+                          className="w-20 h-8 text-xs"
+                          type="number"
+                          min="0"
+                        />
                       </div>
 
                       <Select value={sortOption} onValueChange={setSortOption}>
@@ -1131,7 +1171,11 @@ export default function MarketplacePage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {SORT_OPTIONS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                          {SORT_OPTIONS.map((s) => (
+                            <SelectItem key={s.value} value={s.value}>
+                              {s.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
 
@@ -1140,8 +1184,10 @@ export default function MarketplacePage() {
                         size="sm"
                         className="h-8 text-xs"
                         onClick={() => {
-                          setFilterCategory(''); setFilterCondition('');
-                          setFilterMinPrice(''); setFilterMaxPrice('');
+                          setFilterCategory('');
+                          setFilterCondition('');
+                          setFilterMinPrice('');
+                          setFilterMaxPrice('');
                           setSortOption('createdAt_desc');
                         }}
                       >
@@ -1159,12 +1205,14 @@ export default function MarketplacePage() {
                   return (
                     <button
                       key={cat.value}
-                      onClick={() => setFilterCategory(filterCategory === cat.value ? '' : cat.value)}
+                      onClick={() =>
+                        setFilterCategory(filterCategory === cat.value ? '' : cat.value)
+                      }
                       className={cn(
                         'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap transition-colors',
                         filterCategory === cat.value
                           ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-background border-border hover:bg-muted',
+                          : 'bg-background border-border hover:bg-muted'
                       )}
                     >
                       <Icon className="w-3 h-3" />
@@ -1174,15 +1222,25 @@ export default function MarketplacePage() {
                 })}
               </div>
 
-              <p className="text-xs text-muted-foreground">{total} listing{total !== 1 && 's'} found</p>
+              <p className="text-xs text-muted-foreground">
+                {total} listing{total !== 1 && 's'} found
+              </p>
             </div>
           )}
 
           {/* My Listings – status tabs */}
           {tab === 'my-listings' && (
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">{myListings.length} listing{myListings.length !== 1 && 's'}</p>
-              <Button size="sm" onClick={() => { setEditingListing(null); setFormOpen(true); }}>
+              <p className="text-sm text-muted-foreground">
+                {myListings.length} listing{myListings.length !== 1 && 's'}
+              </p>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setEditingListing(null);
+                  setFormOpen(true);
+                }}
+              >
                 <Plus className="w-4 h-4 mr-1.5" /> New Listing
               </Button>
             </div>
@@ -1198,18 +1256,30 @@ export default function MarketplacePage() {
               <ShoppingBag className="w-12 h-12" />
               <div className="text-center">
                 <p className="font-medium">
-                  {tab === 'browse' ? 'No listings found' : tab === 'my-listings' ? "You haven't listed anything yet" : 'No saved listings'}
+                  {tab === 'browse'
+                    ? 'No listings found'
+                    : tab === 'my-listings'
+                      ? "You haven't listed anything yet"
+                      : 'No saved listings'}
                 </p>
                 <p className="text-sm mt-1">
                   {tab === 'browse'
                     ? 'Try adjusting your filters or search query'
                     : tab === 'my-listings'
-                    ? 'Click "New Listing" to start selling'
-                    : 'Browse and save items you like'}
+                      ? 'Click "New Listing" to start selling'
+                      : 'Browse and save items you like'}
                 </p>
               </div>
               {tab !== 'browse' && (
-                <Button size="sm" onClick={() => { if (tab === 'my-listings') { setEditingListing(null); setFormOpen(true); } else setTab('browse'); }}>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    if (tab === 'my-listings') {
+                      setEditingListing(null);
+                      setFormOpen(true);
+                    } else setTab('browse');
+                  }}
+                >
                   {tab === 'my-listings' ? 'Create Listing' : 'Browse Listings'}
                 </Button>
               )}
@@ -1221,7 +1291,7 @@ export default function MarketplacePage() {
                 'gap-4',
                 viewMode === 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
-                  : 'flex flex-col',
+                  : 'flex flex-col'
               )}
             >
               <AnimatePresence mode="popLayout">
@@ -1236,7 +1306,10 @@ export default function MarketplacePage() {
                       onBookmark={handleBookmark}
                       onChat={openChat}
                       onView={setViewingListing}
-                      onEdit={(l) => { setEditingListing(l); setFormOpen(true); }}
+                      onEdit={(l) => {
+                        setEditingListing(l);
+                        setFormOpen(true);
+                      }}
                       onDelete={handleDelete}
                     />
                   ) : (
@@ -1254,31 +1327,67 @@ export default function MarketplacePage() {
                         onClick={() => setViewingListing(listing)}
                       >
                         <img
-                          src={listing.images[0] || `https://placehold.co/64x64/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category[0])}`}
+                          src={
+                            listing.images[0] ||
+                            `https://placehold.co/64x64/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category[0])}`
+                          }
                           alt={listing.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = `https://placehold.co/64x64/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category[0])}`;
+                            (e.target as HTMLImageElement).src =
+                              `https://placehold.co/64x64/f3f4f6/9ca3af?text=${encodeURIComponent(listing.category[0])}`;
                           }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm truncate cursor-pointer hover:text-primary" onClick={() => setViewingListing(listing)}>{listing.title}</h3>
+                        <h3
+                          className="font-medium text-sm truncate cursor-pointer hover:text-primary"
+                          onClick={() => setViewingListing(listing)}
+                        >
+                          {listing.title}
+                        </h3>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-primary font-bold text-sm flex items-center gap-0.5"><IndianRupee className="w-3 h-3" />{listing.price.toLocaleString('en-IN')}</span>
-                          <Badge variant="outline" className={cn('text-[10px] h-4', CONDITION_COLORS[listing.condition] ?? '')}>{listing.condition}</Badge>
-                          <Badge variant="secondary" className="text-[10px] h-4">{listing.category}</Badge>
+                          <span className="text-primary font-bold text-sm flex items-center gap-0.5">
+                            <IndianRupee className="w-3 h-3" />
+                            {listing.price.toLocaleString('en-IN')}
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              'text-[10px] h-4',
+                              CONDITION_COLORS[listing.condition] ?? ''
+                            )}
+                          >
+                            {listing.condition}
+                          </Badge>
+                          <Badge variant="secondary" className="text-[10px] h-4">
+                            {listing.category}
+                          </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">{(listing.seller?.name || 'Unknown Seller')}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {!(listing.sellerId === currentUserId) ? (
                           <>
-                            <button onClick={() => handleBookmark(listing.id)} className="p-1.5 hover:bg-muted rounded">
-                              <Heart className={cn('w-4 h-4', bookmarkedIds.has(listing.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground')} />
+                            <button
+                              onClick={() => handleBookmark(listing.id)}
+                              className="p-1.5 hover:bg-muted rounded"
+                            >
+                              <Heart
+                                className={cn(
+                                  'w-4 h-4',
+                                  bookmarkedIds.has(listing.id)
+                                    ? 'fill-red-500 text-red-500'
+                                    : 'text-muted-foreground'
+                                )}
+                              />
                             </button>
                             {listing.status !== 'Sold' && (
-                              <Button size="sm" className="h-7 text-xs" onClick={() => openChat(listing)}>
+                              <Button
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => openChat(listing)}
+                              >
                                 <MessageCircle className="w-3 h-3 mr-1" /> Chat
                               </Button>
                             )}
@@ -1304,7 +1413,7 @@ export default function MarketplacePage() {
                         )}
                       </div>
                     </motion.div>
-                  ),
+                  )
                 )}
               </AnimatePresence>
             </motion.div>
@@ -1315,8 +1424,14 @@ export default function MarketplacePage() {
       {/* Dialogs & Panels */}
       <ListingFormDialog
         open={formOpen}
-        onClose={() => { setFormOpen(false); setEditingListing(null); }}
-        onSuccess={() => { fetchListings(); fetchMyListings(); }}
+        onClose={() => {
+          setFormOpen(false);
+          setEditingListing(null);
+        }}
+        onSuccess={() => {
+          fetchListings();
+          fetchMyListings();
+        }}
         existing={editingListing}
       />
 
@@ -1331,7 +1446,10 @@ export default function MarketplacePage() {
 
       <ChatPanel
         open={chatOpen}
-        onClose={() => { setChatOpen(false); setChatListing(null); }}
+        onClose={() => {
+          setChatOpen(false);
+          setChatListing(null);
+        }}
         listing={chatListing}
         currentUserId={currentUserId}
         chats={chats}

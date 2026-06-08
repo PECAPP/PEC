@@ -19,29 +19,7 @@ import { cn } from '@/lib/utils';
 import api from "@pec/api";
 import router from 'next/router';
 
-type PaymentMethod = 'razorpay' | 'upi' | 'bank';
-
-interface PaymentConfig {
-  method: PaymentMethod;
-  razorpay?: {
-    apiKey: string;
-    apiSecret: string;
-  };
-  upi?: {
-    upiId: string;
-    upiName: string;
-  };
-  bank?: {
-    bankName: string;
-    accountName: string;
-    accountNumber: string;
-    ifscCode: string;
-    branch: string;
-  };
-  isActive: boolean;
-  lastUpdated: any;
-  updatedBy: string;
-}
+import { PaymentMethod, PaymentConfig } from './types';
 
 const extractData = <T,>(payload: any): T => {
   if (payload && typeof payload === 'object' && 'success' in payload && 'data' in payload) {
@@ -135,7 +113,12 @@ export default function PaymentSettings() {
         return;
       }
     } else if (method === 'bank') {
-      if (!(bankName || '').trim() || !(accountName || '').trim() || !(accountNumber || '').trim() || !(ifscCode || '').trim()) {
+      if (
+        !(bankName || '').trim() ||
+        !(accountName || '').trim() ||
+        !(accountNumber || '').trim() ||
+        !(ifscCode || '').trim()
+      ) {
         toast.error('Please fill in all bank details');
         return;
       }
@@ -222,9 +205,7 @@ export default function PaymentSettings() {
       {!embedded && (
         <div>
           <h1 className="text-3xl font-bold text-foreground">Payment Settings</h1>
-          <p className="text-muted-foreground mt-2">
-            Configure how students will pay fees
-          </p>
+          <p className="text-muted-foreground mt-2">Configure how students will pay fees</p>
         </div>
       )}
 
@@ -239,7 +220,10 @@ export default function PaymentSettings() {
                   Current: {settings.method} Payment
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Last updated: {settings.lastUpdated ? new Date(settings.lastUpdated).toLocaleDateString() : 'Never'}
+                  Last updated:{' '}
+                  {settings.lastUpdated
+                    ? new Date(settings.lastUpdated).toLocaleDateString()
+                    : 'Never'}
                 </p>
               </div>
             </div>
@@ -251,24 +235,27 @@ export default function PaymentSettings() {
       <Card>
         <CardHeader>
           <CardTitle>Choose Payment Method</CardTitle>
-          <CardDescription>
-            Select which payment method your students will use
-          </CardDescription>
+          <CardDescription>Select which payment method your students will use</CardDescription>
         </CardHeader>
         <CardContent>
           <RadioGroup value={method} onValueChange={(val) => setMethod(val as PaymentMethod)}>
             <div className="space-y-4">
               {/* UPI Option */}
-              <div className={cn(
-                'p-4 rounded-lg border-2 cursor-pointer transition-all',
-                method === 'upi'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-border/80'
-              )}>
+              <div
+                className={cn(
+                  'p-4 rounded-lg border-2 cursor-pointer transition-all',
+                  method === 'upi'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-border/80'
+                )}
+              >
                 <div className="flex items-start gap-3">
                   <RadioGroupItem value="upi" id="upi-radio" className="mt-1" />
                   <div className="flex-1">
-                    <label htmlFor="upi-radio" className="font-semibold text-foreground cursor-pointer">
+                    <label
+                      htmlFor="upi-radio"
+                      className="font-semibold text-foreground cursor-pointer"
+                    >
                       UPI Payment ⚡
                     </label>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -282,20 +269,26 @@ export default function PaymentSettings() {
               </div>
 
               {/* Bank Option */}
-              <div className={cn(
-                'p-4 rounded-lg border-2 cursor-pointer transition-all',
-                method === 'bank'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-border/80'
-              )}>
+              <div
+                className={cn(
+                  'p-4 rounded-lg border-2 cursor-pointer transition-all',
+                  method === 'bank'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-border/80'
+                )}
+              >
                 <div className="flex items-start gap-3">
                   <RadioGroupItem value="bank" id="bank-radio" className="mt-1" />
                   <div className="flex-1">
-                    <label htmlFor="bank-radio" className="font-semibold text-foreground cursor-pointer">
+                    <label
+                      htmlFor="bank-radio"
+                      className="font-semibold text-foreground cursor-pointer"
+                    >
                       Bank Transfer 🏦
                     </label>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Manual - Students transfer to your bank account and upload proof for verification
+                      Manual - Students transfer to your bank account and upload proof for
+                      verification
                     </p>
                     <Badge variant="outline" className="mt-2">
                       0% Commission | Manual Verification
@@ -305,16 +298,21 @@ export default function PaymentSettings() {
               </div>
 
               {/* Razorpay Option */}
-              <div className={cn(
-                'p-4 rounded-lg border-2 cursor-pointer transition-all',
-                method === 'razorpay'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-border/80'
-              )}>
+              <div
+                className={cn(
+                  'p-4 rounded-lg border-2 cursor-pointer transition-all',
+                  method === 'razorpay'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-border/80'
+                )}
+              >
                 <div className="flex items-start gap-3">
                   <RadioGroupItem value="razorpay" id="razorpay-radio" className="mt-1" />
                   <div className="flex-1">
-                    <label htmlFor="razorpay-radio" className="font-semibold text-foreground cursor-pointer">
+                    <label
+                      htmlFor="razorpay-radio"
+                      className="font-semibold text-foreground cursor-pointer"
+                    >
                       Razorpay Payment 💳
                     </label>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -335,23 +333,25 @@ export default function PaymentSettings() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {method === 'upi' ? 'UPI Configuration' : method === 'bank' ? 'Bank Details Configuration' : 'Razorpay Configuration'}
+            {method === 'upi'
+              ? 'UPI Configuration'
+              : method === 'bank'
+                ? 'Bank Details Configuration'
+                : 'Razorpay Configuration'}
           </CardTitle>
           <CardDescription>
             {method === 'upi'
               ? 'Your UPI ID for receiving payments'
               : method === 'bank'
-              ? 'Your bank account details for student transfers'
-              : 'Your Razorpay API credentials (get from https://razorpay.com)'}
+                ? 'Your bank account details for student transfers'
+                : 'Your Razorpay API credentials (get from https://razorpay.com)'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {method === 'upi' ? (
             <>
               <div>
-                <label className="text-sm font-medium text-foreground block mb-2">
-                  UPI ID *
-                </label>
+                <label className="text-sm font-medium text-foreground block mb-2">UPI ID *</label>
                 <Input
                   placeholder="9876543210@ybl"
                   value={upiId}
@@ -436,9 +436,7 @@ export default function PaymentSettings() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground block mb-2">
-                  Branch
-                </label>
+                <label className="text-sm font-medium text-foreground block mb-2">Branch</label>
                 <Input
                   placeholder="University Campus Branch"
                   value={branch}
@@ -451,10 +449,18 @@ export default function PaymentSettings() {
                 <div className="p-3 bg-secondary/50 rounded-lg border border-border">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Preview:</p>
                   <div className="space-y-1 text-sm">
-                    <p><span className="font-medium">Bank:</span> {bankName}</p>
-                    <p><span className="font-medium">Account:</span> {accountName}</p>
-                    <p className="font-mono"><span className="font-medium">Number:</span> {accountNumber}</p>
-                    <p className="font-mono"><span className="font-medium">IFSC:</span> {ifscCode}</p>
+                    <p>
+                      <span className="font-medium">Bank:</span> {bankName}
+                    </p>
+                    <p>
+                      <span className="font-medium">Account:</span> {accountName}
+                    </p>
+                    <p className="font-mono">
+                      <span className="font-medium">Number:</span> {accountNumber}
+                    </p>
+                    <p className="font-mono">
+                      <span className="font-medium">IFSC:</span> {ifscCode}
+                    </p>
                   </div>
                 </div>
               )}
@@ -503,11 +509,7 @@ export default function PaymentSettings() {
                     size="icon"
                     onClick={() => setShowApiSecret(!showApiSecret)}
                   >
-                    {showApiSecret ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
+                    {showApiSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </Button>
                   <Button
                     variant="outline"
@@ -530,7 +532,17 @@ export default function PaymentSettings() {
                   <div className="text-sm text-blue-900 dark:text-blue-200">
                     <p className="font-medium">Get Razorpay credentials:</p>
                     <ol className="list-decimal list-inside mt-1 space-y-1">
-                      <li>Visit <a href="https://razorpay.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">razorpay.com</a></li>
+                      <li>
+                        Visit{' '}
+                        <a
+                          href="https://razorpay.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline font-medium"
+                        >
+                          razorpay.com
+                        </a>
+                      </li>
                       <li>Sign up (free account)</li>
                       <li>Go to Settings → API Keys</li>
                       <li>Copy Key ID and Key Secret</li>
@@ -564,12 +576,7 @@ export default function PaymentSettings() {
 
       {/* Save Button */}
       <div className="flex gap-3">
-        <Button
-          size="lg"
-          onClick={handleSave}
-          disabled={saving}
-          className="gap-2"
-        >
+        <Button size="lg" onClick={handleSave} disabled={saving} className="gap-2">
           {saving ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -583,11 +590,7 @@ export default function PaymentSettings() {
           )}
         </Button>
         {!embedded && (
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => router.push('/finance' as any)}
-          >
+          <Button variant="outline" size="lg" onClick={() => router.push('/finance' as any)}>
             Cancel
           </Button>
         )}

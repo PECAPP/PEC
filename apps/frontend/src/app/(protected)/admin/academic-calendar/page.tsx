@@ -10,41 +10,15 @@ import { toast } from 'sonner';
 import api from "@pec/api";
 import { InteractiveCalendar } from '@/features/academic-calendar/InteractiveCalendar';
 import { EventDetailModal } from '@/features/academic-calendar/EventDetailModal';
-import { getEventLabel, EVENT_LABELS, CATEGORY_LABELS } from '@/features/academic-calendar/calendar-utils';
+import {
+  getEventLabel,
+  EVENT_LABELS,
+  CATEGORY_LABELS,
+} from '@/features/academic-calendar/calendar-utils';
 import { format, isValid, parseISO } from 'date-fns';
-
-interface ParsedEvent {
-  title: string;
-  description: string;
-  date: string;
-  endDate: string | null;
-  startTime: string | null;
-  endTime: string | null;
-  eventType: string;
-  category: string;
-  location: string | null;
-  importance: string;
-  targetAudience: string | null;
-}
-
-interface CalendarEvent {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  endDate: string | null;
-  startTime: string | null;
-  endTime: string | null;
-  eventType: string;
-  category: string;
-  location: string | null;
-  importance: string;
-  targetAudience: string | null;
-  rawData: any;
-  isEditable: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { ParsedEvent, CalendarEvent } from './types';
+import ParsedEventEditModal from './components/ParsedEventEditModal';
+import EventEditModal from './components/EventEditModal';
 
 export default function AdminAcademicCalendarPage() {
   const [view, setView] = useState<'upload' | 'preview' | 'calendar'>('upload');
@@ -104,7 +78,9 @@ export default function AdminAcademicCalendarPage() {
 
       setParsedEvents(events);
       setView('preview');
-      toast.success(`Parsed ${events.length} events from PDF. Review and edit before replacing calendar.`);
+      toast.success(
+        `Parsed ${events.length} events from PDF. Review and edit before replacing calendar.`
+      );
     } catch (error: any) {
       toast.error(error.message || 'Failed to parse PDF');
     } finally {
@@ -185,9 +161,7 @@ export default function AdminAcademicCalendarPage() {
   const handleUpdateEvent = async (updatedEvent: CalendarEvent) => {
     try {
       const response = await api.patch(`/academic-calendar/${updatedEvent.id}`, updatedEvent);
-      setSavedEvents((prev) =>
-        prev.map((e) => (e.id === updatedEvent.id ? response.data : e))
-      );
+      setSavedEvents((prev) => prev.map((e) => (e.id === updatedEvent.id ? response.data : e)));
       toast.success('Event updated');
       setEditingEvent(null);
     } catch (error: any) {
@@ -252,10 +226,7 @@ export default function AdminAcademicCalendarPage() {
             Review Events ({parsedEvents.length})
           </Button>
         )}
-        <Button
-          variant={view === 'calendar' ? 'default' : 'outline'}
-          onClick={loadExistingEvents}
-        >
+        <Button variant={view === 'calendar' ? 'default' : 'outline'} onClick={loadExistingEvents}>
           Calendar View
         </Button>
       </div>
@@ -285,13 +256,9 @@ export default function AdminAcademicCalendarPage() {
                   <p className="text-lg font-medium">
                     {isDragActive ? 'Drop the PDF here' : 'Upload Academic Calendar PDF'}
                   </p>
-                  <p className="text-muted-foreground">
-                    Drag and drop or click to select a file
-                  </p>
+                  <p className="text-muted-foreground">Drag and drop or click to select a file</p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Supported format: PDF only
-                </p>
+                <p className="text-sm text-muted-foreground">Supported format: PDF only</p>
               </div>
             )}
           </div>
@@ -324,7 +291,10 @@ export default function AdminAcademicCalendarPage() {
                 <X className="w-4 h-4 mr-2" />
                 Cancel
               </Button>
-              <Button onClick={() => setIsReplaceConfirmOpen(true)} disabled={isSaving || parsedEvents.length === 0}>
+              <Button
+                onClick={() => setIsReplaceConfirmOpen(true)}
+                disabled={isSaving || parsedEvents.length === 0}
+              >
                 {isSaving ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -379,8 +349,8 @@ export default function AdminAcademicCalendarPage() {
                           event.importance === 'high'
                             ? 'text-red-600'
                             : event.importance === 'medium'
-                            ? 'text-yellow-600'
-                            : 'text-green-600'
+                              ? 'text-yellow-600'
+                              : 'text-green-600'
                         }
                       >
                         {event.importance}
@@ -435,7 +405,9 @@ export default function AdminAcademicCalendarPage() {
           event={parsedEvents[editingParsedIndex]}
           isOpen={true}
           onClose={() => setEditingParsedIndex(null)}
-          onSave={(updatedEvent) => handleSaveParsedEvent(editingParsedIndex as number, updatedEvent)}
+          onSave={(updatedEvent) =>
+            handleSaveParsedEvent(editingParsedIndex as number, updatedEvent)
+          }
         />
       )}
 
@@ -445,7 +417,8 @@ export default function AdminAcademicCalendarPage() {
             <div className="space-y-2">
               <h2 className="text-xl font-semibold">Save reviewed calendar?</h2>
               <p className="text-sm text-muted-foreground">
-                Choose one option. Replacing will remove old rows from academic calendar and insert the reviewed Gemini events.
+                Choose one option. Replacing will remove old rows from academic calendar and insert
+                the reviewed Gemini events.
               </p>
             </div>
             <div className="flex justify-end gap-3">
@@ -510,378 +483,6 @@ export default function AdminAcademicCalendarPage() {
         onEdit={handleEventEdit}
         onDelete={handleDeleteEvent}
       />
-    </div>
-  );
-}
-
-function ParsedEventEditModal({
-  event,
-  isOpen,
-  title = 'Edit Parsed Event',
-  submitLabel = 'Save Event',
-  onClose,
-  onSave,
-}: {
-  event: ParsedEvent;
-  isOpen: boolean;
-  title?: string;
-  submitLabel?: string;
-  onClose: () => void;
-  onSave: (event: ParsedEvent) => void;
-}) {
-  const [formData, setFormData] = useState<ParsedEvent>(event);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave({
-      ...formData,
-      title: formData.title.trim(),
-      description: formData.description?.trim() || '',
-      location: formData.location?.trim() || null,
-      targetAudience: formData.targetAudience?.trim() || null,
-    });
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-background rounded-lg border max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-semibold">{title}</h2>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <Label htmlFor="parsed-title">Title</Label>
-            <Input
-              id="parsed-title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="parsed-description">Description</Label>
-            <Textarea
-              id="parsed-description"
-              value={formData.description || ''}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="parsed-date">Date</Label>
-              <Input
-                id="parsed-date"
-                type="date"
-                value={formData.date ? format(new Date(formData.date), 'yyyy-MM-dd') : ''}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="parsed-end-date">End Date</Label>
-              <Input
-                id="parsed-end-date"
-                type="date"
-                value={formData.endDate ? format(new Date(formData.endDate), 'yyyy-MM-dd') : ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, endDate: e.target.value ? e.target.value : null })
-                }
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="parsed-eventType">Event Type</Label>
-              <Select
-                value={formData.eventType}
-                onValueChange={(value) => setFormData({ ...formData, eventType: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(EVENT_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="parsed-category">Category</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="parsed-startTime">Start Time</Label>
-              <Input
-                id="parsed-startTime"
-                type="time"
-                value={formData.startTime || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, startTime: e.target.value ? e.target.value : null })
-                }
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="parsed-endTime">End Time</Label>
-              <Input
-                id="parsed-endTime"
-                type="time"
-                value={formData.endTime || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, endTime: e.target.value ? e.target.value : null })
-                }
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="parsed-importance">Importance</Label>
-              <Select
-                value={formData.importance}
-                onValueChange={(value) => setFormData({ ...formData, importance: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="parsed-targetAudience">Target Audience</Label>
-              <Input
-                id="parsed-targetAudience"
-                value={formData.targetAudience || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, targetAudience: e.target.value || null })
-                }
-                placeholder="all, students, faculty..."
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="parsed-location">Location</Label>
-            <Input
-              id="parsed-location"
-              value={formData.location || ''}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value || null })}
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">{submitLabel}</Button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function EventEditModal({
-  event,
-  isOpen,
-  onClose,
-  onSave,
-}: {
-  event: CalendarEvent;
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (event: CalendarEvent) => void;
-}) {
-  const [formData, setFormData] = useState(event);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-background rounded-lg border max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-semibold">Edit Event</h2>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date ? format(new Date(formData.date), 'yyyy-MM-dd') : ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, date: new Date(e.target.value).toISOString() })
-                }
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="eventType">Event Type</Label>
-              <Select
-                value={formData.eventType}
-                onValueChange={(value) => setFormData({ ...formData, eventType: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(EVENT_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="startTime">Start Time</Label>
-              <Input
-                id="startTime"
-                type="time"
-                value={formData.startTime || ''}
-                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="endTime">End Time</Label>
-              <Input
-                id="endTime"
-                type="time"
-                value={formData.endTime || ''}
-                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="importance">Importance</Label>
-              <Select
-                value={formData.importance}
-                onValueChange={(value) => setFormData({ ...formData, importance: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              value={formData.location || ''}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="targetAudience">Target Audience</Label>
-            <Input
-              id="targetAudience"
-              value={formData.targetAudience || ''}
-              onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
-              placeholder="e.g., all, students, faculty"
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">Save Changes</Button>
-          </div>
-        </form>
-      </div>
     </div>
   );
 }
