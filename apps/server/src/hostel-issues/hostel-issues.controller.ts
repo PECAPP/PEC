@@ -92,15 +92,16 @@ export class HostelIssuesController {
   @Post(':id/replies')
   async reply(
     @Param('id') id: string,
-    @Body() body: { text: string; authorName?: string; authorRole?: string },
+    @Body() body: { text: string },
+    @Request() req: any
   ) {
     const data = await this.service.update(id, {
       responses: {
         _op: 'arrayUnion',
         val: {
           text: body.text,
-          authorName: body.authorName || 'Staff',
-          authorRole: body.authorRole || 'Admin',
+          authorName: req.user.name || req.user.email || req.user.uid || req.user.sub || 'Unknown',
+          authorRole: req.user.role || 'student',
           createdAt: new Date().toISOString(),
         },
       },

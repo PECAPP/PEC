@@ -67,11 +67,11 @@ export class AuthController {
     );
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
     this.setAccessTokenCookie(res, auth.access_token);
-    this.setCsrfCookie(res, req);
+    const csrfToken = this.setCsrfCookie(res, req);
     this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
 
     const { refresh_token, ...response } = auth;
-    return response;
+    return { ...response, csrfToken };
   }
 
   @HttpCode(HttpStatus.CREATED)
@@ -95,10 +95,10 @@ export class AuthController {
 
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
     this.setAccessTokenCookie(res, auth.access_token);
-    this.setCsrfCookie(res, req);
+    const csrfToken = this.setCsrfCookie(res, req);
     this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
     const { refresh_token, ...response } = auth;
-    return response;
+    return { ...response, csrfToken };
   }
 
   @HttpCode(HttpStatus.OK)
@@ -124,14 +124,15 @@ export class AuthController {
 
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
     this.setAccessTokenCookie(res, auth.access_token);
-    this.setCsrfCookie(res, req);
+    const csrfToken = this.setCsrfCookie(res, req);
     this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
     const { refresh_token, ...response } = auth;
-    return response;
+    return { ...response, csrfToken };
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('logout')
+  @Throttle({ short: { limit: 10, ttl: 60000 } })
   async logout(
     @Body(new ZodValidationPipe(refreshSchema)) body: RefreshInput,
     @Request() req: FastifyRequest,
@@ -150,6 +151,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('verify-email')
+  @Throttle({ short: { limit: 5, ttl: 60000 } })
   async verifyEmail(
     @Body(new ZodValidationPipe(verifyEmailSchema)) body: VerifyEmailInput,
   ) {
@@ -168,6 +170,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('reset-password')
+  @Throttle({ short: { limit: 5, ttl: 60000 } })
   async resetPassword(
     @Body(new ZodValidationPipe(resetPasswordSchema)) body: ResetPasswordInput,
   ) {
@@ -341,25 +344,27 @@ export class AuthController {
     });
   }
 
-  private setCsrfCookie(res: FastifyReply, req?: FastifyRequest): void {
+  private setCsrfCookie(res: FastifyReply, req?: FastifyRequest): string {
     if (req) {
       const cookieHeader = req.headers.cookie;
       if (cookieHeader) {
         const entries = cookieHeader.split(';').map((chunk) => chunk.trim());
         const target = entries.find((item) => item.startsWith(`${this.cookiePrefix}csrf_token=`));
         if (target) {
-          return; // Do not rotate if already exists
+          const existingToken = target.slice(`${this.cookiePrefix}csrf_token=`.length);
+          if (existingToken) return existingToken;
         }
       }
     }
     const crypto = require('crypto');
     const csrfToken = crypto.randomBytes(32).toString('hex');
     res.setCookie(`${this.cookiePrefix}csrf_token`, csrfToken, {
-      httpOnly: false, // Must be readable by client JS
+      httpOnly: true, // Secure against XSS
       secure: this.isProd,
       sameSite: 'strict',
       path: '/',
     });
+    return csrfToken;
   }
 
   private clearRefreshCookie(res: FastifyReply): void {

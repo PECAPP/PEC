@@ -284,8 +284,7 @@ export class AuthService {
   }
 
   async getSessions(userId: string) {
-    const sessions = await this.prisma.refreshToken.findMany({ take: 1000, 
-      where: { userId, revokedAt: null },
+    const sessions = await this.prisma.refreshToken.findMany({ where: { userId, revokedAt: null },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,

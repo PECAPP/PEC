@@ -31,8 +31,7 @@ export class HostelIssuesRepository {
     };
 
     const total = await this.prisma.hostelIssue.count({ where });
-    const items = await this.prisma.hostelIssue.findMany({ take: 1000, 
-      where,
+    const items = await this.prisma.hostelIssue.findMany({ where,
       orderBy: { [query.sortBy ?? 'createdAt']: query.sortOrder ?? 'desc' },
       take: query.limit,
       skip: query.offset,

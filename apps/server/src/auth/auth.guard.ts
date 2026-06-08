@@ -91,8 +91,7 @@ export class AuthGuard implements CanActivate {
 
       if (!permissions) {
         // Fetch from DB
-        const roleRecords = await this.prisma.role.findMany({ take: 1000, 
-          where: {
+        const roleRecords = await this.prisma.role.findMany({ where: {
             name: { in: roles.length > 0 ? roles : primaryRole ? [primaryRole] : [] },
           },
           include: {
