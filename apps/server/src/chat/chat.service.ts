@@ -72,8 +72,7 @@ export class ChatService {
       return this.findDefaultRoomsForCollegeAdmin(userId);
     }
 
-    const userChatRooms = await this.prisma.userChatRoom.findMany({ take: 1000, 
-      where: { userId },
+    const userChatRooms = await this.prisma.userChatRoom.findMany({ where: { userId },
       include: {
         chatRoom: {
           include: {
@@ -96,8 +95,7 @@ export class ChatService {
     const rooms = userChatRooms.map((ucr) => ucr.chatRoom);
 
     if (isFaculty) {
-      const clubs = await this.prisma.club.findMany({ take: 1000, 
-        select: { chatRoomId: true },
+      const clubs = await this.prisma.club.findMany({ select: { chatRoomId: true },
       });
       const clubRoomIds = new Set(clubs.map((club) => club.chatRoomId));
       return rooms.filter(
@@ -109,8 +107,7 @@ export class ChatService {
   }
 
   private async findDefaultRoomsForCollegeAdmin(userId: string) {
-    const departments = await this.prisma.department.findMany({ take: 1000, 
-      select: {
+    const departments = await this.prisma.department.findMany({ select: {
         name: true,
         timetableLabel: true,
       },
@@ -126,13 +123,11 @@ export class ChatService {
     });
 
     const clubRoomIds = (
-      await this.prisma.club.findMany({ take: 1000, 
-        select: { chatRoomId: true },
+      await this.prisma.club.findMany({ select: { chatRoomId: true },
       })
     ).map((club) => club.chatRoomId);
 
-    const rooms = await this.prisma.chatRoom.findMany({ take: 1000, 
-      where: {
+    const rooms = await this.prisma.chatRoom.findMany({ where: {
         OR: [
           {
             isGroup: true,
@@ -164,8 +159,7 @@ export class ChatService {
 
     const roomIds = rooms.map((room) => room.id);
     if (roomIds.length > 0) {
-      const existingMemberships = await this.prisma.userChatRoom.findMany({ take: 1000, 
-        where: {
+      const existingMemberships = await this.prisma.userChatRoom.findMany({ where: {
           userId,
           chatRoomId: { in: roomIds },
         },
@@ -199,8 +193,7 @@ export class ChatService {
       throw new ForbiddenException('You are not a participant of this room');
     }
 
-    return this.prisma.message.findMany({ take: 1000, 
-      where: { chatRoomId: roomId },
+    return this.prisma.message.findMany({ where: { chatRoomId: roomId },
       orderBy: { createdAt: 'asc' },
       take: limit,
       include: {
@@ -271,8 +264,7 @@ export class ChatService {
 
   async getChatUsers(query: string) {
     if (!query || query.trim().length === 0) {
-      return this.prisma.user.findMany({ take: 1000, 
-        select: {
+      return this.prisma.user.findMany({ select: {
           id: true,
           name: true,
           email: true,
@@ -282,8 +274,7 @@ export class ChatService {
       });
     }
 
-    return this.prisma.user.findMany({ take: 1000, 
-      where: {
+    return this.prisma.user.findMany({ where: {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { email: { contains: query, mode: 'insensitive' } },
@@ -324,8 +315,7 @@ export class ChatService {
       return [];
     }
 
-    const clubs = await this.prisma.club.findMany({ take: 1000, 
-      include: {
+    const clubs = await this.prisma.club.findMany({ include: {
         chatRoom: {
           include: {
             participants: {
@@ -397,8 +387,7 @@ export class ChatService {
       throw new BadRequestException('Club already exists');
     }
 
-    const adminUsers = await this.prisma.user.findMany({ take: 1000, 
-      where: { roles: { some: { role: { name: 'college_admin' } } } },
+    const adminUsers = await this.prisma.user.findMany({ where: { roles: { some: { role: { name: 'college_admin' } } } },
       select: { id: true },
     });
 
@@ -545,8 +534,7 @@ export class ChatService {
       return [];
     }
 
-    const requests = await this.prisma.clubJoinRequest.findMany({ take: 1000, 
-      where: isAdmin ? {} : { requesterId: userId },
+    const requests = await this.prisma.clubJoinRequest.findMany({ where: isAdmin ? {} : { requesterId: userId },
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
       include: {
         club: { select: { id: true, name: true, chatRoomId: true } },

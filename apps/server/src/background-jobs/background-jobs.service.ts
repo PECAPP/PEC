@@ -69,8 +69,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
   }
 
   list(limit = 50) {
-    return this.prisma.backgroundJob.findMany({ take: 1000, 
-      orderBy: [{ createdAt: 'desc' }],
+    return this.prisma.backgroundJob.findMany({ orderBy: [{ createdAt: 'desc' }],
       take: Math.min(Math.max(limit, 1), 200),
     });
   }
@@ -266,8 +265,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
     const threshold = settings?.attendanceRequiredPercentage ?? 75;
 
     // 2. Simple but effective logic: iterate over active students
-    const students = await this.prisma.user.findMany({ take: 1000, 
-      where: { roles: { some: { role: { name: 'student' } } } },
+    const students = await this.prisma.user.findMany({ where: { roles: { some: { role: { name: 'student' } } } },
       select: { id: true, name: true }
     });
 

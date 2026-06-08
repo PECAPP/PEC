@@ -16,7 +16,7 @@ export class TimetableRepository extends BaseRepository {
       ...(query.department ? { department: query.department } : {}),
       ...(query.semester ? { semester: query.semester } : {}),
       ...(query.facultyId ? { facultyId: query.facultyId } : {}),
-      ...(query.courseId ? { courseId: query.courseId } : {}),
+      ...((query as any).courseId ? { courseId: (query as any).courseId } : {}),
     };
 
     return this.findManyWithCount(this.prisma.timetable, {
@@ -99,7 +99,7 @@ export class TimetableRepository extends BaseRepository {
         department: data.department ?? null,
         semester: data.semester ?? null,
         batch: data.batch ?? null,
-      },
+      } as any,
     });
   }
 

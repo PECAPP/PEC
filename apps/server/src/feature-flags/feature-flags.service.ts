@@ -22,8 +22,7 @@ export class FeatureFlagsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async listAll() {
-    return this.prisma.featureFlag.findMany({ take: 1000, 
-      orderBy: [{ key: 'asc' }],
+    return this.prisma.featureFlag.findMany({ orderBy: [{ key: 'asc' }],
     });
   }
 

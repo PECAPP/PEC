@@ -14,11 +14,11 @@ export class RoomsService {
     if (query.floor !== undefined) where.floor = query.floor;
     if (query.isAvailable !== undefined) where.isAvailable = query.isAvailable;
 
-    return this.prisma.room.findMany({ take: 1000, 
+    return this.prisma.room.findMany({
       where,
       orderBy: { building: 'asc' },
-      take: query.limit,
-      skip: query.offset,
+      take: query.limit ?? 1000,
+      skip: query.offset ?? 0,
     });
   }
 
@@ -29,7 +29,11 @@ export class RoomsService {
   async create(data: CreateRoomDto) {
     return this.prisma.room.create({
       data: {
-        ...data,
+        name: data.name,
+        type: data.type,
+        capacity: data.capacity,
+        building: data.building,
+        floor: data.floor,
         facilities: data.facilities ?? '[]',
         isAvailable: data.isAvailable ?? true,
       },
@@ -48,8 +52,7 @@ export class RoomsService {
     const where: any = { building, isAvailable: true };
     if (floor !== undefined) where.floor = floor;
 
-    return this.prisma.room.findMany({ take: 1000, 
-      where,
+    return this.prisma.room.findMany({ where,
       orderBy: { name: 'asc' },
     });
   }

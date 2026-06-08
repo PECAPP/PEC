@@ -17,20 +17,16 @@ export class FacultyBioSystemService {
         where: { userId: facultyId },
         include: { user: true },
       }),
-      this.prisma.facultyPublication.findMany({ take: 1000, 
-        where: { facultyId },
+      this.prisma.facultyPublication.findMany({ where: { facultyId },
         orderBy: { year: 'desc' },
       }),
-      this.prisma.facultyAward.findMany({ take: 1000, 
-        where: { facultyId },
+      this.prisma.facultyAward.findMany({ where: { facultyId },
         orderBy: { year: 'desc' },
       }),
-      this.prisma.facultyConference.findMany({ take: 1000, 
-        where: { facultyId },
+      this.prisma.facultyConference.findMany({ where: { facultyId },
         orderBy: { startDate: 'desc' },
       }),
-      this.prisma.facultyConsultation.findMany({ take: 1000, 
-        where: { facultyId },
+      this.prisma.facultyConsultation.findMany({ where: { facultyId },
         orderBy: { createdAt: 'desc' },
       }),
     ]);
@@ -52,8 +48,7 @@ export class FacultyBioSystemService {
   }
 
   async getPublications(facultyId: string) {
-    return this.prisma.facultyPublication.findMany({ take: 1000, 
-      where: { facultyId },
+    return this.prisma.facultyPublication.findMany({ where: { facultyId },
       orderBy: { year: 'desc' },
       take: 50,
     });
@@ -77,8 +72,7 @@ export class FacultyBioSystemService {
   }
 
   async getAwards(facultyId: string) {
-    return this.prisma.facultyAward.findMany({ take: 1000, 
-      where: { facultyId },
+    return this.prisma.facultyAward.findMany({ where: { facultyId },
       orderBy: { year: 'desc' },
       take: 50,
     });
@@ -97,8 +91,7 @@ export class FacultyBioSystemService {
   }
 
   async getConferences(facultyId: string) {
-    return this.prisma.facultyConference.findMany({ take: 1000, 
-      where: { facultyId },
+    return this.prisma.facultyConference.findMany({ where: { facultyId },
       orderBy: { startDate: 'desc' },
       take: 50,
     });
@@ -117,8 +110,7 @@ export class FacultyBioSystemService {
   }
 
   async getConsultations(facultyId: string) {
-    return this.prisma.facultyConsultation.findMany({ take: 1000, 
-      where: { facultyId },
+    return this.prisma.facultyConsultation.findMany({ where: { facultyId },
       orderBy: { createdAt: 'desc' },
       take: 50,
     });

@@ -22,8 +22,7 @@ export class CgpaEntriesRepository {
     const db = this.prisma as any;
 
     const [items, total] = await Promise.all([
-      db.cgpaEntry.findMany({ take: 1000, 
-        where,
+      db.cgpaEntry.findMany({ where,
         orderBy: { [sortBy]: sortOrder },
         take,
         skip,

@@ -6,8 +6,7 @@ export class RolesMgmtService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    return this.prisma.role.findMany({ take: 1000, 
-      include: {
+    return this.prisma.role.findMany({ include: {
         permissions: {
           include: { permission: true }
         }

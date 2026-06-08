@@ -13,12 +13,10 @@ export class StudentPortfolioService {
 
   async getPortfolio(studentId: string) {
     const [projects, skills] = await Promise.all([
-      this.prisma.studentProject.findMany({ take: 1000, 
-        where: { studentId },
+      this.prisma.studentProject.findMany({ where: { studentId },
         orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
       }),
-      this.prisma.studentSkill.findMany({ take: 1000, 
-        where: { studentId },
+      this.prisma.studentSkill.findMany({ where: { studentId },
         orderBy: [{ category: 'asc' }, { level: 'desc' }],
       }),
     ]);
@@ -34,8 +32,7 @@ export class StudentPortfolioService {
   }
 
   async getProjects(studentId: string) {
-    return this.prisma.studentProject.findMany({ take: 1000, 
-      where: { studentId },
+    return this.prisma.studentProject.findMany({ where: { studentId },
       orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
     });
   }
@@ -43,8 +40,15 @@ export class StudentPortfolioService {
   async createProject(data: CreateStudentProjectDto) {
     return this.prisma.studentProject.create({
       data: {
-        ...data,
+        studentId: data.studentId as string,
+        title: data.title as string,
+        description: data.description as string,
         techStack: data.techStack ?? '[]',
+        githubUrl: data.githubUrl,
+        liveUrl: data.liveUrl,
+        imageUrl: data.imageUrl,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
         isFeatured: data.isFeatured ?? false,
       },
     });
@@ -59,8 +63,7 @@ export class StudentPortfolioService {
   }
 
   async getSkills(studentId: string) {
-    return this.prisma.studentSkill.findMany({ take: 1000, 
-      where: { studentId },
+    return this.prisma.studentSkill.findMany({ where: { studentId },
       orderBy: [{ category: 'asc' }, { level: 'desc' }],
     });
   }
@@ -68,7 +71,8 @@ export class StudentPortfolioService {
   async createSkill(data: CreateStudentSkillDto) {
     return this.prisma.studentSkill.create({
       data: {
-        ...data,
+        studentId: data.studentId as string,
+        name: data.name as string,
         level: data.level ?? 50,
         category: data.category ?? 'technical',
       },

@@ -15,8 +15,7 @@ export class CourseMaterialsRepository {
       ...(query.type ? { type: query.type } : {}),
     };
 
-    return this.prisma.courseMaterial.findMany({ take: 1000, 
-      where,
+    return this.prisma.courseMaterial.findMany({ where,
       orderBy: { [query.sortBy ?? 'uploadedAt']: query.sortOrder ?? 'desc' },
       take: query.limit,
       skip: query.offset,

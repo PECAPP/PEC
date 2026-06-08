@@ -6,8 +6,7 @@ export class ClubsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    return this.prisma.club.findMany({ take: 1000, 
-      include: {
+    return this.prisma.club.findMany({ include: {
         createdBy: {
           select: { name: true, avatar: true },
         },
@@ -47,8 +46,7 @@ export class ClubsService {
   }
 
   async getMyRequests(userId: string) {
-    return this.prisma.clubJoinRequest.findMany({ take: 1000, 
-      where: { requesterId: userId },
+    return this.prisma.clubJoinRequest.findMany({ where: { requesterId: userId },
       include: { club: true },
     });
   }

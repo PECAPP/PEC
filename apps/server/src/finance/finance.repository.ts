@@ -27,8 +27,7 @@ export class FinanceRepository {
   // ─── Summary ─────────────────────────────────────────────────────────────────
 
   async getSummary(studentId: string) {
-    const fees = await this.prisma.feeRecord.findMany({ take: 1000, 
-      where: { studentId },
+    const fees = await this.prisma.feeRecord.findMany({ where: { studentId },
     });
 
     const totalPending = fees
@@ -69,8 +68,7 @@ export class FinanceRepository {
 
     const [total, items] = await Promise.all([
       this.prisma.feeRecord.count({ where }),
-      this.prisma.feeRecord.findMany({ take: 1000, 
-        where,
+      this.prisma.feeRecord.findMany({ where,
         orderBy: { dueDate: 'asc' },
         take: limit,
         skip: offset,
@@ -281,8 +279,7 @@ export class FinanceRepository {
 
     const [total, items] = await Promise.all([
       this.prisma.financeTransaction.count({ where }),
-      this.prisma.financeTransaction.findMany({ take: 1000, 
-        where,
+      this.prisma.financeTransaction.findMany({ where,
         orderBy: { createdAt: 'desc' },
         take: limit,
         skip: offset,

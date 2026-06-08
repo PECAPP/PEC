@@ -54,8 +54,7 @@ export abstract class BaseRepository {
     );
 
     const [items, total] = await Promise.all([
-      delegate.findMany({ take: 1000, 
-        where: options.where,
+      delegate.findMany({ where: options.where,
         take,
         skip,
         orderBy: options.orderBy,

@@ -23,7 +23,7 @@ export class AttendanceSessionRepository {
   }
 
   async findAll(where?: Prisma.AttendanceSessionWhereInput): Promise<AttendanceSession[]> {
-    return this.prisma.attendanceSession.findMany({ take: 1000,  where });
+    return this.prisma.attendanceSession.findMany({ where });
   }
 
   async update(id: string, data: Prisma.AttendanceSessionUpdateInput): Promise<AttendanceSession> {

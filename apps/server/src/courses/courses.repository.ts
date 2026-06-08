@@ -27,8 +27,7 @@ export class CoursesRepository extends BaseRepository {
     const sortOrder = query.sortOrder ?? 'asc';
 
     const [items, total] = await Promise.all([
-      this.prisma.course.findMany({ take: 1000, 
-        where,
+      this.prisma.course.findMany({ where,
         take,
         skip,
         include: {

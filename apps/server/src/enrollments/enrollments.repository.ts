@@ -22,8 +22,7 @@ export class EnrollmentsRepository extends BaseRepository {
     const { take, skip } = this.resolvePagination(query, 20, 200);
 
     const [items, total] = await Promise.all([
-      this.prisma.enrollment.findMany({ take: 1000, 
-        where,
+      this.prisma.enrollment.findMany({ where,
         take,
         skip,
         orderBy: { enrolledAt: 'desc' },
@@ -90,8 +89,7 @@ export class EnrollmentsRepository extends BaseRepository {
 
     // 2. Prerequisites Check
     if ((course as any).prerequisiteIds && (course as any).prerequisiteIds.length > 0) {
-      const studentHistory = await this.prisma.enrollment.findMany({ take: 1000, 
-        where: { studentId, status: 'active' }, // In a real system we'd check for status 'completed'
+      const studentHistory = await this.prisma.enrollment.findMany({ where: { studentId, status: 'active' }, // In a real system we'd check for status 'completed'
         select: { courseCode: true }
       });
       const historicalCodes = studentHistory.map(h => h.courseCode);
@@ -106,20 +104,17 @@ export class EnrollmentsRepository extends BaseRepository {
 
   async findConflicts(studentId: string, targetCourseId: string) {
     const [currentEnrollments, newCourseSlots] = await Promise.all([
-      this.prisma.enrollment.findMany({ take: 1000, 
-        where: { studentId, status: 'active' },
+      this.prisma.enrollment.findMany({ where: { studentId, status: 'active' },
         select: { courseId: true }
       }),
-      this.prisma.timetable.findMany({ take: 1000, 
-        where: { courseId: targetCourseId }
+      this.prisma.timetable.findMany({ where: { courseId: targetCourseId }
       })
     ]);
 
     const currentCourseIds = currentEnrollments.map(e => e.courseId);
     if (currentCourseIds.length === 0) return [];
 
-    const existingSlots = await this.prisma.timetable.findMany({ take: 1000, 
-      where: { courseId: { in: currentCourseIds } }
+    const existingSlots = await this.prisma.timetable.findMany({ where: { courseId: { in: currentCourseIds } }
     });
 
     const conflicts: any[] = [];
