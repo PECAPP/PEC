@@ -9,7 +9,7 @@ export declare const departmentSchema: z.ZodObject<{
     code: z.ZodString;
     hod: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     name: string;
     code: string;
     id?: string | undefined;
@@ -31,7 +31,7 @@ export declare const facultySchema: z.ZodObject<{
     designation: z.ZodString;
     specialization: z.ZodOptional<z.ZodString>;
     phone: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     fullName: string;
     email: string;
     department: string;
@@ -64,7 +64,7 @@ export declare const attendanceSchema: z.ZodObject<{
     facultyId: z.ZodOptional<z.ZodString>;
     lat: z.ZodOptional<z.ZodNumber>;
     lng: z.ZodOptional<z.ZodNumber>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     status: "present" | "absent" | "late";
     studentId: string;
     subject: string;
@@ -96,7 +96,7 @@ export declare const attendanceSchema: z.ZodObject<{
 export declare const AuthLoginSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     email: string;
     password: string;
 }, {
@@ -108,7 +108,7 @@ export declare const AuthSignupSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
     role: z.ZodDefault<z.ZodEnum<["student", "faculty", "college_admin"]>>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     fullName: string;
     email: string;
     password: string;
@@ -137,7 +137,7 @@ export declare const AuthResponseSchema: z.ZodObject<{
         role: string;
     }>;
     token: z.ZodString;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     user: {
         id: string;
         fullName: string;
@@ -167,7 +167,7 @@ export declare const attendanceSessionSchema: z.ZodObject<{
     attendanceCount: z.ZodDefault<z.ZodNumber>;
     createdAt: z.ZodOptional<z.ZodString>;
     endedAt: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     date: string;
     courseId: string;
     facultyId: string;
@@ -204,7 +204,7 @@ export declare const courseSchema: z.ZodObject<{
     instructor: z.ZodOptional<z.ZodString>;
     semester: z.ZodOptional<z.ZodNumber>;
     status: z.ZodDefault<z.ZodEnum<["active", "inactive", "archived"]>>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     name: string;
     code: string;
     status: "active" | "inactive" | "archived";
@@ -238,7 +238,7 @@ export declare const userSchema: z.ZodObject<{
     designation: z.ZodOptional<z.ZodString>;
     specialization: z.ZodOptional<z.ZodString>;
     phone: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     status: "active" | "inactive" | "suspended";
     fullName: string;
     email: string;
@@ -275,7 +275,7 @@ export declare const enrollmentSchema: z.ZodObject<{
     batch: z.ZodOptional<z.ZodString>;
     status: z.ZodDefault<z.ZodEnum<["active", "inactive", "completed", "withdrawn"]>>;
     enrolledAt: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     status: "active" | "inactive" | "completed" | "withdrawn";
     studentId: string;
     courseId: string;
@@ -310,7 +310,7 @@ export declare const hostelIssueSchema: z.ZodObject<{
     responses: z.ZodOptional<z.ZodUnknown>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     description: string;
     status: "pending" | "assigned" | "resolved" | "closed";
     studentId: string;
@@ -353,35 +353,35 @@ export declare const timetableSchema: z.ZodObject<{
     department: z.ZodOptional<z.ZodString>;
     semester: z.ZodOptional<z.ZodNumber>;
     batch: z.ZodOptional<z.ZodString>;
-}, "passthrough", z.ZodTypeAny, z.objectOutputType<{
-    id: z.ZodOptional<z.ZodString>;
-    courseId: z.ZodOptional<z.ZodString>;
-    courseName: z.ZodString;
-    courseCode: z.ZodString;
-    facultyId: z.ZodOptional<z.ZodString>;
-    facultyName: z.ZodOptional<z.ZodString>;
-    day: z.ZodEnum<["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]>;
-    startTime: z.ZodString;
-    endTime: z.ZodString;
-    room: z.ZodString;
-    department: z.ZodOptional<z.ZodString>;
-    semester: z.ZodOptional<z.ZodNumber>;
-    batch: z.ZodOptional<z.ZodString>;
-}, z.ZodTypeAny, "passthrough">, z.objectInputType<{
-    id: z.ZodOptional<z.ZodString>;
-    courseId: z.ZodOptional<z.ZodString>;
-    courseName: z.ZodString;
-    courseCode: z.ZodString;
-    facultyId: z.ZodOptional<z.ZodString>;
-    facultyName: z.ZodOptional<z.ZodString>;
-    day: z.ZodEnum<["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]>;
-    startTime: z.ZodString;
-    endTime: z.ZodString;
-    room: z.ZodString;
-    department: z.ZodOptional<z.ZodString>;
-    semester: z.ZodOptional<z.ZodNumber>;
-    batch: z.ZodOptional<z.ZodString>;
-}, z.ZodTypeAny, "passthrough">>;
+}, "strict", z.ZodTypeAny, {
+    courseName: string;
+    startTime: string;
+    courseCode: string;
+    day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+    endTime: string;
+    room: string;
+    id?: string | undefined;
+    department?: string | undefined;
+    courseId?: string | undefined;
+    facultyId?: string | undefined;
+    semester?: number | undefined;
+    batch?: string | undefined;
+    facultyName?: string | undefined;
+}, {
+    courseName: string;
+    startTime: string;
+    courseCode: string;
+    day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+    endTime: string;
+    room: string;
+    id?: string | undefined;
+    department?: string | undefined;
+    courseId?: string | undefined;
+    facultyId?: string | undefined;
+    semester?: number | undefined;
+    batch?: string | undefined;
+    facultyName?: string | undefined;
+}>;
 export declare const examinationSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     courseId: z.ZodString;
@@ -390,7 +390,7 @@ export declare const examinationSchema: z.ZodObject<{
     startTime: z.ZodString;
     endTime: z.ZodString;
     room: z.ZodString;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     date: string;
     courseId: string;
     startTime: string;
@@ -425,7 +425,7 @@ export declare const academicCalendarEventSchema: z.ZodObject<{
     endDate: z.ZodString;
     type: z.ZodEnum<["academic", "holiday", "exam", "event"]>;
     isPublic: z.ZodDefault<z.ZodBoolean>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     type: "academic" | "holiday" | "exam" | "event";
     title: string;
     startDate: string;
@@ -458,7 +458,7 @@ export declare const canteenOrderSchema: z.ZodObject<{
     totalAmount: z.ZodNumber;
     status: z.ZodDefault<z.ZodEnum<["pending", "preparing", "ready", "delivered", "cancelled"]>>;
     instructions: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     status: "pending" | "preparing" | "ready" | "delivered" | "cancelled";
     studentId: string;
     items: {
@@ -488,7 +488,7 @@ export declare const canteenItemSchema: z.ZodObject<{
     image: z.ZodOptional<z.ZodString>;
     isAvailable: z.ZodDefault<z.ZodBoolean>;
     stock: z.ZodDefault<z.ZodNumber>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     name: string;
     category: string;
     price: number;
@@ -523,7 +523,7 @@ export declare const campusMapRegionSchema: z.ZodObject<{
         lng: number;
     }>, "many">;
     color: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     name: string;
     category: string;
     coordinates: {

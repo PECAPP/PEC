@@ -11,7 +11,7 @@ export const departmentSchema = z.object({
   code: z.string().min(2, 'Code must be at least 2 characters').toUpperCase(),
   hod: z.string().optional(),
   description: z.string().max(500, 'Description too long').optional(),
-});
+}).strict();
 
 export const facultySchema = z.object({
   id: z.string().uuid().optional(),
@@ -22,7 +22,7 @@ export const facultySchema = z.object({
   designation: z.string().min(1, 'Designation is required'),
   specialization: z.string().optional(),
   phone: z.string().regex(/^\+?[0-9- ]{10,15}$/, 'Invalid phone number').optional(),
-});
+}).strict();
 
 export const attendanceSchema = z.object({
   id: z.string().uuid().optional(),
@@ -38,19 +38,19 @@ export const attendanceSchema = z.object({
   facultyId: z.string().uuid().optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
-});
+}).strict();
 
 export const AuthLoginSchema = z.object({
   email: z.string().email('Invalid institutional email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-});
+}).strict();
 
 export const AuthSignupSchema = z.object({
   fullName: z.string().min(3, 'Full name required'),
   email: z.string().email('Invalid institutional email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.enum(['student', 'faculty', 'college_admin']).default('student'),
-});
+}).strict();
 
 export const AuthResponseSchema = z.object({
   user: z.object({
@@ -60,7 +60,7 @@ export const AuthResponseSchema = z.object({
     role: z.string(),
   }),
   token: z.string(),
-});
+}).strict();
 
 export const attendanceSessionSchema = z.object({
   id: z.string().uuid().optional(),
@@ -75,7 +75,7 @@ export const attendanceSessionSchema = z.object({
   attendanceCount: z.number().int().min(0).default(0),
   createdAt: z.string().datetime().optional(),
   endedAt: z.string().datetime().optional(),
-});
+}).strict();
 
 export const courseSchema = z.object({
   id: z.string().uuid().optional(),
@@ -87,7 +87,7 @@ export const courseSchema = z.object({
   instructor: z.string().optional(),
   semester: z.number().int().min(1).max(8).optional(),
   status: z.enum(['active', 'inactive', 'archived']).default('active'),
-});
+}).strict();
 
 export const userSchema = z.object({
   id: z.string().uuid().optional(),
@@ -104,7 +104,7 @@ export const userSchema = z.object({
   designation: z.string().optional(),
   specialization: z.string().optional(),
   phone: z.string().optional(),
-});
+}).strict();
 
 export const enrollmentSchema = z.object({
   id: z.string().uuid().optional(),
@@ -116,7 +116,7 @@ export const enrollmentSchema = z.object({
   batch: z.string().optional(),
   status: z.enum(['active', 'inactive', 'completed', 'withdrawn']).default('active'),
   enrolledAt: z.string().datetime().optional(),
-});
+}).strict();
 
 export const hostelIssueSchema = z.object({
   id: z.string().uuid().optional(),
@@ -132,7 +132,7 @@ export const hostelIssueSchema = z.object({
   responses: z.unknown().optional(),
   createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),
-});
+}).strict();
 
 export const timetableSchema = z.object({
   id: z.string().uuid().optional(),
@@ -148,7 +148,7 @@ export const timetableSchema = z.object({
   department: z.string().optional(),
   semester: z.number().int().min(1).max(8).optional(),
   batch: z.string().optional(),
-}).passthrough();
+}).strict();
 
 export const examinationSchema = z.object({
   id: z.string().uuid().optional(),
@@ -158,7 +158,7 @@ export const examinationSchema = z.object({
   startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid start time (HH:MM)'),
   endTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid end time (HH:MM)'),
   room: z.string().min(1, 'Room required'),
-});
+}).strict();
 
 export type DepartmentInput = z.infer<typeof departmentSchema>;
 export type FacultyInput = z.infer<typeof facultySchema>;
@@ -179,7 +179,7 @@ export const academicCalendarEventSchema = z.object({
   endDate: z.string().datetime(),
   type: z.enum(['academic', 'holiday', 'exam', 'event']),
   isPublic: z.boolean().default(true),
-});
+}).strict();
 
 export const canteenOrderSchema = z.object({
   id: z.string().uuid().optional(),
@@ -191,7 +191,7 @@ export const canteenOrderSchema = z.object({
   totalAmount: z.number().min(0),
   status: z.enum(['pending', 'preparing', 'ready', 'delivered', 'cancelled']).default('pending'),
   instructions: z.string().optional(),
-});
+}).strict();
 
 export const canteenItemSchema = z.object({
   id: z.string().uuid().optional(),
@@ -202,7 +202,7 @@ export const canteenItemSchema = z.object({
   image: z.string().optional(),
   isAvailable: z.boolean().default(true),
   stock: z.number().int().min(0).default(0),
-});
+}).strict();
 
 export const campusMapRegionSchema = z.object({
   id: z.string().uuid().optional(),
@@ -214,7 +214,7 @@ export const campusMapRegionSchema = z.object({
     lng: z.number(),
   })).min(3, 'Region must be a polygon with at least 3 points'),
   color: z.string().regex(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i, 'Must be a valid hex color').optional(),
-});
+}).strict();
 
 export type AcademicCalendarEventInput = z.infer<typeof academicCalendarEventSchema>;
 export type CanteenOrderInput = z.infer<typeof canteenOrderSchema>;
