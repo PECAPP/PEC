@@ -23,6 +23,7 @@ model User {
   sessionVersion           Int                      @default(0)
   failedLoginAttempts      Int                      @default(0)
   lockedUntil              DateTime?
+  deletedAt                DateTime?
   attendances              Attendance[]             @relation("StudentAttendance")
   canteenOrders            CanteenOrder[]
   cgpaEntries              CgpaEntry[]
@@ -46,8 +47,10 @@ model User {
   studentProfile           StudentProfile?
   chatRooms                UserChatRoom[]
   roles                    UserRole[]
+
   @@index([emailVerified])
   @@index([lockedUntil])
+  @@index([email], map: "idx_user_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model CgpaEntry {
@@ -172,9 +175,9 @@ model Role {
 
 model Permission {
   id          String           @id @default(uuid())
-  action      String           // e.g. "create", "read", "update", "delete", "manage"
-  subject     String           // e.g. "HostelIssue", "all"
-  conditions  Json?            // e.g. { "studentId": "{{id}}" }
+  action      String // e.g. "create", "read", "update", "delete", "manage"
+  subject     String // e.g. "HostelIssue", "all"
+  conditions  Json? // e.g. { "studentId": "{{id}}" }
   description String?
   createdAt   DateTime         @default(now())
   roles       RolePermission[]
@@ -230,6 +233,8 @@ model EmailVerificationToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+  @@index([expiresAt]) // For scheduled pruning of expired tokens
+  @@index([usedAt]) // For cleanup of used tokens
 }
 
 model PasswordResetToken {
@@ -242,6 +247,8 @@ model PasswordResetToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+  @@index([expiresAt]) // For scheduled pruning of expired tokens
+  @@index([usedAt]) // For cleanup of used tokens
 }
 
 model StudentProfile {
@@ -310,8 +317,6 @@ model Course {
   timetableEntries Timetable[]    @relation("CourseTimetable")
 
   @@index([department, semester])
-  @@index([status])
-  @@index([deletedAt])
   @@index([status], map: "idx_course_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
@@ -330,7 +335,7 @@ model Enrollment {
 
   @@unique([studentId, courseId])
   @@index([studentId, status])
-  @@index([courseId])
+  @@index([courseId, status])
   @@index([enrolledAt])
 }
 
@@ -354,18 +359,18 @@ model FeeRecord {
   createdAt               DateTime             @default(now())
   updatedAt               DateTime             @updatedAt
   deletedAt               DateTime?
-  student                 User                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student                 User                 @relation(fields: [studentId], references: [id])
   transactions            FinanceTransaction[]
 
   @@index([studentId, status])
   @@index([category, status])
   @@index([dueDate])
-  @@index([deletedAt])
+  @@index([status, dueDate])
   @@index([studentId, status], map: "idx_feerecord_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model FinanceTransaction {
-  id            String    @id @default(uuid())
+  id            String    @id @default(cuid())
   studentId     String
   feeRecordId   String
   amount        Float
@@ -375,12 +380,11 @@ model FinanceTransaction {
   receiptNo     String    @unique
   notes         String?
   createdAt     DateTime  @default(now())
-  feeRecord     FeeRecord @relation(fields: [feeRecordId], references: [id], onDelete: Cascade)
-  student       User      @relation("FinanceTransactions", fields: [studentId], references: [id], onDelete: Cascade)
+  feeRecord     FeeRecord @relation(fields: [feeRecordId], references: [id])
+  student       User      @relation("FinanceTransactions", fields: [studentId], references: [id])
 
-  @@index([studentId])
-  @@index([feeRecordId])
-  @@index([status])
+  @@index([studentId, status])
+  @@index([feeRecordId, status])
   @@index([createdAt])
 }
 
@@ -422,7 +426,7 @@ model Room {
 }
 
 model ChatRoom {
-  id           String         @id @default(uuid())
+  id           String         @id @default(cuid())
   name         String
   isGroup      Boolean        @default(true)
   createdAt    DateTime       @default(now())
@@ -442,18 +446,17 @@ model Notice {
   important     Boolean   @default(false)
   priorityLevel Int       @default(1)
   pinned        Boolean   @default(false)
-  mediaJson   String?
-  authorId    String?
-  publishedAt DateTime  @default(now())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  author      User?     @relation("NoticeAuthor", fields: [authorId], references: [id])
+  mediaJson     String?
+  authorId      String?
+  publishedAt   DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  author        User?     @relation("NoticeAuthor", fields: [authorId], references: [id])
 
   @@index([pinned, priorityLevel, publishedAt])
   @@index([category, publishedAt])
   @@index([authorId])
-  @@index([deletedAt, publishedAt])
   @@index([category], map: "idx_notice_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
@@ -532,7 +535,7 @@ model UserChatRoom {
 }
 
 model Attendance {
-  id        String             @id @default(uuid())
+  id        String             @id @default(cuid())
   date      DateTime
   status    String
   subject   String
@@ -589,7 +592,7 @@ model ExamSchedule {
   course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@index([courseId, date])
-  @@index([deletedAt])
+  @@index([courseId], map: "idx_exam_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model Job {
@@ -606,8 +609,6 @@ model Job {
   @@index([deadline])
   @@index([type, location])
   @@index([company])
-  @@index([deletedAt, deadline])
-  @@index([deletedAt])
   @@index([deadline], map: "idx_job_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
@@ -706,7 +707,7 @@ model CanteenOrderItem {
   name     String
   quantity Int
   price    Float
-  item     CanteenItem  @relation(fields: [itemId], references: [id])
+  item     CanteenItem  @relation(fields: [itemId], references: [id], onDelete: Cascade)
   order    CanteenOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
@@ -914,7 +915,7 @@ model MarketplaceChat {
 }
 
 model MarketplaceMessage {
-  id        String          @id @default(uuid())
+  id        String          @id @default(cuid())
   chatId    String
   senderId  String
   text      String
@@ -922,6 +923,6 @@ model MarketplaceMessage {
   chat      MarketplaceChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender    User            @relation("MarketplaceMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
-  @@index([chatId])
+  @@index([chatId, createdAt])
   @@index([senderId])
 }
