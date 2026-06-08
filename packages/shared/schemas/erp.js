@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.examinationSchema = exports.timetableSchema = exports.hostelIssueSchema = exports.enrollmentSchema = exports.userSchema = exports.courseSchema = exports.attendanceSessionSchema = exports.AuthResponseSchema = exports.AuthSignupSchema = exports.AuthLoginSchema = exports.attendanceSchema = exports.facultySchema = exports.departmentSchema = void 0;
+exports.campusMapRegionSchema = exports.canteenItemSchema = exports.canteenOrderSchema = exports.academicCalendarEventSchema = exports.examinationSchema = exports.timetableSchema = exports.hostelIssueSchema = exports.enrollmentSchema = exports.userSchema = exports.courseSchema = exports.attendanceSessionSchema = exports.AuthResponseSchema = exports.AuthSignupSchema = exports.AuthLoginSchema = exports.attendanceSchema = exports.facultySchema = exports.departmentSchema = void 0;
 const zod_1 = require("zod");
 /**
  * Shared Domain Schemas (Single Source of Truth)
@@ -147,4 +147,45 @@ exports.examinationSchema = zod_1.z.object({
     startTime: zod_1.z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid start time (HH:MM)'),
     endTime: zod_1.z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid end time (HH:MM)'),
     room: zod_1.z.string().min(1, 'Room required'),
+});
+exports.academicCalendarEventSchema = zod_1.z.object({
+    id: zod_1.z.string().uuid().optional(),
+    title: zod_1.z.string().min(3, 'Title is required'),
+    description: zod_1.z.string().optional(),
+    startDate: zod_1.z.string().datetime(),
+    endDate: zod_1.z.string().datetime(),
+    type: zod_1.z.enum(['academic', 'holiday', 'exam', 'event']),
+    isPublic: zod_1.z.boolean().default(true),
+});
+exports.canteenOrderSchema = zod_1.z.object({
+    id: zod_1.z.string().uuid().optional(),
+    studentId: zod_1.z.string().uuid('Student ID is required'),
+    items: zod_1.z.array(zod_1.z.object({
+        itemId: zod_1.z.string().uuid(),
+        quantity: zod_1.z.number().int().min(1),
+    })).min(1, 'Order must contain at least one item'),
+    totalAmount: zod_1.z.number().min(0),
+    status: zod_1.z.enum(['pending', 'preparing', 'ready', 'delivered', 'cancelled']).default('pending'),
+    instructions: zod_1.z.string().optional(),
+});
+exports.canteenItemSchema = zod_1.z.object({
+    id: zod_1.z.string().uuid().optional(),
+    name: zod_1.z.string().min(2, 'Item name is required'),
+    price: zod_1.z.number().min(0, 'Price must be non-negative'),
+    category: zod_1.z.string().min(1, 'Category is required'),
+    description: zod_1.z.string().optional(),
+    image: zod_1.z.string().optional(),
+    isAvailable: zod_1.z.boolean().default(true),
+    stock: zod_1.z.number().int().min(0).default(0),
+});
+exports.campusMapRegionSchema = zod_1.z.object({
+    id: zod_1.z.string().uuid().optional(),
+    name: zod_1.z.string().min(2, 'Region name is required'),
+    description: zod_1.z.string().optional(),
+    category: zod_1.z.string().min(1, 'Category is required'),
+    coordinates: zod_1.z.array(zod_1.z.object({
+        lat: zod_1.z.number(),
+        lng: zod_1.z.number(),
+    })).min(3, 'Region must be a polygon with at least 3 points'),
+    color: zod_1.z.string().regex(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i, 'Must be a valid hex color').optional(),
 });

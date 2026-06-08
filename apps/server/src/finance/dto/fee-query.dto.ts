@@ -1,33 +1,16 @@
-import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class FeeQueryDto {
-  @IsOptional()
-  @IsString()
-  studentId?: string;
+export const feeQuerySchema = z.object({
+  studentId: z.string().optional(),
+  category: z.string().optional(),
+  status: z.string().optional(),
+  semester: z.string().optional(),
+  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+});
 
-  @IsOptional()
-  @IsString()
-  category?: string;
 
-  @IsOptional()
-  @IsString()
-  status?: string;
 
-  @IsOptional()
-  @IsString()
-  semester?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  limit?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  offset?: number;
+export class FeeQueryDto extends createZodDto(feeQuerySchema) {
 }

@@ -1,12 +1,13 @@
-import { IsOptional, IsString } from 'class-validator';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class DepartmentQueryDto extends PaginationQueryDto {
-  @IsOptional()
-  @IsString()
-  search?: string;
+export const departmentQuerySchema = z.object({  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  sortOrder: z.any().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  status?: string;
+
+
+export class DepartmentQueryDto extends createZodDto(departmentQuerySchema) {
 }

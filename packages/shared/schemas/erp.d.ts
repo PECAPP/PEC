@@ -417,3 +417,134 @@ export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
 export type HostelIssueInput = z.infer<typeof hostelIssueSchema>;
 export type TimetableInput = z.infer<typeof timetableSchema>;
 export type ExaminationInput = z.infer<typeof examinationSchema>;
+export declare const academicCalendarEventSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    title: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    startDate: z.ZodString;
+    endDate: z.ZodString;
+    type: z.ZodEnum<["academic", "holiday", "exam", "event"]>;
+    isPublic: z.ZodDefault<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    type: "academic" | "holiday" | "exam" | "event";
+    title: string;
+    startDate: string;
+    endDate: string;
+    isPublic: boolean;
+    id?: string | undefined;
+    description?: string | undefined;
+}, {
+    type: "academic" | "holiday" | "exam" | "event";
+    title: string;
+    startDate: string;
+    endDate: string;
+    id?: string | undefined;
+    description?: string | undefined;
+    isPublic?: boolean | undefined;
+}>;
+export declare const canteenOrderSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    studentId: z.ZodString;
+    items: z.ZodArray<z.ZodObject<{
+        itemId: z.ZodString;
+        quantity: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        itemId: string;
+        quantity: number;
+    }, {
+        itemId: string;
+        quantity: number;
+    }>, "many">;
+    totalAmount: z.ZodNumber;
+    status: z.ZodDefault<z.ZodEnum<["pending", "preparing", "ready", "delivered", "cancelled"]>>;
+    instructions: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    status: "pending" | "preparing" | "ready" | "delivered" | "cancelled";
+    studentId: string;
+    items: {
+        itemId: string;
+        quantity: number;
+    }[];
+    totalAmount: number;
+    id?: string | undefined;
+    instructions?: string | undefined;
+}, {
+    studentId: string;
+    items: {
+        itemId: string;
+        quantity: number;
+    }[];
+    totalAmount: number;
+    id?: string | undefined;
+    status?: "pending" | "preparing" | "ready" | "delivered" | "cancelled" | undefined;
+    instructions?: string | undefined;
+}>;
+export declare const canteenItemSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    name: z.ZodString;
+    price: z.ZodNumber;
+    category: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    image: z.ZodOptional<z.ZodString>;
+    isAvailable: z.ZodDefault<z.ZodBoolean>;
+    stock: z.ZodDefault<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    category: string;
+    price: number;
+    isAvailable: boolean;
+    stock: number;
+    id?: string | undefined;
+    description?: string | undefined;
+    image?: string | undefined;
+}, {
+    name: string;
+    category: string;
+    price: number;
+    id?: string | undefined;
+    description?: string | undefined;
+    image?: string | undefined;
+    isAvailable?: boolean | undefined;
+    stock?: number | undefined;
+}>;
+export declare const campusMapRegionSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    name: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    category: z.ZodString;
+    coordinates: z.ZodArray<z.ZodObject<{
+        lat: z.ZodNumber;
+        lng: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        lat: number;
+        lng: number;
+    }, {
+        lat: number;
+        lng: number;
+    }>, "many">;
+    color: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    category: string;
+    coordinates: {
+        lat: number;
+        lng: number;
+    }[];
+    id?: string | undefined;
+    description?: string | undefined;
+    color?: string | undefined;
+}, {
+    name: string;
+    category: string;
+    coordinates: {
+        lat: number;
+        lng: number;
+    }[];
+    id?: string | undefined;
+    description?: string | undefined;
+    color?: string | undefined;
+}>;
+export type AcademicCalendarEventInput = z.infer<typeof academicCalendarEventSchema>;
+export type CanteenOrderInput = z.infer<typeof canteenOrderSchema>;
+export type CanteenItemInput = z.infer<typeof canteenItemSchema>;
+export type CampusMapRegionInput = z.infer<typeof campusMapRegionSchema>;

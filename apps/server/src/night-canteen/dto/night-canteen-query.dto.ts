@@ -1,30 +1,23 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class NightCanteenItemQueryDto extends PaginationQueryDto {
-  @IsOptional()
-  @IsString()
-  category?: string;
+export const nightCanteenItemQuerySchema = z.object({  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  sortOrder: z.any().optional(),
+});
 
-  @IsOptional()
-  @IsIn(['true', 'false'])
-  isAvailable?: 'true' | 'false';
 
-  @IsOptional()
-  @IsIn(['name', 'price', 'updatedAt', 'createdAt'])
-  sortBy?: 'name' | 'price' | 'updatedAt' | 'createdAt';
+
+export class NightCanteenItemQueryDto extends createZodDto(nightCanteenItemQuerySchema) {
 }
+export const nightCanteenOrderQuerySchema = z.object({
+  studentId: z.string().optional(),
+  status: z.string().optional(),
+  sortBy: z.any().optional(),
+});
 
-export class NightCanteenOrderQueryDto extends PaginationQueryDto {
-  @IsOptional()
-  @IsString()
-  studentId?: string;
 
-  @IsOptional()
-  @IsString()
-  status?: string;
 
-  @IsOptional()
-  @IsIn(['timestamp', 'status', 'totalAmount', 'updatedAt'])
-  sortBy?: 'timestamp' | 'status' | 'totalAmount' | 'updatedAt';
+export class NightCanteenOrderQueryDto extends createZodDto(nightCanteenOrderQuerySchema) {
 }

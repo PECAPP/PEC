@@ -1,17 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { createZodDto } from 'nestjs-zod';
 import { attendanceSchema } from '@pec/shared';
 
-export class UpdateAttendanceDto {
-  @ApiPropertyOptional({ enum: ['present', 'absent', 'late'] })
-  status?: 'present' | 'absent' | 'late';
-
-  @ApiPropertyOptional()
-  date?: string | Date;
-
-  @ApiPropertyOptional()
-  remarks?: string;
-
-  static validate(data: unknown): Partial<ReturnType<typeof attendanceSchema.parse>> {
-    return attendanceSchema.partial().parse(data);
-  }
-}
+export class UpdateAttendanceDto extends createZodDto(attendanceSchema.partial()) {}

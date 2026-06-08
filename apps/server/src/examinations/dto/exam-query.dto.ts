@@ -1,33 +1,15 @@
-import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class ExamQueryDto {
-  @IsOptional()
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  @IsInt()
-  @Min(1)
-  limit?: number;
+export const examQuerySchema = z.object({
+  limit: z.number().int().optional(),
+  offset: z.number().int().optional(),
+  courseId: z.string().optional(),
+  department: z.string().optional(),
+  upcoming: z.boolean().optional(),
+});
 
-  @IsOptional()
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  @IsInt()
-  @Min(0)
-  offset?: number;
 
-  @IsOptional()
-  @IsString()
-  courseId?: string;
 
-  @IsOptional()
-  @IsString()
-  department?: string;
-
-  @IsOptional()
-  @Transform(({ value }) => {
-    if (value === undefined) return undefined;
-    if (typeof value === 'boolean') return value;
-    const normalized = String(value).toLowerCase().trim();
-    return normalized === 'true' || normalized === '1';
-  })
-  upcoming?: boolean;
+export class ExamQueryDto extends createZodDto(examQuerySchema) {
 }

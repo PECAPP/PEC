@@ -1,15 +1,13 @@
-import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class UpsertFeatureFlagDto {
-  @IsBoolean()
-  enabled!: boolean;
+export const upsertFeatureFlagSchema = z.object({
+  enabled: z.boolean(),
+  description: z.string().optional(),
+  payload: z.string().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(300)
-  description?: string;
 
-  @IsOptional()
-  @IsString()
-  payload?: string;
+
+export class UpsertFeatureFlagDto extends createZodDto(upsertFeatureFlagSchema) {
 }

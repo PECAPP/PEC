@@ -1,11 +1,12 @@
-import { IsString, IsOptional } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class SyncSocialDto {
-  @IsOptional()
-  @IsString()
-  githubUsername?: string;
+export const syncSocialSchema = z.object({
+  githubUsername: z.string().optional(),
+  linkedinUsername: z.string().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  linkedinUsername?: string;
+
+
+export class SyncSocialDto extends createZodDto(syncSocialSchema) {
 }

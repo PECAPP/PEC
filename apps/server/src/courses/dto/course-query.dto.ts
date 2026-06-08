@@ -1,27 +1,13 @@
-import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CourseQueryDto extends PaginationQueryDto {
-  @IsOptional()
-  @IsString()
-  department?: string;
+export const courseQuerySchema = z.object({  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  sortOrder: z.any().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  facultyId?: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  semester?: number;
 
-  @IsOptional()
-  @IsString()
-  status?: string;
-
-  @IsOptional()
-  @IsIn(['code', 'name', 'createdAt', 'semester'])
-  sortBy?: 'code' | 'name' | 'createdAt' | 'semester';
+export class CourseQueryDto extends createZodDto(courseQuerySchema) {
 }

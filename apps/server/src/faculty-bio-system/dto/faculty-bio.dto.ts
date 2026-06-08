@@ -1,123 +1,61 @@
-import { IsString, IsOptional, IsNumber, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CreatePublicationDto {
-  @IsString()
-  facultyId: string;
+export const createPublicationSchema = z.object({
+  facultyId: z.string(),
+  title: z.string(),
+  journal: z.string().optional(),
+  conference: z.string().optional(),
+  year: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  doi: z.string().optional(),
+  url: z.string().optional(),
+  abstract: z.string().optional(),
+  citations: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  coAuthors: z.string().optional(),
+});
 
-  @IsString()
-  title: string;
 
-  @IsOptional()
-  @IsString()
-  journal?: string;
 
-  @IsOptional()
-  @IsString()
-  conference?: string;
-
-  @Type(() => Number)
-  @IsNumber()
-  year: number;
-
-  @IsOptional()
-  @IsString()
-  doi?: string;
-
-  @IsOptional()
-  @IsString()
-  url?: string;
-
-  @IsOptional()
-  @IsString()
-  abstract?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  citations?: number;
-
-  @IsOptional()
-  @IsString()
-  coAuthors?: string;
+export class CreatePublicationDto extends createZodDto(createPublicationSchema) {
 }
+export const createAwardSchema = z.object({
+  facultyId: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  awardedBy: z.string().optional(),
+  year: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  category: z.string().optional(),
+});
 
-export class CreateAwardDto {
-  @IsString()
-  facultyId: string;
 
-  @IsString()
-  title: string;
 
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  awardedBy?: string;
-
-  @Type(() => Number)
-  @IsNumber()
-  year: number;
-
-  @IsOptional()
-  @IsString()
-  category?: string;
+export class CreateAwardDto extends createZodDto(createAwardSchema) {
 }
+export const createConferenceSchema = z.object({
+  facultyId: z.string(),
+  name: z.string(),
+  location: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  role: z.string().optional(),
+  presentationTitle: z.string().optional(),
+  description: z.string().optional(),
+});
 
-export class CreateConferenceDto {
-  @IsString()
-  facultyId: string;
 
-  @IsString()
-  name: string;
 
-  @IsOptional()
-  @IsString()
-  location?: string;
-
-  @IsOptional()
-  @IsString()
-  startDate?: string;
-
-  @IsOptional()
-  @IsString()
-  endDate?: string;
-
-  @IsOptional()
-  @IsString()
-  role?: string;
-
-  @IsOptional()
-  @IsString()
-  presentationTitle?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
+export class CreateConferenceDto extends createZodDto(createConferenceSchema) {
 }
+export const createConsultationSchema = z.object({
+  facultyId: z.string(),
+  organization: z.string(),
+  description: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  status: z.string().optional(),
+});
 
-export class CreateConsultationDto {
-  @IsString()
-  facultyId: string;
 
-  @IsString()
-  organization: string;
 
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  startDate?: string;
-
-  @IsOptional()
-  @IsString()
-  endDate?: string;
-
-  @IsOptional()
-  @IsString()
-  status?: string;
+export class CreateConsultationDto extends createZodDto(createConsultationSchema) {
 }

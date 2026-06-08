@@ -1,53 +1,19 @@
-import { Type } from 'class-transformer';
-import {
-  IsDateString,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Max,
-  Min,
-} from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateCgpaEntryDto {
-  @IsString()
-  subjectName!: string;
+export const createCgpaEntrySchema = z.object({
+  subjectName: z.string(),
+  courseId: z.string().uuid().optional(),
+  courseCode: z.string().optional(),
+  semester: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  credits: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  gradePoint: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  examDate: z.string().optional(),
+  courseType: z.string().optional(),
+  notes: z.string().optional(),
+});
 
-  @IsOptional()
-  @IsUUID('4')
-  courseId?: string;
 
-  @IsOptional()
-  @IsString()
-  courseCode?: string;
 
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  semester!: number;
-
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0.5)
-  @Max(12)
-  credits!: number;
-
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  @Max(10)
-  gradePoint!: number;
-
-  @IsOptional()
-  @IsDateString()
-  examDate?: string;
-
-  @IsOptional()
-  @IsString()
-  courseType?: string; // core | elective | minor | honors
-
-  @IsOptional()
-  @IsString()
-  notes?: string;
+export class CreateCgpaEntryDto extends createZodDto(createCgpaEntrySchema) {
 }

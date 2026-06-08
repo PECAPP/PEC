@@ -1,115 +1,57 @@
-import { IsString, IsOptional, IsNumber, IsBoolean, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateStudentProjectDto {
-  @IsString()
-  studentId: string;
+export const createStudentProjectSchema = z.object({
+  studentId: z.string(),
+  title: z.string(),
+  description: z.string(),
+  techStack: z.string().optional(),
+  githubUrl: z.string().optional(),
+  liveUrl: z.string().optional(),
+  imageUrl: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  isFeatured: z.boolean().optional(),
+});
 
-  @IsString()
-  title: string;
 
-  @IsString()
-  description: string;
 
-  @IsOptional()
-  @IsString()
-  techStack?: string;
-
-  @IsOptional()
-  @IsString()
-  githubUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  liveUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  imageUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  startDate?: string;
-
-  @IsOptional()
-  @IsString()
-  endDate?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isFeatured?: boolean;
+export class CreateStudentProjectDto extends createZodDto(createStudentProjectSchema) {
 }
+export const updateStudentProjectSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  techStack: z.string().optional(),
+  githubUrl: z.string().optional(),
+  liveUrl: z.string().optional(),
+  imageUrl: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  isFeatured: z.boolean().optional(),
+});
 
-export class UpdateStudentProjectDto {
-  @IsOptional()
-  @IsString()
-  title?: string;
 
-  @IsOptional()
-  @IsString()
-  description?: string;
 
-  @IsOptional()
-  @IsString()
-  techStack?: string;
-
-  @IsOptional()
-  @IsString()
-  githubUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  liveUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  imageUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  startDate?: string;
-
-  @IsOptional()
-  @IsString()
-  endDate?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isFeatured?: boolean;
+export class UpdateStudentProjectDto extends createZodDto(updateStudentProjectSchema) {
 }
+export const createStudentSkillSchema = z.object({
+  studentId: z.string(),
+  name: z.string(),
+  level: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  category: z.string().optional(),
+});
 
-export class CreateStudentSkillDto {
-  @IsString()
-  studentId: string;
 
-  @IsString()
-  name: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  level?: number;
-
-  @IsOptional()
-  @IsString()
-  category?: string;
+export class CreateStudentSkillDto extends createZodDto(createStudentSkillSchema) {
 }
+export const updateStudentSkillSchema = z.object({
+  name: z.string().optional(),
+  level: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  category: z.string().optional(),
+});
 
-export class UpdateStudentSkillDto {
-  @IsOptional()
-  @IsString()
-  name?: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  level?: number;
 
-  @IsOptional()
-  @IsString()
-  category?: string;
+export class UpdateStudentSkillDto extends createZodDto(updateStudentSkillSchema) {
 }

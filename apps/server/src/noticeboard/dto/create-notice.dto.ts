@@ -1,75 +1,23 @@
-import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsBoolean,
-  IsIn,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-  ValidateNested,
-  IsInt,
-  Min,
-  Max,
-} from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-class NoticeMediaDto {
-  @IsString()
-  @MinLength(1)
-  url!: string;
+export const noticeMediaSchema = z.object({
+  url: z.string().min(1),
+  kind: z.enum(['image', 'audio', 'video', 'file']),
+  name: z.string().max(200).optional(),
+  mimeType: z.string().max(120).optional(),
+  sizeBytes: z.number().optional(),
+});
 
-  @IsString()
-  @IsIn(['image', 'audio', 'video', 'file'])
-  kind!: 'image' | 'audio' | 'video' | 'file';
+export const createNoticeSchema = z.object({
+  title: z.string(),
+  content: z.string(),
+  category: z.string().optional(),
+  important: z.boolean().optional(),
+  priorityLevel: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  pinned: z.boolean().optional(),
+  media: z.array(noticeMediaSchema).optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(200)
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(120)
-  mimeType?: string;
-
-  @IsOptional()
-  sizeBytes?: number;
-}
-
-export class CreateNoticeDto {
-  @IsString()
-  @MinLength(3)
-  @MaxLength(160)
-  title!: string;
-
-  @IsString()
-  @MinLength(5)
-  @MaxLength(5000)
-  content!: string;
-
-  @IsOptional()
-  @IsString()
-  @IsIn(['news', 'update', 'event', 'alert'])
-  category?: 'news' | 'update' | 'event' | 'alert';
-
-  @IsOptional()
-  @IsBoolean()
-  important?: boolean;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(3)
-  priorityLevel?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  pinned?: boolean;
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => NoticeMediaDto)
-  media?: NoticeMediaDto[];
-}
+export class NoticeMediaDto extends createZodDto(noticeMediaSchema) {}
+export class CreateNoticeDto extends createZodDto(createNoticeSchema) {}

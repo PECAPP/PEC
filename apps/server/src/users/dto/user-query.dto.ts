@@ -1,5 +1,5 @@
-import { Type } from 'class-transformer';
-import { IsOptional, IsString, IsEnum, Min, Max } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -7,38 +7,17 @@ export enum UserRole {
   STUDENT = 'student',
   STAFF = 'staff',
 }
+export const userQuerySchema = z.object({
+  role: z.string().optional(),
+  department: z.string().optional(),
+  semester: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  search: z.string().optional(),
+  status: z.string().optional(),
+});
 
-export class UserQueryDto {
-  @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
 
-  @IsOptional()
-  @IsString()
-  department?: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @Min(1)
-  @Max(8)
-  semester?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @Min(1)
-  @Max(200)
-  limit?: number = 100;
-
-  @IsOptional()
-  @Type(() => Number)
-  @Min(0)
-  offset?: number = 0;
-
-  @IsOptional()
-  @IsString()
-  search?: string;
-
-  @IsOptional()
-  @IsString()
-  status?: 'active' | 'inactive' | 'suspended';
+export class UserQueryDto extends createZodDto(userQuerySchema) {
 }

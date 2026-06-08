@@ -1,20 +1,13 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CourseMaterialQueryDto extends PaginationQueryDto {
-  @IsOptional()
-  @IsString()
-  courseId?: string;
+export const courseMaterialQuerySchema = z.object({  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  sortOrder: z.any().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  uploadedBy?: string;
 
-  @IsOptional()
-  @IsIn(['lecture-notes', 'reference', 'assignment', 'video', 'other'])
-  type?: 'lecture-notes' | 'reference' | 'assignment' | 'video' | 'other';
 
-  @IsOptional()
-  @IsIn(['uploadedAt', 'createdAt', 'courseCode', 'title'])
-  sortBy?: 'uploadedAt' | 'createdAt' | 'courseCode' | 'title';
+export class CourseMaterialQueryDto extends createZodDto(courseMaterialQuerySchema) {
 }
