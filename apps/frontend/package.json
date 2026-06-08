@@ -16,6 +16,7 @@
     "@next/bundle-analyzer": "^15.1.7",
     "@pec/api": "workspace:*",
     "@pec/database": "workspace:*",
+    "@pec/env": "workspace:*",
     "@pec/shared": "workspace:*",
     "@pec/ui": "workspace:*",
     "@react-three/drei": "^10.7.7",
@@ -29,6 +30,7 @@
     "ajv": "^8.18.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
+    "firebase": "^12.14.0",
     "flatted": "^3.4.2",
     "handlebars": "^4.7.9",
     "html2canvas": "^1.4.1",
@@ -54,9 +56,7 @@
     "undici": "^7.24.6",
     "vaul": "^0.9.9",
     "xlsx": "^0.18.5",
-    "zod": "^3.25.76",
-    "@pec/api": "workspace:*",
-    "@pec/env": "workspace:*"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@orval/query": "^8.15.0",

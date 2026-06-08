@@ -24,8 +24,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@pec/ui';
-import { cn } from '@/lib/utils';
-import { AXIOS_INSTANCE } from '@pec/api';
+import { cn, extractData } from '@/lib/utils';
+import api from '@pec/api';
 
 interface HostelIssue {
   id: string;
@@ -53,9 +53,15 @@ export default function HostelAdmin() {
   useEffect(() => {
     // Simplified query without orderBy to avoid composite index requirement
     const fetchIssues = async () => {
-      const { data } = await AXIOS_INSTANCE.get('/hostelIssues');
-      setIssues(data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
-      setLoading(false);
+      try {
+        const rawData = extractData<any>((await api.get('/hostelIssues', { params: { limit: 2000 } })).data);
+        const data = Array.isArray(rawData) ? rawData : [];
+        setIssues(data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+      } catch (err) {
+        console.error("Failed to fetch issues", err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchIssues();
     const intervalId = setInterval(fetchIssues, 5000);
@@ -66,7 +72,7 @@ export default function HostelAdmin() {
 
   const updateStatus = async (issueId: string, newStatus: string) => {
     try {
-      await AXIOS_INSTANCE.patch(`/hostelIssues/${issueId}`, { status: newStatus });
+      await api.patch(`/hostelIssues/${issueId}`, { status: newStatus });
       toast.success(`Issue marked as ${newStatus}`);
     } catch (err) {
       toast.error('Failed to update status');
@@ -77,9 +83,16 @@ export default function HostelAdmin() {
     if (!newMessage.trim() || !selectedIssue) return;
 
     try {
-      await AXIOS_INSTANCE.post(`/hostelIssues/${selectedIssue.id}/reply`, {
-          message: newMessage
-        });
+      await api.patch(`/hostelIssues/${selectedIssue.id}`, {
+        responses: {
+          _op: 'arrayUnion',
+          val: {
+            from: 'Maintenance Team',
+            message: newMessage,
+            timestamp: new Date().toISOString(),
+          },
+        },
+      });
       setNewMessage('');
       toast.success('Reply sent');
     } catch (err) {
@@ -195,7 +208,7 @@ export default function HostelAdmin() {
                           {getStatusConfig(issue.status).label}
                         </Badge>
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">
-                          {issue.createdAt?.toDate ? issue.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                          {issue.createdAt ? new Date(issue.createdAt).toLocaleDateString() : 'Just now'}
                         </span>
                       </div>
                       <h3 className="font-bold text-foreground line-clamp-1">{issue.title}</h3>
@@ -265,7 +278,7 @@ export default function HostelAdmin() {
                       {res.message}
                     </div>
                     <span className="text-[10px] text-muted-foreground px-1">
-                      {res.from} • {res.timestamp?.toDate ? res.timestamp.toDate().toLocaleTimeString() : 'Just now'}
+                      {res.from} • {res.timestamp ? new Date(res.timestamp).toLocaleTimeString() : 'Just now'}
                     </span>
                   </div>
                 ))}

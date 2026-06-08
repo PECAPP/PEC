@@ -25,6 +25,9 @@ import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 import { LoadingGrid } from '@/components/common/AsyncState';
 import { SecuritySettings } from './SecuritySettings';
+import { PrivacySettings } from './components/PrivacySettings';
+import { NotificationSettings } from './components/NotificationSettings';
+import { NetworkSettings } from './components/NetworkSettings';
 
 export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -243,9 +246,15 @@ export default function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="notifications" className="mt-0">
-               <div className="card-elevated p-12 bg-card/50 text-center italic text-muted-foreground font-medium text-sm animate-in fade-in duration-500">
-                  Notification settings will be available in the next update.
-               </div>
+               <NotificationSettings />
+            </TabsContent>
+
+            <TabsContent value="privacy" className="mt-0">
+               <PrivacySettings />
+            </TabsContent>
+
+            <TabsContent value="connected" className="mt-0">
+               <NetworkSettings />
             </TabsContent>
 
             <TabsContent value="security" className="mt-0">

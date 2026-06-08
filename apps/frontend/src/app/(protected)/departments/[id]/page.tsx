@@ -20,6 +20,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { AXIOS_INSTANCE } from "@pec/api";
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 
 import { toast } from 'sonner';
 

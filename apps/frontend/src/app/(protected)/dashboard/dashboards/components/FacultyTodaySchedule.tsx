@@ -25,7 +25,7 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
-export function FacultyTodaySchedule({ schedule, onViewFull }: Props) {
+export function FacultyTodaySchedule({ schedule, onViewFull, onGenerateQR }: Props) {
   const safeSchedule = Array.isArray(schedule) ? schedule : [];
   return (
     <motion.div variants={item} className="card-elevated p-6">

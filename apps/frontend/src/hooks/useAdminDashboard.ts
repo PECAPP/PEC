@@ -4,7 +4,7 @@ import { extractData } from "@/lib/utils";
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { User, Course, DashboardStats, AdminDashboardData } from '../../shared/types';
+import { User, Course, DashboardStats, AdminDashboardData } from '@pec/shared';
 import api from "@pec/api";
 import { toast } from 'sonner';
 

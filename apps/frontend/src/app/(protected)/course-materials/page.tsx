@@ -93,9 +93,9 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
     courseId: '',
     title: '',
     description: '',
-    fileURL: '',
     type: 'lecture-notes' as CourseMaterial['type'],
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const isAdmin = userRole.includes('admin');
 
@@ -149,19 +149,27 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
   const materialsApiAvailable = data?.materialsApiAvailable ?? true;
 
   const handleUpload = async () => {
-    if (!materialForm.title || !materialForm.courseId || !materialForm.fileURL) {
-      toast.error('Please fill all required fields');
+    if (!materialForm.title || !materialForm.courseId || !selectedFile) {
+      toast.error('Please fill all required fields and select a file');
       return;
     }
 
     setUploading(true);
     try {
       const course = courses.find(c => c.id === materialForm.courseId);
-      await api.post('/course-materials', {
-        ...materialForm,
-        courseName: course?.name,
-        courseCode: course?.code,
-        uploadedBy: userId,
+      
+      const formData = new FormData();
+      formData.append('courseId', materialForm.courseId);
+      formData.append('courseName', course?.name || '');
+      formData.append('courseCode', course?.code || '');
+      formData.append('title', materialForm.title);
+      formData.append('description', materialForm.description);
+      formData.append('type', materialForm.type);
+      formData.append('uploadedBy', userId);
+      formData.append('file', selectedFile);
+
+      await api.post('/course-materials', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       
       toast.success('Material uploaded successfully');
@@ -225,9 +233,9 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
       courseId: '',
       title: '',
       description: '',
-      fileURL: '',
       type: 'lecture-notes',
     });
+    setSelectedFile(null);
   };
 
   const getTypeIcon = (type: string) => {
@@ -379,9 +387,13 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">File URL</label>
-              <Input value={materialForm.fileURL} onChange={e => setMaterialForm({...materialForm, fileURL: e.target.value})} className="mt-1" placeholder="https://drive.google.com/..." />
-              <p className="text-xs text-muted-foreground mt-1">Upload to Google Drive/Dropbox and paste shareable link</p>
+              <label className="text-sm font-medium">File</label>
+              <Input 
+                type="file" 
+                onChange={e => setSelectedFile(e.target.files?.[0] || null)} 
+                className="mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" 
+              />
+              <p className="text-xs text-muted-foreground mt-1">Select a file (PDF, DOCX, ZIP) - Max 50MB</p>
             </div>
             <Button onClick={handleUpload} disabled={uploading} className="w-full">
               {uploading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading...</> : <><Upload className="w-4 h-4 mr-2" /> Upload Material</>}
