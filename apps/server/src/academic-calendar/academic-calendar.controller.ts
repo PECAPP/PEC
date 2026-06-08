@@ -12,7 +12,9 @@ import {
   UploadedFile,
   ParseIntPipe,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AcademicCalendarService } from './academic-calendar.service';
@@ -76,8 +78,8 @@ export class AcademicCalendarController {
 
   @Post('bulk-import')
   @CheckPolicies((ability) => ability.can('manage', 'all'))
-  async bulkImport(@Body() body: { events: CreateAcademicCalendarEventDto[] }, @Query('userId') userId?: string) {
-    const createdEvents = await this.calendarService.replaceAll(body.events, userId);
+  async bulkImport(@Body() body: { events: CreateAcademicCalendarEventDto[] }, @Req() req: any) {
+    const createdEvents = await this.calendarService.replaceAll(body.events, req.user?.id);
 
     return {
       message: `Successfully replaced calendar with ${createdEvents.length} events`,
@@ -86,18 +88,22 @@ export class AcademicCalendarController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300000) // 5 minutes
   async findAll(
-    @Query('month') month?: number,
-    @Query('year') year?: number,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
     @Query('eventType') eventType?: string,
     @Query('category') category?: string,
   ) {
-    return this.calendarService.findAll(month, year, eventType, category);
+    return this.calendarService.findAll(startDate, endDate, eventType, category);
   }
 
   @Get('upcoming')
-  async getUpcoming(@Query('limit') limit?: number) {
-    return this.calendarService.getUpcomingEvents(limit || 10);
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300000) // 5 minutes
+  async getUpcoming(@Query('limit') limit?: number, @Query('localCurrentDate') localCurrentDate?: string) {
+    return this.calendarService.getUpcomingEvents(limit || 10, localCurrentDate);
   }
 
   @Get('range')
@@ -112,20 +118,20 @@ export class AcademicCalendarController {
 
   @Post()
   @CheckPolicies((ability) => ability.can('manage', 'all'))
-  async create(@Body() data: CreateAcademicCalendarEventDto, @Query('userId') userId?: string) {
-    return this.calendarService.create(data, userId);
+  async create(@Body() data: CreateAcademicCalendarEventDto, @Req() req: any) {
+    return this.calendarService.create(data, req.user?.id);
   }
 
   @Patch(':id')
   @CheckPolicies((ability) => ability.can('manage', 'all'))
-  async update(@Param('id') id: string, @Body() data: UpdateAcademicCalendarEventDto) {
-    return this.calendarService.update(id, data);
+  async update(@Param('id') id: string, @Body() data: UpdateAcademicCalendarEventDto, @Req() req: any) {
+    return this.calendarService.update(id, data, req.user?.id, req.user?.role);
   }
 
   @Delete(':id')
   @CheckPolicies((ability) => ability.can('manage', 'all'))
-  async delete(@Param('id') id: string) {
-    return this.calendarService.delete(id);
+  async delete(@Param('id') id: string, @Req() req: any) {
+    return this.calendarService.delete(id, req.user?.id, req.user?.role);
   }
 
   @Delete()
