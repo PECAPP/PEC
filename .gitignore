@@ -19,7 +19,9 @@ out
 
 # Production
 /build
+
 dist
+dist-swc
 dist-ssr
 PEC_ERP_Report.tex
 # Misc
