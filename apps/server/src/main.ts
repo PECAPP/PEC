@@ -7,27 +7,18 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { Logger } from 'nestjs-pino';
 
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({ trustProxy: true }),
+    { bufferLogs: true }
+  );
   app.useLogger(app.get(Logger));
   configureApp(app);
 
-  let protoPath = join(process.cwd(), '../../packages/protos/hello.proto');
-  if (!require('fs').existsSync(protoPath)) {
-    protoPath = join(process.cwd(), 'packages/protos/hello.proto');
-  }
-  if (!require('fs').existsSync(protoPath)) {
-    protoPath = '/app/packages/protos/hello.proto';
-  }
 
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.GRPC,
-    options: {
-      package: 'hello',
-      protoPath,
-      url: '0.0.0.0:50051',
-    },
-  });
 
   // Also connect a RabbitMQ microservice listener so this app can consume events
   app.connectMicroservice<MicroserviceOptions>({

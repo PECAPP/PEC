@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -46,9 +47,16 @@ import { FinanceModule } from './finance/finance.module';
 import { RolesMgmtModule } from './roles/roles-mgmt.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CaslModule } from './casl/casl.module';
+import { GlobalCacheModule } from './cache/global-cache.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
+
+import { CommonServicesModule } from './common/common.module';
 
 @Module({
   imports: [
+    CommonServicesModule,
+    GlobalCacheModule,
+    MaintenanceModule,
     PrometheusModule.register(),
     CaslModule,
     PermissionsModule,
@@ -99,6 +107,7 @@ import { CaslModule } from './casl/casl.module';
         ],
       }),
     }),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [
