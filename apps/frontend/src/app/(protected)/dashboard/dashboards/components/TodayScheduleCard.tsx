@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 
 import { Calendar, ArrowUpRight, User, MapPin } from 'lucide-react';
 import { Button, Badge } from '@pec/ui';
@@ -24,6 +25,13 @@ interface Props {
 }
 
 export function TodayScheduleCard({ scheduleDay, todayClasses, todayEvents = [], onViewFull, containerHeight }: Props) {
+  const [currentTimeStr, setCurrentTimeStr] = useState<string>('');
+
+  useEffect(() => {
+    const now = new Date();
+    setCurrentTimeStr(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`);
+  }, []);
+
   return (
     <div
       className="card-elevated ui-card-pad flex h-fit flex-col"
@@ -60,9 +68,7 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, todayEvents = [],
           />
         ) : (
           todayClasses.map((cls, index) => {
-            const now = new Date();
-            const currentTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            const isOngoing = currentTimeStr >= cls.startTime && currentTimeStr <= cls.endTime;
+            const isOngoing = currentTimeStr && currentTimeStr >= cls.startTime && currentTimeStr <= cls.endTime;
             
             return (
               <div 

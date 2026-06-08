@@ -236,7 +236,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     if (authLoading) return;
 
     if (!user) {
-      router.replace('/auth');
+      // Let middleware handle the redirect — don't force it from client
       return;
     }
 

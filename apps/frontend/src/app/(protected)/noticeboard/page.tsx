@@ -391,7 +391,7 @@ export default function NoticeboardPage() {
                   {notice.media.map((item, index) => (
                     <div key={`${notice.id}-${index}`} className="group/media relative aspect-video rounded-xl overflow-hidden border border-border/40 bg-muted/20 hover:border-primary/30 transition-all shadow-sm">
                       {item.kind === 'image' ? (
-                        <a href={item.url} target="_blank" rel="noreferrer" className="block w-full h-full">
+                        <a href={item.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
                           <Image
                             src={item.url}
                             alt={item.name || 'Notice attachment'}
@@ -402,7 +402,7 @@ export default function NoticeboardPage() {
                         </a>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center p-2 text-center bg-background/40">
-                           <a href={item.url} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1.5">
+                           <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5">
                               <Tag className="w-4 h-4 text-primary" />
                               <span className="text-[8px] font-bold uppercase tracking-widest text-primary truncate max-w-full px-1">{item.name || 'View'}</span>
                            </a>

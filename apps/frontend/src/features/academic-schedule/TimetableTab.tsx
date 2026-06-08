@@ -231,7 +231,7 @@ export default function TimetableTab() {
 
   const fetchData = async () => {
     try {
-      const allCourses = await api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
+      const allCourses = await fetchAllPages<any>('/courses');
       let facultyOwnedCourses =
         isFaculty && user?.uid
           ? allCourses.filter(
@@ -283,7 +283,7 @@ export default function TimetableTab() {
       
       setCourses(coursesData);
 
-      const timetableItems = await api.get('/timetable', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
+      const timetableItems = await fetchAllPages<any>('/timetable');
       const timetableData: any = {};
 
       timetableItems.forEach((item: any) => {
@@ -457,7 +457,7 @@ export default function TimetableTab() {
 
     setGenerating(true);
     try {
-      const allCoursesRaw = await api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
+      const allCoursesRaw = await fetchAllPages<any>('/courses');
       const allCourses: CourseSchedule[] = allCoursesRaw.map((course: any) => {
         const { facultyId, facultyName } = getFacultyPayload(course);
         return {
@@ -491,7 +491,7 @@ export default function TimetableTab() {
         return result;
       };
 
-      const existingTimetable = await api.get('/timetable', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
+      const existingTimetable = await fetchAllPages<any>('/timetable');
       const deleteChunks = chunkArray(existingTimetable, 20);
       for (const chunk of deleteChunks) {
         const deleteResults = await Promise.allSettled(

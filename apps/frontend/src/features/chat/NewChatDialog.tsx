@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Search, Loader2 } from "lucide-react";
 
 import { findUserByEmail, createOrFindDMRoom } from "@/lib/chatRooms.service";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from "sonner";
 
 interface Props {

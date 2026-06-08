@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { NewChatDialog } from "@/features/chat/NewChatDialog";
 import { CreateGroupDialog } from "@/features/chat/CreateGroupDialog";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 interface Props {
   rooms: ChatRoom[];

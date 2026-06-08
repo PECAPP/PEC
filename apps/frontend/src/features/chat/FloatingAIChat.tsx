@@ -98,12 +98,16 @@ const FloatingAIChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
+  const cleanupResizeListeners = useRef<(() => void) | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
+      }
+      if (cleanupResizeListeners.current) {
+        cleanupResizeListeners.current();
       }
     };
   }, []);
@@ -165,7 +169,10 @@ const FloatingAIChat = () => {
       document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("touchmove", handleMouseMove);
       document.removeEventListener("touchend", handleMouseUp);
+      cleanupResizeListeners.current = null;
     };
+
+    cleanupResizeListeners.current = handleMouseUp;
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);

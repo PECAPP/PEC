@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Sora } from 'next/font/google';
 import { Providers } from './providers';
 import { RouteTransitionLoader } from '@/components/layout/RouteTransitionLoader';
+import { cookies } from 'next/headers';
 import './globals.css';
 
 const inter = Inter({
@@ -25,17 +26,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const savedAccent = cookieStore.get('accent-color')?.value || 'pec-gold';
+
   return (
     <html 
       lang="en" 
       suppressHydrationWarning 
       data-scroll-behavior="smooth"
-      className={`accent-pec-gold ${inter.variable} ${sora.variable}`}
+      className={`accent-${savedAccent} ${inter.variable} ${sora.variable}`}
     >
       <body suppressHydrationWarning>
         <RouteTransitionLoader />

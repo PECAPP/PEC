@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import { ChatRoom } from '@pec/shared';
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { 
   getMembersForGroup,
   addMemberToGroup, 

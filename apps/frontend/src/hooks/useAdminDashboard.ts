@@ -52,7 +52,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
   const [courseSearchQuery, setCourseSearchQuery] = useState('');
   const [userSearchQuery, setUserSearchQuery] = useState('');
 
-  const isAdmin = ['college_admin'].includes(user?.role || '');
+  const isAdmin = ['college_admin', 'admin', 'super_admin'].includes(user?.role || '');
 
   const filteredCourses = (courses || []).filter((course) => {
     const query = courseSearchQuery.toLowerCase();
@@ -97,7 +97,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
     if (authLoading) return;
 
     if (!user) {
-      router.replace('/auth');
+      // Let middleware handle the redirect — don't force it from client
       return;
     }
 

@@ -69,7 +69,7 @@ export function NoticeboardCard({ notices, onViewAll, className }: Props) {
                   </div>
                   {notice.publishedAt && (
                     <span className="shrink-0 text-[10px] text-muted-foreground font-medium opacity-60">
-                      {new Date(notice.publishedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      {new Date(notice.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
                   )}
                 </div>

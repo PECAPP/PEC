@@ -15,8 +15,7 @@ import {
   LogOut,
   Moon,
   Sun,
-  Monitor,
-  Settings as SettingsIcon,
+  Monitor,  Settings as SettingsIcon,
   Check
 } from 'lucide-react';
 import { useTheme } from "next-themes";
@@ -25,6 +24,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 import { LoadingGrid } from '@/components/common/AsyncState';
+import { SecuritySettings } from './SecuritySettings';
 
 export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -106,18 +106,10 @@ export default function SettingsPage() {
           ))}
         </TabsList>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
             <TabsContent value="profile" className="mt-0 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-6">
-                  <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8">
+                  <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
                     <div className="flex items-center gap-3 pb-4 border-b border-border/40">
                       <User className="w-5 h-5 text-primary" />
                       <h2 className="text-xl font-bold tracking-tight">Profile Information</h2>
@@ -151,18 +143,20 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-6">
-                  <div className="card-elevated p-6 bg-card/40 flex flex-col items-center gap-6 text-center">
-                    <div className="relative group">
-                      <div className="w-32 h-32 rounded-[2rem] bg-primary/5 flex items-center justify-center border-2 border-dashed border-primary/20 group-hover:border-primary/50 transition-all overflow-hidden shadow-inner">
-                        <User className="w-16 h-16 text-primary/30" />
-                        <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all cursor-pointer">
-                           <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Upload</span>
-                        </div>
-                      </div>
+                  <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8 animate-in fade-in duration-500 delay-100">
+                     <div className="flex items-center gap-3 pb-4 border-b border-border/40">
+                      <Shield className="w-5 h-5 text-primary" />
+                      <h2 className="text-xl font-bold tracking-tight">Account Actions</h2>
                     </div>
-                    <div className="space-y-1">
-                      <h3 className="font-bold text-foreground">User Profile</h3>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Profile Picture</p>
+
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-xl border border-destructive/20 bg-destructive/5 space-y-3">
+                        <h3 className="text-sm font-bold text-destructive">Sign Out</h3>
+                        <p className="text-xs text-muted-foreground">Sign out of your account on this device. You will need to sign back in to access your portal.</p>
+                        <Button variant="destructive" className="w-full h-10 mt-2 font-bold gap-2 rounded-lg" onClick={handleSignOut}>
+                          <LogOut className="w-4 h-4" /> Sign Out
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -170,86 +164,76 @@ export default function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="appearance" className="mt-0 space-y-8">
-              <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-12">
+              <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
                 <div className="flex items-center gap-3 pb-4 border-b border-border/40">
                   <Palette className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-bold tracking-tight">Appearance Settings</h2>
+                  <h2 className="text-xl font-bold tracking-tight">Appearance & Theme</h2>
                 </div>
 
-                {/* Theme Mode */}
                 <div className="space-y-6">
-                  <div className="flex flex-col gap-1">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Theme Mode</Label>
-                    <p className="text-[10px] text-muted-foreground italic font-medium">Select your preferred system interface theme</p>
+                  <div>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 mb-1">Color Scheme</h3>
+                    <p className="text-[10px] text-muted-foreground italic font-medium mb-4">Choose your preferred lighting environment</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
-                      { id: 'light', name: 'Light', icon: Sun },
-                      { id: 'dark', name: 'Dark', icon: Moon },
-                      { id: 'system', name: 'System', icon: Monitor }
-                    ].map((m) => (
-                      <div
-                        key={m.id}
-                        onClick={() => setTheme(m.id)}
+                      { id: 'light', label: 'Light Mode', icon: Sun },
+                      { id: 'dark', label: 'Dark Mode', icon: Moon },
+                      { id: 'system', label: 'System Theme', icon: Monitor }
+                    ].map(t => (
+                      <div 
+                        key={t.id}
+                        onClick={() => {
+                          setTheme(t.id);
+                          toast.success(`${t.label} applied`);
+                        }}
                         className={cn(
-                          "p-6 rounded-2xl border-2 cursor-pointer transition-all flex flex-col gap-4 group",
-                          theme === m.id
-                            ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
-                            : "border-border/40 hover:border-primary/20 bg-background/40"
+                          "p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center gap-3",
+                          theme === t.id 
+                            ? "border-primary bg-primary/5 shadow-sm shadow-primary/5" 
+                            : "border-border/40 hover:border-primary/20 bg-background/40 hover:bg-background/80"
                         )}
                       >
-                        <div className={cn(
-                          "w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm",
-                          theme === m.id ? "bg-primary text-primary-foreground" : "bg-muted/40 text-muted-foreground group-hover:bg-muted"
-                        )}>
-                          <m.icon className="w-6 h-6" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-sm tracking-tight">{m.name}</span>
-                          {theme === m.id && <Check className="w-4 h-4 text-primary" />}
-                        </div>
+                        <t.icon className={cn("w-6 h-6", theme === t.id ? "text-primary" : "text-muted-foreground")} />
+                        <span className="text-xs font-bold uppercase tracking-wider">{t.label}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Accent Color */}
-                <div className="space-y-6 pt-6 border-t border-border/20">
-                  <div className="flex flex-col gap-1">
-                    <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Accent Color</Label>
-                    <p className="text-[10px] text-muted-foreground italic font-medium">Choose a color for interactive interface elements</p>
+                <div className="space-y-6 pt-4">
+                  <div>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 mb-1">Accent Color</h3>
+                    <p className="text-[10px] text-muted-foreground italic font-medium mb-4">Personalize your application's primary color</p>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
-                      { id: 'pec-gold', name: 'PEC Gold', color: 'bg-[#F59E0B]' },
-                      { id: 'emerald', name: 'Emerald', color: 'bg-[#10B981]' },
-                      { id: 'sapphire', name: 'Sapphire', color: 'bg-[#3B82F6]' },
-                      { id: 'amethyst', name: 'Amethyst', color: 'bg-[#8B5CF6]' }
-                    ].map((acc) => {
-                      const isActive = typeof window !== 'undefined' && localStorage.getItem('accent-color') === acc.id;
+                      { id: 'emerald', name: 'Emerald', color: 'bg-emerald-500' },
+                      { id: 'sapphire', name: 'Sapphire', color: 'bg-blue-500' },
+                      { id: 'amethyst', name: 'Amethyst', color: 'bg-purple-500' },
+                      { id: 'pec-gold', name: 'PEC Gold', color: 'bg-yellow-500' }
+                    ].map(acc => {
+                      const isActive = document.documentElement.classList.contains(`accent-${acc.id}`) || 
+                                     (acc.id === 'emerald' && !document.documentElement.className.includes('accent-'));
                       return (
-                        <div
+                        <div 
                           key={acc.id}
                           onClick={() => {
                             const root = document.documentElement;
                             root.classList.remove('accent-emerald', 'accent-sapphire', 'accent-amethyst', 'accent-pec-gold');
                             root.classList.add(`accent-${acc.id}`);
                             localStorage.setItem('accent-color', acc.id);
+                            document.cookie = `accent-color=${acc.id}; path=/; max-age=31536000`;
                             toast.success(`${acc.name} theme applied`);
-                            setActiveTab('appearance');
                           }}
                           className={cn(
-                            "p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col gap-4 group",
-                            isActive 
-                              ? "border-primary bg-primary/5 shadow-sm shadow-primary/5" 
-                              : "border-border/40 hover:border-primary/20 bg-background/40"
+                            "p-4 rounded-xl border cursor-pointer transition-all",
+                            isActive ? "border-primary bg-primary/10" : "border-border/40 hover:bg-muted/50"
                           )}
                         >
-                          <div className={cn("w-full aspect-[2/1] rounded-lg shadow-inner", acc.color)} />
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/80">{acc.name}</span>
-                            {isActive && <Check className="w-3 h-3 text-primary shrink-0" />}
-                          </div>
+                          <div className={cn("w-full h-8 rounded-lg", acc.color)} />
+                          <p className="text-[10px] font-bold mt-2 text-center uppercase tracking-wider">{acc.name}</p>
                         </div>
                       );
                     })}
@@ -259,12 +243,14 @@ export default function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="notifications" className="mt-0">
-               <div className="card-elevated p-12 bg-card/50 text-center italic text-muted-foreground font-medium text-sm">
+               <div className="card-elevated p-12 bg-card/50 text-center italic text-muted-foreground font-medium text-sm animate-in fade-in duration-500">
                   Notification settings will be available in the next update.
                </div>
             </TabsContent>
-          </motion.div>
-        </AnimatePresence>
+
+            <TabsContent value="security" className="mt-0">
+               <SecuritySettings />
+            </TabsContent>
       </Tabs>
     </div>
   );

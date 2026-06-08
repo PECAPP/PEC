@@ -3,7 +3,7 @@ import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitl
 
 
 import { useEffect, useState } from "react";
-import { useAbility } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import {  buildApiUrl  } from "@pec/api";
 import {  authClient  } from "@pec/api";
 
@@ -23,8 +23,8 @@ interface Role {
   }[];
 }
 
-export default function RolesAdminPage() {
-  const ability = useAbility();
+export default function RolesManagement() {
+  const { ability } = useAuth();
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);

@@ -99,12 +99,12 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
               <p className="text-sm text-muted-foreground">{profileData.department || 'Department'} - Semester {profileData.semester ?? '-'}</p>
               <div className="flex items-center gap-3 mt-1.5">
                 {profileData.githubUsername && (
-                  <a href={`https://github.com/${profileData.githubUsername}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={`https://github.com/${profileData.githubUsername}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                     <Github className="w-4 h-4" />
                   </a>
                 )}
                 {profileData.linkedinUsername && (
-                  <a href={`https://linkedin.com/in/${profileData.linkedinUsername}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={`https://linkedin.com/in/${profileData.linkedinUsername}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                     <Linkedin className="w-4 h-4" />
                   </a>
                 )}

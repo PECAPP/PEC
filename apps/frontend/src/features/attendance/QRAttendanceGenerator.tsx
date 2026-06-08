@@ -33,7 +33,7 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
       const expiry = new Date(now.getTime() + duration * 60000); // duration in minutes
 
       // Create unique session ID
-      const uniqueId = `${courseId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const uniqueId = `${courseId}-${Date.now()}-${window.crypto.randomUUID().split('-')[0]}`;
 
       // Create attendance session in backend
       const res = await AXIOS_INSTANCE.post('/api/v1/attendance-session', {

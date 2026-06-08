@@ -126,9 +126,7 @@ export default function NightCanteen() {
         hostelRoom,
         items: cart.map((i) => ({
           itemId: i.id,
-          name: i.name,
           quantity: i.quantity,
-          price: i.price,
         })),
         totalAmount: cartTotal,
         status: "Pending",
@@ -245,11 +243,10 @@ export default function NightCanteen() {
                     className="group relative overflow-hidden rounded-2xl border border-border bg-card hover:border-primary/50 transition-all card-shadow"
                   >
                     <div className="aspect-[16/9] overflow-hidden bg-muted relative">
-                      <ImageWithBlur
+                      <img
                         src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        fallbackColor="bg-muted"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
@@ -306,7 +303,7 @@ export default function NightCanteen() {
                     {cart.map((item) => (
                       <div key={item.id} className="flex gap-3">
                         <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-border">
-                          <ImageWithBlur
+                          <img
                             src={item.image}
                             alt={item.name}
                             className="w-full h-full object-cover"

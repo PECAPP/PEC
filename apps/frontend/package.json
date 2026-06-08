@@ -14,6 +14,7 @@
     "@fontsource/dm-sans": "^5.2.8",
     "@hookform/resolvers": "^3.10.0",
     "@next/bundle-analyzer": "^15.1.7",
+    "@pec/api": "workspace:*",
     "@pec/database": "workspace:*",
     "@pec/shared": "workspace:*",
     "@pec/ui": "workspace:*",

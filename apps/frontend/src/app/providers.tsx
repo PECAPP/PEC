@@ -19,6 +19,7 @@ const initAccentColor = () => {
   root.classList.remove('accent-emerald', 'accent-sapphire', 'accent-amethyst', 'accent-golden', 'accent-pec-gold');
   root.classList.add(`accent-${accent}`);
   localStorage.setItem('accent-color', accent);
+  document.cookie = `accent-color=${accent}; path=/; max-age=31536000`; // Ensure cookie is always synced
   root.removeAttribute('style');
 };
 

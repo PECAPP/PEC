@@ -1,8 +1,7 @@
 'use client';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
-
-
 import { Plus, QrCode } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   courses: any[];
@@ -19,12 +18,14 @@ export function FacultyHeader({
   onShowScheduleManager, 
   onGenerateQR 
 }: Props) {
-  const getTimePeriod = () => {
+  const [timePeriod, setTimePeriod] = useState<string>('');
+
+  useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  };
+    if (hour < 12) setTimePeriod('Good Morning');
+    else if (hour < 17) setTimePeriod('Good Afternoon');
+    else setTimePeriod('Good Evening');
+  }, []);
 
   return (
     <div className="relative overflow-hidden p-6 rounded-2xl bg-card border border-border flex flex-col gap-6 md:flex-row md:items-center md:justify-between shadow-sm">
@@ -33,7 +34,7 @@ export function FacultyHeader({
           Academic Management
         </div>
         <h1 className="text-2xl font-bold text-foreground">
-          {getTimePeriod()}, Professor!
+          {timePeriod ? `${timePeriod}, Professor!` : 'Welcome, Professor!'}
         </h1>
         <p className="text-sm text-muted-foreground">
           Manage your courses, students, and institutional activities.

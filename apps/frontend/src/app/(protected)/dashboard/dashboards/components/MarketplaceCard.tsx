@@ -131,9 +131,7 @@ export function MarketplaceCard({
                     src={listing.images[0]}
                     alt={listing.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://placehold.co/200x150/f4f4f5/a1a1aa?text=${encodeURIComponent(listing.category)}`;
-                    }}
+                    onError={(e) => { const target = e.target as HTMLImageElement; target.style.display = "none"; const fallback = document.createElement("div"); fallback.className = "absolute inset-0 flex items-center justify-center text-4xl bg-gradient-to-br from-primary/10 to-transparent"; fallback.innerHTML = CATEGORY_ICONS[listing.category.toLowerCase()] ?? "??"; target.parentElement?.appendChild(fallback); }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-2xl">
@@ -147,13 +145,15 @@ export function MarketplaceCard({
                 )}
               </div>
               {/* Info */}
-              <div className="p-2">
-                <p className="text-xs font-medium truncate">{listing.title}</p>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-sm font-bold text-primary">₹{fmt(listing.price)}</span>
+              <div className="p-3">
+                <p className="text-xs font-medium line-clamp-2 leading-tight h-8" title={listing.title}>
+                  {listing.title}
+                </p>
+                <div className="flex flex-wrap items-end justify-between gap-2 mt-2">
+                  <span className="text-lg font-bold text-emerald-400">₹{fmt(listing.price)}</span>
                   <Badge
                     variant="outline"
-                    className={cn('text-[9px] h-4 px-1', CONDITION_COLORS[listing.condition] ?? '')}
+                    className={cn('text-[9px] h-4 px-1.5', CONDITION_COLORS[listing.condition] ?? '')}
                   >
                     {listing.condition.replace('_', ' ')}
                   </Badge>

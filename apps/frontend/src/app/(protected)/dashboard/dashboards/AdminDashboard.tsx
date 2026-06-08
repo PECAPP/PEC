@@ -1,8 +1,7 @@
 'use client';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
 
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import dynamic from 'next/dynamic';
 import { Settings, Loader2, BookOpen, Users, BarChart3 } from 'lucide-react';
@@ -40,6 +39,15 @@ export interface AdminDashboardProps {
 export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('courses');
+  const [timePeriod, setTimePeriod] = useState<string>('');
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setTimePeriod('Good Morning');
+    else if (hour < 17) setTimePeriod('Good Afternoon');
+    else setTimePeriod('Good Evening');
+  }, []);
+
   const {
     loading,
     courses,
@@ -84,13 +92,6 @@ export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
     );
   }
 
-  const getTimePeriod = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="relative overflow-hidden p-8 rounded-2xl bg-card/60 backdrop-blur-md border border-border flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-xl glass-premium">
@@ -99,7 +100,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
             System Administration
           </div>
           <h1 className="text-3xl font-bold text-foreground">
-            {getTimePeriod()}, Admin
+            {timePeriod ? `${timePeriod}, Admin` : 'Welcome, Admin'}
           </h1>
           <p className="text-muted-foreground mt-1">Complete control over your institutional ERP system</p>
         </div>

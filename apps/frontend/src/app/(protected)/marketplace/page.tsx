@@ -484,11 +484,7 @@ function ListingDetailDialog({
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-bold text-base text-foreground">{(listing.seller?.name || 'Unknown Seller')}</p>
-              {listing.seller?.studentProfile?.phone && (
-                <p className="text-sm font-medium text-muted-foreground mt-0.5 flex items-center gap-1">
-                  📞 {listing.seller?.studentProfile.phone}
-                </p>
-              )}
+
             </div>
           </div>
 

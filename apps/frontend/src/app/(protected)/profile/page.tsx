@@ -324,7 +324,7 @@ export default function StudentProfile() {
             <h4 className="text-sm font-semibold text-foreground border-b pb-2 border-border">Professional Links</h4>
             <div className="flex gap-4 pt-2">
                {profileData?.socials?.github && (
-                 <a href={`https://github.com/${profileData.socials.github.replace('@', '')}`} target="_blank" rel="noreferrer" className="p-2 border border-border rounded-md hover:bg-muted transition-colors">
+                 <a href={`https://github.com/${profileData.socials.github.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="p-2 border border-border rounded-md hover:bg-muted transition-colors">
                    <Github className="w-5 h-5" />
                  </a>
                )}

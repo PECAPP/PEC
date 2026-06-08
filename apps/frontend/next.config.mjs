@@ -54,12 +54,7 @@ const nextConfig = {
   },
 
   // ─── Turbopack alias (dev) ────────────────────────────────────────────────────
-  turbopack: {
-    root: path.join(__dirname, '../../'),
-    resolveAlias: {
-      canvas: emptyModuleAlias,
-    },
-  },
+  // Removed turbopack block to avoid illegal path errors.
 
   // ─── Webpack alias (build / test) ────────────────────────────────────────────
   webpack(config) {

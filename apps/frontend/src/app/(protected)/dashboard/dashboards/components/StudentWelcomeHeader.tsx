@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Camera } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface StudentProfileSummary {
   enrollmentNumber?: string | null;
@@ -15,12 +16,14 @@ interface Props {
 }
 
 export function StudentWelcomeHeader({ firstName, profileData }: Props) {
-  const getTimePeriod = () => {
+  const [timePeriod, setTimePeriod] = useState<string>('');
+
+  useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  };
+    if (hour < 12) setTimePeriod('Good Morning');
+    else if (hour < 17) setTimePeriod('Good Afternoon');
+    else setTimePeriod('Good Evening');
+  }, []);
 
   return (
     <motion.div
@@ -37,7 +40,7 @@ export function StudentWelcomeHeader({ firstName, profileData }: Props) {
           Institutional Dashboard
         </div>
         <h1 className="text-3xl font-bold text-foreground">
-          {getTimePeriod()}, {firstName}!
+          {timePeriod ? `${timePeriod}, ${firstName}!` : `Welcome, ${firstName}!`}
         </h1>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span className="font-semibold text-primary">{profileData?.enrollmentNumber || 'Student'}</span>

@@ -235,8 +235,6 @@ function PaymentDialog({ fee, open, onClose, onSuccess }: {
       await new Promise((r) => setTimeout(r, 1800));
       const res = await api.post('/finance/pay', {
         feeRecordId: fee.id,
-        paymentMethod: method,
-        gatewayTxnId: `SIM-${method.toUpperCase()}-${Date.now()}`,
         notes: upiId ? `UPI ID: ${upiId}` : undefined,
       });
       setReceiptNo((res as any).data?.transaction?.receiptNo ?? '');

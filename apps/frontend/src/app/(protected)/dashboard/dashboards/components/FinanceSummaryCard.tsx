@@ -168,12 +168,12 @@ export function FinanceSummaryCard({
                 key={fee.id}
                 className={cn(
                   'flex items-center justify-between p-2 rounded-lg border text-xs',
-                  overdue ? 'border-red-300 bg-red-500/5' : 'border-border',
+                  overdue ? 'border-l-2 border-l-red-500 border-y-transparent border-r-transparent bg-red-500/10' : 'border-border bg-card',
                 )}
               >
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium truncate">{fee.description}</p>
-                  <p className={cn('text-[10px]', overdue ? 'text-red-500' : 'text-muted-foreground')}>
+                  <p className="font-semibold text-foreground truncate">{fee.description}</p>
+                  <p className={cn('text-[10px]', overdue ? 'text-red-500/80' : 'text-muted-foreground')}>
                     Due: {new Date(fee.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                     {overdue && ' · OVERDUE'}
                   </p>

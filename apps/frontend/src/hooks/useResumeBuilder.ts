@@ -6,6 +6,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCollegeSettings } from "@/hooks/useCollegeSettings";
 import api from "@pec/api";
 import { AXIOS_INSTANCE } from "@pec/api";
+import { safeLocalStorage } from "@/lib/ssr-safe";
 import {
   ResumeData,
   PersonalInfo,
@@ -109,7 +110,7 @@ export function useResumeBuilder() {
 
   const readLocalResumeDraft = useCallback((uid?: string | null): ResumeData | null => {
     try {
-      const raw = localStorage.getItem(getDraftStorageKey(uid));
+      const raw = safeLocalStorage.get(getDraftStorageKey(uid));
       if (!raw) return null;
       return JSON.parse(raw) as ResumeData;
     } catch {
@@ -118,7 +119,7 @@ export function useResumeBuilder() {
   }, []);
 
   const writeLocalResumeDraft = useCallback((payload: ResumeData, uid?: string | null) => {
-    localStorage.setItem(getDraftStorageKey(uid), JSON.stringify(payload));
+    safeLocalStorage.set(getDraftStorageKey(uid), JSON.stringify(payload));
   }, []);
 
   useEffect(() => {

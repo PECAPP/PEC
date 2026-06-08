@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { InteractiveCalendar } from "@/features/academic-calendar/InteractiveCalendar";
 import AdminAcademicCalendarPage from "@/app/(protected)/admin/academic-calendar/page";
 import api from "@pec/api";

@@ -16,7 +16,13 @@ const categoryColors: Record<string, string> = {
 function Building({ region, onClick }: { region: any; onClick: () => void }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const color = categoryColors[region.category] || '#6b7280';
-  const height = 0.3 + Math.random() * 0.5;
+  // Deterministic pseudo-random height to prevent SSR hydration mismatch
+  const height = useMemo(() => {
+    const seed = (region.x || 0) + (region.y || 0) + (region.name?.length || 0);
+    const pseudoRandom = (Math.sin(seed * 12.9898) * 43758.5453) % 1;
+    const normalized = Math.abs(pseudoRandom);
+    return 0.3 + normalized * 0.5;
+  }, [region.x, region.y, region.name]);
 
   useFrame((state) => {
     if (meshRef.current) {

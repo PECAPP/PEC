@@ -28,7 +28,7 @@ const CommandMenu = dynamic(() => import('@/components/layout/CommandMenu'), {
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
       <Input
         placeholder="Search... (Ctrl+K)"
-        className="pl-10 bg-background border border-input shadow-sm focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground"
+        className="pl-10 bg-white/5 border border-white/10 shadow-sm hover:bg-white/10 transition-colors focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground"
         readOnly
       />
     </div>

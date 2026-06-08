@@ -2,7 +2,7 @@ import { Button, Textarea, ScrollArea } from "@pec/ui";
 import { useState, useRef, useEffect, KeyboardEvent, forwardRef, useImperativeHandle } from 'react';
 import { Send, Paperclip, X } from 'lucide-react';
 
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 import { toast } from 'sonner';
 import { getFileType, uploadMedia, validateFileSize } from '@/lib/cloudinary.service';

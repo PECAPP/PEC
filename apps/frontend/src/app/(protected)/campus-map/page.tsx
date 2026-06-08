@@ -1,7 +1,14 @@
 'use client';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { Loader2, MapPin, Box, ZoomOut, ZoomIn, Square, Route, Save, RotateCcw, Edit3, Map } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { AXIOS_INSTANCE } from '@pec/api';
+
+import { Button } from '@pec/ui';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const CampusMap3D = dynamic(
   () => import('@/features/campus-map/CampusMap3D').then((mod) => mod.default),

@@ -18,9 +18,17 @@ async function AuthGate({ children }: { children: React.ReactNode }) {
 // 2. Initial static shell for PPR (Partial Prerendering)
 function LayoutLoading() {
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
+      <div className="mesh-gradient-bg">
+        <div className="mesh-gradient-item mesh-1" />
+        <div className="mesh-gradient-item mesh-2" />
+        <div className="mesh-gradient-item mesh-3" />
+      </div>
+      
       {/* Structural Shell */}
-      <div className="absolute inset-y-0 left-0 w-64 bg-sidebar border-r border-sidebar-border hidden lg:block" />
+      <div className="absolute inset-y-0 left-0 w-64 bg-sidebar border-r border-sidebar-border hidden lg:block">
+        <div className="sidebar-mesh" />
+      </div>
       <div className="absolute top-0 right-0 left-0 h-16 bg-background border-b border-sidebar-border lg:left-64" />
       
       {/* Branded Loading Content */}
