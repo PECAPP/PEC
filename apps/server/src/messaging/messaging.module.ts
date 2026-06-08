@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MessagingService } from './messaging.service';
 import { AttendanceConsumer } from './consumers/attendance.consumer';
+import { PrismaModule } from '../prisma/prisma.module';
+import { BackgroundJobsModule } from '../background-jobs/background-jobs.module';
 
 @Module({
   imports: [
+    PrismaModule,
+    BackgroundJobsModule,
     ClientsModule.register([
       {
         name: 'RABBITMQ_SERVICE',
