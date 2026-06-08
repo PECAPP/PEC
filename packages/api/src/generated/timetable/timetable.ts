@@ -36,37 +36,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type timetableControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+export const timetableControllerFindAllV1 = (
 
-export type timetableControllerFindAllV1ResponseSuccess = (timetableControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type timetableControllerFindAllV1Response = (timetableControllerFindAllV1ResponseSuccess)
-
-export const getTimetableControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/timetable`
-}
-
-export const timetableControllerFindAllV1 = async ( options?: RequestInit): Promise<timetableControllerFindAllV1Response> => {
-
-  return customInstance<timetableControllerFindAllV1Response>(getTimetableControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/timetable`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -87,7 +67,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof timetableControllerFindAllV1>>> = ({ signal }) => timetableControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof timetableControllerFindAllV1>>> = ({ signal }) => timetableControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -142,37 +122,19 @@ export function useTimetableControllerFindAllV1<TData = Awaited<ReturnType<typeo
 
 
 
-export type timetableControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type timetableControllerCreateV1ResponseSuccess = (timetableControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type timetableControllerCreateV1Response = (timetableControllerCreateV1ResponseSuccess)
-
-export const getTimetableControllerCreateV1Url = () => {
+export const timetableControllerCreateV1 = (
+    createTimetableDto: CreateTimetableDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/timetable`
-}
-
-export const timetableControllerCreateV1 = async (createTimetableDto: CreateTimetableDto, options?: RequestInit): Promise<timetableControllerCreateV1Response> => {
-
-  return customInstance<timetableControllerCreateV1Response>(getTimetableControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createTimetableDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/timetable`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createTimetableDto, signal
+    },
+      options);
+    }
 
 
 
@@ -217,38 +179,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getTimetableControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type timetableControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type timetableControllerUpdateV1ResponseSuccess = (timetableControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type timetableControllerUpdateV1Response = (timetableControllerUpdateV1ResponseSuccess)
-
-export const getTimetableControllerUpdateV1Url = (id: string,) => {
+    export const timetableControllerUpdateV1 = (
+    id: string,
+    updateTimetableDto: UpdateTimetableDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/timetable/${id}`
-}
-
-export const timetableControllerUpdateV1 = async (id: string,
-    updateTimetableDto: UpdateTimetableDto, options?: RequestInit): Promise<timetableControllerUpdateV1Response> => {
-
-  return customInstance<timetableControllerUpdateV1Response>(getTimetableControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateTimetableDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/timetable/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateTimetableDto, signal
+    },
+      options);
+    }
 
 
 
@@ -293,37 +237,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getTimetableControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type timetableControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type timetableControllerRemoveV1ResponseSuccess = (timetableControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type timetableControllerRemoveV1Response = (timetableControllerRemoveV1ResponseSuccess)
-
-export const getTimetableControllerRemoveV1Url = (id: string,) => {
+    export const timetableControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/timetable/${id}`
-}
-
-export const timetableControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<timetableControllerRemoveV1Response> => {
-
-  return customInstance<timetableControllerRemoveV1Response>(getTimetableControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/timetable/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

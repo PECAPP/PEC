@@ -6,7 +6,7 @@ export declare const apiContract: {
             body: import("zod").ZodObject<{
                 email: import("zod").ZodString;
                 password: import("zod").ZodString;
-            }, "strip", import("zod").ZodTypeAny, {
+            }, "strict", import("zod").ZodTypeAny, {
                 email: string;
                 password: string;
             }, {
@@ -33,7 +33,7 @@ export declare const apiContract: {
                         role: string;
                     }>;
                     token: import("zod").ZodString;
-                }, "strip", import("zod").ZodTypeAny, {
+                }, "strict", import("zod").ZodTypeAny, {
                     user: {
                         id: string;
                         fullName: string;
@@ -67,7 +67,7 @@ export declare const apiContract: {
                 email: import("zod").ZodString;
                 password: import("zod").ZodString;
                 role: import("zod").ZodDefault<import("zod").ZodEnum<["student", "faculty", "college_admin"]>>;
-            }, "strip", import("zod").ZodTypeAny, {
+            }, "strict", import("zod").ZodTypeAny, {
                 fullName: string;
                 email: string;
                 password: string;
@@ -98,7 +98,7 @@ export declare const apiContract: {
                         role: string;
                     }>;
                     token: import("zod").ZodString;
-                }, "strip", import("zod").ZodTypeAny, {
+                }, "strict", import("zod").ZodTypeAny, {
                     user: {
                         id: string;
                         fullName: string;

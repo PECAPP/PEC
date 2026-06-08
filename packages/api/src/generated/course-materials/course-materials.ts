@@ -35,37 +35,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type courseMaterialsControllerFindManyV1Response200 = {
-  data: void
-  status: 200
-}
+export const courseMaterialsControllerFindManyV1 = (
 
-export type courseMaterialsControllerFindManyV1ResponseSuccess = (courseMaterialsControllerFindManyV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type courseMaterialsControllerFindManyV1Response = (courseMaterialsControllerFindManyV1ResponseSuccess)
-
-export const getCourseMaterialsControllerFindManyV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/course-materials`
-}
-
-export const courseMaterialsControllerFindManyV1 = async ( options?: RequestInit): Promise<courseMaterialsControllerFindManyV1Response> => {
-
-  return customInstance<courseMaterialsControllerFindManyV1Response>(getCourseMaterialsControllerFindManyV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/course-materials`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -86,7 +66,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>> = ({ signal }) => courseMaterialsControllerFindManyV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>> = ({ signal }) => courseMaterialsControllerFindManyV1(requestOptions, signal);
 
 
 
@@ -141,37 +121,19 @@ export function useCourseMaterialsControllerFindManyV1<TData = Awaited<ReturnTyp
 
 
 
-export type courseMaterialsControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type courseMaterialsControllerCreateV1ResponseSuccess = (courseMaterialsControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type courseMaterialsControllerCreateV1Response = (courseMaterialsControllerCreateV1ResponseSuccess)
-
-export const getCourseMaterialsControllerCreateV1Url = () => {
+export const courseMaterialsControllerCreateV1 = (
+    createCourseMaterialDto: CreateCourseMaterialDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/course-materials`
-}
-
-export const courseMaterialsControllerCreateV1 = async (createCourseMaterialDto: CreateCourseMaterialDto, options?: RequestInit): Promise<courseMaterialsControllerCreateV1Response> => {
-
-  return customInstance<courseMaterialsControllerCreateV1Response>(getCourseMaterialsControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createCourseMaterialDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/course-materials`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCourseMaterialDto, signal
+    },
+      options);
+    }
 
 
 
@@ -216,37 +178,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCourseMaterialsControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type courseMaterialsControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type courseMaterialsControllerRemoveV1ResponseSuccess = (courseMaterialsControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type courseMaterialsControllerRemoveV1Response = (courseMaterialsControllerRemoveV1ResponseSuccess)
-
-export const getCourseMaterialsControllerRemoveV1Url = (id: string,) => {
+    export const courseMaterialsControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/course-materials/${id}`
-}
-
-export const courseMaterialsControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<courseMaterialsControllerRemoveV1Response> => {
-
-  return customInstance<courseMaterialsControllerRemoveV1Response>(getCourseMaterialsControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/course-materials/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

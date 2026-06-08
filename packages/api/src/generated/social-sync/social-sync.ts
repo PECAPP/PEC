@@ -35,37 +35,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type socialSyncControllerGetSocialDataV1Response200 = {
-  data: void
-  status: 200
-}
+export const socialSyncControllerGetSocialDataV1 = (
 
-export type socialSyncControllerGetSocialDataV1ResponseSuccess = (socialSyncControllerGetSocialDataV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type socialSyncControllerGetSocialDataV1Response = (socialSyncControllerGetSocialDataV1ResponseSuccess)
-
-export const getSocialSyncControllerGetSocialDataV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/social-sync`
-}
-
-export const socialSyncControllerGetSocialDataV1 = async ( options?: RequestInit): Promise<socialSyncControllerGetSocialDataV1Response> => {
-
-  return customInstance<socialSyncControllerGetSocialDataV1Response>(getSocialSyncControllerGetSocialDataV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/social-sync`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -86,7 +66,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>> = ({ signal }) => socialSyncControllerGetSocialDataV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>> = ({ signal }) => socialSyncControllerGetSocialDataV1(requestOptions, signal);
 
 
 
@@ -141,37 +121,19 @@ export function useSocialSyncControllerGetSocialDataV1<TData = Awaited<ReturnTyp
 
 
 
-export type socialSyncControllerSyncSocialDataV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type socialSyncControllerSyncSocialDataV1ResponseSuccess = (socialSyncControllerSyncSocialDataV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type socialSyncControllerSyncSocialDataV1Response = (socialSyncControllerSyncSocialDataV1ResponseSuccess)
-
-export const getSocialSyncControllerSyncSocialDataV1Url = () => {
+export const socialSyncControllerSyncSocialDataV1 = (
+    syncSocialDto: SyncSocialDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/social-sync`
-}
-
-export const socialSyncControllerSyncSocialDataV1 = async (syncSocialDto: SyncSocialDto, options?: RequestInit): Promise<socialSyncControllerSyncSocialDataV1Response> => {
-
-  return customInstance<socialSyncControllerSyncSocialDataV1Response>(getSocialSyncControllerSyncSocialDataV1Url(),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(syncSocialDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/social-sync`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: syncSocialDto, signal
+    },
+      options);
+    }
 
 
 
@@ -216,37 +178,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSocialSyncControllerSyncSocialDataV1MutationOptions(options), queryClient);
     }
-    export type socialSyncControllerFetchGitHubReposV1Response200 = {
-  data: void
-  status: 200
-}
+    export const socialSyncControllerFetchGitHubReposV1 = (
 
-export type socialSyncControllerFetchGitHubReposV1ResponseSuccess = (socialSyncControllerFetchGitHubReposV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type socialSyncControllerFetchGitHubReposV1Response = (socialSyncControllerFetchGitHubReposV1ResponseSuccess)
-
-export const getSocialSyncControllerFetchGitHubReposV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/social-sync/github/repos`
-}
-
-export const socialSyncControllerFetchGitHubReposV1 = async ( options?: RequestInit): Promise<socialSyncControllerFetchGitHubReposV1Response> => {
-
-  return customInstance<socialSyncControllerFetchGitHubReposV1Response>(getSocialSyncControllerFetchGitHubReposV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/social-sync/github/repos`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -267,7 +209,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>> = ({ signal }) => socialSyncControllerFetchGitHubReposV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>> = ({ signal }) => socialSyncControllerFetchGitHubReposV1(requestOptions, signal);
 
 
 

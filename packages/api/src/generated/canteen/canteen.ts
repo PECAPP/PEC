@@ -31,37 +31,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type canteenControllerGetItemsV1Response200 = {
-  data: void
-  status: 200
-}
+export const canteenControllerGetItemsV1 = (
 
-export type canteenControllerGetItemsV1ResponseSuccess = (canteenControllerGetItemsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type canteenControllerGetItemsV1Response = (canteenControllerGetItemsV1ResponseSuccess)
-
-export const getCanteenControllerGetItemsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/canteenItems`
-}
-
-export const canteenControllerGetItemsV1 = async ( options?: RequestInit): Promise<canteenControllerGetItemsV1Response> => {
-
-  return customInstance<canteenControllerGetItemsV1Response>(getCanteenControllerGetItemsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/canteenItems`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -82,7 +62,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>> = ({ signal }) => canteenControllerGetItemsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>> = ({ signal }) => canteenControllerGetItemsV1(requestOptions, signal);
 
 
 
@@ -137,37 +117,17 @@ export function useCanteenControllerGetItemsV1<TData = Awaited<ReturnType<typeof
 
 
 
-export type canteenControllerGetOrdersV1Response200 = {
-  data: void
-  status: 200
-}
+export const canteenControllerGetOrdersV1 = (
 
-export type canteenControllerGetOrdersV1ResponseSuccess = (canteenControllerGetOrdersV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type canteenControllerGetOrdersV1Response = (canteenControllerGetOrdersV1ResponseSuccess)
-
-export const getCanteenControllerGetOrdersV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/canteenOrders`
-}
-
-export const canteenControllerGetOrdersV1 = async ( options?: RequestInit): Promise<canteenControllerGetOrdersV1Response> => {
-
-  return customInstance<canteenControllerGetOrdersV1Response>(getCanteenControllerGetOrdersV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/canteenOrders`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -188,7 +148,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>> = ({ signal }) => canteenControllerGetOrdersV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>> = ({ signal }) => canteenControllerGetOrdersV1(requestOptions, signal);
 
 
 
@@ -243,37 +203,17 @@ export function useCanteenControllerGetOrdersV1<TData = Awaited<ReturnType<typeo
 
 
 
-export type canteenControllerCreateOrderV1Response201 = {
-  data: void
-  status: 201
-}
+export const canteenControllerCreateOrderV1 = (
 
-export type canteenControllerCreateOrderV1ResponseSuccess = (canteenControllerCreateOrderV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type canteenControllerCreateOrderV1Response = (canteenControllerCreateOrderV1ResponseSuccess)
-
-export const getCanteenControllerCreateOrderV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/canteenOrders`
-}
-
-export const canteenControllerCreateOrderV1 = async ( options?: RequestInit): Promise<canteenControllerCreateOrderV1Response> => {
-
-  return customInstance<canteenControllerCreateOrderV1Response>(getCanteenControllerCreateOrderV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/canteenOrders`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 

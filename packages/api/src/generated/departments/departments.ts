@@ -36,37 +36,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type departmentsControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+export const departmentsControllerFindAllV1 = (
 
-export type departmentsControllerFindAllV1ResponseSuccess = (departmentsControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type departmentsControllerFindAllV1Response = (departmentsControllerFindAllV1ResponseSuccess)
-
-export const getDepartmentsControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/departments`
-}
-
-export const departmentsControllerFindAllV1 = async ( options?: RequestInit): Promise<departmentsControllerFindAllV1Response> => {
-
-  return customInstance<departmentsControllerFindAllV1Response>(getDepartmentsControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/departments`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -87,7 +67,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentsControllerFindAllV1>>> = ({ signal }) => departmentsControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentsControllerFindAllV1>>> = ({ signal }) => departmentsControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -142,37 +122,19 @@ export function useDepartmentsControllerFindAllV1<TData = Awaited<ReturnType<typ
 
 
 
-export type departmentsControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type departmentsControllerCreateV1ResponseSuccess = (departmentsControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type departmentsControllerCreateV1Response = (departmentsControllerCreateV1ResponseSuccess)
-
-export const getDepartmentsControllerCreateV1Url = () => {
+export const departmentsControllerCreateV1 = (
+    createDepartmentDto: CreateDepartmentDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/departments`
-}
-
-export const departmentsControllerCreateV1 = async (createDepartmentDto: CreateDepartmentDto, options?: RequestInit): Promise<departmentsControllerCreateV1Response> => {
-
-  return customInstance<departmentsControllerCreateV1Response>(getDepartmentsControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createDepartmentDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/departments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createDepartmentDto, signal
+    },
+      options);
+    }
 
 
 
@@ -217,37 +179,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDepartmentsControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type departmentsControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type departmentsControllerFindOneV1ResponseSuccess = (departmentsControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type departmentsControllerFindOneV1Response = (departmentsControllerFindOneV1ResponseSuccess)
-
-export const getDepartmentsControllerFindOneV1Url = (id: string,) => {
+    export const departmentsControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/departments/${id}`
-}
-
-export const departmentsControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<departmentsControllerFindOneV1Response> => {
-
-  return customInstance<departmentsControllerFindOneV1Response>(getDepartmentsControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/departments/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -268,7 +210,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentsControllerFindOneV1>>> = ({ signal }) => departmentsControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentsControllerFindOneV1>>> = ({ signal }) => departmentsControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -323,38 +265,20 @@ export function useDepartmentsControllerFindOneV1<TData = Awaited<ReturnType<typ
 
 
 
-export type departmentsControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type departmentsControllerUpdateV1ResponseSuccess = (departmentsControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type departmentsControllerUpdateV1Response = (departmentsControllerUpdateV1ResponseSuccess)
-
-export const getDepartmentsControllerUpdateV1Url = (id: string,) => {
+export const departmentsControllerUpdateV1 = (
+    id: string,
+    updateDepartmentDto: UpdateDepartmentDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/departments/${id}`
-}
-
-export const departmentsControllerUpdateV1 = async (id: string,
-    updateDepartmentDto: UpdateDepartmentDto, options?: RequestInit): Promise<departmentsControllerUpdateV1Response> => {
-
-  return customInstance<departmentsControllerUpdateV1Response>(getDepartmentsControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateDepartmentDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/departments/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateDepartmentDto, signal
+    },
+      options);
+    }
 
 
 
@@ -399,37 +323,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDepartmentsControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type departmentsControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type departmentsControllerRemoveV1ResponseSuccess = (departmentsControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type departmentsControllerRemoveV1Response = (departmentsControllerRemoveV1ResponseSuccess)
-
-export const getDepartmentsControllerRemoveV1Url = (id: string,) => {
+    export const departmentsControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/departments/${id}`
-}
-
-export const departmentsControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<departmentsControllerRemoveV1Response> => {
-
-  return customInstance<departmentsControllerRemoveV1Response>(getDepartmentsControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/departments/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

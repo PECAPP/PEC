@@ -39,37 +39,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type attendanceControllerGetFacultyStatsV1Response200 = {
-  data: void
-  status: 200
-}
+export const attendanceControllerGetFacultyStatsV1 = (
 
-export type attendanceControllerGetFacultyStatsV1ResponseSuccess = (attendanceControllerGetFacultyStatsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerGetFacultyStatsV1Response = (attendanceControllerGetFacultyStatsV1ResponseSuccess)
-
-export const getAttendanceControllerGetFacultyStatsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/faculty-stats`
-}
-
-export const attendanceControllerGetFacultyStatsV1 = async ( options?: RequestInit): Promise<attendanceControllerGetFacultyStatsV1Response> => {
-
-  return customInstance<attendanceControllerGetFacultyStatsV1Response>(getAttendanceControllerGetFacultyStatsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/faculty-stats`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -90,7 +70,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerGetFacultyStatsV1>>> = ({ signal }) => attendanceControllerGetFacultyStatsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerGetFacultyStatsV1>>> = ({ signal }) => attendanceControllerGetFacultyStatsV1(requestOptions, signal);
 
 
 
@@ -145,44 +125,18 @@ export function useAttendanceControllerGetFacultyStatsV1<TData = Awaited<ReturnT
 
 
 
-export type attendanceControllerGetSummaryV1Response200 = {
-  data: void
-  status: 200
-}
+export const attendanceControllerGetSummaryV1 = (
+    params: AttendanceControllerGetSummaryV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type attendanceControllerGetSummaryV1ResponseSuccess = (attendanceControllerGetSummaryV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type attendanceControllerGetSummaryV1Response = (attendanceControllerGetSummaryV1ResponseSuccess)
-
-export const getAttendanceControllerGetSummaryV1Url = (params: AttendanceControllerGetSummaryV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/attendance/summary`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/attendance/summary?${stringifiedParams}` : `/api/v1/attendance/summary`
-}
-
-export const attendanceControllerGetSummaryV1 = async (params: AttendanceControllerGetSummaryV1Params, options?: RequestInit): Promise<attendanceControllerGetSummaryV1Response> => {
-
-  return customInstance<attendanceControllerGetSummaryV1Response>(getAttendanceControllerGetSummaryV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -203,7 +157,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerGetSummaryV1>>> = ({ signal }) => attendanceControllerGetSummaryV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerGetSummaryV1>>> = ({ signal }) => attendanceControllerGetSummaryV1(params, requestOptions, signal);
 
 
 
@@ -258,37 +212,17 @@ export function useAttendanceControllerGetSummaryV1<TData = Awaited<ReturnType<t
 
 
 
-export type attendanceControllerGetMyWaiverRequestsV1Response200 = {
-  data: void
-  status: 200
-}
+export const attendanceControllerGetMyWaiverRequestsV1 = (
 
-export type attendanceControllerGetMyWaiverRequestsV1ResponseSuccess = (attendanceControllerGetMyWaiverRequestsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerGetMyWaiverRequestsV1Response = (attendanceControllerGetMyWaiverRequestsV1ResponseSuccess)
-
-export const getAttendanceControllerGetMyWaiverRequestsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/waivers/my`
-}
-
-export const attendanceControllerGetMyWaiverRequestsV1 = async ( options?: RequestInit): Promise<attendanceControllerGetMyWaiverRequestsV1Response> => {
-
-  return customInstance<attendanceControllerGetMyWaiverRequestsV1Response>(getAttendanceControllerGetMyWaiverRequestsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/waivers/my`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -309,7 +243,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerGetMyWaiverRequestsV1>>> = ({ signal }) => attendanceControllerGetMyWaiverRequestsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerGetMyWaiverRequestsV1>>> = ({ signal }) => attendanceControllerGetMyWaiverRequestsV1(requestOptions, signal);
 
 
 
@@ -364,37 +298,19 @@ export function useAttendanceControllerGetMyWaiverRequestsV1<TData = Awaited<Ret
 
 
 
-export type attendanceControllerCreateWaiverRequestV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type attendanceControllerCreateWaiverRequestV1ResponseSuccess = (attendanceControllerCreateWaiverRequestV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerCreateWaiverRequestV1Response = (attendanceControllerCreateWaiverRequestV1ResponseSuccess)
-
-export const getAttendanceControllerCreateWaiverRequestV1Url = () => {
+export const attendanceControllerCreateWaiverRequestV1 = (
+    createWaiverRequestDto: CreateWaiverRequestDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/waivers`
-}
-
-export const attendanceControllerCreateWaiverRequestV1 = async (createWaiverRequestDto: CreateWaiverRequestDto, options?: RequestInit): Promise<attendanceControllerCreateWaiverRequestV1Response> => {
-
-  return customInstance<attendanceControllerCreateWaiverRequestV1Response>(getAttendanceControllerCreateWaiverRequestV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createWaiverRequestDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/waivers`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createWaiverRequestDto, signal
+    },
+      options);
+    }
 
 
 
@@ -439,37 +355,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAttendanceControllerCreateWaiverRequestV1MutationOptions(options), queryClient);
     }
-    export type attendanceControllerUploadWaiverDocumentV1Response201 = {
-  data: void
-  status: 201
-}
+    export const attendanceControllerUploadWaiverDocumentV1 = (
 
-export type attendanceControllerUploadWaiverDocumentV1ResponseSuccess = (attendanceControllerUploadWaiverDocumentV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerUploadWaiverDocumentV1Response = (attendanceControllerUploadWaiverDocumentV1ResponseSuccess)
-
-export const getAttendanceControllerUploadWaiverDocumentV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/waivers/upload`
-}
-
-export const attendanceControllerUploadWaiverDocumentV1 = async ( options?: RequestInit): Promise<attendanceControllerUploadWaiverDocumentV1Response> => {
-
-  return customInstance<attendanceControllerUploadWaiverDocumentV1Response>(getAttendanceControllerUploadWaiverDocumentV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/waivers/upload`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -514,37 +410,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAttendanceControllerUploadWaiverDocumentV1MutationOptions(options), queryClient);
     }
-    export type attendanceControllerStreamWaiverDocumentV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type attendanceControllerStreamWaiverDocumentV1ResponseSuccess = (attendanceControllerStreamWaiverDocumentV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerStreamWaiverDocumentV1Response = (attendanceControllerStreamWaiverDocumentV1ResponseSuccess)
-
-export const getAttendanceControllerStreamWaiverDocumentV1Url = (fileName: string,) => {
+    export const attendanceControllerStreamWaiverDocumentV1 = (
+    fileName: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/waivers/files/${fileName}`
-}
-
-export const attendanceControllerStreamWaiverDocumentV1 = async (fileName: string, options?: RequestInit): Promise<attendanceControllerStreamWaiverDocumentV1Response> => {
-
-  return customInstance<attendanceControllerStreamWaiverDocumentV1Response>(getAttendanceControllerStreamWaiverDocumentV1Url(fileName),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/waivers/files/${fileName}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -565,7 +441,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerStreamWaiverDocumentV1>>> = ({ signal }) => attendanceControllerStreamWaiverDocumentV1(fileName, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerStreamWaiverDocumentV1>>> = ({ signal }) => attendanceControllerStreamWaiverDocumentV1(fileName, requestOptions, signal);
 
 
 
@@ -620,37 +496,17 @@ export function useAttendanceControllerStreamWaiverDocumentV1<TData = Awaited<Re
 
 
 
-export type attendanceControllerExportExcelV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type attendanceControllerExportExcelV1ResponseSuccess = (attendanceControllerExportExcelV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerExportExcelV1Response = (attendanceControllerExportExcelV1ResponseSuccess)
-
-export const getAttendanceControllerExportExcelV1Url = (courseId: string,) => {
+export const attendanceControllerExportExcelV1 = (
+    courseId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/export/${courseId}`
-}
-
-export const attendanceControllerExportExcelV1 = async (courseId: string, options?: RequestInit): Promise<attendanceControllerExportExcelV1Response> => {
-
-  return customInstance<attendanceControllerExportExcelV1Response>(getAttendanceControllerExportExcelV1Url(courseId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/export/${courseId}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -671,7 +527,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerExportExcelV1>>> = ({ signal }) => attendanceControllerExportExcelV1(courseId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerExportExcelV1>>> = ({ signal }) => attendanceControllerExportExcelV1(courseId, requestOptions, signal);
 
 
 
@@ -726,37 +582,17 @@ export function useAttendanceControllerExportExcelV1<TData = Awaited<ReturnType<
 
 
 
-export type attendanceControllerExportMyExcelV1Response200 = {
-  data: void
-  status: 200
-}
+export const attendanceControllerExportMyExcelV1 = (
 
-export type attendanceControllerExportMyExcelV1ResponseSuccess = (attendanceControllerExportMyExcelV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerExportMyExcelV1Response = (attendanceControllerExportMyExcelV1ResponseSuccess)
-
-export const getAttendanceControllerExportMyExcelV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/my/export`
-}
-
-export const attendanceControllerExportMyExcelV1 = async ( options?: RequestInit): Promise<attendanceControllerExportMyExcelV1Response> => {
-
-  return customInstance<attendanceControllerExportMyExcelV1Response>(getAttendanceControllerExportMyExcelV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/my/export`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -777,7 +613,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerExportMyExcelV1>>> = ({ signal }) => attendanceControllerExportMyExcelV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerExportMyExcelV1>>> = ({ signal }) => attendanceControllerExportMyExcelV1(requestOptions, signal);
 
 
 
@@ -832,44 +668,18 @@ export function useAttendanceControllerExportMyExcelV1<TData = Awaited<ReturnTyp
 
 
 
-export type attendanceControllerGetPredictionV1Response200 = {
-  data: void
-  status: 200
-}
+export const attendanceControllerGetPredictionV1 = (
+    params: AttendanceControllerGetPredictionV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type attendanceControllerGetPredictionV1ResponseSuccess = (attendanceControllerGetPredictionV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type attendanceControllerGetPredictionV1Response = (attendanceControllerGetPredictionV1ResponseSuccess)
-
-export const getAttendanceControllerGetPredictionV1Url = (params: AttendanceControllerGetPredictionV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/attendance/predict`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/attendance/predict?${stringifiedParams}` : `/api/v1/attendance/predict`
-}
-
-export const attendanceControllerGetPredictionV1 = async (params: AttendanceControllerGetPredictionV1Params, options?: RequestInit): Promise<attendanceControllerGetPredictionV1Response> => {
-
-  return customInstance<attendanceControllerGetPredictionV1Response>(getAttendanceControllerGetPredictionV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -890,7 +700,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerGetPredictionV1>>> = ({ signal }) => attendanceControllerGetPredictionV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerGetPredictionV1>>> = ({ signal }) => attendanceControllerGetPredictionV1(params, requestOptions, signal);
 
 
 
@@ -945,37 +755,19 @@ export function useAttendanceControllerGetPredictionV1<TData = Awaited<ReturnTyp
 
 
 
-export type attendanceControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type attendanceControllerCreateV1ResponseSuccess = (attendanceControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerCreateV1Response = (attendanceControllerCreateV1ResponseSuccess)
-
-export const getAttendanceControllerCreateV1Url = () => {
+export const attendanceControllerCreateV1 = (
+    createAttendanceDto: CreateAttendanceDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance`
-}
-
-export const attendanceControllerCreateV1 = async (createAttendanceDto: CreateAttendanceDto, options?: RequestInit): Promise<attendanceControllerCreateV1Response> => {
-
-  return customInstance<attendanceControllerCreateV1Response>(getAttendanceControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createAttendanceDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAttendanceDto, signal
+    },
+      options);
+    }
 
 
 
@@ -1020,37 +812,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAttendanceControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type attendanceControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+    export const attendanceControllerFindAllV1 = (
 
-export type attendanceControllerFindAllV1ResponseSuccess = (attendanceControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerFindAllV1Response = (attendanceControllerFindAllV1ResponseSuccess)
-
-export const getAttendanceControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance`
-}
-
-export const attendanceControllerFindAllV1 = async ( options?: RequestInit): Promise<attendanceControllerFindAllV1Response> => {
-
-  return customInstance<attendanceControllerFindAllV1Response>(getAttendanceControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -1071,7 +843,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerFindAllV1>>> = ({ signal }) => attendanceControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerFindAllV1>>> = ({ signal }) => attendanceControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -1126,37 +898,17 @@ export function useAttendanceControllerFindAllV1<TData = Awaited<ReturnType<type
 
 
 
-export type attendanceControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type attendanceControllerFindOneV1ResponseSuccess = (attendanceControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerFindOneV1Response = (attendanceControllerFindOneV1ResponseSuccess)
-
-export const getAttendanceControllerFindOneV1Url = (id: string,) => {
+export const attendanceControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/${id}`
-}
-
-export const attendanceControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<attendanceControllerFindOneV1Response> => {
-
-  return customInstance<attendanceControllerFindOneV1Response>(getAttendanceControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -1177,7 +929,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerFindOneV1>>> = ({ signal }) => attendanceControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceControllerFindOneV1>>> = ({ signal }) => attendanceControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -1232,38 +984,20 @@ export function useAttendanceControllerFindOneV1<TData = Awaited<ReturnType<type
 
 
 
-export type attendanceControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type attendanceControllerUpdateV1ResponseSuccess = (attendanceControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerUpdateV1Response = (attendanceControllerUpdateV1ResponseSuccess)
-
-export const getAttendanceControllerUpdateV1Url = (id: string,) => {
+export const attendanceControllerUpdateV1 = (
+    id: string,
+    updateAttendanceDto: UpdateAttendanceDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/${id}`
-}
-
-export const attendanceControllerUpdateV1 = async (id: string,
-    updateAttendanceDto: UpdateAttendanceDto, options?: RequestInit): Promise<attendanceControllerUpdateV1Response> => {
-
-  return customInstance<attendanceControllerUpdateV1Response>(getAttendanceControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateAttendanceDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateAttendanceDto, signal
+    },
+      options);
+    }
 
 
 
@@ -1308,37 +1042,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAttendanceControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type attendanceControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type attendanceControllerRemoveV1ResponseSuccess = (attendanceControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceControllerRemoveV1Response = (attendanceControllerRemoveV1ResponseSuccess)
-
-export const getAttendanceControllerRemoveV1Url = (id: string,) => {
+    export const attendanceControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendance/${id}`
-}
-
-export const attendanceControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<attendanceControllerRemoveV1Response> => {
-
-  return customInstance<attendanceControllerRemoveV1Response>(getAttendanceControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendance/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

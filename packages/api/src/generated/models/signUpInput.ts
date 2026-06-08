@@ -5,18 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { SignUpInputRole } from './signUpInputRole';
 
-export interface SignUpInput {
-  /** The registered email address */
-  email: string;
-  /**
-     * A strong password
-     * @minLength 8
-     */
-  password: string;
-  /** Full Display Name */
-  name: string;
-  /** User role */
-  role?: SignUpInputRole;
-}
+export interface SignUpInput { [key: string]: unknown }

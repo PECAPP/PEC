@@ -6,12 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface SignInInput {
-  /** The registered email address */
-  email: string;
-  /**
-     * The password associated with the account
-     * @minLength 8
-     */
-  password: string;
-}
+export interface SignInInput { [key: string]: unknown }

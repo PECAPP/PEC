@@ -42,44 +42,18 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type studentPortfolioControllerGetPortfolioV1Response200 = {
-  data: void
-  status: 200
-}
+export const studentPortfolioControllerGetPortfolioV1 = (
+    params: StudentPortfolioControllerGetPortfolioV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type studentPortfolioControllerGetPortfolioV1ResponseSuccess = (studentPortfolioControllerGetPortfolioV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type studentPortfolioControllerGetPortfolioV1Response = (studentPortfolioControllerGetPortfolioV1ResponseSuccess)
-
-export const getStudentPortfolioControllerGetPortfolioV1Url = (params: StudentPortfolioControllerGetPortfolioV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/student-portfolio?${stringifiedParams}` : `/api/v1/student-portfolio`
-}
-
-export const studentPortfolioControllerGetPortfolioV1 = async (params: StudentPortfolioControllerGetPortfolioV1Params, options?: RequestInit): Promise<studentPortfolioControllerGetPortfolioV1Response> => {
-
-  return customInstance<studentPortfolioControllerGetPortfolioV1Response>(getStudentPortfolioControllerGetPortfolioV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -100,7 +74,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>> = ({ signal }) => studentPortfolioControllerGetPortfolioV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>> = ({ signal }) => studentPortfolioControllerGetPortfolioV1(params, requestOptions, signal);
 
 
 
@@ -155,44 +129,18 @@ export function useStudentPortfolioControllerGetPortfolioV1<TData = Awaited<Retu
 
 
 
-export type studentPortfolioControllerGetProjectsV1Response200 = {
-  data: void
-  status: 200
-}
+export const studentPortfolioControllerGetProjectsV1 = (
+    params: StudentPortfolioControllerGetProjectsV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type studentPortfolioControllerGetProjectsV1ResponseSuccess = (studentPortfolioControllerGetProjectsV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type studentPortfolioControllerGetProjectsV1Response = (studentPortfolioControllerGetProjectsV1ResponseSuccess)
-
-export const getStudentPortfolioControllerGetProjectsV1Url = (params: StudentPortfolioControllerGetProjectsV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/projects`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/student-portfolio/projects?${stringifiedParams}` : `/api/v1/student-portfolio/projects`
-}
-
-export const studentPortfolioControllerGetProjectsV1 = async (params: StudentPortfolioControllerGetProjectsV1Params, options?: RequestInit): Promise<studentPortfolioControllerGetProjectsV1Response> => {
-
-  return customInstance<studentPortfolioControllerGetProjectsV1Response>(getStudentPortfolioControllerGetProjectsV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -213,7 +161,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>> = ({ signal }) => studentPortfolioControllerGetProjectsV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>> = ({ signal }) => studentPortfolioControllerGetProjectsV1(params, requestOptions, signal);
 
 
 
@@ -268,37 +216,19 @@ export function useStudentPortfolioControllerGetProjectsV1<TData = Awaited<Retur
 
 
 
-export type studentPortfolioControllerCreateProjectV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type studentPortfolioControllerCreateProjectV1ResponseSuccess = (studentPortfolioControllerCreateProjectV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type studentPortfolioControllerCreateProjectV1Response = (studentPortfolioControllerCreateProjectV1ResponseSuccess)
-
-export const getStudentPortfolioControllerCreateProjectV1Url = () => {
+export const studentPortfolioControllerCreateProjectV1 = (
+    createStudentProjectDto: CreateStudentProjectDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/student-portfolio/projects`
-}
-
-export const studentPortfolioControllerCreateProjectV1 = async (createStudentProjectDto: CreateStudentProjectDto, options?: RequestInit): Promise<studentPortfolioControllerCreateProjectV1Response> => {
-
-  return customInstance<studentPortfolioControllerCreateProjectV1Response>(getStudentPortfolioControllerCreateProjectV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createStudentProjectDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/projects`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createStudentProjectDto, signal
+    },
+      options);
+    }
 
 
 
@@ -343,38 +273,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getStudentPortfolioControllerCreateProjectV1MutationOptions(options), queryClient);
     }
-    export type studentPortfolioControllerUpdateProjectV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type studentPortfolioControllerUpdateProjectV1ResponseSuccess = (studentPortfolioControllerUpdateProjectV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type studentPortfolioControllerUpdateProjectV1Response = (studentPortfolioControllerUpdateProjectV1ResponseSuccess)
-
-export const getStudentPortfolioControllerUpdateProjectV1Url = (id: string,) => {
+    export const studentPortfolioControllerUpdateProjectV1 = (
+    id: string,
+    updateStudentProjectDto: UpdateStudentProjectDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/student-portfolio/projects/${id}`
-}
-
-export const studentPortfolioControllerUpdateProjectV1 = async (id: string,
-    updateStudentProjectDto: UpdateStudentProjectDto, options?: RequestInit): Promise<studentPortfolioControllerUpdateProjectV1Response> => {
-
-  return customInstance<studentPortfolioControllerUpdateProjectV1Response>(getStudentPortfolioControllerUpdateProjectV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateStudentProjectDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/projects/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateStudentProjectDto, signal
+    },
+      options);
+    }
 
 
 
@@ -419,37 +331,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getStudentPortfolioControllerUpdateProjectV1MutationOptions(options), queryClient);
     }
-    export type studentPortfolioControllerDeleteProjectV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type studentPortfolioControllerDeleteProjectV1ResponseSuccess = (studentPortfolioControllerDeleteProjectV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type studentPortfolioControllerDeleteProjectV1Response = (studentPortfolioControllerDeleteProjectV1ResponseSuccess)
-
-export const getStudentPortfolioControllerDeleteProjectV1Url = (id: string,) => {
+    export const studentPortfolioControllerDeleteProjectV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/student-portfolio/projects/${id}`
-}
-
-export const studentPortfolioControllerDeleteProjectV1 = async (id: string, options?: RequestInit): Promise<studentPortfolioControllerDeleteProjectV1Response> => {
-
-  return customInstance<studentPortfolioControllerDeleteProjectV1Response>(getStudentPortfolioControllerDeleteProjectV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/projects/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -494,44 +386,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getStudentPortfolioControllerDeleteProjectV1MutationOptions(options), queryClient);
     }
-    export type studentPortfolioControllerGetSkillsV1Response200 = {
-  data: void
-  status: 200
-}
+    export const studentPortfolioControllerGetSkillsV1 = (
+    params: StudentPortfolioControllerGetSkillsV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type studentPortfolioControllerGetSkillsV1ResponseSuccess = (studentPortfolioControllerGetSkillsV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type studentPortfolioControllerGetSkillsV1Response = (studentPortfolioControllerGetSkillsV1ResponseSuccess)
-
-export const getStudentPortfolioControllerGetSkillsV1Url = (params: StudentPortfolioControllerGetSkillsV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/skills`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/student-portfolio/skills?${stringifiedParams}` : `/api/v1/student-portfolio/skills`
-}
-
-export const studentPortfolioControllerGetSkillsV1 = async (params: StudentPortfolioControllerGetSkillsV1Params, options?: RequestInit): Promise<studentPortfolioControllerGetSkillsV1Response> => {
-
-  return customInstance<studentPortfolioControllerGetSkillsV1Response>(getStudentPortfolioControllerGetSkillsV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -552,7 +418,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>> = ({ signal }) => studentPortfolioControllerGetSkillsV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>> = ({ signal }) => studentPortfolioControllerGetSkillsV1(params, requestOptions, signal);
 
 
 
@@ -607,37 +473,19 @@ export function useStudentPortfolioControllerGetSkillsV1<TData = Awaited<ReturnT
 
 
 
-export type studentPortfolioControllerCreateSkillV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type studentPortfolioControllerCreateSkillV1ResponseSuccess = (studentPortfolioControllerCreateSkillV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type studentPortfolioControllerCreateSkillV1Response = (studentPortfolioControllerCreateSkillV1ResponseSuccess)
-
-export const getStudentPortfolioControllerCreateSkillV1Url = () => {
+export const studentPortfolioControllerCreateSkillV1 = (
+    createStudentSkillDto: CreateStudentSkillDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/student-portfolio/skills`
-}
-
-export const studentPortfolioControllerCreateSkillV1 = async (createStudentSkillDto: CreateStudentSkillDto, options?: RequestInit): Promise<studentPortfolioControllerCreateSkillV1Response> => {
-
-  return customInstance<studentPortfolioControllerCreateSkillV1Response>(getStudentPortfolioControllerCreateSkillV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createStudentSkillDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/skills`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createStudentSkillDto, signal
+    },
+      options);
+    }
 
 
 
@@ -682,38 +530,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getStudentPortfolioControllerCreateSkillV1MutationOptions(options), queryClient);
     }
-    export type studentPortfolioControllerUpdateSkillV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type studentPortfolioControllerUpdateSkillV1ResponseSuccess = (studentPortfolioControllerUpdateSkillV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type studentPortfolioControllerUpdateSkillV1Response = (studentPortfolioControllerUpdateSkillV1ResponseSuccess)
-
-export const getStudentPortfolioControllerUpdateSkillV1Url = (id: string,) => {
+    export const studentPortfolioControllerUpdateSkillV1 = (
+    id: string,
+    updateStudentSkillDto: UpdateStudentSkillDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/student-portfolio/skills/${id}`
-}
-
-export const studentPortfolioControllerUpdateSkillV1 = async (id: string,
-    updateStudentSkillDto: UpdateStudentSkillDto, options?: RequestInit): Promise<studentPortfolioControllerUpdateSkillV1Response> => {
-
-  return customInstance<studentPortfolioControllerUpdateSkillV1Response>(getStudentPortfolioControllerUpdateSkillV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateStudentSkillDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/skills/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateStudentSkillDto, signal
+    },
+      options);
+    }
 
 
 
@@ -758,37 +588,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getStudentPortfolioControllerUpdateSkillV1MutationOptions(options), queryClient);
     }
-    export type studentPortfolioControllerDeleteSkillV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type studentPortfolioControllerDeleteSkillV1ResponseSuccess = (studentPortfolioControllerDeleteSkillV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type studentPortfolioControllerDeleteSkillV1Response = (studentPortfolioControllerDeleteSkillV1ResponseSuccess)
-
-export const getStudentPortfolioControllerDeleteSkillV1Url = (id: string,) => {
+    export const studentPortfolioControllerDeleteSkillV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/student-portfolio/skills/${id}`
-}
-
-export const studentPortfolioControllerDeleteSkillV1 = async (id: string, options?: RequestInit): Promise<studentPortfolioControllerDeleteSkillV1Response> => {
-
-  return customInstance<studentPortfolioControllerDeleteSkillV1Response>(getStudentPortfolioControllerDeleteSkillV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/skills/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -833,44 +643,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getStudentPortfolioControllerDeleteSkillV1MutationOptions(options), queryClient);
     }
-    export type studentPortfolioControllerSyncGitHubReposV1Response200 = {
-  data: void
-  status: 200
-}
+    export const studentPortfolioControllerSyncGitHubReposV1 = (
+    params: StudentPortfolioControllerSyncGitHubReposV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type studentPortfolioControllerSyncGitHubReposV1ResponseSuccess = (studentPortfolioControllerSyncGitHubReposV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type studentPortfolioControllerSyncGitHubReposV1Response = (studentPortfolioControllerSyncGitHubReposV1ResponseSuccess)
-
-export const getStudentPortfolioControllerSyncGitHubReposV1Url = (params: StudentPortfolioControllerSyncGitHubReposV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/student-portfolio/github/sync`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/student-portfolio/github/sync?${stringifiedParams}` : `/api/v1/student-portfolio/github/sync`
-}
-
-export const studentPortfolioControllerSyncGitHubReposV1 = async (params: StudentPortfolioControllerSyncGitHubReposV1Params, options?: RequestInit): Promise<studentPortfolioControllerSyncGitHubReposV1Response> => {
-
-  return customInstance<studentPortfolioControllerSyncGitHubReposV1Response>(getStudentPortfolioControllerSyncGitHubReposV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -891,7 +675,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>> = ({ signal }) => studentPortfolioControllerSyncGitHubReposV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>> = ({ signal }) => studentPortfolioControllerSyncGitHubReposV1(params, requestOptions, signal);
 
 
 

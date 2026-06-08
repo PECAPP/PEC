@@ -31,37 +31,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type permissionsControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
+export const permissionsControllerCreateV1 = (
 
-export type permissionsControllerCreateV1ResponseSuccess = (permissionsControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type permissionsControllerCreateV1Response = (permissionsControllerCreateV1ResponseSuccess)
-
-export const getPermissionsControllerCreateV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/permissions`
-}
-
-export const permissionsControllerCreateV1 = async ( options?: RequestInit): Promise<permissionsControllerCreateV1Response> => {
-
-  return customInstance<permissionsControllerCreateV1Response>(getPermissionsControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/permissions`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -106,37 +86,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getPermissionsControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type permissionsControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+    export const permissionsControllerFindAllV1 = (
 
-export type permissionsControllerFindAllV1ResponseSuccess = (permissionsControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type permissionsControllerFindAllV1Response = (permissionsControllerFindAllV1ResponseSuccess)
-
-export const getPermissionsControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/permissions`
-}
-
-export const permissionsControllerFindAllV1 = async ( options?: RequestInit): Promise<permissionsControllerFindAllV1Response> => {
-
-  return customInstance<permissionsControllerFindAllV1Response>(getPermissionsControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/permissions`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -157,7 +117,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>> = ({ signal }) => permissionsControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>> = ({ signal }) => permissionsControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -212,37 +172,17 @@ export function usePermissionsControllerFindAllV1<TData = Awaited<ReturnType<typ
 
 
 
-export type permissionsControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type permissionsControllerFindOneV1ResponseSuccess = (permissionsControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type permissionsControllerFindOneV1Response = (permissionsControllerFindOneV1ResponseSuccess)
-
-export const getPermissionsControllerFindOneV1Url = (id: string,) => {
+export const permissionsControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/permissions/${id}`
-}
-
-export const permissionsControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<permissionsControllerFindOneV1Response> => {
-
-  return customInstance<permissionsControllerFindOneV1Response>(getPermissionsControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/permissions/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -263,7 +203,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>> = ({ signal }) => permissionsControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>> = ({ signal }) => permissionsControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -318,37 +258,17 @@ export function usePermissionsControllerFindOneV1<TData = Awaited<ReturnType<typ
 
 
 
-export type permissionsControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type permissionsControllerUpdateV1ResponseSuccess = (permissionsControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type permissionsControllerUpdateV1Response = (permissionsControllerUpdateV1ResponseSuccess)
-
-export const getPermissionsControllerUpdateV1Url = (id: string,) => {
+export const permissionsControllerUpdateV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/permissions/${id}`
-}
-
-export const permissionsControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<permissionsControllerUpdateV1Response> => {
-
-  return customInstance<permissionsControllerUpdateV1Response>(getPermissionsControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/permissions/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -393,37 +313,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getPermissionsControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type permissionsControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type permissionsControllerRemoveV1ResponseSuccess = (permissionsControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type permissionsControllerRemoveV1Response = (permissionsControllerRemoveV1ResponseSuccess)
-
-export const getPermissionsControllerRemoveV1Url = (id: string,) => {
+    export const permissionsControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/permissions/${id}`
-}
-
-export const permissionsControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<permissionsControllerRemoveV1Response> => {
-
-  return customInstance<permissionsControllerRemoveV1Response>(getPermissionsControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/permissions/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

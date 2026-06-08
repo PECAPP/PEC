@@ -36,37 +36,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type roomsControllerFindManyV1Response200 = {
-  data: void
-  status: 200
-}
+export const roomsControllerFindManyV1 = (
 
-export type roomsControllerFindManyV1ResponseSuccess = (roomsControllerFindManyV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type roomsControllerFindManyV1Response = (roomsControllerFindManyV1ResponseSuccess)
-
-export const getRoomsControllerFindManyV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/rooms`
-}
-
-export const roomsControllerFindManyV1 = async ( options?: RequestInit): Promise<roomsControllerFindManyV1Response> => {
-
-  return customInstance<roomsControllerFindManyV1Response>(getRoomsControllerFindManyV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/rooms`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -87,7 +67,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerFindManyV1>>> = ({ signal }) => roomsControllerFindManyV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerFindManyV1>>> = ({ signal }) => roomsControllerFindManyV1(requestOptions, signal);
 
 
 
@@ -142,37 +122,19 @@ export function useRoomsControllerFindManyV1<TData = Awaited<ReturnType<typeof r
 
 
 
-export type roomsControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type roomsControllerCreateV1ResponseSuccess = (roomsControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type roomsControllerCreateV1Response = (roomsControllerCreateV1ResponseSuccess)
-
-export const getRoomsControllerCreateV1Url = () => {
+export const roomsControllerCreateV1 = (
+    createRoomDto: CreateRoomDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/rooms`
-}
-
-export const roomsControllerCreateV1 = async (createRoomDto: CreateRoomDto, options?: RequestInit): Promise<roomsControllerCreateV1Response> => {
-
-  return customInstance<roomsControllerCreateV1Response>(getRoomsControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createRoomDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/rooms`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createRoomDto, signal
+    },
+      options);
+    }
 
 
 
@@ -217,44 +179,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRoomsControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type roomsControllerGetAvailabilityV1Response200 = {
-  data: void
-  status: 200
-}
+    export const roomsControllerGetAvailabilityV1 = (
+    params: RoomsControllerGetAvailabilityV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type roomsControllerGetAvailabilityV1ResponseSuccess = (roomsControllerGetAvailabilityV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type roomsControllerGetAvailabilityV1Response = (roomsControllerGetAvailabilityV1ResponseSuccess)
-
-export const getRoomsControllerGetAvailabilityV1Url = (params: RoomsControllerGetAvailabilityV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/rooms/availability`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/rooms/availability?${stringifiedParams}` : `/api/v1/rooms/availability`
-}
-
-export const roomsControllerGetAvailabilityV1 = async (params: RoomsControllerGetAvailabilityV1Params, options?: RequestInit): Promise<roomsControllerGetAvailabilityV1Response> => {
-
-  return customInstance<roomsControllerGetAvailabilityV1Response>(getRoomsControllerGetAvailabilityV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -275,7 +211,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>> = ({ signal }) => roomsControllerGetAvailabilityV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>> = ({ signal }) => roomsControllerGetAvailabilityV1(params, requestOptions, signal);
 
 
 
@@ -330,37 +266,17 @@ export function useRoomsControllerGetAvailabilityV1<TData = Awaited<ReturnType<t
 
 
 
-export type roomsControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type roomsControllerFindOneV1ResponseSuccess = (roomsControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type roomsControllerFindOneV1Response = (roomsControllerFindOneV1ResponseSuccess)
-
-export const getRoomsControllerFindOneV1Url = (id: string,) => {
+export const roomsControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/rooms/${id}`
-}
-
-export const roomsControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<roomsControllerFindOneV1Response> => {
-
-  return customInstance<roomsControllerFindOneV1Response>(getRoomsControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/rooms/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -381,7 +297,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerFindOneV1>>> = ({ signal }) => roomsControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerFindOneV1>>> = ({ signal }) => roomsControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -436,37 +352,17 @@ export function useRoomsControllerFindOneV1<TData = Awaited<ReturnType<typeof ro
 
 
 
-export type roomsControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type roomsControllerUpdateV1ResponseSuccess = (roomsControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type roomsControllerUpdateV1Response = (roomsControllerUpdateV1ResponseSuccess)
-
-export const getRoomsControllerUpdateV1Url = (id: string,) => {
+export const roomsControllerUpdateV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/rooms/${id}`
-}
-
-export const roomsControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<roomsControllerUpdateV1Response> => {
-
-  return customInstance<roomsControllerUpdateV1Response>(getRoomsControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/rooms/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -511,37 +407,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRoomsControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type roomsControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type roomsControllerRemoveV1ResponseSuccess = (roomsControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type roomsControllerRemoveV1Response = (roomsControllerRemoveV1ResponseSuccess)
-
-export const getRoomsControllerRemoveV1Url = (id: string,) => {
+    export const roomsControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/rooms/${id}`
-}
-
-export const roomsControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<roomsControllerRemoveV1Response> => {
-
-  return customInstance<roomsControllerRemoveV1Response>(getRoomsControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/rooms/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

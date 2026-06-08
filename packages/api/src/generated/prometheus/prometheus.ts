@@ -27,37 +27,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type prometheusControllerIndexV1Response200 = {
-  data: void
-  status: 200
-}
+export const prometheusControllerIndexV1 = (
 
-export type prometheusControllerIndexV1ResponseSuccess = (prometheusControllerIndexV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type prometheusControllerIndexV1Response = (prometheusControllerIndexV1ResponseSuccess)
-
-export const getPrometheusControllerIndexV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/metrics`
-}
-
-export const prometheusControllerIndexV1 = async ( options?: RequestInit): Promise<prometheusControllerIndexV1Response> => {
-
-  return customInstance<prometheusControllerIndexV1Response>(getPrometheusControllerIndexV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/metrics`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -78,7 +58,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof prometheusControllerIndexV1>>> = ({ signal }) => prometheusControllerIndexV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof prometheusControllerIndexV1>>> = ({ signal }) => prometheusControllerIndexV1(requestOptions, signal);
 
 
 

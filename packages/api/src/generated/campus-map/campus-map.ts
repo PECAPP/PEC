@@ -36,37 +36,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type campusMapControllerListRegionsV1Response200 = {
-  data: void
-  status: 200
-}
+export const campusMapControllerListRegionsV1 = (
 
-export type campusMapControllerListRegionsV1ResponseSuccess = (campusMapControllerListRegionsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type campusMapControllerListRegionsV1Response = (campusMapControllerListRegionsV1ResponseSuccess)
-
-export const getCampusMapControllerListRegionsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRegions`
-}
-
-export const campusMapControllerListRegionsV1 = async ( options?: RequestInit): Promise<campusMapControllerListRegionsV1Response> => {
-
-  return customInstance<campusMapControllerListRegionsV1Response>(getCampusMapControllerListRegionsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRegions`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -87,7 +67,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>> = ({ signal }) => campusMapControllerListRegionsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>> = ({ signal }) => campusMapControllerListRegionsV1(requestOptions, signal);
 
 
 
@@ -142,37 +122,19 @@ export function useCampusMapControllerListRegionsV1<TData = Awaited<ReturnType<t
 
 
 
-export type campusMapControllerCreateRegionV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type campusMapControllerCreateRegionV1ResponseSuccess = (campusMapControllerCreateRegionV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type campusMapControllerCreateRegionV1Response = (campusMapControllerCreateRegionV1ResponseSuccess)
-
-export const getCampusMapControllerCreateRegionV1Url = () => {
+export const campusMapControllerCreateRegionV1 = (
+    createCampusMapRegionDto: CreateCampusMapRegionDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRegions`
-}
-
-export const campusMapControllerCreateRegionV1 = async (createCampusMapRegionDto: CreateCampusMapRegionDto, options?: RequestInit): Promise<campusMapControllerCreateRegionV1Response> => {
-
-  return customInstance<campusMapControllerCreateRegionV1Response>(getCampusMapControllerCreateRegionV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createCampusMapRegionDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRegions`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCampusMapRegionDto, signal
+    },
+      options);
+    }
 
 
 
@@ -217,37 +179,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampusMapControllerCreateRegionV1MutationOptions(options), queryClient);
     }
-    export type campusMapControllerGetRegionV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type campusMapControllerGetRegionV1ResponseSuccess = (campusMapControllerGetRegionV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type campusMapControllerGetRegionV1Response = (campusMapControllerGetRegionV1ResponseSuccess)
-
-export const getCampusMapControllerGetRegionV1Url = (id: string,) => {
+    export const campusMapControllerGetRegionV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRegions/${id}`
-}
-
-export const campusMapControllerGetRegionV1 = async (id: string, options?: RequestInit): Promise<campusMapControllerGetRegionV1Response> => {
-
-  return customInstance<campusMapControllerGetRegionV1Response>(getCampusMapControllerGetRegionV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRegions/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -268,7 +210,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>> = ({ signal }) => campusMapControllerGetRegionV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>> = ({ signal }) => campusMapControllerGetRegionV1(id, requestOptions, signal);
 
 
 
@@ -323,38 +265,20 @@ export function useCampusMapControllerGetRegionV1<TData = Awaited<ReturnType<typ
 
 
 
-export type campusMapControllerUpdateRegionV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type campusMapControllerUpdateRegionV1ResponseSuccess = (campusMapControllerUpdateRegionV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type campusMapControllerUpdateRegionV1Response = (campusMapControllerUpdateRegionV1ResponseSuccess)
-
-export const getCampusMapControllerUpdateRegionV1Url = (id: string,) => {
+export const campusMapControllerUpdateRegionV1 = (
+    id: string,
+    updateCampusMapRegionDto: UpdateCampusMapRegionDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRegions/${id}`
-}
-
-export const campusMapControllerUpdateRegionV1 = async (id: string,
-    updateCampusMapRegionDto: UpdateCampusMapRegionDto, options?: RequestInit): Promise<campusMapControllerUpdateRegionV1Response> => {
-
-  return customInstance<campusMapControllerUpdateRegionV1Response>(getCampusMapControllerUpdateRegionV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateCampusMapRegionDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRegions/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCampusMapRegionDto, signal
+    },
+      options);
+    }
 
 
 
@@ -399,37 +323,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampusMapControllerUpdateRegionV1MutationOptions(options), queryClient);
     }
-    export type campusMapControllerDeleteRegionV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type campusMapControllerDeleteRegionV1ResponseSuccess = (campusMapControllerDeleteRegionV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type campusMapControllerDeleteRegionV1Response = (campusMapControllerDeleteRegionV1ResponseSuccess)
-
-export const getCampusMapControllerDeleteRegionV1Url = (id: string,) => {
+    export const campusMapControllerDeleteRegionV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRegions/${id}`
-}
-
-export const campusMapControllerDeleteRegionV1 = async (id: string, options?: RequestInit): Promise<campusMapControllerDeleteRegionV1Response> => {
-
-  return customInstance<campusMapControllerDeleteRegionV1Response>(getCampusMapControllerDeleteRegionV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRegions/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

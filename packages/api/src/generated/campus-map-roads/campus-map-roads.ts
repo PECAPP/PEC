@@ -36,37 +36,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type campusMapRoadsControllerListRoadsV1Response200 = {
-  data: void
-  status: 200
-}
+export const campusMapRoadsControllerListRoadsV1 = (
 
-export type campusMapRoadsControllerListRoadsV1ResponseSuccess = (campusMapRoadsControllerListRoadsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type campusMapRoadsControllerListRoadsV1Response = (campusMapRoadsControllerListRoadsV1ResponseSuccess)
-
-export const getCampusMapRoadsControllerListRoadsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRoads`
-}
-
-export const campusMapRoadsControllerListRoadsV1 = async ( options?: RequestInit): Promise<campusMapRoadsControllerListRoadsV1Response> => {
-
-  return customInstance<campusMapRoadsControllerListRoadsV1Response>(getCampusMapRoadsControllerListRoadsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRoads`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -87,7 +67,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>> = ({ signal }) => campusMapRoadsControllerListRoadsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>> = ({ signal }) => campusMapRoadsControllerListRoadsV1(requestOptions, signal);
 
 
 
@@ -142,37 +122,19 @@ export function useCampusMapRoadsControllerListRoadsV1<TData = Awaited<ReturnTyp
 
 
 
-export type campusMapRoadsControllerCreateRoadV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type campusMapRoadsControllerCreateRoadV1ResponseSuccess = (campusMapRoadsControllerCreateRoadV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type campusMapRoadsControllerCreateRoadV1Response = (campusMapRoadsControllerCreateRoadV1ResponseSuccess)
-
-export const getCampusMapRoadsControllerCreateRoadV1Url = () => {
+export const campusMapRoadsControllerCreateRoadV1 = (
+    createCampusMapRoadDto: CreateCampusMapRoadDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRoads`
-}
-
-export const campusMapRoadsControllerCreateRoadV1 = async (createCampusMapRoadDto: CreateCampusMapRoadDto, options?: RequestInit): Promise<campusMapRoadsControllerCreateRoadV1Response> => {
-
-  return customInstance<campusMapRoadsControllerCreateRoadV1Response>(getCampusMapRoadsControllerCreateRoadV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createCampusMapRoadDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRoads`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCampusMapRoadDto, signal
+    },
+      options);
+    }
 
 
 
@@ -217,37 +179,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampusMapRoadsControllerCreateRoadV1MutationOptions(options), queryClient);
     }
-    export type campusMapRoadsControllerGetRoadV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type campusMapRoadsControllerGetRoadV1ResponseSuccess = (campusMapRoadsControllerGetRoadV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type campusMapRoadsControllerGetRoadV1Response = (campusMapRoadsControllerGetRoadV1ResponseSuccess)
-
-export const getCampusMapRoadsControllerGetRoadV1Url = (id: string,) => {
+    export const campusMapRoadsControllerGetRoadV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRoads/${id}`
-}
-
-export const campusMapRoadsControllerGetRoadV1 = async (id: string, options?: RequestInit): Promise<campusMapRoadsControllerGetRoadV1Response> => {
-
-  return customInstance<campusMapRoadsControllerGetRoadV1Response>(getCampusMapRoadsControllerGetRoadV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRoads/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -268,7 +210,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>> = ({ signal }) => campusMapRoadsControllerGetRoadV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>> = ({ signal }) => campusMapRoadsControllerGetRoadV1(id, requestOptions, signal);
 
 
 
@@ -323,38 +265,20 @@ export function useCampusMapRoadsControllerGetRoadV1<TData = Awaited<ReturnType<
 
 
 
-export type campusMapRoadsControllerUpdateRoadV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type campusMapRoadsControllerUpdateRoadV1ResponseSuccess = (campusMapRoadsControllerUpdateRoadV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type campusMapRoadsControllerUpdateRoadV1Response = (campusMapRoadsControllerUpdateRoadV1ResponseSuccess)
-
-export const getCampusMapRoadsControllerUpdateRoadV1Url = (id: string,) => {
+export const campusMapRoadsControllerUpdateRoadV1 = (
+    id: string,
+    updateCampusMapRoadDto: UpdateCampusMapRoadDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRoads/${id}`
-}
-
-export const campusMapRoadsControllerUpdateRoadV1 = async (id: string,
-    updateCampusMapRoadDto: UpdateCampusMapRoadDto, options?: RequestInit): Promise<campusMapRoadsControllerUpdateRoadV1Response> => {
-
-  return customInstance<campusMapRoadsControllerUpdateRoadV1Response>(getCampusMapRoadsControllerUpdateRoadV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateCampusMapRoadDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRoads/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCampusMapRoadDto, signal
+    },
+      options);
+    }
 
 
 
@@ -399,37 +323,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampusMapRoadsControllerUpdateRoadV1MutationOptions(options), queryClient);
     }
-    export type campusMapRoadsControllerDeleteRoadV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type campusMapRoadsControllerDeleteRoadV1ResponseSuccess = (campusMapRoadsControllerDeleteRoadV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type campusMapRoadsControllerDeleteRoadV1Response = (campusMapRoadsControllerDeleteRoadV1ResponseSuccess)
-
-export const getCampusMapRoadsControllerDeleteRoadV1Url = (id: string,) => {
+    export const campusMapRoadsControllerDeleteRoadV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/campusMapRoads/${id}`
-}
-
-export const campusMapRoadsControllerDeleteRoadV1 = async (id: string, options?: RequestInit): Promise<campusMapRoadsControllerDeleteRoadV1Response> => {
-
-  return customInstance<campusMapRoadsControllerDeleteRoadV1Response>(getCampusMapRoadsControllerDeleteRoadV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/campusMapRoads/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

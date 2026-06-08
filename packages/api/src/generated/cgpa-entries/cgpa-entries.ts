@@ -37,44 +37,18 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type cgpaEntriesControllerGetStatsV1Response200 = {
-  data: void
-  status: 200
-}
+export const cgpaEntriesControllerGetStatsV1 = (
+    params: CgpaEntriesControllerGetStatsV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type cgpaEntriesControllerGetStatsV1ResponseSuccess = (cgpaEntriesControllerGetStatsV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type cgpaEntriesControllerGetStatsV1Response = (cgpaEntriesControllerGetStatsV1ResponseSuccess)
-
-export const getCgpaEntriesControllerGetStatsV1Url = (params: CgpaEntriesControllerGetStatsV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/cgpa-entries/dashboard/summary`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/cgpa-entries/dashboard/summary?${stringifiedParams}` : `/api/v1/cgpa-entries/dashboard/summary`
-}
-
-export const cgpaEntriesControllerGetStatsV1 = async (params: CgpaEntriesControllerGetStatsV1Params, options?: RequestInit): Promise<cgpaEntriesControllerGetStatsV1Response> => {
-
-  return customInstance<cgpaEntriesControllerGetStatsV1Response>(getCgpaEntriesControllerGetStatsV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -95,7 +69,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>> = ({ signal }) => cgpaEntriesControllerGetStatsV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>> = ({ signal }) => cgpaEntriesControllerGetStatsV1(params, requestOptions, signal);
 
 
 
@@ -150,37 +124,17 @@ export function useCgpaEntriesControllerGetStatsV1<TData = Awaited<ReturnType<ty
 
 
 
-export type cgpaEntriesControllerFindManyV1Response200 = {
-  data: void
-  status: 200
-}
+export const cgpaEntriesControllerFindManyV1 = (
 
-export type cgpaEntriesControllerFindManyV1ResponseSuccess = (cgpaEntriesControllerFindManyV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type cgpaEntriesControllerFindManyV1Response = (cgpaEntriesControllerFindManyV1ResponseSuccess)
-
-export const getCgpaEntriesControllerFindManyV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/cgpa-entries`
-}
-
-export const cgpaEntriesControllerFindManyV1 = async ( options?: RequestInit): Promise<cgpaEntriesControllerFindManyV1Response> => {
-
-  return customInstance<cgpaEntriesControllerFindManyV1Response>(getCgpaEntriesControllerFindManyV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/cgpa-entries`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -201,7 +155,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>> = ({ signal }) => cgpaEntriesControllerFindManyV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>> = ({ signal }) => cgpaEntriesControllerFindManyV1(requestOptions, signal);
 
 
 
@@ -256,37 +210,19 @@ export function useCgpaEntriesControllerFindManyV1<TData = Awaited<ReturnType<ty
 
 
 
-export type cgpaEntriesControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type cgpaEntriesControllerCreateV1ResponseSuccess = (cgpaEntriesControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type cgpaEntriesControllerCreateV1Response = (cgpaEntriesControllerCreateV1ResponseSuccess)
-
-export const getCgpaEntriesControllerCreateV1Url = () => {
+export const cgpaEntriesControllerCreateV1 = (
+    createCgpaEntryDto: CreateCgpaEntryDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/cgpa-entries`
-}
-
-export const cgpaEntriesControllerCreateV1 = async (createCgpaEntryDto: CreateCgpaEntryDto, options?: RequestInit): Promise<cgpaEntriesControllerCreateV1Response> => {
-
-  return customInstance<cgpaEntriesControllerCreateV1Response>(getCgpaEntriesControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createCgpaEntryDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/cgpa-entries`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCgpaEntryDto, signal
+    },
+      options);
+    }
 
 
 
@@ -331,37 +267,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCgpaEntriesControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type cgpaEntriesControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type cgpaEntriesControllerFindOneV1ResponseSuccess = (cgpaEntriesControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type cgpaEntriesControllerFindOneV1Response = (cgpaEntriesControllerFindOneV1ResponseSuccess)
-
-export const getCgpaEntriesControllerFindOneV1Url = (id: string,) => {
+    export const cgpaEntriesControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/cgpa-entries/${id}`
-}
-
-export const cgpaEntriesControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<cgpaEntriesControllerFindOneV1Response> => {
-
-  return customInstance<cgpaEntriesControllerFindOneV1Response>(getCgpaEntriesControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/cgpa-entries/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -382,7 +298,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>> = ({ signal }) => cgpaEntriesControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>> = ({ signal }) => cgpaEntriesControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -437,38 +353,20 @@ export function useCgpaEntriesControllerFindOneV1<TData = Awaited<ReturnType<typ
 
 
 
-export type cgpaEntriesControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type cgpaEntriesControllerUpdateV1ResponseSuccess = (cgpaEntriesControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type cgpaEntriesControllerUpdateV1Response = (cgpaEntriesControllerUpdateV1ResponseSuccess)
-
-export const getCgpaEntriesControllerUpdateV1Url = (id: string,) => {
+export const cgpaEntriesControllerUpdateV1 = (
+    id: string,
+    updateCgpaEntryDto: UpdateCgpaEntryDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/cgpa-entries/${id}`
-}
-
-export const cgpaEntriesControllerUpdateV1 = async (id: string,
-    updateCgpaEntryDto: UpdateCgpaEntryDto, options?: RequestInit): Promise<cgpaEntriesControllerUpdateV1Response> => {
-
-  return customInstance<cgpaEntriesControllerUpdateV1Response>(getCgpaEntriesControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateCgpaEntryDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/cgpa-entries/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCgpaEntryDto, signal
+    },
+      options);
+    }
 
 
 
@@ -513,37 +411,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCgpaEntriesControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type cgpaEntriesControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type cgpaEntriesControllerRemoveV1ResponseSuccess = (cgpaEntriesControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type cgpaEntriesControllerRemoveV1Response = (cgpaEntriesControllerRemoveV1ResponseSuccess)
-
-export const getCgpaEntriesControllerRemoveV1Url = (id: string,) => {
+    export const cgpaEntriesControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/cgpa-entries/${id}`
-}
-
-export const cgpaEntriesControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<cgpaEntriesControllerRemoveV1Response> => {
-
-  return customInstance<cgpaEntriesControllerRemoveV1Response>(getCgpaEntriesControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/cgpa-entries/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

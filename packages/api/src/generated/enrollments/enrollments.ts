@@ -37,37 +37,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type enrollmentsControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+export const enrollmentsControllerFindAllV1 = (
 
-export type enrollmentsControllerFindAllV1ResponseSuccess = (enrollmentsControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type enrollmentsControllerFindAllV1Response = (enrollmentsControllerFindAllV1ResponseSuccess)
-
-export const getEnrollmentsControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/enrollments`
-}
-
-export const enrollmentsControllerFindAllV1 = async ( options?: RequestInit): Promise<enrollmentsControllerFindAllV1Response> => {
-
-  return customInstance<enrollmentsControllerFindAllV1Response>(getEnrollmentsControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/enrollments`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -88,7 +68,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>> = ({ signal }) => enrollmentsControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>> = ({ signal }) => enrollmentsControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -143,37 +123,19 @@ export function useEnrollmentsControllerFindAllV1<TData = Awaited<ReturnType<typ
 
 
 
-export type enrollmentsControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type enrollmentsControllerCreateV1ResponseSuccess = (enrollmentsControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type enrollmentsControllerCreateV1Response = (enrollmentsControllerCreateV1ResponseSuccess)
-
-export const getEnrollmentsControllerCreateV1Url = () => {
+export const enrollmentsControllerCreateV1 = (
+    createEnrollmentDto: CreateEnrollmentDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/enrollments`
-}
-
-export const enrollmentsControllerCreateV1 = async (createEnrollmentDto: CreateEnrollmentDto, options?: RequestInit): Promise<enrollmentsControllerCreateV1Response> => {
-
-  return customInstance<enrollmentsControllerCreateV1Response>(getEnrollmentsControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createEnrollmentDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/enrollments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createEnrollmentDto, signal
+    },
+      options);
+    }
 
 
 
@@ -218,44 +180,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getEnrollmentsControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type enrollmentsControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
+    export const enrollmentsControllerRemoveV1 = (
+    params: EnrollmentsControllerRemoveV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type enrollmentsControllerRemoveV1ResponseSuccess = (enrollmentsControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type enrollmentsControllerRemoveV1Response = (enrollmentsControllerRemoveV1ResponseSuccess)
-
-export const getEnrollmentsControllerRemoveV1Url = (params: EnrollmentsControllerRemoveV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/enrollments`, method: 'DELETE',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/enrollments?${stringifiedParams}` : `/api/v1/enrollments`
-}
-
-export const enrollmentsControllerRemoveV1 = async (params: EnrollmentsControllerRemoveV1Params, options?: RequestInit): Promise<enrollmentsControllerRemoveV1Response> => {
-
-  return customInstance<enrollmentsControllerRemoveV1Response>(getEnrollmentsControllerRemoveV1Url(params),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
 
 
 
@@ -300,38 +236,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getEnrollmentsControllerRemoveV1MutationOptions(options), queryClient);
     }
-    export type enrollmentsControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type enrollmentsControllerUpdateV1ResponseSuccess = (enrollmentsControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type enrollmentsControllerUpdateV1Response = (enrollmentsControllerUpdateV1ResponseSuccess)
-
-export const getEnrollmentsControllerUpdateV1Url = (id: string,) => {
+    export const enrollmentsControllerUpdateV1 = (
+    id: string,
+    updateEnrollmentDto: UpdateEnrollmentDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/enrollments/${id}`
-}
-
-export const enrollmentsControllerUpdateV1 = async (id: string,
-    updateEnrollmentDto: UpdateEnrollmentDto, options?: RequestInit): Promise<enrollmentsControllerUpdateV1Response> => {
-
-  return customInstance<enrollmentsControllerUpdateV1Response>(getEnrollmentsControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateEnrollmentDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/enrollments/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateEnrollmentDto, signal
+    },
+      options);
+    }
 
 
 

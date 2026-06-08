@@ -36,44 +36,18 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type backgroundJobsControllerListV1Response200 = {
-  data: void
-  status: 200
-}
+export const backgroundJobsControllerListV1 = (
+    params: BackgroundJobsControllerListV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type backgroundJobsControllerListV1ResponseSuccess = (backgroundJobsControllerListV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type backgroundJobsControllerListV1Response = (backgroundJobsControllerListV1ResponseSuccess)
-
-export const getBackgroundJobsControllerListV1Url = (params: BackgroundJobsControllerListV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/background-jobs`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/background-jobs?${stringifiedParams}` : `/api/v1/background-jobs`
-}
-
-export const backgroundJobsControllerListV1 = async (params: BackgroundJobsControllerListV1Params, options?: RequestInit): Promise<backgroundJobsControllerListV1Response> => {
-
-  return customInstance<backgroundJobsControllerListV1Response>(getBackgroundJobsControllerListV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -94,7 +68,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>> = ({ signal }) => backgroundJobsControllerListV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>> = ({ signal }) => backgroundJobsControllerListV1(params, requestOptions, signal);
 
 
 
@@ -149,37 +123,19 @@ export function useBackgroundJobsControllerListV1<TData = Awaited<ReturnType<typ
 
 
 
-export type backgroundJobsControllerEnqueueV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type backgroundJobsControllerEnqueueV1ResponseSuccess = (backgroundJobsControllerEnqueueV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type backgroundJobsControllerEnqueueV1Response = (backgroundJobsControllerEnqueueV1ResponseSuccess)
-
-export const getBackgroundJobsControllerEnqueueV1Url = () => {
+export const backgroundJobsControllerEnqueueV1 = (
+    createBackgroundJobDto: CreateBackgroundJobDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/background-jobs`
-}
-
-export const backgroundJobsControllerEnqueueV1 = async (createBackgroundJobDto: CreateBackgroundJobDto, options?: RequestInit): Promise<backgroundJobsControllerEnqueueV1Response> => {
-
-  return customInstance<backgroundJobsControllerEnqueueV1Response>(getBackgroundJobsControllerEnqueueV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createBackgroundJobDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/background-jobs`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createBackgroundJobDto, signal
+    },
+      options);
+    }
 
 
 
@@ -224,37 +180,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getBackgroundJobsControllerEnqueueV1MutationOptions(options), queryClient);
     }
-    export type backgroundJobsControllerEnqueueAuditLogPruneV1Response201 = {
-  data: void
-  status: 201
-}
+    export const backgroundJobsControllerEnqueueAuditLogPruneV1 = (
 
-export type backgroundJobsControllerEnqueueAuditLogPruneV1ResponseSuccess = (backgroundJobsControllerEnqueueAuditLogPruneV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type backgroundJobsControllerEnqueueAuditLogPruneV1Response = (backgroundJobsControllerEnqueueAuditLogPruneV1ResponseSuccess)
-
-export const getBackgroundJobsControllerEnqueueAuditLogPruneV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/background-jobs/prune-audit-logs`
-}
-
-export const backgroundJobsControllerEnqueueAuditLogPruneV1 = async ( options?: RequestInit): Promise<backgroundJobsControllerEnqueueAuditLogPruneV1Response> => {
-
-  return customInstance<backgroundJobsControllerEnqueueAuditLogPruneV1Response>(getBackgroundJobsControllerEnqueueAuditLogPruneV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/background-jobs/prune-audit-logs`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 

@@ -64,8 +64,8 @@ const createPrismaClient = () => {
 
               if ('id' in (result as any)) {
                 entityId = (result as any).id;
-              } else if (args.where && 'id' in args.where) {
-                entityId = (args.where as any).id;
+              } else if ((args as any).where && 'id' in (args as any).where) {
+                entityId = ((args as any).where as any).id;
               }
 
               // Fire and forget audit log creation

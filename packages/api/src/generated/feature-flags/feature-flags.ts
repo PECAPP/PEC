@@ -35,37 +35,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type featureFlagsControllerListAllV1Response200 = {
-  data: void
-  status: 200
-}
+export const featureFlagsControllerListAllV1 = (
 
-export type featureFlagsControllerListAllV1ResponseSuccess = (featureFlagsControllerListAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type featureFlagsControllerListAllV1Response = (featureFlagsControllerListAllV1ResponseSuccess)
-
-export const getFeatureFlagsControllerListAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/feature-flags`
-}
-
-export const featureFlagsControllerListAllV1 = async ( options?: RequestInit): Promise<featureFlagsControllerListAllV1Response> => {
-
-  return customInstance<featureFlagsControllerListAllV1Response>(getFeatureFlagsControllerListAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/feature-flags`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -86,7 +66,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>> = ({ signal }) => featureFlagsControllerListAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>> = ({ signal }) => featureFlagsControllerListAllV1(requestOptions, signal);
 
 
 
@@ -141,37 +121,17 @@ export function useFeatureFlagsControllerListAllV1<TData = Awaited<ReturnType<ty
 
 
 
-export type featureFlagsControllerGetByKeyV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type featureFlagsControllerGetByKeyV1ResponseSuccess = (featureFlagsControllerGetByKeyV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type featureFlagsControllerGetByKeyV1Response = (featureFlagsControllerGetByKeyV1ResponseSuccess)
-
-export const getFeatureFlagsControllerGetByKeyV1Url = (key: string,) => {
+export const featureFlagsControllerGetByKeyV1 = (
+    key: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/feature-flags/${key}`
-}
-
-export const featureFlagsControllerGetByKeyV1 = async (key: string, options?: RequestInit): Promise<featureFlagsControllerGetByKeyV1Response> => {
-
-  return customInstance<featureFlagsControllerGetByKeyV1Response>(getFeatureFlagsControllerGetByKeyV1Url(key),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/feature-flags/${key}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -192,7 +152,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>> = ({ signal }) => featureFlagsControllerGetByKeyV1(key, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>> = ({ signal }) => featureFlagsControllerGetByKeyV1(key, requestOptions, signal);
 
 
 
@@ -247,38 +207,20 @@ export function useFeatureFlagsControllerGetByKeyV1<TData = Awaited<ReturnType<t
 
 
 
-export type featureFlagsControllerUpsertV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type featureFlagsControllerUpsertV1ResponseSuccess = (featureFlagsControllerUpsertV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type featureFlagsControllerUpsertV1Response = (featureFlagsControllerUpsertV1ResponseSuccess)
-
-export const getFeatureFlagsControllerUpsertV1Url = (key: string,) => {
+export const featureFlagsControllerUpsertV1 = (
+    key: string,
+    upsertFeatureFlagDto: UpsertFeatureFlagDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/feature-flags/${key}`
-}
-
-export const featureFlagsControllerUpsertV1 = async (key: string,
-    upsertFeatureFlagDto: UpsertFeatureFlagDto, options?: RequestInit): Promise<featureFlagsControllerUpsertV1Response> => {
-
-  return customInstance<featureFlagsControllerUpsertV1Response>(getFeatureFlagsControllerUpsertV1Url(key),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(upsertFeatureFlagDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/feature-flags/${key}`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: upsertFeatureFlagDto, signal
+    },
+      options);
+    }
 
 
 

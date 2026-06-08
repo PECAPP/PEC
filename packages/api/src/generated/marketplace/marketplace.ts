@@ -36,37 +36,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type marketplaceControllerFindListingsV1Response200 = {
-  data: void
-  status: 200
-}
+export const marketplaceControllerFindListingsV1 = (
 
-export type marketplaceControllerFindListingsV1ResponseSuccess = (marketplaceControllerFindListingsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerFindListingsV1Response = (marketplaceControllerFindListingsV1ResponseSuccess)
-
-export const getMarketplaceControllerFindListingsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/listings`
-}
-
-export const marketplaceControllerFindListingsV1 = async ( options?: RequestInit): Promise<marketplaceControllerFindListingsV1Response> => {
-
-  return customInstance<marketplaceControllerFindListingsV1Response>(getMarketplaceControllerFindListingsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/listings`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -87,7 +67,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>> = ({ signal }) => marketplaceControllerFindListingsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>> = ({ signal }) => marketplaceControllerFindListingsV1(requestOptions, signal);
 
 
 
@@ -142,37 +122,19 @@ export function useMarketplaceControllerFindListingsV1<TData = Awaited<ReturnTyp
 
 
 
-export type marketplaceControllerCreateListingV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type marketplaceControllerCreateListingV1ResponseSuccess = (marketplaceControllerCreateListingV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerCreateListingV1Response = (marketplaceControllerCreateListingV1ResponseSuccess)
-
-export const getMarketplaceControllerCreateListingV1Url = () => {
+export const marketplaceControllerCreateListingV1 = (
+    createListingDto: CreateListingDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/listings`
-}
-
-export const marketplaceControllerCreateListingV1 = async (createListingDto: CreateListingDto, options?: RequestInit): Promise<marketplaceControllerCreateListingV1Response> => {
-
-  return customInstance<marketplaceControllerCreateListingV1Response>(getMarketplaceControllerCreateListingV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createListingDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/listings`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createListingDto, signal
+    },
+      options);
+    }
 
 
 
@@ -217,37 +179,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerCreateListingV1MutationOptions(options), queryClient);
     }
-    export type marketplaceControllerFindMyListingsV1Response200 = {
-  data: void
-  status: 200
-}
+    export const marketplaceControllerFindMyListingsV1 = (
 
-export type marketplaceControllerFindMyListingsV1ResponseSuccess = (marketplaceControllerFindMyListingsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerFindMyListingsV1Response = (marketplaceControllerFindMyListingsV1ResponseSuccess)
-
-export const getMarketplaceControllerFindMyListingsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/listings/my`
-}
-
-export const marketplaceControllerFindMyListingsV1 = async ( options?: RequestInit): Promise<marketplaceControllerFindMyListingsV1Response> => {
-
-  return customInstance<marketplaceControllerFindMyListingsV1Response>(getMarketplaceControllerFindMyListingsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/listings/my`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -268,7 +210,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>> = ({ signal }) => marketplaceControllerFindMyListingsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>> = ({ signal }) => marketplaceControllerFindMyListingsV1(requestOptions, signal);
 
 
 
@@ -323,37 +265,17 @@ export function useMarketplaceControllerFindMyListingsV1<TData = Awaited<ReturnT
 
 
 
-export type marketplaceControllerFindListingV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type marketplaceControllerFindListingV1ResponseSuccess = (marketplaceControllerFindListingV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerFindListingV1Response = (marketplaceControllerFindListingV1ResponseSuccess)
-
-export const getMarketplaceControllerFindListingV1Url = (id: string,) => {
+export const marketplaceControllerFindListingV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/listings/${id}`
-}
-
-export const marketplaceControllerFindListingV1 = async (id: string, options?: RequestInit): Promise<marketplaceControllerFindListingV1Response> => {
-
-  return customInstance<marketplaceControllerFindListingV1Response>(getMarketplaceControllerFindListingV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/listings/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -374,7 +296,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>> = ({ signal }) => marketplaceControllerFindListingV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>> = ({ signal }) => marketplaceControllerFindListingV1(id, requestOptions, signal);
 
 
 
@@ -429,38 +351,20 @@ export function useMarketplaceControllerFindListingV1<TData = Awaited<ReturnType
 
 
 
-export type marketplaceControllerUpdateListingV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type marketplaceControllerUpdateListingV1ResponseSuccess = (marketplaceControllerUpdateListingV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerUpdateListingV1Response = (marketplaceControllerUpdateListingV1ResponseSuccess)
-
-export const getMarketplaceControllerUpdateListingV1Url = (id: string,) => {
+export const marketplaceControllerUpdateListingV1 = (
+    id: string,
+    updateListingDto: UpdateListingDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/listings/${id}`
-}
-
-export const marketplaceControllerUpdateListingV1 = async (id: string,
-    updateListingDto: UpdateListingDto, options?: RequestInit): Promise<marketplaceControllerUpdateListingV1Response> => {
-
-  return customInstance<marketplaceControllerUpdateListingV1Response>(getMarketplaceControllerUpdateListingV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateListingDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/listings/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateListingDto, signal
+    },
+      options);
+    }
 
 
 
@@ -505,37 +409,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerUpdateListingV1MutationOptions(options), queryClient);
     }
-    export type marketplaceControllerDeleteListingV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type marketplaceControllerDeleteListingV1ResponseSuccess = (marketplaceControllerDeleteListingV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerDeleteListingV1Response = (marketplaceControllerDeleteListingV1ResponseSuccess)
-
-export const getMarketplaceControllerDeleteListingV1Url = (id: string,) => {
+    export const marketplaceControllerDeleteListingV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/listings/${id}`
-}
-
-export const marketplaceControllerDeleteListingV1 = async (id: string, options?: RequestInit): Promise<marketplaceControllerDeleteListingV1Response> => {
-
-  return customInstance<marketplaceControllerDeleteListingV1Response>(getMarketplaceControllerDeleteListingV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/listings/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -580,37 +464,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerDeleteListingV1MutationOptions(options), queryClient);
     }
-    export type marketplaceControllerToggleBookmarkV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type marketplaceControllerToggleBookmarkV1ResponseSuccess = (marketplaceControllerToggleBookmarkV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerToggleBookmarkV1Response = (marketplaceControllerToggleBookmarkV1ResponseSuccess)
-
-export const getMarketplaceControllerToggleBookmarkV1Url = (listingId: string,) => {
+    export const marketplaceControllerToggleBookmarkV1 = (
+    listingId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/bookmarks/${listingId}`
-}
-
-export const marketplaceControllerToggleBookmarkV1 = async (listingId: string, options?: RequestInit): Promise<marketplaceControllerToggleBookmarkV1Response> => {
-
-  return customInstance<marketplaceControllerToggleBookmarkV1Response>(getMarketplaceControllerToggleBookmarkV1Url(listingId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/bookmarks/${listingId}`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -655,37 +519,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerToggleBookmarkV1MutationOptions(options), queryClient);
     }
-    export type marketplaceControllerGetBookmarksV1Response200 = {
-  data: void
-  status: 200
-}
+    export const marketplaceControllerGetBookmarksV1 = (
 
-export type marketplaceControllerGetBookmarksV1ResponseSuccess = (marketplaceControllerGetBookmarksV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerGetBookmarksV1Response = (marketplaceControllerGetBookmarksV1ResponseSuccess)
-
-export const getMarketplaceControllerGetBookmarksV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/bookmarks`
-}
-
-export const marketplaceControllerGetBookmarksV1 = async ( options?: RequestInit): Promise<marketplaceControllerGetBookmarksV1Response> => {
-
-  return customInstance<marketplaceControllerGetBookmarksV1Response>(getMarketplaceControllerGetBookmarksV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/bookmarks`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -706,7 +550,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>> = ({ signal }) => marketplaceControllerGetBookmarksV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>> = ({ signal }) => marketplaceControllerGetBookmarksV1(requestOptions, signal);
 
 
 
@@ -761,37 +605,17 @@ export function useMarketplaceControllerGetBookmarksV1<TData = Awaited<ReturnTyp
 
 
 
-export type marketplaceControllerGetBookmarkedIdsV1Response200 = {
-  data: void
-  status: 200
-}
+export const marketplaceControllerGetBookmarkedIdsV1 = (
 
-export type marketplaceControllerGetBookmarkedIdsV1ResponseSuccess = (marketplaceControllerGetBookmarkedIdsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerGetBookmarkedIdsV1Response = (marketplaceControllerGetBookmarkedIdsV1ResponseSuccess)
-
-export const getMarketplaceControllerGetBookmarkedIdsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/bookmarks/ids`
-}
-
-export const marketplaceControllerGetBookmarkedIdsV1 = async ( options?: RequestInit): Promise<marketplaceControllerGetBookmarkedIdsV1Response> => {
-
-  return customInstance<marketplaceControllerGetBookmarkedIdsV1Response>(getMarketplaceControllerGetBookmarkedIdsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/bookmarks/ids`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -812,7 +636,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>> = ({ signal }) => marketplaceControllerGetBookmarkedIdsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>> = ({ signal }) => marketplaceControllerGetBookmarkedIdsV1(requestOptions, signal);
 
 
 
@@ -867,37 +691,17 @@ export function useMarketplaceControllerGetBookmarkedIdsV1<TData = Awaited<Retur
 
 
 
-export type marketplaceControllerGetOrCreateChatV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type marketplaceControllerGetOrCreateChatV1ResponseSuccess = (marketplaceControllerGetOrCreateChatV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerGetOrCreateChatV1Response = (marketplaceControllerGetOrCreateChatV1ResponseSuccess)
-
-export const getMarketplaceControllerGetOrCreateChatV1Url = (listingId: string,) => {
+export const marketplaceControllerGetOrCreateChatV1 = (
+    listingId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/chats/listing/${listingId}`
-}
-
-export const marketplaceControllerGetOrCreateChatV1 = async (listingId: string, options?: RequestInit): Promise<marketplaceControllerGetOrCreateChatV1Response> => {
-
-  return customInstance<marketplaceControllerGetOrCreateChatV1Response>(getMarketplaceControllerGetOrCreateChatV1Url(listingId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/chats/listing/${listingId}`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -942,37 +746,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerGetOrCreateChatV1MutationOptions(options), queryClient);
     }
-    export type marketplaceControllerGetMyChatsV1Response200 = {
-  data: void
-  status: 200
-}
+    export const marketplaceControllerGetMyChatsV1 = (
 
-export type marketplaceControllerGetMyChatsV1ResponseSuccess = (marketplaceControllerGetMyChatsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerGetMyChatsV1Response = (marketplaceControllerGetMyChatsV1ResponseSuccess)
-
-export const getMarketplaceControllerGetMyChatsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/chats`
-}
-
-export const marketplaceControllerGetMyChatsV1 = async ( options?: RequestInit): Promise<marketplaceControllerGetMyChatsV1Response> => {
-
-  return customInstance<marketplaceControllerGetMyChatsV1Response>(getMarketplaceControllerGetMyChatsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/chats`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -993,7 +777,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>> = ({ signal }) => marketplaceControllerGetMyChatsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>> = ({ signal }) => marketplaceControllerGetMyChatsV1(requestOptions, signal);
 
 
 
@@ -1048,37 +832,17 @@ export function useMarketplaceControllerGetMyChatsV1<TData = Awaited<ReturnType<
 
 
 
-export type marketplaceControllerGetChatMessagesV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type marketplaceControllerGetChatMessagesV1ResponseSuccess = (marketplaceControllerGetChatMessagesV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerGetChatMessagesV1Response = (marketplaceControllerGetChatMessagesV1ResponseSuccess)
-
-export const getMarketplaceControllerGetChatMessagesV1Url = (chatId: string,) => {
+export const marketplaceControllerGetChatMessagesV1 = (
+    chatId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/chats/${chatId}/messages`
-}
-
-export const marketplaceControllerGetChatMessagesV1 = async (chatId: string, options?: RequestInit): Promise<marketplaceControllerGetChatMessagesV1Response> => {
-
-  return customInstance<marketplaceControllerGetChatMessagesV1Response>(getMarketplaceControllerGetChatMessagesV1Url(chatId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/chats/${chatId}/messages`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -1099,7 +863,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>> = ({ signal }) => marketplaceControllerGetChatMessagesV1(chatId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>> = ({ signal }) => marketplaceControllerGetChatMessagesV1(chatId, requestOptions, signal);
 
 
 
@@ -1154,37 +918,17 @@ export function useMarketplaceControllerGetChatMessagesV1<TData = Awaited<Return
 
 
 
-export type marketplaceControllerSendMessageV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type marketplaceControllerSendMessageV1ResponseSuccess = (marketplaceControllerSendMessageV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type marketplaceControllerSendMessageV1Response = (marketplaceControllerSendMessageV1ResponseSuccess)
-
-export const getMarketplaceControllerSendMessageV1Url = (chatId: string,) => {
+export const marketplaceControllerSendMessageV1 = (
+    chatId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/marketplace/chats/${chatId}/messages`
-}
-
-export const marketplaceControllerSendMessageV1 = async (chatId: string, options?: RequestInit): Promise<marketplaceControllerSendMessageV1Response> => {
-
-  return customInstance<marketplaceControllerSendMessageV1Response>(getMarketplaceControllerSendMessageV1Url(chatId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/marketplace/chats/${chatId}/messages`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 

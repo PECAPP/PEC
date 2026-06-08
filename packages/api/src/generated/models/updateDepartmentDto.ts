@@ -6,11 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface UpdateDepartmentDto {
-  name?: string;
-  code?: string;
-  hod?: string;
-  description?: string;
-  status?: string;
-  timetableLabel?: string;
-}
+export interface UpdateDepartmentDto { [key: string]: unknown }

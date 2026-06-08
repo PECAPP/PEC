@@ -5,9 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { SetRoleInputRole } from './setRoleInputRole';
 
-export interface SetRoleInput {
-  /** Role to assign */
-  role: SetRoleInputRole;
-}
+export interface SetRoleInput { [key: string]: unknown }

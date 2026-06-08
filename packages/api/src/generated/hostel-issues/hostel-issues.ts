@@ -36,37 +36,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type hostelIssuesControllerFindManyV1Response200 = {
-  data: void
-  status: 200
-}
+export const hostelIssuesControllerFindManyV1 = (
 
-export type hostelIssuesControllerFindManyV1ResponseSuccess = (hostelIssuesControllerFindManyV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type hostelIssuesControllerFindManyV1Response = (hostelIssuesControllerFindManyV1ResponseSuccess)
-
-export const getHostelIssuesControllerFindManyV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/hostelIssues`
-}
-
-export const hostelIssuesControllerFindManyV1 = async ( options?: RequestInit): Promise<hostelIssuesControllerFindManyV1Response> => {
-
-  return customInstance<hostelIssuesControllerFindManyV1Response>(getHostelIssuesControllerFindManyV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/hostelIssues`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -87,7 +67,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>> = ({ signal }) => hostelIssuesControllerFindManyV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>> = ({ signal }) => hostelIssuesControllerFindManyV1(requestOptions, signal);
 
 
 
@@ -142,37 +122,19 @@ export function useHostelIssuesControllerFindManyV1<TData = Awaited<ReturnType<t
 
 
 
-export type hostelIssuesControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type hostelIssuesControllerCreateV1ResponseSuccess = (hostelIssuesControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type hostelIssuesControllerCreateV1Response = (hostelIssuesControllerCreateV1ResponseSuccess)
-
-export const getHostelIssuesControllerCreateV1Url = () => {
+export const hostelIssuesControllerCreateV1 = (
+    createHostelIssueDto: CreateHostelIssueDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/hostelIssues`
-}
-
-export const hostelIssuesControllerCreateV1 = async (createHostelIssueDto: CreateHostelIssueDto, options?: RequestInit): Promise<hostelIssuesControllerCreateV1Response> => {
-
-  return customInstance<hostelIssuesControllerCreateV1Response>(getHostelIssuesControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createHostelIssueDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/hostelIssues`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createHostelIssueDto, signal
+    },
+      options);
+    }
 
 
 
@@ -217,37 +179,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getHostelIssuesControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type hostelIssuesControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type hostelIssuesControllerFindOneV1ResponseSuccess = (hostelIssuesControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type hostelIssuesControllerFindOneV1Response = (hostelIssuesControllerFindOneV1ResponseSuccess)
-
-export const getHostelIssuesControllerFindOneV1Url = (id: string,) => {
+    export const hostelIssuesControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/hostelIssues/${id}`
-}
-
-export const hostelIssuesControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<hostelIssuesControllerFindOneV1Response> => {
-
-  return customInstance<hostelIssuesControllerFindOneV1Response>(getHostelIssuesControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/hostelIssues/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -268,7 +210,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>> = ({ signal }) => hostelIssuesControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>> = ({ signal }) => hostelIssuesControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -323,38 +265,20 @@ export function useHostelIssuesControllerFindOneV1<TData = Awaited<ReturnType<ty
 
 
 
-export type hostelIssuesControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type hostelIssuesControllerUpdateV1ResponseSuccess = (hostelIssuesControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type hostelIssuesControllerUpdateV1Response = (hostelIssuesControllerUpdateV1ResponseSuccess)
-
-export const getHostelIssuesControllerUpdateV1Url = (id: string,) => {
+export const hostelIssuesControllerUpdateV1 = (
+    id: string,
+    updateHostelIssueDto: UpdateHostelIssueDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/hostelIssues/${id}`
-}
-
-export const hostelIssuesControllerUpdateV1 = async (id: string,
-    updateHostelIssueDto: UpdateHostelIssueDto, options?: RequestInit): Promise<hostelIssuesControllerUpdateV1Response> => {
-
-  return customInstance<hostelIssuesControllerUpdateV1Response>(getHostelIssuesControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateHostelIssueDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/hostelIssues/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateHostelIssueDto, signal
+    },
+      options);
+    }
 
 
 
@@ -399,37 +323,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getHostelIssuesControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type hostelIssuesControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type hostelIssuesControllerRemoveV1ResponseSuccess = (hostelIssuesControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type hostelIssuesControllerRemoveV1Response = (hostelIssuesControllerRemoveV1ResponseSuccess)
-
-export const getHostelIssuesControllerRemoveV1Url = (id: string,) => {
+    export const hostelIssuesControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/hostelIssues/${id}`
-}
-
-export const hostelIssuesControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<hostelIssuesControllerRemoveV1Response> => {
-
-  return customInstance<hostelIssuesControllerRemoveV1Response>(getHostelIssuesControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/hostelIssues/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -474,37 +378,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getHostelIssuesControllerRemoveV1MutationOptions(options), queryClient);
     }
-    export type hostelIssuesControllerReplyV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type hostelIssuesControllerReplyV1ResponseSuccess = (hostelIssuesControllerReplyV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type hostelIssuesControllerReplyV1Response = (hostelIssuesControllerReplyV1ResponseSuccess)
-
-export const getHostelIssuesControllerReplyV1Url = (id: string,) => {
+    export const hostelIssuesControllerReplyV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/hostelIssues/${id}/replies`
-}
-
-export const hostelIssuesControllerReplyV1 = async (id: string, options?: RequestInit): Promise<hostelIssuesControllerReplyV1Response> => {
-
-  return customInstance<hostelIssuesControllerReplyV1Response>(getHostelIssuesControllerReplyV1Url(id),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/hostelIssues/${id}/replies`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 

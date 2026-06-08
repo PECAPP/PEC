@@ -6,7 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface VerifyEmailInput {
-  /** Email verification token */
-  token: string;
-}
+export interface VerifyEmailInput { [key: string]: unknown }

@@ -42,37 +42,19 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type authControllerSignInV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type authControllerSignInV1ResponseSuccess = (authControllerSignInV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerSignInV1Response = (authControllerSignInV1ResponseSuccess)
-
-export const getAuthControllerSignInV1Url = () => {
+export const authControllerSignInV1 = (
+    signInInput: SignInInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/login`
-}
-
-export const authControllerSignInV1 = async (signInInput: SignInInput, options?: RequestInit): Promise<authControllerSignInV1Response> => {
-
-  return customInstance<authControllerSignInV1Response>(getAuthControllerSignInV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(signInInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/login`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: signInInput, signal
+    },
+      options);
+    }
 
 
 
@@ -117,37 +99,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerSignInV1MutationOptions(options), queryClient);
     }
-    export type authControllerSignUpV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type authControllerSignUpV1ResponseSuccess = (authControllerSignUpV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type authControllerSignUpV1Response = (authControllerSignUpV1ResponseSuccess)
-
-export const getAuthControllerSignUpV1Url = () => {
+    export const authControllerSignUpV1 = (
+    signUpInput: SignUpInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/register`
-}
-
-export const authControllerSignUpV1 = async (signUpInput: SignUpInput, options?: RequestInit): Promise<authControllerSignUpV1Response> => {
-
-  return customInstance<authControllerSignUpV1Response>(getAuthControllerSignUpV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(signUpInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/register`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: signUpInput, signal
+    },
+      options);
+    }
 
 
 
@@ -192,37 +156,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerSignUpV1MutationOptions(options), queryClient);
     }
-    export type authControllerRefreshV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type authControllerRefreshV1ResponseSuccess = (authControllerRefreshV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerRefreshV1Response = (authControllerRefreshV1ResponseSuccess)
-
-export const getAuthControllerRefreshV1Url = () => {
+    export const authControllerRefreshV1 = (
+    refreshInput: RefreshInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/refresh`
-}
-
-export const authControllerRefreshV1 = async (refreshInput: RefreshInput, options?: RequestInit): Promise<authControllerRefreshV1Response> => {
-
-  return customInstance<authControllerRefreshV1Response>(getAuthControllerRefreshV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(refreshInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/refresh`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: refreshInput, signal
+    },
+      options);
+    }
 
 
 
@@ -267,37 +213,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerRefreshV1MutationOptions(options), queryClient);
     }
-    export type authControllerLogoutV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type authControllerLogoutV1ResponseSuccess = (authControllerLogoutV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerLogoutV1Response = (authControllerLogoutV1ResponseSuccess)
-
-export const getAuthControllerLogoutV1Url = () => {
+    export const authControllerLogoutV1 = (
+    refreshInput: RefreshInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/logout`
-}
-
-export const authControllerLogoutV1 = async (refreshInput: RefreshInput, options?: RequestInit): Promise<authControllerLogoutV1Response> => {
-
-  return customInstance<authControllerLogoutV1Response>(getAuthControllerLogoutV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(refreshInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/logout`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: refreshInput, signal
+    },
+      options);
+    }
 
 
 
@@ -342,37 +270,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerLogoutV1MutationOptions(options), queryClient);
     }
-    export type authControllerVerifyEmailV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type authControllerVerifyEmailV1ResponseSuccess = (authControllerVerifyEmailV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerVerifyEmailV1Response = (authControllerVerifyEmailV1ResponseSuccess)
-
-export const getAuthControllerVerifyEmailV1Url = () => {
+    export const authControllerVerifyEmailV1 = (
+    verifyEmailInput: VerifyEmailInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/verify-email`
-}
-
-export const authControllerVerifyEmailV1 = async (verifyEmailInput: VerifyEmailInput, options?: RequestInit): Promise<authControllerVerifyEmailV1Response> => {
-
-  return customInstance<authControllerVerifyEmailV1Response>(getAuthControllerVerifyEmailV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(verifyEmailInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/verify-email`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: verifyEmailInput, signal
+    },
+      options);
+    }
 
 
 
@@ -417,37 +327,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerVerifyEmailV1MutationOptions(options), queryClient);
     }
-    export type authControllerRequestPasswordResetV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type authControllerRequestPasswordResetV1ResponseSuccess = (authControllerRequestPasswordResetV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerRequestPasswordResetV1Response = (authControllerRequestPasswordResetV1ResponseSuccess)
-
-export const getAuthControllerRequestPasswordResetV1Url = () => {
+    export const authControllerRequestPasswordResetV1 = (
+    requestPasswordResetInput: RequestPasswordResetInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/request-password-reset`
-}
-
-export const authControllerRequestPasswordResetV1 = async (requestPasswordResetInput: RequestPasswordResetInput, options?: RequestInit): Promise<authControllerRequestPasswordResetV1Response> => {
-
-  return customInstance<authControllerRequestPasswordResetV1Response>(getAuthControllerRequestPasswordResetV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(requestPasswordResetInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/request-password-reset`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: requestPasswordResetInput, signal
+    },
+      options);
+    }
 
 
 
@@ -492,37 +384,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerRequestPasswordResetV1MutationOptions(options), queryClient);
     }
-    export type authControllerResetPasswordV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type authControllerResetPasswordV1ResponseSuccess = (authControllerResetPasswordV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerResetPasswordV1Response = (authControllerResetPasswordV1ResponseSuccess)
-
-export const getAuthControllerResetPasswordV1Url = () => {
+    export const authControllerResetPasswordV1 = (
+    resetPasswordInput: ResetPasswordInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/reset-password`
-}
-
-export const authControllerResetPasswordV1 = async (resetPasswordInput: ResetPasswordInput, options?: RequestInit): Promise<authControllerResetPasswordV1Response> => {
-
-  return customInstance<authControllerResetPasswordV1Response>(getAuthControllerResetPasswordV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(resetPasswordInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/reset-password`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: resetPasswordInput, signal
+    },
+      options);
+    }
 
 
 
@@ -567,37 +441,158 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerResetPasswordV1MutationOptions(options), queryClient);
     }
-    export type authControllerGetPermissionsV1Response200 = {
-  data: void
-  status: 200
+    export const authControllerGetSessionsV1 = (
+
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/auth/sessions`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAuthControllerGetSessionsV1QueryKey = () => {
+    return [
+    `/api/v1/auth/sessions`
+    ] as const;
+    }
+
+
+export const getAuthControllerGetSessionsV1QueryOptions = <TData = Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAuthControllerGetSessionsV1QueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGetSessionsV1>>> = ({ signal }) => authControllerGetSessionsV1(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type authControllerGetPermissionsV1ResponseSuccess = (authControllerGetPermissionsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerGetPermissionsV1Response = (authControllerGetPermissionsV1ResponseSuccess)
-
-export const getAuthControllerGetPermissionsV1Url = () => {
+export type AuthControllerGetSessionsV1QueryResult = NonNullable<Awaited<ReturnType<typeof authControllerGetSessionsV1>>>
+export type AuthControllerGetSessionsV1QueryError = unknown
 
 
+export function useAuthControllerGetSessionsV1<TData = Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof authControllerGetSessionsV1>>,
+          TError,
+          Awaited<ReturnType<typeof authControllerGetSessionsV1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuthControllerGetSessionsV1<TData = Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof authControllerGetSessionsV1>>,
+          TError,
+          Awaited<ReturnType<typeof authControllerGetSessionsV1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuthControllerGetSessionsV1<TData = Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
+export function useAuthControllerGetSessionsV1<TData = Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetSessionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  return `/api/v1/auth/me/permissions`
+  const queryOptions = getAuthControllerGetSessionsV1QueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const authControllerGetPermissionsV1 = async ( options?: RequestInit): Promise<authControllerGetPermissionsV1Response> => {
-
-  return customInstance<authControllerGetPermissionsV1Response>(getAuthControllerGetPermissionsV1Url(),
-  {
-    ...options,
-    method: 'GET'
 
 
-  }
-);}
 
+
+
+export const authControllerRevokeSessionV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/auth/sessions/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+export const getAuthControllerRevokeSessionV1MutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRevokeSessionV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof authControllerRevokeSessionV1>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['authControllerRevokeSessionV1'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerRevokeSessionV1>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  authControllerRevokeSessionV1(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthControllerRevokeSessionV1MutationResult = NonNullable<Awaited<ReturnType<typeof authControllerRevokeSessionV1>>>
+
+    export type AuthControllerRevokeSessionV1MutationError = unknown
+
+    export const useAuthControllerRevokeSessionV1 = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRevokeSessionV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof authControllerRevokeSessionV1>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getAuthControllerRevokeSessionV1MutationOptions(options), queryClient);
+    }
+    export const authControllerGetPermissionsV1 = (
+
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/auth/me/permissions`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -618,7 +613,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGetPermissionsV1>>> = ({ signal }) => authControllerGetPermissionsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGetPermissionsV1>>> = ({ signal }) => authControllerGetPermissionsV1(requestOptions, signal);
 
 
 
@@ -673,37 +668,17 @@ export function useAuthControllerGetPermissionsV1<TData = Awaited<ReturnType<typ
 
 
 
-export type authControllerGetProfileV1Response200 = {
-  data: void
-  status: 200
-}
+export const authControllerGetProfileV1 = (
 
-export type authControllerGetProfileV1ResponseSuccess = (authControllerGetProfileV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerGetProfileV1Response = (authControllerGetProfileV1ResponseSuccess)
-
-export const getAuthControllerGetProfileV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/profile`
-}
-
-export const authControllerGetProfileV1 = async ( options?: RequestInit): Promise<authControllerGetProfileV1Response> => {
-
-  return customInstance<authControllerGetProfileV1Response>(getAuthControllerGetProfileV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/profile`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -724,7 +699,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGetProfileV1>>> = ({ signal }) => authControllerGetProfileV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGetProfileV1>>> = ({ signal }) => authControllerGetProfileV1(requestOptions, signal);
 
 
 
@@ -779,37 +754,17 @@ export function useAuthControllerGetProfileV1<TData = Awaited<ReturnType<typeof 
 
 
 
-export type authControllerCompleteProfileV1Response201 = {
-  data: void
-  status: 201
-}
+export const authControllerCompleteProfileV1 = (
 
-export type authControllerCompleteProfileV1ResponseSuccess = (authControllerCompleteProfileV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type authControllerCompleteProfileV1Response = (authControllerCompleteProfileV1ResponseSuccess)
-
-export const getAuthControllerCompleteProfileV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/complete-profile`
-}
-
-export const authControllerCompleteProfileV1 = async ( options?: RequestInit): Promise<authControllerCompleteProfileV1Response> => {
-
-  return customInstance<authControllerCompleteProfileV1Response>(getAuthControllerCompleteProfileV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/complete-profile`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -854,37 +809,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerCompleteProfileV1MutationOptions(options), queryClient);
     }
-    export type authControllerChangePasswordV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type authControllerChangePasswordV1ResponseSuccess = (authControllerChangePasswordV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerChangePasswordV1Response = (authControllerChangePasswordV1ResponseSuccess)
-
-export const getAuthControllerChangePasswordV1Url = () => {
+    export const authControllerChangePasswordV1 = (
+    changePasswordInput: ChangePasswordInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/change-password`
-}
-
-export const authControllerChangePasswordV1 = async (changePasswordInput: ChangePasswordInput, options?: RequestInit): Promise<authControllerChangePasswordV1Response> => {
-
-  return customInstance<authControllerChangePasswordV1Response>(getAuthControllerChangePasswordV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(changePasswordInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/change-password`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: changePasswordInput, signal
+    },
+      options);
+    }
 
 
 
@@ -929,37 +866,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthControllerChangePasswordV1MutationOptions(options), queryClient);
     }
-    export type authControllerSetRoleV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type authControllerSetRoleV1ResponseSuccess = (authControllerSetRoleV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type authControllerSetRoleV1Response = (authControllerSetRoleV1ResponseSuccess)
-
-export const getAuthControllerSetRoleV1Url = () => {
+    export const authControllerSetRoleV1 = (
+    setRoleInput: SetRoleInput,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/auth/set-role`
-}
-
-export const authControllerSetRoleV1 = async (setRoleInput: SetRoleInput, options?: RequestInit): Promise<authControllerSetRoleV1Response> => {
-
-  return customInstance<authControllerSetRoleV1Response>(getAuthControllerSetRoleV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(setRoleInput)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/auth/set-role`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: setRoleInput, signal
+    },
+      options);
+    }
 
 
 

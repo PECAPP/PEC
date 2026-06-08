@@ -22,37 +22,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type aiControllerGetCompletionV1Response201 = {
-  data: void
-  status: 201
-}
+export const aiControllerGetCompletionV1 = (
 
-export type aiControllerGetCompletionV1ResponseSuccess = (aiControllerGetCompletionV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type aiControllerGetCompletionV1Response = (aiControllerGetCompletionV1ResponseSuccess)
-
-export const getAiControllerGetCompletionV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/ai/completion`
-}
-
-export const aiControllerGetCompletionV1 = async ( options?: RequestInit): Promise<aiControllerGetCompletionV1Response> => {
-
-  return customInstance<aiControllerGetCompletionV1Response>(getAiControllerGetCompletionV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/ai/completion`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 

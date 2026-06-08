@@ -36,37 +36,19 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type usersControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type usersControllerCreateV1ResponseSuccess = (usersControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerCreateV1Response = (usersControllerCreateV1ResponseSuccess)
-
-export const getUsersControllerCreateV1Url = () => {
+export const usersControllerCreateV1 = (
+    createUserDto: CreateUserDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/users`
-}
-
-export const usersControllerCreateV1 = async (createUserDto: CreateUserDto, options?: RequestInit): Promise<usersControllerCreateV1Response> => {
-
-  return customInstance<usersControllerCreateV1Response>(getUsersControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createUserDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/users`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createUserDto, signal
+    },
+      options);
+    }
 
 
 
@@ -111,37 +93,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUsersControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type usersControllerFindManyV1Response200 = {
-  data: void
-  status: 200
-}
+    export const usersControllerFindManyV1 = (
 
-export type usersControllerFindManyV1ResponseSuccess = (usersControllerFindManyV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerFindManyV1Response = (usersControllerFindManyV1ResponseSuccess)
-
-export const getUsersControllerFindManyV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/users`
-}
-
-export const usersControllerFindManyV1 = async ( options?: RequestInit): Promise<usersControllerFindManyV1Response> => {
-
-  return customInstance<usersControllerFindManyV1Response>(getUsersControllerFindManyV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/users`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -162,7 +124,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerFindManyV1>>> = ({ signal }) => usersControllerFindManyV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerFindManyV1>>> = ({ signal }) => usersControllerFindManyV1(requestOptions, signal);
 
 
 
@@ -217,44 +179,18 @@ export function useUsersControllerFindManyV1<TData = Awaited<ReturnType<typeof u
 
 
 
-export type usersControllerSearchV1Response200 = {
-  data: void
-  status: 200
-}
+export const usersControllerSearchV1 = (
+    params: UsersControllerSearchV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type usersControllerSearchV1ResponseSuccess = (usersControllerSearchV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type usersControllerSearchV1Response = (usersControllerSearchV1ResponseSuccess)
-
-export const getUsersControllerSearchV1Url = (params: UsersControllerSearchV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/users/search`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/users/search?${stringifiedParams}` : `/api/v1/users/search`
-}
-
-export const usersControllerSearchV1 = async (params: UsersControllerSearchV1Params, options?: RequestInit): Promise<usersControllerSearchV1Response> => {
-
-  return customInstance<usersControllerSearchV1Response>(getUsersControllerSearchV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -275,7 +211,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerSearchV1>>> = ({ signal }) => usersControllerSearchV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerSearchV1>>> = ({ signal }) => usersControllerSearchV1(params, requestOptions, signal);
 
 
 
@@ -330,37 +266,17 @@ export function useUsersControllerSearchV1<TData = Awaited<ReturnType<typeof use
 
 
 
-export type usersControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type usersControllerFindOneV1ResponseSuccess = (usersControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerFindOneV1Response = (usersControllerFindOneV1ResponseSuccess)
-
-export const getUsersControllerFindOneV1Url = (id: string,) => {
+export const usersControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/users/${id}`
-}
-
-export const usersControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<usersControllerFindOneV1Response> => {
-
-  return customInstance<usersControllerFindOneV1Response>(getUsersControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/users/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -381,7 +297,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerFindOneV1>>> = ({ signal }) => usersControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerFindOneV1>>> = ({ signal }) => usersControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -436,37 +352,17 @@ export function useUsersControllerFindOneV1<TData = Awaited<ReturnType<typeof us
 
 
 
-export type usersControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type usersControllerUpdateV1ResponseSuccess = (usersControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerUpdateV1Response = (usersControllerUpdateV1ResponseSuccess)
-
-export const getUsersControllerUpdateV1Url = (id: string,) => {
+export const usersControllerUpdateV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/users/${id}`
-}
-
-export const usersControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<usersControllerUpdateV1Response> => {
-
-  return customInstance<usersControllerUpdateV1Response>(getUsersControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/users/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -511,37 +407,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUsersControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type usersControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type usersControllerRemoveV1ResponseSuccess = (usersControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerRemoveV1Response = (usersControllerRemoveV1ResponseSuccess)
-
-export const getUsersControllerRemoveV1Url = (id: string,) => {
+    export const usersControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/users/${id}`
-}
-
-export const usersControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<usersControllerRemoveV1Response> => {
-
-  return customInstance<usersControllerRemoveV1Response>(getUsersControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/users/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

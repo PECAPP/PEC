@@ -36,37 +36,19 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type coursesControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type coursesControllerCreateV1ResponseSuccess = (coursesControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type coursesControllerCreateV1Response = (coursesControllerCreateV1ResponseSuccess)
-
-export const getCoursesControllerCreateV1Url = () => {
+export const coursesControllerCreateV1 = (
+    createCourseDto: CreateCourseDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/courses`
-}
-
-export const coursesControllerCreateV1 = async (createCourseDto: CreateCourseDto, options?: RequestInit): Promise<coursesControllerCreateV1Response> => {
-
-  return customInstance<coursesControllerCreateV1Response>(getCoursesControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createCourseDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/courses`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCourseDto, signal
+    },
+      options);
+    }
 
 
 
@@ -111,37 +93,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCoursesControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type coursesControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+    export const coursesControllerFindAllV1 = (
 
-export type coursesControllerFindAllV1ResponseSuccess = (coursesControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type coursesControllerFindAllV1Response = (coursesControllerFindAllV1ResponseSuccess)
-
-export const getCoursesControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/courses`
-}
-
-export const coursesControllerFindAllV1 = async ( options?: RequestInit): Promise<coursesControllerFindAllV1Response> => {
-
-  return customInstance<coursesControllerFindAllV1Response>(getCoursesControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/courses`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -162,7 +124,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesControllerFindAllV1>>> = ({ signal }) => coursesControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesControllerFindAllV1>>> = ({ signal }) => coursesControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -217,37 +179,17 @@ export function useCoursesControllerFindAllV1<TData = Awaited<ReturnType<typeof 
 
 
 
-export type coursesControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type coursesControllerFindOneV1ResponseSuccess = (coursesControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type coursesControllerFindOneV1Response = (coursesControllerFindOneV1ResponseSuccess)
-
-export const getCoursesControllerFindOneV1Url = (id: string,) => {
+export const coursesControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/courses/${id}`
-}
-
-export const coursesControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<coursesControllerFindOneV1Response> => {
-
-  return customInstance<coursesControllerFindOneV1Response>(getCoursesControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/courses/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -268,7 +210,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesControllerFindOneV1>>> = ({ signal }) => coursesControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesControllerFindOneV1>>> = ({ signal }) => coursesControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -323,38 +265,20 @@ export function useCoursesControllerFindOneV1<TData = Awaited<ReturnType<typeof 
 
 
 
-export type coursesControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type coursesControllerUpdateV1ResponseSuccess = (coursesControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type coursesControllerUpdateV1Response = (coursesControllerUpdateV1ResponseSuccess)
-
-export const getCoursesControllerUpdateV1Url = (id: string,) => {
+export const coursesControllerUpdateV1 = (
+    id: string,
+    updateCourseDto: UpdateCourseDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/courses/${id}`
-}
-
-export const coursesControllerUpdateV1 = async (id: string,
-    updateCourseDto: UpdateCourseDto, options?: RequestInit): Promise<coursesControllerUpdateV1Response> => {
-
-  return customInstance<coursesControllerUpdateV1Response>(getCoursesControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateCourseDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/courses/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCourseDto, signal
+    },
+      options);
+    }
 
 
 
@@ -399,37 +323,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCoursesControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type coursesControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type coursesControllerRemoveV1ResponseSuccess = (coursesControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type coursesControllerRemoveV1Response = (coursesControllerRemoveV1ResponseSuccess)
-
-export const getCoursesControllerRemoveV1Url = (id: string,) => {
+    export const coursesControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/courses/${id}`
-}
-
-export const coursesControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<coursesControllerRemoveV1Response> => {
-
-  return customInstance<coursesControllerRemoveV1Response>(getCoursesControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/courses/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

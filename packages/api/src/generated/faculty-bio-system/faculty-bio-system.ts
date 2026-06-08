@@ -38,37 +38,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type facultyBioSystemControllerGetFullProfileV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerGetFullProfileV1ResponseSuccess = (facultyBioSystemControllerGetFullProfileV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerGetFullProfileV1Response = (facultyBioSystemControllerGetFullProfileV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerGetFullProfileV1Url = (facultyId: string,) => {
+export const facultyBioSystemControllerGetFullProfileV1 = (
+    facultyId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/${facultyId}`
-}
-
-export const facultyBioSystemControllerGetFullProfileV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetFullProfileV1Response> => {
-
-  return customInstance<facultyBioSystemControllerGetFullProfileV1Response>(getFacultyBioSystemControllerGetFullProfileV1Url(facultyId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/${facultyId}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -89,7 +69,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>> = ({ signal }) => facultyBioSystemControllerGetFullProfileV1(facultyId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>> = ({ signal }) => facultyBioSystemControllerGetFullProfileV1(facultyId, requestOptions, signal);
 
 
 
@@ -144,37 +124,17 @@ export function useFacultyBioSystemControllerGetFullProfileV1<TData = Awaited<Re
 
 
 
-export type facultyBioSystemControllerGetPublicationsV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerGetPublicationsV1ResponseSuccess = (facultyBioSystemControllerGetPublicationsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerGetPublicationsV1Response = (facultyBioSystemControllerGetPublicationsV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerGetPublicationsV1Url = (facultyId: string,) => {
+export const facultyBioSystemControllerGetPublicationsV1 = (
+    facultyId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/${facultyId}/publications`
-}
-
-export const facultyBioSystemControllerGetPublicationsV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetPublicationsV1Response> => {
-
-  return customInstance<facultyBioSystemControllerGetPublicationsV1Response>(getFacultyBioSystemControllerGetPublicationsV1Url(facultyId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/${facultyId}/publications`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -195,7 +155,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>> = ({ signal }) => facultyBioSystemControllerGetPublicationsV1(facultyId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>> = ({ signal }) => facultyBioSystemControllerGetPublicationsV1(facultyId, requestOptions, signal);
 
 
 
@@ -250,37 +210,19 @@ export function useFacultyBioSystemControllerGetPublicationsV1<TData = Awaited<R
 
 
 
-export type facultyBioSystemControllerCreatePublicationV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type facultyBioSystemControllerCreatePublicationV1ResponseSuccess = (facultyBioSystemControllerCreatePublicationV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerCreatePublicationV1Response = (facultyBioSystemControllerCreatePublicationV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerCreatePublicationV1Url = () => {
+export const facultyBioSystemControllerCreatePublicationV1 = (
+    createPublicationDto: CreatePublicationDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/publications`
-}
-
-export const facultyBioSystemControllerCreatePublicationV1 = async (createPublicationDto: CreatePublicationDto, options?: RequestInit): Promise<facultyBioSystemControllerCreatePublicationV1Response> => {
-
-  return customInstance<facultyBioSystemControllerCreatePublicationV1Response>(getFacultyBioSystemControllerCreatePublicationV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createPublicationDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/publications`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createPublicationDto, signal
+    },
+      options);
+    }
 
 
 
@@ -325,37 +267,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerCreatePublicationV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerUpdatePublicationV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerUpdatePublicationV1ResponseSuccess = (facultyBioSystemControllerUpdatePublicationV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerUpdatePublicationV1Response = (facultyBioSystemControllerUpdatePublicationV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerUpdatePublicationV1Url = (id: string,) => {
+    export const facultyBioSystemControllerUpdatePublicationV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/publications/${id}`
-}
-
-export const facultyBioSystemControllerUpdatePublicationV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerUpdatePublicationV1Response> => {
-
-  return customInstance<facultyBioSystemControllerUpdatePublicationV1Response>(getFacultyBioSystemControllerUpdatePublicationV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/publications/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -400,37 +322,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerUpdatePublicationV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerDeletePublicationV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerDeletePublicationV1ResponseSuccess = (facultyBioSystemControllerDeletePublicationV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerDeletePublicationV1Response = (facultyBioSystemControllerDeletePublicationV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerDeletePublicationV1Url = (id: string,) => {
+    export const facultyBioSystemControllerDeletePublicationV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/publications/${id}`
-}
-
-export const facultyBioSystemControllerDeletePublicationV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerDeletePublicationV1Response> => {
-
-  return customInstance<facultyBioSystemControllerDeletePublicationV1Response>(getFacultyBioSystemControllerDeletePublicationV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/publications/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -475,37 +377,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerDeletePublicationV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerGetAwardsV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerGetAwardsV1ResponseSuccess = (facultyBioSystemControllerGetAwardsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerGetAwardsV1Response = (facultyBioSystemControllerGetAwardsV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerGetAwardsV1Url = (facultyId: string,) => {
+    export const facultyBioSystemControllerGetAwardsV1 = (
+    facultyId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/${facultyId}/awards`
-}
-
-export const facultyBioSystemControllerGetAwardsV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetAwardsV1Response> => {
-
-  return customInstance<facultyBioSystemControllerGetAwardsV1Response>(getFacultyBioSystemControllerGetAwardsV1Url(facultyId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/${facultyId}/awards`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -526,7 +408,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>> = ({ signal }) => facultyBioSystemControllerGetAwardsV1(facultyId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>> = ({ signal }) => facultyBioSystemControllerGetAwardsV1(facultyId, requestOptions, signal);
 
 
 
@@ -581,37 +463,19 @@ export function useFacultyBioSystemControllerGetAwardsV1<TData = Awaited<ReturnT
 
 
 
-export type facultyBioSystemControllerCreateAwardV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type facultyBioSystemControllerCreateAwardV1ResponseSuccess = (facultyBioSystemControllerCreateAwardV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerCreateAwardV1Response = (facultyBioSystemControllerCreateAwardV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerCreateAwardV1Url = () => {
+export const facultyBioSystemControllerCreateAwardV1 = (
+    createAwardDto: CreateAwardDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/awards`
-}
-
-export const facultyBioSystemControllerCreateAwardV1 = async (createAwardDto: CreateAwardDto, options?: RequestInit): Promise<facultyBioSystemControllerCreateAwardV1Response> => {
-
-  return customInstance<facultyBioSystemControllerCreateAwardV1Response>(getFacultyBioSystemControllerCreateAwardV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createAwardDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/awards`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAwardDto, signal
+    },
+      options);
+    }
 
 
 
@@ -656,37 +520,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerCreateAwardV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerUpdateAwardV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerUpdateAwardV1ResponseSuccess = (facultyBioSystemControllerUpdateAwardV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerUpdateAwardV1Response = (facultyBioSystemControllerUpdateAwardV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerUpdateAwardV1Url = (id: string,) => {
+    export const facultyBioSystemControllerUpdateAwardV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/awards/${id}`
-}
-
-export const facultyBioSystemControllerUpdateAwardV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerUpdateAwardV1Response> => {
-
-  return customInstance<facultyBioSystemControllerUpdateAwardV1Response>(getFacultyBioSystemControllerUpdateAwardV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/awards/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -731,37 +575,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerUpdateAwardV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerDeleteAwardV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerDeleteAwardV1ResponseSuccess = (facultyBioSystemControllerDeleteAwardV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerDeleteAwardV1Response = (facultyBioSystemControllerDeleteAwardV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerDeleteAwardV1Url = (id: string,) => {
+    export const facultyBioSystemControllerDeleteAwardV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/awards/${id}`
-}
-
-export const facultyBioSystemControllerDeleteAwardV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerDeleteAwardV1Response> => {
-
-  return customInstance<facultyBioSystemControllerDeleteAwardV1Response>(getFacultyBioSystemControllerDeleteAwardV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/awards/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -806,37 +630,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerDeleteAwardV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerGetConferencesV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerGetConferencesV1ResponseSuccess = (facultyBioSystemControllerGetConferencesV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerGetConferencesV1Response = (facultyBioSystemControllerGetConferencesV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerGetConferencesV1Url = (facultyId: string,) => {
+    export const facultyBioSystemControllerGetConferencesV1 = (
+    facultyId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/${facultyId}/conferences`
-}
-
-export const facultyBioSystemControllerGetConferencesV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetConferencesV1Response> => {
-
-  return customInstance<facultyBioSystemControllerGetConferencesV1Response>(getFacultyBioSystemControllerGetConferencesV1Url(facultyId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/${facultyId}/conferences`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -857,7 +661,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>> = ({ signal }) => facultyBioSystemControllerGetConferencesV1(facultyId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>> = ({ signal }) => facultyBioSystemControllerGetConferencesV1(facultyId, requestOptions, signal);
 
 
 
@@ -912,37 +716,19 @@ export function useFacultyBioSystemControllerGetConferencesV1<TData = Awaited<Re
 
 
 
-export type facultyBioSystemControllerCreateConferenceV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type facultyBioSystemControllerCreateConferenceV1ResponseSuccess = (facultyBioSystemControllerCreateConferenceV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerCreateConferenceV1Response = (facultyBioSystemControllerCreateConferenceV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerCreateConferenceV1Url = () => {
+export const facultyBioSystemControllerCreateConferenceV1 = (
+    createConferenceDto: CreateConferenceDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/conferences`
-}
-
-export const facultyBioSystemControllerCreateConferenceV1 = async (createConferenceDto: CreateConferenceDto, options?: RequestInit): Promise<facultyBioSystemControllerCreateConferenceV1Response> => {
-
-  return customInstance<facultyBioSystemControllerCreateConferenceV1Response>(getFacultyBioSystemControllerCreateConferenceV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createConferenceDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/conferences`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createConferenceDto, signal
+    },
+      options);
+    }
 
 
 
@@ -987,37 +773,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerCreateConferenceV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerUpdateConferenceV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerUpdateConferenceV1ResponseSuccess = (facultyBioSystemControllerUpdateConferenceV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerUpdateConferenceV1Response = (facultyBioSystemControllerUpdateConferenceV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerUpdateConferenceV1Url = (id: string,) => {
+    export const facultyBioSystemControllerUpdateConferenceV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/conferences/${id}`
-}
-
-export const facultyBioSystemControllerUpdateConferenceV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerUpdateConferenceV1Response> => {
-
-  return customInstance<facultyBioSystemControllerUpdateConferenceV1Response>(getFacultyBioSystemControllerUpdateConferenceV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/conferences/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -1062,37 +828,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerUpdateConferenceV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerDeleteConferenceV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerDeleteConferenceV1ResponseSuccess = (facultyBioSystemControllerDeleteConferenceV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerDeleteConferenceV1Response = (facultyBioSystemControllerDeleteConferenceV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerDeleteConferenceV1Url = (id: string,) => {
+    export const facultyBioSystemControllerDeleteConferenceV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/conferences/${id}`
-}
-
-export const facultyBioSystemControllerDeleteConferenceV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerDeleteConferenceV1Response> => {
-
-  return customInstance<facultyBioSystemControllerDeleteConferenceV1Response>(getFacultyBioSystemControllerDeleteConferenceV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/conferences/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -1137,37 +883,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerDeleteConferenceV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerGetConsultationsV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerGetConsultationsV1ResponseSuccess = (facultyBioSystemControllerGetConsultationsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerGetConsultationsV1Response = (facultyBioSystemControllerGetConsultationsV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerGetConsultationsV1Url = (facultyId: string,) => {
+    export const facultyBioSystemControllerGetConsultationsV1 = (
+    facultyId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/${facultyId}/consultations`
-}
-
-export const facultyBioSystemControllerGetConsultationsV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetConsultationsV1Response> => {
-
-  return customInstance<facultyBioSystemControllerGetConsultationsV1Response>(getFacultyBioSystemControllerGetConsultationsV1Url(facultyId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/${facultyId}/consultations`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -1188,7 +914,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>> = ({ signal }) => facultyBioSystemControllerGetConsultationsV1(facultyId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>> = ({ signal }) => facultyBioSystemControllerGetConsultationsV1(facultyId, requestOptions, signal);
 
 
 
@@ -1243,37 +969,19 @@ export function useFacultyBioSystemControllerGetConsultationsV1<TData = Awaited<
 
 
 
-export type facultyBioSystemControllerCreateConsultationV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type facultyBioSystemControllerCreateConsultationV1ResponseSuccess = (facultyBioSystemControllerCreateConsultationV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerCreateConsultationV1Response = (facultyBioSystemControllerCreateConsultationV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerCreateConsultationV1Url = () => {
+export const facultyBioSystemControllerCreateConsultationV1 = (
+    createConsultationDto: CreateConsultationDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/consultations`
-}
-
-export const facultyBioSystemControllerCreateConsultationV1 = async (createConsultationDto: CreateConsultationDto, options?: RequestInit): Promise<facultyBioSystemControllerCreateConsultationV1Response> => {
-
-  return customInstance<facultyBioSystemControllerCreateConsultationV1Response>(getFacultyBioSystemControllerCreateConsultationV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createConsultationDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/consultations`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createConsultationDto, signal
+    },
+      options);
+    }
 
 
 
@@ -1318,37 +1026,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerCreateConsultationV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerUpdateConsultationV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerUpdateConsultationV1ResponseSuccess = (facultyBioSystemControllerUpdateConsultationV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerUpdateConsultationV1Response = (facultyBioSystemControllerUpdateConsultationV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerUpdateConsultationV1Url = (id: string,) => {
+    export const facultyBioSystemControllerUpdateConsultationV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/consultations/${id}`
-}
-
-export const facultyBioSystemControllerUpdateConsultationV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerUpdateConsultationV1Response> => {
-
-  return customInstance<facultyBioSystemControllerUpdateConsultationV1Response>(getFacultyBioSystemControllerUpdateConsultationV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/consultations/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -1393,37 +1081,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerUpdateConsultationV1MutationOptions(options), queryClient);
     }
-    export type facultyBioSystemControllerDeleteConsultationV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type facultyBioSystemControllerDeleteConsultationV1ResponseSuccess = (facultyBioSystemControllerDeleteConsultationV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type facultyBioSystemControllerDeleteConsultationV1Response = (facultyBioSystemControllerDeleteConsultationV1ResponseSuccess)
-
-export const getFacultyBioSystemControllerDeleteConsultationV1Url = (id: string,) => {
+    export const facultyBioSystemControllerDeleteConsultationV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/faculty-bio-system/consultations/${id}`
-}
-
-export const facultyBioSystemControllerDeleteConsultationV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerDeleteConsultationV1Response> => {
-
-  return customInstance<facultyBioSystemControllerDeleteConsultationV1Response>(getFacultyBioSystemControllerDeleteConsultationV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/faculty-bio-system/consultations/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

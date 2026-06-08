@@ -42,3 +42,15 @@ export interface PlacementSettings {
   updatedAt: any;
   updatedBy: string;
 }
+
+export interface DashboardStats {
+  totalStudents: number;
+  totalFaculty: number;
+  totalCourses: number;
+}
+
+export interface AdminDashboardData {
+  courses: any[];
+  users: any[];
+  stats: DashboardStats;
+}

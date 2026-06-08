@@ -5,11 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { UpdateAttendanceDtoDate } from './updateAttendanceDtoDate';
-import type { UpdateAttendanceDtoStatus } from './updateAttendanceDtoStatus';
 
-export interface UpdateAttendanceDto {
-  status?: UpdateAttendanceDtoStatus;
-  date?: UpdateAttendanceDtoDate;
-  remarks?: string;
-}
+export interface UpdateAttendanceDto { [key: string]: unknown }

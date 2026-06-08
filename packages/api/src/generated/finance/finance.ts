@@ -37,44 +37,18 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type financeControllerGetSummaryV1Response200 = {
-  data: void
-  status: 200
-}
+export const financeControllerGetSummaryV1 = (
+    params: FinanceControllerGetSummaryV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type financeControllerGetSummaryV1ResponseSuccess = (financeControllerGetSummaryV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type financeControllerGetSummaryV1Response = (financeControllerGetSummaryV1ResponseSuccess)
-
-export const getFinanceControllerGetSummaryV1Url = (params: FinanceControllerGetSummaryV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/finance/summary`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/finance/summary?${stringifiedParams}` : `/api/v1/finance/summary`
-}
-
-export const financeControllerGetSummaryV1 = async (params: FinanceControllerGetSummaryV1Params, options?: RequestInit): Promise<financeControllerGetSummaryV1Response> => {
-
-  return customInstance<financeControllerGetSummaryV1Response>(getFinanceControllerGetSummaryV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -95,7 +69,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>> = ({ signal }) => financeControllerGetSummaryV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>> = ({ signal }) => financeControllerGetSummaryV1(params, requestOptions, signal);
 
 
 
@@ -150,37 +124,17 @@ export function useFinanceControllerGetSummaryV1<TData = Awaited<ReturnType<type
 
 
 
-export type financeControllerGetFeesV1Response200 = {
-  data: void
-  status: 200
-}
+export const financeControllerGetFeesV1 = (
 
-export type financeControllerGetFeesV1ResponseSuccess = (financeControllerGetFeesV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerGetFeesV1Response = (financeControllerGetFeesV1ResponseSuccess)
-
-export const getFinanceControllerGetFeesV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/fees`
-}
-
-export const financeControllerGetFeesV1 = async ( options?: RequestInit): Promise<financeControllerGetFeesV1Response> => {
-
-  return customInstance<financeControllerGetFeesV1Response>(getFinanceControllerGetFeesV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/fees`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -201,7 +155,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetFeesV1>>> = ({ signal }) => financeControllerGetFeesV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetFeesV1>>> = ({ signal }) => financeControllerGetFeesV1(requestOptions, signal);
 
 
 
@@ -256,37 +210,19 @@ export function useFinanceControllerGetFeesV1<TData = Awaited<ReturnType<typeof 
 
 
 
-export type financeControllerCreateFeeV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type financeControllerCreateFeeV1ResponseSuccess = (financeControllerCreateFeeV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerCreateFeeV1Response = (financeControllerCreateFeeV1ResponseSuccess)
-
-export const getFinanceControllerCreateFeeV1Url = () => {
+export const financeControllerCreateFeeV1 = (
+    createFeeDto: CreateFeeDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/fees`
-}
-
-export const financeControllerCreateFeeV1 = async (createFeeDto: CreateFeeDto, options?: RequestInit): Promise<financeControllerCreateFeeV1Response> => {
-
-  return customInstance<financeControllerCreateFeeV1Response>(getFinanceControllerCreateFeeV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createFeeDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/fees`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createFeeDto, signal
+    },
+      options);
+    }
 
 
 
@@ -331,37 +267,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFinanceControllerCreateFeeV1MutationOptions(options), queryClient);
     }
-    export type financeControllerUpdateFeeV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type financeControllerUpdateFeeV1ResponseSuccess = (financeControllerUpdateFeeV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerUpdateFeeV1Response = (financeControllerUpdateFeeV1ResponseSuccess)
-
-export const getFinanceControllerUpdateFeeV1Url = (id: string,) => {
+    export const financeControllerUpdateFeeV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/fees/${id}`
-}
-
-export const financeControllerUpdateFeeV1 = async (id: string, options?: RequestInit): Promise<financeControllerUpdateFeeV1Response> => {
-
-  return customInstance<financeControllerUpdateFeeV1Response>(getFinanceControllerUpdateFeeV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/fees/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -406,37 +322,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFinanceControllerUpdateFeeV1MutationOptions(options), queryClient);
     }
-    export type financeControllerDeleteFeeV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type financeControllerDeleteFeeV1ResponseSuccess = (financeControllerDeleteFeeV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerDeleteFeeV1Response = (financeControllerDeleteFeeV1ResponseSuccess)
-
-export const getFinanceControllerDeleteFeeV1Url = (id: string,) => {
+    export const financeControllerDeleteFeeV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/fees/${id}`
-}
-
-export const financeControllerDeleteFeeV1 = async (id: string, options?: RequestInit): Promise<financeControllerDeleteFeeV1Response> => {
-
-  return customInstance<financeControllerDeleteFeeV1Response>(getFinanceControllerDeleteFeeV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/fees/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -481,37 +377,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFinanceControllerDeleteFeeV1MutationOptions(options), queryClient);
     }
-    export type financeControllerBulkMonthlyV1Response201 = {
-  data: void
-  status: 201
-}
+    export const financeControllerBulkMonthlyV1 = (
 
-export type financeControllerBulkMonthlyV1ResponseSuccess = (financeControllerBulkMonthlyV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerBulkMonthlyV1Response = (financeControllerBulkMonthlyV1ResponseSuccess)
-
-export const getFinanceControllerBulkMonthlyV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/fees/bulk-monthly`
-}
-
-export const financeControllerBulkMonthlyV1 = async ( options?: RequestInit): Promise<financeControllerBulkMonthlyV1Response> => {
-
-  return customInstance<financeControllerBulkMonthlyV1Response>(getFinanceControllerBulkMonthlyV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/fees/bulk-monthly`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -556,37 +432,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFinanceControllerBulkMonthlyV1MutationOptions(options), queryClient);
     }
-    export type financeControllerPayFeeV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type financeControllerPayFeeV1ResponseSuccess = (financeControllerPayFeeV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerPayFeeV1Response = (financeControllerPayFeeV1ResponseSuccess)
-
-export const getFinanceControllerPayFeeV1Url = () => {
+    export const financeControllerPayFeeV1 = (
+    payFeeDto: PayFeeDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/pay`
-}
-
-export const financeControllerPayFeeV1 = async (payFeeDto: PayFeeDto, options?: RequestInit): Promise<financeControllerPayFeeV1Response> => {
-
-  return customInstance<financeControllerPayFeeV1Response>(getFinanceControllerPayFeeV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(payFeeDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/pay`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: payFeeDto, signal
+    },
+      options);
+    }
 
 
 
@@ -631,37 +489,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFinanceControllerPayFeeV1MutationOptions(options), queryClient);
     }
-    export type financeControllerMarkPaidV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type financeControllerMarkPaidV1ResponseSuccess = (financeControllerMarkPaidV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerMarkPaidV1Response = (financeControllerMarkPaidV1ResponseSuccess)
-
-export const getFinanceControllerMarkPaidV1Url = (id: string,) => {
+    export const financeControllerMarkPaidV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/fees/${id}/mark-paid`
-}
-
-export const financeControllerMarkPaidV1 = async (id: string, options?: RequestInit): Promise<financeControllerMarkPaidV1Response> => {
-
-  return customInstance<financeControllerMarkPaidV1Response>(getFinanceControllerMarkPaidV1Url(id),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/fees/${id}/mark-paid`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -706,37 +544,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFinanceControllerMarkPaidV1MutationOptions(options), queryClient);
     }
-    export type financeControllerGetTransactionsV1Response200 = {
-  data: void
-  status: 200
-}
+    export const financeControllerGetTransactionsV1 = (
 
-export type financeControllerGetTransactionsV1ResponseSuccess = (financeControllerGetTransactionsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerGetTransactionsV1Response = (financeControllerGetTransactionsV1ResponseSuccess)
-
-export const getFinanceControllerGetTransactionsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/transactions`
-}
-
-export const financeControllerGetTransactionsV1 = async ( options?: RequestInit): Promise<financeControllerGetTransactionsV1Response> => {
-
-  return customInstance<financeControllerGetTransactionsV1Response>(getFinanceControllerGetTransactionsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/transactions`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -757,7 +575,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>> = ({ signal }) => financeControllerGetTransactionsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>> = ({ signal }) => financeControllerGetTransactionsV1(requestOptions, signal);
 
 
 
@@ -812,37 +630,17 @@ export function useFinanceControllerGetTransactionsV1<TData = Awaited<ReturnType
 
 
 
-export type financeControllerGetTransactionV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type financeControllerGetTransactionV1ResponseSuccess = (financeControllerGetTransactionV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type financeControllerGetTransactionV1Response = (financeControllerGetTransactionV1ResponseSuccess)
-
-export const getFinanceControllerGetTransactionV1Url = (id: string,) => {
+export const financeControllerGetTransactionV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/finance/transactions/${id}`
-}
-
-export const financeControllerGetTransactionV1 = async (id: string, options?: RequestInit): Promise<financeControllerGetTransactionV1Response> => {
-
-  return customInstance<financeControllerGetTransactionV1Response>(getFinanceControllerGetTransactionV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/finance/transactions/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -863,7 +661,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>> = ({ signal }) => financeControllerGetTransactionV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>> = ({ signal }) => financeControllerGetTransactionV1(id, requestOptions, signal);
 
 
 

@@ -31,37 +31,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type collegeSettingsControllerGetSettingsV1Response200 = {
-  data: void
-  status: 200
-}
+export const collegeSettingsControllerGetSettingsV1 = (
 
-export type collegeSettingsControllerGetSettingsV1ResponseSuccess = (collegeSettingsControllerGetSettingsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type collegeSettingsControllerGetSettingsV1Response = (collegeSettingsControllerGetSettingsV1ResponseSuccess)
-
-export const getCollegeSettingsControllerGetSettingsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/college-settings`
-}
-
-export const collegeSettingsControllerGetSettingsV1 = async ( options?: RequestInit): Promise<collegeSettingsControllerGetSettingsV1Response> => {
-
-  return customInstance<collegeSettingsControllerGetSettingsV1Response>(getCollegeSettingsControllerGetSettingsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/college-settings`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -82,7 +62,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>> = ({ signal }) => collegeSettingsControllerGetSettingsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>> = ({ signal }) => collegeSettingsControllerGetSettingsV1(requestOptions, signal);
 
 
 
@@ -137,37 +117,17 @@ export function useCollegeSettingsControllerGetSettingsV1<TData = Awaited<Return
 
 
 
-export type collegeSettingsControllerUpdateSettingsV1Response200 = {
-  data: void
-  status: 200
-}
+export const collegeSettingsControllerUpdateSettingsV1 = (
 
-export type collegeSettingsControllerUpdateSettingsV1ResponseSuccess = (collegeSettingsControllerUpdateSettingsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type collegeSettingsControllerUpdateSettingsV1Response = (collegeSettingsControllerUpdateSettingsV1ResponseSuccess)
-
-export const getCollegeSettingsControllerUpdateSettingsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/college-settings`
-}
-
-export const collegeSettingsControllerUpdateSettingsV1 = async ( options?: RequestInit): Promise<collegeSettingsControllerUpdateSettingsV1Response> => {
-
-  return customInstance<collegeSettingsControllerUpdateSettingsV1Response>(getCollegeSettingsControllerUpdateSettingsV1Url(),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/college-settings`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 

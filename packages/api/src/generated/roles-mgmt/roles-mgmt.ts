@@ -31,37 +31,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type rolesMgmtControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
+export const rolesMgmtControllerCreateV1 = (
 
-export type rolesMgmtControllerCreateV1ResponseSuccess = (rolesMgmtControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type rolesMgmtControllerCreateV1Response = (rolesMgmtControllerCreateV1ResponseSuccess)
-
-export const getRolesMgmtControllerCreateV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/roles`
-}
-
-export const rolesMgmtControllerCreateV1 = async ( options?: RequestInit): Promise<rolesMgmtControllerCreateV1Response> => {
-
-  return customInstance<rolesMgmtControllerCreateV1Response>(getRolesMgmtControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/roles`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -106,37 +86,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRolesMgmtControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type rolesMgmtControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+    export const rolesMgmtControllerFindAllV1 = (
 
-export type rolesMgmtControllerFindAllV1ResponseSuccess = (rolesMgmtControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type rolesMgmtControllerFindAllV1Response = (rolesMgmtControllerFindAllV1ResponseSuccess)
-
-export const getRolesMgmtControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/roles`
-}
-
-export const rolesMgmtControllerFindAllV1 = async ( options?: RequestInit): Promise<rolesMgmtControllerFindAllV1Response> => {
-
-  return customInstance<rolesMgmtControllerFindAllV1Response>(getRolesMgmtControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/roles`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -157,7 +117,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>> = ({ signal }) => rolesMgmtControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>> = ({ signal }) => rolesMgmtControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -212,37 +172,17 @@ export function useRolesMgmtControllerFindAllV1<TData = Awaited<ReturnType<typeo
 
 
 
-export type rolesMgmtControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type rolesMgmtControllerFindOneV1ResponseSuccess = (rolesMgmtControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type rolesMgmtControllerFindOneV1Response = (rolesMgmtControllerFindOneV1ResponseSuccess)
-
-export const getRolesMgmtControllerFindOneV1Url = (id: string,) => {
+export const rolesMgmtControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/roles/${id}`
-}
-
-export const rolesMgmtControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<rolesMgmtControllerFindOneV1Response> => {
-
-  return customInstance<rolesMgmtControllerFindOneV1Response>(getRolesMgmtControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/roles/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -263,7 +203,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>> = ({ signal }) => rolesMgmtControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>> = ({ signal }) => rolesMgmtControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -318,37 +258,17 @@ export function useRolesMgmtControllerFindOneV1<TData = Awaited<ReturnType<typeo
 
 
 
-export type rolesMgmtControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type rolesMgmtControllerUpdateV1ResponseSuccess = (rolesMgmtControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type rolesMgmtControllerUpdateV1Response = (rolesMgmtControllerUpdateV1ResponseSuccess)
-
-export const getRolesMgmtControllerUpdateV1Url = (id: string,) => {
+export const rolesMgmtControllerUpdateV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/roles/${id}`
-}
-
-export const rolesMgmtControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<rolesMgmtControllerUpdateV1Response> => {
-
-  return customInstance<rolesMgmtControllerUpdateV1Response>(getRolesMgmtControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/roles/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -393,37 +313,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRolesMgmtControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type rolesMgmtControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type rolesMgmtControllerRemoveV1ResponseSuccess = (rolesMgmtControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type rolesMgmtControllerRemoveV1Response = (rolesMgmtControllerRemoveV1ResponseSuccess)
-
-export const getRolesMgmtControllerRemoveV1Url = (id: string,) => {
+    export const rolesMgmtControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/roles/${id}`
-}
-
-export const rolesMgmtControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<rolesMgmtControllerRemoveV1Response> => {
-
-  return customInstance<rolesMgmtControllerRemoveV1Response>(getRolesMgmtControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/roles/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

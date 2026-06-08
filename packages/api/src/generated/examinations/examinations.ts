@@ -35,37 +35,19 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type examinationsControllerCreateScheduleV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type examinationsControllerCreateScheduleV1ResponseSuccess = (examinationsControllerCreateScheduleV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type examinationsControllerCreateScheduleV1Response = (examinationsControllerCreateScheduleV1ResponseSuccess)
-
-export const getExaminationsControllerCreateScheduleV1Url = () => {
+export const examinationsControllerCreateScheduleV1 = (
+    createExamScheduleDto: CreateExamScheduleDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/examinations/schedules`
-}
-
-export const examinationsControllerCreateScheduleV1 = async (createExamScheduleDto: CreateExamScheduleDto, options?: RequestInit): Promise<examinationsControllerCreateScheduleV1Response> => {
-
-  return customInstance<examinationsControllerCreateScheduleV1Response>(getExaminationsControllerCreateScheduleV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createExamScheduleDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/examinations/schedules`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createExamScheduleDto, signal
+    },
+      options);
+    }
 
 
 
@@ -110,37 +92,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getExaminationsControllerCreateScheduleV1MutationOptions(options), queryClient);
     }
-    export type examinationsControllerListSchedulesV1Response200 = {
-  data: void
-  status: 200
-}
+    export const examinationsControllerListSchedulesV1 = (
 
-export type examinationsControllerListSchedulesV1ResponseSuccess = (examinationsControllerListSchedulesV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type examinationsControllerListSchedulesV1Response = (examinationsControllerListSchedulesV1ResponseSuccess)
-
-export const getExaminationsControllerListSchedulesV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/examinations/schedules`
-}
-
-export const examinationsControllerListSchedulesV1 = async ( options?: RequestInit): Promise<examinationsControllerListSchedulesV1Response> => {
-
-  return customInstance<examinationsControllerListSchedulesV1Response>(getExaminationsControllerListSchedulesV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/examinations/schedules`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -161,7 +123,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>> = ({ signal }) => examinationsControllerListSchedulesV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>> = ({ signal }) => examinationsControllerListSchedulesV1(requestOptions, signal);
 
 
 
@@ -216,37 +178,17 @@ export function useExaminationsControllerListSchedulesV1<TData = Awaited<ReturnT
 
 
 
-export type examinationsControllerDeleteScheduleV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type examinationsControllerDeleteScheduleV1ResponseSuccess = (examinationsControllerDeleteScheduleV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type examinationsControllerDeleteScheduleV1Response = (examinationsControllerDeleteScheduleV1ResponseSuccess)
-
-export const getExaminationsControllerDeleteScheduleV1Url = (id: string,) => {
+export const examinationsControllerDeleteScheduleV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/examinations/schedules/${id}`
-}
-
-export const examinationsControllerDeleteScheduleV1 = async (id: string, options?: RequestInit): Promise<examinationsControllerDeleteScheduleV1Response> => {
-
-  return customInstance<examinationsControllerDeleteScheduleV1Response>(getExaminationsControllerDeleteScheduleV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/examinations/schedules/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

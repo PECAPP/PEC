@@ -42,37 +42,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type chatControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+export const chatControllerFindAllV1 = (
 
-export type chatControllerFindAllV1ResponseSuccess = (chatControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerFindAllV1Response = (chatControllerFindAllV1ResponseSuccess)
-
-export const getChatControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/rooms`
-}
-
-export const chatControllerFindAllV1 = async ( options?: RequestInit): Promise<chatControllerFindAllV1Response> => {
-
-  return customInstance<chatControllerFindAllV1Response>(getChatControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/rooms`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -93,7 +73,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerFindAllV1>>> = ({ signal }) => chatControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerFindAllV1>>> = ({ signal }) => chatControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -148,46 +128,19 @@ export function useChatControllerFindAllV1<TData = Awaited<ReturnType<typeof cha
 
 
 
-export type chatControllerFindMessagesV1Response200 = {
-  data: void
-  status: 200
-}
+export const chatControllerFindMessagesV1 = (
+    roomId: string,
+    params: ChatControllerFindMessagesV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type chatControllerFindMessagesV1ResponseSuccess = (chatControllerFindMessagesV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type chatControllerFindMessagesV1Response = (chatControllerFindMessagesV1ResponseSuccess)
-
-export const getChatControllerFindMessagesV1Url = (roomId: string,
-    params: ChatControllerFindMessagesV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/chat/messages/${roomId}`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/chat/messages/${roomId}?${stringifiedParams}` : `/api/v1/chat/messages/${roomId}`
-}
-
-export const chatControllerFindMessagesV1 = async (roomId: string,
-    params: ChatControllerFindMessagesV1Params, options?: RequestInit): Promise<chatControllerFindMessagesV1Response> => {
-
-  return customInstance<chatControllerFindMessagesV1Response>(getChatControllerFindMessagesV1Url(roomId,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -210,7 +163,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>> = ({ signal }) => chatControllerFindMessagesV1(roomId,params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>> = ({ signal }) => chatControllerFindMessagesV1(roomId,params, requestOptions, signal);
 
 
 
@@ -269,44 +222,18 @@ export function useChatControllerFindMessagesV1<TData = Awaited<ReturnType<typeo
 
 
 
-export type chatControllerGetChatUsersV1Response200 = {
-  data: void
-  status: 200
-}
+export const chatControllerGetChatUsersV1 = (
+    params: ChatControllerGetChatUsersV1Params,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
-export type chatControllerGetChatUsersV1ResponseSuccess = (chatControllerGetChatUsersV1Response200) & {
-  headers: Headers;
-};
-;
 
-export type chatControllerGetChatUsersV1Response = (chatControllerGetChatUsersV1ResponseSuccess)
-
-export const getChatControllerGetChatUsersV1Url = (params: ChatControllerGetChatUsersV1Params,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      return customInstance<void>(
+      {url: `/api/v1/chat/users`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/chat/users?${stringifiedParams}` : `/api/v1/chat/users`
-}
-
-export const chatControllerGetChatUsersV1 = async (params: ChatControllerGetChatUsersV1Params, options?: RequestInit): Promise<chatControllerGetChatUsersV1Response> => {
-
-  return customInstance<chatControllerGetChatUsersV1Response>(getChatControllerGetChatUsersV1Url(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
 
 
 
@@ -327,7 +254,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>> = ({ signal }) => chatControllerGetChatUsersV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>> = ({ signal }) => chatControllerGetChatUsersV1(params, requestOptions, signal);
 
 
 
@@ -382,37 +309,19 @@ export function useChatControllerGetChatUsersV1<TData = Awaited<ReturnType<typeo
 
 
 
-export type chatControllerCreateRoomV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type chatControllerCreateRoomV1ResponseSuccess = (chatControllerCreateRoomV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerCreateRoomV1Response = (chatControllerCreateRoomV1ResponseSuccess)
-
-export const getChatControllerCreateRoomV1Url = () => {
+export const chatControllerCreateRoomV1 = (
+    createRoomDto: CreateRoomDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/room`
-}
-
-export const chatControllerCreateRoomV1 = async (createRoomDto: CreateRoomDto, options?: RequestInit): Promise<chatControllerCreateRoomV1Response> => {
-
-  return customInstance<chatControllerCreateRoomV1Response>(getChatControllerCreateRoomV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createRoomDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/room`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createRoomDto, signal
+    },
+      options);
+    }
 
 
 
@@ -457,37 +366,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getChatControllerCreateRoomV1MutationOptions(options), queryClient);
     }
-    export type chatControllerSendMessageV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type chatControllerSendMessageV1ResponseSuccess = (chatControllerSendMessageV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerSendMessageV1Response = (chatControllerSendMessageV1ResponseSuccess)
-
-export const getChatControllerSendMessageV1Url = () => {
+    export const chatControllerSendMessageV1 = (
+    sendMessageDto: SendMessageDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/message`
-}
-
-export const chatControllerSendMessageV1 = async (sendMessageDto: SendMessageDto, options?: RequestInit): Promise<chatControllerSendMessageV1Response> => {
-
-  return customInstance<chatControllerSendMessageV1Response>(getChatControllerSendMessageV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(sendMessageDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/message`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: sendMessageDto, signal
+    },
+      options);
+    }
 
 
 
@@ -532,37 +423,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getChatControllerSendMessageV1MutationOptions(options), queryClient);
     }
-    export type chatControllerRemoveMessageV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type chatControllerRemoveMessageV1ResponseSuccess = (chatControllerRemoveMessageV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerRemoveMessageV1Response = (chatControllerRemoveMessageV1ResponseSuccess)
-
-export const getChatControllerRemoveMessageV1Url = (id: string,) => {
+    export const chatControllerRemoveMessageV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/message/${id}`
-}
-
-export const chatControllerRemoveMessageV1 = async (id: string, options?: RequestInit): Promise<chatControllerRemoveMessageV1Response> => {
-
-  return customInstance<chatControllerRemoveMessageV1Response>(getChatControllerRemoveMessageV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/message/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -607,37 +478,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getChatControllerRemoveMessageV1MutationOptions(options), queryClient);
     }
-    export type chatControllerListClubsV1Response200 = {
-  data: void
-  status: 200
-}
+    export const chatControllerListClubsV1 = (
 
-export type chatControllerListClubsV1ResponseSuccess = (chatControllerListClubsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerListClubsV1Response = (chatControllerListClubsV1ResponseSuccess)
-
-export const getChatControllerListClubsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/clubs`
-}
-
-export const chatControllerListClubsV1 = async ( options?: RequestInit): Promise<chatControllerListClubsV1Response> => {
-
-  return customInstance<chatControllerListClubsV1Response>(getChatControllerListClubsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/clubs`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -658,7 +509,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListClubsV1>>> = ({ signal }) => chatControllerListClubsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListClubsV1>>> = ({ signal }) => chatControllerListClubsV1(requestOptions, signal);
 
 
 
@@ -713,37 +564,19 @@ export function useChatControllerListClubsV1<TData = Awaited<ReturnType<typeof c
 
 
 
-export type chatControllerCreateClubV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type chatControllerCreateClubV1ResponseSuccess = (chatControllerCreateClubV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerCreateClubV1Response = (chatControllerCreateClubV1ResponseSuccess)
-
-export const getChatControllerCreateClubV1Url = () => {
+export const chatControllerCreateClubV1 = (
+    createClubDto: CreateClubDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/clubs`
-}
-
-export const chatControllerCreateClubV1 = async (createClubDto: CreateClubDto, options?: RequestInit): Promise<chatControllerCreateClubV1Response> => {
-
-  return customInstance<chatControllerCreateClubV1Response>(getChatControllerCreateClubV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createClubDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/clubs`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createClubDto, signal
+    },
+      options);
+    }
 
 
 
@@ -788,38 +621,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getChatControllerCreateClubV1MutationOptions(options), queryClient);
     }
-    export type chatControllerSubmitClubJoinRequestV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type chatControllerSubmitClubJoinRequestV1ResponseSuccess = (chatControllerSubmitClubJoinRequestV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerSubmitClubJoinRequestV1Response = (chatControllerSubmitClubJoinRequestV1ResponseSuccess)
-
-export const getChatControllerSubmitClubJoinRequestV1Url = (id: string,) => {
+    export const chatControllerSubmitClubJoinRequestV1 = (
+    id: string,
+    clubJoinRequestDto: ClubJoinRequestDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/clubs/${id}/join-request`
-}
-
-export const chatControllerSubmitClubJoinRequestV1 = async (id: string,
-    clubJoinRequestDto: ClubJoinRequestDto, options?: RequestInit): Promise<chatControllerSubmitClubJoinRequestV1Response> => {
-
-  return customInstance<chatControllerSubmitClubJoinRequestV1Response>(getChatControllerSubmitClubJoinRequestV1Url(id),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(clubJoinRequestDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/clubs/${id}/join-request`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: clubJoinRequestDto, signal
+    },
+      options);
+    }
 
 
 
@@ -864,37 +679,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getChatControllerSubmitClubJoinRequestV1MutationOptions(options), queryClient);
     }
-    export type chatControllerListClubJoinRequestsV1Response200 = {
-  data: void
-  status: 200
-}
+    export const chatControllerListClubJoinRequestsV1 = (
 
-export type chatControllerListClubJoinRequestsV1ResponseSuccess = (chatControllerListClubJoinRequestsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerListClubJoinRequestsV1Response = (chatControllerListClubJoinRequestsV1ResponseSuccess)
-
-export const getChatControllerListClubJoinRequestsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/clubs/requests`
-}
-
-export const chatControllerListClubJoinRequestsV1 = async ( options?: RequestInit): Promise<chatControllerListClubJoinRequestsV1Response> => {
-
-  return customInstance<chatControllerListClubJoinRequestsV1Response>(getChatControllerListClubJoinRequestsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/clubs/requests`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -915,7 +710,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>> = ({ signal }) => chatControllerListClubJoinRequestsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>> = ({ signal }) => chatControllerListClubJoinRequestsV1(requestOptions, signal);
 
 
 
@@ -970,38 +765,20 @@ export function useChatControllerListClubJoinRequestsV1<TData = Awaited<ReturnTy
 
 
 
-export type chatControllerReviewClubJoinRequestV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type chatControllerReviewClubJoinRequestV1ResponseSuccess = (chatControllerReviewClubJoinRequestV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerReviewClubJoinRequestV1Response = (chatControllerReviewClubJoinRequestV1ResponseSuccess)
-
-export const getChatControllerReviewClubJoinRequestV1Url = (requestId: string,) => {
+export const chatControllerReviewClubJoinRequestV1 = (
+    requestId: string,
+    clubJoinRequestDecisionDto: ClubJoinRequestDecisionDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/clubs/requests/${requestId}`
-}
-
-export const chatControllerReviewClubJoinRequestV1 = async (requestId: string,
-    clubJoinRequestDecisionDto: ClubJoinRequestDecisionDto, options?: RequestInit): Promise<chatControllerReviewClubJoinRequestV1Response> => {
-
-  return customInstance<chatControllerReviewClubJoinRequestV1Response>(getChatControllerReviewClubJoinRequestV1Url(requestId),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(clubJoinRequestDecisionDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/clubs/requests/${requestId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: clubJoinRequestDecisionDto, signal
+    },
+      options);
+    }
 
 
 
@@ -1046,38 +823,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getChatControllerReviewClubJoinRequestV1MutationOptions(options), queryClient);
     }
-    export type chatControllerPostToClubV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type chatControllerPostToClubV1ResponseSuccess = (chatControllerPostToClubV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerPostToClubV1Response = (chatControllerPostToClubV1ResponseSuccess)
-
-export const getChatControllerPostToClubV1Url = (id: string,) => {
+    export const chatControllerPostToClubV1 = (
+    id: string,
+    postClubMessageDto: PostClubMessageDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/chat/clubs/${id}/post`
-}
-
-export const chatControllerPostToClubV1 = async (id: string,
-    postClubMessageDto: PostClubMessageDto, options?: RequestInit): Promise<chatControllerPostToClubV1Response> => {
-
-  return customInstance<chatControllerPostToClubV1Response>(getChatControllerPostToClubV1Url(id),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(postClubMessageDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/chat/clubs/${id}/post`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postClubMessageDto, signal
+    },
+      options);
+    }
 
 
 

@@ -5,19 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { CreateTimetableDtoDay } from './createTimetableDtoDay';
 
-export interface CreateTimetableDto {
-  courseId?: string;
-  courseName: string;
-  courseCode: string;
-  facultyId?: string;
-  facultyName?: string;
-  day: CreateTimetableDtoDay;
-  startTime: string;
-  endTime: string;
-  room: string;
-  department?: string;
-  semester?: number;
-  batch?: string;
-}
+export interface CreateTimetableDto { [key: string]: unknown }

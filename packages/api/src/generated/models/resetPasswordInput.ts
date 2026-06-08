@@ -6,12 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface ResetPasswordInput {
-  /** Password reset token */
-  token: string;
-  /**
-     * New password
-     * @minLength 8
-     */
-  password: string;
-}
+export interface ResetPasswordInput { [key: string]: unknown }

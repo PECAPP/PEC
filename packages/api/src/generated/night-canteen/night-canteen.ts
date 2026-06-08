@@ -38,37 +38,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type nightCanteenControllerListItemsV1Response200 = {
-  data: void
-  status: 200
-}
+export const nightCanteenControllerListItemsV1 = (
 
-export type nightCanteenControllerListItemsV1ResponseSuccess = (nightCanteenControllerListItemsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerListItemsV1Response = (nightCanteenControllerListItemsV1ResponseSuccess)
-
-export const getNightCanteenControllerListItemsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/items`
-}
-
-export const nightCanteenControllerListItemsV1 = async ( options?: RequestInit): Promise<nightCanteenControllerListItemsV1Response> => {
-
-  return customInstance<nightCanteenControllerListItemsV1Response>(getNightCanteenControllerListItemsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/items`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -89,7 +69,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>> = ({ signal }) => nightCanteenControllerListItemsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>> = ({ signal }) => nightCanteenControllerListItemsV1(requestOptions, signal);
 
 
 
@@ -144,37 +124,19 @@ export function useNightCanteenControllerListItemsV1<TData = Awaited<ReturnType<
 
 
 
-export type nightCanteenControllerCreateItemV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type nightCanteenControllerCreateItemV1ResponseSuccess = (nightCanteenControllerCreateItemV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerCreateItemV1Response = (nightCanteenControllerCreateItemV1ResponseSuccess)
-
-export const getNightCanteenControllerCreateItemV1Url = () => {
+export const nightCanteenControllerCreateItemV1 = (
+    createCanteenItemDto: CreateCanteenItemDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/items`
-}
-
-export const nightCanteenControllerCreateItemV1 = async (createCanteenItemDto: CreateCanteenItemDto, options?: RequestInit): Promise<nightCanteenControllerCreateItemV1Response> => {
-
-  return customInstance<nightCanteenControllerCreateItemV1Response>(getNightCanteenControllerCreateItemV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createCanteenItemDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/items`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCanteenItemDto, signal
+    },
+      options);
+    }
 
 
 
@@ -219,37 +181,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNightCanteenControllerCreateItemV1MutationOptions(options), queryClient);
     }
-    export type nightCanteenControllerGetItemV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type nightCanteenControllerGetItemV1ResponseSuccess = (nightCanteenControllerGetItemV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerGetItemV1Response = (nightCanteenControllerGetItemV1ResponseSuccess)
-
-export const getNightCanteenControllerGetItemV1Url = (id: string,) => {
+    export const nightCanteenControllerGetItemV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/items/${id}`
-}
-
-export const nightCanteenControllerGetItemV1 = async (id: string, options?: RequestInit): Promise<nightCanteenControllerGetItemV1Response> => {
-
-  return customInstance<nightCanteenControllerGetItemV1Response>(getNightCanteenControllerGetItemV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/items/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -270,7 +212,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>> = ({ signal }) => nightCanteenControllerGetItemV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>> = ({ signal }) => nightCanteenControllerGetItemV1(id, requestOptions, signal);
 
 
 
@@ -325,38 +267,20 @@ export function useNightCanteenControllerGetItemV1<TData = Awaited<ReturnType<ty
 
 
 
-export type nightCanteenControllerUpsertItemV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type nightCanteenControllerUpsertItemV1ResponseSuccess = (nightCanteenControllerUpsertItemV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerUpsertItemV1Response = (nightCanteenControllerUpsertItemV1ResponseSuccess)
-
-export const getNightCanteenControllerUpsertItemV1Url = (id: string,) => {
+export const nightCanteenControllerUpsertItemV1 = (
+    id: string,
+    createCanteenItemDto: CreateCanteenItemDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/items/${id}`
-}
-
-export const nightCanteenControllerUpsertItemV1 = async (id: string,
-    createCanteenItemDto: CreateCanteenItemDto, options?: RequestInit): Promise<nightCanteenControllerUpsertItemV1Response> => {
-
-  return customInstance<nightCanteenControllerUpsertItemV1Response>(getNightCanteenControllerUpsertItemV1Url(id),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createCanteenItemDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/items/${id}`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCanteenItemDto, signal
+    },
+      options);
+    }
 
 
 
@@ -401,38 +325,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNightCanteenControllerUpsertItemV1MutationOptions(options), queryClient);
     }
-    export type nightCanteenControllerUpdateItemV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type nightCanteenControllerUpdateItemV1ResponseSuccess = (nightCanteenControllerUpdateItemV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerUpdateItemV1Response = (nightCanteenControllerUpdateItemV1ResponseSuccess)
-
-export const getNightCanteenControllerUpdateItemV1Url = (id: string,) => {
+    export const nightCanteenControllerUpdateItemV1 = (
+    id: string,
+    updateCanteenItemDto: UpdateCanteenItemDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/items/${id}`
-}
-
-export const nightCanteenControllerUpdateItemV1 = async (id: string,
-    updateCanteenItemDto: UpdateCanteenItemDto, options?: RequestInit): Promise<nightCanteenControllerUpdateItemV1Response> => {
-
-  return customInstance<nightCanteenControllerUpdateItemV1Response>(getNightCanteenControllerUpdateItemV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateCanteenItemDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/items/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCanteenItemDto, signal
+    },
+      options);
+    }
 
 
 
@@ -477,37 +383,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNightCanteenControllerUpdateItemV1MutationOptions(options), queryClient);
     }
-    export type nightCanteenControllerDeleteItemV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type nightCanteenControllerDeleteItemV1ResponseSuccess = (nightCanteenControllerDeleteItemV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerDeleteItemV1Response = (nightCanteenControllerDeleteItemV1ResponseSuccess)
-
-export const getNightCanteenControllerDeleteItemV1Url = (id: string,) => {
+    export const nightCanteenControllerDeleteItemV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/items/${id}`
-}
-
-export const nightCanteenControllerDeleteItemV1 = async (id: string, options?: RequestInit): Promise<nightCanteenControllerDeleteItemV1Response> => {
-
-  return customInstance<nightCanteenControllerDeleteItemV1Response>(getNightCanteenControllerDeleteItemV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/items/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 
@@ -552,37 +438,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNightCanteenControllerDeleteItemV1MutationOptions(options), queryClient);
     }
-    export type nightCanteenControllerListOrdersV1Response200 = {
-  data: void
-  status: 200
-}
+    export const nightCanteenControllerListOrdersV1 = (
 
-export type nightCanteenControllerListOrdersV1ResponseSuccess = (nightCanteenControllerListOrdersV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerListOrdersV1Response = (nightCanteenControllerListOrdersV1ResponseSuccess)
-
-export const getNightCanteenControllerListOrdersV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/orders`
-}
-
-export const nightCanteenControllerListOrdersV1 = async ( options?: RequestInit): Promise<nightCanteenControllerListOrdersV1Response> => {
-
-  return customInstance<nightCanteenControllerListOrdersV1Response>(getNightCanteenControllerListOrdersV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/orders`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -603,7 +469,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>> = ({ signal }) => nightCanteenControllerListOrdersV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>> = ({ signal }) => nightCanteenControllerListOrdersV1(requestOptions, signal);
 
 
 
@@ -658,37 +524,19 @@ export function useNightCanteenControllerListOrdersV1<TData = Awaited<ReturnType
 
 
 
-export type nightCanteenControllerCreateOrderV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type nightCanteenControllerCreateOrderV1ResponseSuccess = (nightCanteenControllerCreateOrderV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerCreateOrderV1Response = (nightCanteenControllerCreateOrderV1ResponseSuccess)
-
-export const getNightCanteenControllerCreateOrderV1Url = () => {
+export const nightCanteenControllerCreateOrderV1 = (
+    createCanteenOrderDto: CreateCanteenOrderDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/orders`
-}
-
-export const nightCanteenControllerCreateOrderV1 = async (createCanteenOrderDto: CreateCanteenOrderDto, options?: RequestInit): Promise<nightCanteenControllerCreateOrderV1Response> => {
-
-  return customInstance<nightCanteenControllerCreateOrderV1Response>(getNightCanteenControllerCreateOrderV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createCanteenOrderDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/orders`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createCanteenOrderDto, signal
+    },
+      options);
+    }
 
 
 
@@ -733,37 +581,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNightCanteenControllerCreateOrderV1MutationOptions(options), queryClient);
     }
-    export type nightCanteenControllerGetOrderV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type nightCanteenControllerGetOrderV1ResponseSuccess = (nightCanteenControllerGetOrderV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerGetOrderV1Response = (nightCanteenControllerGetOrderV1ResponseSuccess)
-
-export const getNightCanteenControllerGetOrderV1Url = (id: string,) => {
+    export const nightCanteenControllerGetOrderV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/orders/${id}`
-}
-
-export const nightCanteenControllerGetOrderV1 = async (id: string, options?: RequestInit): Promise<nightCanteenControllerGetOrderV1Response> => {
-
-  return customInstance<nightCanteenControllerGetOrderV1Response>(getNightCanteenControllerGetOrderV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/orders/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -784,7 +612,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>> = ({ signal }) => nightCanteenControllerGetOrderV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>> = ({ signal }) => nightCanteenControllerGetOrderV1(id, requestOptions, signal);
 
 
 
@@ -839,38 +667,20 @@ export function useNightCanteenControllerGetOrderV1<TData = Awaited<ReturnType<t
 
 
 
-export type nightCanteenControllerUpdateOrderV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type nightCanteenControllerUpdateOrderV1ResponseSuccess = (nightCanteenControllerUpdateOrderV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerUpdateOrderV1Response = (nightCanteenControllerUpdateOrderV1ResponseSuccess)
-
-export const getNightCanteenControllerUpdateOrderV1Url = (id: string,) => {
+export const nightCanteenControllerUpdateOrderV1 = (
+    id: string,
+    updateCanteenOrderDto: UpdateCanteenOrderDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/orders/${id}`
-}
-
-export const nightCanteenControllerUpdateOrderV1 = async (id: string,
-    updateCanteenOrderDto: UpdateCanteenOrderDto, options?: RequestInit): Promise<nightCanteenControllerUpdateOrderV1Response> => {
-
-  return customInstance<nightCanteenControllerUpdateOrderV1Response>(getNightCanteenControllerUpdateOrderV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateCanteenOrderDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/orders/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCanteenOrderDto, signal
+    },
+      options);
+    }
 
 
 
@@ -915,37 +725,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNightCanteenControllerUpdateOrderV1MutationOptions(options), queryClient);
     }
-    export type nightCanteenControllerDeleteOrderV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type nightCanteenControllerDeleteOrderV1ResponseSuccess = (nightCanteenControllerDeleteOrderV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type nightCanteenControllerDeleteOrderV1Response = (nightCanteenControllerDeleteOrderV1ResponseSuccess)
-
-export const getNightCanteenControllerDeleteOrderV1Url = (id: string,) => {
+    export const nightCanteenControllerDeleteOrderV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/night-canteen/orders/${id}`
-}
-
-export const nightCanteenControllerDeleteOrderV1 = async (id: string, options?: RequestInit): Promise<nightCanteenControllerDeleteOrderV1Response> => {
-
-  return customInstance<nightCanteenControllerDeleteOrderV1Response>(getNightCanteenControllerDeleteOrderV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/night-canteen/orders/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

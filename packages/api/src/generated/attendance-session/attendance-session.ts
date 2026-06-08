@@ -31,37 +31,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type attendanceSessionControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
+export const attendanceSessionControllerCreateV1 = (
 
-export type attendanceSessionControllerCreateV1ResponseSuccess = (attendanceSessionControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type attendanceSessionControllerCreateV1Response = (attendanceSessionControllerCreateV1ResponseSuccess)
-
-export const getAttendanceSessionControllerCreateV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendanceSessions`
-}
-
-export const attendanceSessionControllerCreateV1 = async ( options?: RequestInit): Promise<attendanceSessionControllerCreateV1Response> => {
-
-  return customInstance<attendanceSessionControllerCreateV1Response>(getAttendanceSessionControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendanceSessions`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 
@@ -106,37 +86,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAttendanceSessionControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type attendanceSessionControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+    export const attendanceSessionControllerFindAllV1 = (
 
-export type attendanceSessionControllerFindAllV1ResponseSuccess = (attendanceSessionControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceSessionControllerFindAllV1Response = (attendanceSessionControllerFindAllV1ResponseSuccess)
-
-export const getAttendanceSessionControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendanceSessions`
-}
-
-export const attendanceSessionControllerFindAllV1 = async ( options?: RequestInit): Promise<attendanceSessionControllerFindAllV1Response> => {
-
-  return customInstance<attendanceSessionControllerFindAllV1Response>(getAttendanceSessionControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendanceSessions`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -157,7 +117,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>> = ({ signal }) => attendanceSessionControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>> = ({ signal }) => attendanceSessionControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -212,37 +172,17 @@ export function useAttendanceSessionControllerFindAllV1<TData = Awaited<ReturnTy
 
 
 
-export type attendanceSessionControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type attendanceSessionControllerFindOneV1ResponseSuccess = (attendanceSessionControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceSessionControllerFindOneV1Response = (attendanceSessionControllerFindOneV1ResponseSuccess)
-
-export const getAttendanceSessionControllerFindOneV1Url = (id: string,) => {
+export const attendanceSessionControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendanceSessions/${id}`
-}
-
-export const attendanceSessionControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<attendanceSessionControllerFindOneV1Response> => {
-
-  return customInstance<attendanceSessionControllerFindOneV1Response>(getAttendanceSessionControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendanceSessions/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -263,7 +203,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>> = ({ signal }) => attendanceSessionControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>> = ({ signal }) => attendanceSessionControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -318,37 +258,17 @@ export function useAttendanceSessionControllerFindOneV1<TData = Awaited<ReturnTy
 
 
 
-export type attendanceSessionControllerUpdateV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type attendanceSessionControllerUpdateV1ResponseSuccess = (attendanceSessionControllerUpdateV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceSessionControllerUpdateV1Response = (attendanceSessionControllerUpdateV1ResponseSuccess)
-
-export const getAttendanceSessionControllerUpdateV1Url = (id: string,) => {
+export const attendanceSessionControllerUpdateV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendanceSessions/${id}`
-}
-
-export const attendanceSessionControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<attendanceSessionControllerUpdateV1Response> => {
-
-  return customInstance<attendanceSessionControllerUpdateV1Response>(getAttendanceSessionControllerUpdateV1Url(id),
-  {
-    ...options,
-    method: 'PATCH'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendanceSessions/${id}`, method: 'PATCH', signal
+    },
+      options);
+    }
 
 
 
@@ -393,37 +313,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAttendanceSessionControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export type attendanceSessionControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type attendanceSessionControllerRemoveV1ResponseSuccess = (attendanceSessionControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type attendanceSessionControllerRemoveV1Response = (attendanceSessionControllerRemoveV1ResponseSuccess)
-
-export const getAttendanceSessionControllerRemoveV1Url = (id: string,) => {
+    export const attendanceSessionControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/attendanceSessions/${id}`
-}
-
-export const attendanceSessionControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<attendanceSessionControllerRemoveV1Response> => {
-
-  return customInstance<attendanceSessionControllerRemoveV1Response>(getAttendanceSessionControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/attendanceSessions/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

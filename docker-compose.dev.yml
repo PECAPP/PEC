@@ -147,7 +147,7 @@ services:
       - database_node_modules:/app/packages/database/node_modules
     command: >
       sh -c "cd /app/packages/database && pnpm exec prisma generate && DATABASE_URL=$$DIRECT_URL pnpm exec prisma db push --accept-data-loss && 
-      cd /app/apps/server && pnpm exec nest start --watch"
+      cd /app/apps/server && pnpm run start:dev"
     depends_on:
       postgres:
         condition: service_healthy

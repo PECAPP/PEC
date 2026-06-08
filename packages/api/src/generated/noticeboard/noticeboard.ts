@@ -36,37 +36,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type noticeboardControllerListV1Response200 = {
-  data: void
-  status: 200
-}
+export const noticeboardControllerListV1 = (
 
-export type noticeboardControllerListV1ResponseSuccess = (noticeboardControllerListV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type noticeboardControllerListV1Response = (noticeboardControllerListV1ResponseSuccess)
-
-export const getNoticeboardControllerListV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/noticeboard`
-}
-
-export const noticeboardControllerListV1 = async ( options?: RequestInit): Promise<noticeboardControllerListV1Response> => {
-
-  return customInstance<noticeboardControllerListV1Response>(getNoticeboardControllerListV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/noticeboard`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -87,7 +67,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof noticeboardControllerListV1>>> = ({ signal }) => noticeboardControllerListV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof noticeboardControllerListV1>>> = ({ signal }) => noticeboardControllerListV1(requestOptions, signal);
 
 
 
@@ -142,37 +122,19 @@ export function useNoticeboardControllerListV1<TData = Awaited<ReturnType<typeof
 
 
 
-export type noticeboardControllerCreateV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type noticeboardControllerCreateV1ResponseSuccess = (noticeboardControllerCreateV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type noticeboardControllerCreateV1Response = (noticeboardControllerCreateV1ResponseSuccess)
-
-export const getNoticeboardControllerCreateV1Url = () => {
+export const noticeboardControllerCreateV1 = (
+    createNoticeDto: CreateNoticeDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/noticeboard`
-}
-
-export const noticeboardControllerCreateV1 = async (createNoticeDto: CreateNoticeDto, options?: RequestInit): Promise<noticeboardControllerCreateV1Response> => {
-
-  return customInstance<noticeboardControllerCreateV1Response>(getNoticeboardControllerCreateV1Url(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createNoticeDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/noticeboard`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createNoticeDto, signal
+    },
+      options);
+    }
 
 
 
@@ -217,38 +179,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNoticeboardControllerCreateV1MutationOptions(options), queryClient);
     }
-    export type noticeboardControllerTogglePinV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type noticeboardControllerTogglePinV1ResponseSuccess = (noticeboardControllerTogglePinV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type noticeboardControllerTogglePinV1Response = (noticeboardControllerTogglePinV1ResponseSuccess)
-
-export const getNoticeboardControllerTogglePinV1Url = (id: string,) => {
+    export const noticeboardControllerTogglePinV1 = (
+    id: string,
+    togglePinDto: TogglePinDto,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/noticeboard/${id}/pin`
-}
-
-export const noticeboardControllerTogglePinV1 = async (id: string,
-    togglePinDto: TogglePinDto, options?: RequestInit): Promise<noticeboardControllerTogglePinV1Response> => {
-
-  return customInstance<noticeboardControllerTogglePinV1Response>(getNoticeboardControllerTogglePinV1Url(id),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(togglePinDto)
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/noticeboard/${id}/pin`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: togglePinDto, signal
+    },
+      options);
+    }
 
 
 
@@ -293,37 +237,17 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNoticeboardControllerTogglePinV1MutationOptions(options), queryClient);
     }
-    export type noticeboardControllerRemoveV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type noticeboardControllerRemoveV1ResponseSuccess = (noticeboardControllerRemoveV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type noticeboardControllerRemoveV1Response = (noticeboardControllerRemoveV1ResponseSuccess)
-
-export const getNoticeboardControllerRemoveV1Url = (id: string,) => {
+    export const noticeboardControllerRemoveV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/noticeboard/${id}`
-}
-
-export const noticeboardControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<noticeboardControllerRemoveV1Response> => {
-
-  return customInstance<noticeboardControllerRemoveV1Response>(getNoticeboardControllerRemoveV1Url(id),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/noticeboard/${id}`, method: 'DELETE', signal
+    },
+      options);
+    }
 
 
 

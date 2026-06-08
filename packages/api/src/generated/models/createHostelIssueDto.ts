@@ -5,21 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { CreateHostelIssueDtoPriority } from './createHostelIssueDtoPriority';
-import type { CreateHostelIssueDtoResponses } from './createHostelIssueDtoResponses';
-import type { CreateHostelIssueDtoStatus } from './createHostelIssueDtoStatus';
 
-export interface CreateHostelIssueDto {
-  title: string;
-  description: string;
-  category: string;
-  priority: CreateHostelIssueDtoPriority;
-  status?: CreateHostelIssueDtoStatus;
-  roomNumber: string;
-  studentId: string;
-  studentName: string;
-  organizationId?: string;
-  responses?: CreateHostelIssueDtoResponses;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export interface CreateHostelIssueDto { [key: string]: unknown }

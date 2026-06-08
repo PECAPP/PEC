@@ -31,37 +31,17 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type clubsControllerFindAllV1Response200 = {
-  data: void
-  status: 200
-}
+export const clubsControllerFindAllV1 = (
 
-export type clubsControllerFindAllV1ResponseSuccess = (clubsControllerFindAllV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type clubsControllerFindAllV1Response = (clubsControllerFindAllV1ResponseSuccess)
-
-export const getClubsControllerFindAllV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/clubs`
-}
-
-export const clubsControllerFindAllV1 = async ( options?: RequestInit): Promise<clubsControllerFindAllV1Response> => {
-
-  return customInstance<clubsControllerFindAllV1Response>(getClubsControllerFindAllV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/clubs`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -82,7 +62,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof clubsControllerFindAllV1>>> = ({ signal }) => clubsControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof clubsControllerFindAllV1>>> = ({ signal }) => clubsControllerFindAllV1(requestOptions, signal);
 
 
 
@@ -137,37 +117,17 @@ export function useClubsControllerFindAllV1<TData = Awaited<ReturnType<typeof cl
 
 
 
-export type clubsControllerGetMyRequestsV1Response200 = {
-  data: void
-  status: 200
-}
+export const clubsControllerGetMyRequestsV1 = (
 
-export type clubsControllerGetMyRequestsV1ResponseSuccess = (clubsControllerGetMyRequestsV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type clubsControllerGetMyRequestsV1Response = (clubsControllerGetMyRequestsV1ResponseSuccess)
-
-export const getClubsControllerGetMyRequestsV1Url = () => {
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/clubs/my-requests`
-}
-
-export const clubsControllerGetMyRequestsV1 = async ( options?: RequestInit): Promise<clubsControllerGetMyRequestsV1Response> => {
-
-  return customInstance<clubsControllerGetMyRequestsV1Response>(getClubsControllerGetMyRequestsV1Url(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/clubs/my-requests`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -188,7 +148,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof clubsControllerGetMyRequestsV1>>> = ({ signal }) => clubsControllerGetMyRequestsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof clubsControllerGetMyRequestsV1>>> = ({ signal }) => clubsControllerGetMyRequestsV1(requestOptions, signal);
 
 
 
@@ -243,37 +203,17 @@ export function useClubsControllerGetMyRequestsV1<TData = Awaited<ReturnType<typ
 
 
 
-export type clubsControllerFindOneV1Response200 = {
-  data: void
-  status: 200
-}
-
-export type clubsControllerFindOneV1ResponseSuccess = (clubsControllerFindOneV1Response200) & {
-  headers: Headers;
-};
-;
-
-export type clubsControllerFindOneV1Response = (clubsControllerFindOneV1ResponseSuccess)
-
-export const getClubsControllerFindOneV1Url = (id: string,) => {
+export const clubsControllerFindOneV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/clubs/${id}`
-}
-
-export const clubsControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<clubsControllerFindOneV1Response> => {
-
-  return customInstance<clubsControllerFindOneV1Response>(getClubsControllerFindOneV1Url(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/clubs/${id}`, method: 'GET', signal
+    },
+      options);
+    }
 
 
 
@@ -294,7 +234,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof clubsControllerFindOneV1>>> = ({ signal }) => clubsControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof clubsControllerFindOneV1>>> = ({ signal }) => clubsControllerFindOneV1(id, requestOptions, signal);
 
 
 
@@ -349,37 +289,17 @@ export function useClubsControllerFindOneV1<TData = Awaited<ReturnType<typeof cl
 
 
 
-export type clubsControllerJoinV1Response201 = {
-  data: void
-  status: 201
-}
-
-export type clubsControllerJoinV1ResponseSuccess = (clubsControllerJoinV1Response201) & {
-  headers: Headers;
-};
-;
-
-export type clubsControllerJoinV1Response = (clubsControllerJoinV1ResponseSuccess)
-
-export const getClubsControllerJoinV1Url = (id: string,) => {
+export const clubsControllerJoinV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
 
 
-
-
-  return `/api/v1/clubs/${id}/join`
-}
-
-export const clubsControllerJoinV1 = async (id: string, options?: RequestInit): Promise<clubsControllerJoinV1Response> => {
-
-  return customInstance<clubsControllerJoinV1Response>(getClubsControllerJoinV1Url(id),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+      return customInstance<void>(
+      {url: `/api/v1/clubs/${id}/join`, method: 'POST', signal
+    },
+      options);
+    }
 
 
 

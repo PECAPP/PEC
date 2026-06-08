@@ -5,29 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { CreateAttendanceDtoMethod } from './createAttendanceDtoMethod';
-import type { CreateAttendanceDtoStatus } from './createAttendanceDtoStatus';
 
-export interface CreateAttendanceDto {
-  /** Student UUID */
-  studentId: string;
-  /** Course ID or subject code */
-  subject: string;
-  /** Date in YYYY-MM-DD format */
-  date: string;
-  status: CreateAttendanceDtoStatus;
-  remarks?: string;
-  /** Attendance Session UUID */
-  sessionId?: string;
-  /** ISO marked at timestamp */
-  markedAt?: string;
-  method?: CreateAttendanceDtoMethod;
-  /** Course UUID */
-  courseId?: string;
-  /** Faculty UUID */
-  facultyId?: string;
-  /** Latitude for geofencing */
-  lat?: number;
-  /** Longitude for geofencing */
-  lng?: number;
-}
+export interface CreateAttendanceDto { [key: string]: unknown }

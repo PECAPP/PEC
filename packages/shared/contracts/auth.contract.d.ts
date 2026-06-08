@@ -6,7 +6,7 @@ export declare const authContract: {
         body: z.ZodObject<{
             email: z.ZodString;
             password: z.ZodString;
-        }, "strip", z.ZodTypeAny, {
+        }, "strict", z.ZodTypeAny, {
             email: string;
             password: string;
         }, {
@@ -33,7 +33,7 @@ export declare const authContract: {
                     role: string;
                 }>;
                 token: z.ZodString;
-            }, "strip", z.ZodTypeAny, {
+            }, "strict", z.ZodTypeAny, {
                 user: {
                     id: string;
                     fullName: string;
@@ -67,7 +67,7 @@ export declare const authContract: {
             email: z.ZodString;
             password: z.ZodString;
             role: z.ZodDefault<z.ZodEnum<["student", "faculty", "college_admin"]>>;
-        }, "strip", z.ZodTypeAny, {
+        }, "strict", z.ZodTypeAny, {
             fullName: string;
             email: string;
             password: string;
@@ -98,7 +98,7 @@ export declare const authContract: {
                     role: string;
                 }>;
                 token: z.ZodString;
-            }, "strip", z.ZodTypeAny, {
+            }, "strict", z.ZodTypeAny, {
                 user: {
                     id: string;
                     fullName: string;
