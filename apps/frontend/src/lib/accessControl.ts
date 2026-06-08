@@ -1,4 +1,5 @@
 import { AXIOS_INSTANCE } from "@pec/api";
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const normalizeCourse = (doc: any) => {
   const data = doc?.data ? doc.data() : doc;

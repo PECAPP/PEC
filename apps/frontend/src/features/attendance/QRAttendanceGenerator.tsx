@@ -1,6 +1,8 @@
 import { Button, Card, Dialog, DialogContent, DialogHeader, DialogTitle, useToast, Progress } from "@pec/ui";
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 import { AXIOS_INSTANCE } from "@pec/api";
 

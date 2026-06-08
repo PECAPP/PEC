@@ -2,8 +2,7 @@ import { Button, Card, useToast } from "@pec/ui";
 import { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
-import { useAttendanceControllerCreateV1 } from '@pec/api';
-
+import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Camera, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { AXIOS_INSTANCE } from "@pec/api";
@@ -14,7 +13,7 @@ interface QRAttendanceScannerProps {
 }
 
 export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerProps) {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const { user } = usePermissions();
   const [scanning, setScanning] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -42,7 +41,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
       );
     } catch (error) {
       console.error('Error starting scanner:', error);
-      toast({
+      uiToast({
         title: 'Camera Error',
         description: 'Failed to access camera. Please check permissions.',
         variant: 'destructive',
@@ -76,44 +75,20 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
         return;
       }
 
-      // Parse rotating QR (format: uniqueId:timestamp)
       const parts = decodedText.split(':');
       const uniqueId = parts[0];
       const qrTimestamp = parts.length > 1 ? parseInt(parts[1]) : 0;
       
-      // 1. Security Check: Freshness
       const now = Date.now();
-      // Allow 20s window (10s rotation + 10s buffer for network/scanning)
       if (qrTimestamp && (now - qrTimestamp > 20000)) { 
          setResult('error');
          setMessage('QR Code has expired. Please scan the new one.');
-         toast({
-           title: 'Expired QR',
-           description: 'This code is too old. Scan the fresh one on screen!',
-           variant: 'destructive',
+         toast('Expired QR', {
+           description: 'This code is too old. Scan the fresh one on screen!'
          });
          return;
       }
 
-      // Find active session with this QR code (using the BASE uniqueId if your DB stores just that? 
-      // Wait, the DB stores "qrCode". If the generator stored `uniqueId` (without timestamp), we query that.
-      // Yes, generator stored `uniqueId` in backend, but displays `uniqueId:timestamp` in QR.
-      // So we query by `uniqueId`.
-      
-      // Session and attendance checks are handled by the backend API.
-
-      if (!attendanceSnapshot.empty) {
-        setResult('error');
-        setMessage('Attendance already marked');
-        toast({
-          title: 'Already Marked',
-          description: 'You have already marked attendance for this session',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // Get Geo Location for Geofencing
       let location: { lat?: number; lng?: number } = {};
       try {
         const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -122,28 +97,14 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
         location = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       } catch (err) {
         console.warn('Geolocation failed or denied:', err);
-        // We will continue but backend may enforce it if required
       }
 
-      // Mark attendance
-      await addDoc(collection(({} as any), 'attendance'), {
-        sessionId: sessionDoc.id,
-        studentId: user.uid,
-        courseId: sessionData.courseId,
-        facultyId: sessionData.facultyId,
-        status: 'present',
-        markedAt: serverTimestamp(),
-        method: 'qr',
-        date: sessionData.date,
-        lat: location.lat,
-        lng: location.lng,
-      });
+      await AXIOS_INSTANCE.post('/attendance/mark-qr', { qrCode: uniqueId, lat: location.lat, lng: location.lng });
 
       setResult('success');
-      setMessage(`Attendance marked for ${sessionData.courseName}`);
-      toast({
-        title: 'Success!',
-        description: `Attendance marked for ${sessionData.courseName}`,
+      setMessage(`Attendance marked!`);
+      toast('Success!', {
+        description: `Attendance marked successfully`,
       });
 
       if (onSuccess) {
@@ -153,10 +114,8 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
       console.error('Error marking attendance:', error);
       setResult('error');
       setMessage('Failed to mark attendance');
-      toast({
-        title: 'Error',
+      toast('Error', {
         description: 'Failed to mark attendance. Please try again.',
-        variant: 'destructive',
       });
     } finally {
       setProcessing(false);
@@ -164,7 +123,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
   };
 
   const onScanFailure = (error: any) => {
-    // Ignore scan failures (happens continuously while scanning)
+    // Ignore scan failures
   };
 
   useEffect(() => {
