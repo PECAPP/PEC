@@ -84,9 +84,8 @@ The platform utilizes a **pnpm workspace monorepo** orchestrated by **Turborepo*
 
 - **apps/frontend/**: The Next.js 16 App Router application housing all institutional interfaces, role-based dashboards, and client-side logic.
 - **apps/server/**: The NestJS 11 backend API managing institutional business operations, academic records, and security logic.
-- **packages/database/**: Shared Prisma schema, client exports, and database configuration used by the server.
-- **packages/shared/**: Cross-platform Zod validation schemas and TypeScript type definitions shared across frontend and backend.
-- **packages/protos/**: gRPC proto definitions for microservice communication (`@pec/protos`).
+- **packages/database/**: Prisma schema, migrations, and exported `@pec/database` client.
+- **packages/shared/**: Zod schemas and TypeScript types exported as `@pec/shared`.
 
 ### 📁 Frontend Architecture (`apps/frontend/src/`)
 

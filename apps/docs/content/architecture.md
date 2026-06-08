@@ -43,7 +43,7 @@ graph TD
 - **Backend API Orchestration Tier** (`apps/server/`): Powered by NestJS 11.x on Express (with Fastify adapter available), managing millions of academic records while maintaining fast query performance through advanced b-tree indexing.
 - **Persistence and Data Sovereignty Tier**: A private relational cloud (PostgreSQL 16) adhering to strict institutional data protection standards. Managed via the `packages/database/` shared Prisma package.
 - **Cache and Queue Tier**: Redis (`ioredis`) used for rate-limiting storage (ThrottlerStorageRedisService), Bull job queue persistence, and `cache-manager` server-side caching.
-- **Shared Packages** (`packages/`): `@pec/database` (Prisma client), `@pec/shared` (Zod schemas and types), `@pec/protos` (gRPC proto definitions).
+- **Shared Packages** (`packages/`): `@pec/database` (Prisma client), `@pec/shared` (Zod schemas and types).
 
 ---
 
@@ -128,7 +128,6 @@ We utilize a multi-layered synchronization approach to ensure all stakeholders s
 
 ### gRPC Microservices
 
-- **Proto Definitions**: Stored in `packages/protos/` as `@pec/protos`.
 - **gRPC Transport**: `@grpc/grpc-js` and `@grpc/proto-loader` are installed for inter-service proto-based communication.
 - **NestJS Microservices**: `@nestjs/microservices` enables hybrid REST + gRPC service architecture.
 
@@ -190,7 +189,6 @@ The architecture is reflected in the following directory organization:
 
 - **`packages/database/`**: Prisma schema, migrations, and exported `@pec/database` client.
 - **`packages/shared/`**: Zod schemas and TypeScript types exported as `@pec/shared`.
-- **`packages/protos/`**: gRPC `.proto` files exported as `@pec/protos`.
 
 ---
 
