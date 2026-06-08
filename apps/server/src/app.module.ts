@@ -51,6 +51,7 @@ import { GlobalCacheModule } from './cache/global-cache.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 
 import { CommonServicesModule } from './common/common.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { CommonServicesModule } from './common/common.module';
     AcademicCalendarModule,
     MarketplaceModule,
     FinanceModule,
+    SettingsModule,
     CqrsModule,
     LoggerModule.forRoot({
       pinoHttp: {

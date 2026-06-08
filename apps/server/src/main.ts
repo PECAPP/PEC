@@ -53,6 +53,14 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   await app.startAllMicroservices();
-  await app.listen(process.env.PORT ?? 4000, '0.0.0.0');
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
+
+// trigger rebuild
+
+// trigger rebuild again
+
+// trigger rebuild again 3
+// trigger 4

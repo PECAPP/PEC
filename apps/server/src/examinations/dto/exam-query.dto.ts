@@ -6,6 +6,7 @@ export const examQuerySchema = z.object({
   offset: z.number().int().optional(),
   courseId: z.string().optional(),
   department: z.string().optional(),
+  examType: z.string().optional(),
   upcoming: z.boolean().optional(),
 });
 
