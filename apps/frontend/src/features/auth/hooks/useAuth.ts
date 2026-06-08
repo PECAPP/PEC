@@ -4,6 +4,7 @@ import { RolePermissions, UserRole, getRolePermissions } from '@/features/auth/l
 import {  authClient  } from "@pec/api";
 import {  buildApiUrl  } from "@pec/api";
 import { AppAbility, buildAbilityFor } from '@/lib/casl-ability';
+import { safeLocalStorage, safeDocument, safeWindow, isBrowser } from '@/lib/ssr-safe';
 
 export interface CurrentUser {
   id: string;
@@ -36,28 +37,40 @@ interface UseAuthResult {
   login: (email: string, password: string) => Promise<void>;
 }
 
-const AUTH_CACHE_TTL_MS = 30_000;
+const AUTH_CACHE_TTL_MS = 0;
+
+export const clearAuthCache = () => {
+  cachedToken = null;
+  cachedUser = null;
+  cachedAt = 0;
+  inFlightRequest = null;
+};
 
 let cachedToken: string | null = null;
 let cachedUser: CurrentUser | null = null;
 let cachedAt = 0;
 let inFlightRequest: Promise<CurrentUser | null> | null = null;
-let refreshAttemptedWithoutToken = false;
+let redirectInProgress = false;
 
 const isAllowedRole = (role: string | null | undefined): role is UserRole => {
   return ['student', 'faculty', 'college_admin', 'admin'].includes(role as string);
 };
 
-function clearAuthCache() {
-  cachedToken = null;
-  cachedUser = null;
-  cachedAt = 0;
-  inFlightRequest = null;
-}
 
 function hasRefreshMarkerCookie(): boolean {
-  if (typeof document === 'undefined') return false;
-  return document.cookie.split(';').some((cookie) => cookie.trim().startsWith('refresh_present='));
+  return safeDocument.hasCookiePrefix('refresh_present=');
+}
+
+function isOnAuthPage(): boolean {
+  const pathname = safeWindow.getPathname();
+  return pathname === '/auth' || pathname.startsWith('/auth/');
+}
+
+function safeRedirectToAuth(): void {
+  if (!isBrowser()) return;
+  if (isOnAuthPage() || redirectInProgress) return;
+  redirectInProgress = true;
+  safeWindow.navigate('/auth?clear_session=true');
 }
 
 async function fetchProfile(token: string, force = false): Promise<CurrentUser | null> {
@@ -73,21 +86,26 @@ async function fetchProfile(token: string, force = false): Promise<CurrentUser |
   }
 
   inFlightRequest = (async () => {
-    const res = await fetch(buildApiUrl('/auth/profile'), {
+    const res = await fetch(buildApiUrl(`/v1/auth/profile?t=${Date.now()}`), {
       headers: {
         Authorization: `Bearer ${token}`,
       },
       credentials: 'include',
+      cache: 'no-store',
     });
 
     if (res.status === 401 || res.status === 403) {
+      safeLocalStorage.remove('auth_user');
       authClient.logout();
       clearAuthCache();
+      safeRedirectToAuth();
       return null;
     }
 
     if (!res.ok) {
-      throw new Error('Failed to fetch profile');
+      const err = new Error('Failed to fetch profile');
+      (err as any).status = res.status;
+      throw err;
     }
 
     const payload = await res.json();
@@ -96,7 +114,13 @@ async function fetchProfile(token: string, force = false): Promise<CurrentUser |
     const fullName = payload.fullName || payload.name || 'User';
     const roles = Array.isArray(payload.roles) ? payload.roles : role ? [role] : [];
 
-    const caslPermissions = await authClient.fetchPermissions();
+    const permsRes = await fetch(buildApiUrl(`/v1/auth/me/permissions?t=${Date.now()}`), {
+      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
+      cache: 'no-store'
+    });
+    const permsData = permsRes.ok ? await permsRes.json() : { permissions: [] };
+    const caslPermissions = permsData.permissions || [];
     const ability = buildAbilityFor(caslPermissions);
 
     const user: CurrentUser = {
@@ -133,8 +157,11 @@ async function fetchProfile(token: string, force = false): Promise<CurrentUser |
 }
 
 export function useAuth(): UseAuthResult {
+  // SSR-SAFE: All useState initializers return server-safe defaults (null/null/true).
+  // The real values are loaded inside the useEffect below, which only runs on the client.
+  // This prevents server/client HTML mismatches (hydration errors).
   const [user, setUser] = useState<CurrentUser | null>(null);
-  const [token, setToken] = useState<string | null>(() => authClient.getAccessToken());
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -145,25 +172,32 @@ export function useAuth(): UseAuthResult {
       try {
         let currentToken = authClient.getAccessToken();
 
-        if (!currentToken && (force || !refreshAttemptedWithoutToken) && hasRefreshMarkerCookie()) {
-          refreshAttemptedWithoutToken = true;
+        if (!currentToken && hasRefreshMarkerCookie()) {
           try {
             currentToken = await authClient.refreshAccessToken();
-          } catch {
-            currentToken = null;
+          } catch (err: any) {
+            const status = err.response?.status || err.status;
+            if (status !== 429 && !(status >= 500)) {
+              currentToken = null;
+            } else {
+              // It's a transient 500/429 error. We shouldn't force a logout.
+              // We'll leave currentToken null but skip the session clear block
+              // by re-throwing to let the outer block handle it.
+              throw err;
+            }
           }
         }
 
-        if (currentToken) {
-          refreshAttemptedWithoutToken = false;
-        }
         setToken(currentToken);
 
         if (!currentToken) {
           clearAuthCache();
+          safeLocalStorage.remove('auth_user');
           setUser(null);
-          if (mounted) {
-            setLoading(false);
+          if (mounted) setLoading(false);
+          const protectedPrefixes = ['/dashboard', '/courses', '/users', '/chat', '/settings', '/faculty', '/departments', '/attendance'];
+          if (protectedPrefixes.some(p => safeWindow.getPathname().startsWith(p))) {
+            safeRedirectToAuth();
           }
           return;
         }
@@ -178,11 +212,18 @@ export function useAuth(): UseAuthResult {
         if (mounted) {
           setError(err instanceof Error ? err.message : 'An error occurred');
         }
-        authClient.resetSession();
-        clearAuthCache();
-        if (mounted) {
-          setToken(null);
-          setUser(null);
+        const status = (err as any)?.response?.status || (err as any)?.status;
+        console.error('[useAuth] Outer catch hit. Error:', err, 'Status:', status);
+        
+        if (status !== 429 && !(status >= 500)) {
+          authClient.resetSession();
+          clearAuthCache();
+          safeLocalStorage.remove('auth_user');
+          if (mounted) {
+            setToken(null);
+            setUser(null);
+          }
+          safeRedirectToAuth();
         }
       } finally {
         if (mounted) {
@@ -194,20 +235,37 @@ export function useAuth(): UseAuthResult {
     syncUser();
 
     const onAuthChange = () => {
-      refreshAttemptedWithoutToken = false;
       setLoading(true);
       syncUser(true);
     };
 
     const onAuthFailed = () => {
-      refreshAttemptedWithoutToken = true;
       clearAuthCache();
+      safeLocalStorage.remove('auth_user');
       setUser(null);
       setToken(null);
+      safeRedirectToAuth();
     };
 
     window.addEventListener('auth-change', onAuthChange);
     window.addEventListener('auth-failed', onAuthFailed);
+
+    // Hydrate from localStorage now that we're on the client
+    if (!hasRefreshMarkerCookie()) {
+      safeLocalStorage.remove('auth_user');
+    } else {
+      const stored = safeLocalStorage.get('auth_user');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          parsed.permissions = getRolePermissions(parsed.role || 'student');
+          setUser(parsed);
+        } catch {}
+      }
+    }
+
+    // Sync token from authClient (browser-only)
+    setToken(authClient.getAccessToken());
 
     return () => {
       mounted = false;
@@ -217,22 +275,21 @@ export function useAuth(): UseAuthResult {
   }, []);
 
   const logout = async () => {
-    await authClient.logout();
-    refreshAttemptedWithoutToken = true;
+    try { await authClient.logout(); } catch (e) {}
     clearAuthCache();
+    safeLocalStorage.remove('auth_user');
     setUser(null);
     setToken(null);
-    window.dispatchEvent(new Event('auth-failed'));
+    safeRedirectToAuth();
   };
 
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
       await authClient.login({ email, password });
-      refreshAttemptedWithoutToken = false;
       const currentToken = authClient.getAccessToken();
       setToken(currentToken);
-      window.dispatchEvent(new Event('auth-change'));
+      safeWindow.dispatch('auth-change');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
       throw err;

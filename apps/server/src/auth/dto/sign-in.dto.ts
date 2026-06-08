@@ -1,10 +1,12 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class SignInDto {
-  @IsEmail()
-  email: string;
+export const signInSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
 
-  @IsString()
-  @MinLength(6)
-  password: string;
+
+
+export class SignInDto extends createZodDto(signInSchema) {
 }

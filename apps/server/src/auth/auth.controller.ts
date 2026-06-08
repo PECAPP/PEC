@@ -9,11 +9,11 @@ import {
   Request,
   Res,
   BadRequestException,
+  Delete,
+  Param,
+  ForbiddenException,
 } from '@nestjs/common';
-import type {
-  Request as ExpressRequest,
-  Response as ExpressResponse,
-} from 'express';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { PoliciesGuard } from './guards/policies.guard';
@@ -43,8 +43,9 @@ import {
 
 @Controller('auth')
 export class AuthController {
-  private readonly refreshCookieName =
-    process.env.REFRESH_COOKIE_NAME ?? 'refresh_token';
+  private readonly isProd = process.env.NODE_ENV === 'production';
+  private readonly cookiePrefix = this.isProd ? '__Host-' : '';
+  private readonly refreshCookieName = `${this.cookiePrefix}${process.env.REFRESH_COOKIE_NAME ?? 'refresh_token'}`;
 
   constructor(private authService: AuthService) {}
 
@@ -53,8 +54,8 @@ export class AuthController {
   @Throttle({ short: { limit: 5, ttl: 60000 } })
   async signIn(
     @Body(new ZodValidationPipe(signInSchema)) signInDto: SignInInput,
-    @Request() req: ExpressRequest,
-    @Res({ passthrough: true }) res: ExpressResponse,
+    @Request() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const auth = await this.authService.signIn(
       signInDto.email,
@@ -66,6 +67,7 @@ export class AuthController {
     );
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
     this.setAccessTokenCookie(res, auth.access_token);
+    this.setCsrfCookie(res, req);
     this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
 
     const { refresh_token, ...response } = auth;
@@ -77,8 +79,8 @@ export class AuthController {
   @Throttle({ short: { limit: 3, ttl: 60000 } })
   async signUp(
     @Body(new ZodValidationPipe(signUpSchema)) signUpDto: SignUpInput,
-    @Request() req: ExpressRequest,
-    @Res({ passthrough: true }) res: ExpressResponse,
+    @Request() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const auth = await this.authService.signUp(
       signUpDto.email,
@@ -93,6 +95,7 @@ export class AuthController {
 
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
     this.setAccessTokenCookie(res, auth.access_token);
+    this.setCsrfCookie(res, req);
     this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
     const { refresh_token, ...response } = auth;
     return response;
@@ -103,9 +106,11 @@ export class AuthController {
   @Throttle({ short: { limit: 10, ttl: 60000 } })
   async refresh(
     @Body(new ZodValidationPipe(refreshSchema)) body: RefreshInput,
-    @Request() req: ExpressRequest,
-    @Res({ passthrough: true }) res: ExpressResponse,
+    @Request() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
+    this.verifyCsrf(req);
+
     const refreshToken =
       body.refreshToken || this.extractRefreshTokenFromCookie(req);
     if (!refreshToken) {
@@ -119,6 +124,7 @@ export class AuthController {
 
     this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
     this.setAccessTokenCookie(res, auth.access_token);
+    this.setCsrfCookie(res, req);
     this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
     const { refresh_token, ...response } = auth;
     return response;
@@ -128,13 +134,17 @@ export class AuthController {
   @Post('logout')
   async logout(
     @Body(new ZodValidationPipe(refreshSchema)) body: RefreshInput,
-    @Request() req: ExpressRequest,
-    @Res({ passthrough: true }) res: ExpressResponse,
+    @Request() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
+    this.verifyCsrf(req);
+
     const refreshToken =
       body.refreshToken || this.extractRefreshTokenFromCookie(req);
-    await this.authService.logout(refreshToken);
+    const accessToken = this.extractAccessToken(req);
+    await this.authService.logout(refreshToken, accessToken);
     this.clearRefreshCookie(res);
+    res.clearCookie(`${this.cookiePrefix}csrf_token`, { path: '/' });
     return { loggedOut: true };
   }
 
@@ -165,6 +175,22 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('sessions')
+  async getSessions(@Request() req: any) {
+    const userId = req.user.sub;
+    const sessions = await this.authService.getSessions(userId);
+    return { sessions };
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('sessions/:id')
+  async revokeSession(@Param('id') sessionId: string, @Request() req: any) {
+    const userId = req.user.sub;
+    await this.authService.revokeSession(userId, sessionId);
+    return { revoked: true };
+  }
+
+  @UseGuards(AuthGuard)
   @Get('me/permissions')
   getPermissions(@Request() req: any) {
     return { permissions: req.user.permissions || [] };
@@ -185,11 +211,12 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('change-password')
+  @Throttle({ short: { limit: 3, ttl: 60000 } })
   async changePassword(
     @Request() req: any,
     @Body(new ZodValidationPipe(changePasswordSchema))
     body: ChangePasswordInput,
-    @Res({ passthrough: true }) res: ExpressResponse,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const result = await this.authService.changePassword(
       req.user.sub,
@@ -212,7 +239,7 @@ export class AuthController {
   }
 
   private extractRefreshTokenFromCookie(
-    req: ExpressRequest,
+    req: FastifyRequest,
   ): string | undefined {
     const cookieHeader = req.headers.cookie;
     if (!cookieHeader) {
@@ -232,13 +259,43 @@ export class AuthController {
     return token ? decodeURIComponent(token) : undefined;
   }
 
+  private extractAccessToken(req: FastifyRequest): string | undefined {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      return authHeader.substring(7);
+    }
+    const cookieHeader = req.headers.cookie;
+    if (!cookieHeader) return undefined;
+    const entries = cookieHeader.split(';').map((chunk) => chunk.trim());
+    const target = entries.find((item) => item.startsWith(`${this.cookiePrefix}access_token=`));
+    if (!target) return undefined;
+    const token = target.slice(`${this.cookiePrefix}access_token=`.length);
+    return token ? decodeURIComponent(token) : undefined;
+  }
+
+  private verifyCsrf(req: FastifyRequest): void {
+    const csrfHeader = req.headers['x-csrf-token'];
+    const cookieHeader = req.headers.cookie;
+    let csrfCookie;
+    if (cookieHeader) {
+      const entries = cookieHeader.split(';').map((chunk) => chunk.trim());
+      const target = entries.find((item) => item.startsWith(`${this.cookiePrefix}csrf_token=`));
+      if (target) {
+        csrfCookie = target.slice(`${this.cookiePrefix}csrf_token=`.length);
+      }
+    }
+    if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
+      throw new ForbiddenException('CSRF Token Invalid');
+    }
+  }
+
   private setRefreshCookie(
-    res: ExpressResponse,
+    res: FastifyReply,
     token: string,
     refreshExpiresAt: string,
   ): void {
     const expires = new Date(refreshExpiresAt);
-    res.cookie(this.refreshCookieName, token, {
+    res.setCookie(this.refreshCookieName, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -246,7 +303,7 @@ export class AuthController {
       expires,
     });
     // Non-HttpOnly marker for client-side refresh heuristics.
-    res.cookie('refresh_present', '1', {
+    res.setCookie('refresh_present', '1', {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -255,16 +312,16 @@ export class AuthController {
     });
   }
 
-  private setIdentityCookies(res: ExpressResponse, user: { uid: string, role: string }): void {
+  private setIdentityCookies(res: FastifyReply, user: { uid: string, role: string }): void {
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-    res.cookie('user_id', user.uid, { 
+    res.setCookie('user_id', user.uid, { 
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         path: '/', 
         expires 
     });
-    res.cookie('user_role', user.role, {
+    res.setCookie('user_role', user.role, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
@@ -273,44 +330,61 @@ export class AuthController {
     });
   }
 
-  private setAccessTokenCookie(res: ExpressResponse, token: string): void {
-    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour (longer than typical JWT to avoid frequent flips)
-    res.cookie('access_token', token, {
-      httpOnly: false, // Accessible by Next.js client-side libraries IF needed, but mainly for SSR
-      secure: process.env.NODE_ENV === 'production',
+  private setAccessTokenCookie(res: FastifyReply, token: string): void {
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins to match JWT
+    res.setCookie(`${this.cookiePrefix}access_token`, token, {
+      httpOnly: true, // Secure against XSS
+      secure: this.isProd,
       sameSite: 'strict',
       path: '/',
       expires,
     });
   }
 
-  private clearRefreshCookie(res: ExpressResponse): void {
+  private setCsrfCookie(res: FastifyReply, req?: FastifyRequest): void {
+    if (req) {
+      const cookieHeader = req.headers.cookie;
+      if (cookieHeader) {
+        const entries = cookieHeader.split(';').map((chunk) => chunk.trim());
+        const target = entries.find((item) => item.startsWith(`${this.cookiePrefix}csrf_token=`));
+        if (target) {
+          return; // Do not rotate if already exists
+        }
+      }
+    }
+    const crypto = require('crypto');
+    const csrfToken = crypto.randomBytes(32).toString('hex');
+    res.setCookie(`${this.cookiePrefix}csrf_token`, csrfToken, {
+      httpOnly: false, // Must be readable by client JS
+      secure: this.isProd,
+      sameSite: 'strict',
+      path: '/',
+    });
+  }
+
+  private clearRefreshCookie(res: FastifyReply): void {
     res.clearCookie(this.refreshCookieName, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: this.isProd,
       sameSite: 'strict',
       path: '/',
     });
     res.clearCookie('refresh_present', {
       httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
+      secure: this.isProd,
       sameSite: 'strict',
       path: '/',
     });
-    res.clearCookie('access_token', { path: '/' });
+    res.clearCookie(`${this.cookiePrefix}access_token`, { path: '/' });
     res.clearCookie('user_id', { path: '/' });
     res.clearCookie('user_role', { path: '/' });
   }
 
-  private getIp(req: ExpressRequest): string | null {
-    const forwarded = req.headers['x-forwarded-for'];
-    if (typeof forwarded === 'string' && forwarded.length > 0) {
-      return forwarded.split(',')[0].trim();
-    }
+  private getIp(req: FastifyRequest): string | null {
     return req.ip ?? req.socket?.remoteAddress ?? null;
   }
 
-  private getUserAgent(req: ExpressRequest): string | null {
+  private getUserAgent(req: FastifyRequest): string | null {
     const ua = req.headers['user-agent'];
     if (Array.isArray(ua)) {
       return ua[0] ?? null;

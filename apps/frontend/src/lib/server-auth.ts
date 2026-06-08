@@ -1,15 +1,8 @@
 import { cookies } from 'next/headers';
-
-const isValidSessionUid = (value: string | undefined): value is string => {
-  if (!value) return false;
-  const normalized = value.trim().toLowerCase();
-  if (!normalized) return false;
-  if (normalized === 'unknown') return false;
-  return true;
-};
+import { getSessionFromToken } from './session';
 
 /**
- * Robust server-side session retriever.
+ * Robust server-side session retriever using the unified `jose` based decoder.
  * Priority:
  * 1. access_token cookie (decoded as JWT)
  */
@@ -20,35 +13,17 @@ export async function getServerSession() {
     const userIdCookie = cookieStore.get('user_id')?.value;
     const userRoleCookie = cookieStore.get('user_role')?.value;
 
-    // 1. Try DECODING the access_token if it's a JWT
-    if (accessToken) {
-      try {
-        const parts = accessToken.split('.');
-        if (parts.length === 3) {
-          const payloadBase64 = parts[1];
-          const decoded = JSON.parse(Buffer.from(payloadBase64, 'base64').toString());
-          const uid = decoded.sub || decoded.uid || userIdCookie;
+    console.log('[getServerSession] accessToken present:', !!accessToken);
 
-          if (!isValidSessionUid(uid)) {
-            return null;
-          }
-          
-          return {
-            uid,
-            role: (decoded.role || userRoleCookie || 'student') as any,
-            email: decoded.email || 'user@pec.edu',
-            fullName: decoded.name || decoded.fullName || 'User',
-            token: accessToken,
-            profileComplete: decoded.profileComplete || true, // fallback to true to prevent unnecessary loops
-          };
-        }
-      } catch (e) {
-        // Not a valid JWT or parse error - fall through to simpler checks
-      }
+    const session = getSessionFromToken(accessToken, userIdCookie, userRoleCookie);
+    
+    if (!session) {
+      console.log('[getServerSession] Returning null');
+      return null;
     }
 
-    // 2. No session found
-    return null;
+    console.log('[getServerSession] Decoded UID:', session.uid);
+    return session;
   } catch (error) {
     console.error('Core SSR session error:', error);
     return null;

@@ -54,6 +54,16 @@ class AuthClient {
     reject: (error: Error) => void;
   }> = [];
 
+  private get isProd(): boolean {
+    return typeof window !== 'undefined'
+      ? window.location.protocol === 'https:'
+      : false;
+  }
+
+  private get cookiePrefix(): string {
+    return this.isProd ? '__Host-' : '';
+  }
+
   private readCookie(name: string): string | null {
     if (typeof document === 'undefined') return null;
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -61,17 +71,23 @@ class AuthClient {
     return match ? decodeURIComponent(match[1]) : null;
   }
 
+  private getCsrfToken(): string | null {
+    // Try prefixed name first, fall back to unprefixed for dev
+    return this.readCookie(`${this.cookiePrefix}csrf_token`) ?? this.readCookie('csrf_token');
+  }
+
   private writeAccessTokenCookie(token: string | null): void {
     if (typeof document === 'undefined') return;
 
+    const cookieName = `${this.cookiePrefix}access_token`;
     if (!token) {
-      document.cookie = 'access_token=; path=/; max-age=0; samesite=strict;';
+      document.cookie = `${cookieName}=; path=/; max-age=0; samesite=strict;`;
       return;
     }
 
-    // Keep access token available across full page reloads in the browser.
-    const oneHourSeconds = 60 * 60;
-    document.cookie = `access_token=${encodeURIComponent(token)}; path=/; max-age=${oneHourSeconds}; samesite=strict;`;
+    // 15 minutes to match JWT expiry
+    const fifteenMinutesSeconds = 15 * 60;
+    document.cookie = `${cookieName}=${encodeURIComponent(token)}; path=/; max-age=${fifteenMinutesSeconds}; samesite=strict;`;
   }
 
   private clearSession(): void {
@@ -79,6 +95,8 @@ class AuthClient {
     this.refreshToken = null;
     this.writeAccessTokenCookie(null);
     if (typeof document !== 'undefined') {
+      const prefix = this.cookiePrefix;
+      document.cookie = `${prefix}csrf_token=; path=/; max-age=0; samesite=strict;`;
       document.cookie = 'refresh_present=; path=/; max-age=0; samesite=strict;';
       document.cookie = 'user_id=; path=/; max-age=0; samesite=strict;';
       document.cookie = 'user_role=; path=/; max-age=0; samesite=strict;';
@@ -124,9 +142,13 @@ class AuthClient {
   }
 
   async login(credentials: AuthCredentials): Promise<AuthResponse> {
+    const csrfToken = this.getCsrfToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
     const response = await fetch(authUrl('login'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(credentials),
       credentials: 'include',
     });
@@ -138,6 +160,7 @@ class AuthClient {
 
     const data: AuthResponse = await response.json();
     this.accessToken = data.access_token;
+    this.writeAccessTokenCookie(this.accessToken);
 
     if (data.refresh_token) {
       this.refreshToken = data.refresh_token;
@@ -149,9 +172,13 @@ class AuthClient {
   async signup(
     credentials: SignUpCredentials
   ): Promise<AuthResponse & { emailVerificationToken?: string }> {
+    const csrfToken = this.getCsrfToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
     const response = await fetch(authUrl('register'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(credentials),
       credentials: 'include',
     });
@@ -163,6 +190,7 @@ class AuthClient {
 
     const data = await response.json();
     this.accessToken = data.access_token;
+    this.writeAccessTokenCookie(this.accessToken);
 
     if (data.refresh_token) {
       this.refreshToken = data.refresh_token;
@@ -184,9 +212,13 @@ class AuthClient {
     this.isRefreshing = true;
 
     try {
+      const csrfToken = this.getCsrfToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
       const response = await fetch(authUrl('refresh'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({}),
         credentials: 'include',
       });
@@ -224,13 +256,17 @@ class AuthClient {
 
   async logout(): Promise<void> {
     try {
+      const csrfToken = this.getCsrfToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
       const body = this.refreshToken
         ? JSON.stringify({ refreshToken: this.refreshToken })
         : JSON.stringify({});
 
       await fetch(authUrl('logout'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body,
         credentials: 'include',
       });
@@ -291,12 +327,16 @@ class AuthClient {
 
   async changePassword(payload: ChangePasswordPayload): Promise<{ changed: boolean }> {
     const token = this.getAccessToken();
+    const csrfToken = this.getCsrfToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
     const response = await fetch(authUrl('change-password'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers,
       body: JSON.stringify(payload),
       credentials: 'include',
     });
@@ -336,8 +376,10 @@ class AuthClient {
   getAccessToken(): string | null {
     if (this.accessToken) return this.accessToken;
 
-    // Recovery after page reload.
-    const fromCookie = this.readCookie('access_token');
+    // Recovery after page reload — check both prefixed (prod) and plain (dev)
+    const fromCookie =
+      this.readCookie(`${this.cookiePrefix}access_token`) ??
+      this.readCookie('access_token');
     if (fromCookie) {
       this.accessToken = fromCookie;
       return fromCookie;
@@ -373,4 +415,36 @@ class AuthClient {
   }
 }
 
-export const authClient = new AuthClient();
+/**
+ * Browser-only singleton. Safe to use in client components.
+ *
+ * Fix #23: Do NOT use this in React Server Components or `getServerSideProps`.
+ * The module-level singleton persists across all requests in the Node.js process,
+ * meaning one user's cached accessToken can leak into another user's server render.
+ *
+ * For SSR/RSC, create a per-request instance: `new AuthClient()`
+ */
+export const authClient: AuthClient =
+  typeof window !== 'undefined'
+    ? new AuthClient()
+    : (new Proxy({} as AuthClient, {
+        get(_, prop) {
+          if (prop === 'getAccessToken') return () => null;
+          if (prop === 'isAuthenticated') return () => false;
+          if (prop === 'hasRefreshSession') return () => false;
+          return () => {
+            throw new Error(
+              `[AuthClient] Attempted to call ${String(prop)} on the server. ` +
+              'Use a request-scoped AuthClient instance in SSR/RSC contexts.'
+            );
+          };
+        },
+      }) as AuthClient);
+
+/**
+ * Factory for creating request-scoped AuthClient instances in SSR/RSC contexts.
+ * Use this in `getServerSideProps`, API routes, or Server Components.
+ */
+export function createAuthClient(): AuthClient {
+  return new AuthClient();
+}

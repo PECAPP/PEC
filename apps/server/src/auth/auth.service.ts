@@ -4,7 +4,10 @@ import {
   ConflictException,
   BadRequestException,
   ForbiddenException,
+  Inject,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -65,11 +68,15 @@ export class AuthService {
   private readonly accountLockMinutes = Number(
     process.env.AUTH_LOCK_MINUTES ?? '15',
   );
+  private readonly bcryptRounds = Number(
+    process.env.BCRYPT_ROUNDS ?? '12',
+  );
 
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async signIn(
@@ -88,7 +95,7 @@ export class AuthService {
     const isMatch = await bcrypt.compare(pass, user.password);
 
     if (!isMatch) {
-      await this.registerFailedLogin(user.id, user.failedLoginAttempts);
+      await this.registerFailedLogin(user.id, user.failedLoginAttempts, context.ipAddress);
       throw new UnauthorizedException();
     }
 
@@ -112,15 +119,15 @@ export class AuthService {
     role: string,
     context: AuthContext,
   ): Promise<AuthResult & { emailVerificationToken: string }> {
-    if (!APP_ROLES.includes(role as (typeof APP_ROLES)[number])) {
-      throw new BadRequestException('Unsupported role');
+    let assignedRole = role || 'student';
+    if (!APP_ROLES.includes(assignedRole as (typeof APP_ROLES)[number])) {
+      assignedRole = 'student';
     }
 
     const existing = await this.usersService.findOne(email);
     if (existing) throw new ConflictException('User already exists');
 
-    const salt = await bcrypt.genSalt(12);
-    const hash = await bcrypt.hash(pass, salt);
+    const passwordHash = await bcrypt.hash(pass, this.bcryptRounds);
 
     const user = await this.prisma.$transaction(async (tx) => {
       const created = await tx.user.create({
@@ -128,15 +135,15 @@ export class AuthService {
           email,
           password: hash,
           name,
-          role,
+          role: assignedRole,
           passwordChangedAt: new Date(),
         },
       });
 
       const persistedRole = await tx.role.upsert({
-        where: { name: role },
+        where: { name: assignedRole },
         update: {},
-        create: { name: role },
+        create: { name: assignedRole },
       });
 
       await tx.userRole.create({
@@ -182,15 +189,21 @@ export class AuthService {
     }
 
     if (tokenRecord.revokedAt) {
-      await this.prisma.refreshToken.updateMany({
-        where: {
-          familyId: tokenRecord.familyId,
-          revokedAt: null,
-        },
-        data: {
-          revokedAt: new Date(),
-        },
-      });
+      await this.prisma.$transaction([
+        this.prisma.refreshToken.updateMany({
+          where: {
+            familyId: tokenRecord.familyId,
+            revokedAt: null,
+          },
+          data: {
+            revokedAt: new Date(),
+          },
+        }),
+        this.prisma.user.update({
+          where: { id: tokenRecord.userId },
+          data: { sessionVersion: { increment: 1 } },
+        }),
+      ]);
       throw new UnauthorizedException('Refresh token reuse detected');
     }
 
@@ -248,7 +261,12 @@ export class AuthService {
     };
   }
 
-  async logout(refreshTokenRaw?: string): Promise<void> {
+  async logout(refreshTokenRaw?: string, accessTokenRaw?: string): Promise<void> {
+    if (accessTokenRaw) {
+      const accessHash = this.hashToken(accessTokenRaw);
+      await this.cacheManager.set(`blacklist:token:${accessHash}`, true, 60 * 60 * 1000); // Blacklist for 1 hour (in ms)
+    }
+
     if (!refreshTokenRaw) {
       return;
     }
@@ -265,6 +283,35 @@ export class AuthService {
     });
   }
 
+  async getSessions(userId: string) {
+    const sessions = await this.prisma.refreshToken.findMany({ take: 1000, 
+      where: { userId, revokedAt: null },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        ipAddress: true,
+        userAgent: true,
+        createdAt: true,
+        expiresAt: true,
+      },
+    });
+    return sessions;
+  }
+
+  async revokeSession(userId: string, sessionId: string) {
+    // Only allow revoking sessions that belong to the user
+    await this.prisma.refreshToken.updateMany({
+      where: {
+        id: sessionId,
+        userId: userId,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+  }
+
   async verifyEmail(token: string): Promise<{ verified: boolean }> {
     const tokenHash = this.hashToken(token);
     const record = await this.prisma.emailVerificationToken.findUnique({
@@ -272,6 +319,9 @@ export class AuthService {
     });
 
     if (!record || record.usedAt || record.expiresAt.getTime() <= Date.now()) {
+      if (record && record.expiresAt.getTime() <= Date.now()) {
+        await this.prisma.emailVerificationToken.delete({ where: { id: record.id } });
+      }
       throw new BadRequestException('Invalid or expired verification token');
     }
 
@@ -322,6 +372,9 @@ export class AuthService {
     });
 
     if (!record || record.usedAt || record.expiresAt.getTime() <= Date.now()) {
+      if (record && record.expiresAt.getTime() <= Date.now()) {
+        await this.prisma.passwordResetToken.delete({ where: { id: record.id } });
+      }
       throw new BadRequestException('Invalid or expired password reset token');
     }
 
@@ -590,6 +643,8 @@ export class AuthService {
       });
     });
 
+    await this.cacheManager.del(`user_perms:${userId}`);
+
     return {
       id: updated.id,
       uid: updated.id,
@@ -713,18 +768,22 @@ export class AuthService {
   private async registerFailedLogin(
     userId: string,
     currentAttempts: number,
+    ipAddress?: string | null,
   ): Promise<void> {
     const attempts = currentAttempts + 1;
-    const lockUntil =
-      attempts >= this.accountLockThreshold
-        ? new Date(Date.now() + this.accountLockMinutes * 60_000)
-        : null;
+
+    // Hard account locking removed to prevent Account Lockout DoS attacks.
+    // We now rely purely on the @Throttle decorators at the controller level
+    // which rate limits by IP address, not by user account.
+    if (ipAddress) {
+      console.warn(`[AUTH] Failed login attempt for user ${userId} from IP: ${ipAddress}`);
+    }
 
     await this.prisma.user.update({
       where: { id: userId },
       data: {
         failedLoginAttempts: attempts,
-        lockedUntil: lockUntil,
+        lockedUntil: null,
       },
     });
   }
@@ -748,6 +807,33 @@ export class AuthService {
 
   private generateOpaqueToken(): string {
     return randomBytes(48).toString('base64url');
+  }
+
+  /**
+   * Prune expired and used verification/reset tokens.
+   * Call this from a scheduled cron job (e.g. daily at 3am).
+   */
+  async pruneExpiredTokens(): Promise<{ emailTokens: number; resetTokens: number; refreshTokens: number }> {
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60_000); // 7 days grace
+
+    const [emailTokens, resetTokens, refreshTokens] = await Promise.all([
+      this.prisma.emailVerificationToken.deleteMany({
+        where: { OR: [{ expiresAt: { lt: now } }, { usedAt: { lt: cutoff } }] },
+      }),
+      this.prisma.passwordResetToken.deleteMany({
+        where: { OR: [{ expiresAt: { lt: now } }, { usedAt: { lt: cutoff } }] },
+      }),
+      this.prisma.refreshToken.deleteMany({
+        where: { AND: [{ expiresAt: { lt: now } }, { revokedAt: { not: null } }] },
+      }),
+    ]);
+
+    return {
+      emailTokens: emailTokens.count,
+      resetTokens: resetTokens.count,
+      refreshTokens: refreshTokens.count,
+    };
   }
 
   private getRefreshExpiryDate(): Date {
