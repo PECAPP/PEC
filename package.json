@@ -17,7 +17,7 @@
     "check:env": "node scripts/check_env.js",
     "dev:docker:logs": "docker compose -f docker-compose.dev.yml logs -f --tail=100",
     "dev:docker:restart": "docker compose -f docker-compose.dev.yml restart",
-    "dev:local": "docker compose -f docker-compose.dev.yml up -d postgres pgbouncer redis rabbitmq deps_installer backend envoy dev_worker && cd apps/frontend && npx next dev --turbopack -p 3001",
+    "dev:local": "docker compose -f docker-compose.dev.yml up -d",
     "prod:docker": "docker compose up -d --build",
     "prod:docker:down": "docker compose down",
     "setup": "pnpm install && pnpm --filter pec-server db:push && pnpm --filter pec-server prisma:generate && pnpm --filter pec-server db:seed",
@@ -138,11 +138,13 @@
     "dbportal": "^1.1.0",
     "eslint": "^10.1.0",
     "eslint-config-next": "^16.2.1",
+    "eslint-plugin-boundaries": "^6.0.2",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.17",
+    "ts-morph": "^28.0.0",
     "turbo": "^2.9.16",
     "typescript": "^5.8.3"
   },
@@ -153,5 +155,17 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "pnpm": {
+    "supportedArchitectures": {
+      "os": [
+        "linux",
+        "win32"
+      ],
+      "cpu": [
+        "x64",
+        "arm64"
+      ]
+    }
   }
 }

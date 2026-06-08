@@ -17,21 +17,41 @@ export function Loader({ fullScreen = true, inline = false }: LoaderProps) {
   const containerClass = inline 
     ? "relative w-full h-1 bg-muted/30 overflow-hidden" 
     : fullScreen 
-      ? "fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-background/95 backdrop-blur-md pointer-events-none"
-      : "flex items-center justify-center p-12 w-full min-h-[100px]";
+      ? "fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/80 backdrop-blur-md pointer-events-none overflow-hidden"
+      : "flex flex-col items-center justify-center p-12 w-full min-h-[100px]";
 
-  // The bar itself
+  if (inline) {
+    return (
+      <div className={containerClass} role="status" aria-label="Loading">
+        <div className="w-full h-[4px] bg-secondary/20 relative overflow-hidden">
+          <div className="absolute top-0 bottom-0 left-0 w-1/3 bg-primary animate-indefinite-bar shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
+        </div>
+      </div>
+    );
+  }
+
+  // The bar itself for non-inline (fullScreen or block)
   return (
     <div className={containerClass} role="status" aria-label="Loading">
-      <div className={`${inline ? "w-full" : "w-64"} h-[4px] bg-secondary/20 relative overflow-hidden`}>
-        <div className="absolute top-0 bottom-0 left-0 w-1/3 bg-primary animate-indefinite-bar" />
-      </div>
+      {fullScreen && (
+        <div className="mesh-gradient-bg pointer-events-none">
+          <div className="mesh-gradient-item mesh-1" />
+          <div className="mesh-gradient-item mesh-2" />
+          <div className="mesh-gradient-item mesh-3" />
+        </div>
+      )}
 
-      {!inline && (
-        <span className="mt-4 text-[10px] font-bold uppercase tracking-[0.6em] text-primary/40 animate-pulse-loader">
+      <div className={fullScreen ? "relative z-10 flex flex-col items-center animate-in zoom-in-95 duration-500" : "flex flex-col items-center"}>
+        
+        
+        <div className="w-64 h-[4px] bg-secondary/20 relative overflow-hidden rounded-full">
+          <div className="absolute top-0 bottom-0 left-0 w-1/3 bg-primary animate-indefinite-bar shadow-[0_0_15px_rgba(var(--primary-rgb),0.8)] rounded-full" />
+        </div>
+
+        <span className="mt-6 text-[11px] font-black uppercase tracking-[0.5em] text-primary/60 animate-pulse-loader">
           Loading
         </span>
-      )}
+      </div>
 
       <style jsx global>{`
         @keyframes indefinite-bar {
