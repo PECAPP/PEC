@@ -12,24 +12,23 @@ import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 
-
-
 import { ok } from '../common/utils/api-response';
-import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('admin')
 @UseGuards(AuthGuard, PoliciesGuard)
-  @CheckPolicies((ability) => ability.can('read', 'Admin'))
+@CheckPolicies((ability) => ability.can('read', 'Admin'))
 export class AdminController {
+  constructor(private readonly adminService: AdminService) {}
+
   @Get('dashboard-stats')
   @UseInterceptors(CacheInterceptor)
   @CacheKey('dashboard-stats-cache')
+  @CacheTTL(60000)
   async getStats() {
     const data = await this.adminService.getDashboardStats();
     return ok(data);
   }
-
-  constructor(private readonly adminService: AdminService) {}
 
   @Post('upload-students')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))

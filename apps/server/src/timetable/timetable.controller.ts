@@ -31,7 +31,7 @@ export class TimetableController {
 
   @CheckPolicies((ability) => ability.can('read', 'Timetable'))
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(300) // 5 minutes
+  @CacheTTL(300000) // 5 minutes
   @Get()
   async findAll(@Query() query: TimetableQueryDto) {
     const result = await this.timetableService.findAll(query);
