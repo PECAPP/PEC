@@ -5,9 +5,9 @@ services:
     container_name: pec_postgres
     restart: always
     environment:
-      POSTGRES_DB: pec
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-pec}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - 5432:5432
     command: ["postgres", "-c", "statement_timeout=5000", "-c", "autovacuum_vacuum_scale_factor=0.05", "-c", "autovacuum_analyze_scale_factor=0.02", "-c", "wal_level=logical"]
@@ -37,10 +37,10 @@ services:
     container_name: pec_pgbouncer
     environment:
       AUTH_TYPE: scram-sha-256
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       DB_HOST: postgres
-      DB_NAME: pec
+      DB_NAME: ${POSTGRES_DB:-pec}
       POOL_MODE: transaction
       MAX_CLIENT_CONN: "1000"
       DEFAULT_POOL_SIZE: "20"
@@ -61,27 +61,40 @@ services:
         limits:
           cpus: "1.0"
           memory: 1024M
+  db_migrator:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: pec_db_migrator
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      DIRECT_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-pec}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_started
+    command: ["npx", "prisma", "migrate", "deploy", "--schema=node_modules/@pec/database/prisma/schema.prisma"]
+    networks:
+      - pec-network
+
   backend:
     build:
       context: .
       dockerfile: apps/server/Dockerfile
-    container_name: PECApp-Backend
+    container_name: pec_backend
     restart: always
     ports:
       - 4000:4000
       - 50051:50051
     environment:
-      JWT_SECRET: pec_secret_key_2026
+      JWT_SECRET: ${JWT_SECRET:-pec_secret_key_2026}
       PORT: "4000"
-      NODE_ENV: development
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/pec
-      REPLICA_URL: postgresql://postgres:postgres@postgres:5432/pec
-      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      REPLICA_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      DIRECT_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-pec}
       REDIS_URL: redis://redis:6379
-    command: >
-      sh -c " cd /app/packages/database && npx prisma db push --accept-data-loss
-      && cd /app/apps/server && node -r tsconfig-paths/register
-      dist/apps/server/src/main.js "
     depends_on:
       postgres:
         condition: service_healthy
@@ -198,13 +211,14 @@ services:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
-    container_name: PECApp-Frontend
+    container_name: pec_frontend
     restart: always
     ports:
       - 3000:3001
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:3000/api
-      INTERNAL_API_URL: http://backend:4000/api
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}
+      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:4000/api}
+      NODE_ENV: production
     depends_on:
       - backend
     networks:
@@ -220,22 +234,23 @@ services:
           cpus: "1.0"
           memory: 1024M
   dev_worker:
-    image: node:22-alpine
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
     container_name: pec_dev_worker
     working_dir: /app
-    volumes:
-      - ./:/app
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/pec
-      REPLICA_URL: postgresql://postgres:postgres@postgres:5432/pec
-      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      REPLICA_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      DIRECT_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-pec}
+      NODE_ENV: production
     depends_on:
       redis:
         condition: service_healthy
       postgres:
         condition: service_healthy
-    command: sh -c "corepack enable pnpm && pnpm install && npx ts-node apps/server/src/background-jobs/worker.ts"
+    command: ["node", "dist/src/background-jobs/worker.js"]
     networks:
       - pec-network
     logging:

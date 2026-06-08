@@ -12,9 +12,9 @@ services:
     container_name: pec_postgres_dev
     restart: always
     environment:
-      POSTGRES_DB: pec
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-pec}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - 5432:5432
     command: ["postgres", "-c", "statement_timeout=5000", "-c", "autovacuum_vacuum_scale_factor=0.05", "-c", "autovacuum_analyze_scale_factor=0.02", "-c", "wal_level=logical"]
@@ -36,10 +36,10 @@ services:
     container_name: pec_pgbouncer_dev
     environment:
       AUTH_TYPE: scram-sha-256
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       DB_HOST: postgres
-      DB_NAME: pec
+      DB_NAME: ${POSTGRES_DB:-pec}
       POOL_MODE: transaction
       MAX_CLIENT_CONN: "1000"
       DEFAULT_POOL_SIZE: "20"
@@ -58,6 +58,9 @@ services:
     restart: always
     ports:
       - 6379:6379
+    # Use volatile-lru so standard caching works correctly when memory is full.
+    # Blacklisted tokens should be managed by DB/TTL instead of relying on noeviction
+    command: redis-server --maxmemory 256mb --maxmemory-policy volatile-lru
     networks:
       - pec-network
     logging: *default-logging
@@ -90,39 +93,60 @@ services:
       retries: 5
 
   deps_installer:
-    image: node:22-bookworm-slim
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     container_name: pec_deps_installer_dev
     working_dir: /app
     volumes:
       - ./:/app
       - root_node_modules:/app/node_modules
       - pnpm_store_dev:/app/.pnpm-store
-    command: sh -c "corepack enable pnpm && pnpm config set store-dir /app/.pnpm-store && pnpm install --config.confirmModulesPurge=false"
+      - server_node_modules:/app/apps/server/node_modules
+      - frontend_node_modules:/app/apps/frontend/node_modules
+      - database_node_modules:/app/packages/database/node_modules
+    # Fix #20: Always re-run pnpm install so lockfile changes are picked up.
+    # pnpm's content-addressable store makes this fast on cache hits.
+    command: >-
+      sh -c "pnpm config set store-dir /app/.pnpm-store &&
+      pnpm install --config.confirmModulesPurge=false"
     networks:
       - pec-network
 
   backend:
-    image: node:22-bookworm-slim
-    container_name: PECApp-Backend-Dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: pec_backend_dev
     working_dir: /app
     restart: always
     ports:
       - 4000:4000
       - 50052:50051
     environment:
-      JWT_SECRET: pec_secret_key_2026
+      JWT_SECRET: ${JWT_SECRET:-pec_secret_key_2026}
       PORT: "4000"
       NODE_ENV: development
-      DATABASE_URL: postgresql://postgres:postgres@pgbouncer:5432/pec?pgbouncer=true
-      REPLICA_URL: postgresql://postgres:postgres@pgbouncer:5432/pec?pgbouncer=true
-      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      REPLICA_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      DIRECT_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-pec}
       REDIS_URL: redis://redis:6379
       RABBITMQ_URL: amqp://rabbitmq:5672
+      BCRYPT_ROUNDS: "12"
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: "3310"
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: ${MINIO_USER:-admin}
+      MINIO_SECRET_KEY: ${MINIO_PASSWORD:-admin123}
+      MINIO_BUCKET: pec-uploads
     volumes:
       - ./:/app
       - root_node_modules:/app/node_modules
+      - server_node_modules:/app/apps/server/node_modules
+      - database_node_modules:/app/packages/database/node_modules
     command: >
-      sh -c "apt-get update -y && apt-get install -y openssl && corepack enable pnpm && cd /app/packages/database && pnpm exec prisma generate && DATABASE_URL=$$DIRECT_URL pnpm exec prisma db push --accept-data-loss && 
+      sh -c "cd /app/packages/database && pnpm exec prisma generate && DATABASE_URL=$$DIRECT_URL pnpm exec prisma db push --accept-data-loss && 
       cd /app/apps/server && pnpm exec nest start --watch"
     depends_on:
       postgres:
@@ -133,12 +157,14 @@ services:
         condition: service_started
       deps_installer:
         condition: service_completed_successfully
+    # Fix #22: Healthcheck now hits /api/v1/health (proper endpoint) rather than root path.
+    # This catches the case where the process is up but all routes are returning 500.
     healthcheck:
       test:
         - CMD
         - node
         - -e
-        - "require('http').get('http://localhost:4000/api/v1', (res) => res.statusCode === 200 ? process.exit(0) : process.exit(1)).on('error', () => process.exit(1))"
+        - "require('http').get('http://localhost:4000/api/v1/health', (res) => { process.exit(res.statusCode < 500 ? 0 : 1); }).on('error', () => process.exit(1))"
       interval: 15s
       timeout: 10s
       retries: 10
@@ -162,25 +188,26 @@ services:
       - pec-network
 
   frontend:
-    image: node:22-bookworm-slim
-    container_name: PECApp-Frontend-Dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: pec_frontend_dev
     working_dir: /app
     restart: always
     ports:
       - 3001:3001
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:3001/api
-      INTERNAL_API_URL: http://backend:4000/api
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}
+      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:4000/api}
       NODE_ENV: development
       NODE_OPTIONS: "--max-old-space-size=3072"
       WATCHPACK_POLLING: "true"
     volumes:
       - ./:/app
       - root_node_modules:/app/node_modules
-    tmpfs:
-      - /app/apps/frontend/.next
+      - frontend_node_modules:/app/apps/frontend/node_modules
     command: >
-      sh -c "corepack enable pnpm && cd apps/frontend && pnpm exec next dev --turbopack -H 0.0.0.0 -p 3001"
+      sh -c "cd apps/frontend && pnpm exec next dev -H 0.0.0.0 -p 3001"
     depends_on:
       backend:
         condition: service_healthy
@@ -195,17 +222,21 @@ services:
           memory: 4G
 
   dev_worker:
-    image: node:22-bookworm-slim
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     container_name: pec_dev_worker_dev
     working_dir: /app
     volumes:
       - ./:/app
       - root_node_modules:/app/node_modules
+      - server_node_modules:/app/apps/server/node_modules
+      - database_node_modules:/app/packages/database/node_modules
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://postgres:postgres@pgbouncer:5432/pec?pgbouncer=true
-      REPLICA_URL: postgresql://postgres:postgres@pgbouncer:5432/pec?pgbouncer=true
-      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/pec
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      REPLICA_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      DIRECT_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-pec}
     depends_on:
       redis:
         condition: service_healthy
@@ -217,30 +248,74 @@ services:
         condition: service_started
       deps_installer:
         condition: service_completed_successfully
+      # Fix #21: Worker waits for backend to be healthy so it doesn't fire
+      # events before backend consumers are registered.
+      backend:
+        condition: service_healthy
     command: >
-      sh -c "apt-get update -y && apt-get install -y openssl &&
-      corepack enable pnpm &&
-      cd /app/packages/database && pnpm exec prisma generate &&
+      sh -c "cd /app/packages/database && pnpm exec prisma generate &&
       cd /app && pnpm exec tsx watch apps/server/src/background-jobs/worker.ts"
     networks:
       - pec-network
     logging: *default-logging
 
-  qdrant:
-    image: qdrant/qdrant
-    container_name: pec_qdrant_dev
-    restart: unless-stopped
+  clamav:
+    image: clamav/clamav:latest
+    container_name: pec_clamav_dev
+    restart: always
     ports:
-      - "6333:6333"
-      - "6334:6334"
+      - "3310:3310"
+    networks:
+      - pec-network
+    logging: *default-logging
+
+  minio:
+    image: minio/minio
+    container_name: pec_minio_dev
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-admin123}
+    command: server /data --console-address ":9001"
     volumes:
-      - qdrant_dev_data:/qdrant/storage
+      - minio_dev_data:/data
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-create-bucket:
+    image: minio/mc
+    container_name: pec_minio_create_bucket_dev
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - pec-network
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_USER:-admin} ${MINIO_PASSWORD:-admin123};
+      /usr/bin/mc mb myminio/pec-uploads --ignore-existing;
+      /usr/bin/mc policy set download myminio/pec-uploads;
+      exit 0;
+      "
 
 volumes:
   postgres_dev_data:
   qdrant_dev_data:
+  minio_dev_data:
   root_node_modules:
   pnpm_store_dev:
+  server_node_modules:
+  frontend_node_modules:
+  database_node_modules:
 
 networks:
   pec-network:
