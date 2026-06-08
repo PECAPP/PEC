@@ -1,56 +1,33 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import Queue = require('bull');
-import IORedis from 'ioredis';
-
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+import { Injectable, Inject, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class QueueService implements OnModuleInit, OnModuleDestroy {
-  private queue: Queue.Queue;
-
-  constructor() {
-    this.queue = new Queue('background-jobs', redisUrl as any);
-  }
+  constructor(@Inject('RMQ_SERVICE') private client: ClientProxy) {}
 
   async onModuleInit() {
-    // set up a simple processor
-    this.queue.process(async (job) => {
-      try {
-        if (job.name === 'send-email') {
-          console.log('Sending email job payload:', job.data);
-        }
-        if (job.name === 'example') {
-          console.log('Example job executed', job.data);
-        }
-        if (job.name === 'attendance-created') {
-          console.log(`[BACKGROUND JOB] Processing attendance recalculation for student: ${job.data.studentId}`);
-          console.log(`[BACKGROUND JOB] Cached metrics successfully updated for course: ${job.data.courseId}`);
-        }
-        return Promise.resolve();
-      } catch (err) {
-        console.error('Job error', err);
-        throw err;
-      }
-    });
-
-    this.queue.on('failed', (job, err) => {
-      console.error('Job failed', job?.id, err?.message || err);
-    });
+    await this.client.connect();
+    console.log('[QueueService] Connected to RabbitMQ');
   }
 
   async addSendEmailJob(payload: any) {
-    await this.queue.add('send-email', payload, { attempts: 3 });
+    try {
+      await this.client.emit('send-email', payload).toPromise();
+    } catch (e) {
+      console.error('Failed to emit send-email job', e?.message || e);
+    }
   }
 
   async addJob(name: string, payload: any, opts: any = {}) {
-    await this.queue.add(name, payload, opts);
+    try {
+      await this.client.emit(name, payload).toPromise();
+    } catch (e) {
+      console.error(`Failed to emit ${name} job`, e?.message || e);
+    }
   }
 
   async onModuleDestroy() {
-    try {
-      await this.queue.close();
-    } catch (e) {
-      // ignore
-    }
+    this.client.close();
   }
 }
+

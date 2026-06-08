@@ -24,9 +24,14 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly prisma: PrismaService) {
     this.handlers.set('audit-log.prune', async (payload) => {
-      const config = payload
-        ? (JSON.parse(payload) as { retentionDays?: number })
-        : {};
+      let config: { retentionDays?: number } = {};
+      if (payload) {
+        try {
+          config = JSON.parse(payload);
+        } catch (e) {
+          this.logger.error('Failed to parse audit-log.prune payload', e);
+        }
+      }
       const retentionDays = Math.max(1, Number(config.retentionDays ?? 30));
       const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
 
@@ -64,7 +69,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
   }
 
   list(limit = 50) {
-    return this.prisma.backgroundJob.findMany({
+    return this.prisma.backgroundJob.findMany({ take: 1000, 
       orderBy: [{ createdAt: 'desc' }],
       take: Math.min(Math.max(limit, 1), 200),
     });
@@ -261,7 +266,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
     const threshold = settings?.attendanceRequiredPercentage ?? 75;
 
     // 2. Simple but effective logic: iterate over active students
-    const students = await this.prisma.user.findMany({
+    const students = await this.prisma.user.findMany({ take: 1000, 
       where: { roles: { some: { role: { name: 'student' } } } },
       select: { id: true, name: true }
     });
