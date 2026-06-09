@@ -1,10 +1,9 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { saveAs } from "file-saver";
 
 // Institution branding
 const INSTITUTION_NAME = "PEC Campus OS";
-const INSTITUTION_LOGO = ""; // Add logo URL if available
+const _INSTITUTION_LOGO = ""; // Add logo URL if available
 
 /**
  * Generate PDF with institution header

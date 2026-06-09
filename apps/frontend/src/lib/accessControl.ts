@@ -1,5 +1,4 @@
 import { AXIOS_INSTANCE } from "@pec/api";
-import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const normalizeCourse = (doc: any) => {
   const data = doc?.data ? doc.data() : doc;
@@ -84,20 +83,16 @@ export async function filterStudentsByFaculty(
     
     if (courseIds.length === 0) return [];
     
-    const enrollmentSnapshots = await Promise.all(
-      courseIds.map((courseId) =>
-        getDocs(
-          query(
-            collection(({} as any), 'enrollments'),
-            where('courseId', '==', courseId)
-          )
-        )
+    // Fetch enrollments for all faculty courses via backend REST API
+    const allEnrollments = await Promise.all(
+      courseIds.map(courseId =>
+        AXIOS_INSTANCE.get(`/api/v1/enrollments?courseId=${courseId}`)
+          .then(r => (Array.isArray(r.data) ? r.data : r.data?.data ?? []) as any[])
+          .catch(() => [] as any[])
       )
     );
     const enrolledStudentIds = new Set(
-      enrollmentSnapshots.flatMap((snapshot) =>
-        snapshot.docs.map((doc: any) => doc.data?.().studentId ?? doc.data?.studentId)
-      )
+      allEnrollments.flat().map((e: any) => e.studentId)
     );
     
     return students.filter(student => enrolledStudentIds.has(student.id));

@@ -128,14 +128,14 @@ export function isStudent(user: User | null): boolean {
 /**
  * Check if user is placement officer
  */
-export function isPlacementOfficer(user: User | null): boolean {
+export function isPlacementOfficer(_user: User | null): boolean {
   return false;
 }
 
 /**
  * Check if user is recruiter
  */
-export function isRecruiter(user: User | null): boolean {
+export function isRecruiter(_user: User | null): boolean {
   return false;
 }
 

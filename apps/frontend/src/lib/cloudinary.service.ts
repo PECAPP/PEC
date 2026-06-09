@@ -9,7 +9,7 @@ export function validateFileSize(file: File): boolean {
   return file.size <= 25 * 1024 * 1024; // 25MB max for everything as simplified check
 }
 
-export async function uploadMedia(file: File, userId: string): Promise<string> {
+export async function uploadMedia(file: File, _userId: string): Promise<string> {
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "demo";
   const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ml_default";
   
