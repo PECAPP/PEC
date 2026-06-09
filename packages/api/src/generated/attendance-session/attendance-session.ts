@@ -172,6 +172,92 @@ export function useAttendanceSessionControllerFindAllV1<TData = Awaited<ReturnTy
 
 
 
+export const attendanceSessionControllerCountAttendanceV1 = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/attendanceSessions/${id}/count`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getAttendanceSessionControllerCountAttendanceV1QueryKey = (id: string,) => {
+    return [
+    `/api/v1/attendanceSessions/${id}/count`
+    ] as const;
+    }
+
+
+export const getAttendanceSessionControllerCountAttendanceV1QueryOptions = <TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAttendanceSessionControllerCountAttendanceV1QueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>> = ({ signal }) => attendanceSessionControllerCountAttendanceV1(id, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AttendanceSessionControllerCountAttendanceV1QueryResult = NonNullable<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>>
+export type AttendanceSessionControllerCountAttendanceV1QueryError = unknown
+
+
+export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>,
+          TError,
+          Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>,
+          TError,
+          Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAttendanceSessionControllerCountAttendanceV1QueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 export const attendanceSessionControllerFindOneV1 = (
     id: string,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal

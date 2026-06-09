@@ -35,9 +35,14 @@ function extractErrorMessage(value: unknown): string | undefined {
   if (typeof value === "object") {
     const record = value as Record<string, unknown>;
 
+    if (record.errors && Array.isArray(record.errors)) {
+      const errs = record.errors.map(e => `${e.path}: ${e.message}`).join(', ');
+      if (errs) return `Validation failed: ${errs}`;
+    }
+
     for (const key of ["message", "error", "detail", "title", "reason"]) {
       const nested = extractErrorMessage(record[key]);
-      if (nested) return nested;
+      if (nested && nested !== "Validation failed") return nested;
     }
 
     const values = Object.values(record)

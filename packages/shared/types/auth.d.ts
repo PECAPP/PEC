@@ -23,8 +23,8 @@ export interface StudentProfile {
     city: string;
     state: string;
     bio?: string;
-    createdAt?: any;
-    updatedAt?: any;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
 }
 export interface FacultyProfile {
     uid: string;
@@ -37,8 +37,8 @@ export interface FacultyProfile {
     specialization: string;
     qualifications: string;
     bio?: string;
-    createdAt?: any;
-    updatedAt?: any;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
 }
 export interface CollegeAdminProfile {
     uid: string;
@@ -50,6 +50,6 @@ export interface CollegeAdminProfile {
     phone: string;
     responsibilities: string;
     bio?: string;
-    createdAt?: any;
-    updatedAt?: any;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
 }

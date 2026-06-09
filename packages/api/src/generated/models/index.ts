@@ -6,8 +6,6 @@
  * OpenAPI spec version: 1.0
  */
 
-export * from './academicCalendarControllerBulkImportV1Params';
-export * from './academicCalendarControllerCreateV1Params';
 export * from './academicCalendarControllerFindAllV1Params';
 export * from './academicCalendarControllerGetByRangeV1Params';
 export * from './academicCalendarControllerGetUpcomingV1Params';
@@ -33,7 +31,6 @@ export * from './createClubDto';
 export * from './createConferenceDto';
 export * from './createConsultationDto';
 export * from './createCourseDto';
-export * from './createCourseMaterialDto';
 export * from './createDepartmentDto';
 export * from './createEnrollmentDto';
 export * from './createExamScheduleDto';
@@ -53,6 +50,7 @@ export * from './enrollmentsControllerRemoveV1Params';
 export * from './financeControllerGetSummaryV1Params';
 export * from './payFeeDto';
 export * from './postClubMessageDto';
+export * from './presignRequestDto';
 export * from './refreshInput';
 export * from './requestPasswordResetInput';
 export * from './resetPasswordInput';

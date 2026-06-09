@@ -57,6 +57,13 @@ async function main() {
     { action: 'read', subject: 'Course' },
     { action: 'manage', subject: 'Course' },
     
+    // CourseMaterial
+    { action: 'read', subject: 'CourseMaterial' },
+    { action: 'create', subject: 'CourseMaterial' },
+    { action: 'update', subject: 'CourseMaterial', conditions: { uploadedBy: '{{id}}' } },
+    { action: 'delete', subject: 'CourseMaterial', conditions: { uploadedBy: '{{id}}' } },
+    { action: 'manage', subject: 'CourseMaterial' },
+    
     // Admin / System
     { action: 'manage', subject: 'Role' },
     { action: 'manage', subject: 'Permission' },
@@ -91,7 +98,7 @@ async function main() {
   if (studentRole) {
     const studentPerms = await getPerms(
       ['read', 'create', 'update', 'delete'], 
-      ['User', 'HostelIssue', 'MarketplaceListing', 'FeeRecord', 'Timetable', 'Course']
+      ['User', 'HostelIssue', 'MarketplaceListing', 'FeeRecord', 'Timetable', 'Course', 'CourseMaterial']
     );
     // filter down to non-manage 
     const filtered = studentPerms.filter(p => p.action !== 'manage');
@@ -107,8 +114,8 @@ async function main() {
 
   if (facultyRole) {
     const facultyPerms = await getPerms(
-      ['read', 'update', 'create'], 
-      ['User', 'Timetable', 'Course']
+      ['read', 'update', 'create', 'delete'], 
+      ['User', 'Timetable', 'Course', 'CourseMaterial']
     );
     for (const p of facultyPerms) {
       await prisma.rolePermission.upsert({

@@ -8,4 +8,5 @@
 
 export type AcademicCalendarControllerGetUpcomingV1Params = {
 limit: number;
+localCurrentDate: string;
 };

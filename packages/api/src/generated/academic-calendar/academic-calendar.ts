@@ -25,8 +25,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AcademicCalendarControllerBulkImportV1Params,
-  AcademicCalendarControllerCreateV1Params,
   AcademicCalendarControllerFindAllV1Params,
   AcademicCalendarControllerGetByRangeV1Params,
   AcademicCalendarControllerGetUpcomingV1Params,
@@ -152,14 +150,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getAcademicCalendarControllerUploadPdfBase64V1MutationOptions(options), queryClient);
     }
     export const academicCalendarControllerBulkImportV1 = (
-    params: AcademicCalendarControllerBulkImportV1Params,
+
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
 
       return customInstance<void>(
-      {url: `/api/v1/academic-calendar/bulk-import`, method: 'POST',
-        params, signal
+      {url: `/api/v1/academic-calendar/bulk-import`, method: 'POST', signal
     },
       options);
     }
@@ -167,8 +164,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 export const getAcademicCalendarControllerBulkImportV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,{params: AcademicCalendarControllerBulkImportV1Params}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,{params: AcademicCalendarControllerBulkImportV1Params}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,void, TContext> => {
 
 const mutationKey = ['academicCalendarControllerBulkImportV1'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -180,10 +177,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, {params: AcademicCalendarControllerBulkImportV1Params}> = (props) => {
-          const {params} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, void> = () => {
 
-          return  academicCalendarControllerBulkImportV1(params,requestOptions)
+
+          return  academicCalendarControllerBulkImportV1(requestOptions)
         }
 
 
@@ -198,11 +195,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerBulkImportV1MutationError = unknown
 
     export const useAcademicCalendarControllerBulkImportV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,{params: AcademicCalendarControllerBulkImportV1Params}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>,
         TError,
-        {params: AcademicCalendarControllerBulkImportV1Params},
+        void,
         TContext
       > => {
       return useMutation(getAcademicCalendarControllerBulkImportV1MutationOptions(options), queryClient);
@@ -296,7 +293,6 @@ export function useAcademicCalendarControllerFindAllV1<TData = Awaited<ReturnTyp
 
 export const academicCalendarControllerCreateV1 = (
     createAcademicCalendarEventDto: CreateAcademicCalendarEventDto,
-    params: AcademicCalendarControllerCreateV1Params,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
@@ -304,8 +300,7 @@ export const academicCalendarControllerCreateV1 = (
       return customInstance<void>(
       {url: `/api/v1/academic-calendar`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: createAcademicCalendarEventDto,
-        params, signal
+      data: createAcademicCalendarEventDto, signal
     },
       options);
     }
@@ -313,8 +308,8 @@ export const academicCalendarControllerCreateV1 = (
 
 
 export const getAcademicCalendarControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto;params: AcademicCalendarControllerCreateV1Params}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto;params: AcademicCalendarControllerCreateV1Params}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto}, TContext> => {
 
 const mutationKey = ['academicCalendarControllerCreateV1'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -326,10 +321,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, {data: CreateAcademicCalendarEventDto;params: AcademicCalendarControllerCreateV1Params}> = (props) => {
-          const {data,params} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, {data: CreateAcademicCalendarEventDto}> = (props) => {
+          const {data} = props ?? {};
 
-          return  academicCalendarControllerCreateV1(data,params,requestOptions)
+          return  academicCalendarControllerCreateV1(data,requestOptions)
         }
 
 
@@ -344,11 +339,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerCreateV1MutationError = unknown
 
     export const useAcademicCalendarControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto;params: AcademicCalendarControllerCreateV1Params}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>,
         TError,
-        {data: CreateAcademicCalendarEventDto;params: AcademicCalendarControllerCreateV1Params},
+        {data: CreateAcademicCalendarEventDto},
         TContext
       > => {
       return useMutation(getAcademicCalendarControllerCreateV1MutationOptions(options), queryClient);

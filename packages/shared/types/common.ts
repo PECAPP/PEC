@@ -22,9 +22,9 @@ export interface BookBorrow {
   id: string;
   userId: string;
   bookId: string;
-  borrowDate: any;
-  dueDate: any;
-  returnDate?: any;
+  borrowDate: Date | string;
+  dueDate: Date | string;
+  returnDate?: Date | string;
   status: "borrowed" | "returned" | "overdue";
   fine?: number;
 }
@@ -46,8 +46,8 @@ export interface RoomBooking {
   roomId: string;
   userId: string;
   title: string;
-  startTime: any;
-  endTime: any;
+  startTime: Date | string;
+  endTime: Date | string;
   date: string;
   purpose: string;
   status: "pending" | "approved" | "rejected" | "completed";
@@ -58,8 +58,8 @@ export interface Leave {
   userId: string;
   userName?: string;
   leaveTypeId: string;
-  startDate: any;
-  endDate: any;
+  startDate: Date | string;
+  endDate: Date | string;
   status: "pending" | "approved" | "rejected";
 }
 
@@ -68,7 +68,7 @@ export interface Club {
   name: string;
   description: string;
   category: string;
-   президент: string; // presidente
+  president: string;
   members: string[];
   totalMembers: number;
 }
@@ -81,7 +81,7 @@ export interface HostelComplaint {
   description: string;
   status: "pending" | "in-progress" | "resolved";
   priority: "low" | "medium" | "high";
-  createdAt: any;
+  createdAt: Date | string;
 }
 
 export interface Todo {

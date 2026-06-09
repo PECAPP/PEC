@@ -6,9 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export type AcademicCalendarControllerFindAllV1Params = {
-startDate: string;
-endDate: string;
-eventType: string;
-category: string;
-};
+export interface PresignRequestDto { [key: string]: unknown }

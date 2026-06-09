@@ -20,7 +20,7 @@ export interface CollegeSettings {
   cloudinaryCloudName?: string;
   cloudinaryPreset?: string;
   attendanceRequiredPercentage?: number;
-  lastUpdated: any;
+  lastUpdated: Date | string;
   updatedBy: string;
 }
 
@@ -39,7 +39,7 @@ export interface PlacementSettings {
   notifyOnNewJob: boolean;
   notifyOnApplicationUpdate: boolean;
   notifyOnDriveRegistration: boolean;
-  updatedAt: any;
+  updatedAt: Date | string;
   updatedBy: string;
 }
 
@@ -50,7 +50,7 @@ export interface DashboardStats {
 }
 
 export interface AdminDashboardData {
-  courses: any[];
-  users: any[];
+  courses: unknown[];
+  users: unknown[];
   stats: DashboardStats;
 }

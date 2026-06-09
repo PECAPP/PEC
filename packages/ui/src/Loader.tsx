@@ -17,7 +17,7 @@ export function Loader({ fullScreen = true, inline = false }: LoaderProps) {
   const containerClass = inline 
     ? "relative w-full h-1 bg-muted/30 overflow-hidden" 
     : fullScreen 
-      ? "fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/80 backdrop-blur-md pointer-events-none overflow-hidden"
+      ? "fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/80 backdrop-blur-md pointer-events-auto overflow-hidden animate-fade-in-delayed"
       : "flex flex-col items-center justify-center p-12 w-full min-h-[100px]";
 
   if (inline) {
@@ -68,6 +68,15 @@ export function Loader({ fullScreen = true, inline = false }: LoaderProps) {
         }
         .animate-pulse-loader {
           animation: pulse-loader 2s ease-in-out infinite;
+        }
+        @keyframes fade-in-delayed {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        .animate-fade-in-delayed {
+          animation: fade-in-delayed 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          animation-delay: 200ms;
+          opacity: 0;
         }
       `}</style>
     </div>
