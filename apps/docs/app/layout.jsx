@@ -3,6 +3,7 @@ import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 
+export const dynamic = 'force-dynamic'
 export const metadata = {
   title: 'PEC App Documentation',
 }

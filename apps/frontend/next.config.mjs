@@ -21,6 +21,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  turbopack: {
+    root: "../../",
+  },
 
   // ─── Experimental ────────────────────────────────────────────────────────────
   experimental: {
