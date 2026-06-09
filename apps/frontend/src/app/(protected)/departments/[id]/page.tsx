@@ -20,7 +20,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { AXIOS_INSTANCE } from "@pec/api";
-import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 
 import { toast } from 'sonner';
 
@@ -53,52 +52,36 @@ export default function DepartmentDetail() {
       if (!id) return;
       try {
         setLoading(true);
-        // Fetch department details
-        const deptDoc = await getDoc(doc(({} as any), 'departments', id));
-        if (!deptDoc.exists()) {
+
+        // Fetch department details via NestJS REST API
+        const deptRes = await AXIOS_INSTANCE.get(`/api/v1/departments/${id}`);
+        const deptData = deptRes.data?.data ?? deptRes.data;
+        if (!deptData) {
           toast.error('Department not found');
           router.push('/departments');
           return;
         }
-        const deptData = { id: deptDoc.id, ...(deptDoc.data() as any) };
         setDepartment(deptData);
 
-        const departmentName = deptData.name;
+        const departmentName = encodeURIComponent(deptData.name);
 
-        // Fetch faculty members
-        const facultyQuery = query(
-          collection(({} as any), 'users'),
-          where('role', '==', 'faculty'),
-          where('department', '==', departmentName)
-        );
-        const facultySnap = await getDocs(facultyQuery);
-        setFaculty(facultySnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })));
+        // Fetch faculty, students, courses, timetable in parallel
+        const [facultyRes, studentsRes, coursesRes, timetableRes] = await Promise.all([
+          AXIOS_INSTANCE.get(`/api/v1/users?role=faculty&department=${departmentName}&limit=200`),
+          AXIOS_INSTANCE.get(`/api/v1/users?role=student&department=${departmentName}&limit=500`),
+          AXIOS_INSTANCE.get(`/api/v1/courses?department=${departmentName}&limit=200`),
+          AXIOS_INSTANCE.get(`/api/v1/timetable?department=${departmentName}&limit=500`),
+        ]);
 
-        // Fetch students
-        const studentsQuery = query(
-          collection(({} as any), 'users'),
-          where('role', '==', 'student'),
-          where('department', '==', departmentName)
-        );
-        const studentsSnap = await getDocs(studentsQuery);
-        setStudents(studentsSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })));
+        const toArray = (res: any) =>
+          Array.isArray(res.data) ? res.data
+          : Array.isArray(res.data?.data) ? res.data.data
+          : [];
 
-        // Fetch courses
-        const coursesQuery = query(
-          collection(({} as any), 'courses'),
-          where('department', '==', departmentName)
-        );
-        const coursesSnap = await getDocs(coursesQuery);
-        setCourses(coursesSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })));
-
-        // Fetch timetable
-        const timetableQuery = query(
-          collection(({} as any), 'timetable'),
-          where('department', '==', departmentName)
-        );
-        const timetableSnap = await getDocs(timetableQuery);
-        const slots = timetableSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
-        setTimetable(slots);
+        setFaculty(toArray(facultyRes));
+        setStudents(toArray(studentsRes));
+        setCourses(toArray(coursesRes));
+        setTimetable(toArray(timetableRes));
 
       } catch (error) {
         console.error('Error fetching department details:', error);

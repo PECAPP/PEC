@@ -164,7 +164,7 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
       await Promise.all(batchPromises);
       toast.success('Attendance records synchronized successfully');
       fetchStudentAttendance();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to synchronize records');
     }
   };

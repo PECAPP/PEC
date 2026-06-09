@@ -1,5 +1,5 @@
 'use client';
-import { Button, Badge, Input, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@pec/ui";
+import { Button, Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@pec/ui";
 
 
 import { useState, useCallback } from 'react';
@@ -12,7 +12,6 @@ import { InteractiveCalendar } from '@/features/academic-calendar/InteractiveCal
 import { EventDetailModal } from '@/features/academic-calendar/EventDetailModal';
 import {
   getEventLabel,
-  EVENT_LABELS,
   CATEGORY_LABELS,
 } from '@/features/academic-calendar/calendar-utils';
 import { format, isValid, parseISO } from 'date-fns';

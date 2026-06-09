@@ -1,10 +1,7 @@
 'use client';
 import { Badge, Button, ImageWithBlur } from "@pec/ui";
-
-
 import { motion } from 'framer-motion';
-import { CheckCircle, Users, GraduationCap, Plus, X, ArrowRight, BookOpen } from 'lucide-react';
-
+import { CheckCircle, GraduationCap, X, ArrowRight, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Course } from '@pec/shared';
 
@@ -33,9 +30,9 @@ export function CourseCard({
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-20px" }}
-      className="card-elevated group overflow-hidden bg-black/40 backdrop-blur-2xl border border-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all duration-500 rounded-3xl"
+      className="card-elevated group overflow-hidden bg-white dark:bg-black/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all duration-500 rounded-3xl shadow-sm dark:shadow-none"
     >
-      <div className="h-40 w-full relative overflow-hidden bg-black/50">
+      <div className="h-40 w-full relative overflow-hidden bg-black/10 dark:bg-black/50">
         <ImageWithBlur 
           src={image}
           alt={course.name}
@@ -65,10 +62,10 @@ export function CourseCard({
       
       <div className="p-5 space-y-5 relative">
         <div>
-          <h3 className="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors line-clamp-1 drop-shadow-md">
+          <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white group-hover:text-primary dark:group-hover:text-primary transition-colors line-clamp-1 drop-shadow-sm dark:drop-shadow-md">
             {course.name}
           </h3>
-          <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-zinc-400 transition-colors group-hover:text-zinc-300">
+          <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 transition-colors group-hover:text-zinc-800 dark:group-hover:text-zinc-300">
              <User className="w-3.5 h-3.5 opacity-70" />
              <span className="truncate">{course.facultyName.replace(/\b[A-Z]+\b/g, m => m.charAt(0) + m.slice(1).toLowerCase())}</span>
           </div>
@@ -79,26 +76,26 @@ export function CourseCard({
              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Credits</span>
              <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-zinc-200">{course.credits} Units</span>
+                <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{course.credits} Units</span>
              </div>
           </div>
           <div className="flex flex-col gap-1">
              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Schedule</span>
              <div className="flex items-center gap-2">
                 <GraduationCap className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-zinc-200">Sem {course.semester}</span>
+                <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Sem {course.semester}</span>
              </div>
           </div>
         </div>
 
-        <div className="space-y-3 pt-4 border-t border-white/10">
-           <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-zinc-400">
+        <div className="space-y-3 pt-4 border-t border-black/10 dark:border-white/10">
+           <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-zinc-600 dark:text-zinc-400">
               <span>Enrollment Status</span>
               <span className={cn(isFull ? "text-destructive font-extrabold" : "text-primary font-extrabold")}>
                 {course.enrolledStudents} / {course.maxStudents}
               </span>
            </div>
-           <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
+           <div className="h-1.5 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden border border-black/5 dark:border-white/5 p-[1px]">
               <motion.div 
                 initial={{ width: 0 }}
                 whileInView={{ width: `${Math.min(enrollmentRatio, 100)}%` }}
@@ -125,7 +122,7 @@ export function CourseCard({
             variant="ghost" 
             onClick={() => onView(course)} 
             className={cn(
-              "h-10 rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all group/btn bg-white/5 hover:bg-white/10 text-white border border-white/10",
+              "h-10 rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all group/btn bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-zinc-800 dark:text-white border border-black/10 dark:border-white/10",
               (enrolled || isFull) ? "flex-1" : "px-5"
             )}
           >
@@ -135,7 +132,7 @@ export function CourseCard({
 
           {enrolled && onDrop && (
             <Button 
-              variant="ghost"
+              variant="ghost" 
               className="h-10 w-10 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive hover:text-white border border-destructive/20 shrink-0 transition-all"
               onClick={() => onDrop(course.id)}
             >

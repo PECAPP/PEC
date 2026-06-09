@@ -3,7 +3,6 @@ import { Button } from "@pec/ui";
 
 
 import dynamic from 'next/dynamic';
-import { motion } from "framer-motion";
 import { LandingHero } from "@/features/landing/LandingHero";
 import { NeoBrutalGraphics } from "@/components/NeoBrutalGraphics";
 
@@ -28,7 +27,6 @@ const Footer = dynamic(() => import('@/features/landing/Footer').then(mod => mod
 });
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 export function LandingClient() {
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Label } from '@pec/ui';
+import { Button, Input } from '@pec/ui';
 import { Globe, Calendar, Smartphone, Copy, Check, Link2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 

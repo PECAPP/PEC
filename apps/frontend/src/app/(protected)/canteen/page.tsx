@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Badge, Button, ImageWithBlur, Input, Skeleton } from "@pec/ui";
+import { Badge, Button, Input, Skeleton } from "@pec/ui";
 import { AXIOS_INSTANCE } from "@pec/api";
 import { usePermissions } from "@/hooks/usePermissions";
 

@@ -5,24 +5,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger, Badge, ImageWithBlur, Input, 
 import { useState, useTransition, useOptimistic } from 'react';
 import { 
   Search, 
-  GraduationCap, 
-  Loader2, 
-  BookOpen, 
-  Clock, 
-  Plus, 
-  X,
-  CheckCircle2,
+  BookOpen,
   Filter,
-  Layers,
-  ChevronRight
+  Layers
 } from 'lucide-react';
 
-import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
 import { CourseCard } from './CourseCard';
 import { toast } from 'sonner';
 import { enrollInCourseAction, dropCourseAction } from '../actions';
 import { Course } from '@pec/shared';
-import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CourseDirectoryProps {
@@ -34,7 +25,7 @@ interface CourseDirectoryProps {
 }
 
 export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnrolledCourses = [], user, studentProfile }: CourseDirectoryProps) {
-  const [courses, setCourses] = useState(initialCourses);
+  const [courses, _setCourses] = useState(initialCourses);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState(Array.from(new Set(initialEnrolledIds)));
   
   const [optimisticEnrolledIds, setOptimisticEnrolledIds] = useOptimistic(
@@ -47,11 +38,11 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
 
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState(studentProfile?.department || 'all');
-  const [semesterFilter, setSemesterFilter] = useState(studentProfile?.semester?.toString() || 'all');
+  const [semesterFilter, _setSemesterFilter] = useState(studentProfile?.semester?.toString() || 'all');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
-  const [loadingSchedule, setLoadingSchedule] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [_loadingSchedule, setLoadingSchedule] = useState(false);
+  const [_isPending, startTransition] = useTransition();
 
   const handleEnroll = async (course: Course) => {
     startTransition(async () => {
@@ -88,14 +79,14 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
     });
   };
 
-  const fetchCourseSchedule = async (courseId: string) => {
+  const fetchCourseSchedule = async (_courseId: string) => {
      setLoadingSchedule(true);
      setTimeout(() => setLoadingSchedule(false), 500);
   };
 
   const departments = [...new Set(courses.map(c => c.department))];
 
-  const getCourseImage = (dept: string, name: string) => {
+  const getCourseImage = (dept: string, _name: string) => {
     const deptImages: Record<string, string> = {
       'Computer Science': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80',
       'Electronics': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',

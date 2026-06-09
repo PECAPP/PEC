@@ -9,7 +9,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  LineChart,
   Line,
   AreaChart,
   Area,

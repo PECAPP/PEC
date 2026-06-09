@@ -1,16 +1,16 @@
 import React from 'react';
 import { Loader2, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@pec/ui';
+import { Input } from '@pec/ui';
+import { Textarea } from '@pec/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@pec/ui';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@pec/ui';
 import { Award } from '../types';
 
 export default function AwardDialog({

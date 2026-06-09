@@ -17,10 +17,10 @@ import {
 type UserRole = 'student' | 'faculty' | 'college_admin';
 
 interface AuthClientProps {
- initialSessionStatus?: boolean;
+ _initialSessionStatus?: boolean;
 }
 
-export default function AuthClient({ initialSessionStatus = false }: AuthClientProps) {
+export default function AuthClient({ _initialSessionStatus = false }: AuthClientProps) {
  const router = useRouter();
  const { user, isAuthenticated, loading: authLoading, login } = useAuth();
  const [activeTab, setActiveTab] = useState<'signin' | 'signup' | 'forgot'>('signin');

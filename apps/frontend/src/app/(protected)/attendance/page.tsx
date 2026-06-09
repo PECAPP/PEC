@@ -1,7 +1,7 @@
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
 import { serverFetch } from '@/lib/server-data';
-import AttendanceView from '@/modules/attendance/views/AttendanceView';
+import AttendanceView from './AttendanceView';
 
 export const metadata = {
   title: 'Attendance Tracking | PEC APP',

@@ -21,7 +21,7 @@ export default function PaymentDialog({
 }) {
   const [method, setMethod] = useState('upi');
   const [upiId, setUpiId] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [step, setStep] = useState<'form' | 'processing' | 'done'>('form');
   const [receiptNo, setReceiptNo] = useState('');
 

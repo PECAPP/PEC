@@ -1,4 +1,4 @@
-import { Button, Input, Badge, Separator, Card, CardContent, CardDescription, CardHeader, CardTitle, RadioGroup, RadioGroupItem } from "@pec/ui";
+import { Button, Input, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, RadioGroup, RadioGroupItem } from "@pec/ui";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -17,7 +17,6 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import api from "@pec/api";
-import router from 'next/router';
 
 import { PaymentMethod, PaymentConfig } from './types';
 

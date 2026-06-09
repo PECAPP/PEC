@@ -2,7 +2,7 @@
 import { Button, Badge, Input, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@pec/ui";
 
 
-import { useState, useTransition, useEffect, useOptimistic } from 'react';
+import { useState, useTransition, useOptimistic } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { facultySchema, FacultyInput } from '@pec/shared';
@@ -21,7 +21,7 @@ import {
  updateFacultyAction, 
  deleteFacultyAction, 
  promoteToHODAction,
-} from '../actions';
+} from './actions';
 
 interface FacultyMember extends FacultyInput {
  id: string;
@@ -42,7 +42,6 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
  const router = useRouter();
  const [isPending, startTransition] = useTransition();
 
- const [faculty, setFaculty] = useState<FacultyMember[]>(initialFaculty);
  const [searchTerm, setSearchTerm] = useState('');
  const [showDialog, setShowDialog] = useState(false);
  const [showBulkUpload, setShowBulkUpload] = useState(false);
@@ -58,11 +57,9 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
   defaultValues: emptyForm,
  });
 
- useEffect(() => { setFaculty(initialFaculty); }, [initialFaculty]);
- 
   const [optimisticFaculty, addOptimisticFaculty] = useOptimistic(
-    faculty,
-    (state, { type, payload }: { type: 'create' | 'update' | 'delete' | 'promote', payload: any }) => {
+    initialFaculty,
+    (state, { type, payload }: { type: 'create' | 'update' | 'delete' | 'promote', payload: Partial<FacultyMember> & { id?: string } }) => {
    switch (type) {
     case 'create':
      return [{ ...payload, id: 'temp-' + Date.now(), status: 'active' }, ...state];
@@ -181,7 +178,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
    { header: 'Status', key: 'status', width: 15 },
   ];
 
-  faculty.forEach(f => {
+  optimisticFaculty.forEach(f => {
    worksheet.addRow({
     employeeId: f.employeeId, fullName: f.fullName, email: f.email,
     department: f.department, designation: f.designation,
@@ -195,25 +192,26 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
   toast.success('Exported!');
  };
 
- const handleBulkImport = async (data: any[]) => {
-  let successCount = 0, failCount = 0;
-  const errors: string[] = [];
+  const handleBulkImport = async (data: Partial<FacultyMember>[]) => {
+   let successCount = 0, failCount = 0;
+   const errors: string[] = [];
 
-  for (const row of data) {
-   const result = await createFacultyAction({
-    fullName: row.fullName,
-    email: row.email,
-    employeeId: row.employeeId || '',
-    department: row.department || '',
-    designation: row.designation || '',
-    phone: row.phone || '',
-    specialization: row.specialization || '',
-   });
-   
-   if (result?.validationErrors || result?.serverError) {
-    failCount++;
-    errors.push(`${row.fullName}: Error`);
-   } else {
+   for (const row of data) {
+    const result = await createFacultyAction({
+     fullName: row.fullName || '',
+     email: row.email || '',
+     employeeId: row.employeeId || '',
+     department: row.department || '',
+     designation: row.designation || '',
+     phone: row.phone || '',
+     specialization: row.specialization || '',
+    });
+    
+    if (result?.validationErrors || result?.serverError) {
+     failCount++;
+     const errorMessage = result.serverError || 'Validation failed';
+     errors.push(`${row.fullName || 'Unknown'}: ${errorMessage}`);
+    } else {
     successCount++;
    }
   }

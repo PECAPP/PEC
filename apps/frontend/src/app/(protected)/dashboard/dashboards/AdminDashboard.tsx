@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 
 // Types
-import { AdminDashboardData, Course, User } from '@pec/shared';
+import { AdminDashboardData } from '@pec/shared';
 
 // Components
 import { AdminStatsCards } from './components/AdminStatsCards';

@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from "framer-motion";
 import { LoadingGrid } from "@/components/common/AsyncState";
 import { useResumeBuilder } from "@/hooks/useResumeBuilder";
 

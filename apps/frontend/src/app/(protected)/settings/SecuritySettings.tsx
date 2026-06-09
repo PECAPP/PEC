@@ -28,7 +28,7 @@ export function SecuritySettings() {
       if (!res.ok) throw new Error('Failed to fetch sessions');
       const data = await res.json();
       setSessions(data.sessions || []);
-    } catch (err) {
+    } catch (_err) {
       toast.error('Could not load active sessions.');
     } finally {
       setLoading(false);
@@ -49,7 +49,7 @@ export function SecuritySettings() {
       if (!res.ok) throw new Error('Failed to revoke session');
       toast.success('Session revoked successfully.');
       setSessions((prev) => prev.filter((s) => s.id !== id));
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to revoke session.');
     }
   };

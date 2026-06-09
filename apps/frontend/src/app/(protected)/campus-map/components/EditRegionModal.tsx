@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trash2, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@pec/ui';
+import { Input } from '@pec/ui';
 import { MapRegion } from './mapConfig';
 
 export default function EditRegionModal({

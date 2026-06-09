@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Textarea, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
+import { Button, Badge, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
 
 
 import { useState, useEffect } from 'react';
@@ -196,7 +196,7 @@ export default function FacultyBioSystemPage() {
       await api.delete(`/faculty-bio-system/publications/${id}`);
       toast.success('Publication deleted');
       fetchFullProfile();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete publication');
     }
   };
@@ -258,7 +258,7 @@ export default function FacultyBioSystemPage() {
       await api.delete(`/faculty-bio-system/awards/${id}`);
       toast.success('Award deleted');
       fetchFullProfile();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete award');
     }
   };
@@ -325,7 +325,7 @@ export default function FacultyBioSystemPage() {
       await api.delete(`/faculty-bio-system/conferences/${id}`);
       toast.success('Conference deleted');
       fetchFullProfile();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete conference');
     }
   };
@@ -388,7 +388,7 @@ export default function FacultyBioSystemPage() {
       await api.delete(`/faculty-bio-system/consultations/${id}`);
       toast.success('Consultation deleted');
       fetchFullProfile();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete consultation');
     }
   };

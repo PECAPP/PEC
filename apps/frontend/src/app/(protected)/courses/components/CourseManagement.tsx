@@ -7,11 +7,8 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Download, 
-  BookOpen, 
-  Users,
+  Download,
   Search,
-  Settings2,
   FileText
 } from 'lucide-react';
 
@@ -20,11 +17,11 @@ import { cn } from '@/lib/utils';
 
 interface CourseManagementProps {
   initialCourses: Course[];
-  user: any;
+  _user: any;
 }
 
-export function CourseManagement({ initialCourses, user }: CourseManagementProps) {
-  const [courses, setCourses] = useState(initialCourses);
+export function CourseManagement({ initialCourses, _user }: CourseManagementProps) {
+  const [courses, _setCourses] = useState(initialCourses);
   const [searchTerm, setSearchTerm] = useState('');
 
   const filtered = courses.filter(c => 

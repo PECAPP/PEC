@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Clock, CheckCircle2, IndianRupee, CreditCard } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@pec/ui';
+import { Badge } from '@pec/ui';
 import { cn } from '@/lib/utils';
 import { FeeRecord } from '../types';
 import { CATEGORIES, STATUS_CONFIG, fmt, isOverdue } from '../constants';

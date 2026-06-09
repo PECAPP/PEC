@@ -57,7 +57,7 @@ export async function enrollInCourseAction(prevState: any, formData: FormData) {
      revalidatePath('/dashboard');
 
      return { success: true, error: null };
-  } catch (error) {
+  } catch (_error) {
      return { success: false, error: 'An unexpected error occurred' };
   }
 }
@@ -84,7 +84,7 @@ export async function dropCourseAction(courseId: string) {
      revalidatePath('/dashboard');
 
      return { success: true };
-  } catch (e) {
+  } catch (_e) {
      return { success: false, error: 'An unexpected error occurred' };
   }
 }

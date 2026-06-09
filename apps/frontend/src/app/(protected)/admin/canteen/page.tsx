@@ -48,7 +48,7 @@ interface CanteenItem {
 export default function CanteenManager() {
   const [items, setItems] = useState<CanteenItem[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'orders' | 'menu'>('orders');
   const [editingItem, setEditingItem] = useState<Partial<CanteenItem> | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -101,7 +101,7 @@ export default function CanteenManager() {
       toast.success(editingItem.id ? 'Item updated' : 'Item added');
       setIsDialogOpen(false);
       setEditingItem(null);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save item');
     }
   };
@@ -111,7 +111,7 @@ export default function CanteenManager() {
     try {
       await AXIOS_INSTANCE.delete('/night-canteen/items/' + id);
       toast.success('Item deleted');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete item');
     }
   };
@@ -120,7 +120,7 @@ export default function CanteenManager() {
     try {
       await AXIOS_INSTANCE.patch('/night-canteen/orders/' + orderId, { status: newStatus });
       toast.success(`Order marked as ${newStatus}`);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update status');
     }
   };

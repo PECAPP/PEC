@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 interface ResumeHeaderProps {
-  settings: any;
+  _settings: any;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   zoom: number;
@@ -28,7 +28,7 @@ interface ResumeHeaderProps {
 }
 
 export function ResumeHeader({
-  settings,
+  _settings,
   activeTab,
   setActiveTab,
   zoom,

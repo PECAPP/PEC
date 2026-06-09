@@ -58,7 +58,7 @@ export default function CourseMaterials() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (authLoading) return; // Wait for ({} as any) to load
+    if (authLoading) return; // Wait for auth to load
     
     if (!user) {
       router.replace('/auth');
@@ -139,7 +139,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
     return { coursesData, materialsData, materialsApiAvailable };
   };
 
-  const { data, error, isLoading, mutate } = useSWR(`manager-materials-${userId}`, fetcher, {
+  const { data, _error, isLoading, mutate } = useSWR(`manager-materials-${userId}`, fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 60000,
   });
@@ -467,7 +467,7 @@ function StudentMaterialsView({ userId }: { userId: string }) {
     }
   };
 
-  const { data, error, isLoading } = useSWR(`student-materials-${userId}`, fetcher, {
+  const { data, _error, isLoading } = useSWR(`student-materials-${userId}`, fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 60000,
   });
@@ -477,7 +477,7 @@ function StudentMaterialsView({ userId }: { userId: string }) {
   const materialsApiAvailable = data?.materialsApiAvailable ?? true;
   const loading = isLoading;
 
-  if (error) {
+  if (_error) {
     toast.error('Failed to load materials');
   }
 

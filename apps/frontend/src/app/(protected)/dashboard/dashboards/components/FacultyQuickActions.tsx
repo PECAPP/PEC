@@ -3,7 +3,7 @@ import { Button } from "@pec/ui";
 
 
 import { motion } from 'framer-motion';
-import { ClipboardCheck, FileText, TrendingUp, Calendar } from 'lucide-react';
+import { ClipboardCheck } from 'lucide-react';
 
 interface Props {
   onAction: (path: string) => void;

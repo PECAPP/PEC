@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@pec/api";
-import { Monitor, Smartphone, Globe, Shield, Trash2, Key, Loader2 } from "lucide-react";
+import { Monitor, Smartphone, Globe, Shield, Trash2, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface Session {

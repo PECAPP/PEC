@@ -4,7 +4,6 @@ import { Button, Badge } from "@pec/ui";
 
 import { motion } from 'framer-motion';
 import {
-  User,
   Mail,
   Github,
   Linkedin,

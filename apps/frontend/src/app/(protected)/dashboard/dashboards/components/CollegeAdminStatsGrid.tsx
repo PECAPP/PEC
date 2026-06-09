@@ -1,11 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { GraduationCap, Users, BookOpen, CreditCard } from 'lucide-react';
+import { GraduationCap, Users, BookOpen } from 'lucide-react';
 
 interface Props {
   stats: any;
-  formatCurrency: (amount: number) => string;
+  _formatCurrency: (amount: number) => string;
 }
 
 const item = {
@@ -13,7 +13,7 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
-export function CollegeAdminStatsGrid({ stats, formatCurrency }: Props) {
+export function CollegeAdminStatsGrid({ stats, _formatCurrency }: Props) {
   return (
     <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard

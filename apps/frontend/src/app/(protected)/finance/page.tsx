@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
 
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -25,7 +25,7 @@ import api from "@pec/api";
 
 // Shared types and constants
 import { FeeRecord, Transaction, Summary } from './types';
-import { CATEGORIES, STATUS_CONFIG, fmt } from './constants';
+import { CATEGORIES, fmt } from './constants';
 
 // Subcomponents
 import FeeCard from './components/FeeCard';
@@ -37,7 +37,7 @@ import AdminCreateFeeDialog from './components/AdminCreateFeeDialog';
 
 export default function FinancePage() {
   const { permissions, loading: permLoading } = usePermissions();
-  const isAdmin = (permissions as any)?.isAdmin || (permissions as any)?.role === 'college_admin';
+  const _isAdmin = (permissions as any)?.isAdmin || (permissions as any)?.role === 'college_admin';
   const [tab, setTab] = useState('overview');
   const [feeCategory, setFeeCategory] = useState('');
   const [summary, setSummary] = useState<Summary | null>(null);

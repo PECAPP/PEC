@@ -10,7 +10,6 @@ import {
   ChevronRight,
   Bell,
   Moon,
-  Globe,
   Shield,
   Eye,
   Clock,

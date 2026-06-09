@@ -3,13 +3,10 @@ import { Suspense } from 'react';
 import { 
   BookOpen, 
   Clock, 
-  Users, 
   Star, 
   Calendar, 
   ArrowLeft, 
   CheckCircle2, 
-  FileText, 
-  Video, 
   User, 
   Award 
 } from 'lucide-react';

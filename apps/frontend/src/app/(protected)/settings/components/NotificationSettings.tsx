@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Label, Input } from '@pec/ui';
-import { Switch } from '@/components/ui/switch';
-import { Bell, BookOpen, CreditCard, Users, Clock, Save } from 'lucide-react';
+import { Switch } from '@pec/ui';
+import { Bell, BookOpen, CreditCard, Users, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function NotificationSettings() {

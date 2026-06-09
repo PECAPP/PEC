@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Receipt, Loader2, IndianRupee, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@pec/ui';
+import { Badge } from '@pec/ui';
 import { cn } from '@/lib/utils';
 import { Transaction } from '../types';
 import { CATEGORIES, STATUS_CONFIG, fmt } from '../constants';

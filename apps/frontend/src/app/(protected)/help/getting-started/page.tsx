@@ -10,19 +10,10 @@ import {
   ChevronRight,
   Rocket,
   UserPlus,
-  LogIn,
   Layout,
-  Navigation,
-  Bell,
-  Settings,
-  Shield,
-  Smartphone,
-  HelpCircle,
-  Bookmark,
   Clock,
   UtensilsCrossed,
   Wrench,
-  ShieldCheck,
   UserCheck
 } from 'lucide-react';
 

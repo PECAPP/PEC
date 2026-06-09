@@ -4,7 +4,7 @@ import { Badge, Button } from "@pec/ui";
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, ArrowRight, Tag, Heart, Plus } from 'lucide-react';
+import { ShoppingBag, ArrowRight, Heart, Plus } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import api from "@pec/api";

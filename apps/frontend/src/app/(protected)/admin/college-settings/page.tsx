@@ -13,12 +13,8 @@ import {
   MapPin,
   Globe,
   Upload,
-  X,
   Loader2,
-  ChevronDown,
   Cloud,
-  HardDrive,
-  Database,
   Wand2,
 } from 'lucide-react';
 
@@ -622,7 +618,7 @@ export default function CollegeSettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Leave blank to use default ({} as any). Or enter your own Cloudinary credentials to keep logos on your account.
+            Leave blank to use default PEC cloud storage. Or enter your own Cloudinary credentials to keep logos on your account.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

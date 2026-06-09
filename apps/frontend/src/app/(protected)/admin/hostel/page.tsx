@@ -44,7 +44,7 @@ interface HostelIssue {
 
 export default function HostelAdmin() {
   const [issues, setIssues] = useState<HostelIssue[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const [selectedIssue, setSelectedIssue] = useState<HostelIssue | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -74,7 +74,7 @@ export default function HostelAdmin() {
     try {
       await api.patch(`/hostelIssues/${issueId}`, { status: newStatus });
       toast.success(`Issue marked as ${newStatus}`);
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to update status');
     }
   };
@@ -95,7 +95,7 @@ export default function HostelAdmin() {
       });
       setNewMessage('');
       toast.success('Reply sent');
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to send reply');
     }
   };

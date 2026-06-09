@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { List, Calendar } from 'lucide-react';
+import { Badge } from '@pec/ui';
 
 interface TimetableMobileViewProps {
   timetable: Record<string, any[]>;
@@ -15,9 +14,9 @@ interface TimetableMobileViewProps {
   getTimeStatus: (slotTime: string, day: string) => string;
   canManageAllTimetable: boolean;
   openSlotDialog: (day: string, timeSlot: string) => void;
-  user: any;
-  studentAttendanceMap: Map<string, number>;
-  facultyDisplayName: string;
+  _user: any;
+  _studentAttendanceMap: Map<string, number>;
+  _facultyDisplayName: string;
 }
 
 export default function TimetableMobileView({
@@ -31,9 +30,9 @@ export default function TimetableMobileView({
   getTimeStatus,
   canManageAllTimetable,
   openSlotDialog,
-  user,
-  studentAttendanceMap,
-  facultyDisplayName,
+  _user,
+  _studentAttendanceMap,
+  _facultyDisplayName,
 }: TimetableMobileViewProps) {
   return (
     <div className="md:hidden space-y-5">

@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   Download,
   TrendingUp,
-  TrendingDown,
   CreditCard,
   Wallet,
   PieChart,

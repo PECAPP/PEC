@@ -1,6 +1,6 @@
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
-import { UserManagementView } from '@/modules/users/views/UserManagementView';
+import { UserManagementView } from './UserManagementView';
 import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
 
 export const metadata = {

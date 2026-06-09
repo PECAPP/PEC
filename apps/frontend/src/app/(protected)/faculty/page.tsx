@@ -1,7 +1,7 @@
 import { serverFetch } from '@/lib/server-data';
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
-import { FacultyView } from '@/modules/faculty/views/FacultyView';
+import { FacultyView } from './FacultyView';
 
 export const metadata = {
   title: 'Faculty Registry | PEC APP ERP',

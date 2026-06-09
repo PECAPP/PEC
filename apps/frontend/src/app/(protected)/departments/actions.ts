@@ -2,9 +2,11 @@
 
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
+import { actionClient } from '@/lib/safe-action';
+import { departmentSchema } from '@pec/shared';
 import { logActivity } from '@/lib/logger';
 import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
-import { departmentSchema } from '@pec/shared';
+import { z } from 'zod';
 
 const API = resolveInternalApiBaseUrl();
 
@@ -28,55 +30,47 @@ async function apiFetch(method: string, path: string, body?: object) {
   return { ok: res.ok, status: res.status, data };
 }
 
-export async function createDepartment(_prev: any, formData: FormData) {
-  const rawData = {
-    name: formData.get('name') as string,
-    code: formData.get('code') as string,
-    hod: formData.get('hod') as string,
-    description: formData.get('description') as string,
-  };
+// 1. Create Department Action
+export const createDepartmentAction = actionClient
+  .schema(departmentSchema)
+  .action(async ({ parsedInput }) => {
+    const { ok } = await apiFetch('POST', 'departments', parsedInput);
+    
+    if (!ok) {
+      throw new Error('Failed to create department via gateway API.');
+    }
 
-  const validation = departmentSchema.safeParse(rawData);
-  if (!validation.success) {
-    return { error: validation.error.errors[0].message };
-  }
+    revalidateTag('departments', 'default');
+    logActivity('create', 'department', { name: parsedInput.name, code: parsedInput.code });
+    return { success: true };
+  });
 
-  const { ok } = await apiFetch('POST', 'departments', validation.data);
-  if (!ok) return { error: 'Failed to create department' };
+// 2. Update Department Action
+export const updateDepartmentAction = actionClient
+  .schema(departmentSchema)
+  .action(async ({ parsedInput }) => {
+    if (!parsedInput.id) throw new Error('Department ID is required for updates.');
+    
+    const { ok } = await apiFetch('PATCH', `departments/${parsedInput.id}`, parsedInput);
+    if (!ok) {
+      throw new Error('Failed to update department via gateway API.');
+    }
 
-  revalidateTag('departments', 'default');
-  logActivity('create', 'department', { name: validation.data.name, code: validation.data.code });
-  return { success: true };
-}
+    revalidateTag('departments', 'default');
+    logActivity('update', 'department', { id: parsedInput.id, name: parsedInput.name });
+    return { success: true };
+  });
 
-export async function updateDepartment(_prev: any, formData: FormData) {
-  const id = formData.get('id') as string;
-  const rawData = {
-    name: formData.get('name') as string,
-    code: formData.get('code') as string,
-    hod: formData.get('hod') as string,
-    description: formData.get('description') as string,
-  };
+// 3. Delete Department Action
+export const deleteDepartmentAction = actionClient
+  .schema(z.object({ id: z.string() }))
+  .action(async ({ parsedInput: { id } }) => {
+    const { ok } = await apiFetch('DELETE', `departments/${id}`);
+    if (!ok) {
+      throw new Error('Failed to delete department.');
+    }
 
-  const validation = departmentSchema.safeParse(rawData);
-  if (!validation.success) {
-    return { error: validation.error.errors[0].message };
-  }
-
-  const { ok } = await apiFetch('PATCH', `departments/${id}`, validation.data);
-  if (!ok) return { error: 'Failed to update department' };
-
-  revalidateTag('departments', 'default');
-  logActivity('update', 'department', { id, name: validation.data.name });
-  return { success: true };
-}
-
-export async function deleteDepartment(_prev: any, formData: FormData) {
-  const id = formData.get('id') as string;
-  const { ok } = await apiFetch('DELETE', `departments/${id}`);
-  if (!ok) return { error: 'Failed to delete department' };
-
-  revalidateTag('departments', 'default');
-  logActivity('delete', 'department', { id });
-  return { success: true };
-}
+    revalidateTag('departments', 'default');
+    logActivity('delete', 'department', { id });
+    return { success: true };
+  });

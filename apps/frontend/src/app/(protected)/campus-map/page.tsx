@@ -15,8 +15,8 @@ import {
   Map,
   Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@pec/ui';
+import { Badge } from '@pec/ui';
 import { cn } from '@/lib/utils';
 import { AXIOS_INSTANCE } from '@pec/api';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -90,7 +90,7 @@ export default function CampusMap() {
 
         let regionsSnap: any = { empty: true, docs: [] };
         try {
-          const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/campus-map' + (orgId ? '?organizationId=' + orgId : ''));
+          const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/campusMapRegions' + (orgId ? '?organizationId=' + orgId : ''));
           const arr = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
           regionsSnap = { empty: arr.length === 0, docs: arr.map((d: any) => ({ id: d.id, data: () => d })) };
         } catch(e) { console.error('regions fetch err', e); }
@@ -98,7 +98,7 @@ export default function CampusMap() {
         // Fetch roads
         let roadsSnap: any = { empty: true, docs: [] };
         try {
-          const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/campus-map-roads' + (orgId ? '?organizationId=' + orgId : ''));
+          const { data: raw } = await AXIOS_INSTANCE.get('/api/v1/campusMapRoads' + (orgId ? '?organizationId=' + orgId : ''));
           const arr = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
           roadsSnap = { empty: arr.length === 0, docs: arr.map((d: any) => ({ id: d.id, data: () => d })) };
         } catch(e) { console.error('roads fetch err', e); }
@@ -111,7 +111,7 @@ export default function CampusMap() {
             }))
           );
         } else {
-          setRegions(regionsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as MapRegion));
+          setRegions(regionsSnap.docs.map((doc) => ({ _id: doc.id, ...doc.data() }) as MapRegion));
         }
 
         if (roadsSnap.empty) {
@@ -119,7 +119,7 @@ export default function CampusMap() {
             defaultRoads.map((r, i) => ({ ...r, id: `road-${i}`, organizationId: orgId || '' }))
           );
         } else {
-          setRoads(roadsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as MapRoad));
+          setRoads(roadsSnap.docs.map((doc) => ({ _id: doc.id, ...doc.data() }) as MapRoad));
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -240,7 +240,7 @@ export default function CampusMap() {
 
         setRegions((prev) =>
           prev.map((r) =>
-            r.id === region.id ? { ...r, x: newX, y: newY, width: newW, height: newH } : r
+            (r._id || r.id) === (region._id || region.id) ? { ...r, x: newX, y: newY, width: newW, height: newH } : r
           )
         );
       } else if (dragging) {
@@ -250,7 +250,7 @@ export default function CampusMap() {
         const newY = snapToGrid(Math.max(0, Math.min(100 - region.height, pos.y - offsetY)));
 
         setRegions((prev) =>
-          prev.map((r) => (r.id === region.id ? { ...r, x: newX, y: newY } : r))
+          prev.map((r) => ((r._id || r.id) === (region._id || region.id) ? { ...r, x: newX, y: newY } : r))
         );
       }
     },
@@ -266,7 +266,7 @@ export default function CampusMap() {
       newRegion.height > 2
     ) {
       setEditingRegion({
-        id: '',
+        _id: '',
         name: '',
         description: '',
         category: 'academic',
@@ -303,18 +303,19 @@ export default function CampusMap() {
 
     try {
       const regionData = { ...editingRegion, organizationId: user?.organizationId || '' };
+      const regionId = editingRegion._id || editingRegion.id;
 
-      if (editingRegion.id && !editingRegion.id.startsWith('default-')) {
+      if (regionId && !regionId.startsWith('default-')) {
         // Update existing region record
-        await AXIOS_INSTANCE.patch('/api/v1/campus-map/' + editingRegion.id, regionData);
-        setRegions(prev => prev.map(r => r.id === editingRegion.id ? { ...regionData, id: editingRegion.id } : r));
+        await AXIOS_INSTANCE.patch('/api/v1/campusMapRegions/' + regionId, regionData);
+        setRegions(prev => prev.map(r => (r._id || r.id) === regionId ? { ...regionData, _id: regionId } : r));
         toast.success('Region updated!');
       } else {
         // Create new region (replace only THIS default region, keep others)
-        const { data: docRef } = await AXIOS_INSTANCE.post('/api/v1/campus-map', regionData);
+        const { data: docRef } = await AXIOS_INSTANCE.post('/api/v1/campusMapRegions', regionData);
         setRegions(prev => [
-          ...prev.filter(r => r.id !== editingRegion.id), // Remove only the one being saved
-          { ...regionData, id: (docRef?.id || docRef?.data?.id || "new-" + Date.now()) }
+          ...prev.filter(r => (r._id || r.id) !== regionId), // Remove only the one being saved
+          { ...regionData, _id: (docRef?.id || docRef?.data?.id || "new-" + Date.now()) }
         ]);
         toast.success('Region added!');
       }
@@ -335,7 +336,7 @@ export default function CampusMap() {
     // Create new road with clean data - ensure points are simple {x, y} objects
     const cleanPoints = newRoad.points.map((p) => ({ x: Number(p.x), y: Number(p.y) }));
     const roadData: MapRoad = {
-      id: `road-new-${Date.now()}`,
+      _id: `road-new-${Date.now()}`,
       points: cleanPoints,
       width: newRoad.width || 2,
       organizationId: user?.organizationId || '',
@@ -367,32 +368,32 @@ export default function CampusMap() {
       const orgId = user.organizationId;
 
       // First, delete all existing regions and roads for this org
-      const { data: existingRegionsRaw } = await AXIOS_INSTANCE.get('/api/v1/campus-map?organizationId=' + orgId);
+      const { data: existingRegionsRaw } = await AXIOS_INSTANCE.get('/api/v1/campusMapRegions?organizationId=' + orgId);
       const existingRegions = { docs: (Array.isArray(existingRegionsRaw?.data) ? existingRegionsRaw.data : existingRegionsRaw || []).map((d: any) => ({ id: d.id })) };
-      const { data: existingRoadsRaw } = await AXIOS_INSTANCE.get('/api/v1/campus-map-roads?organizationId=' + orgId);
+      const { data: existingRoadsRaw } = await AXIOS_INSTANCE.get('/api/v1/campusMapRoads?organizationId=' + orgId);
       const existingRoads = { docs: (Array.isArray(existingRoadsRaw?.data) ? existingRoadsRaw.data : existingRoadsRaw || []).map((d: any) => ({ id: d.id })) };
       for (const docSnap of existingRegions.docs) {
-        await AXIOS_INSTANCE.delete('/api/v1/campus-map/' + docSnap.id);
+        await AXIOS_INSTANCE.delete('/api/v1/campusMapRegions/' + docSnap.id);
       }
       for (const docSnap of existingRoads.docs) {
-        await AXIOS_INSTANCE.delete('/api/v1/campus-map-roads/' + docSnap.id);
+        await AXIOS_INSTANCE.delete('/api/v1/campusMapRoads/' + docSnap.id);
       }
 
       // Now save all current regions
       const savedRegions: MapRegion[] = [];
       for (const region of regions) {
-        const { id, ...data } = region;
-        const { data: newDoc } = await AXIOS_INSTANCE.post('/api/v1/campus-map', { ...data, organizationId: orgId });
-        savedRegions.push({ ...data, id: (newDoc?.id || newDoc?.data?.id || "new-" + Date.now()), organizationId: orgId });
+        const { _id, ...data } = region;
+        const { data: newDoc } = await AXIOS_INSTANCE.post('/api/v1/campusMapRegions', { ...data, organizationId: orgId });
+        savedRegions.push({ ...data, _id: (newDoc?.id || newDoc?.data?.id || "new-" + Date.now()), organizationId: orgId });
       }
 
       // Save all current roads
       const savedRoads: MapRoad[] = [];
       for (const road of roads) {
         if (!road.points || road.points.length < 2) continue;
-        const { id, ...data } = road;
-        const { data: newDoc } = await AXIOS_INSTANCE.post('/api/v1/campus-map-roads', { ...data, organizationId: orgId });
-        savedRoads.push({ ...data, id: (newDoc?.id || newDoc?.data?.id || "new-" + Date.now()), organizationId: orgId });
+        const { _id, ...data } = road;
+        const { data: newDoc } = await AXIOS_INSTANCE.post('/api/v1/campusMapRoads', { ...data, organizationId: orgId });
+        savedRoads.push({ ...data, _id: (newDoc?.id || newDoc?.data?.id || "new-" + Date.now()), organizationId: orgId });
       }
 
       // Update local state with new IDs
@@ -410,11 +411,11 @@ export default function CampusMap() {
   const deleteRoad = async (id: string) => {
     try {
       if (!id.startsWith('road-')) {
-        await AXIOS_INSTANCE.delete('/api/v1/campus-map-roads/' + id);
+        await AXIOS_INSTANCE.delete('/api/v1/campusMapRoads/' + id);
       }
-      setRoads((prev) => prev.filter((r) => r.id !== id));
+      setRoads((prev) => prev.filter((r) => (r._id || r.id) !== id));
       toast.success('Road deleted');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete road');
     }
   };
@@ -423,12 +424,12 @@ export default function CampusMap() {
   const deleteRegion = async (id: string) => {
     try {
       if (!id.startsWith('default-')) {
-        await AXIOS_INSTANCE.delete('/api/v1/campus-map/' + id);
+        await AXIOS_INSTANCE.delete('/api/v1/campusMapRegions/' + id);
       }
-      setRegions((prev) => prev.filter((r) => r.id !== id));
+      setRegions((prev) => prev.filter((r) => (r._id || r.id) !== id));
       setSelectedRegion(null);
       toast.success('Region deleted');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete');
     }
   };
@@ -722,7 +723,7 @@ export default function CampusMap() {
                   // Convert points array to SVG polyline points string
                   const pointsStr = road.points.map((p) => `${p.x},${p.y}`).join(' ');
                   return (
-                    <g key={road.id}>
+                    <g key={road._id || road.id}>
                       {/* Road base (dark asphalt) */}
                       <polyline
                         points={pointsStr}
@@ -788,7 +789,7 @@ export default function CampusMap() {
 
                 return (
                   <div
-                    key={region.id}
+                    key={region._id || region.id}
                     onMouseDown={(e) => {
                       if (editMode && !resizing && drawMode === 'none') {
                         e.stopPropagation();
@@ -821,10 +822,10 @@ export default function CampusMap() {
                           : 'cursor-pointer',
                       'hover:shadow-lg',
                       styles.regionVars,
-                      selectedRegion?.id === region.id &&
+                      (selectedRegion?._id || selectedRegion?.id) === (region._id || region.id) &&
                         'ring-2 ring-primary ring-offset-2 z-20 scale-105',
                       editMode && drawMode === 'none' && 'ring-1 ring-dashed ring-primary/50',
-                      dragging?.region.id === region.id && 'z-50 opacity-90'
+                      (dragging?.region._id || dragging?.region.id) === (region._id || region.id) && 'z-50 opacity-90'
                     )}
                     style={{
                       left: `${region.x}%`,
@@ -891,10 +892,10 @@ export default function CampusMap() {
                     const midY = (point.y + nextPoint.y) / 2;
                     return (
                       <button
-                        key={`del-${road.id}-seg-${segmentIndex}`}
+                        key={`del-${road._id || road.id}-seg-${segmentIndex}`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          deleteRoad(road.id);
+                          deleteRoad(road._id || road.id);
                         }}
                         className="absolute w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs z-30 hover:scale-110 transition-transform"
                         style={{

@@ -25,7 +25,7 @@ import { extractData, cn } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
 import PDFExportButton from '@/components/common/PDFExportButton';
 import BulkUpload from '@/components/BulkUpload';
-import { markBulkAttendanceAction } from '../actions';
+import { markBulkAttendanceAction } from './actions';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AttendanceManager({ userId, userRole, initialData }: any) {
@@ -114,7 +114,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
           status: r?.status || null
         };
       }));
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to load student data.');
     } finally {
       setLoading(false);

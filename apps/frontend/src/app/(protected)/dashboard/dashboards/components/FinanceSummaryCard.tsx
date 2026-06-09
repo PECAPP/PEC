@@ -4,7 +4,7 @@ import { Badge, Button } from "@pec/ui";
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, Clock, CheckCircle2, AlertTriangle, IndianRupee, ArrowRight } from 'lucide-react';
+import { Wallet, CheckCircle2, ArrowRight } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import api from "@pec/api";

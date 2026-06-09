@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Label } from "
 
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   User, 
   Palette, 
@@ -15,8 +14,7 @@ import {
   LogOut,
   Moon,
   Sun,
-  Monitor,  Settings as SettingsIcon,
-  Check
+  Monitor,  Settings as SettingsIcon
 } from 'lucide-react';
 import { useTheme } from "next-themes";
 

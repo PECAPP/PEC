@@ -9,8 +9,6 @@ import {
   ArrowLeft,
   ChevronRight,
   User,
-  Mail,
-  Phone,
   Camera,
   Key,
   Edit,

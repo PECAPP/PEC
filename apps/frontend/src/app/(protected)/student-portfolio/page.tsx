@@ -2,12 +2,11 @@
 import { Button, Input, Textarea, Badge, Progress, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
 
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Github,
-  ExternalLink,
   Star,
   GitFork,
   Code2,
@@ -15,15 +14,8 @@ import {
   Edit2,
   Trash2,
   Loader2,
-  X,
   Check,
-  Trophy,
   Briefcase,
-  Wrench,
-  Languages,
-  Sparkles,
-  Link2,
-  Calendar,
   Eye,
 } from 'lucide-react';
 
@@ -108,7 +100,7 @@ export default function StudentPortfolioPage() {
       });
       toast.success(`Imported ${repo.name}`);
       fetchPortfolio();
-    } catch (error) {
+    } catch (_error) {
       toast.error(`Failed to import ${repo.name}`);
     }
   };
@@ -182,7 +174,7 @@ export default function StudentPortfolioPage() {
       await api.delete(`/student-portfolio/projects/${id}`);
       toast.success('Project deleted');
       fetchPortfolio();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete project');
     }
   };
@@ -232,7 +224,7 @@ export default function StudentPortfolioPage() {
       await api.delete(`/student-portfolio/skills/${id}`);
       toast.success('Skill deleted');
       fetchPortfolio();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete skill');
     }
   };

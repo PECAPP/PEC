@@ -3,7 +3,6 @@ import { Button, Card, CardContent, CardHeader, CardTitle } from "@pec/ui";
 
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Activity, Server, Database, Clock, RefreshCcw, Cpu } from 'lucide-react';
 
 import { toast } from 'sonner';

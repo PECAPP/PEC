@@ -2,7 +2,7 @@
 import { Button, Badge, Input } from "@pec/ui";
 
 
-import { BookOpen, Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 
 interface CoursesTableProps {
   courses: any[];

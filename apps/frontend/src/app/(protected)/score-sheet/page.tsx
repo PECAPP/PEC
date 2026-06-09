@@ -4,7 +4,7 @@ import { Button, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigg
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, Loader2, Lock } from 'lucide-react';
+import { Calculator, Plus, Trash2, Save, X, TrendingUp, BookOpen, Sigma, Download, Loader2 } from 'lucide-react';
 import { 
   Area, 
   XAxis, 
@@ -67,8 +67,8 @@ export default function ScoreSheetPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
-  const [financeLocked, setFinanceLocked] = useState(false);
-  const [financeLoading, setFinanceLoading] = useState(true);
+  const [_financeLocked, setFinanceLocked] = useState(false);
+  const [_financeLoading, setFinanceLoading] = useState(true);
 
   useEffect(() => {
     if (loading) return;
@@ -104,7 +104,7 @@ export default function ScoreSheetPage() {
         if (data?.totalPending > 0) {
           if (active) setFinanceLocked(true);
         }
-      } catch (error) {
+      } catch (_error) {
       } finally {
         if (active) setFinanceLoading(false);
       }

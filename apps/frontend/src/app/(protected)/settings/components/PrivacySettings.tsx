@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Button, Label } from '@pec/ui';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@pec/ui';
 import { Shield, Download, Eye, Bot, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function PrivacySettings() {
-  const [loading, setLoading] = useState(false);
+  const [_loading, _setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   const [settings, setSettings] = useState({
@@ -29,7 +29,7 @@ export function PrivacySettings() {
       } else {
         toast.error('Failed to start export process.');
       }
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to request export.');
     } finally {
       setExporting(false);

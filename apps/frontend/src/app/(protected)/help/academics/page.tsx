@@ -12,15 +12,8 @@ import {
   Calendar,
   ClipboardCheck,
   GraduationCap,
-  BarChart,
-  Download,
   Clock,
-  Award,
-  Target,
-  Layers,
-  FileSpreadsheet,
-  CalendarDays,
-  BookMarked
+  CalendarDays
 } from 'lucide-react';
 
 import { HelpContent } from '@/features/help/HelpContent';

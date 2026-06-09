@@ -29,7 +29,7 @@ export default function StudentProfile() {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<any>(null);
   const [githubStats, setGithubStats] = useState<any>(null);
-  const [githubLookupError, setGithubLookupError] = useState<string | null>(null);
+  const [_githubLookupError, setGithubLookupError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -108,7 +108,7 @@ export default function StudentProfile() {
           setGithubStats(null);
           setGithubLookupError(null);
         }
-      } catch (err) {
+      } catch (_err) {
         toast.error("Failed to fetch profile");
       } finally {
         if (active) {

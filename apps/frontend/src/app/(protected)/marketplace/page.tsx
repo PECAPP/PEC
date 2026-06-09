@@ -8,12 +8,10 @@ import {
   ShoppingBag,
   Plus,
   Search,
-  Filter,
   X,
   Heart,
   MessageCircle,
   ChevronDown,
-  Tag,
   Package,
   Loader2,
   BookOpen,
@@ -113,7 +111,7 @@ function ProductCard({
   listing,
   isBookmarked,
   currentUserId,
-  ability,
+  _ability,
   onBookmark,
   onChat,
   onView,
@@ -123,7 +121,7 @@ function ProductCard({
   listing: Listing;
   isBookmarked: boolean;
   currentUserId: string;
-  ability: any;
+  _ability: any;
   onBookmark: (id: string) => void;
   onChat: (listing: Listing) => void;
   onView: (listing: Listing) => void;
@@ -1302,7 +1300,7 @@ export default function MarketplacePage() {
                       listing={listing}
                       isBookmarked={bookmarkedIds.has(listing.id)}
                       currentUserId={currentUserId}
-                      ability={ability}
+                      _ability={ability}
                       onBookmark={handleBookmark}
                       onChat={openChat}
                       onView={setViewingListing}
