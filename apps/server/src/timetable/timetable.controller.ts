@@ -10,7 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { TimetableService } from './timetable.service';
 import { TimetableQueryDto } from './dto/timetable-query.dto';
 import { CreateTimetableDto } from './dto/create-timetable.dto';

@@ -41,6 +41,7 @@ export class ExaminationsController {
   @CheckPolicies((ability) => ability.can('read', 'Examination'))
   @Get('schedules')
   async listSchedules(@Request() req: any, @Query() query: ExamQueryDto) {
+    // Force SWC rebuild
     const userRoles = Array.isArray(req.user?.roles)
       ? req.user.roles
       : req.user?.role

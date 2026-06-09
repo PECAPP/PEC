@@ -2,11 +2,10 @@ import {
   Controller,
   Get,
   Post,
-  UploadedFile,
+  Body,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminService } from './admin.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
@@ -31,16 +30,14 @@ export class AdminController {
   }
 
   @Post('upload-students')
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
-  async uploadStudents(@UploadedFile() file: Express.Multer.File) {
-    const results = await this.adminService.processUserBulk(file);
+  async uploadStudents(@Body() body: { fileKey: string }) {
+    const results = await this.adminService.processUserBulk(body.fileKey);
     return ok(results);
   }
 
   @Post('upload-timetable')
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
-  async uploadTimetable(@UploadedFile() file: Express.Multer.File) {
-    const results = await this.adminService.processAttendanceBulk(file);
+  async uploadTimetable(@Body() body: { fileKey: string }) {
+    const results = await this.adminService.processAttendanceBulk(body.fileKey);
     return ok(results);
   }
 }

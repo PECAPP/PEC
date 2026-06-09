@@ -1,6 +1,6 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import OpenAI from 'openai';
-import type { Response as ExpressResponse } from 'express';
+import type { FastifyReply } from 'fastify';
 import { TOOL_DEFINITIONS } from './ai-tools.registry';
 import { AiToolsService } from './ai-tools.service';
 
@@ -51,7 +51,7 @@ export class AiOrchestrationService {
 
   async getCompletion(
     body: any,
-    res: ExpressResponse,
+    res: FastifyReply,
     userId?: string,
   ): Promise<void> {
     if (!this.openaiClient) {
@@ -89,7 +89,7 @@ export class AiOrchestrationService {
           const toolArgs = JSON.parse(toolCall.function.arguments || '{}');
 
           // Notify frontend which tool is running
-          res.write(`data: ${JSON.stringify({ tool: toolName })}\n\n`);
+          res.raw.write(`data: ${JSON.stringify({ tool: toolName })}\n\n`);
 
           const { functionResult, sseEvents } = await this.toolsService.dispatch(
             toolName,
@@ -100,7 +100,7 @@ export class AiOrchestrationService {
           // Emit any side-effect SSE events (e.g. gradesData, navigate)
           if (sseEvents) {
             for (const event of sseEvents) {
-              res.write(`data: ${JSON.stringify(event)}\n\n`);
+              res.raw.write(`data: ${JSON.stringify(event)}\n\n`);
             }
           }
 
@@ -128,7 +128,7 @@ export class AiOrchestrationService {
       const finalContent = responseMessage.content ?? '';
 
       if (finalContent.trim()) {
-        res.write(`data: ${JSON.stringify({ text: finalContent })}\n\n`);
+        res.raw.write(`data: ${JSON.stringify({ text: finalContent })}\n\n`);
       } else {
         // Fallback: no cached content — make a real streaming call
         const stream = await this.openaiClient.chat.completions.create({
@@ -142,20 +142,20 @@ export class AiOrchestrationService {
         for await (const chunk of stream as any) {
           const content = chunk.choices[0]?.delta?.content ?? '';
           if (content) {
-            res.write(`data: ${JSON.stringify({ text: content })}\n\n`);
+            res.raw.write(`data: ${JSON.stringify({ text: content })}\n\n`);
           }
         }
       }
 
-      res.write('data: [DONE]\n\n');
-      res.end();
+      res.raw.write('data: [DONE]\n\n');
+      res.raw.end();
     } catch (error) {
       console.error('[AI] Error:', error);
-      res.write(
+      res.raw.write(
         `data: ${JSON.stringify({ error: error.message || 'AI request failed' })}\n\n`,
       );
-      res.write('data: [DONE]\n\n');
-      res.end();
+      res.raw.write('data: [DONE]\n\n');
+      res.raw.end();
     }
   }
 

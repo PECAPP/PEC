@@ -1,10 +1,10 @@
+import './tracing'; // Initialize OpenTelemetry before anything else
 try { require('dotenv/config'); } catch (e) {}
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { join } from 'path';
 import { Logger } from 'nestjs-pino';
 
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';

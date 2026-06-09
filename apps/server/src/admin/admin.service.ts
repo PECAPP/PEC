@@ -1,7 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as ExcelJS from 'exceljs';
 import * as bcrypt from 'bcrypt';
+import { S3Service } from '../common/services/s3.service';
 
 @Injectable()
 export class AdminService {
@@ -21,15 +22,19 @@ export class AdminService {
     };
   }
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3Service: S3Service,
+  ) {}
 
-  async processUserBulk(file: any) {
+  async processUserBulk(fileKey: string) {
+    const buffer = await this.s3Service.getObjectBuffer(fileKey);
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(file.buffer as any);
+    await workbook.xlsx.load(buffer as any);
     const worksheet = workbook.worksheets[0];
 
     const data: any[] = [];
-    let headers: string[] = [];
+    const headers: string[] = [];
 
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) {
@@ -82,13 +87,14 @@ export class AdminService {
     return results;
   }
 
-  async processAttendanceBulk(file: any) {
+  async processAttendanceBulk(fileKey: string) {
+    const buffer = await this.s3Service.getObjectBuffer(fileKey);
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(file.buffer as any);
+    await workbook.xlsx.load(buffer as any);
     const worksheet = workbook.worksheets[0];
 
     const data: any[] = [];
-    let headers: string[] = [];
+    const headers: string[] = [];
 
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) {

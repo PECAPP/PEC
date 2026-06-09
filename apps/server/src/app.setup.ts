@@ -1,4 +1,4 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { ZodValidationFilter } from './filters/zod-validation.filter';
 import { ZodValidationPipe } from 'nestjs-zod';

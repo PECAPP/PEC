@@ -135,9 +135,7 @@ export class FinanceRepository {
   // ─── Payment ──────────────────────────────────────────────────────────────────
 
   async payFee(dto: PayFeeDto, studentId: string) {
-    // In a real scenario, this would be a webhook handler verifying a signature.
-    // For now, we lock it down to only accept trusted internal mocked values, 
-    // rather than letting the frontend dictate 'paymentMethod' or 'gatewayTxnId' freely.
+    // Simulated payment handler (mock gateway integration)
 
     const fee = await this.prisma.feeRecord.findUnique({
       where: { id: dto.feeRecordId },
@@ -171,9 +169,9 @@ export class FinanceRepository {
       const totalAmount = currentFee.amount + (lateFee > 0 ? lateFee : currentFee.lateFeeAmount);
       const receiptNo = generateReceiptNo();
 
-      // Secure Gateway Generation (Backend generated, not trusted from frontend)
+      // Generate mock gateway transaction details
       const gatewayTxnId = `SIM-${randomUUID()}`; 
-      const paymentMethod = 'online'; // Hardcoded for this simulated flow
+      const paymentMethod = 'online';
       const paymentStatus = 'success'; 
 
       const transaction = await tx.financeTransaction.create({

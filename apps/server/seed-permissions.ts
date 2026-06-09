@@ -76,6 +76,11 @@ export async function seedPermissions() {
     { action: 'create', subject: 'CampusMap', description: 'Create campus map entries' },
     { action: 'update', subject: 'CampusMap', description: 'Update campus map entries' },
     { action: 'delete', subject: 'CampusMap', description: 'Delete campus map entries' },
+    // CourseMaterial
+    { action: 'read', subject: 'CourseMaterial', description: 'View course materials' },
+    { action: 'create', subject: 'CourseMaterial', description: 'Create course materials' },
+    { action: 'update', subject: 'CourseMaterial', description: 'Update course materials' },
+    { action: 'delete', subject: 'CourseMaterial', description: 'Delete course materials' },
     // Admin
     { action: 'read', subject: 'Admin', description: 'View admin dashboard' },
     // Role management
@@ -108,7 +113,7 @@ export async function seedPermissions() {
     'Attendance', 'AttendanceSession', 'Timetable', 'Course', 'Notice',
     'FeeRecord', 'MarketplaceListing', 'HostelIssue', 'CanteenItem',
     'Room', 'FeatureFlag', 'Examination', 'Enrollment', 'Department',
-    'CgpaEntry', 'CampusMap',
+    'CgpaEntry', 'CampusMap', 'CourseMaterial',
   ];
   // Student write permissions
   const studentWritePerms = [

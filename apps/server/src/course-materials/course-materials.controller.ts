@@ -19,7 +19,6 @@ import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 import { CourseMaterialsService } from './course-materials.service';
 import { CourseMaterialQueryDto } from './dto/course-material-query.dto';
-import { CreateCourseMaterialDto } from './dto/create-course-material.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { Response } from 'express';

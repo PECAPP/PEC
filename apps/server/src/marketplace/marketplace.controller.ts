@@ -9,7 +9,6 @@ import {
   Query,
   Request,
   UseGuards,
-  ForbiddenException,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '../auth/auth.guard';

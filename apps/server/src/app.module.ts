@@ -52,6 +52,8 @@ import { MaintenanceModule } from './maintenance/maintenance.module';
 
 import { CommonServicesModule } from './common/common.module';
 import { SettingsModule } from './settings/settings.module';
+import { UploadModule } from './upload/upload.module';
+import { DlqModule } from './dlq/dlq.module';
 
 @Module({
   imports: [
@@ -94,6 +96,8 @@ import { SettingsModule } from './settings/settings.module';
     MarketplaceModule,
     FinanceModule,
     SettingsModule,
+    UploadModule,
+    DlqModule,
     CqrsModule,
     LoggerModule.forRoot({
       pinoHttp: {

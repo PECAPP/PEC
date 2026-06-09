@@ -10,15 +10,10 @@ import {
   Query,
   ParseUUIDPipe,
   Request,
-  StreamableFile,
-  UploadedFile,
   UseGuards,
   Res,
-  UseInterceptors,
-  Header,
 } from '@nestjs/common';
 import type { FastifyReply } from 'fastify';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { Throttle } from '@nestjs/throttler';
 import { AttendanceService } from './attendance.service';
 import { AttendanceQueryDto } from './dto/attendance-query.dto';
@@ -76,16 +71,15 @@ export class AttendanceController {
 
   @CheckPolicies((ability) => ability.can('create', 'Attendance'))
   @Post('waivers/upload')
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
   async uploadWaiverDocument(
     @Request() req: any,
-    @UploadedFile() file: Express.Multer.File,
+    @Body() body: { fileKey: string },
   ) {
-    if (!file) {
-      throw new BadRequestException('No file uploaded');
+    if (!body.fileKey) {
+      throw new BadRequestException('No fileKey provided');
     }
 
-    const data = await this.attendanceService.uploadWaiverDocument(file, req.user.sub);
+    const data = await this.attendanceService.uploadWaiverDocument(body.fileKey, req.user.sub);
     return ok(data);
   }
 

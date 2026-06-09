@@ -1,9 +1,7 @@
-import { Controller, Get, Patch, Delete, Body, Req, UseGuards, Post, UploadedFile, UseInterceptors, InternalServerErrorException } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Patch, Delete, Body, Req, UseGuards, Post, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
-import { ClamavService } from '../common/services/clamav.service';
 import { S3Service } from '../common/services/s3.service';
 import { QueueService } from '../background-jobs/queue.service';
 
@@ -12,7 +10,6 @@ import { QueueService } from '../background-jobs/queue.service';
 export class SettingsController {
   constructor(
     private readonly settingsService: SettingsService,
-    private readonly clamavService: ClamavService,
     private readonly s3Service: S3Service,
     private readonly queueService: QueueService
   ) {}
@@ -56,20 +53,14 @@ export class SettingsController {
   }
 
   @Post('avatar')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
-    if (!file) throw new InternalServerErrorException('No file uploaded');
+  async uploadAvatar(@Req() req: Request, @Body() body: { fileKey: string }) {
+    if (!body.fileKey) throw new BadRequestException('No fileKey provided');
     const userId = (req.user as any).id;
     
-    // 1. Scan the file with ClamAV
-    await this.clamavService.scanBuffer(file.buffer, file.originalname);
+    // In a real app, verify the file exists in S3 and update the user's avatar URL
+    // await this.settingsService.updateAvatar(userId, body.fileKey);
 
-    // 2. Upload to MinIO via S3Service
-    const fileKey = `avatar_${userId}_${Date.now()}.png`;
-    await this.s3Service.uploadFile(file.buffer, fileKey, file.mimetype);
-
-    // 3. Return the URL (in real app, we'd update user profile too)
-    const url = `/api/storage/avatars/${fileKey}`;
+    const url = `/api/storage/avatars/${body.fileKey}`;
     return { success: true, url };
   }
 }

@@ -9,23 +9,21 @@ import {
   Query,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
-  ParseIntPipe,
   BadRequestException,
   Req,
 } from '@nestjs/common';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { Throttle } from '@nestjs/throttler';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { AcademicCalendarService } from './academic-calendar.service';
 import { AiService } from '../ai/ai.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+import { S3Service } from '../common/services/s3.service';
 
 
 import { CreateAcademicCalendarEventDto, UpdateAcademicCalendarEventDto } from './dto/create-academic-calendar-event.dto';
-import { ClamavService } from '../common/services/clamav.service';
+
 
 @Controller('academic-calendar')
 @UseGuards(AuthGuard, PoliciesGuard)
@@ -33,21 +31,19 @@ export class AcademicCalendarController {
   constructor(
     private readonly calendarService: AcademicCalendarService,
     private readonly aiService: AiService,
-    private readonly clamav: ClamavService,
+    private readonly s3Service: S3Service,
   ) {}
 
   @Post('upload-pdf')
   @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute per IP for AI parsing
   @CheckPolicies((ability) => ability.can('manage', 'all'))
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
-  async uploadPdf(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      throw new Error('No file uploaded');
+  async uploadPdf(@Body() body: { fileKey: string }) {
+    if (!body.fileKey) {
+      throw new BadRequestException('No fileKey provided');
     }
 
-    await this.clamav.scanBuffer(file.buffer, file.originalname);
-
-    const pdfBase64 = file.buffer.toString('base64');
+    const buffer = await this.s3Service.getObjectBuffer(body.fileKey);
+    const pdfBase64 = buffer.toString('base64');
     const events = await this.aiService.parseAcademicCalendarPdf(pdfBase64);
 
     return {
@@ -66,7 +62,7 @@ export class AcademicCalendarController {
     }
 
     const buffer = Buffer.from(body.pdfBase64, 'base64');
-    await this.clamav.scanBuffer(buffer, 'base64-upload');
+    // Legacy ClamAV scan removed
 
     const events = await this.aiService.parseAcademicCalendarPdf(body.pdfBase64);
 

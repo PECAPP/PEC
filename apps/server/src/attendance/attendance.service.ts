@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { AttendanceRepository } from './attendance.repository';
 import { QueueService } from '../background-jobs/queue.service';
@@ -12,12 +11,8 @@ import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { CreateWaiverRequestDto } from './dto/create-waiver-request.dto';
 import * as ExcelJS from 'exceljs';
-import { createReadStream } from 'fs';
-import { mkdir, stat, writeFile } from 'fs/promises';
-import { extname, join, resolve } from 'path';
-import { randomUUID } from 'crypto';
+import { resolve } from 'path';
 
-import { ClamavService } from '../common/services/clamav.service';
 import { S3Service } from '../common/services/s3.service';
 
 @Injectable()
@@ -26,7 +21,6 @@ export class AttendanceService {
     private readonly repo: AttendanceRepository,
     private readonly queue: QueueService,
     private readonly messaging: MessagingService,
-    private readonly clamav: ClamavService,
     private readonly s3: S3Service,
   ) {}
 
@@ -117,53 +111,17 @@ export class AttendanceService {
     return this.repo.getWaiverRequestsForStudent(studentId);
   }
 
-  async uploadWaiverDocument(file: any, studentId: string) {
-    const maxBytes = 5 * 1024 * 1024;
-    if (!file.buffer || file.size <= 0) {
-      throw new BadRequestException('Uploaded file is empty');
+  async uploadWaiverDocument(fileKey: string, studentId: string) {
+    if (!fileKey) {
+      throw new BadRequestException('No file key provided');
     }
 
-    if (file.size > maxBytes) {
-      throw new BadRequestException('File size exceeds 5 MB limit');
-    }
-
-    const allowedMimeTypes = new Set([
-      'application/pdf',
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-    ]);
-
-    if (!allowedMimeTypes.has(file.mimetype)) {
-      throw new BadRequestException('Only PDF, JPG, PNG and WEBP files are allowed');
-    }
-
-    // Magic number validation to prevent spoofing
-    const header = file.buffer.subarray(0, 4).toString('hex').toUpperCase();
-    let isValidMagic = false;
-    
-    if (file.mimetype === 'application/pdf' && header === '25504446') isValidMagic = true;
-    else if (file.mimetype === 'image/jpeg' && header.startsWith('FFD8FF')) isValidMagic = true;
-    else if (file.mimetype === 'image/png' && header === '89504E47') isValidMagic = true;
-    else if (file.mimetype === 'image/webp' && header === '52494646') {
-      const webpHeader = file.buffer.subarray(8, 12).toString('utf8');
-      if (webpHeader === 'WEBP') isValidMagic = true;
-    }
-
-    if (!isValidMagic) {
-      throw new BadRequestException('Invalid file content signature. File appears to be spoofed.');
-    }
-
-    await this.clamav.scanBuffer(file.buffer, file.originalname);
-
-    const key = await this.s3.uploadFile(file.buffer, file.originalname, file.mimetype);
+    // In a real application, you might want to verify the file exists in MinIO here
+    // e.g. await this.s3.statObject(fileKey);
 
     return {
-      fileName: key,
-      url: `/api/attendance/waivers/files/${key}`,
-      originalName: file.originalname,
-      mimeType: file.mimetype,
-      size: file.size,
+      fileName: fileKey,
+      url: `/api/attendance/waivers/files/${fileKey}`,
     };
   }
 

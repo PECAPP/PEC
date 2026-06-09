@@ -26,6 +26,10 @@ export class AttendanceSessionService {
     return this.repo.findByQrCode(qrCode);
   }
 
+  async countBySession(sessionId: string): Promise<number> {
+    return this.repo.countBySession(sessionId);
+  }
+
   async update(id: string, data: UpdateAttendanceSessionDto) {
     return this.repo.update(id, data as any);
   }

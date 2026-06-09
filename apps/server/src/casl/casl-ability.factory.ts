@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PureAbility, AbilityBuilder, AbilityTuple, MatchConditions, ExtractSubjectType } from '@casl/ability';
+import { PureAbility, AbilityBuilder, AbilityTuple } from '@casl/ability';
 import { PrismaQuery, createPrismaAbility } from '@casl/prisma';
 
 export type AppAbility = PureAbility<AbilityTuple, PrismaQuery>;

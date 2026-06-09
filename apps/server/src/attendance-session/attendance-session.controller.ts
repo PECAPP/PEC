@@ -43,6 +43,13 @@ export class AttendanceSessionController {
   }
 
   @CheckPolicies((ability) => ability.can('read', 'AttendanceSession'))
+  @Get(':id/count')
+  async countAttendance(@Param('id') id: string) {
+    const count = await this.service.countBySession(id);
+    return ok({ count });
+  }
+
+  @CheckPolicies((ability) => ability.can('read', 'AttendanceSession'))
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const result = await this.service.findOne(id);

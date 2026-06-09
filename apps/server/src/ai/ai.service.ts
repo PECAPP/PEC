@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { Response as ExpressResponse } from 'express';
+import type { FastifyReply } from 'fastify';
 import { AiOrchestrationService } from './ai-orchestration.service';
 import { AiCalendarParserService } from './ai-calendar-parser.service';
 
@@ -28,7 +28,7 @@ export class AiService {
    * Handle an AI chat-completion request and stream the response as SSE.
    * Called by AiController.
    */
-  getCompletion(body: any, res: ExpressResponse, userId?: string): Promise<void> {
+  getCompletion(body: any, res: FastifyReply, userId?: string): Promise<void> {
     return this.orchestration.getCompletion(body, res, userId);
   }
 
