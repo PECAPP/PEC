@@ -6,7 +6,6 @@ import { AuthController } from './auth.controller';
 import { jwtConstants } from './constants';
 import { AuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.guard';
-import { CacheModule } from '@nestjs/cache-manager';
 import { PrismaModule } from '../prisma/prisma.module';
 import { PoliciesGuard } from './guards/policies.guard';
 import { CaslModule } from '../casl/casl.module';

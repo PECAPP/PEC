@@ -57,21 +57,26 @@ export class AuthController {
     @Request() req: FastifyRequest,
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
-    const auth = await this.authService.signIn(
-      signInDto.email,
-      signInDto.password,
-      {
-        ipAddress: this.getIp(req),
-        userAgent: this.getUserAgent(req),
-      },
-    );
-    this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
-    this.setAccessTokenCookie(res, auth.access_token);
-    const csrfToken = this.setCsrfCookie(res, req);
-    this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
+    try {
+      const auth = await this.authService.signIn(
+        signInDto.email,
+        signInDto.password,
+        {
+          ipAddress: this.getIp(req),
+          userAgent: this.getUserAgent(req),
+        },
+      );
+      this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
+      this.setAccessTokenCookie(res, auth.access_token);
+      const csrfToken = this.setCsrfCookie(res, req);
+      this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
 
-    const { refresh_token, ...response } = auth;
-    return { ...response, csrfToken };
+      const { refresh_token, ...response } = auth;
+      return { ...response, csrfToken };
+    } catch (error: any) {
+      if (error.status && error.status < 500) throw error;
+      throw new BadRequestException(error.message || 'Login failed due to an internal error.');
+    }
   }
 
   @HttpCode(HttpStatus.CREATED)
@@ -82,23 +87,28 @@ export class AuthController {
     @Request() req: FastifyRequest,
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
-    const auth = await this.authService.signUp(
-      signUpDto.email,
-      signUpDto.password,
-      signUpDto.name,
-      signUpDto.role || 'student',
-      {
-        ipAddress: this.getIp(req),
-        userAgent: this.getUserAgent(req),
-      },
-    );
+    try {
+      const auth = await this.authService.signUp(
+        signUpDto.email,
+        signUpDto.password,
+        signUpDto.name,
+        signUpDto.role || 'student',
+        {
+          ipAddress: this.getIp(req),
+          userAgent: this.getUserAgent(req),
+        },
+      );
 
-    this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
-    this.setAccessTokenCookie(res, auth.access_token);
-    const csrfToken = this.setCsrfCookie(res, req);
-    this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
-    const { refresh_token, ...response } = auth;
-    return { ...response, csrfToken };
+      this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
+      this.setAccessTokenCookie(res, auth.access_token);
+      const csrfToken = this.setCsrfCookie(res, req);
+      this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
+      const { refresh_token, ...response } = auth;
+      return { ...response, csrfToken };
+    } catch (error: any) {
+      if (error.status && error.status < 500) throw error;
+      throw new BadRequestException(error.message || 'Registration failed due to an internal error.');
+    }
   }
 
   @HttpCode(HttpStatus.OK)
