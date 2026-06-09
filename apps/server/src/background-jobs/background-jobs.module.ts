@@ -7,6 +7,6 @@ import { QueueModule } from './queue.module';
   imports: [QueueModule],
   controllers: [BackgroundJobsController],
   providers: [BackgroundJobsService],
-  exports: [BackgroundJobsService],
+  exports: [BackgroundJobsService, QueueModule],
 })
 export class BackgroundJobsModule {}

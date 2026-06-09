@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { QueueService } from './queue.service';
 
+@Global()
 @Module({
   imports: [
     ClientsModule.register([

@@ -1,13 +1,13 @@
-import { Controller } from '@nestjs/common';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { Controller, Inject } from '@nestjs/common';
+import { EventPattern, Payload, ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '../../prisma/prisma.service';
-import { QueueService } from '../../background-jobs/queue.service';
+import { firstValueFrom } from 'rxjs';
 
 @Controller()
 export class AttendanceConsumer {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly queueService: QueueService,
+    @Inject('RABBITMQ_SERVICE') private readonly client: ClientProxy,
   ) {}
 
   @EventPattern('attendance.created')
@@ -28,15 +28,15 @@ export class AttendanceConsumer {
     });
 
     // Enqueue secondary workflows via RabbitMQ
-    await this.queueService.addJob('notification.faculty', {
+    await firstValueFrom(this.client.emit('notification.faculty', {
       type: 'attendance_marked',
       sessionId: data.sessionId,
       courseId: data.courseId,
-    });
+    }));
     
-    await this.queueService.addJob('workflow.attendance_analytics', {
+    await firstValueFrom(this.client.emit('workflow.attendance_analytics', {
       attendanceId: data.id,
       studentId: data.studentId,
-    });
+    }));
   }
 }

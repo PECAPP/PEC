@@ -4,11 +4,13 @@ import { MessagingService } from './messaging.service';
 import { AttendanceConsumer } from './consumers/attendance.consumer';
 import { PrismaModule } from '../prisma/prisma.module';
 import { BackgroundJobsModule } from '../background-jobs/background-jobs.module';
+import { QueueModule } from '../background-jobs/queue.module';
 
 @Module({
   imports: [
     PrismaModule,
     BackgroundJobsModule,
+    QueueModule,
     ClientsModule.register([
       {
         name: 'RABBITMQ_SERVICE',
@@ -21,7 +23,8 @@ import { BackgroundJobsModule } from '../background-jobs/background-jobs.module'
       },
     ]),
   ],
-  providers: [MessagingService, AttendanceConsumer],
+  controllers: [AttendanceConsumer],
+  providers: [MessagingService],
   exports: [MessagingService],
 })
 export class MessagingModule {}

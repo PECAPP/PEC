@@ -70,6 +70,56 @@ export class S3Service implements OnModuleInit {
   }
 
   /**
+   * Generates a pre-signed URL to upload a file securely directly from the client
+   * @param contentType The MIME type of the file to be uploaded
+   * @param originalName Optional original file name to preserve extension
+   * @param expiresIn Expiration time in seconds (default: 3600)
+   * @returns Object containing the pre-signed URL and the generated key
+   */
+  async generatePresignedUploadUrl(contentType: string, originalName?: string, expiresIn = 3600): Promise<{ url: string; key: string }> {
+    const ext = originalName ? originalName.split('.').pop() : 'bin';
+    const key = `${uuidv4()}.${ext}`;
+
+    try {
+      const command = new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        ContentType: contentType,
+      });
+
+      const url = await getSignedUrl(this.s3Client, command, { expiresIn });
+      return { url, key };
+    } catch (error) {
+      this.logger.error(`Error generating pre-signed upload URL: ${error.message}`, error);
+      throw new HttpException('Failed to generate upload URL', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Retrieves a file from S3/MinIO as a Buffer
+   * @param key S3 Object key
+   * @returns The file content as a Buffer
+   */
+  async getObjectBuffer(key: string): Promise<Buffer> {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      });
+      const response = await this.s3Client.send(command);
+      const stream = response.Body as any;
+      const chunks = [];
+      for await (const chunk of stream) {
+        chunks.push(chunk);
+      }
+      return Buffer.concat(chunks);
+    } catch (error) {
+      this.logger.error(`Error retrieving file from S3 for key ${key}: ${error.message}`, error);
+      throw new HttpException('Failed to retrieve file from storage', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
    * Deletes a file from S3/MinIO
    * @param key S3 Object key
    */
