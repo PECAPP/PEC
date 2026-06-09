@@ -1,18 +1,14 @@
 'use client';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Badge, Button } from "@pec/ui";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, Badge, Button } from "@pec/ui";
 
 
 import { useState } from 'react';
 
 import { 
-  Calendar as CalendarIcon, 
-  Clock, 
   MapPin, 
   Users, 
-  AlertCircle, 
   Edit, 
   Trash2,
-  Info,
   ExternalLink,
   X,
   Share2,
@@ -23,12 +19,10 @@ import {
   getEventLabel,
   getEventColor,
   CATEGORY_LABELS,
-  IMPORTANCE_COLORS,
 } from './calendar-utils';
 import api from "@pec/api";
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 interface AcademicCalendarEvent {
   id: string;
@@ -79,7 +73,7 @@ export function EventDetailModal({
       toast.success('Event deleted successfully');
       onDelete?.(event.id);
       onClose();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete event');
     } finally {
       setIsDeleting(false);

@@ -41,10 +41,10 @@ import { GoogleTranslate } from '@/components/GoogleTranslate';
 const SIDEBAR_WIDTH_KEY = 'sidebar-width';
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 400;
-const DEFAULT_WIDTH = 256;
+const _DEFAULT_WIDTH = 256;
 
 interface SidebarProps {
-  role: UserRole;
+  _role: UserRole;
   collapsed: boolean;
   onToggle: () => void;
   isMobile?: boolean;
@@ -209,7 +209,7 @@ const navItems: NavItem[] = [
 ];
 
 export function Sidebar({
-  role,
+  _role,
   collapsed,
   onToggle,
   isMobile,

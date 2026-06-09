@@ -3,7 +3,7 @@ import { Button } from "@pec/ui";
 
 
 import { motion } from "framer-motion";
-import { CheckCircle, X, ArrowRight, TrendingUp, Sparkles } from "lucide-react";
+import { CheckCircle, X, ArrowRight, Sparkles } from "lucide-react";
 
 import Link from 'next/link';
 
@@ -162,7 +162,7 @@ export function PricingSection() {
               <thead>
                 <tr className="border-b-2 border-emerald-900/50">
                   <th className="text-left py-5 px-4 text-sm font-bold text-white bg-gradient-to-br from-gray-950 via-green-950 to-emerald-950 border-r border-emerald-800/30">Feature</th>
-                  {plans.map((plan, i) => (
+                  {plans.map((plan, _i) => (
                     <th key={plan.name} className={`py-5 px-4 text-center bg-gradient-to-br ${plan.gradient} rounded-t-xl min-w-[140px] relative`}>
                       {plan.badge && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-yellow-400 text-black text-xs font-black rounded-full whitespace-nowrap">POPULAR</div>}
                       <div className="text-white">

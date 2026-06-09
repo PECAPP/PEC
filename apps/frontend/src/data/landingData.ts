@@ -1,16 +1,10 @@
 import { 
   Zap, 
-  Server, 
-  BarChart3, 
   Shield, 
   Users, 
   BookOpen, 
-  Briefcase, 
   GraduationCap,
-  Target,
-  TrendingUp,
-  ClipboardCheck,
-  FileText
+  Target
 } from "lucide-react";
 
 export const testimonials = [

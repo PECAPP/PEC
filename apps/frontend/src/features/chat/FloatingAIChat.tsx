@@ -11,18 +11,12 @@ declare global {
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Send, Sparkles, X, Minimize2, Mic, Volume2, VolumeX } from "lucide-react";
+import { Bot, Send, X, Mic, Volume2, VolumeX } from "lucide-react";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import api, {  isAuthError  } from "@pec/api";
+import {  isAuthError  } from "@pec/api";
 import {  buildApiUrl  } from "@pec/api";
 import {  authClient  } from "@pec/api";
-import { GradesTable } from "./generative/GradesTable";
-import { AttendanceTable } from "./generative/AttendanceTable";
-import { ScheduleTable } from "./generative/ScheduleTable";
-import { SuggestionChips } from "./generative/SuggestionChips";
 import { useRouter } from "next/navigation";
 import { useResizable } from "./hooks/useResizable";
 import { useSpeechToText } from "./hooks/useSpeechToText";
@@ -82,7 +76,7 @@ interface Message {
 
 const FloatingAIChat = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { _user, _isAuthenticated, isLoading: authLoading } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -342,7 +336,7 @@ const FloatingAIChat = () => {
                 } else if (data.error) {
                   throw new Error(data.error);
                 }
-              } catch (e) {
+              } catch (_e) {
                 // Ignore parse errors from chunk fragmentation
               }
             }

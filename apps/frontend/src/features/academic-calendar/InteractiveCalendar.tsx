@@ -2,7 +2,7 @@
 import { Button, Badge, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
 
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   format, 
   isSameDay, 
@@ -77,7 +77,7 @@ export function InteractiveCalendar({
   const [eventTypeFilter, setEventTypeFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [_isSidebarCollapsed, _setIsSidebarCollapsed] = useState(false);
 
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {

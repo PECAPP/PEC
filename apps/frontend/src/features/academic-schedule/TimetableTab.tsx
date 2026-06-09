@@ -6,11 +6,9 @@ import { Button, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, 
 import { useEffect, useState } from "react";
 import {
   Calendar,
-  Clock,
   Loader2,
   Plus,
   Trash2,
-  Edit,
   Save,
   GripVertical,
   Upload,
@@ -18,9 +16,7 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
-  LayoutGrid,
   List,
-  Map as MapIcon,
 } from "lucide-react";
 import BulkUpload from "@/components/BulkUpload";
 
@@ -184,7 +180,7 @@ export default function TimetableTab() {
   const [studentAttendanceMap, setStudentAttendanceMap] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
-    if (authLoading) return; // Wait for ({} as any) to load
+    if (authLoading) return; // Wait for auth to load
 
     if (!user) {
       router.replace('/auth');
@@ -670,7 +666,7 @@ export default function TimetableTab() {
     if (!selectedSlot) return;
 
     const key = `${selectedSlot.day}-${selectedSlot.timeSlot}`;
-    const existingSlot = timetable[key];
+    const _existingSlot = timetable[key];
     const course = courses.find((c) => c.id === slotForm.courseId);
 
     if (!course) {
@@ -727,7 +723,7 @@ export default function TimetableTab() {
     );
   };
 
-  const availableFacultySlots = DAYS
+  const _availableFacultySlots = DAYS
     .flatMap((day) =>
       TIME_SLOTS.filter((timeSlot) => timeSlot !== "13:00-14:00").map((timeSlot) => {
         const key = `${day}-${timeSlot}`;

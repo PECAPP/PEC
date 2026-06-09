@@ -6,7 +6,7 @@ export function useChatMessages(roomId: string | null) {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [limit, setLimit] = useState(20);
-  const lastRoomId = useRef<string | null>(null);
+  const _lastRoomId = useRef<string | null>(null);
 
   useEffect(() => {
     if (!roomId) {

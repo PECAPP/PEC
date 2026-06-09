@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Select, Select
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Loader2, Plus, Trash2, Upload } from 'lucide-react';
+import { Loader2, Plus, Trash2, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -83,7 +83,7 @@ export default function ExaminationsTab() {
   if (role === 'faculty' || role === 'student') {
     return (
       <DepartmentUpcomingExams
-        role={role}
+        _role={role}
         department={user.department || null}
       />
     );
@@ -417,10 +417,10 @@ function CollegeAdminExaminations() {
 }
 
 function DepartmentUpcomingExams({
-  role,
+  _role,
   department,
 }: {
-  role: 'student' | 'faculty';
+  _role: 'student' | 'faculty';
   department: string | null;
 }) {
   const [loading, setLoading] = useState(true);

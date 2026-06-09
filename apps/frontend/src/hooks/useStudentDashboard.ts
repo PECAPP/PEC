@@ -58,7 +58,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     if (summary && typeof summary === 'object') {
       const statsObj = summary.totalSummary || {};
       const summaryCourses = Array.isArray(summary.courses) ? summary.courses : [];
-      const fallbackCourses = Array.isArray(allCourses) ? allCourses : [];
+      const _fallbackCourses = Array.isArray(allCourses) ? allCourses : [];
       
       // Enrich enrolled courses with full details from summary (now comprehensive)
       const normalizedEnrolled: Course[] = summaryCourses.map((course: any, index: number) => {

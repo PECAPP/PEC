@@ -3,7 +3,7 @@ import { Button, Textarea } from "@pec/ui";
 
 
 import { useState } from 'react';
-import { Loader2, Send, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 
 import { toast } from 'sonner';
 import api from "@pec/api";

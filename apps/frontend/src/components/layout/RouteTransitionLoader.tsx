@@ -18,48 +18,53 @@ function RouteTransitionLoaderInner() {
   }, [pathname, searchParams]);
 
   const previousRouteKeyRef = useRef(currentRouteKey);
-  const startTimerRef = useRef<number | null>(null);
   const mountedRef = useRef(false);
 
   const startNavigation = () => {
-    if (!mountedRef.current) return;
-    if (startTimerRef.current !== null) {
-      window.clearTimeout(startTimerRef.current);
+    if (mountedRef.current) {
+      document.body.style.pointerEvents = 'none';
+      // Defer the state update to the next event loop tick to avoid scheduling updates during React's insertion effect phase
+      setTimeout(() => {
+        if (mountedRef.current) {
+          setIsNavigating(true);
+        }
+      }, 0);
     }
-    // Defer state update so we don't flash for fast loads (200ms threshold)
-    startTimerRef.current = window.setTimeout(() => {
-      if (mountedRef.current) {
-        setIsNavigating(true);
-      }
-      startTimerRef.current = null;
-    }, 200);
   };
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
-      if (startTimerRef.current !== null) {
-        window.clearTimeout(startTimerRef.current);
-        startTimerRef.current = null;
-      }
+      document.body.style.pointerEvents = '';
     };
   }, []);
 
   useEffect(() => {
+    if (isNavigating) {
+      document.body.style.pointerEvents = 'none';
+    } else {
+      document.body.style.pointerEvents = '';
+    }
+    return () => {
+      document.body.style.pointerEvents = '';
+    };
+  }, [isNavigating]);
+
+  useEffect(() => {
     if (previousRouteKeyRef.current !== currentRouteKey) {
       setIsNavigating(false);
+      document.body.style.pointerEvents = '';
       previousRouteKeyRef.current = currentRouteKey;
-      if (startTimerRef.current !== null) {
-        window.clearTimeout(startTimerRef.current);
-        startTimerRef.current = null;
-      }
     }
   }, [currentRouteKey]);
 
   useEffect(() => {
     if (!isNavigating) return;
-    const timeout = window.setTimeout(() => setIsNavigating(false), 15000);
+    const timeout = window.setTimeout(() => {
+      setIsNavigating(false);
+      document.body.style.pointerEvents = '';
+    }, 15000);
     return () => window.clearTimeout(timeout);
   }, [isNavigating]);
 

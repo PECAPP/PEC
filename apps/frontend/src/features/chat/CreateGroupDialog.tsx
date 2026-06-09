@@ -10,10 +10,10 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onGroupCreated: (roomId: string) => void;
-  currentUser: { uid: string; organizationId: string };
+  _currentUser: { uid: string; organizationId: string };
 }
 
-export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, currentUser }: Props) {
+export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, _currentUser }: Props) {
   const [name, setName] = useState("");
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);

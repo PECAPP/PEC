@@ -150,7 +150,7 @@ export function useResumeBuilder() {
           if (pData) {
             profileDoc = { exists: () => true, data: () => pData };
           }
-        } catch (e) { /* no profile yet */ }
+        } catch (_e) { /* no profile yet */ }
         if (profileDoc.exists()) {
           const profile = profileDoc.data();
           setResumeData((prev) => {

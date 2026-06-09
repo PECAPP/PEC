@@ -156,7 +156,7 @@ export const ChatMessageItem = ({
                     parts.push(<EventsList key={match.index} data={jsonData} />);
                   }
                 }
-              } catch (e) {
+              } catch (_e) {
                 // If JSON parsing fails, just render the raw string
                 parts.push(match[0]);
               }

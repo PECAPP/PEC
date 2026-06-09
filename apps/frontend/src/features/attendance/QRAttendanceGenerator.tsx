@@ -1,13 +1,10 @@
-import { Button, Card, Dialog, DialogContent, DialogHeader, DialogTitle, useToast, Progress } from "@pec/ui";
+'use client';
+import { Button, Card, useToast, Progress } from "@pec/ui";
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-
 import { AXIOS_INSTANCE } from "@pec/api";
-
 import { usePermissions } from '@/hooks/usePermissions';
-import { QrCode, Users, Clock, X, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Users, Clock, X, RefreshCw, ShieldCheck } from 'lucide-react';
 
 interface QRAttendanceGeneratorProps {
   courseId: string;
@@ -38,13 +35,13 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
       const uniqueId = `${courseId}-${Date.now()}-${window.crypto.randomUUID().split('-')[0]}`;
 
       // Create attendance session in backend
-      const res = await AXIOS_INSTANCE.post('/api/v1/attendance-session', {
+      const res = await AXIOS_INSTANCE.post('/api/v1/attendanceSessions', {
         courseId,
         courseName,
         duration,
         qrCode: uniqueId
       });
-      const sessionRef = { id: res.data.id };
+      const sessionRef = { id: res.data.data?.id ?? res.data.id };
 
       setSessionId(sessionRef.id);
       // Initial QR with timestamp
@@ -71,7 +68,7 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
   const endSession = async () => {
     try {
       if (sessionId) {
-        await AXIOS_INSTANCE.patch(`/api/v1/attendance-session/${sessionId}`, { active: false });
+        await AXIOS_INSTANCE.patch(`/api/v1/attendanceSessions/${sessionId}`, { active: false });
         setIsActive(false);
         toast({
           title: 'Session Ended',
@@ -88,17 +85,18 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
     }
   };
 
-  // Update attendance count in real-time
+  // Poll attendance count from backend every 5 seconds
   useEffect(() => {
     if (!sessionId) return;
 
     const fetchAttendanceCount = async () => {
-      const q = query(
-        collection(({} as any), 'attendance'),
-        where('sessionId', '==', sessionId)
-      );
-      const snapshot = await getDocs(q);
-      setAttendanceCount(snapshot.size);
+      try {
+        const res = await AXIOS_INSTANCE.get(`/api/v1/attendanceSessions/${sessionId}/count`);
+        const count = res.data?.data?.count ?? res.data?.count ?? 0;
+        setAttendanceCount(count);
+      } catch (err) {
+        console.error('Error fetching attendance count:', err);
+      }
     };
 
     // Fetch initially
@@ -147,13 +145,6 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
       const elapsed = (now - startTime) % ROTATION_INTERVAL;
       const progress = 100 - (elapsed / ROTATION_INTERVAL) * 100;
       setRefreshProgress(progress);
-      
-      // Update QR every 10s (approx check)
-      // Actually, we should just derive the QR from Math.floor(now / 10000)
-      // But preserving the original uniqueId is key.
-      // Let's just update the QR value when progress loops? 
-      // Simpler: Just set interval for QR update and use rAF for smooth progress.
-      
       frameId = requestAnimationFrame(animate);
     };
     

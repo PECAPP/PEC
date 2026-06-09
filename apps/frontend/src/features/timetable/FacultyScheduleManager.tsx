@@ -3,7 +3,7 @@ import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger,
 import { useState } from 'react';
 import { useTimetableControllerCreateV1 } from '@pec/api';
 import { usePermissions } from '@/hooks/usePermissions';
-import { Calendar, Clock, MapPin, Plus, Edit, Bell } from 'lucide-react';
+import { Calendar, Plus, Edit, Bell } from 'lucide-react';
 
 interface FacultyScheduleManagerProps {
   courses: any[];

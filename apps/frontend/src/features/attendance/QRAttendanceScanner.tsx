@@ -122,7 +122,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
     }
   };
 
-  const onScanFailure = (error: any) => {
+  const onScanFailure = (_error: any) => {
     // Ignore scan failures
   };
 

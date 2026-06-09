@@ -1,7 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Button } from "@pec/ui";
 import { cn } from '@/lib/utils';
 import { Download, FileText, Star, Trash2, Copy, MoreVertical, Reply } from 'lucide-react';
-import { ChatMessage as ChatMessageType } from '@/lib/messages.service';
 import { deleteMessage, toggleStarMessage } from '@/lib/messages.service';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
@@ -88,7 +87,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
     try {
       await deleteMessage(roomId, message.id, true);
       toast.success("Message deleted");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to delete message");
     }
   };
@@ -98,7 +97,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
     try {
       await toggleStarMessage(roomId, message.id, user.uid, !isStarred);
       toast.success(isStarred ? "Removed from starred" : "Added to starred");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to star message");
     }
   };

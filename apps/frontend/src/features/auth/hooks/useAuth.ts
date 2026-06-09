@@ -250,18 +250,10 @@ export function useAuth(): UseAuthResult {
     window.addEventListener('auth-change', onAuthChange);
     window.addEventListener('auth-failed', onAuthFailed);
 
-    // Hydrate from localStorage now that we're on the client
+    // We no longer hydrate from localStorage to prevent client-side privilege spoofing.
+    // The UI will securely wait for the backend to return the accurate profile via fetchProfile().
     if (!hasRefreshMarkerCookie()) {
       safeLocalStorage.remove('auth_user');
-    } else {
-      const stored = safeLocalStorage.get('auth_user');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          parsed.permissions = getRolePermissions(parsed.role || 'student');
-          setUser(parsed);
-        } catch {}
-      }
     }
 
     // Sync token from authClient (browser-only)
@@ -275,7 +267,7 @@ export function useAuth(): UseAuthResult {
   }, []);
 
   const logout = async () => {
-    try { await authClient.logout(); } catch (e) {}
+    try { await authClient.logout(); } catch (_e) {}
     clearAuthCache();
     safeLocalStorage.remove('auth_user');
     setUser(null);

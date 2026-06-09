@@ -7,8 +7,6 @@ import {
   UserMinus, 
   Edit, 
   X,
-  Mail,
-  Calendar,
   Hash,
   MessageCircle
 } from "lucide-react";
@@ -100,7 +98,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
       await removeMemberFromGroup(room.id, userId);
       toast.success("Member removed");
       await loadMembers();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to remove member");
     }
   };
@@ -117,7 +115,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
         toast.success("User promoted to admin");
       }
       await loadMembers();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update admin status");
     }
   };
@@ -132,7 +130,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
       });
       toast.success("Group info updated");
       setIsEditing(false);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update group info");
     }
   };

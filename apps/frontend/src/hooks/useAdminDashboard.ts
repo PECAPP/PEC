@@ -117,7 +117,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
     void (async () => {
       try {
         await fetchAdminData();
-      } catch (error) {
+      } catch (_error) {
         toast.error('Failed to load admin data');
       } finally {
         setLoading(false);
@@ -162,7 +162,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       setShowCourseDialog(false);
       resetCourseForm();
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to create course');
     }
   };
@@ -181,7 +181,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       setEditingCourse(null);
       resetCourseForm();
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update course');
     }
   };
@@ -192,7 +192,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       await api.delete(`/courses/${courseId}`);
       toast.success('Course deleted successfully!');
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete course');
     }
   };
@@ -207,7 +207,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       setShowUserDialog(false);
       resetUserForm();
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to create user');
     }
   };
@@ -224,7 +224,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       setEditingUser(null);
       resetUserForm();
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update user');
     }
   };
@@ -235,7 +235,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       await api.delete(`/users/${userId}`);
       toast.success('User deleted successfully!');
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete user');
     }
   };

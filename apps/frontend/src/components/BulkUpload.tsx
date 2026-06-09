@@ -46,7 +46,7 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
         const worksheet = workbook.worksheets[0];
         
         const jsonData: any[] = [];
-        let headers: string[] = [];
+        const headers: string[] = [];
         
         worksheet.eachRow((row, rowNumber) => {
           if (rowNumber === 1) {

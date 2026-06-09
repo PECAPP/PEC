@@ -1,5 +1,5 @@
 import { Input, Button } from "@pec/ui";
-import { Hash, Users, Building2, Search, Menu, Plus, MessageCircle } from "lucide-react";
+import { Hash, Users, Building2, Search, Plus, MessageCircle } from "lucide-react";
 import { ChatRoom } from '@pec/shared';
 import { UserRole } from '@pec/shared';
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ interface Props {
   loading?: boolean;
   userRole: UserRole;
   userId?: string; // NEW: for DM name display
-  isMobileOpen?: boolean;
+  _isMobileOpen?: boolean;
   onMobileClose?: () => void;
 }
 
@@ -27,14 +27,14 @@ export function ChatSidebar({
   loading,
   userRole,
   userId,
-  isMobileOpen = false,
+  _isMobileOpen = false,
   onMobileClose,
 }: Props) {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
   const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
-  const isStudent = userRole === "student";
+  const _isStudent = userRole === "student";
   const isChatAdmin = userRole === "college_admin";
 
   // Helper: Get display title for DMs (show other person's name)
