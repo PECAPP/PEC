@@ -1,4 +1,4 @@
-import { Button, Input, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, RadioGroup, RadioGroupItem } from "@pec/ui";
+import { Button, Input, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, RadioGroup, RadioGroupItem, formatDate } from "@pec/ui";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -27,8 +27,7 @@ const extractData = <T,>(payload: any): T => {
   return payload as T;
 };
 
-export default function PaymentSettings() {
-  const embedded = false;
+export default function PaymentSettings({ embedded = false }: { embedded?: boolean }) {
   const router = useRouter();
   const { user, isAdmin, loading: authLoading } = usePermissions();
   const [loading, setLoading] = useState(true);
@@ -221,7 +220,7 @@ export default function PaymentSettings() {
                 <p className="text-sm text-muted-foreground">
                   Last updated:{' '}
                   {settings.lastUpdated
-                    ? new Date(settings.lastUpdated).toLocaleDateString()
+                    ? formatDate(settings.lastUpdated)
                     : 'Never'}
                 </p>
               </div>
@@ -242,7 +241,7 @@ export default function PaymentSettings() {
               {/* UPI Option */}
               <div
                 className={cn(
-                  'p-4 rounded-lg border-2 cursor-pointer transition-all',
+                  'p-4 rounded-sm border cursor-pointer transition-all',
                   method === 'upi'
                     ? 'border-primary bg-primary/5'
                     : 'border-border hover:border-border/80'
@@ -255,7 +254,7 @@ export default function PaymentSettings() {
                       htmlFor="upi-radio"
                       className="font-semibold text-foreground cursor-pointer"
                     >
-                      UPI Payment ⚡
+                      UPI Payment 
                     </label>
                     <p className="text-sm text-muted-foreground mt-1">
                       Simple & Direct - Students scan QR or click button to pay via UPI app
@@ -270,7 +269,7 @@ export default function PaymentSettings() {
               {/* Bank Option */}
               <div
                 className={cn(
-                  'p-4 rounded-lg border-2 cursor-pointer transition-all',
+                  'p-4 rounded-sm border cursor-pointer transition-all',
                   method === 'bank'
                     ? 'border-primary bg-primary/5'
                     : 'border-border hover:border-border/80'
@@ -283,7 +282,7 @@ export default function PaymentSettings() {
                       htmlFor="bank-radio"
                       className="font-semibold text-foreground cursor-pointer"
                     >
-                      Bank Transfer 🏦
+                      Bank Transfer 
                     </label>
                     <p className="text-sm text-muted-foreground mt-1">
                       Manual - Students transfer to your bank account and upload proof for
@@ -299,7 +298,7 @@ export default function PaymentSettings() {
               {/* Razorpay Option */}
               <div
                 className={cn(
-                  'p-4 rounded-lg border-2 cursor-pointer transition-all',
+                  'p-4 rounded-sm border cursor-pointer transition-all',
                   method === 'razorpay'
                     ? 'border-primary bg-primary/5'
                     : 'border-border hover:border-border/80'
@@ -312,7 +311,7 @@ export default function PaymentSettings() {
                       htmlFor="razorpay-radio"
                       className="font-semibold text-foreground cursor-pointer"
                     >
-                      Razorpay Payment 💳
+                      Razorpay Payment 
                     </label>
                     <p className="text-sm text-muted-foreground mt-1">
                       Professional - Cards, UPI, NetBanking, Wallets. Auto-verified payments.
@@ -377,7 +376,7 @@ export default function PaymentSettings() {
 
               {/* Preview */}
               {upiId && upiName && (
-                <div className="p-3 bg-secondary/50 rounded-lg border border-border">
+                <div className="p-3 bg-secondary/50 rounded-sm border border-border">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Preview:</p>
                   <div className="space-y-1">
                     <p className="text-sm">
@@ -445,7 +444,7 @@ export default function PaymentSettings() {
 
               {/* Preview */}
               {bankName && accountNumber && (
-                <div className="p-3 bg-secondary/50 rounded-lg border border-border">
+                <div className="p-3 bg-secondary/50 rounded-sm border border-border">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Preview:</p>
                   <div className="space-y-1 text-sm">
                     <p>
@@ -525,7 +524,7 @@ export default function PaymentSettings() {
               </div>
 
               {/* Info Box */}
-              <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
+              <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-sm border border-blue-200/50 dark:border-blue-800/50">
                 <div className="flex gap-2">
                   <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-blue-900 dark:text-blue-200">

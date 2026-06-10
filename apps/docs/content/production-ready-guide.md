@@ -203,20 +203,20 @@ PHASE 4: SECURITY HARDENING (Week 3)
 
 4.1 ALREADY IN PLACE (no action needed)
 ─────────────────────────────────────────
-✓ JWT with refresh token rotation and reuse detection
-✓ Bcrypt password hashing (cost 12)
-✓ Account lockout (5 attempts → 15 min lock)
-✓ Role-based access control (7 roles with route guards)
-✓ Input sanitization middleware (HTML, injection prevention)
-✓ Field-level encryption (AES-256-GCM) for PII (phone, address, bio)
-✓ Helmet security headers (CSP, HSTS, X-Frame-Options, noSniff)
-✓ CORS whitelist with credential enforcement
-✓ Rate limiting (100 req/min short, 1000 req/10min long)
-✓ Extra rate limiting on finance/payment routes
-✓ HTTPS enforcement in production
-✓ Superuser database connection blocking
-✓ Audit logging of all API calls
-✓ Session version tracking (invalidate on password change)
+ JWT with refresh token rotation and reuse detection
+ Bcrypt password hashing (cost 12)
+ Account lockout (5 attempts → 15 min lock)
+ Role-based access control (7 roles with route guards)
+ Input sanitization middleware (HTML, injection prevention)
+ Field-level encryption (AES-256-GCM) for PII (phone, address, bio)
+ Helmet security headers (CSP, HSTS, X-Frame-Options, noSniff)
+ CORS whitelist with credential enforcement
+ Rate limiting (100 req/min short, 1000 req/10min long)
+ Extra rate limiting on finance/payment routes
+ HTTPS enforcement in production
+ Superuser database connection blocking
+ Audit logging of all API calls
+ Session version tracking (invalidate on password change)
 
 4.2 ADDITIONAL STEPS FOR PRODUCTION
 ─────────────────────────────────────

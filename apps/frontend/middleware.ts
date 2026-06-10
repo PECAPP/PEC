@@ -6,18 +6,6 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("access_token")?.value;
   const { pathname } = request.nextUrl;
 
-  // 0. Force clear session from client
-  if (request.nextUrl.searchParams.get('clear_session') === 'true') {
-    const url = request.nextUrl.clone();
-    url.searchParams.delete('clear_session');
-    const response = NextResponse.redirect(url);
-    response.cookies.delete("access_token");
-    response.cookies.delete("refresh_present");
-    response.cookies.delete("user_id");
-    response.cookies.delete("user_role");
-    return response;
-  }
-
   // 1. Define paths that require authentication
   const isProtectedPath =
     pathname.startsWith("/dashboard") ||
@@ -81,9 +69,15 @@ export async function middleware(request: NextRequest) {
         url.searchParams.set("error", "session_expired");
       }
       const response = NextResponse.redirect(url);
-      response.cookies.delete("access_token");
-      response.cookies.delete("user_id");
-      response.cookies.delete("user_role");
+      const cookieOptions = {
+        path: "/",
+        maxAge: 0,
+        sameSite: "strict" as const,
+        secure: process.env.NODE_ENV === "production",
+      };
+      response.cookies.set("access_token", "", cookieOptions);
+      response.cookies.set("user_id", "", cookieOptions);
+      response.cookies.set("user_role", "", cookieOptions);
       return response;
     }
   }
@@ -145,14 +139,23 @@ async function attemptTokenRefresh(
 
 export const config = {
   matcher: [
+    '/dashboard',
     '/dashboard/:path*',
+    '/courses',
     '/courses/:path*',
+    '/users',
     '/users/:path*',
+    '/chat',
     '/chat/:path*',
+    '/settings',
     '/settings/:path*',
+    '/faculty',
     '/faculty/:path*',
+    '/departments',
     '/departments/:path*',
+    '/attendance',
     '/attendance/:path*',
+    '/auth',
     '/auth/:path*',
   ],
 };

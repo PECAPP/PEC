@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+import { Button, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton } from "@pec/ui";
 
 
 import { useEffect, useMemo, useState } from 'react';
@@ -22,6 +22,8 @@ import { usePermissions } from '@/hooks/usePermissions';
 import api from "@pec/api";
 import { extractData } from '@/lib/utils';
 import { toast } from 'sonner';
+import { DataTable } from '@/components/common/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
 
 import { CgpaEntry, CourseOption } from './types';
 
@@ -318,7 +320,7 @@ export default function ScoreSheetPage() {
   if (apiLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <AppShellSkeleton />
       </div>
     );
   }
@@ -327,10 +329,10 @@ export default function ScoreSheetPage() {
     <div className="space-y-8">
       <div className="card-elevated ui-card-pad flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
             Academic Utilities
           </p>
-          <h1 className="text-3xl font-black tracking-tight text-foreground">CGPA Calculator</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">CGPA Calculator</h1>
           <p className="text-sm text-muted-foreground">
             Add subjects with credits and grade points to compute SGPA, CGPA, and trends.
           </p>
@@ -368,14 +370,14 @@ export default function ScoreSheetPage() {
           { label: 'Latest SGPA', value: stats.latestSgpa.toFixed(2), icon: TrendingUp },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="card-elevated ui-card-pad flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <div className="h-12 w-12 rounded-sm bg-primary/10 text-primary flex items-center justify-center">
               <Icon className="h-5 w-5" />
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                 {label}
               </p>
-              <p className="text-2xl font-black text-foreground">{value}</p>
+              <p className="text-2xl font-bold text-foreground">{value}</p>
             </div>
           </div>
         ))}
@@ -384,7 +386,7 @@ export default function ScoreSheetPage() {
       <div className="card-elevated ui-card-pad space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
               Entry Form
             </p>
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -529,11 +531,11 @@ export default function ScoreSheetPage() {
         <div className="card-elevated ui-card-pad space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-foreground">Semester Trends</h3>
-            <p className="text-xs text-muted-foreground font-black">
+            <p className="text-xs text-muted-foreground font-bold">
               Best SGPA: {bestSgpa.toFixed(2)}
             </p>
           </div>
-          <div className="h-[250px] w-full pt-4 glow-primary/5 rounded-2xl overflow-hidden transition-all hover:bg-primary/[0.02] border border-primary/5">
+          <div className="h-[250px] w-full pt-4 glow-primary/5 rounded-sm overflow-hidden transition-all hover:bg-primary/[0.02] border border-primary/5">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={trend}>
                 <defs>
@@ -608,7 +610,7 @@ export default function ScoreSheetPage() {
           ) : (
             <div className="space-y-3">
               {semesterStats.map((semesterData) => (
-                <div key={semesterData.semester} className="rounded-lg border border-border p-3">
+                <div key={semesterData.semester} className="rounded-sm border border-border p-3">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold text-foreground">
                       Semester {semesterData.semester}
@@ -634,68 +636,81 @@ export default function ScoreSheetPage() {
             No subjects added yet. Add your first subject to start CGPA calculation.
           </div>
         ) : (
-          entries
-            .slice()
-            .sort((a, b) => a.semester - b.semester || a.subjectName.localeCompare(b.subjectName))
-            .map((entry) => {
-              const creditPoints = entry.gradePoint * entry.credits;
-
-              return (
-                <div key={entry.id} className="card-elevated ui-card-pad space-y-3">
-                  <div className="grid gap-4 md:grid-cols-[1.6fr_0.8fr_0.8fr] md:items-center">
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {entry.subjectName}
-                        {entry.courseCode ? ` (${entry.courseCode})` : ''}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        Semester {entry.semester}
-                        {entry.examDate
-                          ? ` - ${new Date(entry.examDate).toLocaleDateString()}`
-                          : ''}
-                      </p>
-                      {entry.notes && (
-                        <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
-                          {entry.notes}
-                        </p>
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                        Performance
-                      </p>
-                      <p className="text-xl font-bold text-foreground">
-                        GP {entry.gradePoint.toFixed(2)}
-                      </p>
-                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                        <div
-                          className="h-full bg-primary transition-all"
-                          style={{ width: `${(entry.gradePoint / 10) * 100}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Credits {entry.credits} | Credit Points {creditPoints.toFixed(2)}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between md:justify-end gap-2">
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDelete(entry.id)}
-                          disabled={deletingId === entry.id}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
+          <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-xl">
+             <DataTable 
+               columns={[
+                  {
+                    accessorKey: 'subjectName',
+                    header: 'Subject & Semester',
+                    cell: ({ row }) => {
+                      const entry = row.original;
+                      return (
+                        <div className="flex flex-col py-2">
+                          <h3 className="text-sm font-bold text-foreground">
+                            {entry.subjectName}
+                            {entry.courseCode ? ` (${entry.courseCode})` : ''}
+                          </h3>
+                          <p className="text-xs text-muted-foreground">
+                            Semester {entry.semester}
+                            {entry.examDate ? ` - ${formatDate(entry.examDate)}` : ''}
+                          </p>
+                          {entry.notes && (
+                            <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                              {entry.notes}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    }
+                  },
+                  {
+                    id: 'performance',
+                    header: 'Performance',
+                    cell: ({ row }) => {
+                      const entry = row.original;
+                      const creditPoints = entry.gradePoint * entry.credits;
+                      return (
+                        <div className="space-y-1 w-full max-w-[200px] py-2">
+                          <p className="text-sm font-bold text-foreground">GP {entry.gradePoint.toFixed(2)}</p>
+                          <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                            <div
+                              className="h-full bg-primary transition-all"
+                              style={{ width: `${(entry.gradePoint / 10) * 100}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Credits {entry.credits} | CP {creditPoints.toFixed(2)}
+                          </p>
+                        </div>
+                      );
+                    }
+                  },
+                  {
+                    id: 'actions',
+                    header: '',
+                    cell: ({ row }) => {
+                      const entry = row.original;
+                      return (
+                        <div className="flex justify-end gap-2 py-2">
+                          <Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
+                            Edit
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDelete(entry.id)}
+                            disabled={deletingId === entry.id}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      );
+                    }
+                  }
+               ]} 
+               data={entries.slice().sort((a, b) => a.semester - b.semester || a.subjectName.localeCompare(b.subjectName))} 
+             />
+          </div>
         )}
       </div>
     </div>

@@ -123,4 +123,25 @@ export class MarketplaceController {
     const data = await this.service.sendMessage(chatId, req.user.sub, text);
     return ok(data);
   }
+
+  @Post('chats/:chatId/offers')
+  async createOffer(
+    @Param('chatId') chatId: string,
+    @Request() req: any,
+    @Body('amount') amount: number,
+  ) {
+    const data = await this.service.createOffer(chatId, req.user.sub, amount);
+    return ok(data);
+  }
+
+  @Patch('chats/:chatId/offers/:messageId')
+  async updateOffer(
+    @Param('chatId') chatId: string,
+    @Param('messageId') messageId: string,
+    @Request() req: any,
+    @Body('status') status: string,
+  ) {
+    const data = await this.service.updateOffer(chatId, messageId, req.user.sub, status);
+    return ok(data);
+  }
 }

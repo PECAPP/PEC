@@ -13,6 +13,9 @@ import {
   Download,
   Eye,
 } from 'lucide-react';
+import { DataTable } from '@/components/common/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
+import { useMemo } from 'react';
 
 const admissions = [
   {
@@ -91,6 +94,64 @@ export default function Admissions() {
         return <Clock className="w-4 h-4" />;
     }
   };
+
+  const columns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'name',
+      header: 'Applicant',
+      cell: ({ row }) => (
+        <div>
+          <p className="font-medium text-foreground">{row.original.name}</p>
+          <p className="text-sm text-muted-foreground">{row.original.email}</p>
+        </div>
+      )
+    },
+    {
+      accessorKey: 'department',
+      header: 'Department',
+      cell: ({ row }) => <span className="text-foreground">{row.original.department}</span>
+    },
+    {
+      accessorKey: 'appliedDate',
+      header: 'Applied Date',
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.appliedDate}</span>
+    },
+    {
+      accessorKey: 'entranceScore',
+      header: 'Entrance Score',
+      cell: ({ row }) => (
+        <div className="text-center w-full">
+          <span className={`font-medium ${row.original.entranceScore >= 80 ? 'text-success' : row.original.entranceScore >= 65 ? 'text-warning' : 'text-destructive'}`}>
+            {row.original.entranceScore}%
+          </span>
+        </div>
+      )
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
+        <div className="text-center w-full">
+          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(row.original.status)}`}>
+            {getStatusIcon(row.original.status)}
+            {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
+          </span>
+        </div>
+      )
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: () => (
+        <div className="text-center w-full">
+          <Button variant="ghost" size="sm">
+            <Eye className="w-4 h-4 mr-2" />
+            View
+          </Button>
+        </div>
+      )
+    }
+  ], []);
 
   return (
     <motion.div
@@ -171,50 +232,8 @@ export default function Admissions() {
       </div>
 
       {/* Admissions List */}
-      <div className="card-elevated overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-secondary/50">
-            <tr>
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Applicant</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Department</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Applied Date</th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Entrance Score</th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {admissions.map((admission) => (
-              <tr key={admission.id} className="border-t border-border hover:bg-secondary/30 transition-colors">
-                <td className="py-4 px-4">
-                  <div>
-                    <p className="font-medium text-foreground">{admission.name}</p>
-                    <p className="text-sm text-muted-foreground">{admission.email}</p>
-                  </div>
-                </td>
-                <td className="py-4 px-4 text-foreground">{admission.department}</td>
-                <td className="py-4 px-4 text-muted-foreground">{admission.appliedDate}</td>
-                <td className="py-4 px-4 text-center">
-                  <span className={`font-medium ${admission.entranceScore >= 80 ? 'text-success' : admission.entranceScore >= 65 ? 'text-warning' : 'text-destructive'}`}>
-                    {admission.entranceScore}%
-                  </span>
-                </td>
-                <td className="py-4 px-4 text-center">
-                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(admission.status)}`}>
-                    {getStatusIcon(admission.status)}
-                    {admission.status.charAt(0).toUpperCase() + admission.status.slice(1)}
-                  </span>
-                </td>
-                <td className="py-4 px-4 text-center">
-                  <Button variant="ghost" size="sm">
-                    <Eye className="w-4 h-4" />
-                    View
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="card-elevated overflow-hidden border rounded-sm shadow-sm">
+        <DataTable columns={columns} data={admissions} />
       </div>
     </motion.div>
   );

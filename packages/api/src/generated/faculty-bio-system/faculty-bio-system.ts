@@ -31,24 +31,42 @@ import type {
   CreatePublicationDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const facultyBioSystemControllerGetFullProfileV1 = (
-    facultyId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+
+export type facultyBioSystemControllerGetFullProfileV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerGetFullProfileV1ResponseSuccess = (facultyBioSystemControllerGetFullProfileV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerGetFullProfileV1Response = (facultyBioSystemControllerGetFullProfileV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerGetFullProfileV1Url = (facultyId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/${facultyId}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/${facultyId}`
+}
+
+export const facultyBioSystemControllerGetFullProfileV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetFullProfileV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerGetFullProfileV1Response>(getFacultyBioSystemControllerGetFullProfileV1Url(facultyId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -60,16 +78,16 @@ export const getFacultyBioSystemControllerGetFullProfileV1QueryKey = (facultyId:
     }
 
 
-export const getFacultyBioSystemControllerGetFullProfileV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFacultyBioSystemControllerGetFullProfileV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFacultyBioSystemControllerGetFullProfileV1QueryKey(facultyId);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>> = ({ signal }) => facultyBioSystemControllerGetFullProfileV1(facultyId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>> = ({ signal }) => facultyBioSystemControllerGetFullProfileV1(facultyId, { signal });
 
 
 
@@ -89,7 +107,7 @@ export function useFacultyBioSystemControllerGetFullProfileV1<TData = Awaited<Re
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetFullProfileV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError = unknown>(
@@ -99,16 +117,16 @@ export function useFacultyBioSystemControllerGetFullProfileV1<TData = Awaited<Re
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetFullProfileV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFacultyBioSystemControllerGetFullProfileV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetFullProfileV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -124,17 +142,37 @@ export function useFacultyBioSystemControllerGetFullProfileV1<TData = Awaited<Re
 
 
 
-export const facultyBioSystemControllerGetPublicationsV1 = (
-    facultyId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type facultyBioSystemControllerGetPublicationsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerGetPublicationsV1ResponseSuccess = (facultyBioSystemControllerGetPublicationsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerGetPublicationsV1Response = (facultyBioSystemControllerGetPublicationsV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerGetPublicationsV1Url = (facultyId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/${facultyId}/publications`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/${facultyId}/publications`
+}
+
+export const facultyBioSystemControllerGetPublicationsV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetPublicationsV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerGetPublicationsV1Response>(getFacultyBioSystemControllerGetPublicationsV1Url(facultyId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -146,16 +184,16 @@ export const getFacultyBioSystemControllerGetPublicationsV1QueryKey = (facultyId
     }
 
 
-export const getFacultyBioSystemControllerGetPublicationsV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFacultyBioSystemControllerGetPublicationsV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFacultyBioSystemControllerGetPublicationsV1QueryKey(facultyId);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>> = ({ signal }) => facultyBioSystemControllerGetPublicationsV1(facultyId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>> = ({ signal }) => facultyBioSystemControllerGetPublicationsV1(facultyId, { signal });
 
 
 
@@ -175,7 +213,7 @@ export function useFacultyBioSystemControllerGetPublicationsV1<TData = Awaited<R
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetPublicationsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError = unknown>(
@@ -185,16 +223,16 @@ export function useFacultyBioSystemControllerGetPublicationsV1<TData = Awaited<R
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetPublicationsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFacultyBioSystemControllerGetPublicationsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetPublicationsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -210,32 +248,50 @@ export function useFacultyBioSystemControllerGetPublicationsV1<TData = Awaited<R
 
 
 
-export const facultyBioSystemControllerCreatePublicationV1 = (
-    createPublicationDto: CreatePublicationDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type facultyBioSystemControllerCreatePublicationV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type facultyBioSystemControllerCreatePublicationV1ResponseSuccess = (facultyBioSystemControllerCreatePublicationV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerCreatePublicationV1Response = (facultyBioSystemControllerCreatePublicationV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerCreatePublicationV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/publications`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createPublicationDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/publications`
+}
+
+export const facultyBioSystemControllerCreatePublicationV1 = async (createPublicationDto: CreatePublicationDto, options?: RequestInit): Promise<facultyBioSystemControllerCreatePublicationV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerCreatePublicationV1Response>(getFacultyBioSystemControllerCreatePublicationV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createPublicationDto)
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerCreatePublicationV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreatePublicationV1>>, TError,{data: CreatePublicationDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreatePublicationV1>>, TError,{data: CreatePublicationDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreatePublicationV1>>, TError,{data: CreatePublicationDto}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerCreatePublicationV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -243,7 +299,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerCreatePublicationV1>>, {data: CreatePublicationDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  facultyBioSystemControllerCreatePublicationV1(data,requestOptions)
+          return  facultyBioSystemControllerCreatePublicationV1(data,)
         }
 
 
@@ -258,7 +314,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerCreatePublicationV1MutationError = unknown
 
     export const useFacultyBioSystemControllerCreatePublicationV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreatePublicationV1>>, TError,{data: CreatePublicationDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreatePublicationV1>>, TError,{data: CreatePublicationDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerCreatePublicationV1>>,
         TError,
@@ -267,30 +323,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerCreatePublicationV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerUpdatePublicationV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerUpdatePublicationV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerUpdatePublicationV1ResponseSuccess = (facultyBioSystemControllerUpdatePublicationV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerUpdatePublicationV1Response = (facultyBioSystemControllerUpdatePublicationV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerUpdatePublicationV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/publications/${id}`, method: 'PATCH', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/publications/${id}`
+}
+
+export const facultyBioSystemControllerUpdatePublicationV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerUpdatePublicationV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerUpdatePublicationV1Response>(getFacultyBioSystemControllerUpdatePublicationV1Url(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerUpdatePublicationV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdatePublicationV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdatePublicationV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdatePublicationV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerUpdatePublicationV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -298,7 +374,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerUpdatePublicationV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  facultyBioSystemControllerUpdatePublicationV1(id,requestOptions)
+          return  facultyBioSystemControllerUpdatePublicationV1(id,)
         }
 
 
@@ -313,7 +389,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerUpdatePublicationV1MutationError = unknown
 
     export const useFacultyBioSystemControllerUpdatePublicationV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdatePublicationV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdatePublicationV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerUpdatePublicationV1>>,
         TError,
@@ -322,30 +398,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerUpdatePublicationV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerDeletePublicationV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerDeletePublicationV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerDeletePublicationV1ResponseSuccess = (facultyBioSystemControllerDeletePublicationV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerDeletePublicationV1Response = (facultyBioSystemControllerDeletePublicationV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerDeletePublicationV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/publications/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/publications/${id}`
+}
+
+export const facultyBioSystemControllerDeletePublicationV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerDeletePublicationV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerDeletePublicationV1Response>(getFacultyBioSystemControllerDeletePublicationV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerDeletePublicationV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeletePublicationV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeletePublicationV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeletePublicationV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerDeletePublicationV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -353,7 +449,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerDeletePublicationV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  facultyBioSystemControllerDeletePublicationV1(id,requestOptions)
+          return  facultyBioSystemControllerDeletePublicationV1(id,)
         }
 
 
@@ -368,7 +464,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerDeletePublicationV1MutationError = unknown
 
     export const useFacultyBioSystemControllerDeletePublicationV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeletePublicationV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeletePublicationV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerDeletePublicationV1>>,
         TError,
@@ -377,17 +473,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerDeletePublicationV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerGetAwardsV1 = (
-    facultyId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerGetAwardsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerGetAwardsV1ResponseSuccess = (facultyBioSystemControllerGetAwardsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerGetAwardsV1Response = (facultyBioSystemControllerGetAwardsV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerGetAwardsV1Url = (facultyId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/${facultyId}/awards`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/${facultyId}/awards`
+}
+
+export const facultyBioSystemControllerGetAwardsV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetAwardsV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerGetAwardsV1Response>(getFacultyBioSystemControllerGetAwardsV1Url(facultyId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -399,16 +515,16 @@ export const getFacultyBioSystemControllerGetAwardsV1QueryKey = (facultyId: stri
     }
 
 
-export const getFacultyBioSystemControllerGetAwardsV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFacultyBioSystemControllerGetAwardsV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFacultyBioSystemControllerGetAwardsV1QueryKey(facultyId);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>> = ({ signal }) => facultyBioSystemControllerGetAwardsV1(facultyId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>> = ({ signal }) => facultyBioSystemControllerGetAwardsV1(facultyId, { signal });
 
 
 
@@ -428,7 +544,7 @@ export function useFacultyBioSystemControllerGetAwardsV1<TData = Awaited<ReturnT
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetAwardsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError = unknown>(
@@ -438,16 +554,16 @@ export function useFacultyBioSystemControllerGetAwardsV1<TData = Awaited<ReturnT
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetAwardsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFacultyBioSystemControllerGetAwardsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetAwardsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -463,32 +579,50 @@ export function useFacultyBioSystemControllerGetAwardsV1<TData = Awaited<ReturnT
 
 
 
-export const facultyBioSystemControllerCreateAwardV1 = (
-    createAwardDto: CreateAwardDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type facultyBioSystemControllerCreateAwardV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type facultyBioSystemControllerCreateAwardV1ResponseSuccess = (facultyBioSystemControllerCreateAwardV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerCreateAwardV1Response = (facultyBioSystemControllerCreateAwardV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerCreateAwardV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/awards`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createAwardDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/awards`
+}
+
+export const facultyBioSystemControllerCreateAwardV1 = async (createAwardDto: CreateAwardDto, options?: RequestInit): Promise<facultyBioSystemControllerCreateAwardV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerCreateAwardV1Response>(getFacultyBioSystemControllerCreateAwardV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createAwardDto)
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerCreateAwardV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateAwardV1>>, TError,{data: CreateAwardDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateAwardV1>>, TError,{data: CreateAwardDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateAwardV1>>, TError,{data: CreateAwardDto}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerCreateAwardV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -496,7 +630,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerCreateAwardV1>>, {data: CreateAwardDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  facultyBioSystemControllerCreateAwardV1(data,requestOptions)
+          return  facultyBioSystemControllerCreateAwardV1(data,)
         }
 
 
@@ -511,7 +645,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerCreateAwardV1MutationError = unknown
 
     export const useFacultyBioSystemControllerCreateAwardV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateAwardV1>>, TError,{data: CreateAwardDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateAwardV1>>, TError,{data: CreateAwardDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerCreateAwardV1>>,
         TError,
@@ -520,30 +654,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerCreateAwardV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerUpdateAwardV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerUpdateAwardV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerUpdateAwardV1ResponseSuccess = (facultyBioSystemControllerUpdateAwardV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerUpdateAwardV1Response = (facultyBioSystemControllerUpdateAwardV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerUpdateAwardV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/awards/${id}`, method: 'PATCH', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/awards/${id}`
+}
+
+export const facultyBioSystemControllerUpdateAwardV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerUpdateAwardV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerUpdateAwardV1Response>(getFacultyBioSystemControllerUpdateAwardV1Url(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerUpdateAwardV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateAwardV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateAwardV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateAwardV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerUpdateAwardV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -551,7 +705,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateAwardV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  facultyBioSystemControllerUpdateAwardV1(id,requestOptions)
+          return  facultyBioSystemControllerUpdateAwardV1(id,)
         }
 
 
@@ -566,7 +720,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerUpdateAwardV1MutationError = unknown
 
     export const useFacultyBioSystemControllerUpdateAwardV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateAwardV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateAwardV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerUpdateAwardV1>>,
         TError,
@@ -575,30 +729,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerUpdateAwardV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerDeleteAwardV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerDeleteAwardV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerDeleteAwardV1ResponseSuccess = (facultyBioSystemControllerDeleteAwardV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerDeleteAwardV1Response = (facultyBioSystemControllerDeleteAwardV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerDeleteAwardV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/awards/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/awards/${id}`
+}
+
+export const facultyBioSystemControllerDeleteAwardV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerDeleteAwardV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerDeleteAwardV1Response>(getFacultyBioSystemControllerDeleteAwardV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerDeleteAwardV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteAwardV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteAwardV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteAwardV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerDeleteAwardV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -606,7 +780,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteAwardV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  facultyBioSystemControllerDeleteAwardV1(id,requestOptions)
+          return  facultyBioSystemControllerDeleteAwardV1(id,)
         }
 
 
@@ -621,7 +795,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerDeleteAwardV1MutationError = unknown
 
     export const useFacultyBioSystemControllerDeleteAwardV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteAwardV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteAwardV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerDeleteAwardV1>>,
         TError,
@@ -630,17 +804,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerDeleteAwardV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerGetConferencesV1 = (
-    facultyId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerGetConferencesV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerGetConferencesV1ResponseSuccess = (facultyBioSystemControllerGetConferencesV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerGetConferencesV1Response = (facultyBioSystemControllerGetConferencesV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerGetConferencesV1Url = (facultyId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/${facultyId}/conferences`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/${facultyId}/conferences`
+}
+
+export const facultyBioSystemControllerGetConferencesV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetConferencesV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerGetConferencesV1Response>(getFacultyBioSystemControllerGetConferencesV1Url(facultyId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -652,16 +846,16 @@ export const getFacultyBioSystemControllerGetConferencesV1QueryKey = (facultyId:
     }
 
 
-export const getFacultyBioSystemControllerGetConferencesV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFacultyBioSystemControllerGetConferencesV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFacultyBioSystemControllerGetConferencesV1QueryKey(facultyId);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>> = ({ signal }) => facultyBioSystemControllerGetConferencesV1(facultyId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>> = ({ signal }) => facultyBioSystemControllerGetConferencesV1(facultyId, { signal });
 
 
 
@@ -681,7 +875,7 @@ export function useFacultyBioSystemControllerGetConferencesV1<TData = Awaited<Re
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetConferencesV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError = unknown>(
@@ -691,16 +885,16 @@ export function useFacultyBioSystemControllerGetConferencesV1<TData = Awaited<Re
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetConferencesV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFacultyBioSystemControllerGetConferencesV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConferencesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -716,32 +910,50 @@ export function useFacultyBioSystemControllerGetConferencesV1<TData = Awaited<Re
 
 
 
-export const facultyBioSystemControllerCreateConferenceV1 = (
-    createConferenceDto: CreateConferenceDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type facultyBioSystemControllerCreateConferenceV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type facultyBioSystemControllerCreateConferenceV1ResponseSuccess = (facultyBioSystemControllerCreateConferenceV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerCreateConferenceV1Response = (facultyBioSystemControllerCreateConferenceV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerCreateConferenceV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/conferences`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createConferenceDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/conferences`
+}
+
+export const facultyBioSystemControllerCreateConferenceV1 = async (createConferenceDto: CreateConferenceDto, options?: RequestInit): Promise<facultyBioSystemControllerCreateConferenceV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerCreateConferenceV1Response>(getFacultyBioSystemControllerCreateConferenceV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createConferenceDto)
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerCreateConferenceV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConferenceV1>>, TError,{data: CreateConferenceDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConferenceV1>>, TError,{data: CreateConferenceDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConferenceV1>>, TError,{data: CreateConferenceDto}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerCreateConferenceV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -749,7 +961,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConferenceV1>>, {data: CreateConferenceDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  facultyBioSystemControllerCreateConferenceV1(data,requestOptions)
+          return  facultyBioSystemControllerCreateConferenceV1(data,)
         }
 
 
@@ -764,7 +976,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerCreateConferenceV1MutationError = unknown
 
     export const useFacultyBioSystemControllerCreateConferenceV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConferenceV1>>, TError,{data: CreateConferenceDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConferenceV1>>, TError,{data: CreateConferenceDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerCreateConferenceV1>>,
         TError,
@@ -773,30 +985,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerCreateConferenceV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerUpdateConferenceV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerUpdateConferenceV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerUpdateConferenceV1ResponseSuccess = (facultyBioSystemControllerUpdateConferenceV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerUpdateConferenceV1Response = (facultyBioSystemControllerUpdateConferenceV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerUpdateConferenceV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/conferences/${id}`, method: 'PATCH', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/conferences/${id}`
+}
+
+export const facultyBioSystemControllerUpdateConferenceV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerUpdateConferenceV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerUpdateConferenceV1Response>(getFacultyBioSystemControllerUpdateConferenceV1Url(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerUpdateConferenceV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConferenceV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConferenceV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConferenceV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerUpdateConferenceV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -804,7 +1036,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConferenceV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  facultyBioSystemControllerUpdateConferenceV1(id,requestOptions)
+          return  facultyBioSystemControllerUpdateConferenceV1(id,)
         }
 
 
@@ -819,7 +1051,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerUpdateConferenceV1MutationError = unknown
 
     export const useFacultyBioSystemControllerUpdateConferenceV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConferenceV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConferenceV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConferenceV1>>,
         TError,
@@ -828,30 +1060,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerUpdateConferenceV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerDeleteConferenceV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerDeleteConferenceV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerDeleteConferenceV1ResponseSuccess = (facultyBioSystemControllerDeleteConferenceV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerDeleteConferenceV1Response = (facultyBioSystemControllerDeleteConferenceV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerDeleteConferenceV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/conferences/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/conferences/${id}`
+}
+
+export const facultyBioSystemControllerDeleteConferenceV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerDeleteConferenceV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerDeleteConferenceV1Response>(getFacultyBioSystemControllerDeleteConferenceV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerDeleteConferenceV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConferenceV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConferenceV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConferenceV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerDeleteConferenceV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -859,7 +1111,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConferenceV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  facultyBioSystemControllerDeleteConferenceV1(id,requestOptions)
+          return  facultyBioSystemControllerDeleteConferenceV1(id,)
         }
 
 
@@ -874,7 +1126,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerDeleteConferenceV1MutationError = unknown
 
     export const useFacultyBioSystemControllerDeleteConferenceV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConferenceV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConferenceV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConferenceV1>>,
         TError,
@@ -883,17 +1135,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerDeleteConferenceV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerGetConsultationsV1 = (
-    facultyId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerGetConsultationsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerGetConsultationsV1ResponseSuccess = (facultyBioSystemControllerGetConsultationsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerGetConsultationsV1Response = (facultyBioSystemControllerGetConsultationsV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerGetConsultationsV1Url = (facultyId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/${facultyId}/consultations`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/${facultyId}/consultations`
+}
+
+export const facultyBioSystemControllerGetConsultationsV1 = async (facultyId: string, options?: RequestInit): Promise<facultyBioSystemControllerGetConsultationsV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerGetConsultationsV1Response>(getFacultyBioSystemControllerGetConsultationsV1Url(facultyId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -905,16 +1177,16 @@ export const getFacultyBioSystemControllerGetConsultationsV1QueryKey = (facultyI
     }
 
 
-export const getFacultyBioSystemControllerGetConsultationsV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFacultyBioSystemControllerGetConsultationsV1QueryOptions = <TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError = unknown>(facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFacultyBioSystemControllerGetConsultationsV1QueryKey(facultyId);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>> = ({ signal }) => facultyBioSystemControllerGetConsultationsV1(facultyId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>> = ({ signal }) => facultyBioSystemControllerGetConsultationsV1(facultyId, { signal });
 
 
 
@@ -934,7 +1206,7 @@ export function useFacultyBioSystemControllerGetConsultationsV1<TData = Awaited<
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetConsultationsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError = unknown>(
@@ -944,16 +1216,16 @@ export function useFacultyBioSystemControllerGetConsultationsV1<TData = Awaited<
           TError,
           Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFacultyBioSystemControllerGetConsultationsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFacultyBioSystemControllerGetConsultationsV1<TData = Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError = unknown>(
- facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof facultyBioSystemControllerGetConsultationsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -969,32 +1241,50 @@ export function useFacultyBioSystemControllerGetConsultationsV1<TData = Awaited<
 
 
 
-export const facultyBioSystemControllerCreateConsultationV1 = (
-    createConsultationDto: CreateConsultationDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type facultyBioSystemControllerCreateConsultationV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type facultyBioSystemControllerCreateConsultationV1ResponseSuccess = (facultyBioSystemControllerCreateConsultationV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerCreateConsultationV1Response = (facultyBioSystemControllerCreateConsultationV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerCreateConsultationV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/consultations`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createConsultationDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/consultations`
+}
+
+export const facultyBioSystemControllerCreateConsultationV1 = async (createConsultationDto: CreateConsultationDto, options?: RequestInit): Promise<facultyBioSystemControllerCreateConsultationV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerCreateConsultationV1Response>(getFacultyBioSystemControllerCreateConsultationV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createConsultationDto)
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerCreateConsultationV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConsultationV1>>, TError,{data: CreateConsultationDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConsultationV1>>, TError,{data: CreateConsultationDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConsultationV1>>, TError,{data: CreateConsultationDto}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerCreateConsultationV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -1002,7 +1292,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConsultationV1>>, {data: CreateConsultationDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  facultyBioSystemControllerCreateConsultationV1(data,requestOptions)
+          return  facultyBioSystemControllerCreateConsultationV1(data,)
         }
 
 
@@ -1017,7 +1307,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerCreateConsultationV1MutationError = unknown
 
     export const useFacultyBioSystemControllerCreateConsultationV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConsultationV1>>, TError,{data: CreateConsultationDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerCreateConsultationV1>>, TError,{data: CreateConsultationDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerCreateConsultationV1>>,
         TError,
@@ -1026,30 +1316,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerCreateConsultationV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerUpdateConsultationV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerUpdateConsultationV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerUpdateConsultationV1ResponseSuccess = (facultyBioSystemControllerUpdateConsultationV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerUpdateConsultationV1Response = (facultyBioSystemControllerUpdateConsultationV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerUpdateConsultationV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/consultations/${id}`, method: 'PATCH', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/consultations/${id}`
+}
+
+export const facultyBioSystemControllerUpdateConsultationV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerUpdateConsultationV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerUpdateConsultationV1Response>(getFacultyBioSystemControllerUpdateConsultationV1Url(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerUpdateConsultationV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConsultationV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConsultationV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConsultationV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerUpdateConsultationV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -1057,7 +1367,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConsultationV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  facultyBioSystemControllerUpdateConsultationV1(id,requestOptions)
+          return  facultyBioSystemControllerUpdateConsultationV1(id,)
         }
 
 
@@ -1072,7 +1382,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerUpdateConsultationV1MutationError = unknown
 
     export const useFacultyBioSystemControllerUpdateConsultationV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConsultationV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConsultationV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerUpdateConsultationV1>>,
         TError,
@@ -1081,30 +1391,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getFacultyBioSystemControllerUpdateConsultationV1MutationOptions(options), queryClient);
     }
-    export const facultyBioSystemControllerDeleteConsultationV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type facultyBioSystemControllerDeleteConsultationV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type facultyBioSystemControllerDeleteConsultationV1ResponseSuccess = (facultyBioSystemControllerDeleteConsultationV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type facultyBioSystemControllerDeleteConsultationV1Response = (facultyBioSystemControllerDeleteConsultationV1ResponseSuccess)
+
+export const getFacultyBioSystemControllerDeleteConsultationV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/faculty-bio-system/consultations/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/faculty-bio-system/consultations/${id}`
+}
+
+export const facultyBioSystemControllerDeleteConsultationV1 = async (id: string, options?: RequestInit): Promise<facultyBioSystemControllerDeleteConsultationV1Response> => {
+
+  return fetchWithAuth<facultyBioSystemControllerDeleteConsultationV1Response>(getFacultyBioSystemControllerDeleteConsultationV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getFacultyBioSystemControllerDeleteConsultationV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConsultationV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConsultationV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConsultationV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['facultyBioSystemControllerDeleteConsultationV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -1112,7 +1442,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConsultationV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  facultyBioSystemControllerDeleteConsultationV1(id,requestOptions)
+          return  facultyBioSystemControllerDeleteConsultationV1(id,)
         }
 
 
@@ -1127,7 +1457,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FacultyBioSystemControllerDeleteConsultationV1MutationError = unknown
 
     export const useFacultyBioSystemControllerDeleteConsultationV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConsultationV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConsultationV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof facultyBioSystemControllerDeleteConsultationV1>>,
         TError,

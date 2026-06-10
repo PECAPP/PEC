@@ -33,14 +33,12 @@ export default function RolesManagement() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const token = authClient.getAccessToken();
-
       const [rolesRes, permsRes] = await Promise.all([
         fetch(buildApiUrl("/roles"), {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         }),
         fetch(buildApiUrl("/permissions"), {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         }),
       ]);
 
@@ -61,11 +59,10 @@ export default function RolesManagement() {
 
   const handleCreateRole = async () => {
     if (!newRoleName) return;
-    const token = authClient.getAccessToken();
     await fetch(buildApiUrl("/roles"), {
       method: "POST",
+      credentials: 'include',
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ name: newRoleName, description: "Custom Role" }),
@@ -89,11 +86,10 @@ export default function RolesManagement() {
       updatedPermIds = updatedPermIds.filter((id) => id !== permissionId);
     }
 
-    const token = authClient.getAccessToken();
     await fetch(buildApiUrl(`/roles/${roleId}`), {
       method: "PATCH",
+      credentials: 'include',
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

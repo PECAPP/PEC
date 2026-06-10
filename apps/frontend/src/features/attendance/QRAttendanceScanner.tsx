@@ -1,11 +1,9 @@
 import { Button, Card, useToast } from "@pec/ui";
 import { useState, useEffect, useRef } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
-
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Camera, CheckCircle, XCircle, Loader2 } from 'lucide-react';
-import { AXIOS_INSTANCE } from "@pec/api";
+import { api } from '@pec/api';
 
 interface QRAttendanceScannerProps {
   onSuccess?: () => void;
@@ -19,7 +17,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<'success' | 'error' | null>(null);
   const [message, setMessage] = useState('');
-  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scannerRef = useRef<any | null>(null);
   const qrCodeRegionId = 'qr-reader';
 
   const startScanning = async () => {
@@ -27,6 +25,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
       setScanning(true);
       setResult(null);
 
+      const { Html5Qrcode } = await import('html5-qrcode');
       const html5QrCode = new Html5Qrcode(qrCodeRegionId);
       scannerRef.current = html5QrCode;
 
@@ -99,7 +98,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
         console.warn('Geolocation failed or denied:', err);
       }
 
-      await AXIOS_INSTANCE.post('/attendance/mark-qr', { qrCode: uniqueId, lat: location.lat, lng: location.lng });
+      await api.post('/attendance/mark-qr', { qrCode: uniqueId, lat: location.lat, lng: location.lng });
 
       setResult('success');
       setMessage(`Attendance marked!`);
@@ -143,7 +142,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
 
       {!scanning && !result && (
         <div className="flex flex-col items-center gap-4">
-          <div className="w-64 h-64 bg-muted rounded-lg flex items-center justify-center">
+          <div className="w-64 h-64 bg-muted rounded-sm flex items-center justify-center">
             <Camera className="w-16 h-16 text-muted-foreground" />
           </div>
           <Button onClick={startScanning} className="w-full">
@@ -155,7 +154,7 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
 
       {scanning && (
         <div className="space-y-4">
-          <div id={qrCodeRegionId} className="rounded-lg overflow-hidden" />
+          <div id={qrCodeRegionId} className="rounded-sm overflow-hidden" />
           {processing && (
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -215,3 +214,4 @@ export function QRAttendanceScanner({ onSuccess, onClose }: QRAttendanceScannerP
 }
 
 export default QRAttendanceScanner;
+

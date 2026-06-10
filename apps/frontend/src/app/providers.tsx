@@ -35,6 +35,15 @@ const initAccentColor = () => {
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     initAccentColor();
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'accent-color') {
+        initAccentColor();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   return (

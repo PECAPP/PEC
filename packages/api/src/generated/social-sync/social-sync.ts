@@ -28,24 +28,42 @@ import type {
   SyncSocialDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const socialSyncControllerGetSocialDataV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type socialSyncControllerGetSocialDataV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type socialSyncControllerGetSocialDataV1ResponseSuccess = (socialSyncControllerGetSocialDataV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type socialSyncControllerGetSocialDataV1Response = (socialSyncControllerGetSocialDataV1ResponseSuccess)
+
+export const getSocialSyncControllerGetSocialDataV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/social-sync`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/social-sync`
+}
+
+export const socialSyncControllerGetSocialDataV1 = async ( options?: RequestInit): Promise<socialSyncControllerGetSocialDataV1Response> => {
+
+  return fetchWithAuth<socialSyncControllerGetSocialDataV1Response>(getSocialSyncControllerGetSocialDataV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -57,16 +75,16 @@ export const getSocialSyncControllerGetSocialDataV1QueryKey = () => {
     }
 
 
-export const getSocialSyncControllerGetSocialDataV1QueryOptions = <TData = Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getSocialSyncControllerGetSocialDataV1QueryOptions = <TData = Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getSocialSyncControllerGetSocialDataV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>> = ({ signal }) => socialSyncControllerGetSocialDataV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>> = ({ signal }) => socialSyncControllerGetSocialDataV1({ signal });
 
 
 
@@ -86,7 +104,7 @@ export function useSocialSyncControllerGetSocialDataV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSocialSyncControllerGetSocialDataV1<TData = Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError = unknown>(
@@ -96,16 +114,16 @@ export function useSocialSyncControllerGetSocialDataV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSocialSyncControllerGetSocialDataV1<TData = Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useSocialSyncControllerGetSocialDataV1<TData = Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerGetSocialDataV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -121,32 +139,50 @@ export function useSocialSyncControllerGetSocialDataV1<TData = Awaited<ReturnTyp
 
 
 
-export const socialSyncControllerSyncSocialDataV1 = (
-    syncSocialDto: SyncSocialDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type socialSyncControllerSyncSocialDataV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type socialSyncControllerSyncSocialDataV1ResponseSuccess = (socialSyncControllerSyncSocialDataV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type socialSyncControllerSyncSocialDataV1Response = (socialSyncControllerSyncSocialDataV1ResponseSuccess)
+
+export const getSocialSyncControllerSyncSocialDataV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/social-sync`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: syncSocialDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/social-sync`
+}
+
+export const socialSyncControllerSyncSocialDataV1 = async (syncSocialDto: SyncSocialDto, options?: RequestInit): Promise<socialSyncControllerSyncSocialDataV1Response> => {
+
+  return fetchWithAuth<socialSyncControllerSyncSocialDataV1Response>(getSocialSyncControllerSyncSocialDataV1Url(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(syncSocialDto)
+  }
+);}
+
 
 
 
 export const getSocialSyncControllerSyncSocialDataV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof socialSyncControllerSyncSocialDataV1>>, TError,{data: SyncSocialDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof socialSyncControllerSyncSocialDataV1>>, TError,{data: SyncSocialDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof socialSyncControllerSyncSocialDataV1>>, TError,{data: SyncSocialDto}, TContext> => {
 
 const mutationKey = ['socialSyncControllerSyncSocialDataV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -154,7 +190,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof socialSyncControllerSyncSocialDataV1>>, {data: SyncSocialDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  socialSyncControllerSyncSocialDataV1(data,requestOptions)
+          return  socialSyncControllerSyncSocialDataV1(data,)
         }
 
 
@@ -169,7 +205,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type SocialSyncControllerSyncSocialDataV1MutationError = unknown
 
     export const useSocialSyncControllerSyncSocialDataV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof socialSyncControllerSyncSocialDataV1>>, TError,{data: SyncSocialDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof socialSyncControllerSyncSocialDataV1>>, TError,{data: SyncSocialDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof socialSyncControllerSyncSocialDataV1>>,
         TError,
@@ -178,17 +214,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSocialSyncControllerSyncSocialDataV1MutationOptions(options), queryClient);
     }
-    export const socialSyncControllerFetchGitHubReposV1 = (
+    export type socialSyncControllerFetchGitHubReposV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type socialSyncControllerFetchGitHubReposV1ResponseSuccess = (socialSyncControllerFetchGitHubReposV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type socialSyncControllerFetchGitHubReposV1Response = (socialSyncControllerFetchGitHubReposV1ResponseSuccess)
+
+export const getSocialSyncControllerFetchGitHubReposV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/social-sync/github/repos`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/social-sync/github/repos`
+}
+
+export const socialSyncControllerFetchGitHubReposV1 = async ( options?: RequestInit): Promise<socialSyncControllerFetchGitHubReposV1Response> => {
+
+  return fetchWithAuth<socialSyncControllerFetchGitHubReposV1Response>(getSocialSyncControllerFetchGitHubReposV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -200,16 +256,16 @@ export const getSocialSyncControllerFetchGitHubReposV1QueryKey = () => {
     }
 
 
-export const getSocialSyncControllerFetchGitHubReposV1QueryOptions = <TData = Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getSocialSyncControllerFetchGitHubReposV1QueryOptions = <TData = Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getSocialSyncControllerFetchGitHubReposV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>> = ({ signal }) => socialSyncControllerFetchGitHubReposV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>> = ({ signal }) => socialSyncControllerFetchGitHubReposV1({ signal });
 
 
 
@@ -229,7 +285,7 @@ export function useSocialSyncControllerFetchGitHubReposV1<TData = Awaited<Return
           TError,
           Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSocialSyncControllerFetchGitHubReposV1<TData = Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError = unknown>(
@@ -239,16 +295,16 @@ export function useSocialSyncControllerFetchGitHubReposV1<TData = Awaited<Return
           TError,
           Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSocialSyncControllerFetchGitHubReposV1<TData = Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useSocialSyncControllerFetchGitHubReposV1<TData = Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof socialSyncControllerFetchGitHubReposV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

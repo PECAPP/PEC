@@ -28,39 +28,55 @@ import type {
   CreateExamScheduleDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const examinationsControllerCreateScheduleV1 = (
-    createExamScheduleDto: CreateExamScheduleDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+
+export type examinationsControllerCreateScheduleV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type examinationsControllerCreateScheduleV1ResponseSuccess = (examinationsControllerCreateScheduleV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type examinationsControllerCreateScheduleV1Response = (examinationsControllerCreateScheduleV1ResponseSuccess)
+
+export const getExaminationsControllerCreateScheduleV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/examinations/schedules`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createExamScheduleDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/examinations/schedules`
+}
+
+export const examinationsControllerCreateScheduleV1 = async (createExamScheduleDto: CreateExamScheduleDto, options?: RequestInit): Promise<examinationsControllerCreateScheduleV1Response> => {
+
+  return fetchWithAuth<examinationsControllerCreateScheduleV1Response>(getExaminationsControllerCreateScheduleV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createExamScheduleDto)
+  }
+);}
+
 
 
 
 export const getExaminationsControllerCreateScheduleV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerCreateScheduleV1>>, TError,{data: CreateExamScheduleDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerCreateScheduleV1>>, TError,{data: CreateExamScheduleDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerCreateScheduleV1>>, TError,{data: CreateExamScheduleDto}, TContext> => {
 
 const mutationKey = ['examinationsControllerCreateScheduleV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -68,7 +84,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof examinationsControllerCreateScheduleV1>>, {data: CreateExamScheduleDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  examinationsControllerCreateScheduleV1(data,requestOptions)
+          return  examinationsControllerCreateScheduleV1(data,)
         }
 
 
@@ -83,7 +99,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ExaminationsControllerCreateScheduleV1MutationError = unknown
 
     export const useExaminationsControllerCreateScheduleV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerCreateScheduleV1>>, TError,{data: CreateExamScheduleDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerCreateScheduleV1>>, TError,{data: CreateExamScheduleDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examinationsControllerCreateScheduleV1>>,
         TError,
@@ -92,17 +108,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getExaminationsControllerCreateScheduleV1MutationOptions(options), queryClient);
     }
-    export const examinationsControllerListSchedulesV1 = (
+    export type examinationsControllerListSchedulesV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type examinationsControllerListSchedulesV1ResponseSuccess = (examinationsControllerListSchedulesV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type examinationsControllerListSchedulesV1Response = (examinationsControllerListSchedulesV1ResponseSuccess)
+
+export const getExaminationsControllerListSchedulesV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/examinations/schedules`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/examinations/schedules`
+}
+
+export const examinationsControllerListSchedulesV1 = async ( options?: RequestInit): Promise<examinationsControllerListSchedulesV1Response> => {
+
+  return fetchWithAuth<examinationsControllerListSchedulesV1Response>(getExaminationsControllerListSchedulesV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -114,16 +150,16 @@ export const getExaminationsControllerListSchedulesV1QueryKey = () => {
     }
 
 
-export const getExaminationsControllerListSchedulesV1QueryOptions = <TData = Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getExaminationsControllerListSchedulesV1QueryOptions = <TData = Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getExaminationsControllerListSchedulesV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>> = ({ signal }) => examinationsControllerListSchedulesV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>> = ({ signal }) => examinationsControllerListSchedulesV1({ signal });
 
 
 
@@ -143,7 +179,7 @@ export function useExaminationsControllerListSchedulesV1<TData = Awaited<ReturnT
           TError,
           Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useExaminationsControllerListSchedulesV1<TData = Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError = unknown>(
@@ -153,16 +189,16 @@ export function useExaminationsControllerListSchedulesV1<TData = Awaited<ReturnT
           TError,
           Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useExaminationsControllerListSchedulesV1<TData = Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useExaminationsControllerListSchedulesV1<TData = Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examinationsControllerListSchedulesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -178,30 +214,50 @@ export function useExaminationsControllerListSchedulesV1<TData = Awaited<ReturnT
 
 
 
-export const examinationsControllerDeleteScheduleV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type examinationsControllerDeleteScheduleV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type examinationsControllerDeleteScheduleV1ResponseSuccess = (examinationsControllerDeleteScheduleV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type examinationsControllerDeleteScheduleV1Response = (examinationsControllerDeleteScheduleV1ResponseSuccess)
+
+export const getExaminationsControllerDeleteScheduleV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/examinations/schedules/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/examinations/schedules/${id}`
+}
+
+export const examinationsControllerDeleteScheduleV1 = async (id: string, options?: RequestInit): Promise<examinationsControllerDeleteScheduleV1Response> => {
+
+  return fetchWithAuth<examinationsControllerDeleteScheduleV1Response>(getExaminationsControllerDeleteScheduleV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getExaminationsControllerDeleteScheduleV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerDeleteScheduleV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerDeleteScheduleV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerDeleteScheduleV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['examinationsControllerDeleteScheduleV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -209,7 +265,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof examinationsControllerDeleteScheduleV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  examinationsControllerDeleteScheduleV1(id,requestOptions)
+          return  examinationsControllerDeleteScheduleV1(id,)
         }
 
 
@@ -224,7 +280,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ExaminationsControllerDeleteScheduleV1MutationError = unknown
 
     export const useExaminationsControllerDeleteScheduleV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerDeleteScheduleV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examinationsControllerDeleteScheduleV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examinationsControllerDeleteScheduleV1>>,
         TError,

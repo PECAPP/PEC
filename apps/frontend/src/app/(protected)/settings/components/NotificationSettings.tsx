@@ -42,9 +42,9 @@ export function NotificationSettings() {
           <div className="space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-70">Categories</h3>
             
-            <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+            <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-500/10 rounded-lg text-blue-500">
+                <div className="p-3 bg-blue-500/10 rounded-sm text-blue-500">
                   <BookOpen className="w-5 h-5" />
                 </div>
                 <div>
@@ -55,9 +55,9 @@ export function NotificationSettings() {
               <Switch checked={settings.academic} onCheckedChange={() => handleToggle('academic')} />
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+            <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-emerald-500/10 rounded-lg text-emerald-500">
+                <div className="p-3 bg-emerald-500/10 rounded-sm text-emerald-500">
                   <CreditCard className="w-5 h-5" />
                 </div>
                 <div>
@@ -68,9 +68,9 @@ export function NotificationSettings() {
               <Switch checked={settings.financial} onCheckedChange={() => handleToggle('financial')} />
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+            <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-purple-500/10 rounded-lg text-purple-500">
+                <div className="p-3 bg-purple-500/10 rounded-sm text-purple-500">
                   <Users className="w-5 h-5" />
                 </div>
                 <div>
@@ -86,11 +86,11 @@ export function NotificationSettings() {
           <div className="space-y-4 pt-4 border-t border-border/40">
             <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-70">Delivery Channels</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+              <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
                 <Label className="text-sm font-bold">In-App / Push</Label>
                 <Switch checked={settings.inApp} onCheckedChange={() => handleToggle('inApp')} />
               </div>
-              <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+              <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
                 <Label className="text-sm font-bold">Email</Label>
                 <Switch checked={settings.email} onCheckedChange={() => handleToggle('email')} />
               </div>
@@ -111,18 +111,18 @@ export function NotificationSettings() {
                <div className="grid grid-cols-2 gap-4 mt-4 animate-in slide-in-from-top-2">
                  <div className="space-y-2">
                    <Label className="text-[10px] font-bold uppercase">Start Time</Label>
-                   <Input type="time" name="quietStart" value={settings.quietStart} onChange={handleChange} className="h-11 rounded-xl font-mono" />
+                   <Input type="time" name="quietStart" value={settings.quietStart} onChange={handleChange} className="h-11 rounded-sm font-mono" />
                  </div>
                  <div className="space-y-2">
                    <Label className="text-[10px] font-bold uppercase">End Time</Label>
-                   <Input type="time" name="quietEnd" value={settings.quietEnd} onChange={handleChange} className="h-11 rounded-xl font-mono" />
+                   <Input type="time" name="quietEnd" value={settings.quietEnd} onChange={handleChange} className="h-11 rounded-sm font-mono" />
                  </div>
                </div>
              )}
           </div>
 
           <div className="pt-4 flex justify-end">
-            <Button onClick={handleSave} className="h-11 px-8 rounded-xl font-bold gap-2">
+            <Button onClick={handleSave} className="h-11 px-8 rounded-sm font-bold gap-2">
               <Save className="w-4 h-4" /> Save Preferences
             </Button>
           </div>

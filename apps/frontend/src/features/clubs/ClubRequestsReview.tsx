@@ -1,5 +1,5 @@
 'use client';
-import { Button, Textarea, Badge } from "@pec/ui";
+import { Button, Textarea, Badge, formatDate } from "@pec/ui";
 
 
 import { useEffect, useState } from 'react';
@@ -154,7 +154,7 @@ export function ClubRequestsReview() {
                       {request.requesterEmail}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Submitted {new Date(request.createdAt).toLocaleDateString()}
+                      Submitted {formatDate(request.createdAt)}
                     </p>
                   </div>
                   <Button

@@ -2,7 +2,6 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState, Suspense } from 'react';
-import { Loader } from '@pec/ui';
 
 const isModifiedEvent = (event: MouseEvent | ReactMouseEvent) =>
   event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
@@ -22,7 +21,6 @@ function RouteTransitionLoaderInner() {
 
   const startNavigation = () => {
     if (mountedRef.current) {
-      document.body.style.pointerEvents = 'none';
       // Defer the state update to the next event loop tick to avoid scheduling updates during React's insertion effect phase
       setTimeout(() => {
         if (mountedRef.current) {
@@ -36,25 +34,13 @@ function RouteTransitionLoaderInner() {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
-      document.body.style.pointerEvents = '';
     };
   }, []);
 
-  useEffect(() => {
-    if (isNavigating) {
-      document.body.style.pointerEvents = 'none';
-    } else {
-      document.body.style.pointerEvents = '';
-    }
-    return () => {
-      document.body.style.pointerEvents = '';
-    };
-  }, [isNavigating]);
 
   useEffect(() => {
     if (previousRouteKeyRef.current !== currentRouteKey) {
       setIsNavigating(false);
-      document.body.style.pointerEvents = '';
       previousRouteKeyRef.current = currentRouteKey;
     }
   }, [currentRouteKey]);
@@ -63,7 +49,6 @@ function RouteTransitionLoaderInner() {
     if (!isNavigating) return;
     const timeout = window.setTimeout(() => {
       setIsNavigating(false);
-      document.body.style.pointerEvents = '';
     }, 15000);
     return () => window.clearTimeout(timeout);
   }, [isNavigating]);
@@ -151,8 +136,36 @@ function RouteTransitionLoaderInner() {
   }
 
   return (
-    <div role="status" aria-live="polite" aria-label="Loading page">
-      <Loader />
+    <div
+      role="status"
+      aria-live="polite"
+      aria-label="Loading page"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 99999,
+        height: '3px',
+        background: 'transparent',
+      }}
+    >
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          background: 'hsl(var(--primary))',
+          animation: 'route-progress 1.4s cubic-bezier(0.65,0.815,0.735,0.395) infinite',
+          boxShadow: '0 0 10px hsl(var(--primary) / 0.6)',
+        }}
+      />
+      <style>{`
+        @keyframes route-progress {
+          0%   { transform: translateX(-100%) scaleX(0.4); }
+          50%  { transform: translateX(10%) scaleX(1.1); }
+          100% { transform: translateX(110%) scaleX(0.4); }
+        }
+      `}</style>
     </div>
   );
 }

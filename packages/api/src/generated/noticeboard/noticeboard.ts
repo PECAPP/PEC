@@ -29,24 +29,42 @@ import type {
   TogglePinDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const noticeboardControllerListV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type noticeboardControllerListV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type noticeboardControllerListV1ResponseSuccess = (noticeboardControllerListV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type noticeboardControllerListV1Response = (noticeboardControllerListV1ResponseSuccess)
+
+export const getNoticeboardControllerListV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/noticeboard`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/noticeboard`
+}
+
+export const noticeboardControllerListV1 = async ( options?: RequestInit): Promise<noticeboardControllerListV1Response> => {
+
+  return fetchWithAuth<noticeboardControllerListV1Response>(getNoticeboardControllerListV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -58,16 +76,16 @@ export const getNoticeboardControllerListV1QueryKey = () => {
     }
 
 
-export const getNoticeboardControllerListV1QueryOptions = <TData = Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getNoticeboardControllerListV1QueryOptions = <TData = Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getNoticeboardControllerListV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof noticeboardControllerListV1>>> = ({ signal }) => noticeboardControllerListV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof noticeboardControllerListV1>>> = ({ signal }) => noticeboardControllerListV1({ signal });
 
 
 
@@ -87,7 +105,7 @@ export function useNoticeboardControllerListV1<TData = Awaited<ReturnType<typeof
           TError,
           Awaited<ReturnType<typeof noticeboardControllerListV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNoticeboardControllerListV1<TData = Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError = unknown>(
@@ -97,16 +115,16 @@ export function useNoticeboardControllerListV1<TData = Awaited<ReturnType<typeof
           TError,
           Awaited<ReturnType<typeof noticeboardControllerListV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNoticeboardControllerListV1<TData = Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useNoticeboardControllerListV1<TData = Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof noticeboardControllerListV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -122,32 +140,50 @@ export function useNoticeboardControllerListV1<TData = Awaited<ReturnType<typeof
 
 
 
-export const noticeboardControllerCreateV1 = (
-    createNoticeDto: CreateNoticeDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type noticeboardControllerCreateV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type noticeboardControllerCreateV1ResponseSuccess = (noticeboardControllerCreateV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type noticeboardControllerCreateV1Response = (noticeboardControllerCreateV1ResponseSuccess)
+
+export const getNoticeboardControllerCreateV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/noticeboard`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createNoticeDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/noticeboard`
+}
+
+export const noticeboardControllerCreateV1 = async (createNoticeDto: CreateNoticeDto, options?: RequestInit): Promise<noticeboardControllerCreateV1Response> => {
+
+  return fetchWithAuth<noticeboardControllerCreateV1Response>(getNoticeboardControllerCreateV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createNoticeDto)
+  }
+);}
+
 
 
 
 export const getNoticeboardControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerCreateV1>>, TError,{data: CreateNoticeDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerCreateV1>>, TError,{data: CreateNoticeDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerCreateV1>>, TError,{data: CreateNoticeDto}, TContext> => {
 
 const mutationKey = ['noticeboardControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -155,7 +191,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof noticeboardControllerCreateV1>>, {data: CreateNoticeDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  noticeboardControllerCreateV1(data,requestOptions)
+          return  noticeboardControllerCreateV1(data,)
         }
 
 
@@ -170,7 +206,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NoticeboardControllerCreateV1MutationError = unknown
 
     export const useNoticeboardControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerCreateV1>>, TError,{data: CreateNoticeDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerCreateV1>>, TError,{data: CreateNoticeDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof noticeboardControllerCreateV1>>,
         TError,
@@ -179,33 +215,51 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNoticeboardControllerCreateV1MutationOptions(options), queryClient);
     }
-    export const noticeboardControllerTogglePinV1 = (
-    id: string,
-    togglePinDto: TogglePinDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type noticeboardControllerTogglePinV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type noticeboardControllerTogglePinV1ResponseSuccess = (noticeboardControllerTogglePinV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type noticeboardControllerTogglePinV1Response = (noticeboardControllerTogglePinV1ResponseSuccess)
+
+export const getNoticeboardControllerTogglePinV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/noticeboard/${id}/pin`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: togglePinDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/noticeboard/${id}/pin`
+}
+
+export const noticeboardControllerTogglePinV1 = async (id: string,
+    togglePinDto: TogglePinDto, options?: RequestInit): Promise<noticeboardControllerTogglePinV1Response> => {
+
+  return fetchWithAuth<noticeboardControllerTogglePinV1Response>(getNoticeboardControllerTogglePinV1Url(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(togglePinDto)
+  }
+);}
+
 
 
 
 export const getNoticeboardControllerTogglePinV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerTogglePinV1>>, TError,{id: string;data: TogglePinDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerTogglePinV1>>, TError,{id: string;data: TogglePinDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerTogglePinV1>>, TError,{id: string;data: TogglePinDto}, TContext> => {
 
 const mutationKey = ['noticeboardControllerTogglePinV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -213,7 +267,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof noticeboardControllerTogglePinV1>>, {id: string;data: TogglePinDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  noticeboardControllerTogglePinV1(id,data,requestOptions)
+          return  noticeboardControllerTogglePinV1(id,data,)
         }
 
 
@@ -228,7 +282,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NoticeboardControllerTogglePinV1MutationError = unknown
 
     export const useNoticeboardControllerTogglePinV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerTogglePinV1>>, TError,{id: string;data: TogglePinDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerTogglePinV1>>, TError,{id: string;data: TogglePinDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof noticeboardControllerTogglePinV1>>,
         TError,
@@ -237,30 +291,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNoticeboardControllerTogglePinV1MutationOptions(options), queryClient);
     }
-    export const noticeboardControllerRemoveV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type noticeboardControllerRemoveV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type noticeboardControllerRemoveV1ResponseSuccess = (noticeboardControllerRemoveV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type noticeboardControllerRemoveV1Response = (noticeboardControllerRemoveV1ResponseSuccess)
+
+export const getNoticeboardControllerRemoveV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/noticeboard/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/noticeboard/${id}`
+}
+
+export const noticeboardControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<noticeboardControllerRemoveV1Response> => {
+
+  return fetchWithAuth<noticeboardControllerRemoveV1Response>(getNoticeboardControllerRemoveV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getNoticeboardControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['noticeboardControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -268,7 +342,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof noticeboardControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  noticeboardControllerRemoveV1(id,requestOptions)
+          return  noticeboardControllerRemoveV1(id,)
         }
 
 
@@ -283,7 +357,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NoticeboardControllerRemoveV1MutationError = unknown
 
     export const useNoticeboardControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noticeboardControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof noticeboardControllerRemoveV1>>,
         TError,

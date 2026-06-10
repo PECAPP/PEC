@@ -45,9 +45,9 @@ export function PrivacySettings() {
         </div>
 
         <div className="space-y-6">
-          <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+          <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg text-primary">
+              <div className="p-3 bg-primary/10 rounded-sm text-primary">
                 <Eye className="w-5 h-5" />
               </div>
               <div>
@@ -61,22 +61,22 @@ export function PrivacySettings() {
             />
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+          <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg text-primary">
+              <div className="p-3 bg-primary/10 rounded-sm text-primary">
                 <Bot className="w-5 h-5" />
               </div>
               <div>
                 <Label className="text-sm font-bold uppercase tracking-wider">AI Data Access</Label>
-                <p className="text-xs text-muted-foreground mt-1">Allow the OmniFlow AI agent to securely access your grades, attendance, and timetable for personalized assistance.</p>
+                <p className="text-xs text-muted-foreground mt-1">Allow the PEC AI agent to securely access your grades, attendance, and timetable for personalized assistance.</p>
               </div>
             </div>
             <Switch checked={settings.aiDataAccess} onCheckedChange={() => handleToggle('aiDataAccess')} />
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+          <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
              <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg text-primary">
+              <div className="p-3 bg-primary/10 rounded-sm text-primary">
                 <Shield className="w-5 h-5" />
               </div>
               <div>
@@ -95,7 +95,7 @@ export function PrivacySettings() {
           <h2 className="text-xl font-bold tracking-tight">Data Export (GDPR)</h2>
         </div>
         <p className="text-sm text-muted-foreground">
-          You have the right to download a complete archive of your data stored on OmniFlow, including your attendance records, grades, and fee receipts.
+          You have the right to download a complete archive of your data stored on PEC Campus ERP, including your attendance records, grades, and fee receipts.
         </p>
         <Button 
           onClick={handleDataExport} 

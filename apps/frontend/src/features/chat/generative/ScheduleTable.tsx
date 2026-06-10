@@ -44,14 +44,14 @@ export const ScheduleTable = ({ data }: { data: ScheduleData }) => {
 
   if (schedule.length === 0) {
     return (
-      <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
         {data.message ?? 'No timetable entries found.'}
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-700 to-slate-900 px-4 py-3 flex items-center justify-between text-white">
         <div className="flex items-center gap-2">

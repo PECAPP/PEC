@@ -46,7 +46,7 @@ export default function ObservabilityAdmin() {
   const nodejsHeapUsedMB = nodejsHeapUsed ? (parseInt(nodejsHeapUsed) / 1024 / 1024).toFixed(2) : 'N/A';
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="  px-4 py-8 ">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
@@ -113,7 +113,7 @@ export default function ObservabilityAdmin() {
         </Card>
       </div>
 
-      <div className="card-elevated overflow-hidden bg-card border border-border rounded-2xl shadow-sm">
+      <div className="card-elevated overflow-hidden bg-card border border-border rounded-sm shadow-sm">
         <div className="p-4 border-b bg-muted/20 flex justify-between items-center">
           <h2 className="font-bold">Raw Prometheus Metrics</h2>
           <span className="text-xs text-muted-foreground">Scraped from /metrics</span>
@@ -124,7 +124,7 @@ export default function ObservabilityAdmin() {
               <RefreshCcw className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <pre className="text-xs bg-muted/50 p-4 rounded-lg overflow-x-auto max-h-[500px] custom-scrollbar border border-border text-foreground">
+            <pre className="text-xs bg-muted/50 p-4 rounded-sm overflow-x-auto max-h-[500px] custom-scrollbar border border-border text-foreground">
               {metrics || 'No metrics data available. Make sure the backend metrics endpoint is reachable.'}
             </pre>
           )}

@@ -5,7 +5,6 @@ export enum UserRole {
   ADMIN = 'admin',
   FACULTY = 'faculty',
   STUDENT = 'student',
-  STAFF = 'staff',
 }
 export const userQuerySchema = z.object({
   role: z.string().optional(),

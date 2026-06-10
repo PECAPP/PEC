@@ -34,7 +34,7 @@ export class FinanceController {
   @CheckPolicies((ability) => ability.can('read', 'FeeRecord'))
   @Get('summary')
   async getSummary(@Request() req: any, @Query('studentId') studentId?: string) {
-    const isAdmin = ['admin', 'college_admin'].includes(req.user.role);
+    const isAdmin = ['admin'].includes(req.user.role);
     const id = isAdmin && studentId ? studentId : req.user.sub;
     return ok(await this.service.getSummary(id));
   }
@@ -44,7 +44,7 @@ export class FinanceController {
   @CheckPolicies((ability) => ability.can('read', 'FeeRecord'))
   @Get('fees')
   async getFees(@Request() req: any, @Query() q: FeeQueryDto) {
-    const isAdmin = ['admin', 'college_admin'].includes(req.user.role);
+    const isAdmin = ['admin'].includes(req.user.role);
     const result = await this.service.findFees(q, req.user.sub, isAdmin);
     return ok(result.items, { total: result.total, limit: result.limit, offset: result.offset });
   }
@@ -92,7 +92,7 @@ export class FinanceController {
   @CheckPolicies((ability) => ability.can('read', 'FeeRecord'))
   @Get('transactions')
   async getTransactions(@Request() req: any, @Query() q: TxnQueryDto) {
-    const isAdmin = ['admin', 'college_admin'].includes(req.user.role);
+    const isAdmin = ['admin'].includes(req.user.role);
     const result = await this.service.findTransactions(q, req.user.sub, isAdmin);
     return ok(result.items, { total: result.total, limit: result.limit, offset: result.offset });
   }
@@ -100,7 +100,7 @@ export class FinanceController {
   @CheckPolicies((ability) => ability.can('read', 'FeeRecord'))
   @Get('transactions/:id')
   async getTransaction(@Param('id') id: string, @Request() req: any) {
-    const isAdmin = ['admin', 'college_admin'].includes(req.user.role);
+    const isAdmin = ['admin'].includes(req.user.role);
     return ok(await this.service.getTransactionById(id, req.user.sub, isAdmin));
   }
 }

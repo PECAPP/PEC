@@ -54,9 +54,9 @@ export default function ResumeBuilderIvyLeague() {
 
   if (loading) {
     return (
-      <div className="p-8 space-y-8 max-w-7xl mx-auto">
-        <div className="h-10 w-64 bg-muted rounded-md animate-pulse" />
-        <LoadingGrid count={3} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" itemClassName="h-48 rounded-xl" />
+      <div className="p-8 space-y-8  ">
+        <div className="h-10 w-64 bg-muted rounded-sm animate-pulse" />
+        <LoadingGrid count={3} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" itemClassName="h-48 rounded-sm" />
       </div>
     );
   }
@@ -64,7 +64,7 @@ export default function ResumeBuilderIvyLeague() {
   return (
     <div className="min-h-screen bg-background pb-12 space-y-6">
       <ResumeHeader
-        settings={settings}
+        _settings={settings}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         zoom={zoom}
@@ -77,7 +77,7 @@ export default function ResumeBuilderIvyLeague() {
         downloadPDF={downloadPDF}
       />
 
-      <div className="w-full mx-auto px-4 lg:px-8 py-6">
+      <div className="w-full  px-4 lg:px-8 py-6">
         {activeTab === "builder" && (
           <div className="grid xl:grid-cols-12 gap-8 items-start">
             {!preview && (

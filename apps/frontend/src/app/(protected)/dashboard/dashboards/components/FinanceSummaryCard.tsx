@@ -1,5 +1,5 @@
 'use client';
-import { Badge, Button } from "@pec/ui";
+import { Badge, Button, formatDate } from "@pec/ui";
 
 
 import { useEffect, useState } from 'react';
@@ -76,8 +76,8 @@ export function FinanceSummaryCard({
     return (
       <div className={cn('card-elevated ui-card-pad space-y-4 animate-pulse', className)}>
         <div className="h-5 w-32 bg-muted rounded" />
-        <div className="h-16 bg-muted rounded-lg" />
-        <div className="h-10 bg-muted rounded-lg" />
+        <div className="h-16 bg-muted rounded-sm" />
+        <div className="h-10 bg-muted rounded-sm" />
       </div>
     );
   }
@@ -98,7 +98,7 @@ export function FinanceSummaryCard({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-violet-500/10">
+          <div className="p-2 rounded-sm bg-violet-500/10">
             <Wallet className="w-4 h-4 text-violet-600" />
           </div>
           <h3 className="font-semibold text-sm">Finance</h3>
@@ -110,15 +110,15 @@ export function FinanceSummaryCard({
 
       {/* Summary row */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="text-center p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+        <div className="text-center p-2 rounded-sm bg-amber-500/10 border border-amber-500/20">
           <p className="text-[10px] text-muted-foreground font-medium">Pending</p>
           <p className="text-sm font-bold text-amber-600">₹{fmt(totalDue)}</p>
         </div>
-        <div className="text-center p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <div className="text-center p-2 rounded-sm bg-emerald-500/10 border border-emerald-500/20">
           <p className="text-[10px] text-muted-foreground font-medium">Paid</p>
           <p className="text-sm font-bold text-emerald-600">₹{fmt(summary.totalPaid || 0)}</p>
         </div>
-        <div className="text-center p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+        <div className="text-center p-2 rounded-sm bg-red-500/10 border border-red-500/20">
           <p className="text-[10px] text-muted-foreground font-medium">Overdue</p>
           <p className="text-sm font-bold text-red-600">{summary.overdue || 0}</p>
         </div>
@@ -167,14 +167,14 @@ export function FinanceSummaryCard({
               <div
                 key={fee.id}
                 className={cn(
-                  'flex items-center justify-between p-2 rounded-lg border text-xs',
+                  'flex items-center justify-between p-2 rounded-sm border text-xs',
                   overdue ? 'border-l-2 border-l-red-500 border-y-transparent border-r-transparent bg-red-500/10' : 'border-border bg-card',
                 )}
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-foreground truncate">{fee.description}</p>
                   <p className={cn('text-[10px]', overdue ? 'text-red-500/80' : 'text-muted-foreground')}>
-                    Due: {new Date(fee.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                    Due: {formatDate(fee.dueDate)}
                     {overdue && ' · OVERDUE'}
                   </p>
                 </div>
@@ -186,7 +186,7 @@ export function FinanceSummaryCard({
       )}
 
       {pendingFees.length === 0 && (summary.totalPending || 0) === 0 && (
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <div className="flex items-center gap-2 p-3 rounded-sm bg-emerald-500/10 border border-emerald-500/20">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <p className="text-xs text-emerald-600 font-medium">All fees paid! You're up to date.</p>
         </div>

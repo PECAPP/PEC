@@ -35,7 +35,7 @@ export function ChatSidebar({
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
   const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
   const _isStudent = userRole === "student";
-  const isChatAdmin = userRole === "college_admin";
+  const isChatAdmin = userRole === "admin";
 
   // Helper: Get display title for DMs (show other person's name)
   const getRoomDisplayTitle = (room: ChatRoom): string => {
@@ -150,7 +150,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -177,7 +177,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -204,7 +204,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -231,7 +231,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -258,7 +258,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium shadow-md shadow-primary/20"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -311,7 +311,7 @@ export function ChatSidebar({
           open={isCreateGroupOpen}
           onOpenChange={setIsCreateGroupOpen}
           onGroupCreated={onRoomChange}
-          currentUser={{
+          _currentUser={{
             uid: user.uid,
             organizationId: user.organizationId
           }}

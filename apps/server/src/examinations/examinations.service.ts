@@ -67,7 +67,7 @@ export class ExaminationsService {
     const offset = Math.max(query.offset ?? 0, 0);
     const requesterRoles = requester?.roles ?? [];
     const isAdminScope = requesterRoles.some((role) =>
-      ['college_admin', 'admin', 'moderator'].includes(role),
+      ['admin'].includes(role),
     );
     const scopedDepartment = isAdminScope
       ? query.department

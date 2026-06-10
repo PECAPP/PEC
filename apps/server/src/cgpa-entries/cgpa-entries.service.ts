@@ -13,7 +13,7 @@ const ELEVATED_ROLES = new Set([
   'college_admin',
   'admin',
   'moderator',
-  'super_admin',
+
 ]);
 
 @Injectable()

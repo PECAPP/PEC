@@ -51,7 +51,7 @@ export function EnrolledCoursesCard({
           enrolledCoursesList.slice(0, 4).map((course, index) => (
             <div 
               key={`${course.id ?? 'course'}-${course.code ?? 'code'}-${course.semester ?? 'sem'}-${index}`} 
-              className="p-4 rounded-xl border border-border bg-card/50 hover:bg-accent/50 hover:border-accent transition-all group cursor-pointer relative overflow-hidden"
+              className="p-4 rounded-sm border border-border bg-card/50 hover:bg-accent/30 hover:border-primary/40 transition-colors duration-300 group cursor-pointer relative overflow-hidden"
               onClick={() => onCourseClick(course.id)}
             >
               <div className="flex items-start justify-between relative z-10">

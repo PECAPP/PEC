@@ -20,24 +20,42 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const calendarSyncControllerGenerateCalendarV1 = (
-    icalToken: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+
+export type calendarSyncControllerGenerateCalendarV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type calendarSyncControllerGenerateCalendarV1ResponseSuccess = (calendarSyncControllerGenerateCalendarV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type calendarSyncControllerGenerateCalendarV1Response = (calendarSyncControllerGenerateCalendarV1ResponseSuccess)
+
+export const getCalendarSyncControllerGenerateCalendarV1Url = (icalToken: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/calendar/${icalToken}.ics`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/calendar/${icalToken}.ics`
+}
+
+export const calendarSyncControllerGenerateCalendarV1 = async (icalToken: string, options?: RequestInit): Promise<calendarSyncControllerGenerateCalendarV1Response> => {
+
+  return fetchWithAuth<calendarSyncControllerGenerateCalendarV1Response>(getCalendarSyncControllerGenerateCalendarV1Url(icalToken),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -49,16 +67,16 @@ export const getCalendarSyncControllerGenerateCalendarV1QueryKey = (icalToken: s
     }
 
 
-export const getCalendarSyncControllerGenerateCalendarV1QueryOptions = <TData = Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError = unknown>(icalToken: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCalendarSyncControllerGenerateCalendarV1QueryOptions = <TData = Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError = unknown>(icalToken: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCalendarSyncControllerGenerateCalendarV1QueryKey(icalToken);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>> = ({ signal }) => calendarSyncControllerGenerateCalendarV1(icalToken, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>> = ({ signal }) => calendarSyncControllerGenerateCalendarV1(icalToken, { signal });
 
 
 
@@ -78,7 +96,7 @@ export function useCalendarSyncControllerGenerateCalendarV1<TData = Awaited<Retu
           TError,
           Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCalendarSyncControllerGenerateCalendarV1<TData = Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError = unknown>(
@@ -88,16 +106,16 @@ export function useCalendarSyncControllerGenerateCalendarV1<TData = Awaited<Retu
           TError,
           Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCalendarSyncControllerGenerateCalendarV1<TData = Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError = unknown>(
- icalToken: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ icalToken: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCalendarSyncControllerGenerateCalendarV1<TData = Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError = unknown>(
- icalToken: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ icalToken: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof calendarSyncControllerGenerateCalendarV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

@@ -39,12 +39,12 @@ export function StudentStatsCards({ stats, onStatClick }: StatsProps) {
         onClick={() => onStatClick('attendance')}
       >
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-success/10 text-success">
+          <div className="p-3 rounded-sm bg-success/10 text-success">
             <ClipboardCheck className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Attendance</p>
-            <p className="text-2xl font-bold text-foreground">{stats.attendancePercentage}%</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Upcoming Deadlines</p>
+            <p className="text-2xl font-bold text-foreground">3</p>
           </div>
         </div>
       </motion.div>
@@ -55,7 +55,7 @@ export function StudentStatsCards({ stats, onStatClick }: StatsProps) {
         onClick={() => onStatClick('courses')}
       >
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+          <div className="p-3 rounded-sm bg-primary/10 text-primary">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
@@ -71,12 +71,12 @@ export function StudentStatsCards({ stats, onStatClick }: StatsProps) {
         onClick={() => onStatClick('scores')}
       >
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500">
+          <div className="p-3 rounded-sm bg-amber-500/10 text-amber-500">
             <GraduationCap className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Score Sheet</p>
-            <p className="text-2xl font-bold text-foreground text-amber-500">VIEW</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Current SGPA</p>
+            <p className="text-2xl font-bold text-foreground">8.5 <span className="text-[10px] font-normal text-muted-foreground hover:underline hover:text-amber-500 transition-colors cursor-pointer ml-1">View Full Sheet</span></p>
           </div>
         </div>
       </motion.div>

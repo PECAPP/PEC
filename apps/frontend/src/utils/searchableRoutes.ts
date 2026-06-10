@@ -76,13 +76,13 @@ export const searchableRoutes = [
   // Admin
   {
     title: 'User Management',
-    path: '/users',
+    path: '/directory/users',
     icon: Users,
     keywords: ['students', 'faculty', 'staff', 'people'],
   },
   {
-    title: 'College Settings',
-    path: '/admin/college-settings',
+    title: 'Campus Configuration',
+    path: '/admin/pec-settings',
     icon: Building2,
     keywords: ['config', 'institution'],
   },

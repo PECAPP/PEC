@@ -59,7 +59,7 @@ export default function AccessDenied({
           {showContactAdmin && (
             <div className="pt-4 border-t border-border mt-6">
               <p className="text-sm text-muted-foreground mb-2">
-                Need access? Contact your administrator
+                Need access? Contact your Admin
               </p>
               <Button 
                 variant="ghost" 

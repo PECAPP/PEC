@@ -24,24 +24,42 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const canteenControllerGetItemsV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type canteenControllerGetItemsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type canteenControllerGetItemsV1ResponseSuccess = (canteenControllerGetItemsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type canteenControllerGetItemsV1Response = (canteenControllerGetItemsV1ResponseSuccess)
+
+export const getCanteenControllerGetItemsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/canteenItems`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/canteenItems`
+}
+
+export const canteenControllerGetItemsV1 = async ( options?: RequestInit): Promise<canteenControllerGetItemsV1Response> => {
+
+  return fetchWithAuth<canteenControllerGetItemsV1Response>(getCanteenControllerGetItemsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -53,16 +71,16 @@ export const getCanteenControllerGetItemsV1QueryKey = () => {
     }
 
 
-export const getCanteenControllerGetItemsV1QueryOptions = <TData = Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCanteenControllerGetItemsV1QueryOptions = <TData = Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCanteenControllerGetItemsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>> = ({ signal }) => canteenControllerGetItemsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>> = ({ signal }) => canteenControllerGetItemsV1({ signal });
 
 
 
@@ -82,7 +100,7 @@ export function useCanteenControllerGetItemsV1<TData = Awaited<ReturnType<typeof
           TError,
           Awaited<ReturnType<typeof canteenControllerGetItemsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCanteenControllerGetItemsV1<TData = Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError = unknown>(
@@ -92,16 +110,16 @@ export function useCanteenControllerGetItemsV1<TData = Awaited<ReturnType<typeof
           TError,
           Awaited<ReturnType<typeof canteenControllerGetItemsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCanteenControllerGetItemsV1<TData = Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCanteenControllerGetItemsV1<TData = Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetItemsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -117,17 +135,37 @@ export function useCanteenControllerGetItemsV1<TData = Awaited<ReturnType<typeof
 
 
 
-export const canteenControllerGetOrdersV1 = (
+export type canteenControllerGetOrdersV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type canteenControllerGetOrdersV1ResponseSuccess = (canteenControllerGetOrdersV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type canteenControllerGetOrdersV1Response = (canteenControllerGetOrdersV1ResponseSuccess)
+
+export const getCanteenControllerGetOrdersV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/canteenOrders`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/canteenOrders`
+}
+
+export const canteenControllerGetOrdersV1 = async ( options?: RequestInit): Promise<canteenControllerGetOrdersV1Response> => {
+
+  return fetchWithAuth<canteenControllerGetOrdersV1Response>(getCanteenControllerGetOrdersV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -139,16 +177,16 @@ export const getCanteenControllerGetOrdersV1QueryKey = () => {
     }
 
 
-export const getCanteenControllerGetOrdersV1QueryOptions = <TData = Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCanteenControllerGetOrdersV1QueryOptions = <TData = Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCanteenControllerGetOrdersV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>> = ({ signal }) => canteenControllerGetOrdersV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>> = ({ signal }) => canteenControllerGetOrdersV1({ signal });
 
 
 
@@ -168,7 +206,7 @@ export function useCanteenControllerGetOrdersV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCanteenControllerGetOrdersV1<TData = Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError = unknown>(
@@ -178,16 +216,16 @@ export function useCanteenControllerGetOrdersV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCanteenControllerGetOrdersV1<TData = Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCanteenControllerGetOrdersV1<TData = Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof canteenControllerGetOrdersV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -203,30 +241,50 @@ export function useCanteenControllerGetOrdersV1<TData = Awaited<ReturnType<typeo
 
 
 
-export const canteenControllerCreateOrderV1 = (
+export type canteenControllerCreateOrderV1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type canteenControllerCreateOrderV1ResponseSuccess = (canteenControllerCreateOrderV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type canteenControllerCreateOrderV1Response = (canteenControllerCreateOrderV1ResponseSuccess)
+
+export const getCanteenControllerCreateOrderV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/canteenOrders`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/canteenOrders`
+}
+
+export const canteenControllerCreateOrderV1 = async ( options?: RequestInit): Promise<canteenControllerCreateOrderV1Response> => {
+
+  return fetchWithAuth<canteenControllerCreateOrderV1Response>(getCanteenControllerCreateOrderV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getCanteenControllerCreateOrderV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof canteenControllerCreateOrderV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof canteenControllerCreateOrderV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof canteenControllerCreateOrderV1>>, TError,void, TContext> => {
 
 const mutationKey = ['canteenControllerCreateOrderV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -234,7 +292,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof canteenControllerCreateOrderV1>>, void> = () => {
 
 
-          return  canteenControllerCreateOrderV1(requestOptions)
+          return  canteenControllerCreateOrderV1()
         }
 
 
@@ -249,7 +307,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CanteenControllerCreateOrderV1MutationError = unknown
 
     export const useCanteenControllerCreateOrderV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof canteenControllerCreateOrderV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof canteenControllerCreateOrderV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof canteenControllerCreateOrderV1>>,
         TError,

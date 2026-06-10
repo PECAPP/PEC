@@ -39,12 +39,12 @@ export function ResumeEditor({
       className="xl:col-span-6 space-y-6"
     >
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="w-full justify-start overflow-auto no-scrollbar bg-muted/20 p-1 rounded-xl">
-          <TabsTrigger value="personal" className="rounded-lg font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Personal</TabsTrigger>
-          <TabsTrigger value="education" className="rounded-lg font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Education</TabsTrigger>
-          <TabsTrigger value="experience" className="rounded-lg font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Experience</TabsTrigger>
-          <TabsTrigger value="projects" className="rounded-lg font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Projects</TabsTrigger>
-          <TabsTrigger value="skills" className="rounded-lg font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Skills</TabsTrigger>
+        <TabsList className="w-full justify-start overflow-auto no-scrollbar bg-muted/20 p-1 rounded-sm">
+          <TabsTrigger value="personal" className="rounded-sm font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Personal</TabsTrigger>
+          <TabsTrigger value="education" className="rounded-sm font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Education</TabsTrigger>
+          <TabsTrigger value="experience" className="rounded-sm font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Experience</TabsTrigger>
+          <TabsTrigger value="projects" className="rounded-sm font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Projects</TabsTrigger>
+          <TabsTrigger value="skills" className="rounded-sm font-bold uppercase tracking-wider text-[10px] px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Skills</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal" className="p-6 space-y-6 mt-6 bg-transparent border-0">
@@ -63,7 +63,7 @@ export function ResumeEditor({
                   value={(resumeData.personalInfo as any)[field]}
                   onChange={(e) => handlePersonalInfoChange(field as any, e.target.value)}
                   placeholder={placeholder}
-                  className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all placeholder:opacity-50"
+                  className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all placeholder:opacity-50"
                 />
               </div>
             ))}
@@ -72,14 +72,14 @@ export function ResumeEditor({
 
         <TabsContent value="education" className="space-y-6 mt-6">
           {resumeData.education.map((edu, idx) => (
-            <div key={idx} className="card-elevated p-8 space-y-6 border-2 border-border rounded-sm shadow-[8px_8px_0px_rgba(0,0,0,0.05)] bg-card/50 relative overflow-hidden group">
+            <div key={idx} className="card-elevated p-8 space-y-6 border border-border rounded-sm shadow-sm bg-card/50 relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-1 h-full bg-primary/30 group-hover:bg-primary transition-all" />
               <div className="space-y-2">
                 <label className="text-xs font-bold text-zinc-200 tracking-wide">Institution</label>
                 <Input
                   value={edu.institution}
                   onChange={(e) => handleEducationChange(idx, "institution", e.target.value)}
-                  className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                  className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                 />
               </div>
               <div className="grid grid-cols-2 gap-6">
@@ -88,7 +88,7 @@ export function ResumeEditor({
                   <Input
                     value={edu.degree}
                     onChange={(e) => handleEducationChange(idx, "degree", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -96,7 +96,7 @@ export function ResumeEditor({
                   <Input
                     value={edu.year}
                     onChange={(e) => handleEducationChange(idx, "year", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
               </div>
@@ -106,7 +106,7 @@ export function ResumeEditor({
                   <Input
                     value={edu.major}
                     onChange={(e) => handleEducationChange(idx, "major", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -114,7 +114,7 @@ export function ResumeEditor({
                   <Input
                     value={edu.gpa}
                     onChange={(e) => handleEducationChange(idx, "gpa", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
               </div>
@@ -123,7 +123,7 @@ export function ResumeEditor({
                 <Textarea
                   value={edu.coursework.join(", ")}
                   onChange={(e) => handleEducationChange(idx, "coursework", e.target.value.split(", "))}
-                  className="bg-background/50 border border-border/50 rounded-lg focus-visible:ring-1 focus:border-primary transition-all font-medium min-h-[80px]"
+                  className="bg-background/50 border border-border/50 rounded-sm focus-visible:ring-1 focus:border-primary transition-all font-medium min-h-[80px]"
                 />
               </div>
             </div>
@@ -132,7 +132,7 @@ export function ResumeEditor({
 
         <TabsContent value="experience" className="space-y-6 mt-6">
           {resumeData.experience.map((exp, idx) => (
-            <div key={idx} className="card-elevated p-8 space-y-6 border-2 border-border rounded-sm shadow-[8px_8px_0px_rgba(0,0,0,0.05)] bg-card/50 relative overflow-hidden group">
+            <div key={idx} className="card-elevated p-8 space-y-6 border border-border rounded-sm shadow-sm bg-card/50 relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-1 h-full bg-primary/30 group-hover:bg-primary transition-all" />
               <Button
                 size="icon"
@@ -149,7 +149,7 @@ export function ResumeEditor({
                     placeholder="Tech Innovations"
                     value={exp.company}
                     onChange={(e) => handleExperienceChange(idx, "company", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -158,7 +158,7 @@ export function ResumeEditor({
                     placeholder="Software Engineer"
                     value={exp.title}
                     onChange={(e) => handleExperienceChange(idx, "title", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -167,7 +167,7 @@ export function ResumeEditor({
                     placeholder="June 2024 - August 2024"
                     value={exp.duration}
                     onChange={(e) => handleExperienceChange(idx, "duration", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -176,7 +176,7 @@ export function ResumeEditor({
                     placeholder="Bangalore, India"
                     value={exp.location}
                     onChange={(e) => handleExperienceChange(idx, "location", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
               </div>
@@ -186,19 +186,19 @@ export function ResumeEditor({
                   placeholder="Describe your responsibilities and achievements..."
                   value={exp.description.join("\n")}
                   onChange={(e) => handleExperienceChange(idx, "description", e.target.value.split("\n"))}
-                  className="bg-background/50 border border-border/50 rounded-lg focus-visible:ring-1 focus:border-primary transition-all font-medium min-h-[120px]"
+                  className="bg-background/50 border border-border/50 rounded-sm focus-visible:ring-1 focus:border-primary transition-all font-medium min-h-[120px]"
                 />
               </div>
             </div>
           ))}
-          <Button onClick={addExperience} variant="outline" className="w-full h-14 border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all">
+          <Button onClick={addExperience} variant="outline" className="w-full h-14 border border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/5 rounded-sm font-bold uppercase tracking-widest text-xs transition-all">
             <Plus className="w-5 h-5 mr-3" /> Initialize New Experience Data
           </Button>
         </TabsContent>
 
         <TabsContent value="projects" className="space-y-6 mt-6">
           {resumeData.projects.map((proj, idx) => (
-            <div key={idx} className="card-elevated p-8 space-y-6 border-2 border-border rounded-sm shadow-[8px_8px_0px_rgba(0,0,0,0.05)] bg-card/50 relative overflow-hidden group">
+            <div key={idx} className="card-elevated p-8 space-y-6 border border-border rounded-sm shadow-sm bg-card/50 relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-1 h-full bg-primary/30 group-hover:bg-primary transition-all" />
               <Button
                 size="icon"
@@ -215,7 +215,7 @@ export function ResumeEditor({
                     placeholder="Smart Campus App"
                     value={proj.name}
                     onChange={(e) => handleProjectChange(idx, "name", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -224,7 +224,7 @@ export function ResumeEditor({
                     placeholder="Jan 2024"
                     value={proj.date}
                     onChange={(e) => handleProjectChange(idx, "date", e.target.value)}
-                    className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
+                    className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all"
                   />
                 </div>
               </div>
@@ -234,12 +234,12 @@ export function ResumeEditor({
                   placeholder="Summarize your project..."
                   value={proj.description.join("\n")}
                   onChange={(e) => handleProjectChange(idx, "description", e.target.value.split("\n"))}
-                  className="bg-background/50 border border-border/50 rounded-lg focus-visible:ring-1 focus:border-primary transition-all font-medium min-h-[120px]"
+                  className="bg-background/50 border border-border/50 rounded-sm focus-visible:ring-1 focus:border-primary transition-all font-medium min-h-[120px]"
                 />
               </div>
             </div>
           ))}
-          <Button onClick={addProject} variant="outline" className="w-full h-14 border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all">
+          <Button onClick={addProject} variant="outline" className="w-full h-14 border border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/5 rounded-sm font-bold uppercase tracking-widest text-xs transition-all">
             <Plus className="w-5 h-5 mr-3" /> Initialize Project Vector
           </Button>
         </TabsContent>
@@ -257,7 +257,7 @@ export function ResumeEditor({
                 value={(resumeData.skills as any)[field]}
                 onChange={(e) => handleSkillsChange(field, e.target.value)}
                 placeholder={placeholder}
-                className="h-10 border border-border/50 rounded-lg bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all placeholder:opacity-50"
+                className="h-10 border border-border/50 rounded-sm bg-background/50 font-medium focus-visible:ring-1 focus:border-primary transition-all placeholder:opacity-50"
               />
             </div>
           ))}

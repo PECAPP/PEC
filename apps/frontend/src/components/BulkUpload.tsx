@@ -2,8 +2,6 @@
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@pec/ui";
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import Papa from 'papaparse';
-import * as ExcelJS from 'exceljs';
 import { Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
 
 interface BulkUploadProps {
@@ -27,20 +25,23 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
 
     if (fileExtension === 'csv') {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          validateAndSetData(results.data);
-        },
-        error: (error) => {
-          setValidationErrors([`CSV Parse Error: ${error.message}`]);
-        }
+      import('papaparse').then((Papa) => {
+        Papa.default.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results: any) => {
+            validateAndSetData(results.data);
+          },
+          error: (error: any) => {
+            setValidationErrors([`CSV Parse Error: ${error.message}`]);
+          }
+        });
       });
     } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const buffer = e.target?.result as ArrayBuffer;
+        const ExcelJS = await import('exceljs');
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.load(buffer);
         const worksheet = workbook.worksheets[0];
@@ -134,6 +135,7 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
       templateColumns.reduce((obj, col) => ({ ...obj, [col]: 'Sample' }), {})
     ];
 
+    const ExcelJS = await import('exceljs');
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet(entityType);
     
@@ -170,7 +172,7 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
       {/* Upload Area */}
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+        className={`border border-dashed rounded-sm p-8 text-center cursor-pointer transition-colors ${
           isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
         }`}
       >
@@ -202,7 +204,7 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
 
           {/* Validation Errors */}
           {validationErrors.length > 0 && (
-            <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
+            <div className="bg-destructive/10 border border-destructive rounded-sm p-4">
               <div className="flex items-center gap-2 mb-2">
                 <AlertCircle className="w-5 h-5 text-destructive" />
                 <h4 className="font-semibold text-destructive">Validation Errors ({validationErrors.length})</h4>
@@ -220,7 +222,7 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
 
           {/* Import Result */}
           {importResult && (
-            <div className={`border rounded-lg p-4 ${importResult.failed > 0 ? 'bg-destructive/10 border-destructive' : 'bg-success/10 border-success'}`}>
+            <div className={`border rounded-sm p-4 ${importResult.failed > 0 ? 'bg-destructive/10 border-destructive' : 'bg-success/10 border-success'}`}>
               <div className="flex items-center gap-2 mb-2">
                 {importResult.failed > 0 ? (
                   <XCircle className="w-5 h-5 text-destructive" />
@@ -230,8 +232,8 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
                 <h4 className="font-semibold">Import Results</h4>
               </div>
               <div className="space-y-1 text-sm">
-                <p className="text-success">✓ {importResult.success} records imported successfully</p>
-                <p className="text-destructive">✗ {importResult.failed} records failed</p>
+                <p className="text-success"> {importResult.success} records imported successfully</p>
+                <p className="text-destructive"> {importResult.failed} records failed</p>
               </div>
               {importResult.errors.length > 0 && (
                 <ul className="list-disc list-inside mt-2 space-y-1 text-sm max-h-40 overflow-y-auto">
@@ -245,7 +247,7 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
 
           {/* Data Preview Table */}
           {!importResult && (
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border rounded-sm overflow-hidden">
               <div className="overflow-x-auto max-h-96">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/30 border-b sticky top-0">

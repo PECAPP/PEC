@@ -14,7 +14,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # Converts your GitHub repository name into the image namespace (e.g., yourusername/omnifow)
+  # Converts your GitHub repository name into the image namespace (e.g., pecapp/pec)
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:

@@ -29,24 +29,42 @@ import type {
   UpdateCampusMapRegionDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const campusMapControllerListRegionsV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type campusMapControllerListRegionsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type campusMapControllerListRegionsV1ResponseSuccess = (campusMapControllerListRegionsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type campusMapControllerListRegionsV1Response = (campusMapControllerListRegionsV1ResponseSuccess)
+
+export const getCampusMapControllerListRegionsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRegions`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRegions`
+}
+
+export const campusMapControllerListRegionsV1 = async ( options?: RequestInit): Promise<campusMapControllerListRegionsV1Response> => {
+
+  return fetchWithAuth<campusMapControllerListRegionsV1Response>(getCampusMapControllerListRegionsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -58,16 +76,16 @@ export const getCampusMapControllerListRegionsV1QueryKey = () => {
     }
 
 
-export const getCampusMapControllerListRegionsV1QueryOptions = <TData = Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCampusMapControllerListRegionsV1QueryOptions = <TData = Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCampusMapControllerListRegionsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>> = ({ signal }) => campusMapControllerListRegionsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>> = ({ signal }) => campusMapControllerListRegionsV1({ signal });
 
 
 
@@ -87,7 +105,7 @@ export function useCampusMapControllerListRegionsV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCampusMapControllerListRegionsV1<TData = Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError = unknown>(
@@ -97,16 +115,16 @@ export function useCampusMapControllerListRegionsV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCampusMapControllerListRegionsV1<TData = Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCampusMapControllerListRegionsV1<TData = Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerListRegionsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -122,32 +140,50 @@ export function useCampusMapControllerListRegionsV1<TData = Awaited<ReturnType<t
 
 
 
-export const campusMapControllerCreateRegionV1 = (
-    createCampusMapRegionDto: CreateCampusMapRegionDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type campusMapControllerCreateRegionV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type campusMapControllerCreateRegionV1ResponseSuccess = (campusMapControllerCreateRegionV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type campusMapControllerCreateRegionV1Response = (campusMapControllerCreateRegionV1ResponseSuccess)
+
+export const getCampusMapControllerCreateRegionV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRegions`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createCampusMapRegionDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRegions`
+}
+
+export const campusMapControllerCreateRegionV1 = async (createCampusMapRegionDto: CreateCampusMapRegionDto, options?: RequestInit): Promise<campusMapControllerCreateRegionV1Response> => {
+
+  return fetchWithAuth<campusMapControllerCreateRegionV1Response>(getCampusMapControllerCreateRegionV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createCampusMapRegionDto)
+  }
+);}
+
 
 
 
 export const getCampusMapControllerCreateRegionV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerCreateRegionV1>>, TError,{data: CreateCampusMapRegionDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerCreateRegionV1>>, TError,{data: CreateCampusMapRegionDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerCreateRegionV1>>, TError,{data: CreateCampusMapRegionDto}, TContext> => {
 
 const mutationKey = ['campusMapControllerCreateRegionV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -155,7 +191,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof campusMapControllerCreateRegionV1>>, {data: CreateCampusMapRegionDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  campusMapControllerCreateRegionV1(data,requestOptions)
+          return  campusMapControllerCreateRegionV1(data,)
         }
 
 
@@ -170,7 +206,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CampusMapControllerCreateRegionV1MutationError = unknown
 
     export const useCampusMapControllerCreateRegionV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerCreateRegionV1>>, TError,{data: CreateCampusMapRegionDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerCreateRegionV1>>, TError,{data: CreateCampusMapRegionDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof campusMapControllerCreateRegionV1>>,
         TError,
@@ -179,17 +215,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampusMapControllerCreateRegionV1MutationOptions(options), queryClient);
     }
-    export const campusMapControllerGetRegionV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type campusMapControllerGetRegionV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type campusMapControllerGetRegionV1ResponseSuccess = (campusMapControllerGetRegionV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type campusMapControllerGetRegionV1Response = (campusMapControllerGetRegionV1ResponseSuccess)
+
+export const getCampusMapControllerGetRegionV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRegions/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRegions/${id}`
+}
+
+export const campusMapControllerGetRegionV1 = async (id: string, options?: RequestInit): Promise<campusMapControllerGetRegionV1Response> => {
+
+  return fetchWithAuth<campusMapControllerGetRegionV1Response>(getCampusMapControllerGetRegionV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -201,16 +257,16 @@ export const getCampusMapControllerGetRegionV1QueryKey = (id: string,) => {
     }
 
 
-export const getCampusMapControllerGetRegionV1QueryOptions = <TData = Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCampusMapControllerGetRegionV1QueryOptions = <TData = Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCampusMapControllerGetRegionV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>> = ({ signal }) => campusMapControllerGetRegionV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>> = ({ signal }) => campusMapControllerGetRegionV1(id, { signal });
 
 
 
@@ -230,7 +286,7 @@ export function useCampusMapControllerGetRegionV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCampusMapControllerGetRegionV1<TData = Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError = unknown>(
@@ -240,16 +296,16 @@ export function useCampusMapControllerGetRegionV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCampusMapControllerGetRegionV1<TData = Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCampusMapControllerGetRegionV1<TData = Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapControllerGetRegionV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -265,33 +321,51 @@ export function useCampusMapControllerGetRegionV1<TData = Awaited<ReturnType<typ
 
 
 
-export const campusMapControllerUpdateRegionV1 = (
-    id: string,
-    updateCampusMapRegionDto: UpdateCampusMapRegionDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type campusMapControllerUpdateRegionV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type campusMapControllerUpdateRegionV1ResponseSuccess = (campusMapControllerUpdateRegionV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type campusMapControllerUpdateRegionV1Response = (campusMapControllerUpdateRegionV1ResponseSuccess)
+
+export const getCampusMapControllerUpdateRegionV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRegions/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateCampusMapRegionDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRegions/${id}`
+}
+
+export const campusMapControllerUpdateRegionV1 = async (id: string,
+    updateCampusMapRegionDto: UpdateCampusMapRegionDto, options?: RequestInit): Promise<campusMapControllerUpdateRegionV1Response> => {
+
+  return fetchWithAuth<campusMapControllerUpdateRegionV1Response>(getCampusMapControllerUpdateRegionV1Url(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateCampusMapRegionDto)
+  }
+);}
+
 
 
 
 export const getCampusMapControllerUpdateRegionV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerUpdateRegionV1>>, TError,{id: string;data: UpdateCampusMapRegionDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerUpdateRegionV1>>, TError,{id: string;data: UpdateCampusMapRegionDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerUpdateRegionV1>>, TError,{id: string;data: UpdateCampusMapRegionDto}, TContext> => {
 
 const mutationKey = ['campusMapControllerUpdateRegionV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -299,7 +373,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof campusMapControllerUpdateRegionV1>>, {id: string;data: UpdateCampusMapRegionDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  campusMapControllerUpdateRegionV1(id,data,requestOptions)
+          return  campusMapControllerUpdateRegionV1(id,data,)
         }
 
 
@@ -314,7 +388,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CampusMapControllerUpdateRegionV1MutationError = unknown
 
     export const useCampusMapControllerUpdateRegionV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerUpdateRegionV1>>, TError,{id: string;data: UpdateCampusMapRegionDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerUpdateRegionV1>>, TError,{id: string;data: UpdateCampusMapRegionDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof campusMapControllerUpdateRegionV1>>,
         TError,
@@ -323,30 +397,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampusMapControllerUpdateRegionV1MutationOptions(options), queryClient);
     }
-    export const campusMapControllerDeleteRegionV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type campusMapControllerDeleteRegionV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type campusMapControllerDeleteRegionV1ResponseSuccess = (campusMapControllerDeleteRegionV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type campusMapControllerDeleteRegionV1Response = (campusMapControllerDeleteRegionV1ResponseSuccess)
+
+export const getCampusMapControllerDeleteRegionV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRegions/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRegions/${id}`
+}
+
+export const campusMapControllerDeleteRegionV1 = async (id: string, options?: RequestInit): Promise<campusMapControllerDeleteRegionV1Response> => {
+
+  return fetchWithAuth<campusMapControllerDeleteRegionV1Response>(getCampusMapControllerDeleteRegionV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getCampusMapControllerDeleteRegionV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerDeleteRegionV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerDeleteRegionV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerDeleteRegionV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['campusMapControllerDeleteRegionV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -354,7 +448,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof campusMapControllerDeleteRegionV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  campusMapControllerDeleteRegionV1(id,requestOptions)
+          return  campusMapControllerDeleteRegionV1(id,)
         }
 
 
@@ -369,7 +463,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CampusMapControllerDeleteRegionV1MutationError = unknown
 
     export const useCampusMapControllerDeleteRegionV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerDeleteRegionV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapControllerDeleteRegionV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof campusMapControllerDeleteRegionV1>>,
         TError,

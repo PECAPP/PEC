@@ -43,13 +43,13 @@ export function FeaturesSection() {
                   scale: 1.02,
                   transition: { duration: 0.2, ease: "easeOut" }
                 }}
-                className={`p-10 border-2 ${role.borderColor} ${role.bgColor} relative group overflow-hidden neo-brutal-shadow hover:shadow-[8px_8px_0px_0px_white] transition-all duration-300`}
+                className={`p-10 border ${role.borderColor} ${role.bgColor} relative group overflow-hidden shadow-sm hover:shadow-sm transition-all duration-300`}
               >
                 {/* Animated Background Pulse */}
                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 <div className="relative z-10">
-                  <div className={`w-20 h-20 border-2 ${role.borderColor} flex items-center justify-center mb-8 bg-black/40 group-hover:bg-black/60 transition-colors`}>
+                  <div className={`w-20 h-20 border ${role.borderColor} flex items-center justify-center mb-8 bg-black/40 group-hover:bg-black/60 transition-colors`}>
                     <role.icon className="w-10 h-10 text-white" />
                   </div>
                   <h3 className="text-3xl font-bold mb-6 text-white uppercase tracking-wider font-monument">{role.role}</h3>

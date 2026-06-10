@@ -1,0 +1,81 @@
+name: Bug Report
+description: Create a report to help us improve
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct.
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Affected Module
+      description: What part of the application is affected?
+      multiple: true
+      options:
+        - "@pec/api"
+        - "@pec/database"
+        - "@pec/env"
+        - "@pec/shared"
+        - "@pec/ui"
+        - "apps/server"
+        - "apps/docs"
+        - "Infrastructure"
+        - "Other"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: dropdown
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: Which version of Node.js are you using?
+      options:
+        - "v20"
+        - "v22"
+        - "Other"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment details
+      description: OS, browser version, database backend, etc.
+    validations:
+      required: false

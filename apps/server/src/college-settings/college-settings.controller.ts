@@ -7,7 +7,7 @@ import { AuthGuard } from '../auth/auth.guard';
 
 import { ok } from '../common/utils/api-response';
 
-@Controller('college-settings')
+@Controller('pec-settings')
 export class CollegeSettingsController {
   constructor(private readonly service: CollegeSettingsService) {}
 

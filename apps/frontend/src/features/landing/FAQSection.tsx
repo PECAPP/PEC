@@ -41,7 +41,7 @@ export function FAQSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
               viewport={{ once: true }}
-              className={`border-2 rounded-none overflow-hidden transition-all duration-300 neo-brutal-shadow ${
+              className={`border rounded-none overflow-hidden transition-all duration-300 shadow-sm ${
                 activeFAQIndex === idx 
                   ? "bg-slate-800 border-cyan-500" 
                   : "bg-slate-900 border-cyan-900 hover:border-cyan-700 hover:bg-slate-800"

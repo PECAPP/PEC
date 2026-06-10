@@ -1,4 +1,4 @@
-import { Button, Badge } from "@pec/ui";
+import { Button, Badge, formatDate } from "@pec/ui";
 import { Bell, ArrowUpRight, Pin } from 'lucide-react';
 
 import { EmptyState } from '@/components/common/AsyncState';
@@ -44,7 +44,7 @@ export function NoticeboardCard({ notices, onViewAll, className }: Props) {
             {safeNotices.slice(0, 4).map((notice, index) => (
               <div
                 key={`${notice.id || 'notice'}-${index}`}
-                className="rounded-lg border border-border bg-secondary/10 p-3 hover:bg-secondary/20 transition-colors"
+                className="rounded-sm border border-border bg-secondary/10 p-4 hover:border-primary/30 hover:bg-secondary/20 transition-colors duration-300 cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
@@ -57,7 +57,7 @@ export function NoticeboardCard({ notices, onViewAll, className }: Props) {
                         </Badge>
                       )}
                       {notice.important && (
-                        <Badge variant="destructive" className="text-[10px] h-4">Important</Badge>
+                        <Badge variant="destructive" className="text-[10px] h-4 bg-red-500/20 text-red-400 border-none">Important</Badge>
                       )}
                       <Badge variant="outline" className="uppercase text-[10px] h-4 bg-background/40">
                         {notice.category || 'update'}
@@ -68,9 +68,14 @@ export function NoticeboardCard({ notices, onViewAll, className }: Props) {
                     </p>
                   </div>
                   {notice.publishedAt && (
-                    <span className="shrink-0 text-[10px] text-muted-foreground font-medium opacity-60">
-                      {new Date(notice.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </span>
+                    <div className="shrink-0 flex flex-col items-end justify-start pt-1">
+                      <span className="text-[11px] font-bold text-foreground/80">
+                        {formatDate(notice.publishedAt)}
+                      </span>
+                      <span className="text-lg font-bold text-foreground/90 leading-none">
+                        {formatDate(notice.publishedAt)}
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>

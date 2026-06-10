@@ -5,11 +5,16 @@ import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { ListingQueryDto } from './dto/listing-query.dto';
 
+import { MarketplaceGateway } from './marketplace.gateway';
+
 @Injectable()
 export class MarketplaceService {
   private readonly logger = new Logger(MarketplaceService.name);
 
-  constructor(private readonly repo: MarketplaceRepository) {}
+  constructor(
+    private readonly repo: MarketplaceRepository,
+    private readonly gateway: MarketplaceGateway
+  ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleStaleChatCleanup() {
@@ -32,5 +37,21 @@ export class MarketplaceService {
   getOrCreateChat(listingId: string, buyerId: string) { return this.repo.getOrCreateChat(listingId, buyerId); }
   getMyChats(userId: string) { return this.repo.getMyChats(userId); }
   getChatMessages(chatId: string, userId: string) { return this.repo.getChatMessages(chatId, userId); }
-  sendMessage(chatId: string, senderId: string, text: string) { return this.repo.sendMessage(chatId, senderId, text); }
+  async sendMessage(chatId: string, senderId: string, text: string) {
+    const message = await this.repo.sendMessage(chatId, senderId, text);
+    this.gateway.broadcastMessage(chatId, message);
+    return message;
+  }
+
+  async createOffer(chatId: string, senderId: string, amount: number) {
+    const message = await this.repo.createOffer(chatId, senderId, amount);
+    this.gateway.broadcastMessage(chatId, message);
+    return message;
+  }
+
+  async updateOffer(chatId: string, messageId: string, userId: string, status: string) {
+    const message = await this.repo.updateOffer(chatId, messageId, userId, status);
+    this.gateway.broadcastMessage(chatId, message);
+    return message;
+  }
 }

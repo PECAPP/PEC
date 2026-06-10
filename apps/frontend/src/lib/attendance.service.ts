@@ -4,7 +4,6 @@ const _API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 const _getHeaders = () => ({
   "Content-Type": "application/json",
-  Authorization: `Bearer ${authClient.getAccessToken() || ""}`,
 });
 
 export const fetchAttendanceRecords = async (_userId: string) => {

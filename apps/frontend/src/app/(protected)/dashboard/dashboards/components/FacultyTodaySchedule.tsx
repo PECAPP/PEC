@@ -67,7 +67,7 @@ function ScheduleItem({ courseId,  time, course, section, room, students, status
   };
 
   return (
-    <div className={`p-3 rounded-lg border ${statusStyles[status]} flex items-center gap-4`}>
+    <div className={`p-3 rounded-sm border ${statusStyles[status]} flex items-center gap-4`}>
       <div className="flex items-center gap-2 w-28 shrink-0">
         <Clock className="w-4 h-4 text-muted-foreground" />
         <span className="text-sm font-medium">{time}</span>
@@ -80,7 +80,7 @@ function ScheduleItem({ courseId,  time, course, section, room, students, status
       {status === 'ongoing' && (
         <div className="flex items-center gap-2 shrink-0">
           <span className="px-2 py-0.5 text-xs font-medium bg-accent text-accent-foreground rounded-full hidden sm:inline-flex">Live</span>
-          <Button size="sm" onClick={() => onGenerateQR?.(courseId)} className="h-7 text-xs shadow-md shadow-primary/20">
+          <Button size="sm" onClick={() => onGenerateQR?.(courseId)} className="h-7 text-xs shadow-sm shadow-primary/20">
             <QrCode className="w-3 h-3 mr-1" /> QR Attend
           </Button>
         </div>
@@ -88,4 +88,5 @@ function ScheduleItem({ courseId,  time, course, section, room, students, status
     </div>
   );
 }
+
 

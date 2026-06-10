@@ -1,5 +1,5 @@
 'use client';
-import { Button, Textarea } from "@pec/ui";
+import { Button, Textarea, Dialog, DialogContent, DialogTitle, DialogDescription } from "@pec/ui";
 
 
 import { useState } from 'react';
@@ -101,19 +101,18 @@ export function ClubProposalDialog({
           'Failed to submit proposal',
       );
     } finally {
+
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-background rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl w-full p-0 overflow-hidden bg-background">
         <div className="sticky top-0 bg-background border-b border-border p-6 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-foreground">Join Club</h2>
-            <p className="text-sm text-muted-foreground mt-1">{clubName}</p>
+            <DialogTitle className="text-xl font-bold text-foreground">Join Club</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">{clubName}</DialogDescription>
           </div>
           <Button
             variant="ghost"
@@ -125,7 +124,7 @@ export function ClubProposalDialog({
           </Button>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
           <div>
             <label className="text-sm font-medium text-foreground">
               Write Your Proposal
@@ -163,7 +162,7 @@ export function ClubProposalDialog({
             </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

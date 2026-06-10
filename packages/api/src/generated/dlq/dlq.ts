@@ -24,24 +24,42 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const dlqControllerGetDeadLetterMessagesV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type dlqControllerGetDeadLetterMessagesV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type dlqControllerGetDeadLetterMessagesV1ResponseSuccess = (dlqControllerGetDeadLetterMessagesV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type dlqControllerGetDeadLetterMessagesV1Response = (dlqControllerGetDeadLetterMessagesV1ResponseSuccess)
+
+export const getDlqControllerGetDeadLetterMessagesV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/admin/dlq/messages`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/admin/dlq/messages`
+}
+
+export const dlqControllerGetDeadLetterMessagesV1 = async ( options?: RequestInit): Promise<dlqControllerGetDeadLetterMessagesV1Response> => {
+
+  return fetchWithAuth<dlqControllerGetDeadLetterMessagesV1Response>(getDlqControllerGetDeadLetterMessagesV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -53,16 +71,16 @@ export const getDlqControllerGetDeadLetterMessagesV1QueryKey = () => {
     }
 
 
-export const getDlqControllerGetDeadLetterMessagesV1QueryOptions = <TData = Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getDlqControllerGetDeadLetterMessagesV1QueryOptions = <TData = Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getDlqControllerGetDeadLetterMessagesV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>> = ({ signal }) => dlqControllerGetDeadLetterMessagesV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>> = ({ signal }) => dlqControllerGetDeadLetterMessagesV1({ signal });
 
 
 
@@ -82,7 +100,7 @@ export function useDlqControllerGetDeadLetterMessagesV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDlqControllerGetDeadLetterMessagesV1<TData = Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError = unknown>(
@@ -92,16 +110,16 @@ export function useDlqControllerGetDeadLetterMessagesV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDlqControllerGetDeadLetterMessagesV1<TData = Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useDlqControllerGetDeadLetterMessagesV1<TData = Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dlqControllerGetDeadLetterMessagesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -117,30 +135,50 @@ export function useDlqControllerGetDeadLetterMessagesV1<TData = Awaited<ReturnTy
 
 
 
-export const dlqControllerReplayMessagesV1 = (
+export type dlqControllerReplayMessagesV1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type dlqControllerReplayMessagesV1ResponseSuccess = (dlqControllerReplayMessagesV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type dlqControllerReplayMessagesV1Response = (dlqControllerReplayMessagesV1ResponseSuccess)
+
+export const getDlqControllerReplayMessagesV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/admin/dlq/replay`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/admin/dlq/replay`
+}
+
+export const dlqControllerReplayMessagesV1 = async ( options?: RequestInit): Promise<dlqControllerReplayMessagesV1Response> => {
+
+  return fetchWithAuth<dlqControllerReplayMessagesV1Response>(getDlqControllerReplayMessagesV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getDlqControllerReplayMessagesV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dlqControllerReplayMessagesV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dlqControllerReplayMessagesV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof dlqControllerReplayMessagesV1>>, TError,void, TContext> => {
 
 const mutationKey = ['dlqControllerReplayMessagesV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -148,7 +186,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof dlqControllerReplayMessagesV1>>, void> = () => {
 
 
-          return  dlqControllerReplayMessagesV1(requestOptions)
+          return  dlqControllerReplayMessagesV1()
         }
 
 
@@ -163,7 +201,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DlqControllerReplayMessagesV1MutationError = unknown
 
     export const useDlqControllerReplayMessagesV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dlqControllerReplayMessagesV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dlqControllerReplayMessagesV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof dlqControllerReplayMessagesV1>>,
         TError,

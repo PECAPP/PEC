@@ -1,6 +1,6 @@
 'use client';
 import { extractData } from "@/lib/utils";
-import { Button, Input, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+import { Button, Input, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, AppShellSkeleton } from "@pec/ui";
 
 
 import { useState, useEffect } from 'react';
@@ -168,7 +168,7 @@ export default function RoomsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <AppShellSkeleton />
       </div>
     );
   }
@@ -244,7 +244,7 @@ export default function RoomsPage() {
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <div className="p-2 rounded-sm bg-primary/10 text-primary">
                   <DoorOpen className="w-5 h-5" />
                 </div>
                 <div>
@@ -296,7 +296,7 @@ export default function RoomsPage() {
 
       {filteredRooms.length === 0 && (
         <div className="card-elevated p-12 text-center">
-          <Building2 className="w-12 h-12 mx-auto mb-4 opacity-20" />
+          <Building2 className="w-12 h-12  mb-4 opacity-20" />
           <p className="text-muted-foreground">No rooms found</p>
         </div>
       )}

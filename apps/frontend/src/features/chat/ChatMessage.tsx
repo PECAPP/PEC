@@ -65,7 +65,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const isStarred = message.starredBy?.includes(user?.uid || "") || false;
   const userRole = user?.role as string;
-  const isAdmin = userRole === "admin" || userRole === "college_admin";
+  const isAdmin = userRole === "admin";
   const canDelete = message.isOwn || isAdmin; // Owner or admin can delete
   const canStar = !!roomId; // Anyone can star if roomId exists
   const canCopy = !!message.content; // Can copy if there's text
@@ -138,7 +138,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
         <div className="relative">
           <div
             className={cn(
-              'rounded-2xl px-4 py-2.5 shadow-md transition-all duration-200',
+              'rounded-sm px-4 py-2.5 shadow-md transition-all duration-200',
               message.isOwn 
                 ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-md' 
                 : 'bg-card border border-border text-foreground rounded-bl-md hover:shadow-lg'
@@ -147,7 +147,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
             {/* Reply Reference */}
             {message.replyTo && (
               <div 
-                className="mb-2.5 p-2.5 bg-background/30 backdrop-blur-sm rounded-lg border-l-3 border-primary text-xs cursor-pointer hover:bg-background/40 transition-colors"
+                className="mb-2.5 p-2.5 bg-background/30 backdrop-blur-sm rounded-sm border-l-3 border-primary text-xs cursor-pointer hover:bg-background/40 transition-colors"
                 onClick={onReplyClick}
               >
                 <p className="font-semibold text-primary text-[11px] mb-0.5">↩️ {message.replyTo.senderName}</p>
@@ -160,7 +160,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
               <img 
                 src={message.mediaUrl} 
                 alt="Shared image" 
-                className="rounded-lg mb-2 max-w-full cursor-pointer hover:opacity-90"
+                className="rounded-sm mb-2 max-w-full cursor-pointer hover:opacity-90"
                 onClick={() => setLightboxImage(message.mediaUrl!)}
               />
             )}
@@ -169,7 +169,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
               <video 
                 src={message.mediaUrl} 
                 controls 
-                className="rounded-lg mb-2 max-w-xs"
+                className="rounded-sm mb-2 max-w-xs"
               />
             )}
 
@@ -177,16 +177,16 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
               <a
                 href={message.mediaUrl}
                 download={message.fileName || "download"}
-                className="flex items-center gap-3 p-3 bg-background/10 rounded-xl mb-2 hover:bg-background/20 hover:scale-[1.02] transition-all cursor-pointer border border-border/50"
+                className="flex items-center gap-3 p-3 bg-background/10 rounded-sm mb-2 hover:bg-background/20 hover:scale-[1.02] transition-all cursor-pointer border border-border/50"
               >
-                <div className="p-2 bg-primary/10 rounded-lg">
+                <div className="p-2 bg-primary/10 rounded-sm">
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate">{message.fileName || "File"}</p>
                   <p className="text-xs opacity-70">{formatFileSize(message.fileSize)}</p>
                 </div>
-                <div className="p-2 bg-primary/20 rounded-lg">
+                <div className="p-2 bg-primary/20 rounded-sm">
                   <Download className="w-4 h-4 text-primary" />
                 </div>
               </a>

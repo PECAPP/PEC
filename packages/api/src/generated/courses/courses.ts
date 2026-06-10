@@ -29,39 +29,55 @@ import type {
   UpdateCourseDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const coursesControllerCreateV1 = (
-    createCourseDto: CreateCourseDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+
+export type coursesControllerCreateV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type coursesControllerCreateV1ResponseSuccess = (coursesControllerCreateV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type coursesControllerCreateV1Response = (coursesControllerCreateV1ResponseSuccess)
+
+export const getCoursesControllerCreateV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/courses`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createCourseDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/courses`
+}
+
+export const coursesControllerCreateV1 = async (createCourseDto: CreateCourseDto, options?: RequestInit): Promise<coursesControllerCreateV1Response> => {
+
+  return fetchWithAuth<coursesControllerCreateV1Response>(getCoursesControllerCreateV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createCourseDto)
+  }
+);}
+
 
 
 
 export const getCoursesControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerCreateV1>>, TError,{data: CreateCourseDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerCreateV1>>, TError,{data: CreateCourseDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof coursesControllerCreateV1>>, TError,{data: CreateCourseDto}, TContext> => {
 
 const mutationKey = ['coursesControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -69,7 +85,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof coursesControllerCreateV1>>, {data: CreateCourseDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  coursesControllerCreateV1(data,requestOptions)
+          return  coursesControllerCreateV1(data,)
         }
 
 
@@ -84,7 +100,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CoursesControllerCreateV1MutationError = unknown
 
     export const useCoursesControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerCreateV1>>, TError,{data: CreateCourseDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerCreateV1>>, TError,{data: CreateCourseDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof coursesControllerCreateV1>>,
         TError,
@@ -93,17 +109,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCoursesControllerCreateV1MutationOptions(options), queryClient);
     }
-    export const coursesControllerFindAllV1 = (
+    export type coursesControllerFindAllV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type coursesControllerFindAllV1ResponseSuccess = (coursesControllerFindAllV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type coursesControllerFindAllV1Response = (coursesControllerFindAllV1ResponseSuccess)
+
+export const getCoursesControllerFindAllV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/courses`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/courses`
+}
+
+export const coursesControllerFindAllV1 = async ( options?: RequestInit): Promise<coursesControllerFindAllV1Response> => {
+
+  return fetchWithAuth<coursesControllerFindAllV1Response>(getCoursesControllerFindAllV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -115,16 +151,16 @@ export const getCoursesControllerFindAllV1QueryKey = () => {
     }
 
 
-export const getCoursesControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCoursesControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCoursesControllerFindAllV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesControllerFindAllV1>>> = ({ signal }) => coursesControllerFindAllV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesControllerFindAllV1>>> = ({ signal }) => coursesControllerFindAllV1({ signal });
 
 
 
@@ -144,7 +180,7 @@ export function useCoursesControllerFindAllV1<TData = Awaited<ReturnType<typeof 
           TError,
           Awaited<ReturnType<typeof coursesControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCoursesControllerFindAllV1<TData = Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError = unknown>(
@@ -154,16 +190,16 @@ export function useCoursesControllerFindAllV1<TData = Awaited<ReturnType<typeof 
           TError,
           Awaited<ReturnType<typeof coursesControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCoursesControllerFindAllV1<TData = Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCoursesControllerFindAllV1<TData = Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -179,17 +215,37 @@ export function useCoursesControllerFindAllV1<TData = Awaited<ReturnType<typeof 
 
 
 
-export const coursesControllerFindOneV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type coursesControllerFindOneV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type coursesControllerFindOneV1ResponseSuccess = (coursesControllerFindOneV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type coursesControllerFindOneV1Response = (coursesControllerFindOneV1ResponseSuccess)
+
+export const getCoursesControllerFindOneV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/courses/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/courses/${id}`
+}
+
+export const coursesControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<coursesControllerFindOneV1Response> => {
+
+  return fetchWithAuth<coursesControllerFindOneV1Response>(getCoursesControllerFindOneV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -201,16 +257,16 @@ export const getCoursesControllerFindOneV1QueryKey = (id: string,) => {
     }
 
 
-export const getCoursesControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCoursesControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCoursesControllerFindOneV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesControllerFindOneV1>>> = ({ signal }) => coursesControllerFindOneV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesControllerFindOneV1>>> = ({ signal }) => coursesControllerFindOneV1(id, { signal });
 
 
 
@@ -230,7 +286,7 @@ export function useCoursesControllerFindOneV1<TData = Awaited<ReturnType<typeof 
           TError,
           Awaited<ReturnType<typeof coursesControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCoursesControllerFindOneV1<TData = Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError = unknown>(
@@ -240,16 +296,16 @@ export function useCoursesControllerFindOneV1<TData = Awaited<ReturnType<typeof 
           TError,
           Awaited<ReturnType<typeof coursesControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCoursesControllerFindOneV1<TData = Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCoursesControllerFindOneV1<TData = Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -265,33 +321,51 @@ export function useCoursesControllerFindOneV1<TData = Awaited<ReturnType<typeof 
 
 
 
-export const coursesControllerUpdateV1 = (
-    id: string,
-    updateCourseDto: UpdateCourseDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type coursesControllerUpdateV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type coursesControllerUpdateV1ResponseSuccess = (coursesControllerUpdateV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type coursesControllerUpdateV1Response = (coursesControllerUpdateV1ResponseSuccess)
+
+export const getCoursesControllerUpdateV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/courses/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateCourseDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/courses/${id}`
+}
+
+export const coursesControllerUpdateV1 = async (id: string,
+    updateCourseDto: UpdateCourseDto, options?: RequestInit): Promise<coursesControllerUpdateV1Response> => {
+
+  return fetchWithAuth<coursesControllerUpdateV1Response>(getCoursesControllerUpdateV1Url(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateCourseDto)
+  }
+);}
+
 
 
 
 export const getCoursesControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerUpdateV1>>, TError,{id: string;data: UpdateCourseDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerUpdateV1>>, TError,{id: string;data: UpdateCourseDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof coursesControllerUpdateV1>>, TError,{id: string;data: UpdateCourseDto}, TContext> => {
 
 const mutationKey = ['coursesControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -299,7 +373,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof coursesControllerUpdateV1>>, {id: string;data: UpdateCourseDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  coursesControllerUpdateV1(id,data,requestOptions)
+          return  coursesControllerUpdateV1(id,data,)
         }
 
 
@@ -314,7 +388,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CoursesControllerUpdateV1MutationError = unknown
 
     export const useCoursesControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerUpdateV1>>, TError,{id: string;data: UpdateCourseDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerUpdateV1>>, TError,{id: string;data: UpdateCourseDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof coursesControllerUpdateV1>>,
         TError,
@@ -323,30 +397,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCoursesControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export const coursesControllerRemoveV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type coursesControllerRemoveV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type coursesControllerRemoveV1ResponseSuccess = (coursesControllerRemoveV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type coursesControllerRemoveV1Response = (coursesControllerRemoveV1ResponseSuccess)
+
+export const getCoursesControllerRemoveV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/courses/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/courses/${id}`
+}
+
+export const coursesControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<coursesControllerRemoveV1Response> => {
+
+  return fetchWithAuth<coursesControllerRemoveV1Response>(getCoursesControllerRemoveV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getCoursesControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof coursesControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['coursesControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -354,7 +448,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof coursesControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  coursesControllerRemoveV1(id,requestOptions)
+          return  coursesControllerRemoveV1(id,)
         }
 
 
@@ -369,7 +463,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CoursesControllerRemoveV1MutationError = unknown
 
     export const useCoursesControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof coursesControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof coursesControllerRemoveV1>>,
         TError,

@@ -11,7 +11,7 @@
     "frontend": "pnpm --filter pec-frontend dev",
     "api": "pnpm --filter pec-server start:dev",
     "sync:api": "pnpm --filter @pec/api generate",
-    "db:reset": "pnpm --filter pec-server db:clean && pnpm --filter pec-server db:push && pnpm --filter pec-server db:seed",
+    "db:reset": "pnpm --filter pec-server db:clean && pnpm --filter @pec/database push && pnpm --filter pec-server db:seed",
     "predev:host": "npx kill-port 3001",
     "dev:host": "concurrently --kill-others-on-fail \"npm run frontend\" \"npm run api\"",
     "check:env": "node scripts/check_env.js",
@@ -20,7 +20,7 @@
     "dev:local": "docker compose -f docker-compose.dev.yml up -d",
     "prod:docker": "docker compose up -d --build",
     "prod:docker:down": "docker compose down",
-    "setup": "pnpm install && pnpm --filter pec-server db:push && pnpm --filter pec-server prisma:generate && pnpm --filter pec-server db:seed",
+    "setup": "pnpm install && pnpm --filter @pec/database push && pnpm --filter @pec/database generate && pnpm --filter pec-server db:seed",
     "clean:full": "node -e \"const fs=require('fs');['node_modules','apps/server/node_modules','apps/frontend/.next','apps/server/dist'].forEach(p=>fs.rmSync(p,{recursive:true,force:true})); console.log('Cleaned all artifacts.')\"",
     "clean:next": "node -e \"require('fs').rmSync('apps/frontend/.next',{recursive:true,force:true});console.log('cleaned .next')\"",
     "db:studio": "npx prisma studio --schema packages/database/prisma/schema.prisma",
@@ -43,12 +43,11 @@
     "@hono/node-server": "^1.19.13",
     "chokidar": "^5.0.0",
     "rxjs": "^7.8.1",
-    "reflect-metadata": "^0.2.2",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.2",
-    "zod": "^3.24.1"
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
     "concurrently": "^9.2.1",
     "eslint": "^8.57.1",
     "eslint-plugin-boundaries": "^6.0.2",

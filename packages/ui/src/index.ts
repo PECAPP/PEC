@@ -57,4 +57,4 @@ export * from "./toggle";
 export * from "./tooltip";
 export * from "./virtual-list";
 export * from "./wobble-card";
-export { cn } from "./utils";
+export { cn, formatDate } from "./utils";

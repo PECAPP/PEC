@@ -48,10 +48,28 @@ model User {
   studentProfile           StudentProfile?
   chatRooms                UserChatRoom[]
   roles                    UserRole[]
+  settings                 UserSettings?
 
   @@index([emailVerified])
   @@index([lockedUntil])
   @@index([email], map: "idx_user_active", where: raw("(\"deletedAt\" IS NULL)"))
+}
+
+model UserSettings {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  theme              String   @default("system")
+  accentColor        String   @default("pec-gold")
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  locale             String   @default("en")
+  timezone           String   @default("Asia/Kolkata")
+  sidebarState       String   @default("expanded")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model CgpaEntry {
@@ -75,26 +93,53 @@ model CgpaEntry {
 }
 
 model HostelIssue {
-  id             String   @id @default(uuid())
-  title          String   @default("")
+  id             String    @id @default(uuid())
+  title          String    @default("")
   studentId      String
   studentName    String?
-  hostelName     String   @default("Hostel")
+  hostelName     String    @default("Hostel")
   roomNumber     String
   category       String
   description    String
-  status         String   @default("Open")
-  priority       String   @default("Medium")
+  images         String[]  @default([])
+  status         String    @default("Open")
+  priority       String    @default("Medium")
   organizationId String?
   responses      Json?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  slaDeadline    DateTime?
+  isEscalated    Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([studentId, status])
   @@index([hostelName, status])
   @@index([category])
   @@index([createdAt])
   @@index([organizationId])
+  @@index([isEscalated])
+}
+
+model HostelOutpass {
+  id            String   @id @default(uuid())
+  studentId     String
+  studentName   String?
+  hostelName    String
+  roomNumber    String
+  reason        String
+  destination   String
+  departureDate DateTime
+  returnDate    DateTime
+  status        String   @default("Pending") // Pending, Approved, Rejected, Active, Completed
+  approvedBy    String?
+  qrCode        String?  @unique
+  evidenceUrl   String?
+  images        String[] @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([studentId, status])
+  @@index([hostelName, status])
+  @@index([status, departureDate])
 }
 
 model CampusMapRegion {
@@ -270,18 +315,22 @@ model StudentProfile {
 }
 
 model FacultyProfile {
-  id             String   @id @default(uuid())
-  userId         String   @unique
-  employeeId     String   @unique
+  id             String                @id @default(uuid())
+  userId         String                @unique
+  employeeId     String                @unique
   department     String
   designation    String
   phone          String?
   specialization String?
   qualifications String?
   bio            String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  publications   FacultyPublication[]
+  awards         FacultyAward[]
+  conferences    FacultyConference[]
+  consultations  FacultyConsultation[]
 
   @@index([department, designation])
 }
@@ -778,8 +827,9 @@ model StudentSkill {
 }
 
 model FacultyPublication {
-  id         String   @id @default(uuid())
+  id         String         @id @default(uuid())
   facultyId  String
+  faculty    FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   title      String
   journal    String?
   conference String?
@@ -787,55 +837,58 @@ model FacultyPublication {
   doi        String?
   url        String?
   abstract   String?
-  citations  Int      @default(0)
+  citations  Int            @default(0)
   coAuthors  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 
   @@index([facultyId])
   @@index([facultyId, year])
 }
 
 model FacultyAward {
-  id          String   @id @default(uuid())
+  id          String         @id @default(uuid())
   facultyId   String
+  faculty     FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   title       String
   description String?
   awardedBy   String?
   year        Int
-  category    String   @default("academic")
-  createdAt   DateTime @default(now())
+  category    String         @default("academic")
+  createdAt   DateTime       @default(now())
 
   @@index([facultyId])
   @@index([facultyId, year])
 }
 
 model FacultyConference {
-  id                String    @id @default(uuid())
+  id                String         @id @default(uuid())
   facultyId         String
+  faculty           FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   name              String
   location          String?
   startDate         DateTime?
   endDate           DateTime?
-  role              String?   @default("presenter")
+  role              String?        @default("presenter")
   presentationTitle String?
   description       String?
-  createdAt         DateTime  @default(now())
+  createdAt         DateTime       @default(now())
 
   @@index([facultyId])
   @@index([facultyId, startDate])
 }
 
 model FacultyConsultation {
-  id           String    @id @default(uuid())
+  id           String         @id @default(uuid())
   facultyId    String
+  faculty      FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   organization String
   description  String?
   startDate    DateTime?
   endDate      DateTime?
-  status       String    @default("active")
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  status       String         @default("active")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   @@index([facultyId])
   @@index([facultyId, status])
@@ -901,14 +954,16 @@ model MarketplaceBookmark {
 }
 
 model MarketplaceChat {
-  id        String               @id @default(uuid())
-  listingId String
-  buyerId   String
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-  buyer     User                 @relation("MarketplaceBuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
-  listing   MarketplaceListing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  messages  MarketplaceMessage[]
+  id          String               @id @default(uuid())
+  listingId   String
+  buyerId     String
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  offerAmount Float?
+  offerStatus String? // "PENDING", "ACCEPTED", "REJECTED"
+  buyer       User                 @relation("MarketplaceBuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
+  listing     MarketplaceListing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  messages    MarketplaceMessage[]
 
   @@unique([listingId, buyerId])
   @@index([listingId])
@@ -916,13 +971,16 @@ model MarketplaceChat {
 }
 
 model MarketplaceMessage {
-  id        String          @id @default(cuid())
-  chatId    String
-  senderId  String
-  text      String
-  createdAt DateTime        @default(now())
-  chat      MarketplaceChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender    User            @relation("MarketplaceMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  id          String          @id @default(cuid())
+  chatId      String
+  senderId    String
+  text        String
+  isOffer     Boolean         @default(false)
+  offerAmount Float?
+  offerStatus String? // "PENDING", "ACCEPTED", "REJECTED", "WITHDRAWN"
+  createdAt   DateTime        @default(now())
+  chat        MarketplaceChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender      User            @relation("MarketplaceMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([chatId, createdAt])
   @@index([senderId])

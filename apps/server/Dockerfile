@@ -6,17 +6,17 @@ RUN corepack enable && apk add --no-cache libc6-compat
 
 FROM base AS fetcher
 WORKDIR /app
-COPY pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm fetch
 
 FROM fetcher AS builder
 WORKDIR /app
 COPY . .
-RUN pnpm install --offline --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 # Generate Prisma
 WORKDIR /app/packages/database
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-RUN npx prisma generate
+RUN pnpm exec prisma generate
 WORKDIR /app
 RUN pnpm build --filter=pec-server && \
     pnpm --filter=pec-server deploy --prod /prod/pec-server
@@ -27,7 +27,7 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 USER nestjs
-COPY --link --from=builder --chown=nestjs:nodejs /prod/pec-server .
+COPY --link --from=builder --chown=1001:1001 /prod/pec-server .
 EXPOSE 4000
 EXPOSE 50051
 CMD ["node", "dist/src/main.js"]

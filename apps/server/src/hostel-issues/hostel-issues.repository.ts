@@ -16,6 +16,16 @@ export class HostelIssuesRepository {
   }
 
   async findMany(query: HostelIssueQueryDto) {
+    // Auto-escalate past-due issues before querying
+    await this.prisma.hostelIssue.updateMany({
+      where: {
+        slaDeadline: { lt: new Date() },
+        status: { notIn: ['resolved', 'closed', 'Resolved', 'Closed'] },
+        isEscalated: false,
+      },
+      data: { isEscalated: true },
+    });
+
     const where: Prisma.HostelIssueWhereInput = {
       ...(query.studentId
         ? {
@@ -44,12 +54,13 @@ export class HostelIssuesRepository {
     return this.prisma.hostelIssue.findUnique({ where: { id } });
   }
 
-  create(data: CreateHostelIssueDto) {
+  create(data: CreateHostelIssueDto & { slaDeadline?: string, images?: string[] }) {
     if (!data.studentId) {
       throw new Error('studentId is required to create a hostel issue');
     }
     return this.prisma.hostelIssue.create({
       data: {
+        title: data.title || 'Hostel Issue',
         description: data.description,
         category: data.category,
         priority: data.priority,
@@ -58,6 +69,8 @@ export class HostelIssuesRepository {
         studentId: data.studentId,
         studentName: data.studentName,
         hostelName: (data as any).hostelName || 'General',
+        images: data.images || [],
+        slaDeadline: this.toDate(data.slaDeadline),
         createdAt: this.toDate(data.createdAt),
       },
     });

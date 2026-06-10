@@ -24,37 +24,55 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const attendanceSessionControllerCreateV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type attendanceSessionControllerCreateV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type attendanceSessionControllerCreateV1ResponseSuccess = (attendanceSessionControllerCreateV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type attendanceSessionControllerCreateV1Response = (attendanceSessionControllerCreateV1ResponseSuccess)
+
+export const getAttendanceSessionControllerCreateV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/attendanceSessions`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/attendanceSessions`
+}
+
+export const attendanceSessionControllerCreateV1 = async ( options?: RequestInit): Promise<attendanceSessionControllerCreateV1Response> => {
+
+  return fetchWithAuth<attendanceSessionControllerCreateV1Response>(getAttendanceSessionControllerCreateV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getAttendanceSessionControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerCreateV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerCreateV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerCreateV1>>, TError,void, TContext> => {
 
 const mutationKey = ['attendanceSessionControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -62,7 +80,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof attendanceSessionControllerCreateV1>>, void> = () => {
 
 
-          return  attendanceSessionControllerCreateV1(requestOptions)
+          return  attendanceSessionControllerCreateV1()
         }
 
 
@@ -77,7 +95,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AttendanceSessionControllerCreateV1MutationError = unknown
 
     export const useAttendanceSessionControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerCreateV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerCreateV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof attendanceSessionControllerCreateV1>>,
         TError,
@@ -86,17 +104,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAttendanceSessionControllerCreateV1MutationOptions(options), queryClient);
     }
-    export const attendanceSessionControllerFindAllV1 = (
+    export type attendanceSessionControllerFindAllV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type attendanceSessionControllerFindAllV1ResponseSuccess = (attendanceSessionControllerFindAllV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type attendanceSessionControllerFindAllV1Response = (attendanceSessionControllerFindAllV1ResponseSuccess)
+
+export const getAttendanceSessionControllerFindAllV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/attendanceSessions`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/attendanceSessions`
+}
+
+export const attendanceSessionControllerFindAllV1 = async ( options?: RequestInit): Promise<attendanceSessionControllerFindAllV1Response> => {
+
+  return fetchWithAuth<attendanceSessionControllerFindAllV1Response>(getAttendanceSessionControllerFindAllV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -108,16 +146,16 @@ export const getAttendanceSessionControllerFindAllV1QueryKey = () => {
     }
 
 
-export const getAttendanceSessionControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAttendanceSessionControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAttendanceSessionControllerFindAllV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>> = ({ signal }) => attendanceSessionControllerFindAllV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>> = ({ signal }) => attendanceSessionControllerFindAllV1({ signal });
 
 
 
@@ -137,7 +175,7 @@ export function useAttendanceSessionControllerFindAllV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAttendanceSessionControllerFindAllV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError = unknown>(
@@ -147,16 +185,16 @@ export function useAttendanceSessionControllerFindAllV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAttendanceSessionControllerFindAllV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAttendanceSessionControllerFindAllV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -172,17 +210,37 @@ export function useAttendanceSessionControllerFindAllV1<TData = Awaited<ReturnTy
 
 
 
-export const attendanceSessionControllerCountAttendanceV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type attendanceSessionControllerCountAttendanceV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type attendanceSessionControllerCountAttendanceV1ResponseSuccess = (attendanceSessionControllerCountAttendanceV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type attendanceSessionControllerCountAttendanceV1Response = (attendanceSessionControllerCountAttendanceV1ResponseSuccess)
+
+export const getAttendanceSessionControllerCountAttendanceV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/attendanceSessions/${id}/count`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/attendanceSessions/${id}/count`
+}
+
+export const attendanceSessionControllerCountAttendanceV1 = async (id: string, options?: RequestInit): Promise<attendanceSessionControllerCountAttendanceV1Response> => {
+
+  return fetchWithAuth<attendanceSessionControllerCountAttendanceV1Response>(getAttendanceSessionControllerCountAttendanceV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -194,16 +252,16 @@ export const getAttendanceSessionControllerCountAttendanceV1QueryKey = (id: stri
     }
 
 
-export const getAttendanceSessionControllerCountAttendanceV1QueryOptions = <TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAttendanceSessionControllerCountAttendanceV1QueryOptions = <TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAttendanceSessionControllerCountAttendanceV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>> = ({ signal }) => attendanceSessionControllerCountAttendanceV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>> = ({ signal }) => attendanceSessionControllerCountAttendanceV1(id, { signal });
 
 
 
@@ -223,7 +281,7 @@ export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<
           TError,
           Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(
@@ -233,16 +291,16 @@ export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<
           TError,
           Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerCountAttendanceV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -258,17 +316,37 @@ export function useAttendanceSessionControllerCountAttendanceV1<TData = Awaited<
 
 
 
-export const attendanceSessionControllerFindOneV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type attendanceSessionControllerFindOneV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type attendanceSessionControllerFindOneV1ResponseSuccess = (attendanceSessionControllerFindOneV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type attendanceSessionControllerFindOneV1Response = (attendanceSessionControllerFindOneV1ResponseSuccess)
+
+export const getAttendanceSessionControllerFindOneV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/attendanceSessions/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/attendanceSessions/${id}`
+}
+
+export const attendanceSessionControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<attendanceSessionControllerFindOneV1Response> => {
+
+  return fetchWithAuth<attendanceSessionControllerFindOneV1Response>(getAttendanceSessionControllerFindOneV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -280,16 +358,16 @@ export const getAttendanceSessionControllerFindOneV1QueryKey = (id: string,) => 
     }
 
 
-export const getAttendanceSessionControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAttendanceSessionControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAttendanceSessionControllerFindOneV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>> = ({ signal }) => attendanceSessionControllerFindOneV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>> = ({ signal }) => attendanceSessionControllerFindOneV1(id, { signal });
 
 
 
@@ -309,7 +387,7 @@ export function useAttendanceSessionControllerFindOneV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAttendanceSessionControllerFindOneV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError = unknown>(
@@ -319,16 +397,16 @@ export function useAttendanceSessionControllerFindOneV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAttendanceSessionControllerFindOneV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAttendanceSessionControllerFindOneV1<TData = Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attendanceSessionControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -344,30 +422,50 @@ export function useAttendanceSessionControllerFindOneV1<TData = Awaited<ReturnTy
 
 
 
-export const attendanceSessionControllerUpdateV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type attendanceSessionControllerUpdateV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type attendanceSessionControllerUpdateV1ResponseSuccess = (attendanceSessionControllerUpdateV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type attendanceSessionControllerUpdateV1Response = (attendanceSessionControllerUpdateV1ResponseSuccess)
+
+export const getAttendanceSessionControllerUpdateV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/attendanceSessions/${id}`, method: 'PATCH', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/attendanceSessions/${id}`
+}
+
+export const attendanceSessionControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<attendanceSessionControllerUpdateV1Response> => {
+
+  return fetchWithAuth<attendanceSessionControllerUpdateV1Response>(getAttendanceSessionControllerUpdateV1Url(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
 
 
 
 export const getAttendanceSessionControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerUpdateV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerUpdateV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerUpdateV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['attendanceSessionControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -375,7 +473,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof attendanceSessionControllerUpdateV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  attendanceSessionControllerUpdateV1(id,requestOptions)
+          return  attendanceSessionControllerUpdateV1(id,)
         }
 
 
@@ -390,7 +488,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AttendanceSessionControllerUpdateV1MutationError = unknown
 
     export const useAttendanceSessionControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerUpdateV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerUpdateV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof attendanceSessionControllerUpdateV1>>,
         TError,
@@ -399,30 +497,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAttendanceSessionControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export const attendanceSessionControllerRemoveV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type attendanceSessionControllerRemoveV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type attendanceSessionControllerRemoveV1ResponseSuccess = (attendanceSessionControllerRemoveV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type attendanceSessionControllerRemoveV1Response = (attendanceSessionControllerRemoveV1ResponseSuccess)
+
+export const getAttendanceSessionControllerRemoveV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/attendanceSessions/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/attendanceSessions/${id}`
+}
+
+export const attendanceSessionControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<attendanceSessionControllerRemoveV1Response> => {
+
+  return fetchWithAuth<attendanceSessionControllerRemoveV1Response>(getAttendanceSessionControllerRemoveV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getAttendanceSessionControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['attendanceSessionControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -430,7 +548,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof attendanceSessionControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  attendanceSessionControllerRemoveV1(id,requestOptions)
+          return  attendanceSessionControllerRemoveV1(id,)
         }
 
 
@@ -445,7 +563,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AttendanceSessionControllerRemoveV1MutationError = unknown
 
     export const useAttendanceSessionControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof attendanceSessionControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof attendanceSessionControllerRemoveV1>>,
         TError,

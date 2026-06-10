@@ -26,14 +26,14 @@ PEC App utilizes a high-contrast, premium "Institutional Dark Mode" designed to 
 
 **Purpose**: To serve as the definitive high-fidelity repository for all institutional academic offerings, syllabus governance, and instructional material dissemination.
 
-#### 👤 Student Experience (The Academic Journey)
+####  Student Experience (The Academic Journey)
 
 - **Advanced Catalog Discovery**: Students utilize a multi-dimensional filtering engine allowing the discovery of courses by department, credit tier, and semester.
 - **Relational Curricular Metadata**: Every course record is a rich relational entity, providing immediate access to standardized course IDs and prerequisite maps.
 - **Digital Course Materials Repository**: Centralized access to all learning resources (lecture notes, reference documents) with version control.
 - **Interactive Syllabus Explorer**: A visual timeline showing course milestones and lesson plans integrated with the global student calendar.
 
-#### 👤 Faculty Experience (Pedagogical Control and Planning)
+####  Faculty Experience (Pedagogical Control and Planning)
 
 - **Syllabus Stewardship**: Faculty can upload versioned course materials and lesson plans directly into a secured institutional bucket with tracked changes.
 - **Learning Analytics Dashboard**: Real-time insights into student engagement with digital materials, allowing instructors to identify and support students.

@@ -83,14 +83,14 @@ export default function Schedule() {
         {scheduleData.map((day, idx) => (
           <div key={idx} className="card-elevated p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-primary" />
               </div>
               <h2 className="text-lg font-semibold text-foreground">{day.day}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {day.slots.map((slot, sIdx) => (
-                <div key={sIdx} className="p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                <div key={sIdx} className="p-4 rounded-sm bg-secondary/30 hover:bg-secondary/50 transition-colors">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                     <Clock className="w-4 h-4" />
                     <span>{slot.time}</span>

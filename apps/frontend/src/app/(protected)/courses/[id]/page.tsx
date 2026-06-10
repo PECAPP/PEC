@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { CourseInteractionsClient as CourseInteractions } from './CourseInteractionsClient';
 import { getServerSession } from '@/lib/server-auth';
 import { extractData } from '@/lib/utils';
+import { cookies } from 'next/headers';
 
 // This is the new Next.js 15+ Server Component pattern
 interface PageProps {
@@ -51,7 +52,7 @@ async function getCourse(id: string) {
 
   try {
     const response = await fetch(`${base}/courses/${id}`, {
-      headers: session?.token ? { Authorization: `Bearer ${session.token}` } : undefined,
+      headers: { cookie: (await cookies()).toString() },
       cache: 'no-store',
     });
     if (!response.ok) return null;
@@ -102,7 +103,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
       {/* Header */}
       <div className="card-elevated p-6">
         <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-          <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+          <div className="w-20 h-20 rounded-sm bg-primary/10 flex items-center justify-center shrink-0">
             <BookOpen className="w-10 h-10 text-primary" />
           </div>
           
@@ -157,7 +158,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
             <Progress value={enrollmentPercentage} className="h-2" />
           </div>
           
-          <Suspense fallback={<div className="h-10 bg-secondary animate-pulse rounded-md" />}>
+          <Suspense fallback={<div className="h-10 bg-secondary animate-pulse rounded-sm" />}>
              <CourseInteractions 
                isFull={isFull} 
                courseId={course.id} 

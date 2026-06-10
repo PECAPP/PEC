@@ -116,7 +116,7 @@ export function PricingSection() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border-2 border-zinc-600 mb-4 neo-brutal-shadow">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border border-zinc-600 mb-4 shadow-sm">
             <Sparkles className="w-4 h-4 text-white" />
             <span className="text-sm font-medium text-white">Academic Excellence</span>
           </div>
@@ -132,21 +132,21 @@ export function PricingSection() {
         <div className="lg:hidden max-w-2xl mx-auto mb-8 space-y-6 px-4">
           {plans.map((plan, idx) => (
             <motion.div key={plan.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }} viewport={{ once: true }} className="relative">
-              {plan.badge && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-yellow-400 text-black text-xs font-black rounded-full z-10">{plan.badge}</div>}
-              <div className={`bg-gradient-to-br ${plan.gradient} rounded-2xl p-6 shadow-2xl`}>
+              {plan.badge && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-yellow-400 text-black text-xs font-bold rounded-full z-10">{plan.badge}</div>}
+              <div className={`bg-gradient-to-br ${plan.gradient} rounded-sm p-6 shadow-2xl`}>
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-                  <div className="text-4xl font-black text-white mb-1">{plan.price}</div>
+                  <div className="text-4xl font-bold text-white mb-1">{plan.price}</div>
                   <div className="text-sm text-white/90 font-medium">{plan.period}</div>
                 </div>
-                <Button asChild size="lg" className="w-full mb-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-bold border-2 border-white/40 rounded-xl py-6">
+                <Button asChild size="lg" className="w-full mb-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-bold border border-white/40 rounded-sm py-6">
                   <Link href="/onboarding" className="flex items-center justify-center gap-2">Get Started <ArrowRight className="w-5 h-5" /></Link>
                 </Button>
                 <div className="space-y-3">
                   {plan.features.map((feature, i) => (
-                    <div key={i} className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
+                    <div key={i} className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-sm px-4 py-3">
                       <span className="text-sm font-semibold text-white">{feature.name}</span>
-                      {feature.value ? <span className="text-sm font-black text-white">{feature.value}</span> : feature.included ? <CheckCircle className="w-5 h-5 text-white flex-shrink-0" /> : <X className="w-5 h-5 text-white/40 flex-shrink-0" />}
+                      {feature.value ? <span className="text-sm font-bold text-white">{feature.value}</span> : feature.included ? <CheckCircle className="w-5 h-5 text-white flex-shrink-0" /> : <X className="w-5 h-5 text-white/40 flex-shrink-0" />}
                     </div>
                   ))}
                 </div>
@@ -158,16 +158,16 @@ export function PricingSection() {
         {/* Desktop Table */}
         <div className="hidden lg:block max-w-7xl mx-auto mb-8">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse shadow-lg rounded-xl overflow-hidden">
+            <table className="w-full border-collapse shadow-lg rounded-sm overflow-hidden">
               <thead>
                 <tr className="border-b-2 border-emerald-900/50">
                   <th className="text-left py-5 px-4 text-sm font-bold text-white bg-gradient-to-br from-gray-950 via-green-950 to-emerald-950 border-r border-emerald-800/30">Feature</th>
                   {plans.map((plan, _i) => (
                     <th key={plan.name} className={`py-5 px-4 text-center bg-gradient-to-br ${plan.gradient} rounded-t-xl min-w-[140px] relative`}>
-                      {plan.badge && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-yellow-400 text-black text-xs font-black rounded-full whitespace-nowrap">POPULAR</div>}
+                      {plan.badge && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-yellow-400 text-black text-xs font-bold rounded-full whitespace-nowrap">POPULAR</div>}
                       <div className="text-white">
                         <div className="text-sm font-bold mb-1">{plan.name}</div>
-                        <div className="text-3xl font-black">{plan.price}</div>
+                        <div className="text-3xl font-bold">{plan.price}</div>
                         <div className="text-xs opacity-90 font-medium">{plan.period}</div>
                       </div>
                     </th>
@@ -189,7 +189,7 @@ export function PricingSection() {
                   <td className="py-5 px-4 bg-emerald-950/60 border-r border-emerald-800/30"></td>
                   {plans.map((plan, i) => (
                     <td key={i} className="py-5 px-4">
-                      <Button asChild size="lg" className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm py-6 rounded-lg">
+                      <Button asChild size="lg" className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm py-6 rounded-sm">
                         <Link href="/onboarding" className="flex items-center justify-center gap-2">Get Started <ArrowRight className="w-4 h-4" /></Link>
                       </Button>
                     </td>
@@ -203,7 +203,7 @@ export function PricingSection() {
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-12 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
             <Sparkles className="w-4 h-4 text-emerald-600" />
-            <span className="text-sm font-semibold text-emerald-600">✓ Save 20% with annual billing</span>
+            <span className="text-sm font-semibold text-emerald-600"> Save 20% with annual billing</span>
           </div>
         </motion.div>
       </div>

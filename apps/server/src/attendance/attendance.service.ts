@@ -131,7 +131,7 @@ export class AttendanceService {
     }
 
     const roles = new Set([...(user.roles ?? []), user.role].filter(Boolean));
-    const isPrivileged = roles.has('college_admin') || roles.has('admin');
+    const isPrivileged = roles.has('admin');
     if (!isPrivileged && !fileName.startsWith(`${user.sub}_`)) {
       throw new ForbiddenException('You are not allowed to access this document');
     }

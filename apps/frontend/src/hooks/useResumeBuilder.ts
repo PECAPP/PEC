@@ -4,8 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCollegeSettings } from "@/hooks/useCollegeSettings";
-import api from "@pec/api";
-import { AXIOS_INSTANCE } from "@pec/api";
+import { api } from '@pec/api';
 import { safeLocalStorage } from "@/lib/ssr-safe";
 import {
   ResumeData,
@@ -145,7 +144,7 @@ export function useResumeBuilder() {
         const localDraft = readLocalResumeDraft(user.uid);
         let profileDoc: any = { exists: () => false, data: () => ({}) };
         try {
-          const { data: pRes } = await AXIOS_INSTANCE.get('/api/v1/student-portfolio?userId=' + user.uid);
+          const { data: pRes } = await api.get('/student-portfolio?userId=' + user.uid);
           const pData = pRes?.data || pRes;
           if (pData) {
             profileDoc = { exists: () => true, data: () => pData };
@@ -211,7 +210,7 @@ export function useResumeBuilder() {
     try {
       writeLocalResumeDraft(resumeData, user?.uid || null);
       if (user?.uid) {
-        await AXIOS_INSTANCE.patch('/api/v1/student-portfolio/' + user.uid, {
+        await api.patch('/student-portfolio/' + user.uid, {
             phone: resumeData.personalInfo.phone || null,
             address: resumeData.personalInfo.location || null,
           });
@@ -553,3 +552,4 @@ export function useResumeBuilder() {
     settings,
   };
 }
+

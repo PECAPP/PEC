@@ -7,31 +7,27 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 
-import { GraduationCap, Users, Building2, Loader2, CheckCircle2, Shield, ShieldAlert } from 'lucide-react';
+import { GraduationCap, Users, Building2, Loader2, CheckCircle2, Shield, ShieldAlert, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import type { UserRole } from '@pec/shared';
 import { completeProfileStatefulAction } from './actions';
 
-const roleIcons: Record<UserRole, ElementType> = {
+const roleIcons: Record<string, ElementType> = {
   student: GraduationCap,
-  faculty: Users,
-  college_admin: Building2,
-  user: Users,
-  moderator: ShieldAlert,
-  placement_officer: Building2,
-  recruiter: Users,
-  super_admin: Shield,
+  faculty: BookOpen,
+  admin: Shield,
 };
 
-const roleLabels: Record<UserRole, string> = {
+const roleDescriptions: Record<string, string> = {
+  student: 'Access courses, timetable, and campus services',
+  faculty: 'Manage courses, attendance, and grades',
+  admin: 'System configuration and college management',
+};
+
+const roleLabels: Record<string, string> = {
   student: 'Student',
   faculty: 'Faculty',
-  college_admin: 'College Admin',
-  user: 'Regular User',
-  moderator: 'Moderator',
-  placement_officer: 'Placement Officer',
-  recruiter: 'Recruiter',
-  super_admin: 'Super Admin',
+  admin: 'Admin',
 };
 
 const initialState = {
@@ -41,7 +37,7 @@ const initialState = {
 
 export default function Onboarding() {
   const router = useRouter();
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   
   // React 19 State handling
   const [state, formAction, isPending] = useActionState(completeProfileStatefulAction, initialState);
@@ -49,7 +45,7 @@ export default function Onboarding() {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!user || !token) {
+    if (!user) {
       router.replace('/auth');
       return;
     }
@@ -63,7 +59,7 @@ export default function Onboarding() {
       router.replace('/dashboard');
       return;
     }
-  }, [authLoading, user, token, router, state.success]);
+  }, [authLoading, user, router, state.success]);
 
   useEffect(() => {
     if (state.error) {
@@ -195,7 +191,7 @@ export default function Onboarding() {
                 </>
               )}
 
-              {user.role === 'college_admin' && (
+              {user.role === 'admin' && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>

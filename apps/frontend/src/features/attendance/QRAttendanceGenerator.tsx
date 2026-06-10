@@ -1,8 +1,9 @@
 'use client';
 import { Button, Card, useToast, Progress } from "@pec/ui";
 import { useState, useEffect } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
-import { AXIOS_INSTANCE } from "@pec/api";
+import dynamic from 'next/dynamic';
+const QRCodeSVG = dynamic(() => import('qrcode.react').then(mod => mod.QRCodeSVG), { ssr: false });
+import { api } from '@pec/api';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Users, Clock, X, RefreshCw, ShieldCheck } from 'lucide-react';
 
@@ -35,7 +36,7 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
       const uniqueId = `${courseId}-${Date.now()}-${window.crypto.randomUUID().split('-')[0]}`;
 
       // Create attendance session in backend
-      const res = await AXIOS_INSTANCE.post('/api/v1/attendanceSessions', {
+      const res = await api.post('/attendanceSessions', {
         courseId,
         courseName,
         duration,
@@ -68,7 +69,7 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
   const endSession = async () => {
     try {
       if (sessionId) {
-        await AXIOS_INSTANCE.patch(`/api/v1/attendanceSessions/${sessionId}`, { active: false });
+        await api.patch(`/attendanceSessions/${sessionId}`, { active: false });
         setIsActive(false);
         toast({
           title: 'Session Ended',
@@ -91,7 +92,7 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
 
     const fetchAttendanceCount = async () => {
       try {
-        const res = await AXIOS_INSTANCE.get(`/api/v1/attendanceSessions/${sessionId}/count`);
+        const res = await api.get(`/attendanceSessions/${sessionId}/count`);
         const count = res.data?.data?.count ?? res.data?.count ?? 0;
         setAttendanceCount(count);
       } catch (err) {
@@ -260,3 +261,4 @@ export function QRAttendanceGenerator({ courseId, courseName, onClose }: QRAtten
 }
 
 export default QRAttendanceGenerator;
+

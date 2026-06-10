@@ -1,5 +1,5 @@
 'use client';
-import { Button, Badge, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
+import { Button, Badge, Tabs, TabsContent, TabsList, TabsTrigger, formatDate, AppShellSkeleton } from "@pec/ui";
 
 
 import { useState, useEffect } from 'react';
@@ -396,7 +396,7 @@ export default function FacultyBioSystemPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <AppShellSkeleton />
       </div>
     );
   }
@@ -460,7 +460,7 @@ export default function FacultyBioSystemPage() {
             <TabsTrigger
               key={id}
               value={id}
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2"
             >
               <Icon className="w-4 h-4" />
               {label}
@@ -472,27 +472,27 @@ export default function FacultyBioSystemPage() {
         <TabsContent value="overview" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <div className="card-elevated p-5 text-center">
-              <BookOpen className="w-8 h-8 mx-auto mb-2 text-primary" />
+              <BookOpen className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalPublications}</p>
               <p className="text-sm text-muted-foreground">Publications</p>
             </div>
             <div className="card-elevated p-5 text-center">
-              <Quote className="w-8 h-8 mx-auto mb-2 text-primary" />
+              <Quote className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalCitations}</p>
               <p className="text-sm text-muted-foreground">Total Citations</p>
             </div>
             <div className="card-elevated p-5 text-center">
-              <Trophy className="w-8 h-8 mx-auto mb-2 text-primary" />
+              <Trophy className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalAwards}</p>
               <p className="text-sm text-muted-foreground">Awards</p>
             </div>
             <div className="card-elevated p-5 text-center">
-              <Mic2 className="w-8 h-8 mx-auto mb-2 text-primary" />
+              <Mic2 className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalConferences}</p>
               <p className="text-sm text-muted-foreground">Conferences</p>
             </div>
             <div className="card-elevated p-5 text-center">
-              <Briefcase className="w-8 h-8 mx-auto mb-2 text-primary" />
+              <Briefcase className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalConsultations}</p>
               <p className="text-sm text-muted-foreground">Consultations</p>
             </div>
@@ -600,7 +600,7 @@ export default function FacultyBioSystemPage() {
 
           {(!profile?.publications || profile.publications.length === 0) && (
             <div className="card-elevated p-12 text-center">
-              <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <BookOpen className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No publications yet.</p>
             </div>
           )}
@@ -669,7 +669,7 @@ export default function FacultyBioSystemPage() {
 
           {(!profile?.awards || profile.awards.length === 0) && (
             <div className="card-elevated p-12 text-center">
-              <Trophy className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <Trophy className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No awards yet.</p>
             </div>
           )}
@@ -722,7 +722,7 @@ export default function FacultyBioSystemPage() {
                       {conf.startDate && (
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />{' '}
-                          {new Date(conf.startDate).toLocaleDateString()}
+                          {formatDate(conf.startDate)}
                         </span>
                       )}
                     </div>
@@ -748,7 +748,7 @@ export default function FacultyBioSystemPage() {
 
           {(!profile?.conferences || profile.conferences.length === 0) && (
             <div className="card-elevated p-12 text-center">
-              <Mic2 className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <Mic2 className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No conferences yet.</p>
             </div>
           )}
@@ -798,13 +798,13 @@ export default function FacultyBioSystemPage() {
                       {consult.startDate && (
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" /> From{' '}
-                          {new Date(consult.startDate).toLocaleDateString()}
+                          {formatDate(consult.startDate)}
                         </span>
                       )}
                       {consult.endDate && (
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" /> To{' '}
-                          {new Date(consult.endDate).toLocaleDateString()}
+                          {formatDate(consult.endDate)}
                         </span>
                       )}
                     </div>
@@ -834,7 +834,7 @@ export default function FacultyBioSystemPage() {
 
           {(!profile?.consultations || profile.consultations.length === 0) && (
             <div className="card-elevated p-12 text-center">
-              <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <Briefcase className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No consultations yet.</p>
             </div>
           )}

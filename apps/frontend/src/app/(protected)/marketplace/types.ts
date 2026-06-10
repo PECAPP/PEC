@@ -24,6 +24,9 @@ export interface ChatMessage {
   id: string;
   senderId: string;
   text: string;
+  isOffer?: boolean;
+  offerAmount?: number;
+  offerStatus?: string; // PENDING, ACCEPTED, REJECTED, WITHDRAWN
   createdAt: string;
   sender: { id: string; name: string; avatar?: string };
 }
@@ -35,5 +38,7 @@ export interface Chat {
   listing: { id: string; title: string; images: string[]; price: number; sellerId: string };
   buyer: { id: string; name: string; avatar?: string };
   messages: ChatMessage[];
+  offerAmount?: number;
+  offerStatus?: string;
   updatedAt: string;
 }

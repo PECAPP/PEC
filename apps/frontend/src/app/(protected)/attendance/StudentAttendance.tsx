@@ -1,8 +1,8 @@
 'use client';
-import { Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Textarea, Button } from "@pec/ui";
+import { Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Textarea, Button, formatDate } from "@pec/ui";
 
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Calendar, 
   BookOpen, 
@@ -19,6 +19,8 @@ import {
 import api, {  isAuthError  } from "@pec/api";
 import { extractData, cn } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
+import { DataTable } from '@/components/common/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -79,7 +81,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
     setLoading(true);
     try {
       const [sumRes, recRes] = await Promise.all([
-        api.get<any>('/attendance/summary'),
+        api.get<any>('/attendance/summary', { params: { studentId: userId } }),
         api.get<any>('/attendance', { params: { studentId: userId, limit: 100 } })
       ]);
       const summary = extractData<any>(sumRes.data);
@@ -216,6 +218,101 @@ export default function StudentAttendance({ userId, initialData }: any) {
     },
   ];
 
+  const courseColumns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'courseCode',
+      header: 'Code',
+      cell: ({ row }) => <Badge className="bg-black/60 text-white border-white/10 px-2 py-0.5 text-[9px] font-bold tracking-widest">{row.original.courseCode}</Badge>
+    },
+    {
+      accessorKey: 'courseName',
+      header: 'Course Name',
+      cell: ({ row }) => {
+        const present = Number(row.original.present) || 0;
+        const absent = Number(row.original.absent) || 0;
+        const total = present + absent;
+        const perCourseLeavesLeft = total > 0 ? Math.max(0, Math.floor(present / 0.75 - total)) : 0;
+        return (
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-white transition-colors">{row.original.courseName}</span>
+            <span className="text-[10px] font-semibold text-zinc-500 mt-0.5">
+              Leaves left: <span className="text-zinc-300">{perCourseLeavesLeft}</span>
+            </span>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'status',
+      header: 'Attended / Absent',
+      cell: ({ row }) => (
+        <div className="inline-flex items-center gap-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/10 font-bold">
+          <span className="text-success">{row.original.present}</span>
+          <span className="w-[1px] h-3 bg-white/20" />
+          <span className="text-destructive">{row.original.absent}</span>
+        </div>
+      )
+    },
+    {
+      accessorKey: 'percentage',
+      header: 'Percentage',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-5">
+          <div className="w-32 h-2 bg-muted rounded-full overflow-hidden hidden sm:block border border-border/20">
+            <div 
+              className={cn(
+                "h-full transition-all duration-1000",
+                row.original.percentage >= 75 ? "bg-success shadow-[0_0_8px_rgba(var(--success-rgb,34,197,94),0.4)]" : "bg-destructive"
+              )} 
+              style={{ width: `${row.original.percentage}%` }} 
+            />
+          </div>
+          <span className={cn(
+            "text-lg font-display font-bold tracking-tight w-14",
+            row.original.percentage >= 75 ? "text-success" : "text-destructive"
+          )}>{Math.round(row.original.percentage)}%</span>
+        </div>
+      )
+    }
+  ], []);
+
+  const historyColumns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'date',
+      header: 'Date',
+      cell: ({ row }) => <span className="text-sm font-bold text-foreground/80">{formatDate(row.original.date)}</span>
+    },
+    {
+      id: 'course',
+      header: 'Course',
+      cell: ({ row }) => {
+        const courses = Array.isArray(courseAttendance) ? courseAttendance : [];
+        const course = courses.find((c: any) => c.courseId === row.original.subject);
+        return (
+          <div className="flex items-center gap-3">
+            <span className="px-2 py-0.5 bg-muted rounded font-mono text-[10px] font-bold text-primary">{course?.courseCode || 'CORE'}</span>
+            <span className="text-sm font-bold text-foreground opacity-80">{course?.courseName || 'Academic Session'}</span>
+          </div>
+        );
+      }
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => {
+        const isPresent = row.original.status === 'present';
+        return (
+          <Badge className={cn(
+            "px-4 py-1 rounded-full font-bold text-[9px] uppercase tracking-widest border",
+            isPresent ? "bg-success/10 text-success border-success/30" : "bg-destructive/10 text-destructive border-destructive/30"
+          )}>
+            {isPresent ? 'Present' : 'Absent'}
+          </Badge>
+        );
+      }
+    }
+  ], [courseAttendance]);
+
   if (loading) return <LoadingGrid count={4} className="grid md:grid-cols-2 gap-8" />;
 
   return (
@@ -232,7 +329,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
         <div className="flex items-center gap-4">
           <Badge 
             className={cn(
-              "h-10 px-6 rounded-xl font-bold text-[10px] uppercase tracking-wider border-2",
+              "h-10 px-6 rounded-sm font-bold text-[10px] uppercase tracking-wider border",
               isEligible 
                 ? "bg-success/10 text-success border-success/30" 
                 : "bg-destructive/10 text-destructive border-destructive/30"
@@ -306,11 +403,11 @@ export default function StudentAttendance({ userId, initialData }: any) {
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-success/5 border border-success/20 space-y-1">
+                <div className="p-4 rounded-sm bg-success/5 border border-success/20 space-y-1">
                   <p className="text-[9px] font-bold uppercase tracking-widest text-success">Attended</p>
                   <p className="text-xl font-bold font-display">{totalPresent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
                 </div>
-                <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20 space-y-1">
+                <div className="p-4 rounded-sm bg-destructive/5 border border-destructive/20 space-y-1">
                   <p className="text-[9px] font-bold uppercase tracking-widest text-destructive">Missed</p>
                   <p className="text-xl font-bold font-display">{totalAbsent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
                 </div>
@@ -321,9 +418,9 @@ export default function StudentAttendance({ userId, initialData }: any) {
 
         {/* Secondary Info Card - Eligibility Protocol */}
         <div className="card-elevated p-8 bg-primary/5 border-primary/20 flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] -z-10" />
+          <div className="absolute inset-0  opacity-[0.03] -z-10" />
           <div className="space-y-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-sm">
+            <div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center border border-primary/20 shadow-sm">
               <ShieldCheck className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold tracking-tight">Eligibility Guidelines</h3>
@@ -334,7 +431,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
           <div className="pt-6">
             <button
               onClick={() => setIsWaiverDialogOpen(true)}
-              className="w-full h-10 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+              className="w-full h-10 rounded-sm bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
             >
               Request Waiver <ArrowRight className="w-3 h-3" />
             </button>
@@ -343,7 +440,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
       </div>
 
       <Dialog open={isWaiverDialogOpen} onOpenChange={setIsWaiverDialogOpen}>
-        <DialogContent className="max-w-2xl border-border/60 bg-card/95 backdrop-blur-xl">
+        <DialogContent className=" border-border/60 bg-card/95 backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Request Attendance Waiver</DialogTitle>
             <DialogDescription>
@@ -358,7 +455,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
                 <select
                   value={waiverForm.courseId}
                   onChange={(e) => setWaiverForm((prev) => ({ ...prev, courseId: e.target.value }))}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  className="h-10 w-full rounded-sm border border-input bg-background px-3 text-sm"
                 >
                   <option value="">General Waiver (All Courses)</option>
                   {courseAttendance.map((course) => (
@@ -465,7 +562,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
 
           <div className="mt-2 border-t border-border/50 pt-4 space-y-3">
             <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Recent Requests</h4>
-            <div className="max-h-56 overflow-auto rounded-xl border border-border/40 divide-y divide-border/30">
+            <div className="max-h-56 overflow-auto rounded-sm border border-border/40 divide-y divide-border/30">
               {waiverRequests.length === 0 ? (
                 <div className="p-4 text-sm text-muted-foreground">No waiver requests submitted yet.</div>
               ) : (
@@ -476,7 +573,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
                         {request.courseCode ? `${request.courseCode} - ${request.courseName}` : 'General Waiver'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(request.fromDate).toLocaleDateString()} to {new Date(request.toDate).toLocaleDateString()}
+                        {formatDate(request.fromDate)} to {formatDate(request.toDate)}
                       </p>
                       {request.reviewerNote ? (
                         <p className="text-xs text-muted-foreground mt-1">Reviewer Note: {request.reviewerNote}</p>
@@ -504,130 +601,23 @@ export default function StudentAttendance({ userId, initialData }: any) {
 
       <div className="space-y-6">
         <div className="flex items-center gap-3 px-1">
-          <div className="p-2 bg-primary/10 rounded-lg"><BookOpen className="w-4 h-4 text-primary" /></div>
+          <div className="p-2 bg-primary/10 rounded-sm"><BookOpen className="w-4 h-4 text-primary" /></div>
           <h2 className="text-xl font-bold tracking-tight">Course Attendance</h2>
         </div>
         
         <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-xl">
-           <table className="w-full border-collapse">
-             <thead>
-               <tr className="border-b border-white/10">
-                 <th className="py-4 px-6 text-left font-bold text-[9px] uppercase tracking-widest text-zinc-400">Code</th>
-                 <th className="py-4 px-6 text-left font-bold text-[9px] uppercase tracking-widest text-zinc-400">Course Name</th>
-                 <th className="py-4 px-6 text-center font-bold text-[9px] uppercase tracking-widest text-zinc-400">Attended / Absent</th>
-                 <th className="py-4 px-6 text-right font-bold text-[9px] uppercase tracking-widest text-zinc-400">Percentage</th>
-               </tr>
-             </thead>
-             <tbody className="divide-y divide-white/5">
-               {Array.isArray(courseAttendance) && courseAttendance.map(c => (
-                 <tr key={c.courseId} className="hover:bg-white/5 transition-colors group">
-                   <td className="py-4 px-6">
-                      <Badge className="bg-black/60 text-white border-white/10 px-2 py-0.5 text-[9px] font-bold tracking-widest">{c.courseCode}</Badge>
-                   </td>
-                   <td className="py-4 px-6">
-                      {(() => {
-                        const present = Number(c.present) || 0;
-                        const absent = Number(c.absent) || 0;
-                        const total = present + absent;
-                        const perCourseLeavesLeft =
-                          total > 0 ? Math.max(0, Math.floor(present / 0.75 - total)) : 0;
-
-                        return (
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold text-white transition-colors">{c.courseName}</span>
-                        <span className="text-[10px] font-semibold text-zinc-500 mt-0.5">
-                          Leaves left: <span className="text-zinc-300">{perCourseLeavesLeft}</span>
-                        </span>
-                      </div>
-                        );
-                      })()}
-                   </td>
-                   <td className="py-4 px-6 text-center text-sm">
-                      <div className="inline-flex items-center gap-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/10 font-bold">
-                        <span className="text-success">{c.present}</span>
-                        <span className="w-[1px] h-3 bg-white/20" />
-                        <span className="text-destructive">{c.absent}</span>
-                      </div>
-                   </td>
-                   <td className="py-5 px-8 text-right">
-                     <div className="flex items-center justify-end gap-5">
-                       <div className="w-32 h-2 bg-muted rounded-full overflow-hidden hidden sm:block border border-border/20">
-                         <div 
-                           className={cn(
-                             "h-full transition-all duration-1000",
-                             c.percentage >= 75 ? "bg-success shadow-[0_0_8px_rgba(var(--success-rgb,34,197,94),0.4)]" : "bg-destructive"
-                           )} 
-                           style={{ width: `${c.percentage}%` }} 
-                         />
-                       </div>
-                       <span className={cn(
-                         "text-lg font-display font-bold tracking-tight w-14",
-                         c.percentage >= 75 ? "text-success" : "text-destructive"
-                       )}>{Math.round(c.percentage)}%</span>
-                     </div>
-                   </td>
-                 </tr>
-               ))}
-               {(!Array.isArray(courseAttendance) || courseAttendance.length === 0) && (
-                 <tr>
-                   <td colSpan={4} className="py-20 text-center text-muted-foreground italic text-sm">No attendance records found for this semester.</td>
-                 </tr>
-               )}
-             </tbody>
-           </table>
+           <DataTable columns={courseColumns} data={courseAttendance} />
         </div>
       </div>
 
       <div className="space-y-6">
          <div className="flex items-center gap-3 px-1">
-           <div className="p-2 bg-primary/10 rounded-lg"><Calendar className="w-4 h-4 text-primary" /></div>
+           <div className="p-2 bg-primary/10 rounded-sm"><Calendar className="w-4 h-4 text-primary" /></div>
            <h2 className="text-xl font-bold tracking-tight">Attendance History</h2>
          </div>
          
          <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-xl">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-muted/40 border-b border-border/40">
-                  <th className="py-4 px-8 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Date</th>
-                  <th className="py-4 px-8 text-left font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Course</th>
-                  <th className="py-4 px-8 text-right font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/20">
-                {(!Array.isArray(attendanceRecords) || attendanceRecords.length === 0) ? (
-                  <tr>
-                    <td colSpan={3} className="py-20 text-center text-muted-foreground italic text-sm">No historical data recorded.</td>
-                  </tr>
-                ) : (
-                  attendanceRecords.map((r: any) => {
-                    const courses = Array.isArray(courseAttendance) ? courseAttendance : [];
-                    const course = courses.find((c: any) => c.courseId === r.subject);
-                    const isPresent = r.status === 'present';
-                    return (
-                      <tr key={r.id} className="hover:bg-primary/[0.02] transition-colors">
-                        <td className="py-5 px-8">
-                          <span className="text-sm font-bold text-foreground/80">{new Date(r.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                        </td>
-                        <td className="py-5 px-8">
-                          <div className="flex items-center gap-3">
-                            <span className="px-2 py-0.5 bg-muted rounded font-mono text-[10px] font-bold text-primary">{course?.courseCode || 'CORE'}</span>
-                            <span className="text-sm font-bold text-foreground opacity-80">{course?.courseName || 'Academic Session'}</span>
-                          </div>
-                        </td>
-                        <td className="py-5 px-8 text-right">
-                          <Badge className={cn(
-                            "px-4 py-1 rounded-full font-bold text-[9px] uppercase tracking-widest border-2",
-                            isPresent ? "bg-success/10 text-success border-success/30" : "bg-destructive/10 text-destructive border-destructive/30"
-                          )}>
-                            {isPresent ? 'Present' : 'Absent'}
-                          </Badge>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+            <DataTable columns={historyColumns} data={attendanceRecords} />
          </div>
       </div>
     </div>

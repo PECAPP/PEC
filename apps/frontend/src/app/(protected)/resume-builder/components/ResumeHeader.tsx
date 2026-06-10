@@ -42,7 +42,7 @@ export function ResumeHeader({
 }: ResumeHeaderProps) {
   return (
     <div className="bg-card border-b-2 border-primary/20 sticky top-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.1)] backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="  px-6">
         <div className="flex flex-col lg:flex-row items-center justify-between py-4 gap-6">
           <div className="flex items-center gap-4">
             <div className="p-2.5 bg-primary/10 border border-primary/20 rounded-sm">
@@ -53,7 +53,7 @@ export function ResumeHeader({
             </div>
           </div>
 
-          <div className="flex bg-muted/30 p-1 rounded-sm border-2 border-border shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
+          <div className="flex bg-muted/30 p-1 rounded-sm border border-border shadow-sm">
             <button
               onClick={() => setActiveTab("builder")}
               className={cn(
@@ -80,13 +80,13 @@ export function ResumeHeader({
 
           <div className="flex items-center gap-2">
             {activeTab === "builder" && (
-              <div className="flex items-center bg-muted/20 p-1.5 rounded-xl border border-border/50 shadow-sm gap-1">
+              <div className="flex items-center bg-muted/20 p-1.5 rounded-sm border border-border/50 shadow-sm gap-1">
                 {/* Zoom Controls */}
                 <div className="flex items-center gap-1 border-r border-border/50 pr-2 mr-1">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 hover:bg-primary/10 rounded-lg"
+                    className="h-8 w-8 hover:bg-primary/10 rounded-sm"
                     onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))}
                   >
                     <ZoomOut className="w-4 h-4" />
@@ -97,7 +97,7 @@ export function ResumeHeader({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 hover:bg-primary/10 rounded-lg"
+                    className="h-8 w-8 hover:bg-primary/10 rounded-sm"
                     onClick={() => setZoom((z) => Math.min(1.5, z + 0.1))}
                   >
                     <ZoomIn className="w-4 h-4" />
@@ -107,7 +107,7 @@ export function ResumeHeader({
                 {/* Mode Toggle */}
                 <Button
                   variant={preview ? "secondary" : "ghost"}
-                  className={cn("h-8 px-3 rounded-lg text-xs font-semibold", preview && "bg-primary/10 text-primary")}
+                  className={cn("h-8 px-3 rounded-sm text-xs font-semibold", preview && "bg-primary/10 text-primary")}
                   onClick={() => setPreview(!preview)}
                 >
                   <Eye className="w-3.5 h-3.5 mr-1.5" />
@@ -117,7 +117,7 @@ export function ResumeHeader({
                 {/* Save Button */}
                 <Button
                   variant="ghost"
-                  className={cn("h-8 px-3 rounded-lg text-xs font-semibold", hasUnsavedResumeChanges && "text-primary bg-primary/5")}
+                  className={cn("h-8 px-3 rounded-sm text-xs font-semibold", hasUnsavedResumeChanges && "text-primary bg-primary/5")}
                   disabled={!hasUnsavedResumeChanges || isSavingResume}
                   onClick={handleSaveResume}
                 >
@@ -133,7 +133,7 @@ export function ResumeHeader({
 
                 {/* Export Button */}
                 <Button 
-                  className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-lg px-4 ml-1 shadow-md transition-all" 
+                  className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-sm px-4 ml-1 shadow-sm transition-all" 
                   onClick={downloadPDF}
                 >
                   <Download className="w-3.5 h-3.5 mr-1.5" />
@@ -147,3 +147,4 @@ export function ResumeHeader({
     </div>
   );
 }
+

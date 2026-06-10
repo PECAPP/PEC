@@ -207,32 +207,32 @@ services:
       - qdrant_data:/qdrant/storage
     networks:
       - pec-network
-  frontend:
-    build:
-      context: .
-      dockerfile: apps/frontend/Dockerfile
-    container_name: pec_frontend
-    restart: always
-    ports:
-      - 3000:3001
-    environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}
-      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:4000/api}
-      NODE_ENV: production
-    depends_on:
-      - backend
-    networks:
-      - pec-network
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-        max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 1024M
+#  frontend:
+#    build:
+#      context: .
+#      dockerfile: apps/frontend/Dockerfile
+#    container_name: pec_frontend
+#    restart: always
+#    ports:
+#      - 3000:3001
+#    environment:
+#      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}
+#      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:4000/api}
+#      NODE_ENV: production
+#    depends_on:
+#      - backend
+#    networks:
+#      - pec-network
+#    logging:
+#      driver: json-file
+#      options:
+#        max-size: 10m
+#        max-file: "3"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1.0"
+#          memory: 1024M
   dev_worker:
     build:
       context: .

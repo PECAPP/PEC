@@ -1,72 +1,89 @@
-# PEC App - Technical and Institutional Governance Specification
+# PEC App - Technical Documentation
 
-This document serves as the definitive high-fidelity, long-form institutional entry point for the PEC App platform. It provides an exhaustive overview of the system's architecture, operational capabilities, business impact metrics, project highlights, and a total end-to-end setup guide for digital transformation.
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
+![NestJS](https://img.shields.io/badge/NestJS-11-ea2845?style=for-the-badge&logo=nestjs)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql)
+![Prisma](https://img.shields.io/badge/Prisma-7-2d3748?style=for-the-badge&logo=prisma)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript)
+
+This document provides an overview of the system's architecture, operational capabilities, project highlights, and an end-to-end setup guide.
+
+## Table of Contents
+
+- [1. Project Overview](#1-project-overview)
+- [2. Goals](#2-goals)
+- [3. Core Feature Modules](#3-core-feature-modules)
+- [4. Repository Architecture Overview](#4-repository-architecture-overview)
+- [5. AI Integrations (Saathi Assistant)](#5-ai-integrations-saathi-assistant)
+- [6. Security and Design Patterns](#6-security-and-design-patterns)
+- [7. Technology Stack Specification](#7-technology-stack-specification)
+- [8. Setup Guide](#8-setup-guide)
+- [9. Verification Steps](#9-verification-steps)
+- [10. Support and Maintenance](#10-support-and-maintenance)
 
 ---
 
-## 1. Executive Institutional Summary
+## 1. Project Overview
 
-PEC App is an industry-leading, enterprise-grade educational resource planning platform designed for the PEC University ecosystem. It reimagines academic and administrative management by consolidating 10+ disparate manual processes into a single, high-concurrency, hardware-accelerated digital ecosystem.
+PEC App is a comprehensive educational resource planning platform designed for the PEC University ecosystem. It consolidates academic and administrative management into a unified Next.js and NestJS monorepo.
 
-The platform is engineered to resolve the "Institutional Friction" caused by manual roll-calls, paper-based admissions, and decentralized communication. By leveraging a state-of-the-art Next.js 16/NestJS 11 stack with hardware-accelerated PostgreSQL indexing, PEC App facilitates sub-second response times for thousands of concurrent users, providing a seamless operational experience for students, faculty, and executive administrators.
+The platform digitizes manual processes like roll-calls, admissions, and communication. By leveraging a Next.js 16/NestJS 11 stack backed by PostgreSQL, PEC App provides a highly responsive experience for thousands of concurrent users across the student and faculty bodies.
 
 ---
 
-## 2. Institutional Strategic Vision and ROI
+## 2. Goals
 
-The transition to PEC App represents a strategic commitment to institutional excellence. The platform is designed to achieve the following quantified operational goals:
-
-### Operational Strategic Goals
+The platform is designed to achieve the following goals:
 
 - **Digital Centralization**: Consolidation of all academic, logistic, and identity data into a single source of truth across all campus blocks.
 - **Process Automation**: Eliminating manual data entry and paper-based processing across attendance and admissions lifecycles.
-- **Data-Driven Governance**: Providing institutional leaders with real-time KPI dashboards for informed decision-making.
-- **Communication Integrity**: Establishing a secure, audited channel for institutional collaboration and data sharing.
+- **Data Insights**: Providing leaders with real-time KPI dashboards for informed decision-making.
+- **Communication**: Establishing a secure channel for campus collaboration and data sharing.
 
 ---
 
-## 3. Core Institutional Feature Modules
+## 3. Core Feature Modules
 
-Each module within PEC App is a discrete domain-driven project, designed to handle institutional scale and complexity.
+Each module within PEC App is a discrete domain-driven project.
 
-### 📚 Academic Management and Curriculum
+###  Academic Management and Curriculum
 
-- **Course Catalog Engineering**: Browse and manage courses with detailed relational metadata and prerequisite dependency maps for all departments.
+- **Course Catalog**: Browse and manage courses with detailed relational metadata and prerequisite dependency maps for all departments.
 - **Digital Course Materials**: A centralized repository for lecture notes and instructional resources with multi-version history and accessibility optimizations.
-- **Intelligent Timetable System**: Automated conflict-detection engine that optimizes 5,000+ weekly sessions, considering faculty availability and departmental constraints.
+- **Timetable System**: Automated conflict-detection engine that optimizes 5,000+ weekly sessions, considering faculty availability and departmental constraints.
 - **Digital Attendance Tracking**: Multi-modal roll-call system (QR-based or Manual via QR Session) with real-time student visibility and automated deficiency alerting. Faculty generate time-limited QR codes; students scan to validate presence.
 - **Attendance Session Management**: Dedicated `attendance-session` module for creating, tracking, and closing QR-based attendance sessions per class.
-- **Syllabus Stewardship**: Faculty-driven curriculum management with lesson plans and objective tracking for accreditation readiness.
+- **Syllabus Management**: Faculty-driven curriculum management with lesson plans and objective tracking for accreditation readiness.
 - **CGPA Entry System**: Dedicated module (`cgpa-entries`) for faculty to record and manage student CGPA/SGPA entries with a full CRUD repository layer.
 - **Academic Calendar**: Full event scheduling, holiday management, and semester planning via the `academic-calendar` module with calendar view, event creation, and important date reminders.
 - **Examinations Management**: Scheduling and management of examination timetables for all departments via the `examinations` module.
 - **Enrollments**: Full student enrollment lifecycle management via the `enrollments` module.
 
-### 🏢 Campus Logistics and Services
+###  Campus Logistics and Services
 
 - **Hostel Infrastructure Management**: Standardized issue reporting with priority categorization and multimedia triage for rapid maintenance resolution.
-- **Interactive 3D Spatial Map**: A hardware-accelerated 3D digital twin of the campus using Three.js (`@react-three/fiber`, `@react-three/drei`) for building orientation and facility navigation. Supports a 2D/3D toggle on the campus map page.
+- **Interactive 3D Campus Map**: A WebGL 3D digital twin of the campus using Three.js (`@react-three/fiber`, `@react-three/drei`) for building orientation and facility navigation. Supports a 2D/3D toggle on the campus map page.
 - **Digital Canteen Ecosystem (Day & Night)**: Dual canteen system — `canteen` module for standard operations and `night-canteen` module for after-hours ordering — with real-time inventory-aware ordering and status tracking.
 - **Campus Announcement Hub (Noticeboard)**: Target announcements to specific blocks or batches with scheduled publishing and engagement analytics.
 - **Room Management**: Full CRUD for managing campus rooms including building, type, and availability tracking via the `rooms` module.
 
-### 💼 Community and Collaboration
+###  Community and Collaboration
 
 - **Clubs Management**: Module for managing student clubs (`clubs`), supporting creation, membership, advisor assignment, and join requests.
 - **Marketplace**: A peer-to-peer campus marketplace (`marketplace`) with listings, bookmarks, integrated chat between buyer/seller, and repository-level queries.
 - **Real-Time Messaging (Chat)**: One-on-one and group chat via Socket.io with academic context (auto-created groups per batch/course).
 
-### 👤 Profile and Portfolio
+###  Profile and Portfolio
 
 - **Student Portfolio System**: Complete portfolio management (`student-portfolio`) with Projects tab (GitHub/live URLs, tech stack), Skills tab (categorized with proficiency), and GitHub Repo Sync via `/student-portfolio/github/sync`.
 - **Faculty Bio System**: Rich professional profiles (`faculty-bio-system`) with Publications, Awards, Conferences, and Consultations sub-modules — each with full CRUD.
 - **Social Sync**: GitHub and LinkedIn username sync (`social-sync`) for students — fetches GitHub repos server-side with optional `GITHUB_TOKEN` for higher rate limits.
 
-### 💰 Finance and Fee Management
+###  Finance and Fee Management
 
 - **Finance Module**: Tracks student fee records, transactions, and payment history via the `finance` module with a dedicated repository layer for complex fee queries.
 
-### 🔧 Platform and Operations
+###  Platform and Operations
 
 - **Feature Flags**: Runtime feature toggle system (`feature-flags`) allowing admins to enable/disable platform features without redeployment.
 - **Background Jobs**: Asynchronous job processing system (`background-jobs`) with Bull queue, retry logic, a dedicated worker, and job monitoring — handles audit log pruning, attendance threshold checks, and stale lock cleanup.
@@ -76,18 +93,21 @@ Each module within PEC App is a discrete domain-driven project, designed to hand
 
 ---
 
-## 4. Institutional Repository Architectural Highlights
+## 4. Repository Architecture Overview
 
-The platform utilizes a **pnpm workspace monorepo** orchestrated by **Turborepo**, organized into logically isolated directories to facilitate modular growth and maintainability. Below is the high-level high-fidelity overview of the system's structural foundations:
+The platform utilizes a **pnpm workspace monorepo** orchestrated by **Turborepo**, organized into logically isolated directories to facilitate modular growth and maintainability. Below is a high-level overview of the system's structural foundations:
 
-### 📁 Monorepo Workspace Structure
+###  Monorepo Workspace Structure
 
 - **apps/frontend/**: The Next.js 16 App Router application housing all institutional interfaces, role-based dashboards, and client-side logic.
 - **apps/server/**: The NestJS 11 backend API managing institutional business operations, academic records, and security logic.
 - **packages/database/**: Prisma schema, migrations, and exported `@pec/database` client.
 - **packages/shared/**: Zod schemas and TypeScript types exported as `@pec/shared`.
+- **packages/env/**: Shared environment variable validation schemas and types exported as `@pec/env`.
+- **packages/api/**: API client and React Query integration exported as `@pec/api`.
+- **packages/ui/**: Reusable React components and UI shell exported as `@pec/ui`.
 
-### 📁 Frontend Architecture (`apps/frontend/src/`)
+###  Frontend Architecture (`apps/frontend/src/`)
 
 - **app/(protected)/**: All role-guarded routes — each feature (courses, attendance, clubs, marketplace, etc.) has its own Next.js directory.
 - **components/ui/**: Atomic, headless components built on Radix-UI primitives (Button, Card, Input, Dialog, etc.).
@@ -95,7 +115,7 @@ The platform utilizes a **pnpm workspace monorepo** orchestrated by **Turborepo*
 - **hooks/**: Custom React hooks for data fetching and UI state.
 - **lib/**: API utilities, date formatters, and `cn()` class merging.
 
-### 📁 Backend API Orchestration (`apps/server/src/`)
+###  Backend API Orchestration (`apps/server/src/`)
 
 All 36 domain-driven NestJS modules are registered in the central `AppModule`. Key modules include:
 
@@ -118,19 +138,19 @@ All 36 domain-driven NestJS modules are registered in the central `AppModule`. K
 - **common/**: Global exception filter, input sanitization middleware, and request logging middleware.
 - **config/**: Runtime configuration helpers (CORS, body size, production detection).
 
-### 📁 Operational Documentation Registry
+###  Operational Documentation Registry
 
 - **docs/**: Centralized documentation registry — Architecture, Features, Development, Setup, Production Guide, Agents Guidelines, and Interconnection Audit.
 
 ---
 
-## 5. AI-Powered Cognitive Features (Saathi Assistant)
+## 5. AI Integrations (Saathi Assistant)
 
-PEC App integrates advanced AI models to provide high-fidelity cognitive assistance to all institutional stakeholders.
+PEC App integrates AI models to provide intelligent assistance across the platform.
 
 - **Saathi AI Student Assistant**: A post-login personalized assistant powered by Google Gemini 2.5 Flash, capable of answering academic queries and navigating platform features.
-- **Landing Assistant**: A pre-login cognitive agent providing prospective students with admission info, campus tours, and facility details.
-- **Intelligence Orchestration**: Utilizing Google Gemini 2.5 Flash for natural language processing across all institutional support channels, reducing administrative triage time by 70%.
+- **Landing Assistant**: A pre-login chatbot providing prospective students with admission info, campus tours, and facility details.
+- **AI Integration**: Utilizing Google Gemini 2.5 Flash for natural language processing across support channels.
 - **RAG (Retrieval-Augmented Generation) Layer**: The `rag.service.ts` integrates with Qdrant vector database (`@qdrant/js-client-rest`) to provide context-enriched, document-grounded answers from institutional knowledge bases.
 - **OpenAI Support**: The `ai.service.ts` additionally supports OpenAI (`openai` npm package) for completion endpoints, enabling resume builder AI analysis and other LLM-powered features.
 - **Resume Builder AI**: The `/ai/completion` endpoint powers the frontend ResumeAnalyzerPanel, providing AI-driven resume feedback and career suggestions.
@@ -138,9 +158,9 @@ PEC App integrates advanced AI models to provide high-fidelity cognitive assista
 
 ---
 
-## 6. Architectural Design Patterns
+## 6. Security and Design Patterns
 
-The system implements industrial-scale patterns to ensure sub-second performance and institutional-grade security.
+The system implements several key patterns to ensure performance and security.
 
 ### 1. Role-Based Access Control (RBAC)
 
@@ -163,7 +183,7 @@ The system implements industrial-scale patterns to ensure sub-second performance
 ### 3. Real-Time Data Synchronization
 
 - **Optimistic UI Updates**: Instant feedback with background synchronization to the backend API services to ensure zero perceived latency for the user.
-- **Websocket Integration**: Sub-100ms latency for secure messages and system-wide notifications using high-speed Socket.io protocols.
+- **Websocket Integration**: Real-time message delivery and system-wide notifications using Socket.io.
 
 ---
 
@@ -173,12 +193,12 @@ The system implements industrial-scale patterns to ensure sub-second performance
 | :---------------------- | :-------------------------------- | :-------------------------------------------------------------------- |
 | **Frontend Framework**  | Next.js 16 + React 19             | Server-First App Router architecture with streaming SSR.              |
 | **Backend Framework**   | NestJS 11 + Express/Fastify       | High-throughput API gateway with low-latency resolution.              |
-| **Persistence**         | PostgreSQL 16 + Prisma 7          | Relational data integrity with hardware-accelerated indexing.         |
+| **Persistence**         | PostgreSQL 16 + Prisma 7          | Relational data integrity with migrations.                            |
 | **Styling**             | Vanilla CSS + Tailwind CSS        | Custom institutional design system with high-contrast themes.         |
-| **AI / Intelligence**   | Google Gemini 2.5 Flash + OpenAI  | Cognitive academic assistance and NLP processing layer.               |
+| **AI / Intelligence**   | Google Gemini 2.5 Flash + OpenAI  | AI chat assistant and resume analysis.                                |
 | **Vector Search (RAG)** | Qdrant (`@qdrant/js-client-rest`) | Context-enriched RAG responses from institutional knowledge base.     |
-| **Graphics / 3D**       | Three.js + @react-three/fiber     | Hardware-accelerated 3D campus spatial environments.                  |
-| **Real-Time**           | Socket.io (WebSocket)             | Sub-100ms latency chat and live attendance synchronization.           |
+| **Graphics / 3D**       | Three.js + @react-three/fiber     | 3D campus map with WebGL.                                             |
+| **Real-Time**           | Socket.io (WebSocket)             | Real-time chat and live attendance synchronization.                   |
 | **Job Queue**           | Bull + Redis (ioredis)            | Async background job processing with retry and monitoring.            |
 | **Caching**             | Redis + cache-manager             | Server-side caching for high-frequency institutional queries.         |
 | **Rate Limiting**       | @nestjs/throttler + Redis         | Redis-backed throttling at 100 req/min and 1000 req/10min.            |
@@ -188,22 +208,22 @@ The system implements industrial-scale patterns to ensure sub-second performance
 | **Microservices**       | gRPC (@grpc/grpc-js) + CQRS       | Proto-based inter-service communication and event bus.                |
 | **Build System**        | Turbo (Turborepo) + pnpm          | Monorepo orchestration with task caching and parallelism.             |
 | **Validation**          | Zod + class-validator             | Runtime type safety across the full stack.                            |
-| **Auth**                | JWT + Bcrypt + Argon2             | Stateless session management with high-entropy credential protection. |
+| **Auth**                | JWT + Bcrypt + Argon2             | Stateless session management with password hashing.                   |
 | **File Handling**       | Multer + ExcelJS + jsPDF          | CSV/file uploads, spreadsheet exports, and PDF generation.            |
 
 ---
 
-## 8. Institutional Operational Setup Guide
+## 8. Setup Guide
 
 ### A. Infrastructure Prerequisites
 
-- **Runtime Environment**: Node.js v20.10.0 (LTS) or higher for stable institutional execution.
+- **Runtime Environment**: Node.js v22 (LTS) or higher.
 - **Package Manager**: pnpm v9.12.3 (configured in `packageManager` field of root `package.json`).
 - **Persistence Tier**: PostgreSQL v16 on Port 5432 with b-tree indexing support for academic records.
 - **Caching / Queue Tier**: Redis (default: `redis://localhost:6379`) for rate limiting, caching, and Bull job queues.
 - **Memory Allocation**: Minimum 8GB RAM; 16GB+ recommended for development with Turbopack.
 
-### B. Initialization Sequence Protocol
+### B. Installation
 
 ```bash
 # Install pnpm globally if not present
@@ -211,7 +231,7 @@ npm install -g pnpm@9.12.3
 
 # Clone and enter the repository
 git clone <repository-url>
-cd pec-app
+cd <repo-folder>
 
 # Install ALL workspace dependencies in one command
 pnpm install
@@ -228,18 +248,18 @@ Or step-by-step:
 
 ```bash
 # Push schema to database
-pnpm --filter pec-server db:push
+pnpm --filter @pec/database push
 
 # Generate Prisma TypeScript client
-pnpm --filter pec-server prisma:generate
+pnpm --filter @pec/database generate
 
 # Seed with institutional data
 pnpm --filter pec-server db:seed
 ```
 
-### D. Environment Governance Configuration
+### D. Environment Variables
 
-Provision `.env` in `apps/server/` and `.env` in `apps/frontend/` according to the institutional security guidelines in [docs/SETUP.md]. The key variables for the backend are:
+Create `.env` in `apps/server/` and `.env` in `apps/frontend/` according to the guidelines in [docs/SETUP.md]. The key variables for the backend are:
 
 ```env
 DATABASE_URL=postgresql://postgres:password@localhost:5432/pec_db
@@ -271,41 +291,26 @@ pnpm run db:studio       # Visual Prisma Studio browser
 
 ---
 
-## 9. Post-Deployment Verification Matrix
+## 9. Verification Steps
 
-Once the services are active, execute this verification matrix to ensure institutional system integrity:
+Once the services are active, verify the system status:
 
 1. **API Readiness**: Navigate to `http://localhost:4000/api/health`. Expected response: `{"status": "ok"}`.
 2. **Hydration Check**: Access the login portal at `http://localhost:3000`. Authenticate using the seeded credentials.
-3. **Spatial Topology Check**: Navigate to the Campus Map section. Verify that the Three.js 3D environment initializes building geometries in under 2 seconds.
-4. **Cognitive Loop Check**: Interact with 'Saathi' AI assistant to verify the Gemini API bridge and context enrichment logic.
+3. **Map Check**: Navigate to the Campus Map section. Verify that the Three.js 3D environment initializes building geometries.
+4. **AI Check**: Interact with 'Saathi' AI assistant to verify the Gemini API bridge and context logic.
 
 ---
 
-## 10. Institutional Support and Maintenance
+## 10. Support and Maintenance
 
-### Contact and Governance
+### Contact
 
-For institutional support, please contact the PEC Technical Operations Group. All change requests must be submitted via the Architecture Council review process to maintain system integrity.
+For support, please contact the PEC Development Team. All change requests must be submitted via pull request to maintain system integrity.
 
-### Operational Resilience protocols
+### Maintenance Protocols
 
-- Daily automated database snapshots stored in an encrypted institutional vault.
-- Health Check endpoints for real-time monitoring by IT operations teams.
+- Health Check endpoints for real-time monitoring.
 - Graceful degradation for AI services ensuring core academic functions remain active.
 
 ---
-
-**PEC Technical Operations Group**
-Copyright (c) 2026 PEC University. All rights reserved.
-Standard: PEC-DOC-BLUEPRINT-2026
-Registry: PEC-DOC-MAIN-v5.8-FINAL
-Target Lines: ~300
-Status: ACTIVE
-
----
-
-This document represents thousands of man-hours of engineering and academic research.
-It is the primary source of truth for the PEC App platform.
-All references to placements, recruiters, jobs, and finance have been purged.
-EOF

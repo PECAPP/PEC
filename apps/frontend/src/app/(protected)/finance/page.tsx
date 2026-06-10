@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton } from "@pec/ui";
 
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -32,6 +32,8 @@ import FeeCard from './components/FeeCard';
 import PaymentDialog from './components/PaymentDialog';
 import TransactionTable from './components/TransactionTable';
 import AdminCreateFeeDialog from './components/AdminCreateFeeDialog';
+import { FinanceCharts } from './components/FinanceCharts';
+import { AnimatedNumber } from './components/AnimatedNumber';
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -150,7 +152,7 @@ export default function FinancePage() {
       t.amount,
       t.paymentMethod,
       t.status,
-      new Date(t.createdAt).toLocaleDateString('en-IN'),
+      formatDate(t.createdAt),
     ]);
     const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -177,18 +179,18 @@ export default function FinancePage() {
   if (permLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        <AppShellSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="container max-w-7xl animate-in fade-in duration-500 flex flex-col min-h-0">
+    <div className="  animate-in fade-in duration-500 flex flex-col min-h-0">
       {/* Institutional Header */}
       <div className="pt-2 md:pt-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6">
           <div className="flex items-center gap-5">
-            <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm relative overflow-hidden group">
+            <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm relative overflow-hidden group">
               <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
               <Wallet className="w-8 h-8 text-primary relative z-10" />
             </div>
@@ -203,7 +205,7 @@ export default function FinancePage() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              className="h-10 rounded-xl px-4 font-bold text-xs gap-2"
+              className="h-10 rounded-sm px-4 font-bold text-xs gap-2"
               onClick={() => {
                 fetchFees();
                 fetchSummary();
@@ -214,7 +216,7 @@ export default function FinancePage() {
             </Button>
             {adminRole && (
               <Button
-                className="h-10 rounded-xl px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+                className="h-10 rounded-sm px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
                 onClick={() => setCreateFeeOpen(true)}
               >
                 <Plus className="w-4 h-4" />
@@ -240,7 +242,7 @@ export default function FinancePage() {
               >
                 My Fees
                 {pendingFees.length > 0 && (
-                  <span className="ml-1.5 w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">
+                  <span className="ml-1.5 w-5 h-5 rounded-full bg-amber-500/15 text-amber-600 border-amber-500/20 text-[10px] flex items-center justify-center font-bold">
                     {pendingFees.length}
                   </span>
                 )}
@@ -266,7 +268,7 @@ export default function FinancePage() {
                 {[
                   {
                     label: 'Total Pending',
-                    value: summary ? `₹${fmt(summary.totalPending || 0)}` : '—',
+                    value: summary ? <AnimatedNumber value={summary.totalPending || 0} prefix="₹" /> : '—',
                     icon: Clock,
                     color: 'text-amber-600',
                     bg: 'bg-amber-500/10',
@@ -274,7 +276,7 @@ export default function FinancePage() {
                   },
                   {
                     label: 'Total Paid',
-                    value: summary ? `₹${fmt(summary.totalPaid || 0)}` : '—',
+                    value: summary ? <AnimatedNumber value={summary.totalPaid || 0} prefix="₹" /> : '—',
                     icon: CheckCircle2,
                     color: 'text-emerald-600',
                     bg: 'bg-emerald-500/10',
@@ -283,7 +285,7 @@ export default function FinancePage() {
                   {
                     label: 'Overdue',
                     value: summary
-                      ? `${summary.overdue || 0} fee${(summary.overdue || 0) !== 1 ? 's' : ''}`
+                      ? <><AnimatedNumber value={summary.overdue || 0} /> fee{(summary.overdue || 0) !== 1 ? 's' : ''}</>
                       : '—',
                     icon: AlertTriangle,
                     color: 'text-red-600',
@@ -292,7 +294,7 @@ export default function FinancePage() {
                   },
                   {
                     label: 'Total Paid Fees',
-                    value: paidFees.length.toString(),
+                    value: <AnimatedNumber value={paidFees.length} />,
                     icon: Receipt,
                     color: 'text-blue-600',
                     bg: 'bg-blue-500/10',
@@ -304,11 +306,11 @@ export default function FinancePage() {
                     <div
                       key={card.label}
                       className={cn(
-                        'p-4 rounded-xl border bg-card flex items-start gap-3',
+                        'p-4 rounded-sm border bg-card flex items-start gap-3',
                         card.border
                       )}
                     >
-                      <div className={cn('p-2.5 rounded-lg', card.bg)}>
+                      <div className={cn('p-2.5 rounded-sm', card.bg)}>
                         <Icon className={cn('w-5 h-5', card.color)} />
                       </div>
                       <div>
@@ -319,6 +321,8 @@ export default function FinancePage() {
                   );
                 })}
               </div>
+
+              <FinanceCharts summary={summary} transactions={transactions} />
 
               {/* Category breakdown */}
               {summary && Object.keys(summary.byCategory || {}).length > 0 && (
@@ -333,7 +337,7 @@ export default function FinancePage() {
                       const total = vals.pending + vals.paid;
                       const paidPct = total > 0 ? Math.round((vals.paid / total) * 100) : 0;
                       return (
-                        <div key={cat} className={cn('p-4 rounded-xl border bg-card', catCfg.bg)}>
+                        <div key={cat} className={cn('p-4 rounded-sm border bg-card', catCfg.bg)}>
                           <div className="flex items-center gap-2 mb-3">
                             <Icon className={cn('w-4 h-4', catCfg.color)} />
                             <span className={cn('text-sm font-semibold', catCfg.color)}>
@@ -454,7 +458,7 @@ export default function FinancePage() {
                     <div className="space-y-3">
                       <h3 className="text-sm font-semibold flex items-center gap-2">
                         <Clock className="w-4 h-4 text-amber-500" /> Pending
-                        <Badge className="bg-amber-500 text-white">
+                        <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/20">
                           {filteredByCategory.filter((f) => f.status === 'pending').length}
                         </Badge>
                       </h3>
@@ -503,7 +507,7 @@ export default function FinancePage() {
           {tab === 'transactions' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
               {/* Filters */}
-              <div className="flex flex-wrap gap-3 p-3 bg-muted/30 border border-border rounded-lg">
+              <div className="flex flex-wrap gap-3 p-3 bg-muted/30 border border-border rounded-sm">
                 <div className="relative flex-1 min-w-40">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                   <Input

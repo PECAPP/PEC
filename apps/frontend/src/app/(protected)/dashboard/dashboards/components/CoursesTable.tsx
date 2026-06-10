@@ -1,8 +1,10 @@
 'use client';
 import { Button, Badge, Input } from "@pec/ui";
 
-
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import { DataTable } from '@/components/common/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
+import { useMemo } from 'react';
 
 interface CoursesTableProps {
   courses: any[];
@@ -21,12 +23,58 @@ export function CoursesTable({
   onEditCourse, 
   onDeleteCourse 
 }: CoursesTableProps) {
+  const columns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'code',
+      header: 'Code',
+      cell: ({ row }) => <span className="font-medium text-foreground">{row.original.code}</span>
+    },
+    {
+      accessorKey: 'name',
+      header: 'Name',
+      cell: ({ row }) => <span className="text-foreground">{row.original.name}</span>
+    },
+    {
+      accessorKey: 'department',
+      header: 'Department',
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.department}</span>
+    },
+    {
+      accessorKey: 'semester',
+      header: 'Semester',
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.semester}</span>
+    },
+    {
+      id: 'enrolled',
+      header: 'Enrolled',
+      cell: ({ row }) => (
+        <Badge variant="outline">
+          {row.original.enrolledStudents || 0}/{row.original.maxStudents || 60}
+        </Badge>
+      )
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => onEditCourse(row.original)}>
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => onDeleteCourse(row.original.id)}>
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </Button>
+        </div>
+      )
+    }
+  ], [onEditCourse, onDeleteCourse]);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <Input 
           placeholder="Search courses..." 
-          className="max-w-sm w-full" 
+          className=" w-full" 
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -36,47 +84,7 @@ export function CoursesTable({
       </div>
 
       <div className="card-elevated overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead className="bg-muted/30 border-b border-border">
-              <tr>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Code</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Name</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Department</th>
-                <th className="text-center p-4 text-sm font-medium text-muted-foreground">Semester</th>
-                <th className="text-center p-4 text-sm font-medium text-muted-foreground">Enrolled</th>
-                <th className="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {courses.length === 0 ? (
-                <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">No courses found. Create your first course!</td></tr>
-              ) : (
-                courses.map((course) => (
-                  <tr key={course.id} className="hover:bg-muted/20">
-                    <td className="p-4 font-medium text-foreground">{course.code}</td>
-                    <td className="p-4 text-foreground">{course.name}</td>
-                    <td className="p-4 text-muted-foreground">{course.department}</td>
-                    <td className="p-4 text-center text-muted-foreground">{course.semester}</td>
-                    <td className="p-4 text-center">
-                      <Badge variant="outline">{course.enrolledStudents || 0}/{course.maxStudents || 60}</Badge>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => onEditCourse(course)}>
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => onDeleteCourse(course.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable columns={columns} data={courses} />
       </div>
     </div>
   );

@@ -24,24 +24,42 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const courseMaterialsControllerFindManyV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type courseMaterialsControllerFindManyV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type courseMaterialsControllerFindManyV1ResponseSuccess = (courseMaterialsControllerFindManyV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type courseMaterialsControllerFindManyV1Response = (courseMaterialsControllerFindManyV1ResponseSuccess)
+
+export const getCourseMaterialsControllerFindManyV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/course-materials`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/course-materials`
+}
+
+export const courseMaterialsControllerFindManyV1 = async ( options?: RequestInit): Promise<courseMaterialsControllerFindManyV1Response> => {
+
+  return fetchWithAuth<courseMaterialsControllerFindManyV1Response>(getCourseMaterialsControllerFindManyV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -53,16 +71,16 @@ export const getCourseMaterialsControllerFindManyV1QueryKey = () => {
     }
 
 
-export const getCourseMaterialsControllerFindManyV1QueryOptions = <TData = Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCourseMaterialsControllerFindManyV1QueryOptions = <TData = Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCourseMaterialsControllerFindManyV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>> = ({ signal }) => courseMaterialsControllerFindManyV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>> = ({ signal }) => courseMaterialsControllerFindManyV1({ signal });
 
 
 
@@ -82,7 +100,7 @@ export function useCourseMaterialsControllerFindManyV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCourseMaterialsControllerFindManyV1<TData = Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError = unknown>(
@@ -92,16 +110,16 @@ export function useCourseMaterialsControllerFindManyV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCourseMaterialsControllerFindManyV1<TData = Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCourseMaterialsControllerFindManyV1<TData = Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerFindManyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -117,30 +135,50 @@ export function useCourseMaterialsControllerFindManyV1<TData = Awaited<ReturnTyp
 
 
 
-export const courseMaterialsControllerCreateV1 = (
+export type courseMaterialsControllerCreateV1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type courseMaterialsControllerCreateV1ResponseSuccess = (courseMaterialsControllerCreateV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type courseMaterialsControllerCreateV1Response = (courseMaterialsControllerCreateV1ResponseSuccess)
+
+export const getCourseMaterialsControllerCreateV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/course-materials`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/course-materials`
+}
+
+export const courseMaterialsControllerCreateV1 = async ( options?: RequestInit): Promise<courseMaterialsControllerCreateV1Response> => {
+
+  return fetchWithAuth<courseMaterialsControllerCreateV1Response>(getCourseMaterialsControllerCreateV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getCourseMaterialsControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerCreateV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerCreateV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerCreateV1>>, TError,void, TContext> => {
 
 const mutationKey = ['courseMaterialsControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -148,7 +186,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof courseMaterialsControllerCreateV1>>, void> = () => {
 
 
-          return  courseMaterialsControllerCreateV1(requestOptions)
+          return  courseMaterialsControllerCreateV1()
         }
 
 
@@ -163,7 +201,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CourseMaterialsControllerCreateV1MutationError = unknown
 
     export const useCourseMaterialsControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerCreateV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerCreateV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof courseMaterialsControllerCreateV1>>,
         TError,
@@ -172,17 +210,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCourseMaterialsControllerCreateV1MutationOptions(options), queryClient);
     }
-    export const courseMaterialsControllerDownloadV1 = (
-    filename: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type courseMaterialsControllerDownloadV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type courseMaterialsControllerDownloadV1ResponseSuccess = (courseMaterialsControllerDownloadV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type courseMaterialsControllerDownloadV1Response = (courseMaterialsControllerDownloadV1ResponseSuccess)
+
+export const getCourseMaterialsControllerDownloadV1Url = (filename: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/course-materials/download/${filename}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/course-materials/download/${filename}`
+}
+
+export const courseMaterialsControllerDownloadV1 = async (filename: string, options?: RequestInit): Promise<courseMaterialsControllerDownloadV1Response> => {
+
+  return fetchWithAuth<courseMaterialsControllerDownloadV1Response>(getCourseMaterialsControllerDownloadV1Url(filename),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -194,16 +252,16 @@ export const getCourseMaterialsControllerDownloadV1QueryKey = (filename: string,
     }
 
 
-export const getCourseMaterialsControllerDownloadV1QueryOptions = <TData = Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError = unknown>(filename: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCourseMaterialsControllerDownloadV1QueryOptions = <TData = Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError = unknown>(filename: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCourseMaterialsControllerDownloadV1QueryKey(filename);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>> = ({ signal }) => courseMaterialsControllerDownloadV1(filename, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>> = ({ signal }) => courseMaterialsControllerDownloadV1(filename, { signal });
 
 
 
@@ -223,7 +281,7 @@ export function useCourseMaterialsControllerDownloadV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCourseMaterialsControllerDownloadV1<TData = Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError = unknown>(
@@ -233,16 +291,16 @@ export function useCourseMaterialsControllerDownloadV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCourseMaterialsControllerDownloadV1<TData = Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError = unknown>(
- filename: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ filename: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCourseMaterialsControllerDownloadV1<TData = Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError = unknown>(
- filename: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ filename: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof courseMaterialsControllerDownloadV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -258,30 +316,50 @@ export function useCourseMaterialsControllerDownloadV1<TData = Awaited<ReturnTyp
 
 
 
-export const courseMaterialsControllerRemoveV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type courseMaterialsControllerRemoveV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type courseMaterialsControllerRemoveV1ResponseSuccess = (courseMaterialsControllerRemoveV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type courseMaterialsControllerRemoveV1Response = (courseMaterialsControllerRemoveV1ResponseSuccess)
+
+export const getCourseMaterialsControllerRemoveV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/course-materials/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/course-materials/${id}`
+}
+
+export const courseMaterialsControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<courseMaterialsControllerRemoveV1Response> => {
+
+  return fetchWithAuth<courseMaterialsControllerRemoveV1Response>(getCourseMaterialsControllerRemoveV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getCourseMaterialsControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['courseMaterialsControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -289,7 +367,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof courseMaterialsControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  courseMaterialsControllerRemoveV1(id,requestOptions)
+          return  courseMaterialsControllerRemoveV1(id,)
         }
 
 
@@ -304,7 +382,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CourseMaterialsControllerRemoveV1MutationError = unknown
 
     export const useCourseMaterialsControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof courseMaterialsControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof courseMaterialsControllerRemoveV1>>,
         TError,

@@ -1,4 +1,4 @@
-import { Button, Input, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@pec/ui";
+import { Button, Input, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, formatDate } from "@pec/ui";
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {  authClient  } from "@pec/api";
 import type { User as UserType } from '@pec/shared';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 const CommandMenu = dynamic(() => import('@/components/layout/CommandMenu'), {
   ssr: false,
@@ -64,12 +65,12 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, sidebarW
   const appLogoSrc = '/logo.png';
   const showNavbarLogo = Boolean(isMobile) || sidebarCollapsed;
 
+  const { logout } = useAuth();
+
   const handleSignOut = async () => {
     try {
-      await authClient.logout();
-      window.dispatchEvent(new Event('auth-failed'));
+      await logout();
       toast.success('Signed out successfully');
-      router.push('/auth');
     } catch (error) {
       console.error('Sign out error:', error);
       toast.error('Failed to sign out');
@@ -77,15 +78,9 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, sidebarW
   };
 
   const roleLabels: Record<string, string> = {
-    college_admin: 'College Admin',
     faculty: 'Faculty',
     student: 'Student',
-    admin: 'System Admin',
-    moderator: 'Moderator',
-    user: 'Regular User',
-    placement_officer: 'Placement Officer',
-    recruiter: 'Recruiter',
-    super_admin: 'Super Admin',
+    admin: 'Admin',
   };
 
   return (
@@ -144,8 +139,8 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, sidebarW
           <div className="hidden lg:block scale-90 sm:scale-100">
              <GoogleTranslate containerId="google_translate_header" />
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Sheet>
+            <SheetTrigger asChild>
               <Button
                 variant="outline"
                 size="icon"
@@ -153,26 +148,26 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, sidebarW
                 title="Notifications"
               >
                 <Bell className="w-4 h-4" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full border-2 border-background animate-pulse" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full border border-background animate-pulse" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 p-0">
-              <div className="p-3 border-b border-border flex items-center justify-between bg-muted/30">
-                <h3 className="text-sm font-bold tracking-tight">Recent Notices</h3>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[85vw] sm:w-[400px] p-0 flex flex-col border-l border-border bg-background/95 backdrop-blur-xl">
+              <SheetHeader className="p-4 border-b border-border bg-muted/10 flex flex-row items-center justify-between space-y-0">
+                <SheetTitle className="text-sm font-bold tracking-tight">Notification Center</SheetTitle>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-7 text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary hover:bg-primary/5"
+                  className="h-7 text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary hover:bg-primary/5 m-0"
                   onClick={() => router.push('/noticeboard')}
                 >
                   View All
                 </Button>
-              </div>
-              <div className="max-h-[320px] overflow-y-auto py-1 px-1">
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto p-2">
                 <NoticePreviewList router={router} />
               </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </SheetContent>
+          </Sheet>
 
           {/* User Menu */}
           <DropdownMenu>
@@ -281,7 +276,7 @@ function NoticePreviewList({ router }: { router: any }) {
             </p>
             <div className="flex items-center gap-2 pt-1">
               <span className="text-[9px] font-bold uppercase text-muted-foreground/50 tracking-widest">
-                {new Date(n.publishedAt || n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {formatDate(n.publishedAt || n.createdAt)}
               </span>
               {n.category && (
                 <span className="text-[8px] font-bold uppercase py-0.5 px-1.5 bg-muted/40 border border-border/40 text-muted-foreground/80 tracking-widest rounded-sm">

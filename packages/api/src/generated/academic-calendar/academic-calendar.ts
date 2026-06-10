@@ -32,37 +32,55 @@ import type {
   UpdateAcademicCalendarEventDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const academicCalendarControllerUploadPdfV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type academicCalendarControllerUploadPdfV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type academicCalendarControllerUploadPdfV1ResponseSuccess = (academicCalendarControllerUploadPdfV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type academicCalendarControllerUploadPdfV1Response = (academicCalendarControllerUploadPdfV1ResponseSuccess)
+
+export const getAcademicCalendarControllerUploadPdfV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar/upload-pdf`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/academic-calendar/upload-pdf`
+}
+
+export const academicCalendarControllerUploadPdfV1 = async ( options?: RequestInit): Promise<academicCalendarControllerUploadPdfV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerUploadPdfV1Response>(getAcademicCalendarControllerUploadPdfV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getAcademicCalendarControllerUploadPdfV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfV1>>, TError,void, TContext> => {
 
 const mutationKey = ['academicCalendarControllerUploadPdfV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -70,7 +88,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfV1>>, void> = () => {
 
 
-          return  academicCalendarControllerUploadPdfV1(requestOptions)
+          return  academicCalendarControllerUploadPdfV1()
         }
 
 
@@ -85,7 +103,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerUploadPdfV1MutationError = unknown
 
     export const useAcademicCalendarControllerUploadPdfV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerUploadPdfV1>>,
         TError,
@@ -94,30 +112,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAcademicCalendarControllerUploadPdfV1MutationOptions(options), queryClient);
     }
-    export const academicCalendarControllerUploadPdfBase64V1 = (
+    export type academicCalendarControllerUploadPdfBase64V1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type academicCalendarControllerUploadPdfBase64V1ResponseSuccess = (academicCalendarControllerUploadPdfBase64V1Response201) & {
+  headers: Headers;
+};
+;
+
+export type academicCalendarControllerUploadPdfBase64V1Response = (academicCalendarControllerUploadPdfBase64V1ResponseSuccess)
+
+export const getAcademicCalendarControllerUploadPdfBase64V1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar/upload-pdf-base64`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/academic-calendar/upload-pdf-base64`
+}
+
+export const academicCalendarControllerUploadPdfBase64V1 = async ( options?: RequestInit): Promise<academicCalendarControllerUploadPdfBase64V1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerUploadPdfBase64V1Response>(getAcademicCalendarControllerUploadPdfBase64V1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getAcademicCalendarControllerUploadPdfBase64V1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfBase64V1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfBase64V1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfBase64V1>>, TError,void, TContext> => {
 
 const mutationKey = ['academicCalendarControllerUploadPdfBase64V1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -125,7 +163,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfBase64V1>>, void> = () => {
 
 
-          return  academicCalendarControllerUploadPdfBase64V1(requestOptions)
+          return  academicCalendarControllerUploadPdfBase64V1()
         }
 
 
@@ -140,7 +178,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerUploadPdfBase64V1MutationError = unknown
 
     export const useAcademicCalendarControllerUploadPdfBase64V1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfBase64V1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUploadPdfBase64V1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerUploadPdfBase64V1>>,
         TError,
@@ -149,30 +187,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAcademicCalendarControllerUploadPdfBase64V1MutationOptions(options), queryClient);
     }
-    export const academicCalendarControllerBulkImportV1 = (
+    export type academicCalendarControllerBulkImportV1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type academicCalendarControllerBulkImportV1ResponseSuccess = (academicCalendarControllerBulkImportV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type academicCalendarControllerBulkImportV1Response = (academicCalendarControllerBulkImportV1ResponseSuccess)
+
+export const getAcademicCalendarControllerBulkImportV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar/bulk-import`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/academic-calendar/bulk-import`
+}
+
+export const academicCalendarControllerBulkImportV1 = async ( options?: RequestInit): Promise<academicCalendarControllerBulkImportV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerBulkImportV1Response>(getAcademicCalendarControllerBulkImportV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getAcademicCalendarControllerBulkImportV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,void, TContext> => {
 
 const mutationKey = ['academicCalendarControllerBulkImportV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -180,7 +238,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, void> = () => {
 
 
-          return  academicCalendarControllerBulkImportV1(requestOptions)
+          return  academicCalendarControllerBulkImportV1()
         }
 
 
@@ -195,7 +253,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerBulkImportV1MutationError = unknown
 
     export const useAcademicCalendarControllerBulkImportV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerBulkImportV1>>,
         TError,
@@ -204,18 +262,44 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAcademicCalendarControllerBulkImportV1MutationOptions(options), queryClient);
     }
-    export const academicCalendarControllerFindAllV1 = (
-    params: AcademicCalendarControllerFindAllV1Params,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type academicCalendarControllerFindAllV1Response200 = {
+  data: void
+  status: 200
+}
 
+export type academicCalendarControllerFindAllV1ResponseSuccess = (academicCalendarControllerFindAllV1Response200) & {
+  headers: Headers;
+};
+;
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar`, method: 'GET',
-        params, signal
-    },
-      options);
+export type academicCalendarControllerFindAllV1Response = (academicCalendarControllerFindAllV1ResponseSuccess)
+
+export const getAcademicCalendarControllerFindAllV1Url = (params: AcademicCalendarControllerFindAllV1Params,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
     }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/academic-calendar?${stringifiedParams}` : `/api/v1/academic-calendar`
+}
+
+export const academicCalendarControllerFindAllV1 = async (params: AcademicCalendarControllerFindAllV1Params, options?: RequestInit): Promise<academicCalendarControllerFindAllV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerFindAllV1Response>(getAcademicCalendarControllerFindAllV1Url(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -227,16 +311,16 @@ export const getAcademicCalendarControllerFindAllV1QueryKey = (params?: Academic
     }
 
 
-export const getAcademicCalendarControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError = unknown>(params: AcademicCalendarControllerFindAllV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAcademicCalendarControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError = unknown>(params: AcademicCalendarControllerFindAllV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAcademicCalendarControllerFindAllV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>> = ({ signal }) => academicCalendarControllerFindAllV1(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>> = ({ signal }) => academicCalendarControllerFindAllV1(params, { signal });
 
 
 
@@ -256,7 +340,7 @@ export function useAcademicCalendarControllerFindAllV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAcademicCalendarControllerFindAllV1<TData = Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError = unknown>(
@@ -266,16 +350,16 @@ export function useAcademicCalendarControllerFindAllV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAcademicCalendarControllerFindAllV1<TData = Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError = unknown>(
- params: AcademicCalendarControllerFindAllV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: AcademicCalendarControllerFindAllV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAcademicCalendarControllerFindAllV1<TData = Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError = unknown>(
- params: AcademicCalendarControllerFindAllV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: AcademicCalendarControllerFindAllV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -291,32 +375,50 @@ export function useAcademicCalendarControllerFindAllV1<TData = Awaited<ReturnTyp
 
 
 
-export const academicCalendarControllerCreateV1 = (
-    createAcademicCalendarEventDto: CreateAcademicCalendarEventDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type academicCalendarControllerCreateV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type academicCalendarControllerCreateV1ResponseSuccess = (academicCalendarControllerCreateV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type academicCalendarControllerCreateV1Response = (academicCalendarControllerCreateV1ResponseSuccess)
+
+export const getAcademicCalendarControllerCreateV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createAcademicCalendarEventDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/academic-calendar`
+}
+
+export const academicCalendarControllerCreateV1 = async (createAcademicCalendarEventDto: CreateAcademicCalendarEventDto, options?: RequestInit): Promise<academicCalendarControllerCreateV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerCreateV1Response>(getAcademicCalendarControllerCreateV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createAcademicCalendarEventDto)
+  }
+);}
+
 
 
 
 export const getAcademicCalendarControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto}, TContext> => {
 
 const mutationKey = ['academicCalendarControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -324,7 +426,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, {data: CreateAcademicCalendarEventDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  academicCalendarControllerCreateV1(data,requestOptions)
+          return  academicCalendarControllerCreateV1(data,)
         }
 
 
@@ -339,7 +441,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerCreateV1MutationError = unknown
 
     export const useAcademicCalendarControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>, TError,{data: CreateAcademicCalendarEventDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerCreateV1>>,
         TError,
@@ -348,30 +450,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAcademicCalendarControllerCreateV1MutationOptions(options), queryClient);
     }
-    export const academicCalendarControllerDeleteAllV1 = (
+    export type academicCalendarControllerDeleteAllV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type academicCalendarControllerDeleteAllV1ResponseSuccess = (academicCalendarControllerDeleteAllV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type academicCalendarControllerDeleteAllV1Response = (academicCalendarControllerDeleteAllV1ResponseSuccess)
+
+export const getAcademicCalendarControllerDeleteAllV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/academic-calendar`
+}
+
+export const academicCalendarControllerDeleteAllV1 = async ( options?: RequestInit): Promise<academicCalendarControllerDeleteAllV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerDeleteAllV1Response>(getAcademicCalendarControllerDeleteAllV1Url(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getAcademicCalendarControllerDeleteAllV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteAllV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteAllV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteAllV1>>, TError,void, TContext> => {
 
 const mutationKey = ['academicCalendarControllerDeleteAllV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -379,7 +501,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerDeleteAllV1>>, void> = () => {
 
 
-          return  academicCalendarControllerDeleteAllV1(requestOptions)
+          return  academicCalendarControllerDeleteAllV1()
         }
 
 
@@ -394,7 +516,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerDeleteAllV1MutationError = unknown
 
     export const useAcademicCalendarControllerDeleteAllV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteAllV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteAllV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerDeleteAllV1>>,
         TError,
@@ -403,18 +525,44 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAcademicCalendarControllerDeleteAllV1MutationOptions(options), queryClient);
     }
-    export const academicCalendarControllerGetUpcomingV1 = (
-    params: AcademicCalendarControllerGetUpcomingV1Params,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type academicCalendarControllerGetUpcomingV1Response200 = {
+  data: void
+  status: 200
+}
 
+export type academicCalendarControllerGetUpcomingV1ResponseSuccess = (academicCalendarControllerGetUpcomingV1Response200) & {
+  headers: Headers;
+};
+;
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar/upcoming`, method: 'GET',
-        params, signal
-    },
-      options);
+export type academicCalendarControllerGetUpcomingV1Response = (academicCalendarControllerGetUpcomingV1ResponseSuccess)
+
+export const getAcademicCalendarControllerGetUpcomingV1Url = (params: AcademicCalendarControllerGetUpcomingV1Params,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
     }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/academic-calendar/upcoming?${stringifiedParams}` : `/api/v1/academic-calendar/upcoming`
+}
+
+export const academicCalendarControllerGetUpcomingV1 = async (params: AcademicCalendarControllerGetUpcomingV1Params, options?: RequestInit): Promise<academicCalendarControllerGetUpcomingV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerGetUpcomingV1Response>(getAcademicCalendarControllerGetUpcomingV1Url(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -426,16 +574,16 @@ export const getAcademicCalendarControllerGetUpcomingV1QueryKey = (params?: Acad
     }
 
 
-export const getAcademicCalendarControllerGetUpcomingV1QueryOptions = <TData = Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError = unknown>(params: AcademicCalendarControllerGetUpcomingV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAcademicCalendarControllerGetUpcomingV1QueryOptions = <TData = Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError = unknown>(params: AcademicCalendarControllerGetUpcomingV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAcademicCalendarControllerGetUpcomingV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>> = ({ signal }) => academicCalendarControllerGetUpcomingV1(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>> = ({ signal }) => academicCalendarControllerGetUpcomingV1(params, { signal });
 
 
 
@@ -455,7 +603,7 @@ export function useAcademicCalendarControllerGetUpcomingV1<TData = Awaited<Retur
           TError,
           Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAcademicCalendarControllerGetUpcomingV1<TData = Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError = unknown>(
@@ -465,16 +613,16 @@ export function useAcademicCalendarControllerGetUpcomingV1<TData = Awaited<Retur
           TError,
           Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAcademicCalendarControllerGetUpcomingV1<TData = Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError = unknown>(
- params: AcademicCalendarControllerGetUpcomingV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: AcademicCalendarControllerGetUpcomingV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAcademicCalendarControllerGetUpcomingV1<TData = Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError = unknown>(
- params: AcademicCalendarControllerGetUpcomingV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: AcademicCalendarControllerGetUpcomingV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetUpcomingV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -490,18 +638,44 @@ export function useAcademicCalendarControllerGetUpcomingV1<TData = Awaited<Retur
 
 
 
-export const academicCalendarControllerGetByRangeV1 = (
-    params: AcademicCalendarControllerGetByRangeV1Params,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type academicCalendarControllerGetByRangeV1Response200 = {
+  data: void
+  status: 200
+}
 
+export type academicCalendarControllerGetByRangeV1ResponseSuccess = (academicCalendarControllerGetByRangeV1Response200) & {
+  headers: Headers;
+};
+;
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar/range`, method: 'GET',
-        params, signal
-    },
-      options);
+export type academicCalendarControllerGetByRangeV1Response = (academicCalendarControllerGetByRangeV1ResponseSuccess)
+
+export const getAcademicCalendarControllerGetByRangeV1Url = (params: AcademicCalendarControllerGetByRangeV1Params,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
     }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/academic-calendar/range?${stringifiedParams}` : `/api/v1/academic-calendar/range`
+}
+
+export const academicCalendarControllerGetByRangeV1 = async (params: AcademicCalendarControllerGetByRangeV1Params, options?: RequestInit): Promise<academicCalendarControllerGetByRangeV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerGetByRangeV1Response>(getAcademicCalendarControllerGetByRangeV1Url(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -513,16 +687,16 @@ export const getAcademicCalendarControllerGetByRangeV1QueryKey = (params?: Acade
     }
 
 
-export const getAcademicCalendarControllerGetByRangeV1QueryOptions = <TData = Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError = unknown>(params: AcademicCalendarControllerGetByRangeV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAcademicCalendarControllerGetByRangeV1QueryOptions = <TData = Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError = unknown>(params: AcademicCalendarControllerGetByRangeV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAcademicCalendarControllerGetByRangeV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>> = ({ signal }) => academicCalendarControllerGetByRangeV1(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>> = ({ signal }) => academicCalendarControllerGetByRangeV1(params, { signal });
 
 
 
@@ -542,7 +716,7 @@ export function useAcademicCalendarControllerGetByRangeV1<TData = Awaited<Return
           TError,
           Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAcademicCalendarControllerGetByRangeV1<TData = Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError = unknown>(
@@ -552,16 +726,16 @@ export function useAcademicCalendarControllerGetByRangeV1<TData = Awaited<Return
           TError,
           Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAcademicCalendarControllerGetByRangeV1<TData = Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError = unknown>(
- params: AcademicCalendarControllerGetByRangeV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: AcademicCalendarControllerGetByRangeV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAcademicCalendarControllerGetByRangeV1<TData = Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError = unknown>(
- params: AcademicCalendarControllerGetByRangeV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: AcademicCalendarControllerGetByRangeV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerGetByRangeV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -577,17 +751,37 @@ export function useAcademicCalendarControllerGetByRangeV1<TData = Awaited<Return
 
 
 
-export const academicCalendarControllerFindOneV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type academicCalendarControllerFindOneV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type academicCalendarControllerFindOneV1ResponseSuccess = (academicCalendarControllerFindOneV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type academicCalendarControllerFindOneV1Response = (academicCalendarControllerFindOneV1ResponseSuccess)
+
+export const getAcademicCalendarControllerFindOneV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/academic-calendar/${id}`
+}
+
+export const academicCalendarControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<academicCalendarControllerFindOneV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerFindOneV1Response>(getAcademicCalendarControllerFindOneV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -599,16 +793,16 @@ export const getAcademicCalendarControllerFindOneV1QueryKey = (id: string,) => {
     }
 
 
-export const getAcademicCalendarControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAcademicCalendarControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAcademicCalendarControllerFindOneV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>> = ({ signal }) => academicCalendarControllerFindOneV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>> = ({ signal }) => academicCalendarControllerFindOneV1(id, { signal });
 
 
 
@@ -628,7 +822,7 @@ export function useAcademicCalendarControllerFindOneV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAcademicCalendarControllerFindOneV1<TData = Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError = unknown>(
@@ -638,16 +832,16 @@ export function useAcademicCalendarControllerFindOneV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAcademicCalendarControllerFindOneV1<TData = Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAcademicCalendarControllerFindOneV1<TData = Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof academicCalendarControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -663,33 +857,51 @@ export function useAcademicCalendarControllerFindOneV1<TData = Awaited<ReturnTyp
 
 
 
-export const academicCalendarControllerUpdateV1 = (
-    id: string,
-    updateAcademicCalendarEventDto: UpdateAcademicCalendarEventDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type academicCalendarControllerUpdateV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type academicCalendarControllerUpdateV1ResponseSuccess = (academicCalendarControllerUpdateV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type academicCalendarControllerUpdateV1Response = (academicCalendarControllerUpdateV1ResponseSuccess)
+
+export const getAcademicCalendarControllerUpdateV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateAcademicCalendarEventDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/academic-calendar/${id}`
+}
+
+export const academicCalendarControllerUpdateV1 = async (id: string,
+    updateAcademicCalendarEventDto: UpdateAcademicCalendarEventDto, options?: RequestInit): Promise<academicCalendarControllerUpdateV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerUpdateV1Response>(getAcademicCalendarControllerUpdateV1Url(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateAcademicCalendarEventDto)
+  }
+);}
+
 
 
 
 export const getAcademicCalendarControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUpdateV1>>, TError,{id: string;data: UpdateAcademicCalendarEventDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUpdateV1>>, TError,{id: string;data: UpdateAcademicCalendarEventDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUpdateV1>>, TError,{id: string;data: UpdateAcademicCalendarEventDto}, TContext> => {
 
 const mutationKey = ['academicCalendarControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -697,7 +909,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerUpdateV1>>, {id: string;data: UpdateAcademicCalendarEventDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  academicCalendarControllerUpdateV1(id,data,requestOptions)
+          return  academicCalendarControllerUpdateV1(id,data,)
         }
 
 
@@ -712,7 +924,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerUpdateV1MutationError = unknown
 
     export const useAcademicCalendarControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUpdateV1>>, TError,{id: string;data: UpdateAcademicCalendarEventDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerUpdateV1>>, TError,{id: string;data: UpdateAcademicCalendarEventDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerUpdateV1>>,
         TError,
@@ -721,30 +933,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAcademicCalendarControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export const academicCalendarControllerDeleteV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type academicCalendarControllerDeleteV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type academicCalendarControllerDeleteV1ResponseSuccess = (academicCalendarControllerDeleteV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type academicCalendarControllerDeleteV1Response = (academicCalendarControllerDeleteV1ResponseSuccess)
+
+export const getAcademicCalendarControllerDeleteV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/academic-calendar/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/academic-calendar/${id}`
+}
+
+export const academicCalendarControllerDeleteV1 = async (id: string, options?: RequestInit): Promise<academicCalendarControllerDeleteV1Response> => {
+
+  return fetchWithAuth<academicCalendarControllerDeleteV1Response>(getAcademicCalendarControllerDeleteV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getAcademicCalendarControllerDeleteV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['academicCalendarControllerDeleteV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -752,7 +984,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicCalendarControllerDeleteV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  academicCalendarControllerDeleteV1(id,requestOptions)
+          return  academicCalendarControllerDeleteV1(id,)
         }
 
 
@@ -767,7 +999,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AcademicCalendarControllerDeleteV1MutationError = unknown
 
     export const useAcademicCalendarControllerDeleteV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicCalendarControllerDeleteV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof academicCalendarControllerDeleteV1>>,
         TError,

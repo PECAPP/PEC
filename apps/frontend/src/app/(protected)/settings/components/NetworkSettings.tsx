@@ -13,7 +13,7 @@ export function NetworkSettings() {
 
   useEffect(() => {
     // Mock fetching ical token from API
-    setIcalUrl('https://api.omniflow.pec.edu/calendar/sync_abc123.ics');
+    setIcalUrl('https://api.erp.pec.edu/calendar/sync_abc123.ics');
   }, []);
 
   const handleCopy = () => {
@@ -39,7 +39,7 @@ export function NetworkSettings() {
         <p className="text-sm text-muted-foreground">Link external accounts to enable Single Sign-On and pull data into your portfolio.</p>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+          <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
              <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center p-2">
                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-full h-full" />
@@ -52,7 +52,7 @@ export function NetworkSettings() {
              <Button variant="outline" className="h-9 text-xs font-bold text-muted-foreground" disabled>Connected</Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+          <div className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
              <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center p-2">
                    <img src="https://www.svgrepo.com/show/512317/github-142.svg" alt="GitHub" className="w-full h-full" />
@@ -74,7 +74,7 @@ export function NetworkSettings() {
           <h2 className="text-xl font-bold tracking-tight">Calendar Sync (iCal)</h2>
         </div>
         <p className="text-sm text-muted-foreground">
-          Subscribe to your OmniFlow timetable and upcoming exams in Apple Calendar, Google Calendar, or Outlook.
+          Subscribe to your PEC timetable and upcoming exams in Apple Calendar, Google Calendar, or Outlook.
         </p>
         <div className="flex gap-3">
           <Input value={icalUrl} readOnly className="h-11 font-mono text-xs bg-muted/50" />
@@ -99,7 +99,7 @@ export function NetworkSettings() {
 
         <div className="space-y-4">
           {sessions.map(s => (
-            <div key={s.id} className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-background/50">
+            <div key={s.id} className="flex items-center justify-between p-4 rounded-sm border border-border/40 bg-background/50">
               <div>
                 <h4 className="font-bold text-sm flex items-center gap-2">
                   {s.device} 

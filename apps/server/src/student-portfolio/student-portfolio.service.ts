@@ -1,90 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  CreateStudentProjectDto,
-  UpdateStudentProjectDto,
-  CreateStudentSkillDto,
-  UpdateStudentSkillDto,
-} from './dto/student-portfolio.dto';
 
 @Injectable()
 export class StudentPortfolioService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getPortfolio(studentId: string) {
-    const [projects, skills] = await Promise.all([
-      this.prisma.studentProject.findMany({ where: { studentId },
-        orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-      }),
-      this.prisma.studentSkill.findMany({ where: { studentId },
-        orderBy: [{ category: 'asc' }, { level: 'desc' }],
-      }),
-    ]);
-
-    const skillsByCategory = skills.reduce((acc, skill) => {
-      const cat = skill.category || 'technical';
-      if (!acc[cat]) acc[cat] = [];
-      acc[cat].push(skill);
-      return acc;
-    }, {} as Record<string, typeof skills>);
-
-    return { projects, skills, skillsByCategory };
-  }
-
-  async getProjects(studentId: string) {
-    return this.prisma.studentProject.findMany({ where: { studentId },
-      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+    const resume = await this.prisma.resumeProfile.findUnique({
+      where: { userId: studentId }
     });
-  }
 
-  async createProject(data: CreateStudentProjectDto) {
-    return this.prisma.studentProject.create({
-      data: {
-        studentId: data.studentId as string,
-        title: data.title as string,
-        description: data.description as string,
-        techStack: data.techStack ?? '[]',
-        githubUrl: data.githubUrl,
-        liveUrl: data.liveUrl,
-        imageUrl: data.imageUrl,
-        startDate: data.startDate ? new Date(data.startDate) : undefined,
-        endDate: data.endDate ? new Date(data.endDate) : undefined,
-        isFeatured: data.isFeatured ?? false,
-      },
-    });
-  }
-
-  async updateProject(id: string, data: UpdateStudentProjectDto) {
-    return this.prisma.studentProject.update({ where: { id }, data });
-  }
-
-  async deleteProject(id: string) {
-    return this.prisma.studentProject.delete({ where: { id } });
-  }
-
-  async getSkills(studentId: string) {
-    return this.prisma.studentSkill.findMany({ where: { studentId },
-      orderBy: [{ category: 'asc' }, { level: 'desc' }],
-    });
-  }
-
-  async createSkill(data: CreateStudentSkillDto) {
-    return this.prisma.studentSkill.create({
-      data: {
-        studentId: data.studentId as string,
-        name: data.name as string,
-        level: data.level ?? 50,
-        category: data.category ?? 'technical',
-      },
-    });
-  }
-
-  async updateSkill(id: string, data: UpdateStudentSkillDto) {
-    return this.prisma.studentSkill.update({ where: { id }, data });
-  }
-
-  async deleteSkill(id: string) {
-    return this.prisma.studentSkill.delete({ where: { id } });
+    return { resume };
   }
 
   async syncGitHubRepos(studentId: string, githubUsername: string) {
@@ -134,3 +60,4 @@ export class StudentPortfolioService {
     }
   }
 }
+

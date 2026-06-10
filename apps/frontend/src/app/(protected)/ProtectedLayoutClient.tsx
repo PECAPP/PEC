@@ -52,7 +52,7 @@ export function ProtectedLayoutClient({ children, user }: ProtectedLayoutClientP
       </div>
 
       <Sidebar
-        role={user.role}
+        _role={user.role}
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         isMobile={isMobile}

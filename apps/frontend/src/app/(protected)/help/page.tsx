@@ -80,17 +80,17 @@ export default function Help() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-sm bg-primary/10 flex items-center justify-center  mb-4">
             <HelpCircle className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">How can we help?</h1>
-          <p className="text-muted-foreground max-w-md mx-auto">
+          <p className="text-muted-foreground  ">
             Search our help center or browse categories below
           </p>
         </motion.div>
 
         {/* Search */}
-        <div className="max-w-xl mx-auto mt-6">
+        <div className="  mt-6">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
@@ -117,7 +117,7 @@ export default function Help() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-secondary group-hover:bg-primary/10 transition-colors">
+                      <div className="p-2 rounded-sm bg-secondary group-hover:bg-primary/10 transition-colors">
                         <category.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>
                       <div>
@@ -172,9 +172,9 @@ export default function Help() {
                 <a
                   key={resource.label}
                   href={resource.link}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-sm hover:bg-secondary transition-colors group"
                 >
-                  <div className="p-2 rounded-lg bg-secondary group-hover:bg-primary/10 transition-colors">
+                  <div className="p-2 rounded-sm bg-secondary group-hover:bg-primary/10 transition-colors">
                     <resource.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                   <div className="flex-1">
@@ -194,14 +194,14 @@ export default function Help() {
               <CardDescription>Can&apos;t find what you&apos;re looking for?</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary">
+              <div className="flex items-center gap-3 p-3 rounded-sm bg-secondary">
                 <Mail className="w-5 h-5 text-primary" />
                 <div>
                   <p className="text-sm font-medium">Email Support</p>
                   <p className="text-xs text-muted-foreground">support@unierp.edu</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary">
+              <div className="flex items-center gap-3 p-3 rounded-sm bg-secondary">
                 <Phone className="w-5 h-5 text-primary" />
                 <div>
                   <p className="text-sm font-medium">Phone Support</p>

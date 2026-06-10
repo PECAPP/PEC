@@ -22,13 +22,13 @@ export class CalendarSyncController {
 
     const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//OmniFlow//Calendar Sync//EN
+PRODID:-//PEC Campus ERP//Calendar Sync//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:OmniFlow - ${settings.user.name}
+X-WR-CALNAME:PEC Schedule - ${settings.user.name}
 X-WR-TIMEZONE:Asia/Kolkata
 BEGIN:VEVENT
-UID:sample-event@omniflow.pec.edu
+UID:sample-event@erp.pec.edu
 DTSTAMP:20240101T000000Z
 DTSTART:20240101T090000Z
 DTEND:20240101T100000Z
@@ -39,7 +39,7 @@ END:VCALENDAR`;
 
     res.set({
       'Content-Type': 'text/calendar; charset=utf-8',
-      'Content-Disposition': `attachment; filename="omniflow_calendar.ics"`,
+      'Content-Disposition': `attachment; filename="pec_calendar.ics"`,
     });
 
     res.send(icsContent);

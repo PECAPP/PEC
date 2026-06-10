@@ -42,7 +42,7 @@ export default function Search() {
     <div className="space-y-6">
       {/* Search Header */}
       <div className="bg-card border-b border-border -mx-6 -mt-6 p-6 mb-6">
-        <div className="max-w-4xl mx-auto">
+        <div className=" ">
           <h1 className="text-2xl font-bold mb-4">Search Results</h1>
           <form onSubmit={handleSearchSubmit} className="relative">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -50,7 +50,7 @@ export default function Search() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 h-12 text-lg bg-background"
-              placeholder="Search explicitly across users, jobs, and drives..."
+              placeholder="Search users, courses, and pages..."
             />
             <Button type="submit" className="absolute right-1.5 top-1.5 bottom-1.5">
               Search
@@ -66,7 +66,7 @@ export default function Search() {
           variants={container}
           initial="hidden"
           animate="show"
-          className="max-w-5xl mx-auto space-y-8"
+          className="  space-y-8"
         >
           {!hasResults ? (
             <div className="text-center py-12 text-muted-foreground">

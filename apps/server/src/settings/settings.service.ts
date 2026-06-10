@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -6,21 +6,26 @@ export class SettingsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getSettings(userId: string) {
-    // userSettings model does not exist in schema, returning mock
-    return {
-      userId,
-      icalToken: 'mock-ical-token-' + userId,
-      theme: 'system'
-    };
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const settings = await this.prisma.userSettings.upsert({
+      where: { userId },
+      update: {},
+      create: { userId },
+    });
+    return settings;
   }
 
   async updateSettings(userId: string, data: any) {
-    // userSettings model does not exist in schema, returning mock
-    return {
-      userId,
-      ...data,
-      icalToken: 'mock-ical-token-' + userId,
-    };
+    const settings = await this.prisma.userSettings.upsert({
+      where: { userId },
+      update: data,
+      create: { userId, ...data },
+    });
+    return settings;
   }
 
   async getActiveSessions(userId: string) {

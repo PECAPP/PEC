@@ -1,5 +1,5 @@
 "use client";
-
+import { AppShellSkeleton } from "@pec/ui";
 import { useEffect, useState } from "react";
 import { api } from "@pec/api";
 import { Monitor, Smartphone, Globe, Shield, Trash2, Loader2 } from "lucide-react";
@@ -69,7 +69,7 @@ export default function SecuritySettingsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 p-4">
+    <div className="  space-y-8 p-4">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Security & Sessions</h1>
         <p className="text-muted-foreground mt-2">
@@ -77,9 +77,9 @@ export default function SecuritySettingsPage() {
         </p>
       </div>
 
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+      <div className="rounded-sm border bg-card text-card-foreground shadow-sm overflow-hidden">
         <div className="p-6 border-b bg-muted/40 flex items-center space-x-3">
-          <div className="p-2 bg-primary/10 text-primary rounded-lg">
+          <div className="p-2 bg-primary/10 text-primary rounded-sm">
             <Shield className="w-5 h-5" />
           </div>
           <div>
@@ -92,9 +92,7 @@ export default function SecuritySettingsPage() {
 
         <div className="p-0">
           {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-            </div>
+            <AppShellSkeleton />
           ) : sessions.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               No active sessions found.
@@ -136,7 +134,7 @@ export default function SecuritySettingsPage() {
                       <button
                         onClick={() => handleRevoke(session.id)}
                         disabled={revoking === session.id}
-                        className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-destructive/20 bg-transparent shadow-sm hover:bg-destructive/10 text-destructive h-9 px-4 py-2 w-full sm:w-auto"
+                        className="inline-flex items-center justify-center rounded-sm text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-destructive/20 bg-transparent shadow-sm hover:bg-destructive/10 text-destructive h-9 px-4 py-2 w-full sm:w-auto"
                       >
                         {revoking === session.id ? (
                           <Loader2 className="w-4 h-4 animate-spin" />

@@ -1,4 +1,4 @@
-export type UserRole = "college_admin" | "faculty" | "student" | "moderator" | "user" | "placement_officer" | "recruiter" | "super_admin";
+export type UserRole = "admin" | "faculty" | "student";
 export interface User {
     id: string;
     uid: string;
@@ -39,6 +39,7 @@ export interface FacultyProfile {
     bio?: string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    user?: User;
 }
 export interface CollegeAdminProfile {
     uid: string;

@@ -39,7 +39,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   public get attendance() { return db.attendance; }
   public get attendanceSession() { return db.attendanceSession; }
   public get examSchedule() { return db.examSchedule; }
-  public get job() { return db.job; }
+
   public get auditLog() { return db.auditLog; }
   public get featureFlag() { return db.featureFlag; }
   public get backgroundJob() { return db.backgroundJob; }
@@ -48,8 +48,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   public get canteenOrderItem() { return db.canteenOrderItem; }
   public get scoreEntry() { return db.scoreEntry; }
   public get resumeProfile() { return db.resumeProfile; }
-  public get studentProject() { return db.studentProject; }
-  public get studentSkill() { return db.studentSkill; }
+
   public get facultyPublication() { return db.facultyPublication; }
   public get facultyAward() { return db.facultyAward; }
   public get facultyConference() { return db.facultyConference; }

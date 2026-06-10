@@ -40,7 +40,7 @@ export const GradesTable = ({ data }: { data: GradesData }) => {
 
   if (subjects.length === 0) {
     return (
-      <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
         {data.message ?? 'No grade records found.'}
       </div>
     );
@@ -59,7 +59,7 @@ export const GradesTable = ({ data }: { data: GradesData }) => {
     .sort((a, b) => a - b);
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2 text-white">
@@ -113,7 +113,7 @@ export const GradesTable = ({ data }: { data: GradesData }) => {
                     {s.credits}
                   </td>
                   <td className="px-3 py-2.5 text-center">
-                    <span className={`inline-block text-xs font-bold px-2 py-0.5 rounded-md ${gradeColor(s.grade)}`}>
+                    <span className={`inline-block text-xs font-bold px-2 py-0.5 rounded-sm ${gradeColor(s.grade)}`}>
                       {s.grade}
                     </span>
                   </td>

@@ -9,7 +9,14 @@ export class CaslAbilityFactory {
   createForUser(user: any) {
     const { can, cannot, build } = new AbilityBuilder<AppAbility>(createPrismaAbility);
 
-    if (user?.role === 'super_admin') {
+    // Fallback for legacy tokens that haven't been refreshed yet
+    const roleFromPayload = user?.role || (user?.roles && user.roles[0]);
+    const normalizedRole = ['college_admin', 'super_admin'].includes(roleFromPayload) ? 'admin' : roleFromPayload;
+
+    console.log('CASL BUILDER: user.role is', user?.role, 'roleFromPayload:', roleFromPayload, 'normalizedRole:', normalizedRole);
+
+    if (normalizedRole === 'admin') {
+      console.log('CASL BUILDER: granting manage all');
       can('manage', 'all'); // read-write access to everything
     } else {
       // Loop over the permissions fetched from Redis or DB

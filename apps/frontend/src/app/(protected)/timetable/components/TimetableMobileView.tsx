@@ -43,7 +43,7 @@ export default function TimetableMobileView({
             <button
               key={day}
               onClick={() => setSelectedDay(day)}
-              className={`snap-center shrink-0 min-w-[70px] py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 flex flex-col items-center gap-1.5 ${
+              className={`snap-center shrink-0 min-w-[70px] py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all border flex flex-col items-center gap-1.5 ${
                 selectedDay === day
                   ? 'bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary-rgb),0.35)] scale-105 z-10'
                   : 'bg-surface/60 backdrop-blur-sm text-muted-foreground border-border/50 hover:border-primary/30 hover:bg-muted/30'
@@ -78,7 +78,7 @@ export default function TimetableMobileView({
         <div className="space-y-6">
           {DAYS.map((day) => (
             <div key={day} className="space-y-3">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary/70 px-1 border-l-2 border-primary ml-1">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-primary/70 px-1 border-l-2 border-primary ml-1">
                 {day}
               </h3>
               <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
@@ -89,9 +89,9 @@ export default function TimetableMobileView({
                   return (
                     <div
                       key={slot}
-                      className="bg-card border border-border/60 rounded-xl p-3 flex items-center gap-3 hover:border-primary/40 transition-colors shadow-sm"
+                      className="bg-card border border-border/60 rounded-sm p-3 flex items-center gap-3 hover:border-primary/40 transition-colors shadow-sm"
                     >
-                      <div className="flex flex-col items-center justify-center bg-muted/30 rounded-lg p-2 min-w-[60px]">
+                      <div className="flex flex-col items-center justify-center bg-muted/30 rounded-sm p-2 min-w-[60px]">
                         <span className="text-[10px] font-bold text-foreground">
                           {slot.split('-')[0]}
                         </span>
@@ -164,14 +164,14 @@ export default function TimetableMobileView({
                     </span>
                   </div>
                   {isLive ? (
-                    <div className="flex-1 p-3 rounded-2xl border-2 border-primary bg-primary/5 flex items-center justify-center min-h-[80px] relative">
+                    <div className="flex-1 p-3 rounded-sm border border-primary bg-primary/5 flex items-center justify-center min-h-[80px] relative">
                       <span className="absolute -top-3 left-4 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">
                         NOW
                       </span>
                       <span className="text-xs text-primary font-medium">Free Slot</span>
                     </div>
                   ) : (
-                    <div className="flex-1 p-3 rounded-2xl border border-dashed border-border bg-muted/5 flex items-center justify-center min-h-[80px]">
+                    <div className="flex-1 p-3 rounded-sm border border-dashed border-border bg-muted/5 flex items-center justify-center min-h-[80px]">
                       <span className="text-xs text-muted-foreground/40 font-medium">
                         Free Slot
                       </span>
@@ -215,8 +215,8 @@ export default function TimetableMobileView({
                   {filteredSlots.map((slot: any, idx: number) => (
                     <div
                       key={idx}
-                      className={`relative overflow-hidden rounded-2xl border-l-4 p-4 transition-all
-                        ${isLive ? 'bg-card border-l-primary shadow-lg ring-1 ring-primary/20' : ''}
+                      className={`relative overflow-hidden rounded-sm border-l-4 p-4 transition-all
+                        ${isLive ? 'bg-card border-l-primary shadow-sm ring-1 ring-primary/20' : ''}
                         ${!isLive && !isCompleted ? 'bg-card border-l-primary shadow-sm hover:shadow-md' : ''}
                         ${isCompleted ? 'bg-muted/10 border-l-muted-foreground/30 shadow-none' : ''}
                       `}
@@ -287,3 +287,4 @@ export default function TimetableMobileView({
     </div>
   );
 }
+

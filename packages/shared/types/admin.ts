@@ -36,7 +36,6 @@ export interface PlacementSettings {
   placementSeasonEnd: string;
   requireCompanyVerification: boolean;
   companyVerificationDocuments: string[];
-  notifyOnNewJob: boolean;
   notifyOnApplicationUpdate: boolean;
   notifyOnDriveRegistration: boolean;
   updatedAt: Date | string;

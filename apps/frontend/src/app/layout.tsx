@@ -1,20 +1,16 @@
 import type { Metadata } from 'next';
-import { Inter, Sora } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { Providers } from './providers';
 import { RouteTransitionLoader } from '@/components/layout/RouteTransitionLoader';
 import { cookies } from 'next/headers';
+import { getServerSession } from '@/lib/server-auth';
+import { AuthProvider } from '@/features/auth/hooks/useAuth';
 import './globals.css';
 
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
-});
-
-const sora = Sora({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-display',
 });
 
 export const metadata: Metadata = {
@@ -33,17 +29,24 @@ export default async function RootLayout({
 }) {
   const cookieStore = await cookies();
   const savedAccent = cookieStore.get('accent-color')?.value || 'pec-gold';
+  
+  // Fetch session on the root layout so AuthContext is available globally
+  const user = await getServerSession();
 
   return (
     <html 
       lang="en" 
       suppressHydrationWarning 
       data-scroll-behavior="smooth"
-      className={`accent-${savedAccent} ${inter.variable} ${sora.variable}`}
+      className={`accent-${savedAccent} ${inter.variable}`}
     >
       <body suppressHydrationWarning>
         <RouteTransitionLoader />
-        <Providers>{children}</Providers>
+        <Providers>
+          <AuthProvider initialSession={user}>
+            {children}
+          </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

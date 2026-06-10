@@ -24,24 +24,42 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const settingsControllerGetSettingsV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type settingsControllerGetSettingsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type settingsControllerGetSettingsV1ResponseSuccess = (settingsControllerGetSettingsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type settingsControllerGetSettingsV1Response = (settingsControllerGetSettingsV1ResponseSuccess)
+
+export const getSettingsControllerGetSettingsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/settings`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/settings`
+}
+
+export const settingsControllerGetSettingsV1 = async ( options?: RequestInit): Promise<settingsControllerGetSettingsV1Response> => {
+
+  return fetchWithAuth<settingsControllerGetSettingsV1Response>(getSettingsControllerGetSettingsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -53,16 +71,16 @@ export const getSettingsControllerGetSettingsV1QueryKey = () => {
     }
 
 
-export const getSettingsControllerGetSettingsV1QueryOptions = <TData = Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getSettingsControllerGetSettingsV1QueryOptions = <TData = Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getSettingsControllerGetSettingsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>> = ({ signal }) => settingsControllerGetSettingsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>> = ({ signal }) => settingsControllerGetSettingsV1({ signal });
 
 
 
@@ -82,7 +100,7 @@ export function useSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError = unknown>(
@@ -92,16 +110,16 @@ export function useSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSettingsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -117,30 +135,50 @@ export function useSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<ty
 
 
 
-export const settingsControllerUpdateSettingsV1 = (
+export type settingsControllerUpdateSettingsV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type settingsControllerUpdateSettingsV1ResponseSuccess = (settingsControllerUpdateSettingsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type settingsControllerUpdateSettingsV1Response = (settingsControllerUpdateSettingsV1ResponseSuccess)
+
+export const getSettingsControllerUpdateSettingsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/settings`, method: 'PATCH', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/settings`
+}
+
+export const settingsControllerUpdateSettingsV1 = async ( options?: RequestInit): Promise<settingsControllerUpdateSettingsV1Response> => {
+
+  return fetchWithAuth<settingsControllerUpdateSettingsV1Response>(getSettingsControllerUpdateSettingsV1Url(),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
 
 
 
 export const getSettingsControllerUpdateSettingsV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUpdateSettingsV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUpdateSettingsV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUpdateSettingsV1>>, TError,void, TContext> => {
 
 const mutationKey = ['settingsControllerUpdateSettingsV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -148,7 +186,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof settingsControllerUpdateSettingsV1>>, void> = () => {
 
 
-          return  settingsControllerUpdateSettingsV1(requestOptions)
+          return  settingsControllerUpdateSettingsV1()
         }
 
 
@@ -163,7 +201,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type SettingsControllerUpdateSettingsV1MutationError = unknown
 
     export const useSettingsControllerUpdateSettingsV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUpdateSettingsV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUpdateSettingsV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof settingsControllerUpdateSettingsV1>>,
         TError,
@@ -172,17 +210,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSettingsControllerUpdateSettingsV1MutationOptions(options), queryClient);
     }
-    export const settingsControllerGetSessionsV1 = (
+    export type settingsControllerGetSessionsV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type settingsControllerGetSessionsV1ResponseSuccess = (settingsControllerGetSessionsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type settingsControllerGetSessionsV1Response = (settingsControllerGetSessionsV1ResponseSuccess)
+
+export const getSettingsControllerGetSessionsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/settings/sessions`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/settings/sessions`
+}
+
+export const settingsControllerGetSessionsV1 = async ( options?: RequestInit): Promise<settingsControllerGetSessionsV1Response> => {
+
+  return fetchWithAuth<settingsControllerGetSessionsV1Response>(getSettingsControllerGetSessionsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -194,16 +252,16 @@ export const getSettingsControllerGetSessionsV1QueryKey = () => {
     }
 
 
-export const getSettingsControllerGetSessionsV1QueryOptions = <TData = Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getSettingsControllerGetSessionsV1QueryOptions = <TData = Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getSettingsControllerGetSessionsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>> = ({ signal }) => settingsControllerGetSessionsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>> = ({ signal }) => settingsControllerGetSessionsV1({ signal });
 
 
 
@@ -223,7 +281,7 @@ export function useSettingsControllerGetSessionsV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSettingsControllerGetSessionsV1<TData = Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError = unknown>(
@@ -233,16 +291,16 @@ export function useSettingsControllerGetSessionsV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSettingsControllerGetSessionsV1<TData = Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useSettingsControllerGetSessionsV1<TData = Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetSessionsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -258,30 +316,50 @@ export function useSettingsControllerGetSessionsV1<TData = Awaited<ReturnType<ty
 
 
 
-export const settingsControllerRevokeAllSessionsV1 = (
+export type settingsControllerRevokeAllSessionsV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type settingsControllerRevokeAllSessionsV1ResponseSuccess = (settingsControllerRevokeAllSessionsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type settingsControllerRevokeAllSessionsV1Response = (settingsControllerRevokeAllSessionsV1ResponseSuccess)
+
+export const getSettingsControllerRevokeAllSessionsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/settings/sessions/revoke-all`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/settings/sessions/revoke-all`
+}
+
+export const settingsControllerRevokeAllSessionsV1 = async ( options?: RequestInit): Promise<settingsControllerRevokeAllSessionsV1Response> => {
+
+  return fetchWithAuth<settingsControllerRevokeAllSessionsV1Response>(getSettingsControllerRevokeAllSessionsV1Url(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getSettingsControllerRevokeAllSessionsV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRevokeAllSessionsV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRevokeAllSessionsV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRevokeAllSessionsV1>>, TError,void, TContext> => {
 
 const mutationKey = ['settingsControllerRevokeAllSessionsV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -289,7 +367,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof settingsControllerRevokeAllSessionsV1>>, void> = () => {
 
 
-          return  settingsControllerRevokeAllSessionsV1(requestOptions)
+          return  settingsControllerRevokeAllSessionsV1()
         }
 
 
@@ -304,7 +382,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type SettingsControllerRevokeAllSessionsV1MutationError = unknown
 
     export const useSettingsControllerRevokeAllSessionsV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRevokeAllSessionsV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRevokeAllSessionsV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof settingsControllerRevokeAllSessionsV1>>,
         TError,
@@ -313,17 +391,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSettingsControllerRevokeAllSessionsV1MutationOptions(options), queryClient);
     }
-    export const settingsControllerGetOAuthAccountsV1 = (
+    export type settingsControllerGetOAuthAccountsV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type settingsControllerGetOAuthAccountsV1ResponseSuccess = (settingsControllerGetOAuthAccountsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type settingsControllerGetOAuthAccountsV1Response = (settingsControllerGetOAuthAccountsV1ResponseSuccess)
+
+export const getSettingsControllerGetOAuthAccountsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/settings/oauth`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/settings/oauth`
+}
+
+export const settingsControllerGetOAuthAccountsV1 = async ( options?: RequestInit): Promise<settingsControllerGetOAuthAccountsV1Response> => {
+
+  return fetchWithAuth<settingsControllerGetOAuthAccountsV1Response>(getSettingsControllerGetOAuthAccountsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -335,16 +433,16 @@ export const getSettingsControllerGetOAuthAccountsV1QueryKey = () => {
     }
 
 
-export const getSettingsControllerGetOAuthAccountsV1QueryOptions = <TData = Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getSettingsControllerGetOAuthAccountsV1QueryOptions = <TData = Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getSettingsControllerGetOAuthAccountsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>> = ({ signal }) => settingsControllerGetOAuthAccountsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>> = ({ signal }) => settingsControllerGetOAuthAccountsV1({ signal });
 
 
 
@@ -364,7 +462,7 @@ export function useSettingsControllerGetOAuthAccountsV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSettingsControllerGetOAuthAccountsV1<TData = Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError = unknown>(
@@ -374,16 +472,16 @@ export function useSettingsControllerGetOAuthAccountsV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useSettingsControllerGetOAuthAccountsV1<TData = Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useSettingsControllerGetOAuthAccountsV1<TData = Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof settingsControllerGetOAuthAccountsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -399,30 +497,50 @@ export function useSettingsControllerGetOAuthAccountsV1<TData = Awaited<ReturnTy
 
 
 
-export const settingsControllerRequestDataExportV1 = (
+export type settingsControllerRequestDataExportV1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type settingsControllerRequestDataExportV1ResponseSuccess = (settingsControllerRequestDataExportV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type settingsControllerRequestDataExportV1Response = (settingsControllerRequestDataExportV1ResponseSuccess)
+
+export const getSettingsControllerRequestDataExportV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/settings/data-export`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/settings/data-export`
+}
+
+export const settingsControllerRequestDataExportV1 = async ( options?: RequestInit): Promise<settingsControllerRequestDataExportV1Response> => {
+
+  return fetchWithAuth<settingsControllerRequestDataExportV1Response>(getSettingsControllerRequestDataExportV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getSettingsControllerRequestDataExportV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRequestDataExportV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRequestDataExportV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRequestDataExportV1>>, TError,void, TContext> => {
 
 const mutationKey = ['settingsControllerRequestDataExportV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -430,7 +548,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof settingsControllerRequestDataExportV1>>, void> = () => {
 
 
-          return  settingsControllerRequestDataExportV1(requestOptions)
+          return  settingsControllerRequestDataExportV1()
         }
 
 
@@ -445,7 +563,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type SettingsControllerRequestDataExportV1MutationError = unknown
 
     export const useSettingsControllerRequestDataExportV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRequestDataExportV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerRequestDataExportV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof settingsControllerRequestDataExportV1>>,
         TError,
@@ -454,30 +572,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSettingsControllerRequestDataExportV1MutationOptions(options), queryClient);
     }
-    export const settingsControllerUploadAvatarV1 = (
+    export type settingsControllerUploadAvatarV1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type settingsControllerUploadAvatarV1ResponseSuccess = (settingsControllerUploadAvatarV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type settingsControllerUploadAvatarV1Response = (settingsControllerUploadAvatarV1ResponseSuccess)
+
+export const getSettingsControllerUploadAvatarV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/settings/avatar`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/settings/avatar`
+}
+
+export const settingsControllerUploadAvatarV1 = async ( options?: RequestInit): Promise<settingsControllerUploadAvatarV1Response> => {
+
+  return fetchWithAuth<settingsControllerUploadAvatarV1Response>(getSettingsControllerUploadAvatarV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getSettingsControllerUploadAvatarV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUploadAvatarV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUploadAvatarV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUploadAvatarV1>>, TError,void, TContext> => {
 
 const mutationKey = ['settingsControllerUploadAvatarV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -485,7 +623,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof settingsControllerUploadAvatarV1>>, void> = () => {
 
 
-          return  settingsControllerUploadAvatarV1(requestOptions)
+          return  settingsControllerUploadAvatarV1()
         }
 
 
@@ -500,7 +638,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type SettingsControllerUploadAvatarV1MutationError = unknown
 
     export const useSettingsControllerUploadAvatarV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUploadAvatarV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof settingsControllerUploadAvatarV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof settingsControllerUploadAvatarV1>>,
         TError,

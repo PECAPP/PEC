@@ -14,13 +14,13 @@ export const metadata = {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
-      <div className="h-24 bg-muted rounded-xl" />
+      <div className="h-24 bg-muted rounded-sm" />
       <div className="grid gap-4 md:grid-cols-3">
-        {[1, 2, 3].map(i => <div key={i} className="h-24 bg-muted rounded-xl" />)}
+        {[1, 2, 3].map(i => <div key={i} className="h-24 bg-muted rounded-sm" />)}
       </div>
       <div className="grid gap-5 xl:grid-cols-3">
-        <div className="lg:col-span-2 h-64 bg-muted rounded-xl" />
-        <div className="h-64 bg-muted rounded-xl" />
+        <div className="lg:col-span-2 h-64 bg-muted rounded-sm" />
+        <div className="h-64 bg-muted rounded-sm" />
       </div>
     </div>
   );

@@ -154,13 +154,13 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
 
       {/* Mention Dropdown */}
       {showMentions && filteredMentionUsers.length > 0 && (
-        <div className="absolute bottom-full left-4 right-4 mb-2 bg-card border border-border shadow-xl rounded-xl overflow-hidden animate-scale-in z-50">
+        <div className="absolute bottom-full left-4 right-4 mb-2 bg-card border border-border shadow-xl rounded-sm overflow-hidden animate-scale-in z-50">
           <ScrollArea className="h-48">
             <div className="p-2 space-y-1">
               {filteredMentionUsers.map(u => (
                 <button
                   key={u.uid}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent text-left rounded-lg transition-colors"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent text-left rounded-sm transition-colors"
                   onClick={() => insertMention(u)}
                 >
                   <div 
@@ -236,7 +236,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
               </>
             )}
 
-            <div className="flex-1 bg-secondary/50 rounded-3xl border border-border/50 px-4 py-2 flex items-center gap-2">
+            <div className="flex-1 bg-secondary/50 rounded-sm border border-border/50 px-4 py-2 flex items-center gap-2">
               <Textarea
                 ref={textareaRef}
                 value={message}

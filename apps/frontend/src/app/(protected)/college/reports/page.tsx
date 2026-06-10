@@ -94,7 +94,7 @@ export default function Reports() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="card-elevated p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center">
               <FileText className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -105,7 +105,7 @@ export default function Reports() {
         </div>
         <div className="card-elevated p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-success/10 flex items-center justify-center">
               <Download className="w-5 h-5 text-success" />
             </div>
             <div>
@@ -116,7 +116,7 @@ export default function Reports() {
         </div>
         <div className="card-elevated p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-accent/10 flex items-center justify-center">
               <Calendar className="w-5 h-5 text-accent" />
             </div>
             <div>
@@ -127,7 +127,7 @@ export default function Reports() {
         </div>
         <div className="card-elevated p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-warning/10 flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-warning" />
             </div>
             <div>
@@ -143,14 +143,14 @@ export default function Reports() {
         {reportCategories.map((category, idx) => (
           <div key={idx} className="card-elevated p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center">
                 <category.icon className="w-5 h-5 text-primary" />
               </div>
               <h2 className="text-lg font-semibold text-foreground">{category.title}</h2>
             </div>
             <div className="space-y-3">
               {category.reports.map((report, rIdx) => (
-                <div key={rIdx} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                <div key={rIdx} className="flex items-center justify-between p-3 rounded-sm bg-secondary/30 hover:bg-secondary/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <FileText className="w-4 h-4 text-muted-foreground" />
                     <div>

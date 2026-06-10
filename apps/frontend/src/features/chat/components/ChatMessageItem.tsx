@@ -9,35 +9,35 @@ import dynamic from 'next/dynamic';
 import { SuggestionChips } from '../generative/SuggestionChips';
 
 const GradesTable = dynamic(() => import("../generative/GradesTable").then((mod) => mod.GradesTable), {
-  loading: () => <div className="w-full h-32 rounded-xl bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">📊 Loading Grades...</div>,
+  loading: () => <div className="w-full h-32 rounded-sm bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3"> Loading Grades...</div>,
   ssr: false,
 });
 const AttendanceTable = dynamic(() => import("../generative/AttendanceTable").then((mod) => mod.AttendanceTable), {
-  loading: () => <div className="w-full h-32 rounded-xl bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">📅 Loading Attendance...</div>,
+  loading: () => <div className="w-full h-32 rounded-sm bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3"> Loading Attendance...</div>,
   ssr: false,
 });
 const ScheduleTable = dynamic(() => import("../generative/ScheduleTable").then((mod) => mod.ScheduleTable), {
-  loading: () => <div className="w-full h-32 rounded-xl bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">🗓️ Loading Schedule...</div>,
+  loading: () => <div className="w-full h-32 rounded-sm bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">️ Loading Schedule...</div>,
   ssr: false,
 });
 const HostelIssuesList = dynamic(() => import("../generative/HostelIssuesList").then((mod) => mod.HostelIssuesList), {
-  loading: () => <div className="w-full h-32 rounded-xl bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">🔧 Loading Maintenance Issues...</div>,
+  loading: () => <div className="w-full h-32 rounded-sm bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3"> Loading Maintenance Issues...</div>,
   ssr: false,
 });
 const CanteenMenuList = dynamic(() => import("../generative/CanteenMenuList").then((mod) => mod.CanteenMenuList), {
-  loading: () => <div className="w-full h-32 rounded-xl bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">🍔 Loading Menu...</div>,
+  loading: () => <div className="w-full h-32 rounded-sm bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3"> Loading Menu...</div>,
   ssr: false,
 });
 const FinanceSummaryCard = dynamic(() => import("../generative/FinanceSummaryCard").then((mod) => mod.FinanceSummaryCard), {
-  loading: () => <div className="w-full h-32 rounded-xl bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">💳 Loading Dues & Fees...</div>,
+  loading: () => <div className="w-full h-32 rounded-sm bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3"> Loading Dues & Fees...</div>,
   ssr: false,
 });
 const EventsList = dynamic(() => import("../generative/EventsList").then((mod) => mod.EventsList), {
-  loading: () => <div className="w-full h-32 rounded-xl bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">🎉 Loading Calendar Events...</div>,
+  loading: () => <div className="w-full h-32 rounded-sm bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3"> Loading Calendar Events...</div>,
   ssr: false,
 });
 const ClubsList = dynamic(() => import("../generative/ClubsList").then((mod) => mod.ClubsList), {
-  loading: () => <div className="w-full h-32 rounded-xl bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3">👥 Loading Student Clubs...</div>,
+  loading: () => <div className="w-full h-32 rounded-sm bg-muted/40 animate-pulse border border-muted flex items-center justify-center text-xs text-muted-foreground my-3"> Loading Student Clubs...</div>,
   ssr: false,
 });
 
@@ -65,8 +65,8 @@ export const ChatMessageItem = ({
       <div
         className={`max-w-[85%] ${
           isUser
-            ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-none"
-            : "bg-muted rounded-2xl rounded-tl-none"
+            ? "bg-primary text-primary-foreground rounded-sm rounded-tr-none"
+            : "bg-muted rounded-sm rounded-tl-none"
         } px-4 py-2.5 shadow-sm`}
       >
         <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
@@ -96,7 +96,7 @@ export const ChatMessageItem = ({
                   parts.push(
                     <div
                       key={match.index}
-                      className="flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-800/40 my-1"
+                      className="flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-sm border border-indigo-100 dark:border-indigo-800/40 my-1"
                     >
                       <span className="animate-pulse">↗</span>
                       <span>

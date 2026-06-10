@@ -14,7 +14,7 @@ import {
  ChevronRight, Globe
 } from 'lucide-react';
 
-type UserRole = 'student' | 'faculty' | 'college_admin';
+type UserRole = 'student' | 'faculty' | 'admin';
 
 interface AuthClientProps {
  _initialSessionStatus?: boolean;
@@ -58,7 +58,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
     redirectPath = '/dashboard';
    } else if (user.role === 'faculty') {
     redirectPath = '/dashboard';
-   } else if (user.role === 'college_admin') {
+   } else if (user.role === 'admin') {
     redirectPath = '/dashboard';
    }
    router.replace(redirectPath);
@@ -123,36 +123,23 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="flex flex-col items-center space-y-8"
     >
-     {/* LOGO AREA */}
-     <div className="relative group">
-      <div className="flex items-baseline">
-       <span className="text-8xl md:text-[10rem] font-bold tracking-tight text-accent leading-none">P</span>
-       <div className="relative">
-        {/* THE RED SLASH ACCENT */}
-        <motion.div 
-         initial={{ width: 0 }}
-         animate={{ width: '100%' }}
-         transition={{ delay: 0.5, duration: 0.5 }}
-         className="absolute -top-4 left-0 h-4 md:h-6 bg-[#FF0000] skew-x-[20deg] z-10 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
-        />
-        <span className="text-8xl md:text-[10rem] font-bold tracking-tight text-accent leading-none">E</span>
+      {/* LOGO AREA */}
+      <div className="relative group">
+       <div className="flex items-baseline">
+        <span className="text-6xl md:text-8xl font-bold tracking-tight text-accent leading-none">P</span>
+        <div className="relative">
+         {/* THE ACCENT */}
+         <span className="text-6xl md:text-8xl font-bold tracking-tight text-accent leading-none">E</span>
+        </div>
+        <span className="text-6xl md:text-8xl font-bold tracking-tight text-accent leading-none">C</span>
        </div>
-       <span className="text-8xl md:text-[10rem] font-bold tracking-tight text-accent leading-none">C</span>
       </div>
-      <div className="absolute -bottom-4 left-0 w-full h-1 bg-accent/20 overflow-hidden">
-        <motion.div 
-         animate={{ x: ['-100%', '100%'] }}
-         transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-         className="w-1/2 h-full bg-accent"
-        />
-      </div>
-     </div>
      
      <div className="space-y-2 text-center">
-      <p className="text-[11px] font-black uppercase tracking-[0.6em] text-accent/80">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-accent/80">
        EXPLORE. INNOVATE. EXCEL.
       </p>
-      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-accent/40 italic">
+      <p className="text-[9px] font-bold uppercase tracking-widest text-accent/40 italic">
        Punjab Engineering College
       </p>
      </div>
@@ -186,8 +173,8 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
    <div className="hidden md:flex md:w-6/12 bg-black relative flex-col justify-center p-12 lg:p-16 text-white group overflow-hidden border-r border-white/5">
     <div className="relative z-20 space-y-10 max-w-[560px]">
      {/* HEADER LOGO + BILINGUAL TITLE */}
-     <div className="flex items-start gap-4 bg-black/50 backdrop-blur-sm border border-white/10 rounded-lg p-4">
-      <div className="w-12 h-12 bg-accent flex items-center justify-center shadow-[4px_4px_0px_white] rounded-sm">
+     <div className="flex items-start gap-4 bg-black/50 backdrop-blur-sm border border-white/10 rounded-sm p-4">
+      <div className="w-12 h-12 bg-accent flex items-center justify-center rounded-sm">
        <Building2 className="w-6 h-6 text-black" />
       </div>
       <div className="space-y-0.5">
@@ -204,9 +191,9 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
       initial={{ opacity: 0, x: -30 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.8 }}
-      className="pt-4 bg-black/45 backdrop-blur-sm border border-white/10 rounded-xl p-5 max-w-[520px]"
+      className="pt-4 bg-black/45 backdrop-blur-sm border border-white/10 rounded-sm p-5 max-w-[520px]"
      >
-      <h1 className="text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight uppercase text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.55)]">
+      <h1 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-white">
        Student <span className="text-accent">Portal</span>
       </h1>
       <p className="text-base lg:text-lg text-white/90 font-medium max-w-md mt-4 leading-snug tracking-tight">
@@ -219,15 +206,15 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.5 }}
-      className="flex items-center gap-6 pt-5 border-t border-white/10 w-fit bg-black/35 backdrop-blur-sm rounded-lg px-4 pb-3"
+      className="flex items-center gap-6 pt-5 border-t border-white/10 w-fit bg-black/35 backdrop-blur-sm rounded-sm px-4 pb-3"
      >
        <div className="flex -space-x-3">
         {[1,2,3,4].map(i => (
-         <div key={i} className="w-9 h-9 border-2 border-black bg-muted flex items-center justify-center overflow-hidden rounded-sm">
+         <div key={i} className="w-9 h-9 border border-black bg-muted flex items-center justify-center overflow-hidden rounded-sm">
           <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" className="w-full h-full object-cover grayscale brightness-110" />
          </div>
         ))}
-        <div className="w-9 h-9 border-2 border-black bg-white flex items-center justify-center text-[10px] font-bold text-black rounded-sm">12K+</div>
+        <div className="w-9 h-9 border border-black bg-white flex items-center justify-center text-[10px] font-bold text-black rounded-sm">12K+</div>
        </div>
        <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">Authorized Users</p>
      </motion.div>
@@ -254,12 +241,10 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
 
    {/* RIGHT SIDE: AUTH FORMS (CLEANER SWISS GRID) */}
    <div className="flex-1 flex items-center justify-center p-6 lg:p-16 bg-background relative overflow-hidden">
-    <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
-
     <motion.div
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     className="w-full max-w-[460px] z-10 bg-card/85 backdrop-blur-md border border-border/70 rounded-xl p-6 lg:p-7 shadow-[0_18px_60px_rgba(0,0,0,0.35)]"
+     className="w-full max-w-[460px] z-10 bg-card/85 backdrop-blur-md border border-border/70 rounded-sm p-6 lg:p-7 shadow-md"
     >
      <div className="mb-8 text-center md:text-left">
       <h2 className="text-4xl font-bold tracking-tight uppercase text-foreground leading-none mb-6">
@@ -275,7 +260,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
       <motion.div
        initial={{ opacity: 0, scale: 0.98 }}
        animate={{ opacity: 1, scale: 1 }}
-       className={`mb-10 p-4 border-2 flex gap-4 text-xs font-bold uppercase tracking-[0.1em] items-center rounded-sm ${
+       className={`mb-10 p-4 border flex gap-4 text-xs font-bold uppercase tracking-[0.1em] items-center rounded-sm ${
         error ? 'bg-destructive/5 border-destructive text-destructive' : 'bg-success/5 border-success text-success'
        }`}
       >
@@ -285,7 +270,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
      )}
 
      <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="w-full space-y-10">
-      <TabsList className="grid w-full grid-cols-2 bg-muted/90 p-1 h-12 rounded-md border border-border">
+      <TabsList className="grid w-full grid-cols-2 bg-muted/90 p-1 h-12 rounded-sm border border-border">
        <TabsTrigger value="signin" className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold uppercase text-[11px] tracking-widest transition-all">Sign In</TabsTrigger>
        <TabsTrigger value="signup" className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold uppercase text-[11px] tracking-widest transition-all">Register</TabsTrigger>
       </TabsList>
@@ -303,7 +288,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
            value={formData.email}
            onChange={handleInputChange}
            autoComplete="username"
-          className="pl-12 h-12 rounded-md border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
+          className="pl-12 h-12 rounded-sm border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
           />
          </div>
         </div>
@@ -322,7 +307,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
            value={formData.password}
            onChange={handleInputChange}
            autoComplete="current-password"
-          className="pl-12 pr-12 h-12 rounded-md border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
+          className="pl-12 pr-12 h-12 rounded-sm border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-3.5 text-muted-foreground hover:text-foreground">
            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -330,20 +315,20 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
          </div>
         </div>
 
-        <Button type="submit" disabled={loading} className="w-full h-12 rounded-md bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[11px] shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
+        <Button type="submit" disabled={loading} className="w-full h-12 rounded-sm bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[11px] shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
          {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Sign In'}
         </Button>
        </form>
 
         <div className="relative pt-2">
         <div className="absolute inset-0 flex items-center px-4"><span className="w-full border-t border-border"></span></div>
-        <div className="relative flex justify-center"><span className="bg-background px-4 text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground opacity-50">Authorized Access</span></div>
+        <div className="relative flex justify-center"><span className="bg-background px-4 text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">Authorized Access</span></div>
        </div>
 
        <Button 
         variant="outline" 
         onClick={() => setShowCredentialsModal(true)}
-        className="w-full h-11 rounded-md border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 text-[10px] font-bold uppercase tracking-widest transition-all gap-3"
+        className="w-full h-11 rounded-sm border border-dashed border-border hover:border-primary hover:bg-primary/5 text-[10px] font-bold uppercase tracking-widest transition-all gap-3"
        >
         <Shield className="w-4 h-4 text-primary" />
         Use Test Accounts
@@ -351,7 +336,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
       </TabsContent>
 
       <TabsContent value="signup" className="mt-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-       <div className="bg-muted/80 border border-border p-8 text-center space-y-6 rounded-md shadow-inner">
+       <div className="bg-muted/80 border border-border p-8 text-center space-y-6 rounded-sm shadow-inner">
          <div className="w-14 h-14 bg-primary flex items-center justify-center mx-auto rounded-sm"><Building2 className="w-7 h-7 text-primary-foreground" /></div>
          <div className="space-y-2">
           <h3 className="text-xl font-bold uppercase tracking-tight">Institutional Registration</h3>
@@ -381,15 +366,15 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
      <motion.div
       initial={{ opacity: 0, scale: 0.98, y: 30 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      className="bg-card border border-primary/40 rounded-xl shadow-[0_30px_80px_rgba(0,0,0,0.55)] max-w-2xl w-full overflow-hidden"
+      className="bg-card border border-primary/40 rounded-sm shadow-xl max-w-2xl w-full overflow-hidden"
      >
       <div className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground px-8 py-8 relative border-b border-black/10">
        <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary-foreground/70">Secure Access</p>
        <h2 className="text-3xl font-bold uppercase tracking-tight mt-2">Test Accounts</h2>
-       <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary-foreground/75 mt-3">Select a test account to auto-fill sign-in credentials</p>
+       <p className="text-[11px] font-bold tracking-widest uppercase text-primary-foreground/75 mt-3">Select a test account to auto-fill sign-in credentials</p>
        <button 
         onClick={() => setShowCredentialsModal(false)}
-        className="absolute top-6 right-6 p-2 rounded-md hover:bg-white/10 transition-all text-white/60 hover:text-white"
+        className="absolute top-6 right-6 p-2 rounded-sm hover:bg-white/10 transition-all text-white/60 hover:text-white"
        >
         <X className="w-5 h-5" />
        </button>
@@ -405,14 +390,14 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
        {[
         { r: 'student', e: 'student@pec.edu', p: 'password123', i: GraduationCap, t: 'TEST STUDENT' },
         { r: 'faculty', e: 'faculty@pec.edu', p: 'password123', i: Users, t: 'TEST FACULTY' },
-        { r: 'college_admin', e: 'admin@pec.edu', p: 'password123', i: Building2, t: 'SYSTEM REGISTRAR' }
+        { r: 'college_admin', e: 'admin@pec.edu', p: 'password123', i: Building2, t: 'Admin' }
        ].map((role) => (
         <button
          key={role.r}
          onClick={() => fillCredentials(role.e, role.p)}
-         className="flex items-center gap-4 p-4 border border-border/80 bg-background hover:bg-muted/50 hover:border-primary/40 transition-all group rounded-lg text-left"
+         className="flex items-center gap-4 p-4 border border-border/80 bg-background hover:bg-muted/50 hover:border-primary/40 transition-all group rounded-sm text-left"
         >
-         <div className="w-12 h-12 bg-primary/90 text-primary-foreground flex items-center justify-center group-hover:scale-105 transition-transform rounded-md shadow-md">
+         <div className="w-12 h-12 bg-primary/90 text-primary-foreground flex items-center justify-center group-hover:scale-105 transition-transform rounded-sm shadow-md">
           <role.i className="w-5 h-5" />
          </div>
          <div className="flex-1 text-left">
@@ -420,7 +405,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
           <p className="text-[10px] font-mono text-muted-foreground uppercase opacity-70 font-bold mt-0.5">{role.e}</p>
          </div>
          <div className="flex items-center gap-3">
-          <span className="text-[9px] uppercase tracking-wider font-bold border border-primary/30 text-primary bg-primary/5 px-2 py-1 rounded-md">
+          <span className="text-[9px] uppercase tracking-wider font-bold border border-primary/30 text-primary bg-primary/5 px-2 py-1 rounded-sm">
            {role.r.replace('_', ' ')}
           </span>
           <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />

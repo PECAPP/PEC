@@ -89,15 +89,15 @@ export function AttendanceOverviewCard({
       </div>
 
       <div className="grid gap-3 mt-6 sm:grid-cols-3">
-        <div className="rounded-lg border border-border bg-background/60 p-3">
+        <div className="rounded-sm border border-border bg-background/60 p-3">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Required</p>
           <p className="text-sm font-semibold">{requiredToTarget === 0 ? '0% needed' : `${requiredToTarget}% more`}</p>
         </div>
-        <div className="rounded-lg border border-border bg-background/60 p-3">
+        <div className="rounded-sm border border-border bg-background/60 p-3">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Status</p>
           <p className="text-sm font-semibold">{statusLabel}</p>
         </div>
-        <div className="rounded-lg border border-border bg-background/60 p-3">
+        <div className="rounded-sm border border-border bg-background/60 p-3">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Next Milestone</p>
           <p className="text-sm font-semibold">
             {clampedPercentage >= greatThreshold

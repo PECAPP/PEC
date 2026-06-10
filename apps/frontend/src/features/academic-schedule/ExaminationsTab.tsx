@@ -1,6 +1,6 @@
 'use client';
 import { extractData } from "@/lib/utils";
-import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@pec/ui";
+import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, formatDate } from "@pec/ui";
 
 
 import { useEffect, useMemo, useState } from 'react';
@@ -42,11 +42,7 @@ type ExamSchedule = {
 
 const examTypeOptions = ['Midterm', 'Final', 'Practical', 'Quiz'];
 
-const formatDate = (value: string) => {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return value;
-  return parsed.toLocaleDateString();
-};
+
 
 const isUpcoming = (value: string) => {
   const date = new Date(value);
@@ -74,7 +70,7 @@ export default function ExaminationsTab() {
   }
 
   const role = user.role;
-  const isCollegeAdmin = ['college_admin', 'admin', 'moderator'].includes(role || '');
+  const isCollegeAdmin = ['admin'].includes(role || '');
 
   if (isCollegeAdmin) {
     return <CollegeAdminExaminations />;
@@ -327,7 +323,7 @@ function CollegeAdminExaminations() {
             </Select>
           </div>
 
-          <div className="border rounded-lg overflow-hidden">
+          <div className="border rounded-sm overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -487,15 +483,15 @@ function DepartmentUpcomingExams({
         </Select>
       </div>
 
-      <div className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-2xl">
+      <div className="border border-border/60 rounded-sm overflow-hidden bg-card shadow-2xl">
         <Table className="border-collapse">
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted border-b border-border/60">
-              <TableHead className="w-40 font-black uppercase text-[10px] tracking-widest text-primary py-4 border-r border-border/60 text-center">Status & Date</TableHead>
-              <TableHead className="font-black uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Course Details</TableHead>
-              <TableHead className="font-black uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Time Slot</TableHead>
-              <TableHead className="font-black uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Venue</TableHead>
-              <TableHead className="text-right font-black uppercase text-[10px] tracking-widest py-4">Type</TableHead>
+              <TableHead className="w-40 font-bold uppercase text-[10px] tracking-widest text-primary py-4 border-r border-border/60 text-center">Status & Date</TableHead>
+              <TableHead className="font-bold uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Course Details</TableHead>
+              <TableHead className="font-bold uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Time Slot</TableHead>
+              <TableHead className="font-bold uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Venue</TableHead>
+              <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest py-4">Type</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -540,11 +536,11 @@ function DepartmentUpcomingExams({
                         className={`align-top border-r border-border/60 py-6 text-center ${isVerySoon ? 'bg-primary/10' : 'bg-muted/30'}`}
                       >
                         <div className="flex flex-col items-center justify-center space-y-2 sticky top-6">
-                          <span className={`text-[10px] font-black leading-none px-2 py-1 rounded-full ${isVerySoon ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-muted-foreground/20 text-muted-foreground'}`}>
+                          <span className={`text-[10px] font-bold leading-none px-2 py-1 rounded-full ${isVerySoon ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-muted-foreground/20 text-muted-foreground'}`}>
                             {diffDays === 0 ? 'TODAY' : diffDays === 1 ? 'TOMORROW' : `${diffDays}D LEFT`}
                           </span>
                           <div className="flex flex-col items-center">
-                            <span className="text-3xl font-black text-foreground tracking-tighter">{examDate.getDate()}</span>
+                            <span className="text-3xl font-bold text-foreground tracking-tighter">{examDate.getDate()}</span>
                             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{new Intl.DateTimeFormat('en-US', { month: 'short' }).format(examDate)}</span>
                             <div className="h-px w-8 bg-border/60 my-1" />
                             <span className="text-[9px] font-bold text-primary uppercase tracking-tight">{new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(examDate)}</span>
@@ -561,18 +557,18 @@ function DepartmentUpcomingExams({
                       </div>
                     </TableCell>
                     <TableCell className="py-6 border-r border-border/60">
-                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md border font-mono text-xs font-bold leading-none shadow-sm ${isVerySoon ? 'bg-primary/20 border-primary/30 text-primary' : 'bg-background border-border/60 text-muted-foreground'}`}>
+                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border font-mono text-xs font-bold leading-none shadow-sm ${isVerySoon ? 'bg-primary/20 border-primary/30 text-primary' : 'bg-background border-border/60 text-muted-foreground'}`}>
                          {exam.startTime} — {exam.endTime}
                       </div>
                     </TableCell>
                     <TableCell className="py-6 border-r border-border/60">
                       <div className="flex flex-col">
-                        <span className="text-xs font-black text-foreground/40 uppercase tracking-widest mb-0.5">Venue</span>
-                        <span className="text-sm font-black text-foreground tracking-widest uppercase">{exam.room}</span>
+                        <span className="text-xs font-bold text-foreground/40 uppercase tracking-widest mb-0.5">Venue</span>
+                        <span className="text-sm font-bold text-foreground tracking-widest uppercase">{exam.room}</span>
                       </div>
                     </TableCell>
                     <TableCell className="py-6 text-right">
-                      <Badge variant={isVerySoon ? 'default' : 'outline'} className="font-black uppercase text-[9px] tracking-widest px-2 shadow-sm">
+                      <Badge variant={isVerySoon ? 'default' : 'outline'} className="font-bold uppercase text-[9px] tracking-widest px-2 shadow-sm">
                         {exam.examType}
                       </Badge>
                     </TableCell>

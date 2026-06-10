@@ -29,24 +29,42 @@ import type {
   UpdateCampusMapRoadDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const campusMapRoadsControllerListRoadsV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type campusMapRoadsControllerListRoadsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type campusMapRoadsControllerListRoadsV1ResponseSuccess = (campusMapRoadsControllerListRoadsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type campusMapRoadsControllerListRoadsV1Response = (campusMapRoadsControllerListRoadsV1ResponseSuccess)
+
+export const getCampusMapRoadsControllerListRoadsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRoads`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRoads`
+}
+
+export const campusMapRoadsControllerListRoadsV1 = async ( options?: RequestInit): Promise<campusMapRoadsControllerListRoadsV1Response> => {
+
+  return fetchWithAuth<campusMapRoadsControllerListRoadsV1Response>(getCampusMapRoadsControllerListRoadsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -58,16 +76,16 @@ export const getCampusMapRoadsControllerListRoadsV1QueryKey = () => {
     }
 
 
-export const getCampusMapRoadsControllerListRoadsV1QueryOptions = <TData = Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCampusMapRoadsControllerListRoadsV1QueryOptions = <TData = Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCampusMapRoadsControllerListRoadsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>> = ({ signal }) => campusMapRoadsControllerListRoadsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>> = ({ signal }) => campusMapRoadsControllerListRoadsV1({ signal });
 
 
 
@@ -87,7 +105,7 @@ export function useCampusMapRoadsControllerListRoadsV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCampusMapRoadsControllerListRoadsV1<TData = Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError = unknown>(
@@ -97,16 +115,16 @@ export function useCampusMapRoadsControllerListRoadsV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCampusMapRoadsControllerListRoadsV1<TData = Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCampusMapRoadsControllerListRoadsV1<TData = Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerListRoadsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -122,32 +140,50 @@ export function useCampusMapRoadsControllerListRoadsV1<TData = Awaited<ReturnTyp
 
 
 
-export const campusMapRoadsControllerCreateRoadV1 = (
-    createCampusMapRoadDto: CreateCampusMapRoadDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type campusMapRoadsControllerCreateRoadV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type campusMapRoadsControllerCreateRoadV1ResponseSuccess = (campusMapRoadsControllerCreateRoadV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type campusMapRoadsControllerCreateRoadV1Response = (campusMapRoadsControllerCreateRoadV1ResponseSuccess)
+
+export const getCampusMapRoadsControllerCreateRoadV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRoads`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createCampusMapRoadDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRoads`
+}
+
+export const campusMapRoadsControllerCreateRoadV1 = async (createCampusMapRoadDto: CreateCampusMapRoadDto, options?: RequestInit): Promise<campusMapRoadsControllerCreateRoadV1Response> => {
+
+  return fetchWithAuth<campusMapRoadsControllerCreateRoadV1Response>(getCampusMapRoadsControllerCreateRoadV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createCampusMapRoadDto)
+  }
+);}
+
 
 
 
 export const getCampusMapRoadsControllerCreateRoadV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerCreateRoadV1>>, TError,{data: CreateCampusMapRoadDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerCreateRoadV1>>, TError,{data: CreateCampusMapRoadDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerCreateRoadV1>>, TError,{data: CreateCampusMapRoadDto}, TContext> => {
 
 const mutationKey = ['campusMapRoadsControllerCreateRoadV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -155,7 +191,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof campusMapRoadsControllerCreateRoadV1>>, {data: CreateCampusMapRoadDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  campusMapRoadsControllerCreateRoadV1(data,requestOptions)
+          return  campusMapRoadsControllerCreateRoadV1(data,)
         }
 
 
@@ -170,7 +206,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CampusMapRoadsControllerCreateRoadV1MutationError = unknown
 
     export const useCampusMapRoadsControllerCreateRoadV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerCreateRoadV1>>, TError,{data: CreateCampusMapRoadDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerCreateRoadV1>>, TError,{data: CreateCampusMapRoadDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof campusMapRoadsControllerCreateRoadV1>>,
         TError,
@@ -179,17 +215,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampusMapRoadsControllerCreateRoadV1MutationOptions(options), queryClient);
     }
-    export const campusMapRoadsControllerGetRoadV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type campusMapRoadsControllerGetRoadV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type campusMapRoadsControllerGetRoadV1ResponseSuccess = (campusMapRoadsControllerGetRoadV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type campusMapRoadsControllerGetRoadV1Response = (campusMapRoadsControllerGetRoadV1ResponseSuccess)
+
+export const getCampusMapRoadsControllerGetRoadV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRoads/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRoads/${id}`
+}
+
+export const campusMapRoadsControllerGetRoadV1 = async (id: string, options?: RequestInit): Promise<campusMapRoadsControllerGetRoadV1Response> => {
+
+  return fetchWithAuth<campusMapRoadsControllerGetRoadV1Response>(getCampusMapRoadsControllerGetRoadV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -201,16 +257,16 @@ export const getCampusMapRoadsControllerGetRoadV1QueryKey = (id: string,) => {
     }
 
 
-export const getCampusMapRoadsControllerGetRoadV1QueryOptions = <TData = Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCampusMapRoadsControllerGetRoadV1QueryOptions = <TData = Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCampusMapRoadsControllerGetRoadV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>> = ({ signal }) => campusMapRoadsControllerGetRoadV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>> = ({ signal }) => campusMapRoadsControllerGetRoadV1(id, { signal });
 
 
 
@@ -230,7 +286,7 @@ export function useCampusMapRoadsControllerGetRoadV1<TData = Awaited<ReturnType<
           TError,
           Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCampusMapRoadsControllerGetRoadV1<TData = Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError = unknown>(
@@ -240,16 +296,16 @@ export function useCampusMapRoadsControllerGetRoadV1<TData = Awaited<ReturnType<
           TError,
           Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCampusMapRoadsControllerGetRoadV1<TData = Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCampusMapRoadsControllerGetRoadV1<TData = Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campusMapRoadsControllerGetRoadV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -265,33 +321,51 @@ export function useCampusMapRoadsControllerGetRoadV1<TData = Awaited<ReturnType<
 
 
 
-export const campusMapRoadsControllerUpdateRoadV1 = (
-    id: string,
-    updateCampusMapRoadDto: UpdateCampusMapRoadDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type campusMapRoadsControllerUpdateRoadV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type campusMapRoadsControllerUpdateRoadV1ResponseSuccess = (campusMapRoadsControllerUpdateRoadV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type campusMapRoadsControllerUpdateRoadV1Response = (campusMapRoadsControllerUpdateRoadV1ResponseSuccess)
+
+export const getCampusMapRoadsControllerUpdateRoadV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRoads/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateCampusMapRoadDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRoads/${id}`
+}
+
+export const campusMapRoadsControllerUpdateRoadV1 = async (id: string,
+    updateCampusMapRoadDto: UpdateCampusMapRoadDto, options?: RequestInit): Promise<campusMapRoadsControllerUpdateRoadV1Response> => {
+
+  return fetchWithAuth<campusMapRoadsControllerUpdateRoadV1Response>(getCampusMapRoadsControllerUpdateRoadV1Url(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateCampusMapRoadDto)
+  }
+);}
+
 
 
 
 export const getCampusMapRoadsControllerUpdateRoadV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerUpdateRoadV1>>, TError,{id: string;data: UpdateCampusMapRoadDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerUpdateRoadV1>>, TError,{id: string;data: UpdateCampusMapRoadDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerUpdateRoadV1>>, TError,{id: string;data: UpdateCampusMapRoadDto}, TContext> => {
 
 const mutationKey = ['campusMapRoadsControllerUpdateRoadV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -299,7 +373,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof campusMapRoadsControllerUpdateRoadV1>>, {id: string;data: UpdateCampusMapRoadDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  campusMapRoadsControllerUpdateRoadV1(id,data,requestOptions)
+          return  campusMapRoadsControllerUpdateRoadV1(id,data,)
         }
 
 
@@ -314,7 +388,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CampusMapRoadsControllerUpdateRoadV1MutationError = unknown
 
     export const useCampusMapRoadsControllerUpdateRoadV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerUpdateRoadV1>>, TError,{id: string;data: UpdateCampusMapRoadDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerUpdateRoadV1>>, TError,{id: string;data: UpdateCampusMapRoadDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof campusMapRoadsControllerUpdateRoadV1>>,
         TError,
@@ -323,30 +397,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampusMapRoadsControllerUpdateRoadV1MutationOptions(options), queryClient);
     }
-    export const campusMapRoadsControllerDeleteRoadV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type campusMapRoadsControllerDeleteRoadV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type campusMapRoadsControllerDeleteRoadV1ResponseSuccess = (campusMapRoadsControllerDeleteRoadV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type campusMapRoadsControllerDeleteRoadV1Response = (campusMapRoadsControllerDeleteRoadV1ResponseSuccess)
+
+export const getCampusMapRoadsControllerDeleteRoadV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/campusMapRoads/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/campusMapRoads/${id}`
+}
+
+export const campusMapRoadsControllerDeleteRoadV1 = async (id: string, options?: RequestInit): Promise<campusMapRoadsControllerDeleteRoadV1Response> => {
+
+  return fetchWithAuth<campusMapRoadsControllerDeleteRoadV1Response>(getCampusMapRoadsControllerDeleteRoadV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getCampusMapRoadsControllerDeleteRoadV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerDeleteRoadV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerDeleteRoadV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerDeleteRoadV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['campusMapRoadsControllerDeleteRoadV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -354,7 +448,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof campusMapRoadsControllerDeleteRoadV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  campusMapRoadsControllerDeleteRoadV1(id,requestOptions)
+          return  campusMapRoadsControllerDeleteRoadV1(id,)
         }
 
 
@@ -369,7 +463,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CampusMapRoadsControllerDeleteRoadV1MutationError = unknown
 
     export const useCampusMapRoadsControllerDeleteRoadV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerDeleteRoadV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campusMapRoadsControllerDeleteRoadV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof campusMapRoadsControllerDeleteRoadV1>>,
         TError,

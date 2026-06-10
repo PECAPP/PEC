@@ -19,42 +19,58 @@ import type {
   PresignRequestDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
+export type uploadControllerGeneratePresignedUrlV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type uploadControllerGeneratePresignedUrlV1ResponseSuccess = (uploadControllerGeneratePresignedUrlV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type uploadControllerGeneratePresignedUrlV1Response = (uploadControllerGeneratePresignedUrlV1ResponseSuccess)
+
+export const getUploadControllerGeneratePresignedUrlV1Url = () => {
+
+
+
+
+  return `/api/v1/upload/presign`
+}
 
 /**
  * @summary Generate a presigned URL to upload a file directly to storage
  */
-export const uploadControllerGeneratePresignedUrlV1 = (
-    presignRequestDto: PresignRequestDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export const uploadControllerGeneratePresignedUrlV1 = async (presignRequestDto: PresignRequestDto, options?: RequestInit): Promise<uploadControllerGeneratePresignedUrlV1Response> => {
 
+  return fetchWithAuth<uploadControllerGeneratePresignedUrlV1Response>(getUploadControllerGeneratePresignedUrlV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(presignRequestDto)
+  }
+);}
 
-      return customInstance<void>(
-      {url: `/api/v1/upload/presign`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: presignRequestDto, signal
-    },
-      options);
-    }
 
 
 
 export const getUploadControllerGeneratePresignedUrlV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadControllerGeneratePresignedUrlV1>>, TError,{data: PresignRequestDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadControllerGeneratePresignedUrlV1>>, TError,{data: PresignRequestDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof uploadControllerGeneratePresignedUrlV1>>, TError,{data: PresignRequestDto}, TContext> => {
 
 const mutationKey = ['uploadControllerGeneratePresignedUrlV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -62,7 +78,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadControllerGeneratePresignedUrlV1>>, {data: PresignRequestDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  uploadControllerGeneratePresignedUrlV1(data,requestOptions)
+          return  uploadControllerGeneratePresignedUrlV1(data,)
         }
 
 
@@ -80,7 +96,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Generate a presigned URL to upload a file directly to storage
  */
 export const useUploadControllerGeneratePresignedUrlV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadControllerGeneratePresignedUrlV1>>, TError,{data: PresignRequestDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadControllerGeneratePresignedUrlV1>>, TError,{data: PresignRequestDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof uploadControllerGeneratePresignedUrlV1>>,
         TError,

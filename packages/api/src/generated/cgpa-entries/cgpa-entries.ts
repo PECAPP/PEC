@@ -30,25 +30,49 @@ import type {
   UpdateCgpaEntryDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const cgpaEntriesControllerGetStatsV1 = (
-    params: CgpaEntriesControllerGetStatsV1Params,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
 
+export type cgpaEntriesControllerGetStatsV1Response200 = {
+  data: void
+  status: 200
+}
 
-      return customInstance<void>(
-      {url: `/api/v1/cgpa-entries/dashboard/summary`, method: 'GET',
-        params, signal
-    },
-      options);
+export type cgpaEntriesControllerGetStatsV1ResponseSuccess = (cgpaEntriesControllerGetStatsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type cgpaEntriesControllerGetStatsV1Response = (cgpaEntriesControllerGetStatsV1ResponseSuccess)
+
+export const getCgpaEntriesControllerGetStatsV1Url = (params: CgpaEntriesControllerGetStatsV1Params,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
     }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/cgpa-entries/dashboard/summary?${stringifiedParams}` : `/api/v1/cgpa-entries/dashboard/summary`
+}
+
+export const cgpaEntriesControllerGetStatsV1 = async (params: CgpaEntriesControllerGetStatsV1Params, options?: RequestInit): Promise<cgpaEntriesControllerGetStatsV1Response> => {
+
+  return fetchWithAuth<cgpaEntriesControllerGetStatsV1Response>(getCgpaEntriesControllerGetStatsV1Url(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -60,16 +84,16 @@ export const getCgpaEntriesControllerGetStatsV1QueryKey = (params?: CgpaEntriesC
     }
 
 
-export const getCgpaEntriesControllerGetStatsV1QueryOptions = <TData = Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError = unknown>(params: CgpaEntriesControllerGetStatsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCgpaEntriesControllerGetStatsV1QueryOptions = <TData = Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError = unknown>(params: CgpaEntriesControllerGetStatsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCgpaEntriesControllerGetStatsV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>> = ({ signal }) => cgpaEntriesControllerGetStatsV1(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>> = ({ signal }) => cgpaEntriesControllerGetStatsV1(params, { signal });
 
 
 
@@ -89,7 +113,7 @@ export function useCgpaEntriesControllerGetStatsV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCgpaEntriesControllerGetStatsV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError = unknown>(
@@ -99,16 +123,16 @@ export function useCgpaEntriesControllerGetStatsV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCgpaEntriesControllerGetStatsV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError = unknown>(
- params: CgpaEntriesControllerGetStatsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: CgpaEntriesControllerGetStatsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCgpaEntriesControllerGetStatsV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError = unknown>(
- params: CgpaEntriesControllerGetStatsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: CgpaEntriesControllerGetStatsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerGetStatsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -124,17 +148,37 @@ export function useCgpaEntriesControllerGetStatsV1<TData = Awaited<ReturnType<ty
 
 
 
-export const cgpaEntriesControllerFindManyV1 = (
+export type cgpaEntriesControllerFindManyV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type cgpaEntriesControllerFindManyV1ResponseSuccess = (cgpaEntriesControllerFindManyV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type cgpaEntriesControllerFindManyV1Response = (cgpaEntriesControllerFindManyV1ResponseSuccess)
+
+export const getCgpaEntriesControllerFindManyV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/cgpa-entries`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/cgpa-entries`
+}
+
+export const cgpaEntriesControllerFindManyV1 = async ( options?: RequestInit): Promise<cgpaEntriesControllerFindManyV1Response> => {
+
+  return fetchWithAuth<cgpaEntriesControllerFindManyV1Response>(getCgpaEntriesControllerFindManyV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -146,16 +190,16 @@ export const getCgpaEntriesControllerFindManyV1QueryKey = () => {
     }
 
 
-export const getCgpaEntriesControllerFindManyV1QueryOptions = <TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCgpaEntriesControllerFindManyV1QueryOptions = <TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCgpaEntriesControllerFindManyV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>> = ({ signal }) => cgpaEntriesControllerFindManyV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>> = ({ signal }) => cgpaEntriesControllerFindManyV1({ signal });
 
 
 
@@ -175,7 +219,7 @@ export function useCgpaEntriesControllerFindManyV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCgpaEntriesControllerFindManyV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError = unknown>(
@@ -185,16 +229,16 @@ export function useCgpaEntriesControllerFindManyV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCgpaEntriesControllerFindManyV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCgpaEntriesControllerFindManyV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindManyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -210,32 +254,50 @@ export function useCgpaEntriesControllerFindManyV1<TData = Awaited<ReturnType<ty
 
 
 
-export const cgpaEntriesControllerCreateV1 = (
-    createCgpaEntryDto: CreateCgpaEntryDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type cgpaEntriesControllerCreateV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type cgpaEntriesControllerCreateV1ResponseSuccess = (cgpaEntriesControllerCreateV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type cgpaEntriesControllerCreateV1Response = (cgpaEntriesControllerCreateV1ResponseSuccess)
+
+export const getCgpaEntriesControllerCreateV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/cgpa-entries`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createCgpaEntryDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/cgpa-entries`
+}
+
+export const cgpaEntriesControllerCreateV1 = async (createCgpaEntryDto: CreateCgpaEntryDto, options?: RequestInit): Promise<cgpaEntriesControllerCreateV1Response> => {
+
+  return fetchWithAuth<cgpaEntriesControllerCreateV1Response>(getCgpaEntriesControllerCreateV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createCgpaEntryDto)
+  }
+);}
+
 
 
 
 export const getCgpaEntriesControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerCreateV1>>, TError,{data: CreateCgpaEntryDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerCreateV1>>, TError,{data: CreateCgpaEntryDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerCreateV1>>, TError,{data: CreateCgpaEntryDto}, TContext> => {
 
 const mutationKey = ['cgpaEntriesControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -243,7 +305,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof cgpaEntriesControllerCreateV1>>, {data: CreateCgpaEntryDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  cgpaEntriesControllerCreateV1(data,requestOptions)
+          return  cgpaEntriesControllerCreateV1(data,)
         }
 
 
@@ -258,7 +320,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CgpaEntriesControllerCreateV1MutationError = unknown
 
     export const useCgpaEntriesControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerCreateV1>>, TError,{data: CreateCgpaEntryDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerCreateV1>>, TError,{data: CreateCgpaEntryDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof cgpaEntriesControllerCreateV1>>,
         TError,
@@ -267,17 +329,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCgpaEntriesControllerCreateV1MutationOptions(options), queryClient);
     }
-    export const cgpaEntriesControllerFindOneV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type cgpaEntriesControllerFindOneV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type cgpaEntriesControllerFindOneV1ResponseSuccess = (cgpaEntriesControllerFindOneV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type cgpaEntriesControllerFindOneV1Response = (cgpaEntriesControllerFindOneV1ResponseSuccess)
+
+export const getCgpaEntriesControllerFindOneV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/cgpa-entries/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/cgpa-entries/${id}`
+}
+
+export const cgpaEntriesControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<cgpaEntriesControllerFindOneV1Response> => {
+
+  return fetchWithAuth<cgpaEntriesControllerFindOneV1Response>(getCgpaEntriesControllerFindOneV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -289,16 +371,16 @@ export const getCgpaEntriesControllerFindOneV1QueryKey = (id: string,) => {
     }
 
 
-export const getCgpaEntriesControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCgpaEntriesControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCgpaEntriesControllerFindOneV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>> = ({ signal }) => cgpaEntriesControllerFindOneV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>> = ({ signal }) => cgpaEntriesControllerFindOneV1(id, { signal });
 
 
 
@@ -318,7 +400,7 @@ export function useCgpaEntriesControllerFindOneV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCgpaEntriesControllerFindOneV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError = unknown>(
@@ -328,16 +410,16 @@ export function useCgpaEntriesControllerFindOneV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCgpaEntriesControllerFindOneV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCgpaEntriesControllerFindOneV1<TData = Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cgpaEntriesControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -353,33 +435,51 @@ export function useCgpaEntriesControllerFindOneV1<TData = Awaited<ReturnType<typ
 
 
 
-export const cgpaEntriesControllerUpdateV1 = (
-    id: string,
-    updateCgpaEntryDto: UpdateCgpaEntryDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type cgpaEntriesControllerUpdateV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type cgpaEntriesControllerUpdateV1ResponseSuccess = (cgpaEntriesControllerUpdateV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type cgpaEntriesControllerUpdateV1Response = (cgpaEntriesControllerUpdateV1ResponseSuccess)
+
+export const getCgpaEntriesControllerUpdateV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/cgpa-entries/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateCgpaEntryDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/cgpa-entries/${id}`
+}
+
+export const cgpaEntriesControllerUpdateV1 = async (id: string,
+    updateCgpaEntryDto: UpdateCgpaEntryDto, options?: RequestInit): Promise<cgpaEntriesControllerUpdateV1Response> => {
+
+  return fetchWithAuth<cgpaEntriesControllerUpdateV1Response>(getCgpaEntriesControllerUpdateV1Url(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateCgpaEntryDto)
+  }
+);}
+
 
 
 
 export const getCgpaEntriesControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerUpdateV1>>, TError,{id: string;data: UpdateCgpaEntryDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerUpdateV1>>, TError,{id: string;data: UpdateCgpaEntryDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerUpdateV1>>, TError,{id: string;data: UpdateCgpaEntryDto}, TContext> => {
 
 const mutationKey = ['cgpaEntriesControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -387,7 +487,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof cgpaEntriesControllerUpdateV1>>, {id: string;data: UpdateCgpaEntryDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  cgpaEntriesControllerUpdateV1(id,data,requestOptions)
+          return  cgpaEntriesControllerUpdateV1(id,data,)
         }
 
 
@@ -402,7 +502,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CgpaEntriesControllerUpdateV1MutationError = unknown
 
     export const useCgpaEntriesControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerUpdateV1>>, TError,{id: string;data: UpdateCgpaEntryDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerUpdateV1>>, TError,{id: string;data: UpdateCgpaEntryDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof cgpaEntriesControllerUpdateV1>>,
         TError,
@@ -411,30 +511,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCgpaEntriesControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export const cgpaEntriesControllerRemoveV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type cgpaEntriesControllerRemoveV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type cgpaEntriesControllerRemoveV1ResponseSuccess = (cgpaEntriesControllerRemoveV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type cgpaEntriesControllerRemoveV1Response = (cgpaEntriesControllerRemoveV1ResponseSuccess)
+
+export const getCgpaEntriesControllerRemoveV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/cgpa-entries/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/cgpa-entries/${id}`
+}
+
+export const cgpaEntriesControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<cgpaEntriesControllerRemoveV1Response> => {
+
+  return fetchWithAuth<cgpaEntriesControllerRemoveV1Response>(getCgpaEntriesControllerRemoveV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getCgpaEntriesControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['cgpaEntriesControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -442,7 +562,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof cgpaEntriesControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  cgpaEntriesControllerRemoveV1(id,requestOptions)
+          return  cgpaEntriesControllerRemoveV1(id,)
         }
 
 
@@ -457,7 +577,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CgpaEntriesControllerRemoveV1MutationError = unknown
 
     export const useCgpaEntriesControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cgpaEntriesControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof cgpaEntriesControllerRemoveV1>>,
         TError,

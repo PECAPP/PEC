@@ -749,7 +749,7 @@ export function exportFeeReceipt(txn: {
     doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(16, 185, 129);
-    doc.text("✓ PAID", 105, cur, { align: "center" });
+    doc.text(" PAID", 105, cur, { align: "center" });
     doc.setTextColor(0, 0, 0);
     cur += 10;
   }

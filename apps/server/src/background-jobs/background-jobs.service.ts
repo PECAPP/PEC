@@ -298,7 +298,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
            create: {
              id: `att-alert-${student.id}-${new Date().toISOString().split('T')[0]}`,
              userId: student.id,
-             title: '📉 Low Attendance Alert',
+             title: ' Low Attendance Alert',
              message: `Your current attendance is ${percentage.toFixed(1)}%, which is below the required ${threshold}%. Please attend next classes to avoid penalties.`,
              type: 'alert',
              link: '/attendance'

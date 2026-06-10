@@ -22,7 +22,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   turbopack: {
-    root: "../../",
+    root: "C:/Users/dubey/PEC",
   },
 
   // ─── Experimental ────────────────────────────────────────────────────────────
@@ -44,6 +44,11 @@ const nextConfig = {
       '@radix-ui/react-tooltip',
       'class-variance-authority',
     ],
+    // Cache client-side navigations longer so re-visits don't recompile
+    staleTimes: {
+      dynamic: 30,   // seconds — dynamic pages stay cached in router
+      static: 180,   // seconds — static pages stay cached much longer
+    },
   },
 
   // ─── Images ──────────────────────────────────────────────────────────────────

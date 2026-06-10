@@ -47,7 +47,7 @@ const createPrismaClient = () => {
               }
             }
 
-            const modelsWithSoftDelete = ['Course', 'FeeRecord', 'Notice', 'ExamSchedule', 'Job'];
+            const modelsWithSoftDelete = ['Course', 'FeeRecord', 'Notice', 'ExamSchedule'];
             if (modelsWithSoftDelete.includes(model)) {
               if (operation === 'findUnique' || operation === 'findFirst' || operation === 'findMany') {
                 args.where = { ...args.where, deletedAt: null };

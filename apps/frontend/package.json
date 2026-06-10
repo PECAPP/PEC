@@ -6,7 +6,8 @@
     "dev": "next dev --turbo -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src --ext .ts,.tsx,.js,.jsx"
+    "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
+    "warmup": "node scripts/warmup-routes.mjs"
   },
   "dependencies": {
     "@casl/ability": "^7.0.0",
@@ -23,6 +24,8 @@
     "@sentry/nextjs": "^10.56.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@tanstack/react-query": "^5.96.0",
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.14.2",
     "@types/three": "^0.183.1",
     "dompurify": "^3.4.8",
     "exceljs": "^4.4.0",
@@ -40,11 +43,12 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-markdown": "^10.1.0",
+    "recharts": "^2.15.4",
     "remark-gfm": "^4.0.1",
     "socket.io-client": "^4.8.3",
+    "swr": "^2.3.0",
     "three": "^0.183.2",
-    "zod": "^3.25.76",
-    "swr": "^2.3.0"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.1.7",

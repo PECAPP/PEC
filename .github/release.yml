@@ -1,0 +1,23 @@
+changelog:
+  categories:
+    - title: "Features"
+      labels:
+        - "enhancement"
+        - "feature"
+    - title: "Bug Fixes"
+      labels:
+        - "bug"
+        - "fix"
+    - title: "Documentation"
+      labels:
+        - "documentation"
+        - "docs"
+    - title: "Dependency Updates"
+      labels:
+        - "dependencies"
+        - "dependabot"
+  exclude:
+    labels:
+      - "ignore-for-release"
+    authors:
+      - "dependabot[bot]"

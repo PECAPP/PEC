@@ -3,10 +3,7 @@ import { z } from 'zod';
 const appRoles = [
   'student',
   'faculty',
-  'college_admin',
   'admin',
-  'moderator',
-  'user',
 ] as const;
 
 export const signInSchema = z.object({

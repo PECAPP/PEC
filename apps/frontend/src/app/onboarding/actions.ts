@@ -42,7 +42,7 @@ export async function completeProfileStatefulAction(prevState: any, formData: Fo
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(session.token ? { Authorization: `Bearer ${session.token}` } : {}),
+        ...((session as any).token ? { Authorization: `Bearer ${(session as any).token}` } : {}),
       },
       body: JSON.stringify({
         ...validated.data,

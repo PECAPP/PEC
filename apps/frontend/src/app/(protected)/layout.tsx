@@ -15,7 +15,9 @@ async function AuthGate({ children }: { children: React.ReactNode }) {
   return <ProtectedLayoutClient user={user}>{children}</ProtectedLayoutClient>;
 }
 
-// 2. Initial static shell for PPR (Partial Prerendering)
+// 2. Minimal fallback — shown only on hard initial load while AuthGate resolves.
+// Client-side navigations (Link clicks) do NOT re-trigger this because the
+// layout is already mounted; only the children (page slot) swaps.
 function LayoutLoading() {
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -24,16 +26,16 @@ function LayoutLoading() {
         <div className="mesh-gradient-item mesh-2" />
         <div className="mesh-gradient-item mesh-3" />
       </div>
-      
+
       {/* Structural Shell */}
       <div className="absolute inset-y-0 left-0 w-64 bg-sidebar border-r border-sidebar-border hidden lg:block">
         <div className="sidebar-mesh" />
       </div>
       <div className="absolute top-0 right-0 left-0 h-16 bg-background border-b border-sidebar-border lg:left-64" />
-      
-      {/* Branded Loading Content */}
+
+      {/* Inline progress bar — not full-screen block */}
       <div className="pt-24 lg:pl-64 p-6 flex items-center justify-center">
-        <Loader fullScreen={false} />
+        <Loader inline />
       </div>
     </div>
   );

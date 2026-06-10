@@ -35,13 +35,13 @@ const CONDITION_COLORS: Record<string, string> = {
 };
 
 const CATEGORY_ICONS: Record<string, string> = {
-  books: '📚',
-  electronics: '💻',
-  furniture: '🪑',
-  clothing: '👕',
-  sports: '⚽',
-  stationery: '✏️',
-  other: '📦',
+  books: '',
+  electronics: '',
+  furniture: '',
+  clothing: '',
+  sports: '',
+  stationery: '️',
+  other: '',
 };
 
 export function MarketplaceCard({
@@ -85,7 +85,7 @@ export function MarketplaceCard({
         <div className="h-5 w-32 bg-muted rounded" />
         <div className="grid grid-cols-2 gap-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 bg-muted rounded-lg" />
+            <div key={i} className="h-24 bg-muted rounded-sm" />
           ))}
         </div>
       </div>
@@ -121,7 +121,7 @@ export function MarketplaceCard({
           {listings.map((listing) => (
             <div
               key={listing.id}
-              className="group relative border border-border bg-secondary/10 rounded-lg overflow-hidden cursor-pointer hover:bg-secondary/20 hover:border-primary/40 transition-colors"
+              className="group relative border border-border bg-secondary/10 rounded-sm overflow-hidden cursor-pointer hover:bg-secondary/20 hover:border-primary/40 transition-colors duration-300"
               onClick={onViewAll}
             >
               {/* Image */}
@@ -135,28 +135,30 @@ export function MarketplaceCard({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-2xl">
-                    {CATEGORY_ICONS[listing.category.toLowerCase()] ?? '📦'}
+                    {CATEGORY_ICONS[listing.category.toLowerCase()] ?? ''}
                   </div>
                 )}
                 {listing.status === 'sold' && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <Badge className="bg-red-500 text-white text-[10px]">SOLD</Badge>
+                    <Badge className="bg-red-500/15 text-red-600 border-red-500/20 text-[10px]">SOLD</Badge>
                   </div>
                 )}
-              </div>
-              {/* Info */}
-              <div className="p-3">
-                <p className="text-xs font-medium line-clamp-2 leading-tight h-8" title={listing.title}>
-                  {listing.title}
-                </p>
-                <div className="flex flex-wrap items-end justify-between gap-2 mt-2">
-                  <span className="text-lg font-bold text-emerald-400">₹{fmt(listing.price)}</span>
+                <div className="absolute top-2 right-2">
                   <Badge
                     variant="outline"
-                    className={cn('text-[9px] h-4 px-1.5', CONDITION_COLORS[listing.condition] ?? '')}
+                    className={cn('text-[9px] h-4 px-1.5 backdrop-blur-md', CONDITION_COLORS[listing.condition] ?? '')}
                   >
                     {listing.condition.replace('_', ' ')}
                   </Badge>
+                </div>
+              </div>
+              {/* Info */}
+              <div className="p-4">
+                <p className="text-sm font-semibold line-clamp-2 leading-tight h-10" title={listing.title}>
+                  {listing.title}
+                </p>
+                <div className="flex flex-wrap items-end justify-between gap-2 mt-1">
+                  <span className="text-xl font-bold text-emerald-500/90 tracking-tight">₹{fmt(listing.price)}</span>
                 </div>
               </div>
             </div>
@@ -173,7 +175,7 @@ export function MarketplaceCard({
         {/* Quick action */}
         <Can I="create" a="MarketplaceListing">
           <Button
-            className="w-full h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+            className="w-full h-10 rounded-sm font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
             onClick={onCreateListing}
           >
             <Plus className="w-4 h-4" />

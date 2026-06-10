@@ -71,7 +71,8 @@ export class AuthController {
       const csrfToken = this.setCsrfCookie(res, req);
       this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
 
-      const { refresh_token, ...response } = auth;
+      // Strip sensitive tokens before sending to client
+      const { access_token, refresh_token, ...response } = auth;
       return { ...response, csrfToken };
     } catch (error: any) {
       if (error.status && error.status < 500) throw error;
@@ -103,7 +104,9 @@ export class AuthController {
       this.setAccessTokenCookie(res, auth.access_token);
       const csrfToken = this.setCsrfCookie(res, req);
       this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
-      const { refresh_token, ...response } = auth;
+      
+      // Strip sensitive tokens before sending to client
+      const { access_token, refresh_token, ...response } = auth;
       return { ...response, csrfToken };
     } catch (error: any) {
       if (error.status && error.status < 500) throw error;
@@ -136,7 +139,9 @@ export class AuthController {
     this.setAccessTokenCookie(res, auth.access_token);
     const csrfToken = this.setCsrfCookie(res, req);
     this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
-    const { refresh_token, ...response } = auth;
+    
+    // Strip sensitive tokens before sending to client
+    const { access_token, refresh_token, ...response } = auth;
     return { ...response, csrfToken };
   }
 
@@ -369,7 +374,7 @@ export class AuthController {
     const crypto = require('crypto');
     const csrfToken = crypto.randomBytes(32).toString('hex');
     res.setCookie(`${this.cookiePrefix}csrf_token`, csrfToken, {
-      httpOnly: true, // Secure against XSS
+      httpOnly: false, // Must be false for Double Submit Cookie pattern
       secure: this.isProd,
       sameSite: 'strict',
       path: '/',

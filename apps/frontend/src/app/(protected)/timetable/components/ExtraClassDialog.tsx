@@ -58,7 +58,7 @@ export default function ExtraClassDialog({
 }: ExtraClassDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle>Schedule Extra Class</DialogTitle>
           <DialogDescription>Add an extra class session to your timetable</DialogDescription>
@@ -174,7 +174,7 @@ export default function ExtraClassDialog({
           {extraClassForm.courseId &&
             extraClassForm.slotKey &&
             !extraClassForm.slotKey.endsWith('-') && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg space-y-2 text-sm">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-sm space-y-2 text-sm">
                 <p className="font-medium text-blue-900">Auto-populated from course:</p>
                 <div className="text-xs text-blue-800 space-y-1">
                   {(() => {

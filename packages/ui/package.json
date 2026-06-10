@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "sideEffects": false,
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "clsx": "^2.1.1",
@@ -56,17 +57,10 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^8.6.18",
-    "@storybook/addon-links": "^8.6.18",
-    "@storybook/blocks": "^8.6.18",
-    "@storybook/react": "^8.6.18",
-    "@storybook/react-vite": "^8.6.18",
-    "@storybook/test": "^8.6.18",
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.15",
-    "storybook": "^8.6.18",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "vite": "^6.0.0"

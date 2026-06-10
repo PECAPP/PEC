@@ -1,8 +1,7 @@
 'use client';
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Dialog, DialogContent } from "@pec/ui";
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge, Dialog, DialogContent, formatDate } from "@pec/ui";
 
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   CheckCircle,
@@ -17,6 +16,8 @@ import { extractData } from '@/lib/utils';
 import { LoadingGrid } from '@/components/common/AsyncState';
 import PDFExportButton from '@/components/common/PDFExportButton';
 import BulkUpload from '@/components/BulkUpload';
+import { DataTable } from '@/components/common/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
 
 interface CourseAttendance {
   courseId: string;
@@ -35,7 +36,7 @@ interface AttendanceClientProps {
 }
 
 export default function AttendanceClient({ session, initialData }: AttendanceClientProps) {
-  const isAdmin = session.role === 'college_admin';
+  const isAdmin = session.role === 'admin';
   const isFaculty = session.role === 'faculty';
 
   if (isAdmin || isFaculty) {
@@ -53,7 +54,7 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
   const [loading, setLoading] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
 
-  const isAdmin = userRole === 'college_admin';
+  const isAdmin = userRole === 'admin';
 
   useEffect(() => {
     if (!initialData?.courses || initialData.courses.length === 0) {
@@ -173,11 +174,50 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
     return { success: data.length, failed: 0, errors: [] };
   };
 
+  const studentColumns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'name',
+      header: 'Registry Student',
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span className="font-bold text-foreground hover:text-primary transition-colors tracking-tight">{row.original.name}</span>
+          <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-tighter">{row.original.email}</span>
+        </div>
+      )
+    },
+    {
+      accessorKey: 'status',
+      header: 'Verification Status',
+      cell: ({ row }) => {
+        const s = row.original;
+        return (
+          <div className="flex justify-center gap-2">
+            {['present', 'absent', 'late'].map(status => (
+              <Button
+                key={status}
+                size="sm"
+                variant={s.status === status ? 'default' : 'outline'}
+                className={`text-[9px] font-bold uppercase tracking-widest px-4 h-9 transition-all
+                  ${s.status === status 
+                    ? (status === 'present' ? 'bg-success hover:bg-success/90' : status === 'absent' ? 'bg-destructive hover:bg-destructive/90' : 'bg-warning hover:bg-warning/90')
+                    : 'hover:border-primary/50'
+                  }`}
+                onClick={() => handleMark(s.id, status)}
+              >
+                {status === 'present' ? 'PRESENT' : status === 'absent' ? 'ABSENT' : 'LATE'}
+              </Button>
+            ))}
+          </div>
+        );
+      }
+    }
+  ], []);
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-foreground uppercase tracking-widest">Attendance Management</h1>
+          <h1 className="text-3xl font-bold text-foreground uppercase tracking-widest">Attendance Management</h1>
           <p className="text-muted-foreground mt-1 font-medium italic">Protocol-level session verification and ledger control</p>
         </div>
         <div className="flex gap-2">
@@ -205,7 +245,7 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
               }}
               label="EXCEL LEDGER"
             />
-            <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-10 px-4 font-black uppercase tracking-widest text-[10px]">
+            <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-10 px-4 font-bold uppercase tracking-widest text-[10px]">
               <Upload className="w-3 h-3 mr-2" /> DATA SYNC
             </Button>
         </div>
@@ -214,7 +254,7 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
       <div className="card-elevated p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-8">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2 block">Instructional Course</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block">Instructional Course</label>
             <Select value={selectedCourse} onValueChange={setSelectedCourse}>
               <SelectTrigger className="h-12 text-sm font-bold bg-muted/20 border-border/60">
                 <SelectValue placeholder="Select high-priority course..." />
@@ -229,7 +269,7 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
             </Select>
           </div>
           <div className="md:col-span-4">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2 block">Sync Date</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block">Sync Date</label>
             <Input 
               type="date" 
               className="h-12 bg-muted/20 border-border/60 font-mono font-bold"
@@ -243,51 +283,13 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
           <div className="pt-8 border-t border-border/60 space-y-6">
              {loading ? <LoadingGrid count={5} /> : (
                <>
-                 <div className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-xl">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="bg-muted border-b border-border/60">
-                          <th className="py-4 px-6 text-left font-black uppercase text-[10px] tracking-widest text-primary border-r border-border/60">Registry Student</th>
-                          <th className="py-4 px-6 text-center font-black uppercase text-[10px] tracking-widest">Verification Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/60">
-                        {students.map(s => (
-                          <tr key={s.id} className="group hover:bg-muted/30 transition-colors">
-                            <td className="py-4 px-6 border-r border-border/60">
-                              <div className="flex flex-col">
-                                <span className="font-black text-foreground group-hover:text-primary transition-colors tracking-tight">{s.name}</span>
-                                <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-tighter">{s.email}</span>
-                              </div>
-                            </td>
-                            <td className="py-4 px-6">
-                               <div className="flex justify-center gap-2">
-                                  {['present', 'absent', 'late'].map(status => (
-                                    <Button
-                                      key={status}
-                                      size="sm"
-                                      variant={s.status === status ? 'default' : 'outline'}
-                                      className={`text-[9px] font-black uppercase tracking-widest px-4 h-9 transition-all
-                                        ${s.status === status 
-                                          ? (status === 'present' ? 'bg-success hover:bg-success/90' : status === 'absent' ? 'bg-destructive hover:bg-destructive/90' : 'bg-warning hover:bg-warning/90')
-                                          : 'hover:border-primary/50'
-                                        }`}
-                                      onClick={() => handleMark(s.id, status)}
-                                    >
-                                      {status === 'present' ? 'PRESENT' : status === 'absent' ? 'ABSENT' : 'LATE'}
-                                    </Button>
-                                  ))}
-                               </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                 <div className="border border-border/60 rounded-sm overflow-hidden bg-card shadow-xl">
+                    <DataTable columns={studentColumns} data={students} />
                  </div>
                  <div className="flex justify-end pt-4">
                     <Button 
                       onClick={handleSave} 
-                      className="bg-primary text-primary-foreground font-black tracking-[0.2em] uppercase text-[11px] h-12 px-10 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                      className="bg-primary text-primary-foreground font-bold tracking-widest uppercase text-[11px] h-12 px-10 shadow-sm shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                     >
                        COMMIT RECORDS TO LEDGER
                     </Button>
@@ -299,10 +301,10 @@ function AttendanceManager({ userId, userRole, initialData }: { userId: string; 
       </div>
 
       <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-        <DialogContent className="max-w-4xl bg-card border-border/60">
+        <DialogContent className=" bg-card border-border/60">
            <div className="flex flex-col space-y-4">
              <div className="space-y-1">
-                <h2 className="text-xl font-black uppercase tracking-widest">Bulk Sync Protocol</h2>
+                <h2 className="text-xl font-bold uppercase tracking-widest">Bulk Sync Protocol</h2>
                 <p className="text-sm text-muted-foreground font-medium italic">Import external session data via standard CSV/Excel format</p>
              </div>
              <BulkUpload 
@@ -362,6 +364,56 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
     return 'bg-destructive';
   };
 
+  const recordColumns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      id: 'verification',
+      header: 'Verification',
+      cell: ({ row }) => {
+        const isPresent = row.original.status === 'present';
+        return (
+          <div className={`w-10 h-10 rounded-sm flex items-center justify-center border ${isPresent ? 'bg-success/10 text-success border-success/20' : 'bg-destructive/10 text-destructive border-destructive/20'}`}>
+            {isPresent ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+          </div>
+        );
+      }
+    },
+    {
+      id: 'subject',
+      header: 'Subject & Instructor',
+      cell: ({ row }) => {
+        const course = (courseAttendance || []).find(c => c.courseId === row.original.subject);
+        return (
+          <div className="flex flex-col">
+            <span className="text-base font-bold text-foreground hover:text-primary transition-colors">{course?.courseCode || 'GEN-CORE'}</span>
+            <span className="text-[11px] text-muted-foreground font-medium line-clamp-1">{course?.courseName || 'Unspecified Academic Session'}</span>
+          </div>
+        );
+      }
+    },
+    {
+      accessorKey: 'date',
+      header: 'Timestamp',
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-bold text-foreground">{formatDate(row.original.date)}</span>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase">{new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date(row.original.date))}</span>
+        </div>
+      )
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => {
+        const isPresent = row.original.status === 'present';
+        return (
+          <Badge variant={isPresent ? 'default' : 'destructive'} className="text-[9px] font-bold uppercase tracking-widest px-3">
+            {isPresent ? 'AUTHENTICATED' : 'MISSED'}
+          </Badge>
+        );
+      }
+    }
+  ], [courseAttendance]);
+
   if (loading) {
     return <LoadingGrid count={4} className="grid gap-6 md:grid-cols-2" itemClassName="h-32" />;
   }
@@ -370,14 +422,14 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
     <div className="space-y-8 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-foreground uppercase tracking-widest">Attendance Overview</h1>
+          <h1 className="text-3xl font-bold text-foreground uppercase tracking-widest">Attendance Overview</h1>
           <p className="text-muted-foreground mt-1 font-medium italic">Detailed session analytics and eligibility tracking</p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant="outline" className="h-10 px-4 font-black uppercase tracking-widest text-[10px] bg-card">
+          <Badge variant="outline" className="h-10 px-4 font-bold uppercase tracking-widest text-[10px] bg-card">
             System Status: Active
           </Badge>
-          <Badge className={`h-10 px-6 font-black tracking-widest uppercase text-[10px] ${overallPercentage >= 75 ? 'bg-success/20 text-success border-success/30' : 'bg-destructive/10 text-destructive border-destructive/20'}`}>
+          <Badge className={`h-10 px-6 font-bold tracking-widest uppercase text-[10px] ${overallPercentage >= 75 ? 'bg-success/20 text-success border-success/30' : 'bg-destructive/10 text-destructive border-destructive/20'}`}>
             {overallPercentage >= 75 ? 'ELIGIBLE' : 'SHORTAGE'}
           </Badge>
         </div>
@@ -399,17 +451,17 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={`text-5xl font-black tracking-tighter ${getStatusColor(overallPercentage)}`}>{Math.round(overallPercentage)}%</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-1">Aggregate</span>
+                <span className={`text-5xl font-bold tracking-tighter ${getStatusColor(overallPercentage)}`}>{Math.round(overallPercentage)}%</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Aggregate</span>
               </div>
            </div>
         </div>
 
         <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
            <div className="card-elevated p-6 flex flex-col justify-between border-l-4 border-success">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Classes Attended</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Classes Attended</p>
               <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-black text-foreground">{(courseAttendance || []).reduce((s,c)=>s+c.present,0)}</span>
+                <span className="text-5xl font-bold text-foreground">{(courseAttendance || []).reduce((s,c)=>s+c.present,0)}</span>
                 <span className="text-muted-foreground font-bold text-sm">Sessions</span>
               </div>
               <div className="mt-4 flex items-center gap-2 text-success font-bold text-[10px] uppercase tracking-widest">
@@ -417,9 +469,9 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
               </div>
            </div>
            <div className="card-elevated p-6 flex flex-col justify-between border-l-4 border-destructive">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Classes Missed</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Classes Missed</p>
               <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-black text-foreground">{(courseAttendance || []).reduce((s,c)=>s+c.absent,0)}</span>
+                <span className="text-5xl font-bold text-foreground">{(courseAttendance || []).reduce((s,c)=>s+c.absent,0)}</span>
                 <span className="text-muted-foreground font-bold text-sm">Sessions</span>
               </div>
               <div className="mt-4 flex items-center gap-2 text-destructive font-bold text-[10px] uppercase tracking-widest">
@@ -432,7 +484,7 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
       <div className="space-y-4">
         <div className="flex items-center gap-2">
            <div className="h-px flex-1 bg-border/60" />
-           <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground px-4">Course Specific Metrics</span>
+           <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4">Course Specific Metrics</span>
            <div className="h-px flex-1 bg-border/60" />
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -445,9 +497,9 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
                 <div className="flex justify-between items-start mb-6">
                   <div className="space-y-1">
                     <Badge variant="secondary" className="font-mono text-[9px] h-5 tracking-tight px-2 bg-muted/50">{c.courseCode}</Badge>
-                    <h3 className="font-black text-foreground uppercase tracking-tight text-sm line-clamp-1">{c.courseName}</h3>
+                    <h3 className="font-bold text-foreground uppercase tracking-tight text-sm line-clamp-1">{c.courseName}</h3>
                   </div>
-                  <div className={`text-2xl font-black tracking-tighter ${getStatusColor(c.percentage)}`}>{Math.round(c.percentage)}%</div>
+                  <div className={`text-2xl font-bold tracking-tighter ${getStatusColor(c.percentage)}`}>{Math.round(c.percentage)}%</div>
                 </div>
 
                 <div className="space-y-3">
@@ -458,7 +510,7 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
                       className={`h-full ${getProgressColor(c.percentage)}`}
                      />
                    </div>
-                   <div className="flex justify-between text-[10px] font-black uppercase tracking-tighter">
+                   <div className="flex justify-between text-[10px] font-bold uppercase tracking-tighter">
                       <span className="text-success flex items-center gap-1 group-hover:gap-2 transition-all">ATTENDED: {c.present}</span>
                       <span className="text-destructive">MISSED: {c.absent}</span>
                    </div>
@@ -470,63 +522,17 @@ function StudentAttendanceView({ userId, initialData }: { userId: string; initia
 
       <div className="space-y-4">
          <div className="flex items-center justify-between">
-           <h2 className="font-black uppercase tracking-widest text-sm flex items-center gap-2">
+           <h2 className="font-bold uppercase tracking-widest text-sm flex items-center gap-2">
              <Clock className="w-4 h-4 text-primary" /> Session History Log
            </h2>
            <div className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Showing last 100 interactions</div>
          </div>
          
-         <div className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-2xl">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-muted border-b border-border/60">
-                  <th className="py-4 px-6 text-left font-black uppercase text-[10px] tracking-widest text-primary border-r border-border/60">Verification</th>
-                  <th className="py-4 px-6 text-left font-black uppercase text-[10px] tracking-widest border-r border-border/60">Subject & Instructor</th>
-                  <th className="py-4 px-6 text-left font-black uppercase text-[10px] tracking-widest border-r border-border/60">Timestamp</th>
-                  <th className="py-4 px-6 text-right font-black uppercase text-[10px] tracking-widest">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {!Array.isArray(attendanceRecords) || attendanceRecords.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="py-20 text-center text-muted-foreground font-medium italic">No attendance data logged yet.</td>
-                  </tr>
-                ) : (
-                  attendanceRecords.map(r => {
-                    const course = (courseAttendance || []).find(c => c.courseId === r.subject);
-                    const isPresent = r.status === 'present';
-                    return (
-                      <tr key={r.id} className="group hover:bg-muted/30 transition-colors">
-                        <td className="py-4 px-6 border-r border-border/60">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${isPresent ? 'bg-success/10 text-success border-success/20' : 'bg-destructive/10 text-destructive border-destructive/20'}`}>
-                            {isPresent ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 border-r border-border/60">
-                          <div className="flex flex-col">
-                            <span className="text-base font-bold text-foreground group-hover:text-primary transition-colors">{course?.courseCode || 'GEN-CORE'}</span>
-                            <span className="text-[11px] text-muted-foreground font-medium line-clamp-1">{course?.courseName || 'Unspecified Academic Session'}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 border-r border-border/60">
-                           <div className="flex flex-col">
-                             <span className="text-sm font-bold text-foreground">{new Date(r.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                             <span className="text-[10px] font-bold text-muted-foreground uppercase">{new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date(r.date))}</span>
-                           </div>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <Badge variant={isPresent ? 'default' : 'destructive'} className="text-[9px] font-black uppercase tracking-widest px-3">
-                            {isPresent ? 'AUTHENTICATED' : 'MISSED'}
-                          </Badge>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+         <div className="border border-border/60 rounded-sm overflow-hidden bg-card shadow-2xl">
+            <DataTable columns={recordColumns} data={attendanceRecords} />
          </div>
       </div>
     </div>
   );
 }
+

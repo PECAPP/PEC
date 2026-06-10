@@ -13,8 +13,8 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
   const { user, loading: authLoading } = useAuth();
 
   const [loading, setLoading] = useState(!initialData);
-  const [courses, setCourses] = useState<Course[]>(initialData?.courses || []);
-  const [users, setUsers] = useState<User[]>(initialData?.users || []);
+  const [courses, setCourses] = useState<Course[]>((initialData?.courses as Course[]) || []);
+  const [users, setUsers] = useState<User[]>((initialData?.users as User[]) || []);
   const [stats, setStats] = useState<DashboardStats>(
     initialData?.stats || {
       totalStudents: 0,
@@ -53,7 +53,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
   const [courseSearchQuery, setCourseSearchQuery] = useState('');
   const [userSearchQuery, setUserSearchQuery] = useState('');
 
-  const isAdmin = ['college_admin', 'admin', 'super_admin'].includes(user?.role || '');
+  const isAdmin = ['admin'].includes(user?.role || '');
 
   const filteredCourses = (courses || []).filter((course) => {
     const query = courseSearchQuery.toLowerCase();

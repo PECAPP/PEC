@@ -103,7 +103,7 @@ export class FinanceRepository {
     await this.prisma.notification.create({
       data: {
         userId: data.studentId,
-        title: '🧾 New Fee Added',
+        title: ' New Fee Added',
         message: `A ${data.category} fee of ₹${data.amount} is due by ${new Date(data.dueDate).toLocaleDateString('en-IN')}.`,
         type: 'alert',
         link: '/finance',
@@ -203,7 +203,7 @@ export class FinanceRepository {
         await tx.notification.create({
           data: {
             userId: studentId,
-            title: '✅ Payment Successful',
+            title: ' Payment Successful',
             message: `₹${totalAmount.toLocaleString('en-IN')} paid for ${currentFee.category} fee. Receipt: ${receiptNo}`,
             type: 'success',
             link: '/finance',
@@ -242,7 +242,7 @@ export class FinanceRepository {
     await this.prisma.notification.create({
       data: {
         userId: fee.studentId,
-        title: '✅ Fee Marked as Paid',
+        title: ' Fee Marked as Paid',
         message: `Your ${fee.category} fee of ₹${fee.amount} has been marked paid. Receipt: ${receiptNo}`,
         type: 'success',
         link: '/finance',
@@ -341,7 +341,7 @@ export class FinanceRepository {
         this.prisma.notification.createMany({
           data: batch.map((s) => ({
             userId: s.id,
-            title: `🧾 ${body.category.charAt(0).toUpperCase() + body.category.slice(1)} Fee for ${body.month}`,
+            title: ` ${body.category.charAt(0).toUpperCase() + body.category.slice(1)} Fee for ${body.month}`,
             message: `₹${body.amount} due by ${new Date(body.dueDate).toLocaleDateString('en-IN')}.`,
             type: 'alert',
             link: '/finance',

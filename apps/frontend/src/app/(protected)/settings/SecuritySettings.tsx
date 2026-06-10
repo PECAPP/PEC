@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@pec/ui';
+import { Button, formatDate } from "@pec/ui";
 import { Lock, Smartphone, Monitor, Globe, LogOut, Loader2 } from 'lucide-react';
 import { authClient, buildApiUrl } from '@pec/api';
 import { toast } from 'sonner';
@@ -21,9 +21,8 @@ export function SecuritySettings() {
 
   const fetchSessions = async () => {
     try {
-      const token = authClient.getAccessToken();
       const res = await fetch(buildApiUrl('/auth/sessions'), {
-        headers: { Authorization: `Bearer ${token}` }
+        credentials: 'include'
       });
       if (!res.ok) throw new Error('Failed to fetch sessions');
       const data = await res.json();
@@ -41,10 +40,9 @@ export function SecuritySettings() {
 
   const handleRevoke = async (id: string) => {
     try {
-      const token = authClient.getAccessToken();
       const res = await fetch(buildApiUrl(`/auth/sessions/${id}`), {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        credentials: 'include'
       });
       if (!res.ok) throw new Error('Failed to revoke session');
       toast.success('Session revoked successfully.');
@@ -90,15 +88,15 @@ export function SecuritySettings() {
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
         ) : sessions.length === 0 ? (
-          <div className="text-center p-8 text-sm text-muted-foreground italic bg-background/40 rounded-xl border border-border/20">
+          <div className="text-center p-8 text-sm text-muted-foreground italic bg-background/40 rounded-sm border border-border/20">
             No active sessions found.
           </div>
         ) : (
           <div className="space-y-3">
             {sessions.map((session, i) => (
-              <div key={session.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border border-border/40 bg-background/40 hover:border-primary/20 transition-all gap-4">
+              <div key={session.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-sm border border-border/40 bg-background/40 hover:border-primary/20 transition-all gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-muted/30 rounded-xl">
+                  <div className="p-3 bg-muted/30 rounded-sm">
                     {getDeviceIcon(session.userAgent)}
                   </div>
                   <div>
@@ -109,7 +107,7 @@ export function SecuritySettings() {
                       )}
                     </h4>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {session.ipAddress || 'Unknown IP'} • Started {new Date(session.createdAt).toLocaleDateString()}
+                      {session.ipAddress || 'Unknown IP'} • Started {formatDate(session.createdAt)}
                     </p>
                   </div>
                 </div>
@@ -118,7 +116,7 @@ export function SecuritySettings() {
                     variant="outline" 
                     size="sm" 
                     onClick={() => handleRevoke(session.id)}
-                    className="shrink-0 h-9 rounded-lg border-destructive/20 text-destructive hover:bg-destructive/5 font-bold text-xs"
+                    className="shrink-0 h-9 rounded-sm border-destructive/20 text-destructive hover:bg-destructive/5 font-bold text-xs"
                   >
                     <LogOut className="w-3.5 h-3.5 mr-2" /> Revoke
                   </Button>

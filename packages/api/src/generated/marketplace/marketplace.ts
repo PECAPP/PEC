@@ -29,24 +29,42 @@ import type {
   UpdateListingDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const marketplaceControllerFindListingsV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerFindListingsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type marketplaceControllerFindListingsV1ResponseSuccess = (marketplaceControllerFindListingsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerFindListingsV1Response = (marketplaceControllerFindListingsV1ResponseSuccess)
+
+export const getMarketplaceControllerFindListingsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/listings`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/listings`
+}
+
+export const marketplaceControllerFindListingsV1 = async ( options?: RequestInit): Promise<marketplaceControllerFindListingsV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerFindListingsV1Response>(getMarketplaceControllerFindListingsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -58,16 +76,16 @@ export const getMarketplaceControllerFindListingsV1QueryKey = () => {
     }
 
 
-export const getMarketplaceControllerFindListingsV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getMarketplaceControllerFindListingsV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMarketplaceControllerFindListingsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>> = ({ signal }) => marketplaceControllerFindListingsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>> = ({ signal }) => marketplaceControllerFindListingsV1({ signal });
 
 
 
@@ -87,7 +105,7 @@ export function useMarketplaceControllerFindListingsV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerFindListingsV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError = unknown>(
@@ -97,16 +115,16 @@ export function useMarketplaceControllerFindListingsV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerFindListingsV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useMarketplaceControllerFindListingsV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -122,32 +140,50 @@ export function useMarketplaceControllerFindListingsV1<TData = Awaited<ReturnTyp
 
 
 
-export const marketplaceControllerCreateListingV1 = (
-    createListingDto: CreateListingDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerCreateListingV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type marketplaceControllerCreateListingV1ResponseSuccess = (marketplaceControllerCreateListingV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerCreateListingV1Response = (marketplaceControllerCreateListingV1ResponseSuccess)
+
+export const getMarketplaceControllerCreateListingV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/listings`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createListingDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/listings`
+}
+
+export const marketplaceControllerCreateListingV1 = async (createListingDto: CreateListingDto, options?: RequestInit): Promise<marketplaceControllerCreateListingV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerCreateListingV1Response>(getMarketplaceControllerCreateListingV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createListingDto)
+  }
+);}
+
 
 
 
 export const getMarketplaceControllerCreateListingV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerCreateListingV1>>, TError,{data: CreateListingDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerCreateListingV1>>, TError,{data: CreateListingDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerCreateListingV1>>, TError,{data: CreateListingDto}, TContext> => {
 
 const mutationKey = ['marketplaceControllerCreateListingV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -155,7 +191,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof marketplaceControllerCreateListingV1>>, {data: CreateListingDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  marketplaceControllerCreateListingV1(data,requestOptions)
+          return  marketplaceControllerCreateListingV1(data,)
         }
 
 
@@ -170,7 +206,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type MarketplaceControllerCreateListingV1MutationError = unknown
 
     export const useMarketplaceControllerCreateListingV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerCreateListingV1>>, TError,{data: CreateListingDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerCreateListingV1>>, TError,{data: CreateListingDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof marketplaceControllerCreateListingV1>>,
         TError,
@@ -179,17 +215,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerCreateListingV1MutationOptions(options), queryClient);
     }
-    export const marketplaceControllerFindMyListingsV1 = (
+    export type marketplaceControllerFindMyListingsV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerFindMyListingsV1ResponseSuccess = (marketplaceControllerFindMyListingsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerFindMyListingsV1Response = (marketplaceControllerFindMyListingsV1ResponseSuccess)
+
+export const getMarketplaceControllerFindMyListingsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/listings/my`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/listings/my`
+}
+
+export const marketplaceControllerFindMyListingsV1 = async ( options?: RequestInit): Promise<marketplaceControllerFindMyListingsV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerFindMyListingsV1Response>(getMarketplaceControllerFindMyListingsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -201,16 +257,16 @@ export const getMarketplaceControllerFindMyListingsV1QueryKey = () => {
     }
 
 
-export const getMarketplaceControllerFindMyListingsV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getMarketplaceControllerFindMyListingsV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMarketplaceControllerFindMyListingsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>> = ({ signal }) => marketplaceControllerFindMyListingsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>> = ({ signal }) => marketplaceControllerFindMyListingsV1({ signal });
 
 
 
@@ -230,7 +286,7 @@ export function useMarketplaceControllerFindMyListingsV1<TData = Awaited<ReturnT
           TError,
           Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerFindMyListingsV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError = unknown>(
@@ -240,16 +296,16 @@ export function useMarketplaceControllerFindMyListingsV1<TData = Awaited<ReturnT
           TError,
           Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerFindMyListingsV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useMarketplaceControllerFindMyListingsV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindMyListingsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -265,17 +321,37 @@ export function useMarketplaceControllerFindMyListingsV1<TData = Awaited<ReturnT
 
 
 
-export const marketplaceControllerFindListingV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerFindListingV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type marketplaceControllerFindListingV1ResponseSuccess = (marketplaceControllerFindListingV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerFindListingV1Response = (marketplaceControllerFindListingV1ResponseSuccess)
+
+export const getMarketplaceControllerFindListingV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/listings/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/listings/${id}`
+}
+
+export const marketplaceControllerFindListingV1 = async (id: string, options?: RequestInit): Promise<marketplaceControllerFindListingV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerFindListingV1Response>(getMarketplaceControllerFindListingV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -287,16 +363,16 @@ export const getMarketplaceControllerFindListingV1QueryKey = (id: string,) => {
     }
 
 
-export const getMarketplaceControllerFindListingV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getMarketplaceControllerFindListingV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMarketplaceControllerFindListingV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>> = ({ signal }) => marketplaceControllerFindListingV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>> = ({ signal }) => marketplaceControllerFindListingV1(id, { signal });
 
 
 
@@ -316,7 +392,7 @@ export function useMarketplaceControllerFindListingV1<TData = Awaited<ReturnType
           TError,
           Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerFindListingV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError = unknown>(
@@ -326,16 +402,16 @@ export function useMarketplaceControllerFindListingV1<TData = Awaited<ReturnType
           TError,
           Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerFindListingV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useMarketplaceControllerFindListingV1<TData = Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerFindListingV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -351,33 +427,51 @@ export function useMarketplaceControllerFindListingV1<TData = Awaited<ReturnType
 
 
 
-export const marketplaceControllerUpdateListingV1 = (
-    id: string,
-    updateListingDto: UpdateListingDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerUpdateListingV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type marketplaceControllerUpdateListingV1ResponseSuccess = (marketplaceControllerUpdateListingV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerUpdateListingV1Response = (marketplaceControllerUpdateListingV1ResponseSuccess)
+
+export const getMarketplaceControllerUpdateListingV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/listings/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateListingDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/listings/${id}`
+}
+
+export const marketplaceControllerUpdateListingV1 = async (id: string,
+    updateListingDto: UpdateListingDto, options?: RequestInit): Promise<marketplaceControllerUpdateListingV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerUpdateListingV1Response>(getMarketplaceControllerUpdateListingV1Url(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateListingDto)
+  }
+);}
+
 
 
 
 export const getMarketplaceControllerUpdateListingV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerUpdateListingV1>>, TError,{id: string;data: UpdateListingDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerUpdateListingV1>>, TError,{id: string;data: UpdateListingDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerUpdateListingV1>>, TError,{id: string;data: UpdateListingDto}, TContext> => {
 
 const mutationKey = ['marketplaceControllerUpdateListingV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -385,7 +479,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof marketplaceControllerUpdateListingV1>>, {id: string;data: UpdateListingDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  marketplaceControllerUpdateListingV1(id,data,requestOptions)
+          return  marketplaceControllerUpdateListingV1(id,data,)
         }
 
 
@@ -400,7 +494,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type MarketplaceControllerUpdateListingV1MutationError = unknown
 
     export const useMarketplaceControllerUpdateListingV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerUpdateListingV1>>, TError,{id: string;data: UpdateListingDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerUpdateListingV1>>, TError,{id: string;data: UpdateListingDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof marketplaceControllerUpdateListingV1>>,
         TError,
@@ -409,30 +503,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerUpdateListingV1MutationOptions(options), queryClient);
     }
-    export const marketplaceControllerDeleteListingV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type marketplaceControllerDeleteListingV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type marketplaceControllerDeleteListingV1ResponseSuccess = (marketplaceControllerDeleteListingV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerDeleteListingV1Response = (marketplaceControllerDeleteListingV1ResponseSuccess)
+
+export const getMarketplaceControllerDeleteListingV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/listings/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/listings/${id}`
+}
+
+export const marketplaceControllerDeleteListingV1 = async (id: string, options?: RequestInit): Promise<marketplaceControllerDeleteListingV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerDeleteListingV1Response>(getMarketplaceControllerDeleteListingV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getMarketplaceControllerDeleteListingV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerDeleteListingV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerDeleteListingV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerDeleteListingV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['marketplaceControllerDeleteListingV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -440,7 +554,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof marketplaceControllerDeleteListingV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  marketplaceControllerDeleteListingV1(id,requestOptions)
+          return  marketplaceControllerDeleteListingV1(id,)
         }
 
 
@@ -455,7 +569,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type MarketplaceControllerDeleteListingV1MutationError = unknown
 
     export const useMarketplaceControllerDeleteListingV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerDeleteListingV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerDeleteListingV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof marketplaceControllerDeleteListingV1>>,
         TError,
@@ -464,30 +578,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerDeleteListingV1MutationOptions(options), queryClient);
     }
-    export const marketplaceControllerToggleBookmarkV1 = (
-    listingId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type marketplaceControllerToggleBookmarkV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type marketplaceControllerToggleBookmarkV1ResponseSuccess = (marketplaceControllerToggleBookmarkV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerToggleBookmarkV1Response = (marketplaceControllerToggleBookmarkV1ResponseSuccess)
+
+export const getMarketplaceControllerToggleBookmarkV1Url = (listingId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/bookmarks/${listingId}`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/bookmarks/${listingId}`
+}
+
+export const marketplaceControllerToggleBookmarkV1 = async (listingId: string, options?: RequestInit): Promise<marketplaceControllerToggleBookmarkV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerToggleBookmarkV1Response>(getMarketplaceControllerToggleBookmarkV1Url(listingId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getMarketplaceControllerToggleBookmarkV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerToggleBookmarkV1>>, TError,{listingId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerToggleBookmarkV1>>, TError,{listingId: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerToggleBookmarkV1>>, TError,{listingId: string}, TContext> => {
 
 const mutationKey = ['marketplaceControllerToggleBookmarkV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -495,7 +629,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof marketplaceControllerToggleBookmarkV1>>, {listingId: string}> = (props) => {
           const {listingId} = props ?? {};
 
-          return  marketplaceControllerToggleBookmarkV1(listingId,requestOptions)
+          return  marketplaceControllerToggleBookmarkV1(listingId,)
         }
 
 
@@ -510,7 +644,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type MarketplaceControllerToggleBookmarkV1MutationError = unknown
 
     export const useMarketplaceControllerToggleBookmarkV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerToggleBookmarkV1>>, TError,{listingId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerToggleBookmarkV1>>, TError,{listingId: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof marketplaceControllerToggleBookmarkV1>>,
         TError,
@@ -519,17 +653,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerToggleBookmarkV1MutationOptions(options), queryClient);
     }
-    export const marketplaceControllerGetBookmarksV1 = (
+    export type marketplaceControllerGetBookmarksV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerGetBookmarksV1ResponseSuccess = (marketplaceControllerGetBookmarksV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerGetBookmarksV1Response = (marketplaceControllerGetBookmarksV1ResponseSuccess)
+
+export const getMarketplaceControllerGetBookmarksV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/bookmarks`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/bookmarks`
+}
+
+export const marketplaceControllerGetBookmarksV1 = async ( options?: RequestInit): Promise<marketplaceControllerGetBookmarksV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerGetBookmarksV1Response>(getMarketplaceControllerGetBookmarksV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -541,16 +695,16 @@ export const getMarketplaceControllerGetBookmarksV1QueryKey = () => {
     }
 
 
-export const getMarketplaceControllerGetBookmarksV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getMarketplaceControllerGetBookmarksV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMarketplaceControllerGetBookmarksV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>> = ({ signal }) => marketplaceControllerGetBookmarksV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>> = ({ signal }) => marketplaceControllerGetBookmarksV1({ signal });
 
 
 
@@ -570,7 +724,7 @@ export function useMarketplaceControllerGetBookmarksV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerGetBookmarksV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError = unknown>(
@@ -580,16 +734,16 @@ export function useMarketplaceControllerGetBookmarksV1<TData = Awaited<ReturnTyp
           TError,
           Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerGetBookmarksV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useMarketplaceControllerGetBookmarksV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarksV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -605,17 +759,37 @@ export function useMarketplaceControllerGetBookmarksV1<TData = Awaited<ReturnTyp
 
 
 
-export const marketplaceControllerGetBookmarkedIdsV1 = (
+export type marketplaceControllerGetBookmarkedIdsV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerGetBookmarkedIdsV1ResponseSuccess = (marketplaceControllerGetBookmarkedIdsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerGetBookmarkedIdsV1Response = (marketplaceControllerGetBookmarkedIdsV1ResponseSuccess)
+
+export const getMarketplaceControllerGetBookmarkedIdsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/bookmarks/ids`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/bookmarks/ids`
+}
+
+export const marketplaceControllerGetBookmarkedIdsV1 = async ( options?: RequestInit): Promise<marketplaceControllerGetBookmarkedIdsV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerGetBookmarkedIdsV1Response>(getMarketplaceControllerGetBookmarkedIdsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -627,16 +801,16 @@ export const getMarketplaceControllerGetBookmarkedIdsV1QueryKey = () => {
     }
 
 
-export const getMarketplaceControllerGetBookmarkedIdsV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getMarketplaceControllerGetBookmarkedIdsV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMarketplaceControllerGetBookmarkedIdsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>> = ({ signal }) => marketplaceControllerGetBookmarkedIdsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>> = ({ signal }) => marketplaceControllerGetBookmarkedIdsV1({ signal });
 
 
 
@@ -656,7 +830,7 @@ export function useMarketplaceControllerGetBookmarkedIdsV1<TData = Awaited<Retur
           TError,
           Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerGetBookmarkedIdsV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError = unknown>(
@@ -666,16 +840,16 @@ export function useMarketplaceControllerGetBookmarkedIdsV1<TData = Awaited<Retur
           TError,
           Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerGetBookmarkedIdsV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useMarketplaceControllerGetBookmarkedIdsV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetBookmarkedIdsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -691,30 +865,50 @@ export function useMarketplaceControllerGetBookmarkedIdsV1<TData = Awaited<Retur
 
 
 
-export const marketplaceControllerGetOrCreateChatV1 = (
-    listingId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerGetOrCreateChatV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type marketplaceControllerGetOrCreateChatV1ResponseSuccess = (marketplaceControllerGetOrCreateChatV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerGetOrCreateChatV1Response = (marketplaceControllerGetOrCreateChatV1ResponseSuccess)
+
+export const getMarketplaceControllerGetOrCreateChatV1Url = (listingId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/chats/listing/${listingId}`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/chats/listing/${listingId}`
+}
+
+export const marketplaceControllerGetOrCreateChatV1 = async (listingId: string, options?: RequestInit): Promise<marketplaceControllerGetOrCreateChatV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerGetOrCreateChatV1Response>(getMarketplaceControllerGetOrCreateChatV1Url(listingId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getMarketplaceControllerGetOrCreateChatV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerGetOrCreateChatV1>>, TError,{listingId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerGetOrCreateChatV1>>, TError,{listingId: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerGetOrCreateChatV1>>, TError,{listingId: string}, TContext> => {
 
 const mutationKey = ['marketplaceControllerGetOrCreateChatV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -722,7 +916,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof marketplaceControllerGetOrCreateChatV1>>, {listingId: string}> = (props) => {
           const {listingId} = props ?? {};
 
-          return  marketplaceControllerGetOrCreateChatV1(listingId,requestOptions)
+          return  marketplaceControllerGetOrCreateChatV1(listingId,)
         }
 
 
@@ -737,7 +931,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type MarketplaceControllerGetOrCreateChatV1MutationError = unknown
 
     export const useMarketplaceControllerGetOrCreateChatV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerGetOrCreateChatV1>>, TError,{listingId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerGetOrCreateChatV1>>, TError,{listingId: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof marketplaceControllerGetOrCreateChatV1>>,
         TError,
@@ -746,17 +940,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMarketplaceControllerGetOrCreateChatV1MutationOptions(options), queryClient);
     }
-    export const marketplaceControllerGetMyChatsV1 = (
+    export type marketplaceControllerGetMyChatsV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerGetMyChatsV1ResponseSuccess = (marketplaceControllerGetMyChatsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerGetMyChatsV1Response = (marketplaceControllerGetMyChatsV1ResponseSuccess)
+
+export const getMarketplaceControllerGetMyChatsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/chats`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/chats`
+}
+
+export const marketplaceControllerGetMyChatsV1 = async ( options?: RequestInit): Promise<marketplaceControllerGetMyChatsV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerGetMyChatsV1Response>(getMarketplaceControllerGetMyChatsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -768,16 +982,16 @@ export const getMarketplaceControllerGetMyChatsV1QueryKey = () => {
     }
 
 
-export const getMarketplaceControllerGetMyChatsV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getMarketplaceControllerGetMyChatsV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMarketplaceControllerGetMyChatsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>> = ({ signal }) => marketplaceControllerGetMyChatsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>> = ({ signal }) => marketplaceControllerGetMyChatsV1({ signal });
 
 
 
@@ -797,7 +1011,7 @@ export function useMarketplaceControllerGetMyChatsV1<TData = Awaited<ReturnType<
           TError,
           Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerGetMyChatsV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError = unknown>(
@@ -807,16 +1021,16 @@ export function useMarketplaceControllerGetMyChatsV1<TData = Awaited<ReturnType<
           TError,
           Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerGetMyChatsV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useMarketplaceControllerGetMyChatsV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetMyChatsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -832,17 +1046,37 @@ export function useMarketplaceControllerGetMyChatsV1<TData = Awaited<ReturnType<
 
 
 
-export const marketplaceControllerGetChatMessagesV1 = (
-    chatId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerGetChatMessagesV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type marketplaceControllerGetChatMessagesV1ResponseSuccess = (marketplaceControllerGetChatMessagesV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerGetChatMessagesV1Response = (marketplaceControllerGetChatMessagesV1ResponseSuccess)
+
+export const getMarketplaceControllerGetChatMessagesV1Url = (chatId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/chats/${chatId}/messages`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/chats/${chatId}/messages`
+}
+
+export const marketplaceControllerGetChatMessagesV1 = async (chatId: string, options?: RequestInit): Promise<marketplaceControllerGetChatMessagesV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerGetChatMessagesV1Response>(getMarketplaceControllerGetChatMessagesV1Url(chatId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -854,16 +1088,16 @@ export const getMarketplaceControllerGetChatMessagesV1QueryKey = (chatId: string
     }
 
 
-export const getMarketplaceControllerGetChatMessagesV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError = unknown>(chatId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getMarketplaceControllerGetChatMessagesV1QueryOptions = <TData = Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError = unknown>(chatId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getMarketplaceControllerGetChatMessagesV1QueryKey(chatId);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>> = ({ signal }) => marketplaceControllerGetChatMessagesV1(chatId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>> = ({ signal }) => marketplaceControllerGetChatMessagesV1(chatId, { signal });
 
 
 
@@ -883,7 +1117,7 @@ export function useMarketplaceControllerGetChatMessagesV1<TData = Awaited<Return
           TError,
           Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerGetChatMessagesV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError = unknown>(
@@ -893,16 +1127,16 @@ export function useMarketplaceControllerGetChatMessagesV1<TData = Awaited<Return
           TError,
           Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMarketplaceControllerGetChatMessagesV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError = unknown>(
- chatId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ chatId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useMarketplaceControllerGetChatMessagesV1<TData = Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError = unknown>(
- chatId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ chatId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof marketplaceControllerGetChatMessagesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -918,30 +1152,50 @@ export function useMarketplaceControllerGetChatMessagesV1<TData = Awaited<Return
 
 
 
-export const marketplaceControllerSendMessageV1 = (
-    chatId: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type marketplaceControllerSendMessageV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type marketplaceControllerSendMessageV1ResponseSuccess = (marketplaceControllerSendMessageV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerSendMessageV1Response = (marketplaceControllerSendMessageV1ResponseSuccess)
+
+export const getMarketplaceControllerSendMessageV1Url = (chatId: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/marketplace/chats/${chatId}/messages`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/marketplace/chats/${chatId}/messages`
+}
+
+export const marketplaceControllerSendMessageV1 = async (chatId: string, options?: RequestInit): Promise<marketplaceControllerSendMessageV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerSendMessageV1Response>(getMarketplaceControllerSendMessageV1Url(chatId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getMarketplaceControllerSendMessageV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerSendMessageV1>>, TError,{chatId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerSendMessageV1>>, TError,{chatId: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerSendMessageV1>>, TError,{chatId: string}, TContext> => {
 
 const mutationKey = ['marketplaceControllerSendMessageV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -949,7 +1203,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof marketplaceControllerSendMessageV1>>, {chatId: string}> = (props) => {
           const {chatId} = props ?? {};
 
-          return  marketplaceControllerSendMessageV1(chatId,requestOptions)
+          return  marketplaceControllerSendMessageV1(chatId,)
         }
 
 
@@ -964,7 +1218,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type MarketplaceControllerSendMessageV1MutationError = unknown
 
     export const useMarketplaceControllerSendMessageV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerSendMessageV1>>, TError,{chatId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerSendMessageV1>>, TError,{chatId: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof marketplaceControllerSendMessageV1>>,
         TError,
@@ -972,4 +1226,156 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getMarketplaceControllerSendMessageV1MutationOptions(options), queryClient);
+    }
+    export type marketplaceControllerCreateOfferV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type marketplaceControllerCreateOfferV1ResponseSuccess = (marketplaceControllerCreateOfferV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerCreateOfferV1Response = (marketplaceControllerCreateOfferV1ResponseSuccess)
+
+export const getMarketplaceControllerCreateOfferV1Url = (chatId: string,) => {
+
+
+
+
+  return `/api/v1/marketplace/chats/${chatId}/offers`
+}
+
+export const marketplaceControllerCreateOfferV1 = async (chatId: string, options?: RequestInit): Promise<marketplaceControllerCreateOfferV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerCreateOfferV1Response>(getMarketplaceControllerCreateOfferV1Url(chatId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getMarketplaceControllerCreateOfferV1MutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerCreateOfferV1>>, TError,{chatId: string}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerCreateOfferV1>>, TError,{chatId: string}, TContext> => {
+
+const mutationKey = ['marketplaceControllerCreateOfferV1'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof marketplaceControllerCreateOfferV1>>, {chatId: string}> = (props) => {
+          const {chatId} = props ?? {};
+
+          return  marketplaceControllerCreateOfferV1(chatId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarketplaceControllerCreateOfferV1MutationResult = NonNullable<Awaited<ReturnType<typeof marketplaceControllerCreateOfferV1>>>
+
+    export type MarketplaceControllerCreateOfferV1MutationError = unknown
+
+    export const useMarketplaceControllerCreateOfferV1 = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerCreateOfferV1>>, TError,{chatId: string}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof marketplaceControllerCreateOfferV1>>,
+        TError,
+        {chatId: string},
+        TContext
+      > => {
+      return useMutation(getMarketplaceControllerCreateOfferV1MutationOptions(options), queryClient);
+    }
+    export type marketplaceControllerUpdateOfferV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type marketplaceControllerUpdateOfferV1ResponseSuccess = (marketplaceControllerUpdateOfferV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type marketplaceControllerUpdateOfferV1Response = (marketplaceControllerUpdateOfferV1ResponseSuccess)
+
+export const getMarketplaceControllerUpdateOfferV1Url = (chatId: string,
+    messageId: string,) => {
+
+
+
+
+  return `/api/v1/marketplace/chats/${chatId}/offers/${messageId}`
+}
+
+export const marketplaceControllerUpdateOfferV1 = async (chatId: string,
+    messageId: string, options?: RequestInit): Promise<marketplaceControllerUpdateOfferV1Response> => {
+
+  return fetchWithAuth<marketplaceControllerUpdateOfferV1Response>(getMarketplaceControllerUpdateOfferV1Url(chatId,messageId),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getMarketplaceControllerUpdateOfferV1MutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerUpdateOfferV1>>, TError,{chatId: string;messageId: string}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerUpdateOfferV1>>, TError,{chatId: string;messageId: string}, TContext> => {
+
+const mutationKey = ['marketplaceControllerUpdateOfferV1'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof marketplaceControllerUpdateOfferV1>>, {chatId: string;messageId: string}> = (props) => {
+          const {chatId,messageId} = props ?? {};
+
+          return  marketplaceControllerUpdateOfferV1(chatId,messageId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarketplaceControllerUpdateOfferV1MutationResult = NonNullable<Awaited<ReturnType<typeof marketplaceControllerUpdateOfferV1>>>
+
+    export type MarketplaceControllerUpdateOfferV1MutationError = unknown
+
+    export const useMarketplaceControllerUpdateOfferV1 = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof marketplaceControllerUpdateOfferV1>>, TError,{chatId: string;messageId: string}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof marketplaceControllerUpdateOfferV1>>,
+        TError,
+        {chatId: string;messageId: string},
+        TContext
+      > => {
+      return useMutation(getMarketplaceControllerUpdateOfferV1MutationOptions(options), queryClient);
     }

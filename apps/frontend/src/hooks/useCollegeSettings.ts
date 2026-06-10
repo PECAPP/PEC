@@ -10,7 +10,7 @@ export function useCollegeSettings() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await api.get("/college-settings");
+        const response = await api.get("/pec-settings");
         // Handle result-wrapper from ok() utility in backend
         const data = response.data?.success ? response.data.data : response.data;
         if (data) {

@@ -135,7 +135,7 @@ export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, _current
               </div>
             )}
 
-            <div className="max-h-40 overflow-y-auto border rounded-md mt-2">
+            <div className="max-h-40 overflow-y-auto border rounded-sm mt-2">
               {isSearching ? (
                 <div className="p-4 flex justify-center">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />

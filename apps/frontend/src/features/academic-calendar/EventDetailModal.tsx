@@ -73,7 +73,6 @@ export function EventDetailModal({
       toast.success('Event deleted successfully');
       onDelete?.(event.id);
       onClose();
-    } catch (_error) {
       toast.error('Failed to delete event');
     } finally {
       setIsDeleting(false);
@@ -82,22 +81,20 @@ export function EventDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl p-0 overflow-hidden border border-border bg-background shadow-2xl rounded-sm flex flex-col max-h-[90vh]">
+      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background rounded-sm flex flex-col max-h-[90vh]">
         <DialogTitle className="sr-only">{event.title}</DialogTitle>
         <DialogDescription className="sr-only">{event.description}</DialogDescription>
         
-        {/* Modal Header/Banner - Fixed at top */}
+        {/* Modal Header */}
         <div className={cn(
-          "h-32 sm:h-48 w-full relative shrink-0 overflow-hidden flex items-end p-6 sm:p-10 border-b border-border bg-grid-pattern",
+          "p-6 sm:p-8 border-b relative",
           getEventColor(event.eventType)
         )}>
-          <div className="relative z-10 flex flex-col gap-3 sm:gap-4">
-            <Badge className={cn(
-              "w-fit px-2 sm:px-3 py-1 rounded-none text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] border border-white/20 bg-background/20 backdrop-blur-md"
-            )}>
+          <div className="flex flex-col gap-3 pr-8">
+            <Badge className="w-fit text-xs font-semibold rounded-sm">
               {getEventLabel(event.eventType)}
             </Badge>
-            <h2 className="text-2xl sm:text-4xl font-bold font-display tracking-tight uppercase leading-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
               {event.title}
             </h2>
           </div>
@@ -106,79 +103,79 @@ export function EventDetailModal({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="absolute top-6 right-6 rounded-none bg-background/10 hover:bg-background/20 backdrop-blur-md text-white border border-white/10 transition-all font-display z-20"
+            className="absolute top-6 right-6 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all"
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-10 space-y-10 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8">
           {/* Main Info Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 font-display">Time & Coordination</h4>
-                <div className="flex items-center gap-5 bg-muted/5 p-5 rounded-sm border border-border/60 hover:border-primary/40 transition-colors">
-                  <div className="w-14 h-14 rounded-none bg-primary/10 flex flex-col items-center justify-center border border-primary/20 shrink-0">
-                    <span className="text-[10px] font-black uppercase leading-none text-primary/60">{format(new Date(event.date), 'MMM')}</span>
-                    <span className="text-2xl font-bold leading-none font-display">{format(new Date(event.date), 'dd')}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground">Date & Time</h4>
+                <div className="flex items-center gap-4 p-4 rounded-sm bg-muted/50 border">
+                  <div className="w-12 h-12 rounded-sm bg-background flex flex-col items-center justify-center border shadow-sm shrink-0 text-primary">
+                    <span className="text-xs font-semibold uppercase">{format(new Date(event.date), 'MMM')}</span>
+                    <span className="text-xl font-bold">{format(new Date(event.date), 'dd')}</span>
                   </div>
-                  <div className="space-y-1">
-                    <p className="font-bold text-sm leading-none">{format(new Date(event.date), 'EEEE, MMMM do')}</p>
-                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{event.startTime || 'All Day Event'}</p>
+                  <div>
+                    <p className="font-medium text-sm">{format(new Date(event.date), 'EEEE, MMMM do')}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{event.startTime || 'All Day Event'}</p>
                   </div>
                 </div>
               </div>
 
               {event.location && (
-                <div className="space-y-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 font-display">Operational Zone</h4>
-                  <div className="flex items-center gap-5 bg-muted/5 p-5 rounded-sm border border-border/60 hover:border-primary/40 transition-colors">
-                    <div className="w-14 h-14 rounded-none bg-primary/10 flex items-center justify-center border border-primary/20 text-primary shrink-0">
-                      <MapPin className="h-6 w-6" />
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-muted-foreground">Location</h4>
+                  <div className="flex items-center gap-4 p-4 rounded-sm bg-muted/50 border">
+                    <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center border shadow-sm text-primary shrink-0">
+                      <MapPin className="h-5 w-5" />
                     </div>
-                    <div className="space-y-1">
-                      <p className="font-bold text-sm leading-none font-display uppercase">{event.location}</p>
-                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">PEC Main Campus Coordinates</p>
+                    <div>
+                      <p className="font-medium text-sm">{event.location}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">PEC Campus</p>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 font-display">Resource Mapping</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-muted/5 p-5 rounded-sm border border-border/60 flex flex-col gap-3">
-                    <div className="flex items-center gap-2 text-primary/60">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground">Event Details</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="p-4 rounded-sm bg-muted/50 border space-y-1">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Users className="w-4 h-4" />
-                      <span className="text-[9px] font-black uppercase tracking-widest">Target Group</span>
+                      <span className="text-xs font-medium">Audience</span>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest truncate">{event.targetAudience || 'General Body'}</p>
+                    <p className="text-sm font-medium">{event.targetAudience || 'General Body'}</p>
                   </div>
-                  <div className="bg-muted/5 p-5 rounded-sm border border-border/60 flex flex-col gap-3">
-                    <div className="flex items-center gap-2 text-primary/60">
+                  <div className="p-4 rounded-sm bg-muted/50 border space-y-1">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Tag className="w-4 h-4" />
-                      <span className="text-[9px] font-black uppercase tracking-widest">Classification</span>
+                      <span className="text-xs font-medium">Category</span>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest truncate">{CATEGORY_LABELS[event.category] || event.category}</p>
+                    <p className="text-sm font-medium">{CATEGORY_LABELS[event.category] || event.category}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 font-display">Impact Analysis</h4>
-                <div className="flex items-center gap-4 bg-muted/5 p-5 rounded-sm border border-border/60">
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground">Importance</h4>
+                <div className="flex items-center gap-3 p-4 rounded-sm bg-muted/50 border">
                   <div className={cn(
-                    "w-4 h-4 rounded-none shrink-0",
-                    event.importance === 'high' ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]" : 
-                    event.importance === 'medium' ? "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]" : 
-                    "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                    "w-3 h-3 rounded-full shrink-0",
+                    event.importance === 'high' ? "bg-red-500" : 
+                    event.importance === 'medium' ? "bg-amber-500" : 
+                    "bg-emerald-500"
                   )} />
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] leading-none text-foreground/80">
-                    Structural Intensity: <span className="text-foreground">{event.importance} priority</span>
+                  <p className="text-sm font-medium capitalize">
+                    {event.importance} Priority
                   </p>
                 </div>
               </div>
@@ -187,63 +184,48 @@ export function EventDetailModal({
 
           {/* Description Section */}
           {event.description && (
-            <div className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 font-display">Executive Brief</h4>
-              <div className="bg-muted/[0.03] p-10 rounded-sm border border-border relative overflow-hidden bg-grid-pattern">
-                <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px]" />
-                <blockquote className="text-sm text-foreground/90 font-medium uppercase tracking-[0.15em] relative z-10 leading-loose text-center max-w-xl mx-auto italic">
-                  "{event.description}"
-                </blockquote>
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-muted-foreground">Description</h4>
+              <div className="p-5 rounded-sm border bg-card text-sm leading-relaxed text-foreground/90">
+                {event.description}
               </div>
             </div>
           )}
-          
-          <div className="h-2" /> {/* Bottom spacing padding */}
         </div>
 
-        {/* Sticky Action Footer */}
-        <div className="shrink-0 p-6 sm:px-10 py-6 border-t border-border bg-background/80 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-6 relative z-30">
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            {isAdmin && event.isEditable ? (
-              <>
-                <Button
-                  onClick={() => onEdit?.(event)}
-                  className="w-full sm:w-auto rounded-none h-14 font-black uppercase tracking-widest px-10 shadow-sm transition-all bg-primary hover:bg-primary/90"
-                >
-                  <Edit className="w-4 h-4 mr-3" />
-                  Correct entry
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="w-full sm:w-auto rounded-none h-14 font-black uppercase tracking-widest px-10 shadow-sm transition-all"
-                >
-                  <Trash2 className="w-4 h-4 mr-3" />
-                  {isDeleting ? 'Removing...' : 'Purge'}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button size="lg" className="w-full sm:w-auto rounded-none font-black uppercase tracking-widest h-14 px-10 shadow-xl transition-all bg-primary hover:bg-primary/90 group">
-                  Register to Calendar
-                  <ExternalLink className="w-4 h-4 ml-3 opacity-50 group-hover:opacity-100 transition-opacity" />
-                </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-none font-black uppercase tracking-widest h-14 px-8 border-border hover:bg-muted/40 transition-all">
-                  <Share2 className="w-4 h-4 mr-3" />
-                  Distribute
-                </Button>
-              </>
-            )}
-          </div>
-          
-          <Button 
-            variant="ghost" 
-            onClick={onClose} 
-            className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/30 hover:text-primary transition-colors h-auto p-0 hover:bg-transparent"
-          >
-            Terminal View [X]
-          </Button>
+        {/* Action Footer */}
+        <div className="p-6 border-t bg-muted/20 flex flex-col sm:flex-row items-center gap-3 justify-end shrink-0">
+          {isAdmin && event.isEditable ? (
+            <>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="w-full sm:w-auto"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </Button>
+              <Button
+                onClick={() => onEdit?.(event)}
+                className="w-full sm:w-auto"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Event
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" className="w-full sm:w-auto">
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </Button>
+              <Button className="w-full sm:w-auto">
+                Add to Calendar
+                <ExternalLink className="w-4 h-4 ml-2" />
+              </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

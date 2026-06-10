@@ -26,6 +26,7 @@ export async function createUserWithRole(params: {
       update: {
         name: params.name,
         password: params.passwordHash,
+        role: params.role,
         githubUsername: params.githubUsername ?? null,
         linkedinUsername: params.linkedinUsername ?? null,
         isPublicProfile: params.isPublicProfile ?? true,
@@ -38,6 +39,7 @@ export async function createUserWithRole(params: {
         email: params.email,
         name: params.name,
         password: params.passwordHash,
+        role: params.role,
         githubUsername: params.githubUsername ?? null,
         linkedinUsername: params.linkedinUsername ?? null,
         isPublicProfile: params.isPublicProfile ?? true,
@@ -64,14 +66,14 @@ export async function seedCoreUsers(passwordHash: string) {
   const admin = await createUserWithRole({
     email: 'admin@pec.edu',
     name: 'PEC College Admin',
-    role: 'college_admin',
+    role: 'admin',
     passwordHash,
   });
 
   await createUserWithRole({
     email: 'ops.admin@pec.edu',
     name: 'Operations Admin',
-    role: 'college_admin',
+    role: 'admin',
     passwordHash,
   });
 

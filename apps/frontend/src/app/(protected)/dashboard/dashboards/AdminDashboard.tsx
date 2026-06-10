@@ -85,7 +85,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+          <Loader2 className="w-8 h-8 animate-spin  mb-4 text-primary" />
           <p className="text-muted-foreground">Loading admin dashboard...</p>
         </div>
       </div>
@@ -94,10 +94,10 @@ export function AdminDashboard({ initialData }: AdminDashboardProps = {}) {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="relative overflow-hidden p-8 rounded-2xl bg-card/60 backdrop-blur-md border border-border flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-xl glass-premium">
+      <div className="relative overflow-hidden p-8 rounded-sm bg-card/60 backdrop-blur-md border border-border flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-xl glass-premium">
         <div className="z-10">
           <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-wider mb-2">
-            System Administration
+            Administration
           </div>
           <h1 className="text-3xl font-bold text-foreground">
             {timePeriod ? `${timePeriod}, Admin` : 'Welcome, Admin'}

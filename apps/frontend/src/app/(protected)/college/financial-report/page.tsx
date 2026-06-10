@@ -13,6 +13,9 @@ import {
   PieChart,
   Calendar,
 } from 'lucide-react';
+import { DataTable } from '@/components/common/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
+import { useMemo } from 'react';
 
 const feeBreakdown = [
   { category: 'Tuition Fee', collected: 28000000, total: 35000000 },
@@ -40,6 +43,37 @@ export default function FinancialReport() {
   const totalCollected = feeBreakdown.reduce((sum, item) => sum + item.collected, 0);
   const totalExpected = feeBreakdown.reduce((sum, item) => sum + item.total, 0);
   const collectionPercentage = Math.round((totalCollected / totalExpected) * 100);
+
+  const columns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'student',
+      header: 'Student',
+      cell: ({ row }) => <span className="font-medium text-foreground">{row.original.student}</span>
+    },
+    {
+      accessorKey: 'type',
+      header: 'Type',
+      cell: ({ row }) => (
+        <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
+          {row.original.type}
+        </span>
+      )
+    },
+    {
+      accessorKey: 'date',
+      header: 'Date',
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.date}</span>
+    },
+    {
+      accessorKey: 'amount',
+      header: 'Amount',
+      cell: ({ row }) => (
+        <div className="text-right w-full">
+          <span className="font-medium text-success">+₹{row.original.amount.toLocaleString()}</span>
+        </div>
+      )
+    }
+  ], []);
 
   return (
     <motion.div
@@ -82,7 +116,7 @@ export default function FinancialReport() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="card-elevated p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-success/10 flex items-center justify-center">
               <CreditCard className="w-5 h-5 text-success" />
             </div>
             <TrendingUp className="w-4 h-4 text-success ml-auto" />
@@ -92,7 +126,7 @@ export default function FinancialReport() {
         </div>
         <div className="card-elevated p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-primary" />
             </div>
           </div>
@@ -101,7 +135,7 @@ export default function FinancialReport() {
         </div>
         <div className="card-elevated p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-warning/10 flex items-center justify-center">
               <PieChart className="w-5 h-5 text-warning" />
             </div>
           </div>
@@ -110,7 +144,7 @@ export default function FinancialReport() {
         </div>
         <div className="card-elevated p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-accent/10 flex items-center justify-center">
               <Calendar className="w-5 h-5 text-accent" />
             </div>
           </div>
@@ -143,7 +177,7 @@ export default function FinancialReport() {
           <h2 className="text-lg font-semibold text-foreground mb-4">Collection Summary</h2>
           <div className="space-y-4">
             <div className="text-center">
-              <div className="relative w-32 h-32 mx-auto">
+              <div className="relative w-32 h-32 ">
                 <svg className="w-32 h-32 transform -rotate-90">
                   <circle
                     cx="64"
@@ -197,36 +231,9 @@ export default function FinancialReport() {
       </div>
 
       {/* Recent Transactions */}
-      <div className="card-elevated p-6">
+      <div className="card-elevated p-6 overflow-hidden border rounded-sm shadow-sm">
         <h2 className="text-lg font-semibold text-foreground mb-4">Recent Transactions</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Student</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Type</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentTransactions.map((txn) => (
-                <tr key={txn.id} className="border-b border-border last:border-0">
-                  <td className="py-3 px-4 font-medium text-foreground">{txn.student}</td>
-                  <td className="py-3 px-4">
-                    <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                      {txn.type}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-muted-foreground">{txn.date}</td>
-                  <td className="py-3 px-4 text-right font-medium text-success">
-                    +₹{txn.amount.toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable columns={columns} data={recentTransactions} />
       </div>
     </motion.div>
   );

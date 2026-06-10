@@ -24,24 +24,42 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const adminControllerGetStatsV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type adminControllerGetStatsV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type adminControllerGetStatsV1ResponseSuccess = (adminControllerGetStatsV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type adminControllerGetStatsV1Response = (adminControllerGetStatsV1ResponseSuccess)
+
+export const getAdminControllerGetStatsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/admin/dashboard-stats`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/admin/dashboard-stats`
+}
+
+export const adminControllerGetStatsV1 = async ( options?: RequestInit): Promise<adminControllerGetStatsV1Response> => {
+
+  return fetchWithAuth<adminControllerGetStatsV1Response>(getAdminControllerGetStatsV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -53,16 +71,16 @@ export const getAdminControllerGetStatsV1QueryKey = () => {
     }
 
 
-export const getAdminControllerGetStatsV1QueryOptions = <TData = Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getAdminControllerGetStatsV1QueryOptions = <TData = Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAdminControllerGetStatsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminControllerGetStatsV1>>> = ({ signal }) => adminControllerGetStatsV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminControllerGetStatsV1>>> = ({ signal }) => adminControllerGetStatsV1({ signal });
 
 
 
@@ -82,7 +100,7 @@ export function useAdminControllerGetStatsV1<TData = Awaited<ReturnType<typeof a
           TError,
           Awaited<ReturnType<typeof adminControllerGetStatsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminControllerGetStatsV1<TData = Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError = unknown>(
@@ -92,16 +110,16 @@ export function useAdminControllerGetStatsV1<TData = Awaited<ReturnType<typeof a
           TError,
           Awaited<ReturnType<typeof adminControllerGetStatsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdminControllerGetStatsV1<TData = Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAdminControllerGetStatsV1<TData = Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminControllerGetStatsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -117,30 +135,50 @@ export function useAdminControllerGetStatsV1<TData = Awaited<ReturnType<typeof a
 
 
 
-export const adminControllerUploadStudentsV1 = (
+export type adminControllerUploadStudentsV1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type adminControllerUploadStudentsV1ResponseSuccess = (adminControllerUploadStudentsV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type adminControllerUploadStudentsV1Response = (adminControllerUploadStudentsV1ResponseSuccess)
+
+export const getAdminControllerUploadStudentsV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/admin/upload-students`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/admin/upload-students`
+}
+
+export const adminControllerUploadStudentsV1 = async ( options?: RequestInit): Promise<adminControllerUploadStudentsV1Response> => {
+
+  return fetchWithAuth<adminControllerUploadStudentsV1Response>(getAdminControllerUploadStudentsV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getAdminControllerUploadStudentsV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadStudentsV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadStudentsV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadStudentsV1>>, TError,void, TContext> => {
 
 const mutationKey = ['adminControllerUploadStudentsV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -148,7 +186,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminControllerUploadStudentsV1>>, void> = () => {
 
 
-          return  adminControllerUploadStudentsV1(requestOptions)
+          return  adminControllerUploadStudentsV1()
         }
 
 
@@ -163,7 +201,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AdminControllerUploadStudentsV1MutationError = unknown
 
     export const useAdminControllerUploadStudentsV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadStudentsV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadStudentsV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof adminControllerUploadStudentsV1>>,
         TError,
@@ -172,30 +210,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAdminControllerUploadStudentsV1MutationOptions(options), queryClient);
     }
-    export const adminControllerUploadTimetableV1 = (
+    export type adminControllerUploadTimetableV1Response201 = {
+  data: void
+  status: 201
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type adminControllerUploadTimetableV1ResponseSuccess = (adminControllerUploadTimetableV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type adminControllerUploadTimetableV1Response = (adminControllerUploadTimetableV1ResponseSuccess)
+
+export const getAdminControllerUploadTimetableV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/admin/upload-timetable`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/admin/upload-timetable`
+}
+
+export const adminControllerUploadTimetableV1 = async ( options?: RequestInit): Promise<adminControllerUploadTimetableV1Response> => {
+
+  return fetchWithAuth<adminControllerUploadTimetableV1Response>(getAdminControllerUploadTimetableV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getAdminControllerUploadTimetableV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadTimetableV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadTimetableV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadTimetableV1>>, TError,void, TContext> => {
 
 const mutationKey = ['adminControllerUploadTimetableV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -203,7 +261,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminControllerUploadTimetableV1>>, void> = () => {
 
 
-          return  adminControllerUploadTimetableV1(requestOptions)
+          return  adminControllerUploadTimetableV1()
         }
 
 
@@ -218,7 +276,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AdminControllerUploadTimetableV1MutationError = unknown
 
     export const useAdminControllerUploadTimetableV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadTimetableV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminControllerUploadTimetableV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof adminControllerUploadTimetableV1>>,
         TError,

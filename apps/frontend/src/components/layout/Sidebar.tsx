@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -8,7 +10,6 @@ import {
   Users,
   MessageCircle,
   Building2,
-  UserCog,
   UserCircle,
   Book,
   Calendar,
@@ -23,12 +24,15 @@ import {
   Bell,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   X,
   Users2,
   GripVertical,
   ShoppingBag,
   Wallet,
   Activity,
+  Briefcase,
+  Shield,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -54,63 +58,43 @@ interface SidebarProps {
   onWidthChange: (width: number) => void;
 }
 
-interface NavItem {
+interface NavChild {
   icon: React.ElementType;
   label: string;
   path: string;
   permission?: { action: string; subject: string };
 }
 
+interface NavItem {
+  icon: React.ElementType;
+  label: string;
+  path: string;
+  permission?: { action: string; subject: string };
+  children?: NavChild[];
+}
+
+// Items whose path starts with '#' are accordion groups (no direct navigation)
 const navItems: NavItem[] = [
-  {
-    icon: LayoutDashboard,
-    label: 'Dashboard',
-    path: '/dashboard',
-  },
+  // ── Core ──────────────────────────────────────────────────
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   {
     icon: Users,
-    label: 'Users',
-    path: '/users',
+    label: 'Directory',
+    path: '/directory',
     permission: { action: 'read', subject: 'User' },
   },
   {
     icon: MessageCircle,
-    label: 'Chat',
-    path: '/chat',
+    label: 'Communications',
+    path: '#communications',
+    children: [
+      { icon: MessageCircle, label: 'Chat', path: '/chat' },
+      { icon: Bell, label: 'Noticeboard', path: '/noticeboard' },
+    ],
   },
-  {
-    icon: Bell,
-    label: 'Noticeboard',
-    path: '/noticeboard',
-  },
-  {
-    icon: Users2,
-    label: 'Clubs',
-    path: '/clubs',
-  },
-  {
-    icon: Building2,
-    label: 'Departments',
-    path: '/departments',
-    permission: { action: 'manage', subject: 'all' },
-  },
-  {
-    icon: UserCog,
-    label: 'Faculty',
-    path: '/faculty',
-    permission: { action: 'read', subject: 'User' },
-  },
-  {
-    icon: UserCircle,
-    label: 'My Profile',
-    path: '/profile',
-  },
-  {
-    icon: Book,
-    label: 'Courses',
-    path: '/courses',
-    permission: { action: 'read', subject: 'Course' },
-  },
+  { icon: Users2, label: 'Clubs', path: '/clubs' },
+
+  // ── Academics ─────────────────────────────────────────────
   {
     icon: Calendar,
     label: 'Academic Schedule',
@@ -118,93 +102,89 @@ const navItems: NavItem[] = [
     permission: { action: 'read', subject: 'Timetable' },
   },
   {
-    icon: ClipboardCheck,
-    label: 'Attendance',
-    path: '/attendance',
-  },
-  {
-    icon: FileText,
-    label: 'Score Sheet',
-    path: '/score-sheet',
-  },
-  {
     icon: Book,
-    label: 'Course Materials',
-    path: '/course-materials',
-    permission: { action: 'read', subject: 'Course' },
+    label: 'Courses',
+    path: '#courses',
+    children: [
+      {
+        icon: Book,
+        label: 'Course List',
+        path: '/courses',
+        permission: { action: 'read', subject: 'Course' },
+      },
+      {
+        icon: Book,
+        label: 'Course Materials',
+        path: '/course-materials',
+        permission: { action: 'read', subject: 'Course' },
+      },
+    ],
   },
   {
-    icon: FileText,
-    label: 'Resume Builder',
-    path: '/resume-builder',
+    icon: ClipboardCheck,
+    label: 'Performance',
+    path: '#performance',
+    children: [
+      { icon: ClipboardCheck, label: 'Attendance', path: '/attendance' },
+      { icon: FileText, label: 'Score Sheet', path: '/score-sheet' },
+    ],
   },
+  { icon: Briefcase, label: 'Career', path: '/resume-builder' },
+
+  // ── Campus Life ───────────────────────────────────────────
+  {
+    icon: ShoppingBag,
+    label: 'Marketplace',
+    path: '/marketplace',
+    permission: { action: 'read', subject: 'MarketplaceListing' },
+  },
+  {
+    icon: Building2,
+    label: 'Hostels',
+    path: '/hostels',
+    permission: { action: 'read', subject: 'HostelIssue' },
+  },
+  {
+    icon: UtensilsCrossed,
+    label: 'Dining',
+    path: '/canteen',
+    permission: { action: 'read', subject: 'CanteenItem' },
+  },
+  { icon: MapPin, label: 'Campus Map', path: '/campus-map' },
   {
     icon: Wallet,
     label: 'Finance',
     path: '/finance',
     permission: { action: 'read', subject: 'FeeRecord' },
   },
-  {
-    icon: ShoppingBag,
-    label: 'Buy & Sell',
-    path: '/marketplace',
-    permission: { action: 'read', subject: 'MarketplaceListing' },
-  },
-  {
-    icon: Building2,
-    label: 'Hostel Issues',
-    path: '/hostel-issues',
-    permission: { action: 'read', subject: 'HostelIssue' },
-  },
-  {
-    icon: UtensilsCrossed,
-    label: 'Night Canteen',
-    path: '/canteen',
-  },
-  {
-    icon: MapPin,
-    label: 'Campus Map',
-    path: '/campus-map',
-  },
-  {
-    icon: ChefHat,
-    label: 'Canteen Manager',
-    path: '/admin/canteen',
-    permission: { action: 'manage', subject: 'all' },
-  },
-  {
-    icon: Wrench,
-    label: 'Manage Hostel',
-    path: '/admin/hostel',
-    permission: { action: 'manage', subject: 'HostelIssue' },
-  },
-  {
-    icon: Calendar,
-    label: 'Manage Academic Calendar',
-    path: '/admin/academic-calendar',
-    permission: { action: 'manage', subject: 'all' },
-  },
-  {
-    icon: Settings,
-    label: 'Settings',
-    path: '/settings',
-  },
-  {
-    icon: Settings,
-    label: 'Roles & Permissions',
-    path: '/admin/roles',
-    permission: { action: 'manage', subject: 'Role' },
-  },
-  {
-    icon: HelpCircle,
-    label: 'Help & Support',
-    path: '/help',
-  },
+
+  // ── System ────────────────────────────────────────────────
+  { icon: Settings, label: 'Settings', path: '/settings' },
   {
     icon: Activity,
     label: 'Observability',
     path: '/admin/observability',
     permission: { action: 'manage', subject: 'all' },
+  },
+  { icon: HelpCircle, label: 'Help & Support', path: '/help' },
+];
+
+const sectionConfig: Array<{ title: string; paths: string[] }> = [
+  {
+    title: 'Core',
+    paths: ['/dashboard', '/directory', '#communications', '/clubs'],
+  },
+  {
+    title: 'Academics',
+    paths: ['/academic-schedule', '#courses', '#performance', '/resume-builder'],
+  },
+  {
+    title: 'Campus Life',
+    paths: ['/marketplace', '/hostels', '/canteen', '/campus-map', '/finance'],
+  },
+  {
+    title: 'System',
+    paths: ['/settings', '/admin/observability', '/help'],
   },
 ];
 
@@ -223,6 +203,7 @@ export function Sidebar({
   const appLogoSrc = '/logo.png';
 
   const [isResizing, setIsResizing] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const sidebarRef = useRef<HTMLElement>(null);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -234,17 +215,13 @@ export function Sidebar({
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing) return;
-
       const newWidth = e.clientX;
       if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) {
         onWidthChange(newWidth);
         localStorage.setItem(SIDEBAR_WIDTH_KEY, newWidth.toString());
       }
     };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
+    const handleMouseUp = () => setIsResizing(false);
 
     if (isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
@@ -252,63 +229,27 @@ export function Sidebar({
       document.body.style.cursor = 'ew-resize';
       document.body.style.userSelect = 'none';
     }
-
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
-  }, [isResizing]);
+  }, [isResizing, onWidthChange]);
 
-  const filteredItems = navItems.filter((item) => {
+  const canSeeItem = (item: NavChild | NavItem) => {
     if (!item.permission) return true;
     if (!ability) return false;
     return ability.can(item.permission.action, item.permission.subject as any);
-  });
+  };
 
-  const sectionConfig: Array<{ title: string; paths: string[] }> = [
-    {
-      title: 'Core',
-      paths: [
-        '/dashboard',
-        '/profile',
-        '/chat',
-        '/noticeboard',
-        '/clubs',
-        '/users',
-        '/departments',
-        '/faculty',
-      ],
-    },
-    {
-      title: 'Academics',
-      paths: [
-        '/courses',
-        '/academic-schedule',
-        '/attendance',
-        '/score-sheet',
-        '/course-materials',
-        '/resume-builder',
-      ],
-    },
-    {
-      title: 'Campus',
-      paths: [
-        '/finance',
-        '/marketplace',
-        '/hostel-issues',
-        '/canteen',
-        '/campus-map',
-        '/admin/canteen',
-        '/admin/hostel',
-      ],
-    },
-    {
-      title: 'System',
-      paths: ['/settings', '/help', '/admin/observability', '/admin/academic-calendar', '/admin/roles'],
-    },
-  ];
+  const filteredItems = navItems.filter((item) => {
+    if (item.children) {
+      // Show accordion if at least one child is visible
+      return item.children.some(canSeeItem);
+    }
+    return canSeeItem(item);
+  });
 
   const groupedItems = sectionConfig
     .map((section) => ({
@@ -317,26 +258,135 @@ export function Sidebar({
     }))
     .filter((section) => section.items.length > 0);
 
+  const isChildActive = (children: NavChild[]) =>
+    children.some((c) => {
+      const p = location ?? '';
+      return p === c.path || p.startsWith(c.path + '/');
+    });
+
   const renderNavItem = (item: NavItem) => {
     const currentPath = location ?? '';
-    let isActive = false;
+    const isGroup = item.path.startsWith('#');
 
-    if (item.path === '/settings') {
-      isActive =
-        currentPath === item.path ||
-        currentPath === '/admin/college-settings' ||
-        currentPath === '/admin/hostel';
-    } else if (item.path === '/departments') {
-      isActive = currentPath === item.path || currentPath.startsWith('/departments/');
-    } else if (item.path === '/faculty') {
-      isActive = currentPath === item.path || currentPath.startsWith('/faculty/');
+    // Determine active state
+    let isActive: boolean;
+    if (isGroup && item.children) {
+      isActive = isChildActive(item.children);
+    } else if (item.path === '/directory') {
+      isActive = currentPath === item.path || currentPath.startsWith('/directory/');
     } else {
       isActive =
-        currentPath === item.path ||
-        currentPath.startsWith(item.path + '/') ||
-        (item.path !== '/' && currentPath.startsWith(item.path));
+        currentPath === item.path || currentPath.startsWith(item.path + '/');
     }
 
+    // Auto-expand active accordion
+    const isOpen = isGroup && (expanded[item.path] ?? isActive);
+    const Icon = item.icon as any;
+
+    if (isGroup && item.children) {
+      const visibleChildren = item.children.filter(canSeeItem);
+
+      return (
+        <li key={item.path} className={cn('w-full flex flex-col')}>
+          {/* Accordion trigger */}
+          <button
+            onClick={() => {
+              if (collapsed) {
+                onToggle(); // expand sidebar first on click when collapsed
+              } else {
+                setExpanded((p) => ({ ...p, [item.path]: !p[item.path] }));
+              }
+            }}
+            className={cn(
+              'sidebar-item group w-full text-left',
+              collapsed && 'justify-center gap-0 px-0',
+              isActive && 'sidebar-item-active',
+            )}
+          >
+            <div
+              className={cn(
+                'flex items-center',
+                collapsed ? 'justify-center w-full' : 'w-full px-2 justify-between',
+              )}
+            >
+              <div className="flex items-center gap-2">
+                {collapsed ? (
+                  <Icon
+                    className={cn(
+                      'w-5 h-5 shrink-0 transition-all duration-300',
+                      isActive
+                        ? 'text-primary scale-110 drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
+                        : 'text-sidebar-foreground/60 group-hover:text-sidebar-foreground group-hover:scale-110',
+                    )}
+                    strokeWidth={isActive ? 2.5 : 1.8}
+                  />
+                ) : (
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key="label"
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -5 }}
+                      className="swiss-nav-label truncate flex items-center"
+                    >
+                      {item.label}
+                    </motion.span>
+                  </AnimatePresence>
+                )}
+              </div>
+              {!collapsed && (
+                <ChevronDown
+                  className={cn(
+                    'w-3.5 h-3.5 text-sidebar-foreground/40 transition-transform duration-200 shrink-0',
+                    isOpen && 'rotate-180',
+                  )}
+                />
+              )}
+            </div>
+          </button>
+
+          {/* Children */}
+          {!collapsed && (
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.ul
+                  key="children"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.18, ease: 'easeInOut' }}
+                  className="overflow-hidden pl-4 mt-0.5 space-y-0.5"
+                >
+                  {visibleChildren.map((child) => {
+                    const childActive =
+                      currentPath === child.path ||
+                      currentPath.startsWith(child.path + '/');
+                    const ChildIcon = child.icon as any;
+                    return (
+                      <li key={child.path}>
+                        <Link
+                          href={child.path as any}
+                          className={cn(
+                            'flex items-center w-full px-3 py-1.5 rounded-sm text-sm transition-colors',
+                            childActive
+                              ? 'text-primary bg-primary/10 font-medium'
+                              : 'text-sidebar-foreground/65 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+                          )}
+                        >
+                          <span className="truncate">{child.label}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          )}
+        </li>
+      );
+    }
+
+    // Plain nav link
     return (
       <li key={item.path} className={cn(!collapsed && 'flex')}>
         <Link
@@ -345,43 +395,39 @@ export function Sidebar({
             'sidebar-item group',
             !collapsed && 'w-full',
             collapsed && 'justify-center gap-0 px-0',
-            isActive && 'sidebar-item-active'
+            isActive && 'sidebar-item-active',
           )}
         >
-          {(() => {
-            const Icon = item.icon as any;
-            return (
-              <div
+          <div
+            className={cn(
+              'flex items-center',
+              collapsed ? 'justify-center w-full' : 'w-full px-2',
+            )}
+          >
+            {collapsed ? (
+              <Icon
                 className={cn(
-                  'flex items-center',
-                  collapsed ? 'justify-center w-full' : 'w-full px-2'
+                  'w-5 h-5 shrink-0 transition-all duration-300',
+                  isActive
+                    ? 'text-primary scale-110 drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
+                    : 'text-sidebar-foreground/60 group-hover:text-sidebar-foreground group-hover:scale-110',
                 )}
-              >
-                {collapsed ? (
-                  <Icon
-                    className={cn(
-                      'w-5 h-5 shrink-0 transition-all duration-300',
-                      isActive
-                        ? 'text-primary scale-110 drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
-                        : 'text-sidebar-foreground/60 group-hover:text-sidebar-foreground group-hover:scale-110'
-                    )}
-                    strokeWidth={isActive ? 2.5 : 1.8}
-                  />
-                ) : (
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      initial={{ opacity: 0, x: -5 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -5 }}
-                      className="swiss-nav-label truncate"
-                    >
-                      {item.label}
-                    </motion.span>
-                  </AnimatePresence>
-                )}
-              </div>
-            );
-          })()}
+                strokeWidth={isActive ? 2.5 : 1.8}
+              />
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key="label"
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -5 }}
+                  className="swiss-nav-label truncate flex items-center"
+                >
+                  {item.label}
+                </motion.span>
+              </AnimatePresence>
+            )}
+          </div>
         </Link>
       </li>
     );
@@ -407,7 +453,7 @@ export function Sidebar({
         className={cn(
           'fixed left-0 top-0 z-[100] h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col shadow-sm',
           isMobile && !mobileMenuOpen && '-translate-x-full',
-          isMobile && mobileMenuOpen && 'translate-x-0'
+          isMobile && mobileMenuOpen && 'translate-x-0',
         )}
         style={{
           width: collapsed ? undefined : width,
@@ -417,6 +463,7 @@ export function Sidebar({
       >
         {/* Mesh Atmosphere */}
         <div className="sidebar-mesh" aria-hidden="true" />
+
         {/* Resize Handle */}
         {!isMobile && !collapsed && (
           <div
@@ -424,20 +471,19 @@ export function Sidebar({
             onClick={(e) => e.stopPropagation()}
             className={cn(
               'absolute top-0 right-0 w-1 h-full cursor-ew-resize group z-10',
-              'hover:bg-primary/20',
-              'flex items-center justify-center',
-              isResizing && 'bg-primary/30'
+              'hover:bg-primary/20 flex items-center justify-center',
+              isResizing && 'bg-primary/30',
             )}
           >
             <GripVertical className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         )}
 
-        {/* Sidebar Header Controls */}
+        {/* Sidebar Header */}
         <div
           className={cn(
             'min-h-20 flex items-center border-b border-sidebar-border shrink-0',
-            collapsed ? 'justify-center px-2' : 'justify-between px-4'
+            collapsed ? 'justify-center px-2' : 'justify-between px-4',
           )}
         >
           {isMobile ? (
@@ -455,7 +501,6 @@ export function Sidebar({
               title="Expand sidebar"
             >
               <ChevronRight className="w-5 h-5 text-sidebar-foreground" />
-
               <span className="sr-only">Expand sidebar</span>
             </button>
           ) : (
@@ -497,7 +542,7 @@ export function Sidebar({
           )}
         </nav>
 
-        {/* Mobile Fixed Bottom Controls */}
+        {/* Mobile Bottom Controls */}
         {!collapsed && (
           <div className="lg:hidden mt-auto px-4 py-4 border-t border-sidebar-border bg-sidebar-accent/5">
             <div className="flex flex-col gap-4">

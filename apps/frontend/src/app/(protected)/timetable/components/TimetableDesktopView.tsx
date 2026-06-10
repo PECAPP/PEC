@@ -43,7 +43,7 @@ export default function TimetableDesktopView({
   handleDeleteSlot,
 }: TimetableDesktopViewProps) {
   return (
-    <div className="hidden md:block card-elevated overflow-x-auto overflow-y-auto max-h-[70vh] timetable-scroll-container">
+    <div className="hidden md:block card-elevated overflow-x-auto overflow-y-auto max-h-[70vh] timetable-scroll-">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-muted/30">
@@ -78,7 +78,7 @@ export default function TimetableDesktopView({
                       className="border border-border p-2 bg-muted/40 text-center align-middle"
                     >
                       {day === 'Wednesday' && (
-                        <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground/60 vertical-text block rotate-0">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground/60 vertical-text block rotate-0">
                           Lunch Break
                         </span>
                       )}
@@ -122,7 +122,7 @@ export default function TimetableDesktopView({
                           {scopedSlots.map((slot: any, idx: number) => (
                             <div
                               key={idx}
-                              className="p-2 bg-primary/10 rounded-lg border border-primary/20 relative"
+                              className="p-2 bg-primary/10 rounded-sm border border-primary/20 relative"
                             >
                               <div className="font-medium text-sm text-foreground">
                                 {slot.courseCode || slot.courseName}

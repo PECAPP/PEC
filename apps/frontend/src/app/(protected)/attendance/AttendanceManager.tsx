@@ -158,7 +158,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
       {/* Professional Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
         <div className="flex items-center gap-5">
-           <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm relative overflow-hidden group">
+           <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm relative overflow-hidden group">
              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
              <Settings2 className="w-8 h-8 text-primary shadow-glow relative z-10" />
            </div>
@@ -183,7 +183,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
           <Button 
             variant="outline" 
             onClick={() => setShowBulkUpload(true)} 
-            className="h-11 rounded-xl px-5 border-border/60 font-bold text-[10px] uppercase tracking-widest gap-2 bg-background hover:bg-muted/40 transition-all border-2"
+            className="h-11 rounded-sm px-5 border-border/60 font-bold text-[10px] uppercase tracking-widest gap-2 bg-background hover:bg-muted/40 transition-all border"
           >
             <FileSpreadsheet className="w-4 h-4" /> Bulk Upload
           </Button>
@@ -199,11 +199,11 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
              </div>
              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 relative z-10">
                <div className="md:col-span-8 space-y-3">
-                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-2">
+                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
                    <Filter className="w-3 h-3 text-primary" /> Course Selection
                  </label>
                  <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-                   <SelectTrigger className="h-14 font-bold text-lg bg-background border-border/60 rounded-xl px-6 focus:ring-primary/20">
+                   <SelectTrigger className="h-14 font-bold text-lg bg-background border-border/60 rounded-sm px-6 focus:ring-primary/20">
                      <SelectValue placeholder="Select course..." />
                    </SelectTrigger>
                    <SelectContent className="max-h-[400px]">
@@ -216,12 +216,12 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                  </Select>
                </div>
                <div className="md:col-span-4 space-y-3">
-                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-2">
+                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
                    <CalendarIcon className="w-3 h-3 text-primary" /> Session Date
                  </label>
                  <Input 
                    type="date" 
-                   className="h-14 bg-background border-border/60 font-mono font-bold text-center text-lg rounded-xl focus:ring-primary/20"
+                   className="h-14 bg-background border-border/60 font-mono font-bold text-center text-lg rounded-sm focus:ring-primary/20"
                    value={selectedDate} 
                    onChange={(e) => setSelectedDate(e.target.value)} 
                  />
@@ -245,13 +245,13 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                      { label: 'Participation', value: `${Math.round(stats.participationRate)}%`, icon: Activity, color: 'text-indigo-500', bg: 'bg-indigo-500/5' },
                    ].map((item, idx) => (
                      <div key={idx} className={cn(
-                       "relative overflow-hidden p-5 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-md flex flex-col gap-4 group transition-all duration-300 hover:border-primary/30 hover:translate-y-[-2px]",
+                       "relative overflow-hidden p-5 rounded-sm border border-border/40 bg-card/40 backdrop-blur-md flex flex-col gap-4 group transition-all duration-300 hover:border-primary/30 hover:translate-y-[-2px]",
                        item.bg
                      )}>
                         <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
                           <item.icon className="w-16 h-16" />
                         </div>
-                        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center border border-border/40 bg-background", item.color)}>
+                        <div className={cn("w-10 h-10 rounded-sm flex items-center justify-center border border-border/40 bg-background", item.color)}>
                           <item.icon className="w-5 h-5 shadow-glow" />
                         </div>
                         <div>
@@ -264,7 +264,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                    ))}
                 </div>
 
-                {/* List Container */}
+                {/* List  */}
                 <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-2xl">
                   <div className="bg-muted/30 border-b border-border/40 px-8 py-5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -276,7 +276,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                          variant="outline" 
                          size="sm"
                          onClick={() => handleBulkMark('present')}
-                         className="h-9 px-5 rounded-xl font-bold text-[10px] uppercase tracking-[0.1em] border-success/30 text-success hover:bg-success/10 transition-all"
+                         className="h-9 px-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.1em] border-success/30 text-success hover:bg-success/10 transition-all"
                        >
                          Mark All Present
                        </Button>
@@ -284,7 +284,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                          variant="outline" 
                          size="sm"
                          onClick={() => handleBulkMark('absent')}
-                         className="h-9 px-5 rounded-xl font-bold text-[10px] uppercase tracking-[0.1em] border-destructive/30 text-destructive hover:bg-destructive/10 transition-all"
+                         className="h-9 px-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.1em] border-destructive/30 text-destructive hover:bg-destructive/10 transition-all"
                        >
                          Mark All Absent
                        </Button>
@@ -296,7 +296,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                       {students.map(s => (
                         <div key={s.id} className="flex items-center justify-between py-6 px-8 hover:bg-primary/[0.02] transition-colors group">
                            <div className="flex items-center gap-6">
-                              <div className="w-12 h-12 rounded-2xl bg-muted/40 flex items-center justify-center border border-border/20 font-bold text-primary text-xs shrink-0 group-hover:scale-110 transition-transform">
+                              <div className="w-12 h-12 rounded-sm bg-muted/40 flex items-center justify-center border border-border/20 font-bold text-primary text-xs shrink-0 group-hover:scale-110 transition-transform">
                                 {s.name.substring(0, 2).toUpperCase()}
                               </div>
                               <div className="flex flex-col">
@@ -305,7 +305,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                               </div>
                            </div>
 
-                           <div className="flex items-center p-1 bg-muted/40 rounded-2xl border border-border/40 shadow-inner overflow-hidden">
+                           <div className="flex items-center p-1 bg-muted/40 rounded-sm border border-border/40 shadow-inner overflow-hidden">
                              {[
                                { id: 'present', label: 'Present', icon: CheckCircle2, activeClass: 'bg-success text-white shadow-xl shadow-success/30 border-success/50' },
                                { id: 'absent', label: 'Absent', icon: XCircle, activeClass: 'bg-destructive text-white shadow-xl shadow-destructive/30 border-destructive/50' }
@@ -314,7 +314,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                                  key={status.id}
                                  onClick={() => handleMark(s.id, status.id)}
                                  className={cn(
-                                   "flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all duration-200 border-2 border-transparent",
+                                   "flex items-center justify-center gap-2 px-8 py-3 rounded-sm font-bold text-[10px] uppercase tracking-wider transition-all duration-200 border border-transparent",
                                    s.status === status.id 
                                      ? status.activeClass 
                                      : "text-muted-foreground font-medium grayscale hover:grayscale-0 hover:bg-background/80"
@@ -334,7 +334,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                     <Button 
                       onClick={handleSave} 
                       disabled={isSaving || !selectedCourse}
-                      className="bg-primary text-primary-foreground font-bold tracking-widest uppercase text-xs h-14 px-16 rounded-2xl shadow-glow hover:scale-[1.02] transition-all"
+                      className="bg-primary text-primary-foreground font-bold tracking-widest uppercase text-xs h-14 px-16 rounded-sm shadow-glow hover:scale-[1.02] transition-all"
                     >
                        {isSaving ? <Loader2 className="w-5 h-5 animate-spin mr-3" /> : <CheckCircle2 className="w-5 h-5 mr-3 shadow-glow" />}
                        Update Attendance
@@ -343,13 +343,13 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                 </div>
               </motion.div>
             ) : (
-              <div className="py-32 text-center border-2 border-dashed border-primary/10 rounded-3xl bg-primary/[0.01] flex flex-col items-center gap-6">
+              <div className="py-32 text-center border border-dashed border-primary/10 rounded-sm bg-primary/[0.01] flex flex-col items-center gap-6">
                 <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
                   <Database className="w-8 h-8 text-primary/40" />
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-xl font-bold tracking-tight text-foreground/80">Select Parameters</h3>
-                  <p className="text-sm text-center text-muted-foreground font-medium italic max-w-sm">Please select a course and date to begin marking attendance.</p>
+                  <p className="text-sm text-center text-muted-foreground font-medium italic ">Please select a course and date to begin marking attendance.</p>
                 </div>
               </div>
             )}
@@ -359,8 +359,8 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
         {/* Sidebar Info */}
         <div className="space-y-8">
            <div className="card-elevated p-8 bg-primary/5 border-primary/20 space-y-6 relative overflow-hidden">
-              <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] -z-10" />
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-sm transition-transform hover:rotate-12">
+              <div className="absolute inset-0  opacity-[0.03] -z-10" />
+              <div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center border border-primary/20 shadow-sm transition-transform hover:rotate-12">
                 <ShieldCheck className="w-6 h-6 text-primary" />
               </div>
               <div className="space-y-2">
@@ -386,14 +386,14 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
       </div>
 
       <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-        <DialogContent className="max-w-4xl bg-card border-border/60 rounded-3xl p-0 overflow-hidden backdrop-blur-xl shadow-2xl">
+        <DialogContent className=" bg-card border-border/60 rounded-sm p-0 overflow-hidden backdrop-blur-xl shadow-2xl">
            <DialogHeader className="bg-primary p-12 text-white">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <DialogTitle className="text-3xl font-black uppercase tracking-tight">Institutional Bulk Intake</DialogTitle>
+                  <DialogTitle className="text-3xl font-bold uppercase tracking-tight">Institutional Bulk Intake</DialogTitle>
                   <DialogDescription className="opacity-70 font-bold uppercase tracking-widest text-[11px] italic">Attendance Registry Parity System — CSV/Excel Protocol</DialogDescription>
                 </div>
-                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20">
+                <div className="w-16 h-16 bg-white/10 rounded-sm flex items-center justify-center border border-white/20">
                    <Upload className="w-8 h-8 text-white shadow-glow" />
                 </div>
               </div>

@@ -91,14 +91,14 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: hsl(var(--muted-foreground) / 0.5);
   border-radius: 999px;
   border: 1px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: hsl(var(--muted-foreground));
   border: 1px solid transparent;
   background-clip: content-box;
 }
@@ -122,7 +122,7 @@ html {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #333 transparent;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.5) transparent;
 }
 
 /* ====================================
@@ -141,7 +141,7 @@ html {
     --font-display: "Sora", "Inter", system-ui, sans-serif;
     --radius: 0.25rem;
     --motion-fast: 120ms;
-    --motion-base: 160ms;
+    --motion-base: 150ms;
 
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -479,7 +479,7 @@ html {
   }
 
   .protected-shell h1 {
-    @apply text-2xl font-bold tracking-tight text-foreground;
+    @apply text-2xl font-bold tracking-tight text-foreground mb-6;
   }
 
   .protected-shell h1+p {
@@ -652,11 +652,11 @@ html {
   }
 
   /* ===== NEO-BRUTALIST UTILS (Landing Page) ===== */
-  .neo-brutal-shadow {
+  .shadow-sm {
     box-shadow: var(--shadow-sm);
   }
 
-  .neo-brutal-shadow-lg {
+  .shadow-sm-lg {
     box-shadow: var(--shadow-md);
   }
 
@@ -787,7 +787,7 @@ html {
   }
 
   /* Grid Pattern */
-  .bg-grid-pattern {
+  . {
     background-image: linear-gradient(to right,
         hsl(var(--border) / 0.5) 1px,
         transparent 1px),

@@ -32,7 +32,7 @@ const articles = [
 2. Select **'View Profile'** from the dropdown menu.
 3. You'll see your academic summary, attendance trends, and contact details.
 
-Faculty and administrators can also view your profile to provide academic support or manage administrative tasks.`
+Faculty and Admins can also view your profile to provide academic support or manage administrative tasks.`
   },
   { 
     icon: Edit, 
@@ -104,7 +104,7 @@ export default function AccountProfile() {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-4"
         >
-          <div className="p-3 rounded-xl bg-primary/10">
+          <div className="p-3 rounded-sm bg-primary/10">
             <Users className="w-8 h-8 text-primary" />
           </div>
           <div>
@@ -134,7 +134,7 @@ export default function AccountProfile() {
                 <Card className="hover:shadow-md transition-all cursor-pointer group hover:border-primary/50">
                   <CardContent className="py-4">
                     <div className="flex items-center gap-4">
-                      <div className="p-2 rounded-lg bg-secondary group-hover:bg-primary/10 transition-colors">
+                      <div className="p-2 rounded-sm bg-secondary group-hover:bg-primary/10 transition-colors">
                         <article.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -175,7 +175,7 @@ export default function AccountProfile() {
                 
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                    <div className="p-3 rounded-sm bg-primary/10 text-primary">
                       {(() => {
                         const Icon = articles[selectedArticle].icon;
                         return <Icon className="w-8 h-8" />;
@@ -187,7 +187,7 @@ export default function AccountProfile() {
                     </div>
                   </div>
 
-                  <div className="prose prose-invert max-w-none">
+                  <div className="prose prose-invert ">
                     <HelpContent content={articles[selectedArticle].content} />
                   </div>
 

@@ -6,54 +6,68 @@
  * OpenAPI spec version: 1.0
  */
 import {
-  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
-  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
-  UseMutationOptions,
-  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  CreateStudentProjectDto,
-  CreateStudentSkillDto,
   StudentPortfolioControllerGetPortfolioV1Params,
-  StudentPortfolioControllerGetProjectsV1Params,
-  StudentPortfolioControllerGetSkillsV1Params,
-  StudentPortfolioControllerSyncGitHubReposV1Params,
-  UpdateStudentProjectDto,
-  UpdateStudentSkillDto
+  StudentPortfolioControllerSyncGitHubReposV1Params
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const studentPortfolioControllerGetPortfolioV1 = (
-    params: StudentPortfolioControllerGetPortfolioV1Params,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
 
+export type studentPortfolioControllerGetPortfolioV1Response200 = {
+  data: void
+  status: 200
+}
 
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio`, method: 'GET',
-        params, signal
-    },
-      options);
+export type studentPortfolioControllerGetPortfolioV1ResponseSuccess = (studentPortfolioControllerGetPortfolioV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type studentPortfolioControllerGetPortfolioV1Response = (studentPortfolioControllerGetPortfolioV1ResponseSuccess)
+
+export const getStudentPortfolioControllerGetPortfolioV1Url = (params: StudentPortfolioControllerGetPortfolioV1Params,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
     }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/student-portfolio?${stringifiedParams}` : `/api/v1/student-portfolio`
+}
+
+export const studentPortfolioControllerGetPortfolioV1 = async (params: StudentPortfolioControllerGetPortfolioV1Params, options?: RequestInit): Promise<studentPortfolioControllerGetPortfolioV1Response> => {
+
+  return fetchWithAuth<studentPortfolioControllerGetPortfolioV1Response>(getStudentPortfolioControllerGetPortfolioV1Url(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -65,16 +79,16 @@ export const getStudentPortfolioControllerGetPortfolioV1QueryKey = (params?: Stu
     }
 
 
-export const getStudentPortfolioControllerGetPortfolioV1QueryOptions = <TData = Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError = unknown>(params: StudentPortfolioControllerGetPortfolioV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getStudentPortfolioControllerGetPortfolioV1QueryOptions = <TData = Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError = unknown>(params: StudentPortfolioControllerGetPortfolioV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getStudentPortfolioControllerGetPortfolioV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>> = ({ signal }) => studentPortfolioControllerGetPortfolioV1(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>> = ({ signal }) => studentPortfolioControllerGetPortfolioV1(params, { signal });
 
 
 
@@ -94,7 +108,7 @@ export function useStudentPortfolioControllerGetPortfolioV1<TData = Awaited<Retu
           TError,
           Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useStudentPortfolioControllerGetPortfolioV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError = unknown>(
@@ -104,16 +118,16 @@ export function useStudentPortfolioControllerGetPortfolioV1<TData = Awaited<Retu
           TError,
           Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useStudentPortfolioControllerGetPortfolioV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetPortfolioV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: StudentPortfolioControllerGetPortfolioV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useStudentPortfolioControllerGetPortfolioV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetPortfolioV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: StudentPortfolioControllerGetPortfolioV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetPortfolioV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -129,532 +143,44 @@ export function useStudentPortfolioControllerGetPortfolioV1<TData = Awaited<Retu
 
 
 
-export const studentPortfolioControllerGetProjectsV1 = (
-    params: StudentPortfolioControllerGetProjectsV1Params,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/projects`, method: 'GET',
-        params, signal
-    },
-      options);
-    }
-
-
-
-
-export const getStudentPortfolioControllerGetProjectsV1QueryKey = (params?: StudentPortfolioControllerGetProjectsV1Params,) => {
-    return [
-    `/api/v1/student-portfolio/projects`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getStudentPortfolioControllerGetProjectsV1QueryOptions = <TData = Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError = unknown>(params: StudentPortfolioControllerGetProjectsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getStudentPortfolioControllerGetProjectsV1QueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>> = ({ signal }) => studentPortfolioControllerGetProjectsV1(params, requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+export type studentPortfolioControllerSyncGitHubReposV1Response200 = {
+  data: void
+  status: 200
 }
 
-export type StudentPortfolioControllerGetProjectsV1QueryResult = NonNullable<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>>
-export type StudentPortfolioControllerGetProjectsV1QueryError = unknown
+export type studentPortfolioControllerSyncGitHubReposV1ResponseSuccess = (studentPortfolioControllerSyncGitHubReposV1Response200) & {
+  headers: Headers;
+};
+;
 
+export type studentPortfolioControllerSyncGitHubReposV1Response = (studentPortfolioControllerSyncGitHubReposV1ResponseSuccess)
 
-export function useStudentPortfolioControllerGetProjectsV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetProjectsV1Params, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>,
-          TError,
-          Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStudentPortfolioControllerGetProjectsV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetProjectsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>,
-          TError,
-          Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStudentPortfolioControllerGetProjectsV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetProjectsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export const getStudentPortfolioControllerSyncGitHubReposV1Url = (params: StudentPortfolioControllerSyncGitHubReposV1Params,) => {
+  const normalizedParams = new URLSearchParams();
 
-export function useStudentPortfolioControllerGetProjectsV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetProjectsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetProjectsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  Object.entries(params || {}).forEach(([key, value]) => {
 
-  const queryOptions = getStudentPortfolioControllerGetProjectsV1QueryOptions(params,options)
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const stringifiedParams = normalizedParams.toString();
 
-  return { ...query, queryKey: queryOptions.queryKey };
+  return stringifiedParams.length > 0 ? `/api/v1/student-portfolio/github/sync?${stringifiedParams}` : `/api/v1/student-portfolio/github/sync`
 }
 
+export const studentPortfolioControllerSyncGitHubReposV1 = async (params: StudentPortfolioControllerSyncGitHubReposV1Params, options?: RequestInit): Promise<studentPortfolioControllerSyncGitHubReposV1Response> => {
 
+  return fetchWithAuth<studentPortfolioControllerSyncGitHubReposV1Response>(getStudentPortfolioControllerSyncGitHubReposV1Url(params),
+  {
+    ...options,
+    method: 'GET'
 
 
+  }
+);}
 
-
-export const studentPortfolioControllerCreateProjectV1 = (
-    createStudentProjectDto: CreateStudentProjectDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/projects`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createStudentProjectDto, signal
-    },
-      options);
-    }
-
-
-
-export const getStudentPortfolioControllerCreateProjectV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerCreateProjectV1>>, TError,{data: CreateStudentProjectDto}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerCreateProjectV1>>, TError,{data: CreateStudentProjectDto}, TContext> => {
-
-const mutationKey = ['studentPortfolioControllerCreateProjectV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentPortfolioControllerCreateProjectV1>>, {data: CreateStudentProjectDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  studentPortfolioControllerCreateProjectV1(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type StudentPortfolioControllerCreateProjectV1MutationResult = NonNullable<Awaited<ReturnType<typeof studentPortfolioControllerCreateProjectV1>>>
-    export type StudentPortfolioControllerCreateProjectV1MutationBody = CreateStudentProjectDto
-    export type StudentPortfolioControllerCreateProjectV1MutationError = unknown
-
-    export const useStudentPortfolioControllerCreateProjectV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerCreateProjectV1>>, TError,{data: CreateStudentProjectDto}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof studentPortfolioControllerCreateProjectV1>>,
-        TError,
-        {data: CreateStudentProjectDto},
-        TContext
-      > => {
-      return useMutation(getStudentPortfolioControllerCreateProjectV1MutationOptions(options), queryClient);
-    }
-    export const studentPortfolioControllerUpdateProjectV1 = (
-    id: string,
-    updateStudentProjectDto: UpdateStudentProjectDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/projects/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateStudentProjectDto, signal
-    },
-      options);
-    }
-
-
-
-export const getStudentPortfolioControllerUpdateProjectV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerUpdateProjectV1>>, TError,{id: string;data: UpdateStudentProjectDto}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerUpdateProjectV1>>, TError,{id: string;data: UpdateStudentProjectDto}, TContext> => {
-
-const mutationKey = ['studentPortfolioControllerUpdateProjectV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentPortfolioControllerUpdateProjectV1>>, {id: string;data: UpdateStudentProjectDto}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  studentPortfolioControllerUpdateProjectV1(id,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type StudentPortfolioControllerUpdateProjectV1MutationResult = NonNullable<Awaited<ReturnType<typeof studentPortfolioControllerUpdateProjectV1>>>
-    export type StudentPortfolioControllerUpdateProjectV1MutationBody = UpdateStudentProjectDto
-    export type StudentPortfolioControllerUpdateProjectV1MutationError = unknown
-
-    export const useStudentPortfolioControllerUpdateProjectV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerUpdateProjectV1>>, TError,{id: string;data: UpdateStudentProjectDto}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof studentPortfolioControllerUpdateProjectV1>>,
-        TError,
-        {id: string;data: UpdateStudentProjectDto},
-        TContext
-      > => {
-      return useMutation(getStudentPortfolioControllerUpdateProjectV1MutationOptions(options), queryClient);
-    }
-    export const studentPortfolioControllerDeleteProjectV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/projects/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
-
-
-
-export const getStudentPortfolioControllerDeleteProjectV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerDeleteProjectV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerDeleteProjectV1>>, TError,{id: string}, TContext> => {
-
-const mutationKey = ['studentPortfolioControllerDeleteProjectV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentPortfolioControllerDeleteProjectV1>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  studentPortfolioControllerDeleteProjectV1(id,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type StudentPortfolioControllerDeleteProjectV1MutationResult = NonNullable<Awaited<ReturnType<typeof studentPortfolioControllerDeleteProjectV1>>>
-
-    export type StudentPortfolioControllerDeleteProjectV1MutationError = unknown
-
-    export const useStudentPortfolioControllerDeleteProjectV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerDeleteProjectV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof studentPortfolioControllerDeleteProjectV1>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
-      return useMutation(getStudentPortfolioControllerDeleteProjectV1MutationOptions(options), queryClient);
-    }
-    export const studentPortfolioControllerGetSkillsV1 = (
-    params: StudentPortfolioControllerGetSkillsV1Params,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/skills`, method: 'GET',
-        params, signal
-    },
-      options);
-    }
-
-
-
-
-export const getStudentPortfolioControllerGetSkillsV1QueryKey = (params?: StudentPortfolioControllerGetSkillsV1Params,) => {
-    return [
-    `/api/v1/student-portfolio/skills`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getStudentPortfolioControllerGetSkillsV1QueryOptions = <TData = Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError = unknown>(params: StudentPortfolioControllerGetSkillsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getStudentPortfolioControllerGetSkillsV1QueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>> = ({ signal }) => studentPortfolioControllerGetSkillsV1(params, requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type StudentPortfolioControllerGetSkillsV1QueryResult = NonNullable<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>>
-export type StudentPortfolioControllerGetSkillsV1QueryError = unknown
-
-
-export function useStudentPortfolioControllerGetSkillsV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetSkillsV1Params, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>,
-          TError,
-          Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStudentPortfolioControllerGetSkillsV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetSkillsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>,
-          TError,
-          Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useStudentPortfolioControllerGetSkillsV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetSkillsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useStudentPortfolioControllerGetSkillsV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError = unknown>(
- params: StudentPortfolioControllerGetSkillsV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerGetSkillsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getStudentPortfolioControllerGetSkillsV1QueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-export const studentPortfolioControllerCreateSkillV1 = (
-    createStudentSkillDto: CreateStudentSkillDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/skills`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createStudentSkillDto, signal
-    },
-      options);
-    }
-
-
-
-export const getStudentPortfolioControllerCreateSkillV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerCreateSkillV1>>, TError,{data: CreateStudentSkillDto}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerCreateSkillV1>>, TError,{data: CreateStudentSkillDto}, TContext> => {
-
-const mutationKey = ['studentPortfolioControllerCreateSkillV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentPortfolioControllerCreateSkillV1>>, {data: CreateStudentSkillDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  studentPortfolioControllerCreateSkillV1(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type StudentPortfolioControllerCreateSkillV1MutationResult = NonNullable<Awaited<ReturnType<typeof studentPortfolioControllerCreateSkillV1>>>
-    export type StudentPortfolioControllerCreateSkillV1MutationBody = CreateStudentSkillDto
-    export type StudentPortfolioControllerCreateSkillV1MutationError = unknown
-
-    export const useStudentPortfolioControllerCreateSkillV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerCreateSkillV1>>, TError,{data: CreateStudentSkillDto}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof studentPortfolioControllerCreateSkillV1>>,
-        TError,
-        {data: CreateStudentSkillDto},
-        TContext
-      > => {
-      return useMutation(getStudentPortfolioControllerCreateSkillV1MutationOptions(options), queryClient);
-    }
-    export const studentPortfolioControllerUpdateSkillV1 = (
-    id: string,
-    updateStudentSkillDto: UpdateStudentSkillDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/skills/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateStudentSkillDto, signal
-    },
-      options);
-    }
-
-
-
-export const getStudentPortfolioControllerUpdateSkillV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerUpdateSkillV1>>, TError,{id: string;data: UpdateStudentSkillDto}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerUpdateSkillV1>>, TError,{id: string;data: UpdateStudentSkillDto}, TContext> => {
-
-const mutationKey = ['studentPortfolioControllerUpdateSkillV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentPortfolioControllerUpdateSkillV1>>, {id: string;data: UpdateStudentSkillDto}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  studentPortfolioControllerUpdateSkillV1(id,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type StudentPortfolioControllerUpdateSkillV1MutationResult = NonNullable<Awaited<ReturnType<typeof studentPortfolioControllerUpdateSkillV1>>>
-    export type StudentPortfolioControllerUpdateSkillV1MutationBody = UpdateStudentSkillDto
-    export type StudentPortfolioControllerUpdateSkillV1MutationError = unknown
-
-    export const useStudentPortfolioControllerUpdateSkillV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerUpdateSkillV1>>, TError,{id: string;data: UpdateStudentSkillDto}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof studentPortfolioControllerUpdateSkillV1>>,
-        TError,
-        {id: string;data: UpdateStudentSkillDto},
-        TContext
-      > => {
-      return useMutation(getStudentPortfolioControllerUpdateSkillV1MutationOptions(options), queryClient);
-    }
-    export const studentPortfolioControllerDeleteSkillV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/skills/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
-
-
-
-export const getStudentPortfolioControllerDeleteSkillV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerDeleteSkillV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerDeleteSkillV1>>, TError,{id: string}, TContext> => {
-
-const mutationKey = ['studentPortfolioControllerDeleteSkillV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentPortfolioControllerDeleteSkillV1>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  studentPortfolioControllerDeleteSkillV1(id,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type StudentPortfolioControllerDeleteSkillV1MutationResult = NonNullable<Awaited<ReturnType<typeof studentPortfolioControllerDeleteSkillV1>>>
-
-    export type StudentPortfolioControllerDeleteSkillV1MutationError = unknown
-
-    export const useStudentPortfolioControllerDeleteSkillV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPortfolioControllerDeleteSkillV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof studentPortfolioControllerDeleteSkillV1>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
-      return useMutation(getStudentPortfolioControllerDeleteSkillV1MutationOptions(options), queryClient);
-    }
-    export const studentPortfolioControllerSyncGitHubReposV1 = (
-    params: StudentPortfolioControllerSyncGitHubReposV1Params,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-
-
-      return customInstance<void>(
-      {url: `/api/v1/student-portfolio/github/sync`, method: 'GET',
-        params, signal
-    },
-      options);
-    }
 
 
 
@@ -666,16 +192,16 @@ export const getStudentPortfolioControllerSyncGitHubReposV1QueryKey = (params?: 
     }
 
 
-export const getStudentPortfolioControllerSyncGitHubReposV1QueryOptions = <TData = Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError = unknown>(params: StudentPortfolioControllerSyncGitHubReposV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getStudentPortfolioControllerSyncGitHubReposV1QueryOptions = <TData = Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError = unknown>(params: StudentPortfolioControllerSyncGitHubReposV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getStudentPortfolioControllerSyncGitHubReposV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>> = ({ signal }) => studentPortfolioControllerSyncGitHubReposV1(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>> = ({ signal }) => studentPortfolioControllerSyncGitHubReposV1(params, { signal });
 
 
 
@@ -695,7 +221,7 @@ export function useStudentPortfolioControllerSyncGitHubReposV1<TData = Awaited<R
           TError,
           Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useStudentPortfolioControllerSyncGitHubReposV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError = unknown>(
@@ -705,16 +231,16 @@ export function useStudentPortfolioControllerSyncGitHubReposV1<TData = Awaited<R
           TError,
           Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useStudentPortfolioControllerSyncGitHubReposV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError = unknown>(
- params: StudentPortfolioControllerSyncGitHubReposV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: StudentPortfolioControllerSyncGitHubReposV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useStudentPortfolioControllerSyncGitHubReposV1<TData = Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError = unknown>(
- params: StudentPortfolioControllerSyncGitHubReposV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: StudentPortfolioControllerSyncGitHubReposV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentPortfolioControllerSyncGitHubReposV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

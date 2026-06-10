@@ -29,24 +29,42 @@ import type {
   UpdateTimetableDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const timetableControllerFindAllV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type timetableControllerFindAllV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type timetableControllerFindAllV1ResponseSuccess = (timetableControllerFindAllV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type timetableControllerFindAllV1Response = (timetableControllerFindAllV1ResponseSuccess)
+
+export const getTimetableControllerFindAllV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/timetable`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/timetable`
+}
+
+export const timetableControllerFindAllV1 = async ( options?: RequestInit): Promise<timetableControllerFindAllV1Response> => {
+
+  return fetchWithAuth<timetableControllerFindAllV1Response>(getTimetableControllerFindAllV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -58,16 +76,16 @@ export const getTimetableControllerFindAllV1QueryKey = () => {
     }
 
 
-export const getTimetableControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getTimetableControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getTimetableControllerFindAllV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof timetableControllerFindAllV1>>> = ({ signal }) => timetableControllerFindAllV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof timetableControllerFindAllV1>>> = ({ signal }) => timetableControllerFindAllV1({ signal });
 
 
 
@@ -87,7 +105,7 @@ export function useTimetableControllerFindAllV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof timetableControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useTimetableControllerFindAllV1<TData = Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError = unknown>(
@@ -97,16 +115,16 @@ export function useTimetableControllerFindAllV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof timetableControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useTimetableControllerFindAllV1<TData = Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useTimetableControllerFindAllV1<TData = Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timetableControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -122,32 +140,50 @@ export function useTimetableControllerFindAllV1<TData = Awaited<ReturnType<typeo
 
 
 
-export const timetableControllerCreateV1 = (
-    createTimetableDto: CreateTimetableDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type timetableControllerCreateV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type timetableControllerCreateV1ResponseSuccess = (timetableControllerCreateV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type timetableControllerCreateV1Response = (timetableControllerCreateV1ResponseSuccess)
+
+export const getTimetableControllerCreateV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/timetable`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createTimetableDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/timetable`
+}
+
+export const timetableControllerCreateV1 = async (createTimetableDto: CreateTimetableDto, options?: RequestInit): Promise<timetableControllerCreateV1Response> => {
+
+  return fetchWithAuth<timetableControllerCreateV1Response>(getTimetableControllerCreateV1Url(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createTimetableDto)
+  }
+);}
+
 
 
 
 export const getTimetableControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerCreateV1>>, TError,{data: CreateTimetableDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerCreateV1>>, TError,{data: CreateTimetableDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof timetableControllerCreateV1>>, TError,{data: CreateTimetableDto}, TContext> => {
 
 const mutationKey = ['timetableControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -155,7 +191,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof timetableControllerCreateV1>>, {data: CreateTimetableDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  timetableControllerCreateV1(data,requestOptions)
+          return  timetableControllerCreateV1(data,)
         }
 
 
@@ -170,7 +206,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type TimetableControllerCreateV1MutationError = unknown
 
     export const useTimetableControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerCreateV1>>, TError,{data: CreateTimetableDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerCreateV1>>, TError,{data: CreateTimetableDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof timetableControllerCreateV1>>,
         TError,
@@ -179,33 +215,51 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getTimetableControllerCreateV1MutationOptions(options), queryClient);
     }
-    export const timetableControllerUpdateV1 = (
-    id: string,
-    updateTimetableDto: UpdateTimetableDto,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type timetableControllerUpdateV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type timetableControllerUpdateV1ResponseSuccess = (timetableControllerUpdateV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type timetableControllerUpdateV1Response = (timetableControllerUpdateV1ResponseSuccess)
+
+export const getTimetableControllerUpdateV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/timetable/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateTimetableDto, signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/timetable/${id}`
+}
+
+export const timetableControllerUpdateV1 = async (id: string,
+    updateTimetableDto: UpdateTimetableDto, options?: RequestInit): Promise<timetableControllerUpdateV1Response> => {
+
+  return fetchWithAuth<timetableControllerUpdateV1Response>(getTimetableControllerUpdateV1Url(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateTimetableDto)
+  }
+);}
+
 
 
 
 export const getTimetableControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerUpdateV1>>, TError,{id: string;data: UpdateTimetableDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerUpdateV1>>, TError,{id: string;data: UpdateTimetableDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof timetableControllerUpdateV1>>, TError,{id: string;data: UpdateTimetableDto}, TContext> => {
 
 const mutationKey = ['timetableControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -213,7 +267,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof timetableControllerUpdateV1>>, {id: string;data: UpdateTimetableDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  timetableControllerUpdateV1(id,data,requestOptions)
+          return  timetableControllerUpdateV1(id,data,)
         }
 
 
@@ -228,7 +282,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type TimetableControllerUpdateV1MutationError = unknown
 
     export const useTimetableControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerUpdateV1>>, TError,{id: string;data: UpdateTimetableDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerUpdateV1>>, TError,{id: string;data: UpdateTimetableDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof timetableControllerUpdateV1>>,
         TError,
@@ -237,30 +291,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getTimetableControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export const timetableControllerRemoveV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type timetableControllerRemoveV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type timetableControllerRemoveV1ResponseSuccess = (timetableControllerRemoveV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type timetableControllerRemoveV1Response = (timetableControllerRemoveV1ResponseSuccess)
+
+export const getTimetableControllerRemoveV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/timetable/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/timetable/${id}`
+}
+
+export const timetableControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<timetableControllerRemoveV1Response> => {
+
+  return fetchWithAuth<timetableControllerRemoveV1Response>(getTimetableControllerRemoveV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getTimetableControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof timetableControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['timetableControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -268,7 +342,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof timetableControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  timetableControllerRemoveV1(id,requestOptions)
+          return  timetableControllerRemoveV1(id,)
         }
 
 
@@ -283,7 +357,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type TimetableControllerRemoveV1MutationError = unknown
 
     export const useTimetableControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof timetableControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof timetableControllerRemoveV1>>,
         TError,

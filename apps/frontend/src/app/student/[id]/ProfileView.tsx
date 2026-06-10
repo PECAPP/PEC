@@ -87,7 +87,7 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
           className="card-elevated p-4 flex flex-col md:flex-row gap-4 items-center justify-between"
         >
           <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xl font-bold shadow-lg">
+            <div className="w-16 h-16 rounded-sm bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xl font-bold shadow-lg">
               {initials}
             </div>
             <div>
@@ -138,19 +138,19 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
             <div className="card-elevated p-4">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Academic Snapshot</h2>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-lg bg-secondary/30 border border-border">
+                <div className="p-3 rounded-sm bg-secondary/30 border border-border">
                   <p className="text-2xl font-bold text-foreground">{cgpaValue}</p>
                   <p className="text-[10px] text-muted-foreground font-medium uppercase">CGPA</p>
                 </div>
-                <div className="p-3 rounded-lg bg-secondary/30 border border-border">
+                <div className="p-3 rounded-sm bg-secondary/30 border border-border">
                   <p className="text-2xl font-bold text-foreground">{attendanceValue}</p>
                   <p className="text-[10px] text-muted-foreground font-medium uppercase">Attendance</p>
                 </div>
-                <div className="p-3 rounded-lg bg-secondary/30 border border-border">
+                <div className="p-3 rounded-sm bg-secondary/30 border border-border">
                   <p className="text-2xl font-bold text-foreground">{creditsValue}</p>
                   <p className="text-[10px] text-muted-foreground font-medium uppercase">Credits</p>
                 </div>
-                <div className="p-3 rounded-lg bg-secondary/30 border border-border">
+                <div className="p-3 rounded-sm bg-secondary/30 border border-border">
                   <p className="text-2xl font-bold text-foreground">{rankValue}</p>
                   <p className="text-[10px] text-muted-foreground font-medium uppercase">Rank</p>
                 </div>
@@ -199,7 +199,7 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
                <div className="flex flex-wrap gap-1.5">
                  {skills.length > 0 ? (
                    skills.map((skill: string) => (
-                     <span key={skill} className="px-2.5 py-1 rounded-md bg-secondary text-secondary-foreground text-xs font-medium border border-border/50">
+                     <span key={skill} className="px-2.5 py-1 rounded-sm bg-secondary text-secondary-foreground text-xs font-medium border border-border/50">
                        {skill}
                      </span>
                    ))
@@ -214,7 +214,7 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                    {documents.length > 0 ? (
                      documents.map((doc: any, i: number) => (
-                       <div key={i} className="flex items-center justify-between p-2.5 rounded-lg border border-border">
+                       <div key={i} className="flex items-center justify-between p-2.5 rounded-sm border border-border">
                          <div className="flex items-center gap-2.5 overflow-hidden">
                            <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
                              <FileText className="w-4 h-4 text-primary" />

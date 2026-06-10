@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import TimetableTab from "@/features/academic-schedule/TimetableTab";
 import CalendarTab from "@/features/academic-schedule/CalendarTab";
 import ExaminationsTab from "@/features/academic-schedule/ExaminationsTab";
+import AdminCalendarTab from "./AdminCalendarTab";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 const tabs = [
   {
@@ -33,6 +35,7 @@ export default function AcademicSchedulePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const { ability } = useAuth();
 
   const activeTab = searchParams.get("tab") || "timetable";
 
@@ -56,11 +59,11 @@ export default function AcademicSchedulePage() {
     >
       {/* Compact Page Header */}
       <div className="flex items-center gap-3 pb-4">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
           <Calendar className="w-4 h-4 text-primary" />
         </div>
         <div className="min-w-0">
-          <h1 className="text-xl font-black tracking-tight text-foreground leading-none">
+          <h1 className="text-xl font-bold tracking-tight text-foreground leading-none">
             Academic Schedule
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -99,7 +102,9 @@ export default function AcademicSchedulePage() {
       {/* Tab Content */}
       <div className="pt-6">
         {activeTab === "timetable" && <TimetableTab />}
-        {activeTab === "calendar" && <CalendarTab />}
+        {activeTab === "calendar" && (
+          ability?.can('manage', 'all' as any) ? <AdminCalendarTab /> : <CalendarTab />
+        )}
         {activeTab === "examinations" && <ExaminationsTab />}
       </div>
     </motion.div>

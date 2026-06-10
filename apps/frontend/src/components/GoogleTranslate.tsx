@@ -34,9 +34,9 @@ const GOOGLE_TRANSLATE_SCRIPT_ID = 'google-translate-script';
 const WIDGET_CONTAINER_ID = '__gt_singleton_container__';
 
 const languageOptions = [
-  { value: 'en', nativeLabel: 'English', flag: '🇬🇧' },
-  { value: 'hi', nativeLabel: 'हिन्दी', flag: '🇮🇳' },
-  { value: 'pa', nativeLabel: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+  { value: 'en', nativeLabel: 'English', flag: '' },
+  { value: 'hi', nativeLabel: 'हिन्दी', flag: '' },
+  { value: 'pa', nativeLabel: 'ਪੰਜਾਬੀ', flag: '' },
 ];
 
 const includedLanguages = languageOptions.map((l) => l.value).join(',');
@@ -235,7 +235,7 @@ export function GoogleTranslate(_props: GoogleTranslateProps) {
           value={language}
           disabled={isTranslating || isBlocked}
           onChange={(e) => handleLanguageChange(e.target.value)}
-          className="h-8 min-w-[130px] rounded-lg border border-border bg-background/50 backdrop-blur-sm px-2.5 pr-8 text-[10px] font-bold uppercase tracking-widest text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all hover:bg-background/80 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="h-8 min-w-[130px] rounded-sm border border-border bg-background/50 backdrop-blur-sm px-2.5 pr-8 text-[10px] font-bold uppercase tracking-widest text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all hover:bg-background/80 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {languageOptions.map((lang) => (
             <option key={lang.value} value={lang.value} className="bg-background text-foreground">
@@ -247,7 +247,7 @@ export function GoogleTranslate(_props: GoogleTranslateProps) {
         {/* Spinner shown while page is about to reload */}
         {isTranslating && (
           <span
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin pointer-events-none"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 border border-primary/30 border-t-primary rounded-full animate-spin pointer-events-none"
             aria-hidden="true"
           />
         )}

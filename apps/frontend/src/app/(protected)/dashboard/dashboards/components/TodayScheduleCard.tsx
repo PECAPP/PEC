@@ -50,7 +50,7 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, todayEvents = [],
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
         {todayEvents.length > 0 && (
-          <div className="mb-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
+          <div className="mb-3 rounded-sm border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-center gap-2 mb-1">
               <Badge className="bg-primary hover:bg-primary text-primary-foreground text-[10px] px-1.5 h-4">
                 {todayEvents[0].eventType === 'holiday' ? 'HOLIDAY' : todayEvents[0].eventType === 'exam' ? 'EXAM' : 'EVENT'}
@@ -73,7 +73,7 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, todayEvents = [],
             return (
               <div 
                 key={`${cls.id || 'class'}-${index}`} 
-                className={`rounded-lg border p-3 transition-all duration-300 ${isOngoing ? 'border-primary bg-primary/5 shadow-md shadow-primary/10 ring-1 ring-primary/20' : 'border-border bg-secondary/10'}`}
+                className={`rounded-sm border p-3 transition-all duration-300 ${isOngoing ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10 ring-1 ring-primary/20' : 'border-border bg-secondary/10'}`}
               >
                 <div className="mb-2 flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -109,3 +109,4 @@ export function TodayScheduleCard({ scheduleDay, todayClasses, todayEvents = [],
     </div>
   );
 }
+

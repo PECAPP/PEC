@@ -20,7 +20,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useRouter } from 'next/navigation';
 import { uploadToCloudinary } from '@/lib/cloudinaryManager';
 import { processLogoImage } from '@/lib/logoProcessor';
-import { AXIOS_INSTANCE } from "@pec/api";
+import { api } from '@pec/api';
 import type { CollegeSettings as CollegeSettingsType } from '@pec/shared';
 
 type CollegeSettings = CollegeSettingsType;
@@ -83,7 +83,7 @@ export default function CollegeSettings() {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const { data: settingsRes } = await AXIOS_INSTANCE.get('/api/v1/college-settings/main');
+      const { data: settingsRes } = await api.get('/college-settings/main');
       const settingsSnap = { exists: () => !!settingsRes?.data || !!settingsRes, data: () => settingsRes?.data || settingsRes };
 
       if (settingsSnap.exists()) {
@@ -251,7 +251,7 @@ export default function CollegeSettings() {
         updatedBy: user?.email || 'unknown',
       };
 
-      await AXIOS_INSTANCE.put('/api/v1/college-settings/main', newSettings);
+      await api.put('/college-settings/main', newSettings);
 
       setSettings(newSettings);
       setLogoFile(null);
@@ -318,7 +318,7 @@ export default function CollegeSettings() {
                 onDragOver={handleDragOver}
                 onDragEnter={handleDragEnter}
                 onDrop={handleDrop}
-                className="border-2 border-dashed border-primary/30 rounded-lg p-8 text-center cursor-pointer hover:bg-secondary/50 hover:border-primary/60 transition-all"
+                className="border border-dashed border-primary/30 rounded-sm p-8 text-center cursor-pointer hover:bg-secondary/50 hover:border-primary/60 transition-all"
               >
                 <input
                   type="file"
@@ -328,7 +328,7 @@ export default function CollegeSettings() {
                   id="logo-upload"
                 />
                 <label htmlFor="logo-upload" className="cursor-pointer block">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                  <Upload className="w-8 h-8  mb-2 text-muted-foreground" />
                   <p className="text-sm font-medium text-foreground">Drag & drop or click to upload</p>
                   <p className="text-xs text-muted-foreground mt-1">PNG, JPG, GIF up to 5MB</p>
                 </label>
@@ -340,13 +340,13 @@ export default function CollegeSettings() {
               <label className="block text-sm font-medium text-foreground mb-3">
                 Preview
               </label>
-              <div className="border rounded-lg p-4 bg-secondary/50 flex items-center justify-center h-48">
+              <div className="border rounded-sm p-4 bg-secondary/50 flex items-center justify-center h-48">
                 {previewUrl ? (
                   <div className="relative">
                     <img
                       src={previewUrl}
                       alt="Logo preview"
-                      className="max-h-40 max-w-40 object-contain"
+                      className="max-h-40  object-contain"
                     />
                   </div>
                 ) : (
@@ -363,10 +363,10 @@ export default function CollegeSettings() {
                     className="w-full gap-2"
                   >
                     {removingBackground && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {removeBackground ? '✓ Background Removed' : <><Wand2 className="w-4 h-4" /> Remove Background</>}
+                    {removeBackground ? ' Background Removed' : <><Wand2 className="w-4 h-4" /> Remove Background</>}
                   </Button>
                   <p className="text-xs text-muted-foreground">
-                    {removeBackground ? '✓ Ready to upload' : 'Optional: Remove plain background before upload'}
+                    {removeBackground ? ' Ready to upload' : 'Optional: Remove plain background before upload'}
                   </p>
                 </div>
               )}
@@ -384,7 +384,7 @@ export default function CollegeSettings() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Logo Only Option */}
-            <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+            <label className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
               logoDisplayMode === 'logo-only' 
                 ? 'border-primary bg-primary/5' 
                 : 'border-border hover:border-primary/50'
@@ -407,7 +407,7 @@ export default function CollegeSettings() {
             </label>
 
             {/* Text Only Option */}
-            <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+            <label className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
               logoDisplayMode === 'text-only' 
                 ? 'border-primary bg-primary/5' 
                 : 'border-border hover:border-primary/50'
@@ -428,7 +428,7 @@ export default function CollegeSettings() {
             </label>
 
             {/* Both Option */}
-            <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+            <label className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
               logoDisplayMode === 'both' 
                 ? 'border-primary bg-primary/5' 
                 : 'border-border hover:border-primary/50'
@@ -667,3 +667,4 @@ export default function CollegeSettings() {
     </motion.div>
   );
 }
+

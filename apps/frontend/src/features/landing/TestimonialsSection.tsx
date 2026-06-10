@@ -22,7 +22,7 @@ export function TestimonialsSection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-5xl font-black mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
+          <h2 className="text-3xl sm:text-5xl font-bold mb-4" style={{ fontFamily: "'Monument Extended', serif" }}>
             <span className="bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 bg-clip-text text-transparent">Real Results</span>
           </h2>
           <p className="text-lg text-white font-bold max-w-3xl mx-auto uppercase tracking-wide opacity-60">
@@ -33,10 +33,10 @@ export function TestimonialsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {testimonials.slice(0, 4).map((testimonial, idx) => {
             const colors = [
-              { bg: 'bg-yellow-400', border: 'border-yellow-400', shadow: 'shadow-[8px_8px_0px_0px_rgba(239,68,68,1)]', text: 'text-black' },
-              { bg: 'bg-green-400', border: 'border-green-400', shadow: 'shadow-[8px_8px_0px_0px_rgba(59,130,246,1)]', text: 'text-black' },
-              { bg: 'bg-blue-500', border: 'border-blue-500', shadow: 'shadow-[8px_8px_0px_0px_rgba(234,179,8,1)]', text: 'text-white' },
-              { bg: 'bg-red-500', border: 'border-red-500', shadow: 'shadow-[8px_8px_0px_0px_rgba(34,197,94,1)]', text: 'text-white' }
+              { bg: 'bg-yellow-400', border: 'border-yellow-400', shadow: 'shadow-sm', text: 'text-black' },
+              { bg: 'bg-green-400', border: 'border-green-400', shadow: 'shadow-sm', text: 'text-black' },
+              { bg: 'bg-blue-500', border: 'border-blue-500', shadow: 'shadow-sm', text: 'text-white' },
+              { bg: 'bg-red-500', border: 'border-red-500', shadow: 'shadow-sm', text: 'text-white' }
             ];
             const color = colors[idx];
             
@@ -60,12 +60,12 @@ export function TestimonialsSection() {
                   &quot;{testimonial.quote.slice(0, 150)}&quot;...
                 </p>
                 
-                <div className="inline-block px-3 py-2 bg-black border-2 border-black rounded-none mb-4">
-                  <span className="text-white font-black text-xs uppercase">{testimonial.savedHours}</span>
+                <div className="inline-block px-3 py-2 bg-black border border-black rounded-none mb-4">
+                  <span className="text-white font-bold text-xs uppercase">{testimonial.savedHours}</span>
                 </div>
                 
                 <div className={`${color.text} border-t-4 border-black pt-4`}>
-                  <h4 className="font-black text-base mb-1">{testimonial.name}</h4>
+                  <h4 className="font-bold text-base mb-1">{testimonial.name}</h4>
                   <p className="font-bold text-xs opacity-80">{testimonial.designation}</p>
                 </div>
               </motion.div>

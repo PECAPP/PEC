@@ -44,7 +44,7 @@ function StatCard({ icon: Icon, label, value, subtext, trend, trendUp, iconColor
   return (
     <div className="card-elevated p-5">
       <div className="flex items-start justify-between">
-        <div className={`w-10 h-10 rounded-lg bg-secondary flex items-center justify-center ${iconColor}`}>
+        <div className={`w-10 h-10 rounded-sm bg-secondary flex items-center justify-center ${iconColor}`}>
           <Icon className="w-5 h-5" />
         </div>
         {trend && (

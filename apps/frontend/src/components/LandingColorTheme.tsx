@@ -55,7 +55,7 @@ export function LandingColorTheme() {
   const currentTheme = accentThemes[currentIndex];
 
   return (
-    <div className="flex items-center gap-1 bg-accent/10 rounded-lg p-0.5 border border-accent/20">
+    <div className="flex items-center gap-1 bg-accent/10 rounded-sm p-0.5 border border-accent/20">
       <Button
         variant="ghost"
         size="icon"

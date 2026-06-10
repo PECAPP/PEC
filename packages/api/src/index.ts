@@ -1,6 +1,6 @@
 export * from './api-base';
 export * from './auth-client';
-export * from './axios-instance';
+
 export * from './api';
 import api from './api';
 export default api;

@@ -28,7 +28,7 @@ export function FacultyHeader({
   }, []);
 
   return (
-    <div className="relative overflow-hidden p-6 rounded-2xl bg-card border border-border flex flex-col gap-6 md:flex-row md:items-center md:justify-between shadow-sm">
+    <div className="relative overflow-hidden p-6 rounded-sm bg-card border border-border flex flex-col gap-6 md:flex-row md:items-center md:justify-between shadow-sm">
       <div className="space-y-1.5 z-10">
         <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-wider mb-0.5">
           Academic Management
@@ -66,7 +66,7 @@ export function FacultyHeader({
           size="sm"
           onClick={onGenerateQR}
           disabled={!selectedCourse}
-          className="h-9 px-4 font-semibold tracking-tight shadow-lg shadow-primary/10"
+          className="h-9 px-4 font-semibold tracking-tight shadow-sm shadow-primary/10"
         >
           <QrCode className="w-4 h-4 mr-2" />
           QR Attendance
@@ -75,3 +75,4 @@ export function FacultyHeader({
     </div>
   );
 }
+

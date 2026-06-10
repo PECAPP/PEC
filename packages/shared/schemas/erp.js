@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.campusMapRegionSchema = exports.canteenItemSchema = exports.canteenOrderSchema = exports.academicCalendarEventSchema = exports.examinationSchema = exports.timetableSchema = exports.hostelIssueSchema = exports.enrollmentSchema = exports.userSchema = exports.courseSchema = exports.attendanceSessionSchema = exports.AuthResponseSchema = exports.AuthSignupSchema = exports.AuthLoginSchema = exports.attendanceSchema = exports.facultySchema = exports.departmentSchema = void 0;
+exports.campusMapRegionSchema = exports.canteenItemSchema = exports.canteenOrderSchema = exports.academicCalendarEventSchema = exports.examinationSchema = exports.timetableSchema = exports.hostelOutpassSchema = exports.hostelIssueSchema = exports.enrollmentSchema = exports.userSchema = exports.courseSchema = exports.attendanceSessionSchema = exports.AuthResponseSchema = exports.AuthSignupSchema = exports.AuthLoginSchema = exports.attendanceSchema = exports.facultySchema = exports.departmentSchema = void 0;
 const zod_1 = require("zod");
 /**
  * Shared Domain Schemas (Single Source of Truth)
@@ -121,6 +121,27 @@ exports.hostelIssueSchema = zod_1.z.object({
     studentName: zod_1.z.string().min(1, 'Student name required'),
     organizationId: zod_1.z.string().optional(),
     responses: zod_1.z.unknown().optional(),
+    images: zod_1.z.array(zod_1.z.string()).optional(),
+    slaDeadline: zod_1.z.string().datetime().optional(),
+    isEscalated: zod_1.z.boolean().optional(),
+    createdAt: zod_1.z.string().datetime().optional(),
+    updatedAt: zod_1.z.string().datetime().optional(),
+}).strict();
+exports.hostelOutpassSchema = zod_1.z.object({
+    id: zod_1.z.string().uuid().optional(),
+    studentId: zod_1.z.string().min(1, 'Student ID required'),
+    studentName: zod_1.z.string().optional(),
+    hostelName: zod_1.z.string().min(1, 'Hostel Name required'),
+    roomNumber: zod_1.z.string().min(1, 'Room Number required'),
+    reason: zod_1.z.string().min(5, 'Reason is required'),
+    destination: zod_1.z.string().min(3, 'Destination is required'),
+    departureDate: zod_1.z.string().datetime(),
+    returnDate: zod_1.z.string().datetime(),
+    status: zod_1.z.enum(['Pending', 'Approved', 'Rejected', 'Active', 'Completed']).default('Pending'),
+    approvedBy: zod_1.z.string().optional(),
+    qrCode: zod_1.z.string().optional(),
+    evidenceUrl: zod_1.z.string().optional(),
+    images: zod_1.z.array(zod_1.z.string()).optional(),
     createdAt: zod_1.z.string().datetime().optional(),
     updatedAt: zod_1.z.string().datetime().optional(),
 }).strict();

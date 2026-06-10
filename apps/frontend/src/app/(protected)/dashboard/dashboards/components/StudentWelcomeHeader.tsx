@@ -29,7 +29,7 @@ export function StudentWelcomeHeader({ firstName, profileData }: Props) {
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden p-6 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-primary/5 border border-primary/10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between shadow-sm"
+      className="relative overflow-hidden p-6 rounded-sm bg-gradient-to-br from-primary/5 via-transparent to-primary/5 border border-primary/10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between shadow-sm"
     >
       <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none translate-x-4 -translate-y-4">
         <Camera className="w-32 h-32 rotate-12" />
@@ -42,7 +42,7 @@ export function StudentWelcomeHeader({ firstName, profileData }: Props) {
         <h1 className="text-3xl font-bold text-foreground">
           {timePeriod ? `${timePeriod}, ${firstName}!` : `Welcome, ${firstName}!`}
         </h1>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground/80 font-medium">
           <span className="font-semibold text-primary">{profileData?.enrollmentNumber || 'Student'}</span>
           <span className="w-1 h-1 rounded-full bg-border" />
           <span>{profileData?.department || 'Department'}</span>

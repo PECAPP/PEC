@@ -30,7 +30,7 @@ export function CourseCard({
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-20px" }}
-      className="card-elevated group overflow-hidden bg-white dark:bg-black/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all duration-500 rounded-3xl shadow-sm dark:shadow-none"
+      className="card-elevated group overflow-hidden bg-white dark:bg-black/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all duration-500 rounded-sm shadow-sm dark:shadow-none"
     >
       <div className="h-40 w-full relative overflow-hidden bg-black/10 dark:bg-black/50">
         <ImageWithBlur 
@@ -62,7 +62,7 @@ export function CourseCard({
       
       <div className="p-5 space-y-5 relative">
         <div>
-          <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white group-hover:text-primary dark:group-hover:text-primary transition-colors line-clamp-1 drop-shadow-sm dark:drop-shadow-md">
+          <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white group-hover:text-primary dark:group-hover:text-primary transition-colors line-clamp-1  dark:">
             {course.name}
           </h3>
           <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 transition-colors group-hover:text-zinc-800 dark:group-hover:text-zinc-300">
@@ -112,7 +112,7 @@ export function CourseCard({
           {!enrolled && !isFull && onEnroll && (
              <Button 
               onClick={() => onEnroll(course)}
-              className="flex-1 h-10 rounded-xl bg-primary text-primary-foreground font-bold text-[9px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all"
+              className="flex-1 h-10 rounded-sm bg-primary text-primary-foreground font-bold text-[9px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all"
             >
               Enroll Now
             </Button>
@@ -122,7 +122,7 @@ export function CourseCard({
             variant="ghost" 
             onClick={() => onView(course)} 
             className={cn(
-              "h-10 rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all group/btn bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-zinc-800 dark:text-white border border-black/10 dark:border-white/10",
+              "h-10 rounded-sm font-bold text-[9px] uppercase tracking-widest transition-all group/btn bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-zinc-800 dark:text-white border border-black/10 dark:border-white/10",
               (enrolled || isFull) ? "flex-1" : "px-5"
             )}
           >
@@ -133,7 +133,7 @@ export function CourseCard({
           {enrolled && onDrop && (
             <Button 
               variant="ghost" 
-              className="h-10 w-10 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive hover:text-white border border-destructive/20 shrink-0 transition-all"
+              className="h-10 w-10 rounded-sm bg-destructive/10 text-destructive hover:bg-destructive hover:text-white border border-destructive/20 shrink-0 transition-all"
               onClick={() => onDrop(course.id)}
             >
               <X className="w-4 h-4" />
@@ -160,3 +160,4 @@ const User = ({ className }: { className?: string }) => (
     <circle cx="12" cy="7" r="4" />
   </svg>
 );
+

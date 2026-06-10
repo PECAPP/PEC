@@ -1,7 +1,6 @@
 export type UserRole =
   | "student"
   | "faculty"
-  | "college_admin"
   | "admin";
 
 export interface RolePermissions {
@@ -59,22 +58,6 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessCourses: true,
         canManageCourses: true,
         canAccessReports: true,
-      };
-
-    case "college_admin":
-      return {
-        ...basePermissions,
-        canViewDashboard: true,
-        canEditProfile: true,
-        canAccessCourses: true,
-        canAccessFinance: true,
-        canAccessPlacements: true,
-        canManageUsers: true,
-        canManageCourses: true,
-        canAccessAdmin: true,
-        canAccessReports: true,
-        canManageInstitution: true,
-        canManageRecruiters: true,
       };
 
     case "admin":

@@ -9,9 +9,14 @@ import { UpdateCanteenItemDto } from './dto/update-canteen-item.dto';
 import { CreateCanteenOrderDto } from './dto/create-canteen-order.dto';
 import { UpdateCanteenOrderDto } from './dto/update-canteen-order.dto';
 
+import { NightCanteenGateway } from './night-canteen.gateway';
+
 @Injectable()
 export class NightCanteenService {
-  constructor(private readonly repo: NightCanteenRepository) {}
+  constructor(
+    private readonly repo: NightCanteenRepository,
+    private readonly gateway: NightCanteenGateway,
+  ) {}
 
   findItems(query: NightCanteenItemQueryDto) {
     return this.repo.findItems(query);
@@ -45,12 +50,16 @@ export class NightCanteenService {
     return this.repo.findOrderById(id);
   }
 
-  createOrder(data: CreateCanteenOrderDto) {
-    return this.repo.createOrder(data);
+  async createOrder(data: CreateCanteenOrderDto) {
+    const order = await this.repo.createOrder(data);
+    this.gateway.emitNewOrder(order);
+    return order;
   }
 
-  updateOrder(id: string, data: UpdateCanteenOrderDto) {
-    return this.repo.updateOrder(id, data);
+  async updateOrder(id: string, data: UpdateCanteenOrderDto) {
+    const order = await this.repo.updateOrder(id, data);
+    this.gateway.emitOrderUpdated(order);
+    return order;
   }
 
   deleteOrder(id: string) {

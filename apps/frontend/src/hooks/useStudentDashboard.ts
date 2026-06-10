@@ -148,7 +148,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
 
   const fetchCollegeSettings = useCallback(async () => {
     try {
-      const response = await api.get('/college-settings');
+      const response = await api.get('/pec-settings');
       const data = response.data?.success ? response.data.data : response.data;
       if (data) {
         const value = Number(data?.attendanceRequiredPercentage);

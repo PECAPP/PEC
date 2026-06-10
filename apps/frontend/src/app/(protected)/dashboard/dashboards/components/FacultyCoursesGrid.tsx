@@ -57,7 +57,7 @@ export function FacultyCoursesGrid({ courses, onManage }: Props) {
 
 function CourseCard({ code, name, students, progress, avgAttendance }: any) {
   return (
-    <div className="p-4 rounded-lg border border-border hover:border-accent/30 transition-colors">
+    <div className="p-4 rounded-sm border border-border hover:border-accent/30 transition-colors">
       <div className="flex items-start justify-between mb-2">
         <div>
           <span className="text-xs font-medium text-accent">{code}</span>

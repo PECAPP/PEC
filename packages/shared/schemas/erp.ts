@@ -130,6 +130,28 @@ export const hostelIssueSchema = z.object({
   studentName: z.string().min(1, 'Student name required'),
   organizationId: z.string().optional(),
   responses: z.unknown().optional(),
+  images: z.array(z.string()).optional(),
+  slaDeadline: z.string().datetime().optional(),
+  isEscalated: z.boolean().optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+}).strict();
+
+export const hostelOutpassSchema = z.object({
+  id: z.string().uuid().optional(),
+  studentId: z.string().min(1, 'Student ID required'),
+  studentName: z.string().optional(),
+  hostelName: z.string().min(1, 'Hostel Name required'),
+  roomNumber: z.string().min(1, 'Room Number required'),
+  reason: z.string().min(5, 'Reason is required'),
+  destination: z.string().min(3, 'Destination is required'),
+  departureDate: z.string().datetime(),
+  returnDate: z.string().datetime(),
+  status: z.enum(['Pending', 'Approved', 'Rejected', 'Active', 'Completed']).default('Pending'),
+  approvedBy: z.string().optional(),
+  qrCode: z.string().optional(),
+  evidenceUrl: z.string().optional(),
+  images: z.array(z.string()).optional(),
   createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),
 }).strict();
@@ -168,6 +190,7 @@ export type CourseInput = z.infer<typeof courseSchema>;
 export type UserInput = z.infer<typeof userSchema>;
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
 export type HostelIssueInput = z.infer<typeof hostelIssueSchema>;
+export type HostelOutpassInput = z.infer<typeof hostelOutpassSchema>;
 export type TimetableInput = z.infer<typeof timetableSchema>;
 export type ExaminationInput = z.infer<typeof examinationSchema>;
 

@@ -94,7 +94,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
           userRole={(user.role as any) || 'student'}
           userId={user.uid}
           loading={roomsLoading}
-          isMobileOpen={isMobileSidebarOpen}
+          _isMobileOpen={isMobileSidebarOpen}
           onMobileClose={() => setIsMobileSidebarOpen(false)}
         />
       </div>
@@ -114,7 +114,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
             {selectedRoom && (
               <button
                 onClick={() => setIsInfoDialogOpen(true)}
-                className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-lg transition-colors overflow-hidden max-w-full text-left"
+                className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-sm transition-colors overflow-hidden  text-left"
               >
                 <div className="flex-1 overflow-hidden">
                   <h2 className="text-base font-semibold truncate">{selectedRoom.title}</h2>

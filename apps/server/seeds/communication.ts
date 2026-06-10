@@ -18,9 +18,10 @@ export async function seedCommunicationAndActivity(
     data: { name: 'PEC Global Announcements', isGroup: true },
   });
 
-  for (const userId of allUsers) {
-    await prisma.userChatRoom.create({ data: { userId, chatRoomId: globalRoom.id } });
-  }
+  await prisma.userChatRoom.createMany({
+    data: allUsers.map(userId => ({ userId, chatRoomId: globalRoom.id })),
+    skipDuplicates: true
+  });
 
   const prismaAny = prisma as any;
 
@@ -32,9 +33,10 @@ export async function seedCommunicationAndActivity(
     const departmentStudents = students.filter((s) => s.departmentCode === department.code);
     const departmentUsers = [...departmentFaculty.map((f) => f.id), ...departmentStudents.map((s) => s.id)];
     
-    for (const userId of departmentUsers) {
-      await prisma.userChatRoom.create({ data: { userId, chatRoomId: departmentRoom.id } });
-    }
+    await prisma.userChatRoom.createMany({
+      data: departmentUsers.map(userId => ({ userId, chatRoomId: departmentRoom.id })),
+      skipDuplicates: true
+    });
 
     const senders = [...departmentFaculty.map((f) => f.id), ...departmentStudents.slice(0, 4).map((s) => s.id)];
     const messages = [

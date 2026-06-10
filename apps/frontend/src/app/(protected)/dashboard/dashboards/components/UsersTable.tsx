@@ -1,8 +1,10 @@
 'use client';
 import { Button, Badge, Input } from "@pec/ui";
 
-
 import { UserPlus, Edit, Trash2 } from 'lucide-react';
+import { DataTable } from '@/components/common/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
+import { useMemo } from 'react';
 
 interface UsersTableProps {
   users: any[];
@@ -32,12 +34,57 @@ export function UsersTable({
     }
   };
 
+  const columns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'fullName',
+      header: 'Name',
+      cell: ({ row }) => <span className="font-medium text-foreground">{row.original.fullName}</span>
+    },
+    {
+      accessorKey: 'email',
+      header: 'Email',
+      cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>
+    },
+    {
+      accessorKey: 'role',
+      header: 'Role',
+      cell: ({ row }) => (
+        <Badge variant={getRoleBadgeColor(row.original.role)}>
+          {row.original.role?.replace('_', ' ') || 'No Role'}
+        </Badge>
+      )
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
+        <Badge variant={row.original.status === 'active' ? 'default' : 'secondary'}>
+          {row.original.status || 'active'}
+        </Badge>
+      )
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => onEditUser(row.original)}>
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => onDeleteUser(row.original.id)}>
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </Button>
+        </div>
+      )
+    }
+  ], [onEditUser, onDeleteUser]);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <Input 
           placeholder="Search users..." 
-          className="max-w-sm w-full" 
+          className=" w-full" 
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -47,49 +94,7 @@ export function UsersTable({
       </div>
 
       <div className="card-elevated overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead className="bg-muted/30 border-b border-border">
-              <tr>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Name</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Email</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Role</th>
-                <th className="text-center p-4 text-sm font-medium text-muted-foreground">Status</th>
-                <th className="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {users.length === 0 ? (
-                <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No users found</td></tr>
-              ) : (
-                users.map((user) => (
-                  <tr key={user.id} className="hover:bg-muted/20">
-                    <td className="p-4 font-medium text-foreground">{user.fullName}</td>
-                    <td className="p-4 text-muted-foreground">{user.email}</td>
-                    <td className="p-4">
-                      <Badge variant={getRoleBadgeColor(user.role)}>
-                        {user.role?.replace('_', ' ') || 'No Role'}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-center">
-                      <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>{user.status || 'active'}</Badge>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => onEditUser(user)}>
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => onDeleteUser(user.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable columns={columns} data={users} />
       </div>
     </div>
   );

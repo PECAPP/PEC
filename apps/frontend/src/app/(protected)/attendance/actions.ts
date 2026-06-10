@@ -5,30 +5,8 @@ import { cookies } from 'next/headers';
 import { actionClient } from '@/lib/safe-action';
 import { attendanceSchema } from '@pec/shared';
 import { logActivity } from '@/lib/logger';
-import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
 import { z } from 'zod';
-
-const API = resolveInternalApiBaseUrl();
-
-async function getToken() {
-  const cookieStore = await cookies();
-  return cookieStore.get('access_token')?.value ?? '';
-}
-
-async function apiFetch(method: string, path: string, body?: object) {
-  const token = await getToken();
-  const res = await fetch(`${API}/${path}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-    cache: 'no-store',
-  });
-  const data = res.ok ? await res.json().catch(() => null) : null;
-  return { ok: res.ok, status: res.status, data };
-}
+import { apiFetch } from '@/lib/api-fetch';
 
 // 1. Single Attendance Record (Upsert)
 export const markAttendanceAction = actionClient

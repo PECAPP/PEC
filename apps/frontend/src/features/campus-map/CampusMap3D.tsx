@@ -666,7 +666,7 @@ export default function CampusMap3D({
   const isMapNight = timeData.hour < 6 || timeData.hour >= 18;
 
   return (
-    <div className="relative w-full h-[620px] rounded-xl overflow-hidden border border-border shadow-2xl">
+    <div className="relative w-full h-[620px] rounded-sm overflow-hidden border border-border shadow-2xl">
       {/* Night sky layer — sits BEHIND the canvas (zIndex 0).
           Stars/moon are visible only through sky pixels where no 3D geometry
           is drawn. Buildings & ground are solid WebGL geometry → block this layer. */}
@@ -697,13 +697,13 @@ export default function CampusMap3D({
         style={{ zIndex: 2 }}
         className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/55 backdrop-blur-md text-white/90 text-[11px] px-4 py-1.5 rounded-full pointer-events-none select-none tracking-wide shadow-lg"
       >
-        🖱 Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Click a building to explore
+         Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Click a building to explore
       </div>
 
       {/* Legend */}
       <div
         style={{ zIndex: 2 }}
-        className={`absolute top-3 left-3 backdrop-blur-md rounded-xl px-3 py-2.5 pointer-events-none select-none shadow-lg border transition-all duration-500 ${isDark ? 'bg-slate-900/75 border-slate-700/50' : 'bg-black/55 border-transparent'}`}
+        className={`absolute top-3 left-3 backdrop-blur-md rounded-sm px-3 py-2.5 pointer-events-none select-none shadow-lg border transition-all duration-500 ${isDark ? 'bg-slate-900/75 border-slate-700/50' : 'bg-black/55 border-transparent'}`}
       >
         <p className="text-white/50 text-[9px] font-semibold uppercase tracking-widest mb-1.5">
           Legend

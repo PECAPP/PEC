@@ -56,7 +56,7 @@ export const AttendanceTable = ({ data }: { data: AttendanceData }) => {
     const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
     const isGood = percentage >= 75;
     return (
-      <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden my-3">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden my-3">
         <div className={`${isGood ? 'bg-emerald-600' : 'bg-red-600'} px-4 py-3 flex items-center justify-between text-white`}>
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
@@ -76,7 +76,7 @@ export const AttendanceTable = ({ data }: { data: AttendanceData }) => {
 
   if (courses.length === 0) {
     return (
-      <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
         {data.message ?? 'No attendance records found.'}
       </div>
     );
@@ -86,7 +86,7 @@ export const AttendanceTable = ({ data }: { data: AttendanceData }) => {
   const overallColor = overallPct >= 75 ? 'from-emerald-600 to-teal-600' : 'from-red-600 to-rose-600';
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
       {/* Header */}
       <div className={`bg-gradient-to-r ${overallColor} px-4 py-3 flex items-center justify-between text-white`}>
         <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export const AttendanceTable = ({ data }: { data: AttendanceData }) => {
         <div className="flex justify-between text-[10px] text-gray-400 mb-1">
           <span>Overall attendance</span>
           <span className={overallPct >= 75 ? 'text-emerald-600 font-semibold' : 'text-red-600 font-semibold'}>
-            {overallPct >= 75 ? '✓ Above 75% threshold' : '⚠ Below 75% threshold'}
+            {overallPct >= 75 ? ' Above 75% threshold' : ' Below 75% threshold'}
           </span>
         </div>
         {progressBar(overallPct)}

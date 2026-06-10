@@ -33,7 +33,7 @@ export function DepartmentOverviewCard({ departments }: Props) {
           <p className="text-sm text-muted-foreground text-center py-4">No department data available.</p>
         ) : (
           departments.slice(0, 5).map((dept, idx) => (
-            <div key={idx} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors">
+            <div key={idx} className="flex items-center justify-between p-3 rounded-sm border border-border hover:bg-secondary/50 transition-colors">
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-foreground truncate">{dept.name}</p>
                 <p className="text-sm text-muted-foreground">{dept.students} students · {dept.faculty} faculty</p>

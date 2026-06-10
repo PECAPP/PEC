@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Textarea, Badge, Progress, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger } from "@pec/ui";
+import { Button, Input, Textarea, Badge, Progress, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger, AppShellSkeleton } from "@pec/ui";
 
 
 import { useState, useEffect } from 'react';
@@ -250,7 +250,7 @@ export default function StudentPortfolioPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <AppShellSkeleton />
       </div>
     );
   }
@@ -280,7 +280,7 @@ export default function StudentPortfolioPage() {
             <TabsTrigger
               key={tab}
               value={tab}
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-xs font-black uppercase tracking-widest transition-all capitalize"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-xs font-bold uppercase tracking-widest transition-all capitalize"
             >
               {tab}
             </TabsTrigger>
@@ -368,7 +368,7 @@ export default function StudentPortfolioPage() {
 
           {projects.length === 0 && (
             <div className="card-elevated p-12 text-center">
-              <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <Briefcase className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No projects yet. Add your first project!</p>
             </div>
           )}
@@ -428,7 +428,7 @@ export default function StudentPortfolioPage() {
 
           {skills.length === 0 && (
             <div className="card-elevated p-12 text-center">
-              <Code2 className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <Code2 className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">
                 No skills added yet. Start building your skill profile!
               </p>
@@ -497,7 +497,7 @@ export default function StudentPortfolioPage() {
 
           {githubRepos.length === 0 && (
             <div className="card-elevated p-12 text-center">
-              <Github className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <Github className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">
                 No GitHub repos loaded. Configure your GitHub username in profile settings and sync.
               </p>
@@ -508,7 +508,7 @@ export default function StudentPortfolioPage() {
 
       {/* Project Dialog */}
       <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle>{editingProject ? 'Edit Project' : 'Add Project'}</DialogTitle>
             <DialogDescription>

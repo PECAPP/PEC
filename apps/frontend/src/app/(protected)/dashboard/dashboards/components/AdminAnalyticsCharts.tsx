@@ -75,7 +75,7 @@ export function AdminAnalyticsCharts({
                   backgroundColor: 'hsl(var(--card))',
                   borderColor: 'hsl(var(--border))',
                   borderRadius: '4px',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: 'var(--shadow-sm)',
                   fontSize: '12px',
                   fontWeight: 'bold',
                 }}
@@ -126,7 +126,7 @@ export function AdminAnalyticsCharts({
                   backgroundColor: 'hsl(var(--card))',
                   borderColor: 'hsl(var(--border))',
                   borderRadius: '4px',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: 'var(--shadow-sm)',
                   fontSize: '12px',
                 }}
               />
@@ -156,3 +156,4 @@ export function AdminAnalyticsCharts({
 }
 
 import { BarChart3 } from 'lucide-react';
+

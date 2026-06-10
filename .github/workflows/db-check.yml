@@ -1,0 +1,36 @@
+name: Database Check
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'packages/database/**'
+  pull_request:
+    paths:
+      - 'packages/database/**'
+
+jobs:
+  db-check:
+    name: Validate Prisma Schema
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Prisma Schema
+        working-directory: packages/database
+        run: pnpm exec prisma validate

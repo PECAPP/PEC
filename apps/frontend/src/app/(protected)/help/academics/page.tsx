@@ -106,7 +106,7 @@ export default function AcademicsHelp() {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-4"
         >
-          <div className="p-3 rounded-xl bg-primary/10">
+          <div className="p-3 rounded-sm bg-primary/10">
             <FileText className="w-8 h-8 text-primary" />
           </div>
           <div>
@@ -136,7 +136,7 @@ export default function AcademicsHelp() {
                 <Card className="hover:shadow-md transition-all cursor-pointer group hover:border-primary/50">
                   <CardContent className="py-4">
                     <div className="flex items-center gap-4">
-                      <div className="p-2 rounded-lg bg-secondary group-hover:bg-primary/10 transition-colors">
+                      <div className="p-2 rounded-sm bg-secondary group-hover:bg-primary/10 transition-colors">
                         <article.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -177,7 +177,7 @@ export default function AcademicsHelp() {
                 
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                    <div className="p-3 rounded-sm bg-primary/10 text-primary">
                       {(() => {
                         const Icon = articles[selectedArticle].icon;
                         return <Icon className="w-8 h-8" />;
@@ -189,7 +189,7 @@ export default function AcademicsHelp() {
                     </div>
                   </div>
 
-                  <div className="prose prose-invert max-w-none">
+                  <div className="prose prose-invert ">
                     <HelpContent content={articles[selectedArticle].content} />
                   </div>
 

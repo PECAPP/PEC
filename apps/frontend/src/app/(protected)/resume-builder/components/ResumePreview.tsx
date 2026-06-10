@@ -21,11 +21,11 @@ export function ResumePreview({
       animate={{ opacity: 1, x: 0 }}
       className={cn(
         "xl:col-span-6 flex justify-center w-full overflow-x-auto pb-10",
-        preview ? "xl:col-span-12 relative mx-auto max-w-5xl" : "",
+        preview ? "xl:col-span-12 relative  " : "",
       )}
     >
       <div
-        className="bg-white text-black shadow-[0_25px_65px_rgba(0,0,0,0.5)] border-2 border-black/5 origin-top-left transition-all duration-300 ease-out"
+        className="bg-white text-black shadow-[0_25px_65px_rgba(0,0,0,0.5)] border border-black/5 origin-top-left transition-all duration-300 ease-out"
         style={{
           width: "8.5in",
           minHeight: "11in",

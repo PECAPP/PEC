@@ -308,6 +308,9 @@ export declare const hostelIssueSchema: z.ZodObject<{
     studentName: z.ZodString;
     organizationId: z.ZodOptional<z.ZodString>;
     responses: z.ZodOptional<z.ZodUnknown>;
+    images: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    slaDeadline: z.ZodOptional<z.ZodString>;
+    isEscalated: z.ZodOptional<z.ZodBoolean>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
 }, "strict", z.ZodTypeAny, {
@@ -323,6 +326,9 @@ export declare const hostelIssueSchema: z.ZodObject<{
     createdAt?: string | undefined;
     organizationId?: string | undefined;
     responses?: unknown;
+    images?: string[] | undefined;
+    slaDeadline?: string | undefined;
+    isEscalated?: boolean | undefined;
     updatedAt?: string | undefined;
 }, {
     description: string;
@@ -337,7 +343,62 @@ export declare const hostelIssueSchema: z.ZodObject<{
     createdAt?: string | undefined;
     organizationId?: string | undefined;
     responses?: unknown;
+    images?: string[] | undefined;
+    slaDeadline?: string | undefined;
+    isEscalated?: boolean | undefined;
     updatedAt?: string | undefined;
+}>;
+export declare const hostelOutpassSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    studentId: z.ZodString;
+    studentName: z.ZodOptional<z.ZodString>;
+    hostelName: z.ZodString;
+    roomNumber: z.ZodString;
+    reason: z.ZodString;
+    destination: z.ZodString;
+    departureDate: z.ZodString;
+    returnDate: z.ZodString;
+    status: z.ZodDefault<z.ZodEnum<["Pending", "Approved", "Rejected", "Active", "Completed"]>>;
+    approvedBy: z.ZodOptional<z.ZodString>;
+    qrCode: z.ZodOptional<z.ZodString>;
+    evidenceUrl: z.ZodOptional<z.ZodString>;
+    images: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    createdAt: z.ZodOptional<z.ZodString>;
+    updatedAt: z.ZodOptional<z.ZodString>;
+}, "strict", z.ZodTypeAny, {
+    status: "Pending" | "Approved" | "Rejected" | "Active" | "Completed";
+    studentId: string;
+    roomNumber: string;
+    hostelName: string;
+    reason: string;
+    destination: string;
+    departureDate: string;
+    returnDate: string;
+    id?: string | undefined;
+    qrCode?: string | undefined;
+    createdAt?: string | undefined;
+    studentName?: string | undefined;
+    images?: string[] | undefined;
+    updatedAt?: string | undefined;
+    approvedBy?: string | undefined;
+    evidenceUrl?: string | undefined;
+}, {
+    studentId: string;
+    roomNumber: string;
+    hostelName: string;
+    reason: string;
+    destination: string;
+    departureDate: string;
+    returnDate: string;
+    id?: string | undefined;
+    status?: "Pending" | "Approved" | "Rejected" | "Active" | "Completed" | undefined;
+    qrCode?: string | undefined;
+    createdAt?: string | undefined;
+    studentName?: string | undefined;
+    images?: string[] | undefined;
+    updatedAt?: string | undefined;
+    approvedBy?: string | undefined;
+    evidenceUrl?: string | undefined;
 }>;
 export declare const timetableSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
@@ -415,6 +476,7 @@ export type CourseInput = z.infer<typeof courseSchema>;
 export type UserInput = z.infer<typeof userSchema>;
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
 export type HostelIssueInput = z.infer<typeof hostelIssueSchema>;
+export type HostelOutpassInput = z.infer<typeof hostelOutpassSchema>;
 export type TimetableInput = z.infer<typeof timetableSchema>;
 export type ExaminationInput = z.infer<typeof examinationSchema>;
 export declare const academicCalendarEventSchema: z.ZodObject<{

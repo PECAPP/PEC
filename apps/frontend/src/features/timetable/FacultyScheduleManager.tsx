@@ -102,14 +102,14 @@ export function FacultyScheduleManager({ courses, onScheduleAdded }: FacultySche
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-lg">
+          <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-sm">
             <Calendar className="w-5 h-5 text-primary" />
             <div>
               <p className="text-sm font-medium text-foreground">Extra Classes</p>
               <p className="text-xs text-muted-foreground">Schedule additional sessions</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-lg">
+          <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-sm">
             <Edit className="w-5 h-5 text-primary" />
             <div>
               <p className="text-sm font-medium text-foreground">Makeup Classes</p>
@@ -208,7 +208,7 @@ export function FacultyScheduleManager({ courses, onScheduleAdded }: FacultySche
               />
             </div>
 
-            <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+            <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-sm">
               <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <p className="text-xs text-blue-700 dark:text-blue-300">
                 Students will be notified about this class

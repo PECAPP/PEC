@@ -81,10 +81,10 @@ export default async function CoursesPage() {
     .filter(Boolean);
 
   return (
-    <div className="container py-8 px-6 max-w-7xl animate-in fade-in duration-500 min-h-screen relative">
+    <div className=" py-8 px-6  animate-in fade-in duration-500 min-h-screen relative">
       {/* Decorative Atmosphere Layer */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
+        <div className="absolute inset-0  opacity-[0.03]" />
         <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[radial-gradient(circle_at_center,rgba(var(--primary-rgb),0.05)_0%,transparent_70%)] blur-[80px]" />
       </div>
 
@@ -92,7 +92,7 @@ export default async function CoursesPage() {
         <div className="space-y-10 pb-20">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
             <div className="flex items-center gap-5">
-              <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm shadow-primary/5">
+              <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm shadow-primary/5">
                 <BookOpen className="w-8 h-8 text-primary shadow-glow" />
               </div>
               <div>
@@ -114,7 +114,7 @@ export default async function CoursesPage() {
         <div className="space-y-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
             <div className="flex items-center gap-5">
-              <div className="p-3.5 bg-primary/10 rounded-2xl border border-primary/20 shadow-sm shadow-primary/5">
+              <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm shadow-primary/5">
                 <Settings className="w-8 h-8 text-primary shadow-glow" />
               </div>
               <div>
@@ -126,7 +126,7 @@ export default async function CoursesPage() {
           
           <CourseManagement 
             initialCourses={sanitizedCourses} 
-            user={session}
+            _user={session}
           />
         </div>
       )}

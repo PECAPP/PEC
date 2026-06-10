@@ -1,4 +1,5 @@
 import './tracing'; // Initialize OpenTelemetry before anything else
+// Strictly validate environment variables on boot
 try { require('dotenv/config'); } catch (e) {}
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';

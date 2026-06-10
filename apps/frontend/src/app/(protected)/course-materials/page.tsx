@@ -1,7 +1,7 @@
 'use client';
 import { extractData } from "@/lib/utils";
 import api from "@pec/api";
-import { Button, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
+import { Button, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton } from "@pec/ui";
 
 
 import { useState, useEffect, useRef } from 'react';
@@ -46,10 +46,10 @@ const formatUploadedDate = (uploadedAt: unknown) => {
   if (typeof uploadedAt === 'object' && 'toDate' in uploadedAt) {
     const timestampObj = uploadedAt as { toDate?: () => Date };
     const converted = timestampObj.toDate?.();
-    return converted ? converted.toLocaleDateString() : 'N/A';
+    return converted ? formatDate(converted) : 'N/A';
   }
   const parsed = new Date(uploadedAt as string | number | Date);
-  return Number.isNaN(parsed.getTime()) ? 'N/A' : parsed.toLocaleDateString();
+  return Number.isNaN(parsed.getTime()) ? 'N/A' : formatDate(parsed);
 };
 
 export default function CourseMaterials() {
@@ -69,9 +69,7 @@ export default function CourseMaterials() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <AppShellSkeleton />
     );
   }
 
@@ -139,7 +137,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
     return { coursesData, materialsData, materialsApiAvailable };
   };
 
-  const { data, _error, isLoading, mutate } = useSWR(`manager-materials-${userId}`, fetcher, {
+  const { data, error, isLoading, mutate } = useSWR(`manager-materials-${userId}`, fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 60000,
   });
@@ -254,9 +252,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <AppShellSkeleton />
     );
   }
 
@@ -299,7 +295,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
         )}
         {filteredMaterials.length === 0 ? (
           <div className="card-elevated p-12 text-center">
-            <FileText className="w-12 h-12 mx-auto mb-4 opacity-20" />
+            <FileText className="w-12 h-12  mb-4 opacity-20" />
             <p className="text-muted-foreground">No materials uploaded yet</p>
           </div>
         ) : (
@@ -313,7 +309,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
             >
               <div className="flex items-start justify-between">
                 <div className="flex gap-4 flex-1">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
+                  <div className="p-3 rounded-sm bg-primary/10 text-primary">
                     {getTypeIcon(material.type)}
                   </div>
                   <div className="flex-1">
@@ -404,7 +400,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
       {/* Bulk Upload */}
       <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle>Bulk Upload Materials</DialogTitle>
             <DialogDescription>Columns: courseCode, title, description, type, fileURL</DialogDescription>
@@ -467,7 +463,7 @@ function StudentMaterialsView({ userId }: { userId: string }) {
     }
   };
 
-  const { data, _error, isLoading } = useSWR(`student-materials-${userId}`, fetcher, {
+  const { data, error, isLoading } = useSWR(`student-materials-${userId}`, fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 60000,
   });
@@ -477,7 +473,7 @@ function StudentMaterialsView({ userId }: { userId: string }) {
   const materialsApiAvailable = data?.materialsApiAvailable ?? true;
   const loading = isLoading;
 
-  if (_error) {
+  if (error) {
     toast.error('Failed to load materials');
   }
 
@@ -499,9 +495,7 @@ function StudentMaterialsView({ userId }: { userId: string }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <AppShellSkeleton />
     );
   }
 
@@ -549,7 +543,7 @@ function StudentMaterialsView({ userId }: { userId: string }) {
         )}
         {filteredMaterials.length === 0 ? (
           <div className="card-elevated p-12 text-center">
-            <FileText className="w-12 h-12 mx-auto mb-4 opacity-20" />
+            <FileText className="w-12 h-12  mb-4 opacity-20" />
             <p className="text-muted-foreground">No materials available</p>
           </div>
         ) : (
@@ -563,7 +557,7 @@ function StudentMaterialsView({ userId }: { userId: string }) {
             >
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex gap-4 flex-1 min-w-0">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary flex-shrink-0">
+                  <div className="p-3 rounded-sm bg-primary/10 text-primary flex-shrink-0">
                     {getTypeIcon(material.type)}
                   </div>
                   <div className="flex-1 min-w-0">

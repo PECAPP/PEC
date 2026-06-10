@@ -24,37 +24,55 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
-
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+import { fetchWithAuth } from '../../api';
 
 
 
-export const permissionsControllerCreateV1 = (
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type permissionsControllerCreateV1Response201 = {
+  data: void
+  status: 201
+}
+
+export type permissionsControllerCreateV1ResponseSuccess = (permissionsControllerCreateV1Response201) & {
+  headers: Headers;
+};
+;
+
+export type permissionsControllerCreateV1Response = (permissionsControllerCreateV1ResponseSuccess)
+
+export const getPermissionsControllerCreateV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/permissions`, method: 'POST', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/permissions`
+}
+
+export const permissionsControllerCreateV1 = async ( options?: RequestInit): Promise<permissionsControllerCreateV1Response> => {
+
+  return fetchWithAuth<permissionsControllerCreateV1Response>(getPermissionsControllerCreateV1Url(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
 
 
 
 export const getPermissionsControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerCreateV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerCreateV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerCreateV1>>, TError,void, TContext> => {
 
 const mutationKey = ['permissionsControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -62,7 +80,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof permissionsControllerCreateV1>>, void> = () => {
 
 
-          return  permissionsControllerCreateV1(requestOptions)
+          return  permissionsControllerCreateV1()
         }
 
 
@@ -77,7 +95,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PermissionsControllerCreateV1MutationError = unknown
 
     export const usePermissionsControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerCreateV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerCreateV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof permissionsControllerCreateV1>>,
         TError,
@@ -86,17 +104,37 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getPermissionsControllerCreateV1MutationOptions(options), queryClient);
     }
-    export const permissionsControllerFindAllV1 = (
+    export type permissionsControllerFindAllV1Response200 = {
+  data: void
+  status: 200
+}
 
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type permissionsControllerFindAllV1ResponseSuccess = (permissionsControllerFindAllV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type permissionsControllerFindAllV1Response = (permissionsControllerFindAllV1ResponseSuccess)
+
+export const getPermissionsControllerFindAllV1Url = () => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/permissions`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/permissions`
+}
+
+export const permissionsControllerFindAllV1 = async ( options?: RequestInit): Promise<permissionsControllerFindAllV1Response> => {
+
+  return fetchWithAuth<permissionsControllerFindAllV1Response>(getPermissionsControllerFindAllV1Url(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -108,16 +146,16 @@ export const getPermissionsControllerFindAllV1QueryKey = () => {
     }
 
 
-export const getPermissionsControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getPermissionsControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getPermissionsControllerFindAllV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>> = ({ signal }) => permissionsControllerFindAllV1(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>> = ({ signal }) => permissionsControllerFindAllV1({ signal });
 
 
 
@@ -137,7 +175,7 @@ export function usePermissionsControllerFindAllV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof permissionsControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function usePermissionsControllerFindAllV1<TData = Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError = unknown>(
@@ -147,16 +185,16 @@ export function usePermissionsControllerFindAllV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof permissionsControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function usePermissionsControllerFindAllV1<TData = Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function usePermissionsControllerFindAllV1<TData = Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -172,17 +210,37 @@ export function usePermissionsControllerFindAllV1<TData = Awaited<ReturnType<typ
 
 
 
-export const permissionsControllerFindOneV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type permissionsControllerFindOneV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type permissionsControllerFindOneV1ResponseSuccess = (permissionsControllerFindOneV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type permissionsControllerFindOneV1Response = (permissionsControllerFindOneV1ResponseSuccess)
+
+export const getPermissionsControllerFindOneV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/permissions/${id}`, method: 'GET', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/permissions/${id}`
+}
+
+export const permissionsControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<permissionsControllerFindOneV1Response> => {
+
+  return fetchWithAuth<permissionsControllerFindOneV1Response>(getPermissionsControllerFindOneV1Url(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 
 
@@ -194,16 +252,16 @@ export const getPermissionsControllerFindOneV1QueryKey = (id: string,) => {
     }
 
 
-export const getPermissionsControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getPermissionsControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getPermissionsControllerFindOneV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>> = ({ signal }) => permissionsControllerFindOneV1(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>> = ({ signal }) => permissionsControllerFindOneV1(id, { signal });
 
 
 
@@ -223,7 +281,7 @@ export function usePermissionsControllerFindOneV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof permissionsControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function usePermissionsControllerFindOneV1<TData = Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError = unknown>(
@@ -233,16 +291,16 @@ export function usePermissionsControllerFindOneV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof permissionsControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function usePermissionsControllerFindOneV1<TData = Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function usePermissionsControllerFindOneV1<TData = Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof permissionsControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -258,30 +316,50 @@ export function usePermissionsControllerFindOneV1<TData = Awaited<ReturnType<typ
 
 
 
-export const permissionsControllerUpdateV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+export type permissionsControllerUpdateV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type permissionsControllerUpdateV1ResponseSuccess = (permissionsControllerUpdateV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type permissionsControllerUpdateV1Response = (permissionsControllerUpdateV1ResponseSuccess)
+
+export const getPermissionsControllerUpdateV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/permissions/${id}`, method: 'PATCH', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/permissions/${id}`
+}
+
+export const permissionsControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<permissionsControllerUpdateV1Response> => {
+
+  return fetchWithAuth<permissionsControllerUpdateV1Response>(getPermissionsControllerUpdateV1Url(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
 
 
 
 export const getPermissionsControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerUpdateV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerUpdateV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerUpdateV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['permissionsControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -289,7 +367,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof permissionsControllerUpdateV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  permissionsControllerUpdateV1(id,requestOptions)
+          return  permissionsControllerUpdateV1(id,)
         }
 
 
@@ -304,7 +382,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PermissionsControllerUpdateV1MutationError = unknown
 
     export const usePermissionsControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerUpdateV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerUpdateV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof permissionsControllerUpdateV1>>,
         TError,
@@ -313,30 +391,50 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getPermissionsControllerUpdateV1MutationOptions(options), queryClient);
     }
-    export const permissionsControllerRemoveV1 = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
+    export type permissionsControllerRemoveV1Response200 = {
+  data: void
+  status: 200
+}
+
+export type permissionsControllerRemoveV1ResponseSuccess = (permissionsControllerRemoveV1Response200) & {
+  headers: Headers;
+};
+;
+
+export type permissionsControllerRemoveV1Response = (permissionsControllerRemoveV1ResponseSuccess)
+
+export const getPermissionsControllerRemoveV1Url = (id: string,) => {
 
 
-      return customInstance<void>(
-      {url: `/api/v1/permissions/${id}`, method: 'DELETE', signal
-    },
-      options);
-    }
+
+
+  return `/api/v1/permissions/${id}`
+}
+
+export const permissionsControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<permissionsControllerRemoveV1Response> => {
+
+  return fetchWithAuth<permissionsControllerRemoveV1Response>(getPermissionsControllerRemoveV1Url(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
 
 
 
 export const getPermissionsControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['permissionsControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -344,7 +442,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof permissionsControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  permissionsControllerRemoveV1(id,requestOptions)
+          return  permissionsControllerRemoveV1(id,)
         }
 
 
@@ -359,7 +457,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PermissionsControllerRemoveV1MutationError = unknown
 
     export const usePermissionsControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof permissionsControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof permissionsControllerRemoveV1>>,
         TError,

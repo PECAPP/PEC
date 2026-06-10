@@ -41,7 +41,7 @@ jobs:
         run: |
           # If 'git status --porcelain' returns any output, it means the generated files changed
           if [[ -n $(git status --porcelain) ]]; then
-            echo "::error::🚨 API Contract Violation! You modified the backend API but forgot to update the frontend hooks."
+            echo "::error:: API Contract Violation! You modified the backend API but forgot to update the frontend hooks."
             echo "::error::Please run 'pnpm --filter pec-frontend generate-api' locally and commit the updated hooks in this PR."
             
             echo "The following files are out of sync:"
@@ -49,5 +49,5 @@ jobs:
             
             exit 1
           else
-            echo "✅ API Contracts are in sync!"
+            echo " API Contracts are in sync!"
           fi

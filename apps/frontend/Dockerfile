@@ -6,16 +6,16 @@ RUN corepack enable && apk add --no-cache libc6-compat
 
 FROM base AS fetcher
 WORKDIR /app
-COPY pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm fetch
 
 FROM fetcher AS builder
 WORKDIR /app
 COPY . .
-RUN pnpm install --offline --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 WORKDIR /app/packages/database
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-RUN npx prisma generate
+RUN pnpm exec prisma generate
 WORKDIR /app
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}

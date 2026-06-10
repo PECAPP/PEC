@@ -32,7 +32,7 @@ export default function ConferenceDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+      <DialogContent className=" max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editingConference ? 'Edit Conference' : 'Add Conference'}</DialogTitle>
         </DialogHeader>
