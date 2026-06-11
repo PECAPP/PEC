@@ -61,7 +61,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
    } else if (user.role === 'admin') {
     redirectPath = '/dashboard';
    }
-   router.replace(redirectPath);
+   router.replace(redirectPath as any);
   }
  }, [authLoading, isAuthenticated, user, router]);
 
@@ -342,7 +342,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
           <h3 className="text-xl font-bold uppercase tracking-tight">Institutional Registration</h3>
           <p className="text-[11px] text-muted-foreground font-semibold tracking-tight uppercase">Accounts are provisioned by the Office of Academic Affairs.</p>
          </div>
-         <Button onClick={() => router.push('/apply-institution')} className="w-full h-11 rounded-sm uppercase font-bold tracking-widest text-[10px] bg-primary">Open Registration Portal</Button>
+         <Button onClick={() => router.push('/apply-institution' as any)} className="w-full h-11 rounded-sm uppercase font-bold tracking-widest text-[10px] bg-primary">Open Registration Portal</Button>
        </div>
       </TabsContent>
 

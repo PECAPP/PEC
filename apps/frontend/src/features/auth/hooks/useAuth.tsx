@@ -19,7 +19,7 @@ export interface CurrentUser {
   enrollmentNumber?: string;
   permissions: RolePermissions;
   ability?: AppAbility;
-  caslPermissions?: any[];
+  caslPermissions?: import('@/lib/casl-ability').CaslPermission[];
   avatar: string | null;
   verified: boolean;
   profileComplete: boolean;

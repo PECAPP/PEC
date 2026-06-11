@@ -14,7 +14,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-pec}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - 5432:5432
     command: ["postgres", "-c", "statement_timeout=5000", "-c", "autovacuum_vacuum_scale_factor=0.05", "-c", "autovacuum_analyze_scale_factor=0.02", "-c", "wal_level=logical"]
@@ -31,16 +31,44 @@ services:
       timeout: 5s
       retries: 5
 
+  pg_backup:
+    image: postgres:16-alpine
+    container_name: pec_pg_backup_dev
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pec}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGHOST: postgres
+    command: >
+      sh -c '
+      echo "Backup service started.";
+      while true; do
+        sleep 86400;
+        echo "Running daily backup...";
+        pg_dump -U $$POSTGRES_USER -d $$POSTGRES_DB -f /backups/backup_$$(date +%Y%m%d_%H%M%S).sql;
+        echo "Backup complete.";
+        # Keep only the last 7 backups
+        ls -t /backups/backup_*.sql | tail -n +8 | xargs -r rm --;
+      done'
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      - postgres
+    networks:
+      - pec-network
+    logging: *default-logging
+
   pgbouncer:
     image: edoburu/pgbouncer:latest
     container_name: pec_pgbouncer_dev
     environment:
       AUTH_TYPE: scram-sha-256
       DB_USER: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_HOST: postgres
       DB_NAME: ${POSTGRES_DB:-pec}
-      POOL_MODE: transaction
+      POOL_MODE: session
       MAX_CLIENT_CONN: "1000"
       DEFAULT_POOL_SIZE: "20"
       IGNORE_STARTUP_PARAMETERS: extra_float_digits
@@ -65,21 +93,25 @@ services:
       - pec-network
     logging: *default-logging
     healthcheck:
-      test:
-        - CMD
-        - redis-cli
-        - ping
+      # redis-cli ping uses `docker exec` which hits a Windows/WSL2 OCI fork bug.
+      # TCP check is equivalent and works on all platforms.
+      test: ["CMD-SHELL", "echo '' | nc -w 1 localhost 6379 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: pec_rabbitmq_dev
     restart: always
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=pec_dev_cookie_secret
     ports:
       - 5672:5672
       - 15672:15672
+    volumes:
+      - rabbitmq_dev_data:/var/lib/rabbitmq
     networks:
       - pec-network
     logging: *default-logging
@@ -127,10 +159,10 @@ services:
     environment:
       JWT_SECRET: ${JWT_SECRET}
       PORT: "4000"
-      NODE_ENV: development
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
-      REPLICA_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
-      DIRECT_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-pec}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      REPLICA_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pec}
       REDIS_URL: redis://redis:6379
       RABBITMQ_URL: amqp://rabbitmq:5672
       BCRYPT_ROUNDS: "12"
@@ -138,17 +170,21 @@ services:
       CLAMAV_PORT: "3310"
       MINIO_ENDPOINT: minio
       MINIO_PORT: "9000"
-      MINIO_ACCESS_KEY: ${MINIO_USER:-admin}
-      MINIO_SECRET_KEY: ${MINIO_PASSWORD:-admin123}
+      MINIO_ACCESS_KEY: ${MINIO_USER}
+      MINIO_SECRET_KEY: ${MINIO_PASSWORD}
       MINIO_BUCKET: pec-uploads
+      # Allow both the Nginx gateway (port 80) and the direct Next.js dev server (port 3001).
+      # http://localhost     → browser via Nginx (dev + prod-like)
+      # http://localhost:3001 → browser direct to Next.js (fallback / testing)
+      CORS_ORIGINS: "http://localhost,http://127.0.0.1,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3000,http://127.0.0.1:3000"
     volumes:
       - ./:/app
       - root_node_modules:/app/node_modules
       - server_node_modules:/app/apps/server/node_modules
       - database_node_modules:/app/packages/database/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
     command: >
-      sh -c "cd /app/packages/database && pnpm exec prisma generate && DATABASE_URL=$$DIRECT_URL pnpm exec prisma db push --accept-data-loss && 
-      cd /app/apps/server && pnpm run start:dev"
+      sh -c "cd /app/packages/database && pnpm exec prisma generate && DATABASE_URL=$$DIRECT_URL pnpm exec prisma db push --accept-data-loss && cd /app/apps/server && pnpm run start:dev"
     depends_on:
       postgres:
         condition: service_healthy
@@ -174,52 +210,45 @@ services:
       - pec-network
     logging: *default-logging
 
-  envoy:
-    image: envoyproxy/envoy:v1.27-latest
-    container_name: pec_envoy_dev
-    ports:
-      - 8080:8080
-      - 9901:9901
-    volumes:
-      - ./envoy.yaml:/etc/envoy/envoy.yaml
-    depends_on:
-      backend:
-        condition: service_healthy
-    networks:
-      - pec-network
+  # Envoy removed — frontend uses REST + Socket.IO only (no gRPC-Web).
 
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    container_name: pec_frontend_dev
-    working_dir: /app
+  # Frontend is intentionally NOT containerized in dev.
+  # Run it on your host with: cd apps/frontend && pnpm run dev
+  # Nginx will proxy localhost:80 → host.docker.internal:3001 for you.
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: pec_nginx_dev
     restart: always
     ports:
-      - 3001:3001
-    environment:
-      NEXT_PUBLIC_API_URL: /api
-      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:4000/api}
-      NODE_ENV: development
-      NODE_OPTIONS: "--max-old-space-size=3072"
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./:/app
-      - root_node_modules:/app/node_modules
-      - frontend_node_modules:/app/apps/frontend/node_modules
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d/pec.dev.conf:/etc/nginx/conf.d/default.conf:ro
     command: >
-      sh -c "cd apps/frontend && pnpm exec next dev --turbo -H 0.0.0.0 -p 3001"
+      sh -c "apk add --no-cache openssl &&
+      mkdir -p /etc/nginx/ssl &&
+      if [ ! -f /etc/nginx/ssl/nginx.crt ]; then
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt -subj '/CN=localhost';
+      fi &&
+      nginx -g 'daemon off;'"
+    # host.docker.internal is needed to reach the frontend on the host machine.
+    # Docker Desktop (Win/Mac) provides this automatically.
+    # On Linux hosts it must be injected explicitly:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       backend:
         condition: service_healthy
-      deps_installer:
-        condition: service_completed_successfully
     networks:
       - pec-network
     logging: *default-logging
-    deploy:
-      resources:
-        limits:
-          memory: 4G
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   dev_worker:
     build:
@@ -234,9 +263,9 @@ services:
       - database_node_modules:/app/packages/database/node_modules
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
-      REPLICA_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
-      DIRECT_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-pec}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      REPLICA_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgbouncer:5432/${POSTGRES_DB:-pec}?pgbouncer=true
+      DIRECT_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pec}
     depends_on:
       redis:
         condition: service_healthy
@@ -277,8 +306,8 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_USER:-admin}
-      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-admin123}
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
     command: server /data --console-address ":9001"
     volumes:
       - minio_dev_data:/data
@@ -301,16 +330,67 @@ services:
       - pec-network
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_USER:-admin} ${MINIO_PASSWORD:-admin123};
+      /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_USER} ${MINIO_PASSWORD};
       /usr/bin/mc mb myminio/pec-uploads --ignore-existing;
       /usr/bin/mc policy set download myminio/pec-uploads;
       exit 0;
       "
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pec_prometheus_dev
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - pec-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pec_grafana_dev
+    restart: always
+    environment:
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
+    networks:
+      - pec-network
+    depends_on:
+      - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki:latest
+    container_name: pec_loki_dev
+    restart: always
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - pec-network
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: pec_promtail_dev
+    restart: always
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infra/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+    command: -config.file=/etc/promtail/promtail-config.yml
+    networks:
+      - pec-network
+
 volumes:
   postgres_dev_data:
   qdrant_dev_data:
   minio_dev_data:
+  rabbitmq_dev_data:
   root_node_modules:
   pnpm_store_dev:
   server_node_modules:

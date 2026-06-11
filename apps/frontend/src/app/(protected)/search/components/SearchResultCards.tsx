@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 export function UserCard({ user }: { user: any }) {
   const router = useRouter();
   return (
-    <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => router.push(`/users/${user.id}`)}>
+    <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => router.push(`/directory/users/${user.id}` as any)}>
       <CardContent className="p-4 flex items-center gap-3">
         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
           {user.fullName?.[0] || 'U'}
@@ -26,7 +26,7 @@ export function PageCard({ page }: { page: any }) {
   const router = useRouter();
   const Icon = page.icon;
   return (
-    <Card className="hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => router.push(page.path)}>
+    <Card className="hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => router.push(page.path as any)}>
       <CardContent className="p-4 flex items-center gap-3">
         <div className="h-10 w-10 rounded-sm bg-secondary group-hover:bg-primary/10 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
           <Icon className="w-5 h-5" />

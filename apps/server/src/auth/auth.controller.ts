@@ -320,14 +320,7 @@ export class AuthController {
       path: '/',
       expires,
     });
-    // Non-HttpOnly marker for client-side refresh heuristics.
-    res.setCookie('refresh_present', '1', {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      expires,
-    });
+
   }
 
   private setIdentityCookies(res: FastifyReply, user: { uid: string, role: string }): void {
@@ -389,12 +382,7 @@ export class AuthController {
       sameSite: 'strict',
       path: '/',
     });
-    res.clearCookie('refresh_present', {
-      httpOnly: false,
-      secure: this.isProd,
-      sameSite: 'strict',
-      path: '/',
-    });
+
     res.clearCookie(`${this.cookiePrefix}access_token`, { path: '/' });
     res.clearCookie('user_id', { path: '/' });
     res.clearCookie('user_role', { path: '/' });

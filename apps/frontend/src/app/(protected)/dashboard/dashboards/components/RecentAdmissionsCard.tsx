@@ -23,7 +23,7 @@ export function RecentAdmissionsCard({ recentAdmissions }: Props) {
         <motion.div variants={item} className="card-elevated p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-foreground">Recent Admissions</h2>
-            <Link href="/users">
+            <Link href="/directory/users">
               <Button variant="ghost" size="sm">
                 View All
                 <ArrowUpRight className="w-3.5 h-3.5 ml-2" />
@@ -61,7 +61,7 @@ export function RecentAdmissionsCard({ recentAdmissions }: Props) {
             <div>
               <h3 className="font-medium text-foreground">Action Required</h3>
               <p className="text-sm text-muted-foreground mt-1">Pending profile approvals</p>
-              <Link href="/users?filter=pending">
+              <Link href="/directory/users?filter=pending">
                 <Button size="sm" variant="link" className="px-0 h-auto mt-2 text-orange-600">Review</Button>
               </Link>
             </div>

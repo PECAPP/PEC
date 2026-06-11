@@ -14,15 +14,17 @@ const isProd = process.env.NODE_ENV === 'production';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  typedRoutes: false,
+  typedRoutes: true,
   // standalone is only needed for production Docker images, skip in dev
   ...(isProd && { output: 'standalone' }),
   transpilePackages: ['@pec/shared', '@pec/database', '@pec/ui'],
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
+  // Allow Nginx-proxied dev access from pec.edu.in
+  allowedDevOrigins: ['pec.edu.in'],
   turbopack: {
-    root: "C:/Users/dubey/PEC",
+    root: path.resolve(__dirname, '../..'),
   },
 
   // ─── Experimental ────────────────────────────────────────────────────────────
@@ -105,6 +107,10 @@ const nextConfig = {
 
     return [
       {
+        source: '/rabbitmq/api/:path*',
+        destination: 'http://localhost:15672/api/:path*',
+      },
+      {
         source: '/api/v1/:path*',
         destination: `${apiTarget}/v1/:path*`,
       },
@@ -121,14 +127,12 @@ const withBundleAnalyzer = withBundleAnalyzerInit({ enabled: process.env.ANALYZE
 export default withSentryConfig(
   withBundleAnalyzer(nextConfig),
   {
-    silent: true,
-    org: "pec",
-    project: "pec-frontend",
+    // Set via environment variables (SENTRY_ORG, SENTRY_PROJECT)
+    // or .sentryclirc file.
   },
   {
     widenClientFileUpload: true,
     transpileClientSDK: true,
     hideSourceMaps: true,
-    disableLogger: true,
   }
 );

@@ -237,7 +237,23 @@ cd <repo-folder>
 pnpm install
 ```
 
-### C. Quick One-Command Setup
+### C. Custom Local Domain Setup (Optional)
+To test the application locally using `pec.edu.in` instead of `localhost`, you can map the domain to your local machine. The codebase is already configured to natively accept traffic from both!
+
+**Windows:**
+1. Open Notepad as Administrator.
+2. Open `C:\Windows\System32\drivers\etc\hosts`.
+3. Add the following line at the bottom and save:
+   `127.0.0.1 pec.edu.in`
+
+**Mac/Linux:**
+1. Open a terminal and run `sudo nano /etc/hosts`.
+2. Add the following line at the bottom and save:
+   `127.0.0.1 pec.edu.in`
+
+Once set up, you can access the local environment via `http://pec.edu.in` in your browser.
+
+### D. Quick One-Command Setup
 
 ```bash
 # Provision DB, generate Prisma client, and seed in one step

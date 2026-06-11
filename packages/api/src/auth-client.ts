@@ -71,6 +71,14 @@ class AuthClient {
     return this.readCookie(`${this.cookiePrefix}csrf_token`) ?? this.readCookie('csrf_token');
   }
 
+  private hasRefreshSession(): boolean {
+    // Check for the presence of the refresh session cookie
+    return (
+      this.readCookie(`${this.cookiePrefix}refresh_session`) !== null ||
+      this.readCookie('refresh_session') !== null
+    );
+  }
+
   private waitForRefresh(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.refreshSubscribers.push({ resolve, reject });
@@ -293,9 +301,7 @@ class AuthClient {
     return data.permissions || [];
   }
 
-  hasRefreshSession(): boolean {
-    return this.readCookie('refresh_present') === '1';
-  }
+
 }
 
 export const authClient: AuthClient =
@@ -303,7 +309,6 @@ export const authClient: AuthClient =
     ? new AuthClient()
     : (new Proxy({} as AuthClient, {
         get(_, prop) {
-          if (prop === 'hasRefreshSession') return () => false;
           return () => {
             throw new Error(
               `[AuthClient] Attempted to call ${String(prop)} on the server. ` +

@@ -2,7 +2,13 @@ import { AbilityBuilder, createMongoAbility, MongoAbility, Subject } from '@casl
 
 export type AppAbility = MongoAbility<[string, Subject]>;
 
-export function buildAbilityFor(permissions?: any[], role?: string | null): AppAbility {
+export interface CaslPermission {
+  action: string;
+  subject: string;
+  conditions?: Record<string, unknown>;
+}
+
+export function buildAbilityFor(permissions?: CaslPermission[], role?: string | null): AppAbility {
   const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
   // ALWAYS grant full access to admins, regardless of what the backend DB says

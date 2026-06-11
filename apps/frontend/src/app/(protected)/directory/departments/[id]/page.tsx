@@ -61,7 +61,7 @@ export default function DepartmentDetail() {
         const deptData = deptRes.data?.data ?? deptRes.data;
         if (!deptData) {
           toast.error('Department not found');
-          router.push('/departments');
+          router.push('/directory/departments');
           return;
         }
         setDepartment(deptData);
@@ -118,7 +118,7 @@ export default function DepartmentDetail() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/departments">
+          <Link href="/directory/departments">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -337,7 +337,7 @@ export default function DepartmentDetail() {
               <Users className="w-5 h-5 text-accent" />
               Faculty Members
             </h2>
-            <Link href="/faculty">
+            <Link href="/directory/faculty">
               <Button variant="ghost" size="sm" className="text-xs font-bold text-accent">Full Directory</Button>
             </Link>
           </div>
@@ -347,7 +347,7 @@ export default function DepartmentDetail() {
                 <div 
                   key={member.id} 
                   className="flex items-center gap-4 p-4 rounded-sm bg-card border border-border/50 hover:bg-accent/5 hover:border-accent/30 cursor-pointer transition-all shadow-sm"
-                  onClick={() => router.push(`/users/${member.id}`)}
+                  onClick={() => router.push(`/directory/users/${member.id}`)}
                 >
                   <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center border border-accent/20">
                     <span className="text-sm font-bold text-accent">
@@ -385,7 +385,7 @@ export default function DepartmentDetail() {
                 <div 
                   key={student.id} 
                   className="flex items-center justify-between p-4 rounded-sm bg-card border border-border/50 hover:bg-primary/5 hover:border-primary/30 cursor-pointer transition-all shadow-sm"
-                  onClick={() => router.push(`/users/${student.id}`)}
+                  onClick={() => router.push(`/directory/users/${student.id}`)}
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-sm bg-primary/10 flex items-center justify-center border border-primary/20">

@@ -225,7 +225,7 @@ export function UserManagementView({ initialUsers, isAdmin }: UserManagementView
 
    {/* Table */}
    <div className="card-elevated border rounded-sm overflow-hidden shadow-sm">
-    <DataTable columns={columns} data={filteredUsers} onRowClick={(row) => router.push(`/users/${row.id}`)} />
+    <DataTable columns={columns} data={filteredUsers} onRowClick={(row) => router.push(`/directory/users/${row.id}`)} />
     <div className="px-6 py-4 border-t-2 border-border bg-muted/30 flex items-center justify-between">
      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
       Showing {filteredUsers.length} of {users.length} accounts

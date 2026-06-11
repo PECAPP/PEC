@@ -161,7 +161,7 @@ export default function MarketplacePage() {
     const query = params.toString();
     const url = query ? `${pathname}?${query}` : pathname;
     
-    router.replace(url, { scroll: false });
+    router.replace(url as any, { scroll: false });
   }, [tab, search, filterCategory, filterCondition, filterMinPrice, filterMaxPrice, sortOption, pathname, router]);
 
   const [listings, setListings] = useState<Listing[]>([]);

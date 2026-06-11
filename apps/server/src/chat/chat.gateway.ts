@@ -11,7 +11,9 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { Logger, UseGuards } from '@nestjs/common';
 import { WsAuthGuard } from '../auth/ws-auth.guard';
+import { WsThrottlerGuard } from '../common/guards/ws-throttler.guard';
 
+@UseGuards(WsThrottlerGuard)
 @WebSocketGateway({
   cors: {
     origin: '*',

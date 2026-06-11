@@ -26,10 +26,11 @@ export async function middleware(request: NextRequest) {
   if (isProtectedPath) {
     if (!isValidSession) {
       // Try transparent refresh before kicking the user out
-      const refreshPresent = request.cookies.get("refresh_present")?.value;
-      const refreshToken = request.cookies.get("refresh_token")?.value;
+      const isProd = process.env.NODE_ENV === "production";
+      const refreshTokenName = isProd ? "__Host-refresh_token" : "refresh_token";
+      const refreshToken = request.cookies.get(refreshTokenName)?.value;
 
-      if (refreshPresent || refreshToken) {
+      if (refreshToken) {
         const refreshed = await attemptTokenRefresh(request);
         if (refreshed) {
           // Refresh succeeded — clone the response, set new cookies, let user through

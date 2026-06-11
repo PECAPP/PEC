@@ -4,7 +4,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { CqrsModule } from '@nestjs/cqrs';
-import { LoggerModule } from 'nestjs-pino';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 import Redis from 'ioredis';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { AppController } from './app.controller';
@@ -99,20 +100,14 @@ import { DlqModule } from './dlq/dlq.module';
     UploadModule,
     DlqModule,
     CqrsModule,
-    LoggerModule.forRoot({
-      pinoHttp: {
-        serializers: {
-          req: (req) => ({
-            id: req.id,
-            method: req.method,
-            url: req.url,
-          }),
-          res: (res) => ({
-            statusCode: res.statusCode,
-          }),
-        },
-        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty', options: { singleLine: true } } : undefined,
-      },
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          format: process.env.NODE_ENV === 'production' 
+            ? winston.format.combine(winston.format.timestamp(), winston.format.json())
+            : winston.format.combine(winston.format.timestamp(), winston.format.colorize(), winston.format.simple()),
+        }),
+      ],
     }),
     ThrottlerModule.forRootAsync({
       useFactory: () => ({

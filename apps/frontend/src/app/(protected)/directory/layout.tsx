@@ -29,7 +29,7 @@ export default function DirectoryLayout({ children }: { children: ReactNode }) {
             return (
               <Link 
                 key={tab.path} 
-                href={tab.path}
+                href={tab.path as any}
                 className={cn(
                   "pb-3 text-sm font-medium transition-colors border-b-2 flex items-center gap-2",
                   isActive 

@@ -6,7 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { Logger } from 'nestjs-pino';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
@@ -16,7 +16,7 @@ async function bootstrap() {
     new FastifyAdapter({ trustProxy: true }),
     { bufferLogs: true }
   );
-  app.useLogger(app.get(Logger));
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   configureApp(app);
 
 

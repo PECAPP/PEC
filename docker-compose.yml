@@ -85,8 +85,10 @@ services:
     container_name: pec_backend
     restart: always
     ports:
-      - 4000:4000
-      - 50051:50051
+      # Port 4000 intentionally not exposed to host — Nginx is the entry point.
+      # Uncomment below only for direct debug access:
+      # - 4000:4000
+      - 50051:50051  # keep exposed if any internal tooling needs direct gRPC
     environment:
       JWT_SECRET: ${JWT_SECRET:-pec_secret_key_2026}
       PORT: "4000"
@@ -121,16 +123,25 @@ services:
         limits:
           cpus: "1.0"
           memory: 1024M
-  envoy:
-    image: envoyproxy/envoy:v1.27-latest
-    container_name: pec_envoy
+  # Envoy removed — frontend uses REST + Socket.IO only (no gRPC-Web).
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: pec_frontend
+    restart: always
     ports:
-      - 8080:8080
-      - 9901:9901
-    volumes:
-      - ./envoy.yaml:/etc/envoy/envoy.yaml
+      # Port 3001 not exposed to host — Nginx handles all traffic.
+      - "3001:3001"
+    environment:
+      NEXT_PUBLIC_API_URL: /api
+      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:4000/api}
+      NODE_ENV: production
+      PORT: "3001"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - pec-network
     logging:
@@ -143,6 +154,50 @@ services:
         limits:
           cpus: "1.0"
           memory: 1024M
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3001/', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: pec_nginx
+    restart: always
+    ports:
+      - "80:80"
+      # - "443:443"  # uncomment when SSL cert is configured
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d/pec.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      # - ./nginx/ssl:/etc/nginx/ssl:ro  # uncomment when cert is available
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    networks:
+      - pec-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
   redis:
     image: redis:7-alpine
     container_name: pec_redis
@@ -263,6 +318,52 @@ services:
         limits:
           cpus: "1.0"
           memory: 1024M
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pec_prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - pec-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pec_grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - pec-network
+    depends_on:
+      - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki:latest
+    container_name: pec_loki
+    restart: always
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - pec-network
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: pec_promtail
+    restart: always
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infra/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+    command: -config.file=/etc/promtail/promtail-config.yml
+    networks:
+      - pec-network
+
 volumes:
   postgres_data:
   qdrant_data:

@@ -46,7 +46,7 @@ export function UserDetailView({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/users')}>
+          <Button variant="ghost" size="sm" onClick={() => router.push('/directory/users')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>

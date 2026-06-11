@@ -127,7 +127,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
       <div className="flex flex-col gap-1.5 max-w-[85%] md:max-w-[80%] px-3">
         {showSenderName && !message.isOwn && (
           <Link 
-            href={`/users/${message.senderId}`} 
+            href={`/directory/users/${message.senderId}` as any} 
             className="text-xs font-bold px-2 hover:underline transition-colors"
             style={{ color: getUserColor(message.senderId) }}
           >

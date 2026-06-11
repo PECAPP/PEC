@@ -21,7 +21,7 @@ export function DepartmentOverviewCard({ departments }: Props) {
     <motion.div variants={item} className="card-elevated p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Department Overview</h2>
-        <Link href="/departments">
+        <Link href="/directory/departments">
           <Button variant="ghost" size="sm">
             View All
             <ArrowUpRight className="w-3.5 h-3.5 ml-2" />

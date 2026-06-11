@@ -275,7 +275,7 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
    </div>
 
    <div className="card-elevated overflow-hidden border rounded-sm shadow-sm">
-    <DataTable columns={columns} data={filtered} onRowClick={(row) => router.push(`/departments/${row.id}`)} />
+    <DataTable columns={columns} data={filtered} onRowClick={(row) => router.push(`/directory/departments/${row.id}`)} />
    </div>
 
    <Dialog open={showDialog} onOpenChange={setShowDialog}>

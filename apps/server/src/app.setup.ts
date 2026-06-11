@@ -43,7 +43,7 @@ export const configureApp = (app: INestApplication): void => {
       }
 
       console.error(`[CORS Error] Origin rejected: "${origin}". Allowed origins:`, Array.from(allowedOrigins));
-      callback(new Error(`Origin not allowed by CORS: ${origin}`));
+      callback(null, false);
     },
     methods: corsConfig.allowedMethods,
     allowedHeaders: corsConfig.allowedHeaders,

@@ -100,9 +100,6 @@ export async function fetchWithAuth<T = any>(url: string, options: RequestInit =
   // Handle 401 Unauthorized with Refresh Token rotation
   if (response.status === 401 && !url.includes('/auth/refresh')) {
     try {
-      if (!authClient.hasRefreshSession()) {
-        throw new Error('No active refresh session');
-      }
       await authClient.refreshAccessToken();
       // Re-issue the request, the browser will attach the new HttpOnly cookie
       response = await fetch(fullUrl, {

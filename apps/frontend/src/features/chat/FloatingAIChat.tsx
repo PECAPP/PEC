@@ -250,7 +250,7 @@ const FloatingAIChat = () => {
                         : msg
                     )
                   );
-                  setTimeout(() => router.push(navPath), 600);
+                  setTimeout(() => router.push(navPath as any), 600);
                 } else if (data.gradesData) {
                   ensureMessageExists();
                   fullText += `<UI:GradesTable>${JSON.stringify(data.gradesData)}</UI>`;

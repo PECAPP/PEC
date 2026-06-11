@@ -97,3 +97,4 @@ PEC_ERP_Report.tex
 skills-lock.json
 .next/
 .turbo/
+*.tsbuildinfo

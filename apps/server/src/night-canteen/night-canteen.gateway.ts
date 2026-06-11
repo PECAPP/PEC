@@ -6,8 +6,10 @@ import {
   SubscribeMessage,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UseGuards } from '@nestjs/common';
+import { WsThrottlerGuard } from '../common/guards/ws-throttler.guard';
 
+@UseGuards(WsThrottlerGuard)
 @WebSocketGateway({
   cors: {
     origin: '*',

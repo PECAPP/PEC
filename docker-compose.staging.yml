@@ -1,0 +1,193 @@
+name: pec-erp-staging
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pec_postgres_staging
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pec_staging}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - 5432:5432
+    command: ["postgres", "-c", "statement_timeout=5000", "-c", "autovacuum_vacuum_scale_factor=0.05", "-c", "autovacuum_analyze_scale_factor=0.02", "-c", "wal_level=logical"]
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U postgres -d pec_staging
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: pec_pgbouncer_staging
+    environment:
+      AUTH_TYPE: scram-sha-256
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_HOST: postgres
+      DB_NAME: ${POSTGRES_DB:-pec_staging}
+      POOL_MODE: session
+      MAX_CLIENT_CONN: "1000"
+      DEFAULT_POOL_SIZE: "20"
+      IGNORE_STARTUP_PARAMETERS: extra_float_digits
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pec-network
+    logging: *default-logging
+
+  redis:
+    image: redis:7-alpine
+    container_name: pec_redis_staging
+    restart: always
+    command: redis-server --maxmemory 256mb --maxmemory-policy volatile-lru
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD-SHELL", "echo '' | nc -w 1 localhost 6379 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: pec_rabbitmq_staging
+    restart: always
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD
+        - rabbitmq-diagnostics
+        - check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY:-anay/pec-erp}-backend:staging
+    container_name: pec_backend_staging
+    restart: always
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: "4000"
+      NODE_ENV: staging
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec_staging}?pgbouncer=true
+      REPLICA_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@pgbouncer:5432/${POSTGRES_DB:-pec_staging}?pgbouncer=true
+      DIRECT_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-pec_staging}
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      BCRYPT_ROUNDS: "10"
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: "3310"
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: ${MINIO_USER:-admin}
+      MINIO_SECRET_KEY: ${MINIO_PASSWORD:-admin123}
+      MINIO_BUCKET: pec-uploads
+      CORS_ORIGINS: "https://staging.pec-erp.com"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:4000/api/v1/health', (res) => { process.exit(res.statusCode < 500 ? 0 : 1); }).on('error', () => process.exit(1))"
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY:-anay/pec-erp}-frontend:staging
+    container_name: pec_frontend_staging
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: https://staging.pec-erp.com/api
+      INTERNAL_API_URL: http://backend:4000/api
+      NODE_ENV: staging
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - pec-network
+    logging: *default-logging
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: pec_nginx_staging
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d/pec.prod.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      frontend:
+        condition: service_started
+      backend:
+        condition: service_healthy
+    networks:
+      - pec-network
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  clamav:
+    image: clamav/clamav:latest
+    container_name: pec_clamav_staging
+    restart: always
+    networks:
+      - pec-network
+    logging: *default-logging
+
+  minio:
+    image: minio/minio
+    container_name: pec_minio_staging
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-admin123}
+    command: server /data
+    volumes:
+      - minio_staging_data:/data
+    networks:
+      - pec-network
+    logging: *default-logging
+
+volumes:
+  postgres_staging_data:
+  minio_staging_data:
+
+networks:
+  pec-network:
+    driver: bridge

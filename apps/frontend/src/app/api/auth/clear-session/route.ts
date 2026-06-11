@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   // Nuke all session cookies natively via Next.js Route Handler
   // This bypasses any middleware cache bugs and guarantees browser deletion
   response.cookies.set('access_token', '', cookieOptions);
-  response.cookies.set('refresh_present', '', cookieOptions);
+  response.cookies.set('refresh_token', '', cookieOptions);
   response.cookies.set('user_id', '', cookieOptions);
   response.cookies.set('user_role', '', cookieOptions);
   response.cookies.set('csrf_token', '', cookieOptions);

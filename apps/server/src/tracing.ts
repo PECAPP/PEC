@@ -4,6 +4,8 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 
+import { PrismaInstrumentation } from '@prisma/instrumentation';
+
 const traceExporter = new OTLPTraceExporter({
   url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318/v1/traces',
 });
@@ -18,6 +20,7 @@ export const otelSDK = new NodeSDK({
     getNodeAutoInstrumentations({
       '@opentelemetry/instrumentation-fs': { enabled: false }, // Reduce noise
     }),
+    new PrismaInstrumentation(),
   ],
 });
 
