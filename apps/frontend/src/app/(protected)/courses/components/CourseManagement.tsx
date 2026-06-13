@@ -1,6 +1,7 @@
 'use client';
 import { Button, Input, Badge } from "@pec/ui";
 import { useState } from 'react';
+import Link from 'next/link';
 import { 
   Plus, 
   Edit, 
@@ -36,7 +37,7 @@ export function CourseManagement({ initialCourses, _user }: CourseManagementProp
       accessorKey: 'code',
       header: 'Code',
       cell: ({ row }) => (
-        <Badge variant="outline" className="rounded-sm px-2.5 py-0.5 border-border/40 font-bold text-[10px] tracking-widest opacity-80 group-hover:border-primary/40 group-hover:text-primary transition-all">
+        <Badge variant="outline" className="rounded-sm px-2.5 py-0.5 border-border/40 font-medium text-sm  opacity-80 group-hover:border-border/40 group-hover:text-primary transition-all">
           {row.original.code}
         </Badge>
       )
@@ -46,7 +47,9 @@ export function CourseManagement({ initialCourses, _user }: CourseManagementProp
       header: 'Curriculum Module',
       cell: ({ row }) => (
         <div className="flex flex-col">
-           <span className="text-sm font-bold text-foreground/80 group-hover:text-primary transition-colors">{row.original.name}</span>
+           <Link href={`/courses/${row.original.id}`} className="text-sm font-bold text-foreground/80 hover:text-primary transition-colors">
+             {row.original.name}
+           </Link>
            <span className="text-[10px] text-muted-foreground/60 italic font-medium">{row.original.credits} Credits</span>
         </div>
       )
@@ -57,7 +60,7 @@ export function CourseManagement({ initialCourses, _user }: CourseManagementProp
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
            <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-           <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{row.original.department}</span>
+           <span className="text-xs font-bold text-muted-foreground ">{row.original.department}</span>
         </div>
       )
     },
@@ -110,22 +113,22 @@ export function CourseManagement({ initialCourses, _user }: CourseManagementProp
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40 group-focus-within/search:text-primary transition-colors" />
             <Input 
               placeholder="Search catalog by code, name, or department..." 
-              className="h-12 pl-11 rounded-sm bg-card border-border/40 focus:border-primary/40 focus:ring-primary/10 transition-all font-bold placeholder:font-medium" 
+              className="h-12 pl-11 rounded-sm bg-card border-border/40 focus:border-border/40 focus:ring-primary/10 transition-all font-bold placeholder:font-medium" 
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
          </div>
          <div className="flex gap-3 w-full md:w-auto">
-            <Button variant="outline" className="flex-1 md:flex-none h-12 rounded-sm px-6 font-bold text-[10px] uppercase tracking-widest border-border/60 hover:bg-muted/40 transition-all">
+            <Button variant="outline" className="flex-1 md:flex-none h-12 rounded-sm px-3 md:px-6 font-medium text-sm  border-border/60 hover:bg-muted/40 transition-all">
               <Download className="w-4 h-4 mr-2.5 opacity-60" /> Export Catalog
             </Button>
-            <Button className="flex-1 md:flex-none h-12 rounded-sm px-8 font-bold text-[10px] uppercase tracking-widest bg-primary shadow-glow hover:scale-[1.02] transition-all">
+            <Button className="flex-1 md:flex-none h-12 rounded-sm px-4 md:px-8 font-medium text-sm  bg-primary shadow-md border border-border/40 hover:scale-[1.02] transition-all">
               <Plus className="w-4 h-4 mr-2.5" /> Add New Course
             </Button>
          </div>
       </div>
 
-      <div className="card-elevated border-border/40 bg-card/40 backdrop-blur-sm overflow-hidden">
+      <div className="bg-card/40 border border-border/40 rounded-sm shadow-sm backdrop-blur-sm overflow-hidden">
         {filtered.length === 0 ? (
           <div className="py-20 text-center flex flex-col items-center gap-4">
              <div className="p-4 bg-muted/20 rounded-full"><FileText className="w-8 h-8 text-muted-foreground/40" /></div>

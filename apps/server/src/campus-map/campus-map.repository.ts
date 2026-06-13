@@ -42,7 +42,7 @@ export class CampusMapRepository {
       data: {
         ...data,
         description: data.description ?? '',
-      },
+      } as any,
     });
   }
 

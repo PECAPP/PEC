@@ -26,7 +26,7 @@ import { userSchema } from '@pec/shared';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Roles('admin', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Post()
   async create(
     @Body(new ZodValidationPipe(userSchema))
@@ -36,7 +36,7 @@ export class UsersController {
     return { success: true, data };
   }
 
-  @Roles('admin', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Get()
   async findMany(@Request() req: any, @Query() query: UserQueryDto) {
     const userRoles = Array.isArray(req.user?.roles)
@@ -68,7 +68,7 @@ export class UsersController {
     };
   }
 
-  @Roles('admin', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Get('search')
   async search(@Query('email') email: string) {
     const user = await this.usersService.findOne(email);
@@ -76,14 +76,14 @@ export class UsersController {
     return this.usersService.toPublicUserRecord(user as any);
   }
 
-  @Roles('student', 'faculty', 'admin')
+  @Roles('student', 'faculty', 'college_admin')
   @Get(':id')
   async findOne(
     @Request() req: any,
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
     const isOwner = req.user?.sub === id;
-    const elevatedRoles = new Set(['admin']);
+    const elevatedRoles = new Set(['college_admin']);
     const userRoles = Array.isArray(req.user?.roles)
       ? req.user.roles
       : req.user?.role
@@ -105,7 +105,7 @@ export class UsersController {
     return this.usersService.toPublicUserRecord(user as any);
   }
 
-  @Roles('admin', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -116,7 +116,7 @@ export class UsersController {
     return { success: true, data };
   }
 
-  @Roles('admin', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.usersService.deleteAdminUser(id);

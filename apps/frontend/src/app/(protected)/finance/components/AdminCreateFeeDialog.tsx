@@ -189,7 +189,7 @@ export default function AdminCreateFeeDialog({
           </form>
         ) : (
           <form onSubmit={handleBulk} className="space-y-3">
-            <div className="p-3 rounded-sm bg-amber-500/10 border border-amber-500/20 text-sm text-amber-600 flex gap-2">
+            <div className="p-3 rounded-lg border border-amber-500/20 flex items-center justify-center rounded-lg border border-amber-500/20 flex items-center justify-center rounded-lg border border-amber-500/20 flex items-center justify-center bg-amber-500/10 border border-amber-500/20 text-sm text-amber-600 flex gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
               This will create fee records for ALL students. Existing records for the same
               category+month are skipped.

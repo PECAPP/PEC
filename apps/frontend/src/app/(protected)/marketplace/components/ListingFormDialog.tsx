@@ -153,7 +153,7 @@ export default function ListingFormDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+            <label className="text-sm font-medium  text-muted-foreground opacity-60">
               Title *
             </label>
             <Input
@@ -166,7 +166,7 @@ export default function ListingFormDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+              <label className="text-sm font-medium  text-muted-foreground opacity-60">
                 Category *
               </label>
               <Select
@@ -186,7 +186,7 @@ export default function ListingFormDialog({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+              <label className="text-sm font-medium  text-muted-foreground opacity-60">
                 Condition *
               </label>
               <Select
@@ -208,7 +208,7 @@ export default function ListingFormDialog({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+            <label className="text-sm font-medium  text-muted-foreground opacity-60">
               Price (₹) *
             </label>
             <Input
@@ -222,7 +222,7 @@ export default function ListingFormDialog({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+            <label className="text-sm font-medium  text-muted-foreground opacity-60">
               Description
             </label>
             <Textarea
@@ -235,11 +235,11 @@ export default function ListingFormDialog({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+            <label className="text-sm font-medium  text-muted-foreground opacity-60">
               Images (Optimized Client-Side)
             </label>
             <div 
-              className="border border-dashed border-border/60 rounded-sm p-6 text-center hover:bg-muted/30 transition-colors cursor-pointer"
+              className="border border-dashed border-border/60 rounded-sm p-3 md:p-6 text-center hover:bg-muted/30 transition-colors cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
               <input 
@@ -281,7 +281,7 @@ export default function ListingFormDialog({
             <Button
               type="button"
               variant="outline"
-              className="h-10 rounded-sm font-bold uppercase tracking-widest text-[10px]"
+              className="h-10 rounded-sm font-bold  text-[10px]"
               onClick={onClose}
               disabled={loading}
             >
@@ -289,7 +289,7 @@ export default function ListingFormDialog({
             </Button>
             <Button
               type="submit"
-              className="h-10 rounded-sm font-bold uppercase tracking-widest text-[10px] bg-primary shadow-glow transition-all"
+              className="h-10 rounded-sm font-bold  text-[10px] bg-primary shadow-md border border-border/40 transition-all"
               disabled={loading}
             >
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

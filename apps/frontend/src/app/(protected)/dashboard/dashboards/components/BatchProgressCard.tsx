@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface Props {
   placed: number;
@@ -13,50 +12,54 @@ const item = {
 };
 
 export function BatchProgressCard({ placed }: Props) {
+  const total = 1420;
+  const percentage = Math.round((placed / total) * 100);
+  const remaining = total - placed;
+  const target = 1207; // 85%
+
   return (
-    <motion.div variants={item} className="card-elevated p-6">
+    <motion.div variants={item} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 h-full flex flex-col">
       <h2 className="text-lg font-semibold text-foreground mb-4">Batch Progress</h2>
-      <div className="space-y-4">
+      <div className="flex flex-col xl:flex-row items-center justify-between gap-6 flex-1">
         <div className="text-center">
-          <div className="h-[200px] w-full flex justify-center">
-            <ResponsiveContainer width={200} height={200}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: 'Placed', value: placed, color: '#22c55e' },
-                    { name: 'Remaining', value: 1420 - placed, color: 'hsl(var(--secondary))' },
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  startAngle={90}
-                  endAngle={-270}
-                  dataKey="value"
-                >
-                  <Cell fill="#22c55e" />
-                  <Cell fill="hsl(var(--secondary))" />
-                </Pie>
-                <Tooltip />
-                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="currentColor">
-                  <tspan x="50%" dy="-0.5em" fontSize="24" fontWeight="bold">
-                    {((placed / 1420) * 100).toFixed(0)}%
-                  </tspan>
-                  <tspan x="50%" dy="1.5em" fontSize="12" className="fill-muted-foreground">Placed</tspan>
-                </text>
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="relative w-28 h-28 mx-auto">
+            <svg className="w-28 h-28 transform -rotate-90">
+              <circle
+                cx="56"
+                cy="56"
+                r="48"
+                className="stroke-muted"
+                strokeWidth="10"
+                fill="none"
+              />
+              <circle
+                cx="56"
+                cy="56"
+                r="48"
+                className="stroke-primary"
+                strokeWidth="10"
+                fill="none"
+                strokeDasharray={`${percentage * 3.01} 301`}
+              />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold">
+              {percentage}%
+            </span>
           </div>
-          <p className="text-sm text-muted-foreground mt-2">{placed} / 1,420 placed</p>
+          <p className="text-xs text-muted-foreground mt-3">{placed} / {total} placed</p>
         </div>
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Target</span>
-            <span className="font-medium">85% (1,207)</span>
+        <div className="w-full xl:w-auto flex-1 space-y-3">
+          <div className="p-3 rounded-md border border-border/50 flex justify-between items-center bg-muted/20">
+            <span className="text-sm text-muted-foreground">Target</span>
+            <span className="font-bold text-foreground text-sm">85% ({target})</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Remaining</span>
-            <span className="font-medium text-warning">{1420 - placed} students</span>
+          <div className="p-3 rounded-md border border-border/50 flex justify-between items-center bg-muted/20">
+            <span className="text-sm text-muted-foreground">Placed</span>
+            <span className="font-bold text-green-600 text-sm">{placed}</span>
+          </div>
+          <div className="p-3 rounded-md border border-border/50 flex justify-between items-center bg-muted/20">
+            <span className="text-sm text-muted-foreground">Remaining</span>
+            <span className="font-bold text-warning text-sm">{remaining}</span>
           </div>
         </div>
       </div>

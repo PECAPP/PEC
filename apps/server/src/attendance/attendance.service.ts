@@ -14,6 +14,8 @@ import * as ExcelJS from 'exceljs';
 import { resolve } from 'path';
 
 import { S3Service } from '../common/services/s3.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { assertCourseOwnership } from '../common/utils/ownership.utils';
 
 @Injectable()
 export class AttendanceService {
@@ -22,13 +24,18 @@ export class AttendanceService {
     private readonly queue: QueueService,
     private readonly messaging: MessagingService,
     private readonly s3: S3Service,
+    private readonly prisma: PrismaService,
   ) {}
 
   private readonly PEC_COORDINATES = { lat: 30.7673, lng: 76.7863 };
   private readonly MAX_DISTANCE_METERS = 100;
   private readonly WAIVER_UPLOAD_DIR = resolve(process.cwd(), 'uploads', 'waivers');
 
-  async create(data: CreateAttendanceDto) {
+  async create(data: CreateAttendanceDto, user?: any) {
+    if (user?.role === 'faculty') {
+      await assertCourseOwnership(user.sub, data.courseId, this.prisma);
+    }
+
     if (data.lat !== undefined && data.lng !== undefined) {
       const lat = Number(data.lat);
       const lng = Number(data.lng);
@@ -131,7 +138,7 @@ export class AttendanceService {
     }
 
     const roles = new Set([...(user.roles ?? []), user.role].filter(Boolean));
-    const isPrivileged = roles.has('admin');
+    const isPrivileged = roles.has('college_admin');
     if (!isPrivileged && !fileName.startsWith(`${user.sub}_`)) {
       throw new ForbiddenException('You are not allowed to access this document');
     }
@@ -167,7 +174,15 @@ export class AttendanceService {
     return this.repo.getStudentSummary(studentId);
   }
 
-  update(id: string, data: UpdateAttendanceDto) {
+  async update(id: string, data: UpdateAttendanceDto, user?: any) {
+    if (user?.role === 'faculty') {
+      const attendance = await this.repo.findById(id);
+      if (!attendance) throw new BadRequestException('Attendance not found');
+      await assertCourseOwnership(user.sub, attendance.courseId, this.prisma);
+      if (data.courseId && data.courseId !== attendance.courseId) {
+        await assertCourseOwnership(user.sub, data.courseId, this.prisma);
+      }
+    }
     return this.repo.update(id, data);
   }
 
@@ -209,7 +224,12 @@ export class AttendanceService {
     });
   }
 
-  remove(id: string) {
+  async remove(id: string, user?: any) {
+    if (user?.role === 'faculty') {
+      const attendance = await this.repo.findById(id);
+      if (!attendance) throw new BadRequestException('Attendance not found');
+      await assertCourseOwnership(user.sub, attendance.courseId, this.prisma);
+    }
     return this.repo.remove(id);
   }
 

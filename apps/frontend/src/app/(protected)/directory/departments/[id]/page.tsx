@@ -1,5 +1,5 @@
 'use client';
-import { Button, Badge, AppShellSkeleton } from "@pec/ui";
+import { Button, Badge, AppShellSkeleton, PageBanner } from "@pec/ui";
 
 
 import { useState, useEffect } from 'react';
@@ -98,7 +98,8 @@ export default function DepartmentDetail() {
   }, [id, router]);
 
   const getSlotsContent = (day: string, timeId: string) => {
-    return timetable.filter(s => s.day === day && s.timeSlot === timeId);
+    const [start, end] = timeId.split('-');
+    return timetable.filter(s => s.day === day && s.startTime === start && s.endTime === end);
   };
 
   if (loading) {
@@ -116,29 +117,23 @@ export default function DepartmentDetail() {
       className="space-y-6 pb-12"
     >
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <PageBanner
+        title={department.name}
+        subtitle={department.description}
+        badgeText={department.code}
+        actions={
           <Link href="/directory/departments">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="w-4 h-4" /> Back
             </Button>
           </Link>
-          <div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="font-mono">
-                {department.code}
-              </Badge>
-              <h1 className="text-3xl font-bold text-foreground">{department.name}</h1>
-            </div>
-            <p className="text-muted-foreground mt-1 ">{department.description}</p>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card-elevated p-6 flex items-center gap-4 hover:scale-[1.02] transition-transform cursor-default">
-          <div className="p-3 rounded-sm bg-primary/10">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 flex items-center gap-4 hover:scale-[1.02] transition-transform cursor-default">
+          <div className="p-3 rounded-lg border border-border/40 flex items-center justify-center bg-primary/10">
             <GraduationCap className="w-8 h-8 text-primary" />
           </div>
           <div>
@@ -146,8 +141,8 @@ export default function DepartmentDetail() {
             <p className="text-sm text-muted-foreground font-medium">Active Students</p>
           </div>
         </div>
-        <div className="card-elevated p-6 flex items-center gap-4 hover:scale-[1.02] transition-transform cursor-default">
-          <div className="p-3 rounded-sm bg-accent/10">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 flex items-center gap-4 hover:scale-[1.02] transition-transform cursor-default">
+          <div className="p-3 rounded-lg border border-accent/20 flex items-center justify-center bg-accent/10">
             <Users className="w-8 h-8 text-accent" />
           </div>
           <div>
@@ -155,8 +150,8 @@ export default function DepartmentDetail() {
             <p className="text-sm text-muted-foreground font-medium">Faculty Members</p>
           </div>
         </div>
-        <div className="card-elevated p-6 flex items-center gap-4 hover:scale-[1.02] transition-transform cursor-default">
-          <div className="p-3 rounded-sm bg-success/10">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 flex items-center gap-4 hover:scale-[1.02] transition-transform cursor-default">
+          <div className="p-3 rounded-lg border border-success/20 flex items-center justify-center bg-success/10">
             <BookOpen className="w-8 h-8 text-success" />
           </div>
           <div>
@@ -167,7 +162,7 @@ export default function DepartmentDetail() {
       </div>
 
       {/* Dynamic Timetable Section */}
-      <div className="card-elevated p-6">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" />
@@ -204,7 +199,7 @@ export default function DepartmentDetail() {
                       return (
                         <td key={`${day}-${timeObj.id}`} className="p-2 border border-border bg-muted/20 text-center align-middle">
                           {day === 'Wednesday' && (
-                            <span className="text-[9px] font-bold tracking-widest uppercase text-muted-foreground/40 font-mono">Lunch Break</span>
+                            <span className="text-xs font-medium  text-muted-foreground/40 font-mono">Lunch Break</span>
                           )}
                         </td>
                       );
@@ -217,14 +212,14 @@ export default function DepartmentDetail() {
                             slots.map((slot, idx) => (
                               <div 
                                 key={idx}
-                                className="p-2 rounded-sm bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors cursor-pointer group shadow-sm"
+                                className="p-2 rounded-sm bg-primary/5 border border-border/40 hover:bg-primary/10 transition-colors cursor-pointer group shadow-sm"
                                 onClick={() => router.push(`/courses/${slot.courseId}`)}
                               >
                                 <div className="flex items-center justify-between gap-1">
-                                  <p className="text-[10px] font-bold text-primary truncate group-hover:underline">
+                                  <p className="text-sm font-medium text-primary truncate group-hover:underline">
                                     {slot.courseCode}
                                   </p>
-                                  <Badge variant="outline" className="px-1 py-0 text-[8px] h-3.5 font-mono border-primary/20 text-primary/60">
+                                  <Badge variant="outline" className="px-1 py-0 text-[8px] h-3.5 font-mono border-border/40 text-primary/60">
                                     S{slot.semester}
                                   </Badge>
                                 </div>
@@ -255,14 +250,14 @@ export default function DepartmentDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Leadership Section */}
-        <div className="card-elevated p-6">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
           <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
             <Building2 className="w-5 h-5 text-accent" />
             Leadership
           </h2>
-          <div className="p-5 border border-border rounded-sm bg-gradient-to-br from-primary/5 to-transparent">
+          <div className="p-3 md:p-5 border border-border rounded-sm bg-gradient-to-br from-primary/5 to-transparent">
             <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-sm bg-primary/10 flex items-center justify-center border border-primary/20">
+              <div className="w-20 h-20 rounded-sm bg-primary/10 flex items-center justify-center border border-border/40">
                 <span className="text-2xl font-bold text-primary">
                   {department.hod?.split(' ').map((n: string) => n[0]).join('') || 'H'}
                 </span>
@@ -287,7 +282,7 @@ export default function DepartmentDetail() {
         </div>
 
         {/* Courses List Section */}
-        <div className="card-elevated p-6">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-success" />
@@ -302,7 +297,7 @@ export default function DepartmentDetail() {
               courses.map((course) => (
                 <div 
                   key={course.id} 
-                  className="flex items-center justify-between p-4 rounded-sm border border-border/50 hover:border-primary/30 hover:bg-primary/5 cursor-pointer transition-all duration-300 group shadow-sm bg-card"
+                  className="flex items-center justify-between p-4 rounded-sm border border-border/50 hover:border-border/40 hover:bg-primary/5 cursor-pointer transition-all duration-300 group shadow-sm bg-card"
                   onClick={() => router.push(`/courses/${course.id}`)}
                 >
                   <div className="flex items-center gap-4">
@@ -331,7 +326,7 @@ export default function DepartmentDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Faculty Roster */}
-        <div className="card-elevated p-6">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
               <Users className="w-5 h-5 text-accent" />
@@ -359,7 +354,7 @@ export default function DepartmentDetail() {
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className="text-xs text-muted-foreground font-medium">{member.designation || member.role}</p>
                       <span className="w-1 h-1 rounded-full bg-muted-foreground/30"></span>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{member.employeeId || 'ID Pending'}</p>
+                      <p className="text-[10px] text-muted-foreground ">{member.employeeId || 'ID Pending'}</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
@@ -372,7 +367,7 @@ export default function DepartmentDetail() {
         </div>
 
         {/* Student Enrollment */}
-        <div className="card-elevated p-6">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-primary" />
@@ -384,18 +379,18 @@ export default function DepartmentDetail() {
               students.map((student) => (
                 <div 
                   key={student.id} 
-                  className="flex items-center justify-between p-4 rounded-sm bg-card border border-border/50 hover:bg-primary/5 hover:border-primary/30 cursor-pointer transition-all shadow-sm"
+                  className="flex items-center justify-between p-4 rounded-sm bg-card border border-border/50 hover:bg-primary/5 hover:border-border/40 cursor-pointer transition-all shadow-sm"
                   onClick={() => router.push(`/directory/users/${student.id}`)}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-sm bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <div className="w-12 h-12 rounded-sm bg-primary/10 flex items-center justify-center border border-border/40">
                       <span className="text-sm font-bold text-primary">
                         {student.fullName?.split(' ').map((n: string) => n[0]).join('')}
                       </span>
                     </div>
                     <div>
-                      <p className="font-bold text-base text-foreground">{student.fullName}</p>
-                      <p className="text-xs text-muted-foreground font-mono mt-0.5">{student.enrollmentNumber || student.email}</p>
+                      <p className="font-semibold text-sm text-foreground">{student.fullName}</p>
+                      <p className="text-xs text-muted-foreground font-medium mt-0.5">{student.enrollmentNumber || student.email}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -413,7 +408,8 @@ export default function DepartmentDetail() {
           </div>
         </div>
       </div>
-    </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      </motion.div>
   );
 }
 

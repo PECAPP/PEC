@@ -103,7 +103,7 @@ export function MapSearchOverlay({ regions, onSelectRegion, onNavigate }: MapSea
                   </div>
                 ))
               ) : (
-                <div className="p-8 text-center text-muted-foreground">
+                <div className="p-4 md:p-6 text-center text-muted-foreground">
                   No locations found.
                 </div>
               )}
@@ -118,7 +118,7 @@ export function MapSearchOverlay({ regions, onSelectRegion, onNavigate }: MapSea
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="mt-2 bg-primary text-primary-foreground px-4 py-2 rounded-sm shadow-glow flex items-center justify-between text-sm font-medium"
+            className="mt-2 bg-primary text-primary-foreground px-4 py-2 rounded-sm shadow-md border border-border/40 flex items-center justify-between text-sm font-medium"
           >
             <span>Navigating from: {selectedStart.name}</span>
             <button onClick={() => setSelectedStart(null)} className="p-1 bg-white/20 rounded hover:bg-white/30">

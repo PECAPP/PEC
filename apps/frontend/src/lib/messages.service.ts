@@ -42,7 +42,7 @@ const unwrap = <T>(payload: T | ApiSuccess<T>): T => {
   return payload as T;
 };
 
-const toChatMessage = (message: ApiMessage): ChatMessage => {
+export const toChatMessage = (message: ApiMessage): ChatMessage => {
   const parsedPayload = (() => {
     try {
       if (

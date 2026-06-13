@@ -1,0 +1,9 @@
+import { RoleGuard } from '@/components/auth/RoleGuard';
+
+export default function FacultyBioSystemLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <RoleGuard roles={['college_admin', 'faculty']}>
+      {children}
+    </RoleGuard>
+  );
+}

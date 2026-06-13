@@ -25,13 +25,18 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 const CommandMenu = dynamic(() => import('@/components/layout/CommandMenu'), {
   ssr: false,
   loading: () => (
-    <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+    <div className="relative group cursor-pointer">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
       <Input
-        placeholder="Search... (Ctrl+K)"
-        className="pl-10 bg-white/5 border border-white/10 shadow-sm hover:bg-white/10 transition-colors focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground"
+        placeholder="Search..."
+        className="pl-10 pr-20 bg-white/5 backdrop-blur-md border border-white/10 shadow-sm hover:bg-white/10 transition-colors focus-visible:ring-1 focus-visible:ring-primary cursor-pointer text-foreground placeholder:text-muted-foreground/60 h-10 rounded-lg"
         readOnly
       />
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+        <kbd className="inline-flex h-5 items-center justify-center rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">Ctrl</kbd>
+        <span className="text-[10px] text-muted-foreground">+</span>
+        <kbd className="inline-flex h-5 items-center justify-center rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">K</kbd>
+      </div>
     </div>
   ),
 });
@@ -157,7 +162,7 @@ export function Header({ user, sidebarCollapsed, isMobile, onMenuClick, sidebarW
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-7 text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary hover:bg-primary/5 m-0"
+                  className="h-7 text-sm font-medium  text-primary hover:text-primary hover:bg-primary/5 m-0"
                   onClick={() => router.push('/noticeboard')}
                 >
                   View All
@@ -243,7 +248,7 @@ function NoticePreviewList({ router }: { router: any }) {
   }, []);
 
   if (loading) return (
-    <div className="py-8 text-center text-[10px] uppercase font-bold tracking-widest text-muted-foreground/30 animate-pulse">
+    <div className="py-8 text-center text-[10px] uppercase font-bold  text-muted-foreground/30 animate-pulse">
       Securing Updates...
     </div>
   );
@@ -251,7 +256,7 @@ function NoticePreviewList({ router }: { router: any }) {
   if (notices.length === 0) return (
     <div className="py-12 text-center">
       <Bell className="w-8 h-8 mx-auto mb-2 opacity-10" />
-      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">System Clear</p>
+      <p className="text-sm font-medium  text-muted-foreground opacity-40">System Clear</p>
     </div>
   );
 
@@ -275,11 +280,11 @@ function NoticePreviewList({ router }: { router: any }) {
               {n.content}
             </p>
             <div className="flex items-center gap-2 pt-1">
-              <span className="text-[9px] font-bold uppercase text-muted-foreground/50 tracking-widest">
+              <span className="text-xs font-medium uppercase text-muted-foreground/50 ">
                 {formatDate(n.publishedAt || n.createdAt)}
               </span>
               {n.category && (
-                <span className="text-[8px] font-bold uppercase py-0.5 px-1.5 bg-muted/40 border border-border/40 text-muted-foreground/80 tracking-widest rounded-sm">
+                <span className="text-[8px] font-bold uppercase py-0.5 px-1.5 bg-muted/40 border border-border/40 text-muted-foreground/80  rounded-sm">
                   {n.category}
                 </span>
               )}

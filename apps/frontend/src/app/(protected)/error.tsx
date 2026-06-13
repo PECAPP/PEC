@@ -18,7 +18,7 @@ export default function ProtectedError({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 px-4">
-      <div className="card-elevated p-8  w-full border-t-4 border-t-destructive shadow-2xl animate-in zoom-in-95 duration-200">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6  w-full border-t-4 border-t-destructive shadow-2xl animate-in zoom-in-95 duration-200">
         <div className="flex items-center gap-4 mb-4">
            <div className="h-10 w-10 bg-destructive/10 rounded-full flex items-center justify-center">
               <AlertCircle className="w-6 h-6 text-destructive" />

@@ -30,7 +30,7 @@ export function AttendanceOverviewCard({
 
   return (
     <div 
-      className={`card-elevated ui-card-pad h-full cursor-pointer hover:bg-muted/50 transition-colors duration-150 relative overflow-hidden flex flex-col ${className || ''}`}
+      className={`bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 h-full cursor-pointer hover:bg-muted/50 transition-colors duration-150 relative overflow-hidden flex flex-col ${className || ''}`}
       onClick={onClick}
     >
       <div className="absolute -top-12 -right-12 h-36 w-36 rounded-full bg-success/10 blur-2xl" />
@@ -41,7 +41,7 @@ export function AttendanceOverviewCard({
           <ClipboardCheck className="w-5 h-5 text-success" />
           Attendance Overview
         </h2>
-        <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border ${statusTone}`}>
+        <span className={`text-sm font-medium  px-2.5 py-1 rounded-full border ${statusTone}`}>
           {statusLabel}
         </span>
       </div>
@@ -62,13 +62,13 @@ export function AttendanceOverviewCard({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-3xl font-bold">{clampedPercentage}%</span>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Present</span>
+            <span className="text-[10px] text-muted-foreground ">Present</span>
           </div>
         </div>
       </div>
 
       <div className="mt-6">
-        <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2">
+        <div className="flex items-center justify-between text-[10px]  text-muted-foreground font-semibold mb-2">
           <span>Target {safeThreshold}%</span>
           <span>{requiredToTarget === 0 ? 'Goal Met' : `${requiredToTarget}% to go`}</span>
         </div>
@@ -77,11 +77,11 @@ export function AttendanceOverviewCard({
             className={`h-full transition-all duration-700 ${clampedPercentage >= safeThreshold ? 'bg-success' : clampedPercentage >= warningThreshold ? 'bg-warning' : 'bg-destructive'}`}
             style={{ width: `${clampedPercentage}%` }}
           />
-          <span className="absolute -top-3 h-3 w-[2px] bg-warning/80" style={{ left: `${warningThreshold}%` }} />
-          <span className="absolute -top-3 h-3 w-[2px] bg-success/80" style={{ left: `${safeThreshold}%` }} />
-          <span className="absolute -top-3 h-3 w-[2px] bg-success/40" style={{ left: `${greatThreshold}%` }} />
+          <span className="p-3 rounded-lg border border-warning/20 flex items-center justify-center rounded-lg border border-warning/20 flex items-center justify-center rounded-lg border border-warning/20 flex items-center justify-center absolute -top-3 h-3 w-[2px] bg-warning/80" style={{ left: `${warningThreshold}%` }} />
+          <span className="p-3 rounded-lg border border-success/20 flex items-center justify-center rounded-lg border border-success/20 flex items-center justify-center rounded-lg border border-success/20 flex items-center justify-center absolute -top-3 h-3 w-[2px] bg-success/80" style={{ left: `${safeThreshold}%` }} />
+          <span className="p-3 rounded-lg border border-success/20 flex items-center justify-center rounded-lg border border-success/20 flex items-center justify-center rounded-lg border border-success/20 flex items-center justify-center absolute -top-3 h-3 w-[2px] bg-success/40" style={{ left: `${greatThreshold}%` }} />
         </div>
-        <div className="flex items-center justify-between mt-3 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+        <div className="flex items-center justify-between mt-3 text-[10px] text-muted-foreground font-medium ">
           <span>{warningThreshold}% Warning</span>
           <span>{safeThreshold}% Safe</span>
           <span>{greatThreshold}% Great</span>
@@ -90,15 +90,15 @@ export function AttendanceOverviewCard({
 
       <div className="grid gap-3 mt-6 sm:grid-cols-3">
         <div className="rounded-sm border border-border bg-background/60 p-3">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Required</p>
+          <p className="text-[10px]  text-muted-foreground">Required</p>
           <p className="text-sm font-semibold">{requiredToTarget === 0 ? '0% needed' : `${requiredToTarget}% more`}</p>
         </div>
         <div className="rounded-sm border border-border bg-background/60 p-3">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Status</p>
+          <p className="text-[10px]  text-muted-foreground">Status</p>
           <p className="text-sm font-semibold">{statusLabel}</p>
         </div>
         <div className="rounded-sm border border-border bg-background/60 p-3">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Next Milestone</p>
+          <p className="text-[10px]  text-muted-foreground">Next Milestone</p>
           <p className="text-sm font-semibold">
             {clampedPercentage >= greatThreshold
               ? `Maintain ${greatThreshold}%+`

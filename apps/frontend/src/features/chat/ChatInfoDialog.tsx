@@ -8,7 +8,9 @@ import {
   Edit, 
   X,
   Hash,
-  MessageCircle
+  MessageCircle,
+  Info,
+  Settings
 } from "lucide-react";
 
 import { ChatRoom } from '@pec/shared';
@@ -42,7 +44,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
 
   const isDM = room?.type === "dm";
   const userRole = user?.role as string;
-  const isAdmin = room?.admins?.includes(user?.uid || "") || userRole === "admin";
+  const isAdmin = room?.admins?.includes(user?.uid || "") || userRole === "college_admin";
   const canDeleteRoom = !!room && (isDM || (room.type === "group" && !room.isSystem && isAdmin));
 
   useEffect(() => {
@@ -248,9 +250,20 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
           // Group Info & Management
           <Tabs defaultValue="info" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="info">Info</TabsTrigger>
-              <TabsTrigger value="members">Members</TabsTrigger>
-              {isAdmin && <TabsTrigger value="settings">Settings</TabsTrigger>}
+              <TabsTrigger value="info" className="gap-1.5">
+                <Info className="w-3.5 h-3.5" />
+                Info
+              </TabsTrigger>
+              <TabsTrigger value="members" className="gap-1.5">
+                <Users className="w-3.5 h-3.5" />
+                Members
+              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="settings" className="gap-1.5">
+                  <Settings className="w-3.5 h-3.5" />
+                  Settings
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="info" className="space-y-4">

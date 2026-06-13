@@ -81,7 +81,7 @@ export class AcademicCalendarService {
 
   async update(id: string, data: UpdateAcademicCalendarEventDto, userId?: string, userRole?: string) {
     const event = await this.findOne(id);
-    if (userId && event.createdBy !== userId && userRole !== 'admin') {
+    if (userId && event.createdBy !== userId && userRole !== 'college_admin') {
       throw new Error('Unauthorized to update this event');
     }
 
@@ -101,7 +101,7 @@ export class AcademicCalendarService {
 
   async delete(id: string, userId?: string, userRole?: string) {
     const event = await this.findOne(id);
-    if (userId && event.createdBy !== userId && userRole !== 'admin') {
+    if (userId && event.createdBy !== userId && userRole !== 'college_admin') {
       throw new Error('Unauthorized to delete this event');
     }
 

@@ -6,25 +6,17 @@ export type AppAbility = PureAbility<AbilityTuple, PrismaQuery>;
 
 @Injectable()
 export class CaslAbilityFactory {
-  createForUser(user: any) {
-    const { can, cannot, build } = new AbilityBuilder<AppAbility>(createPrismaAbility);
+  createForUser(user: any): AppAbility {
+    const { can, build } = new AbilityBuilder<AppAbility>(createPrismaAbility);
 
-    // Fallback for legacy tokens that haven't been refreshed yet
-    const roleFromPayload = user?.role || (user?.roles && user.roles[0]);
-    const normalizedRole = ['college_admin', 'super_admin'].includes(roleFromPayload) ? 'admin' : roleFromPayload;
+    const roleFromPayload = user?.role || (user?.roles && user.roles[0]?.role?.name) || (user?.roles && user.roles[0]);
+    const normalizedRole = ['college_admin', 'super_admin'].includes(roleFromPayload) ? 'college_admin' : roleFromPayload;
 
-    console.log('CASL BUILDER: user.role is', user?.role, 'roleFromPayload:', roleFromPayload, 'normalizedRole:', normalizedRole);
-
-    if (normalizedRole === 'admin') {
-      console.log('CASL BUILDER: granting manage all');
-      can('manage', 'all'); // read-write access to everything
-    } else {
-      // Loop over the permissions fetched from Redis or DB
-      const permissions = user?.permissions || [];
-      
-      permissions.forEach((perm: any) => {
-        // Parse conditions and replace dynamic variables
-        let conditions = perm.conditions ? { ...perm.conditions } : undefined;
+    if (normalizedRole === 'college_admin' || user?.isSystemAdmin) {
+      can('manage', 'all');
+    } else if (user && user.permissions) {
+      user.permissions.forEach((perm: any) => {
+        let conditions = perm.conditions;
         
         if (conditions && typeof conditions === 'object') {
           // Replace placeholders like "{{id}}" with actual user properties
@@ -45,8 +37,15 @@ export class CaslAbilityFactory {
     }
 
     return build({
-      // Read https://casl.js.org/v6/en/package/casl-prisma
-      conditionsMatcher: () => () => true, // We will use prisma queries later, or standard object matching.
+      // Use proper object condition matching so conditions like { studentId: 'abc' }
+      // are enforced when checking ability.can() against plain objects.
+      // Prisma-level filtering is handled separately in service queries.
+      conditionsMatcher: (conditions) => (object) => {
+        if (!object || !conditions) return true;
+        return Object.entries(conditions as Record<string, unknown>).every(
+          ([key, val]) => (object as Record<string, unknown>)[key] === val,
+        );
+      },
     });
   }
 }

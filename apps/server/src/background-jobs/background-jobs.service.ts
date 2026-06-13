@@ -47,6 +47,10 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
     this.handlers.set('attendance.check-low', async () => {
       await this.handleLowAttendanceCheck();
     });
+
+    this.handlers.set('role-delegation.expire', async () => {
+      await this.handleRoleDelegationExpiry();
+    });
   }
 
   async onModuleInit() {
@@ -307,5 +311,49 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
        }
     }
     this.logger.log('Low Attendance Check Completed.');
+  }
+
+  private async handleRoleDelegationExpiry() {
+    this.logger.log('Running Role Delegation Expiry Check...');
+    const now = new Date();
+    
+    // Find all expired delegations that haven't been formally revoked
+    const expiredDelegations = await this.prisma.roleDelegation.findMany({
+      where: {
+        revokedAt: null,
+        validUntil: { lte: now }
+      },
+      select: { id: true, delegateeId: true, role: { select: { name: true } } }
+    });
+
+    if (expiredDelegations.length === 0) {
+      this.logger.log('No expired delegations found.');
+      return;
+    }
+
+    this.logger.log(`Found ${expiredDelegations.length} expired delegations. Revoking...`);
+
+    // Mark them as revoked and notify
+    for (const delegation of expiredDelegations) {
+      await this.prisma.roleDelegation.update({
+        where: { id: delegation.id },
+        data: { revokedAt: now }
+      });
+
+      // Clear the user's permission cache to enforce immediately
+      await this.prisma.$executeRawUnsafe(`DELETE FROM "cache" WHERE key = 'user_perms:${delegation.delegateeId}'`).catch(() => {});
+      // Note: Ideal way is via cacheManager, but raw query or triggering a cache invalidate event works as a fallback.
+
+      await this.prisma.notification.create({
+        data: {
+          userId: delegation.delegateeId,
+          title: 'Role Delegation Expired',
+          message: `Your temporary delegation for the role "${delegation.role.name}" has expired.`,
+          type: 'info'
+        }
+      });
+    }
+
+    this.logger.log('Role Delegation Expiry Check Completed.');
   }
 }

@@ -43,7 +43,7 @@ const roleOptions: RoleOption[] = [
     color: 'bg-foreground/80'
   },
   {
-    value: 'admin',
+    value: 'college_admin',
     label: 'Admin',
     description: 'Manage institution, users, departments, and financial operations',
     icon: Building2,

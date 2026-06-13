@@ -1,4 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { departmentSchema } from '@pec/shared';
 
-export class UpdateDepartmentDto extends createZodDto(departmentSchema.partial()) {}
+import { z } from 'zod';
+
+export class UpdateDepartmentDto extends createZodDto(departmentSchema.extend({
+  timetableLabel: z.string().optional(),
+}).partial()) {}

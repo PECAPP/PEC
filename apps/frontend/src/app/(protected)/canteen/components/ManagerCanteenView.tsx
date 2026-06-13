@@ -36,6 +36,12 @@ import {
   SelectItem,
   Switch,
   Badge,
+  PageBanner,
+  StatCard,
+  GlassBoardColumn,
+  GlassBoardCard,
+  EmptyState,
+  StatusBadge,
 } from '@pec/ui';
 import { api } from '@pec/api';
 
@@ -222,42 +228,41 @@ export default function ManagerCanteenView() {
   ], []);
 
   return (
-    <div className="  px-4 py-8 ">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
-            <Package className="w-8 h-8 text-primary" />
-            Canteen Dashboard
-          </h1>
-          <p className="text-muted-foreground">Manage your night hunger squad from here.</p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-muted p-1 rounded-sm">
-            <Button 
-              variant={activeTab === 'orders' ? 'secondary' : 'ghost'} 
-              onClick={() => setActiveTab('orders')}
-              size="sm"
-            >
-              Recent Orders
-            </Button>
-            <Button 
-              variant={activeTab === 'menu' ? 'secondary' : 'ghost'} 
-              onClick={() => setActiveTab('menu')}
-              size="sm"
-            >
-              Menu Manager
-            </Button>
-          </div>
-          
-          {activeTab === 'menu' && (
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="gradient" onClick={() => setEditingItem({})}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Item
-                </Button>
-              </DialogTrigger>
+    <div className="space-y-6 animate-in fade-in duration-500 pb-8">
+      <PageBanner
+        title="Canteen Dashboard"
+        subtitle="Manage your night hunger squad from here."
+        icon={<Package className="w-7 h-7 text-primary" />}
+        badgeText="Dining Management"
+        actions={
+          <>
+            <div className="flex items-center gap-2 bg-background/50 p-1 rounded-sm backdrop-blur-md border border-white/10">
+              <Button 
+                variant={activeTab === 'orders' ? 'secondary' : 'ghost'} 
+                onClick={() => setActiveTab('orders')}
+                size="sm"
+                className={activeTab === 'orders' ? 'shadow-sm' : ''}
+              >
+                Recent Orders
+              </Button>
+              <Button 
+                variant={activeTab === 'menu' ? 'secondary' : 'ghost'} 
+                onClick={() => setActiveTab('menu')}
+                size="sm"
+                className={activeTab === 'menu' ? 'shadow-sm' : ''}
+              >
+                Menu Manager
+              </Button>
+            </div>
+            
+            {activeTab === 'menu' && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="gradient" onClick={() => setEditingItem({})}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Item
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>{editingItem?.id ? 'Edit Item' : 'New Canteen Item'}</DialogTitle>
@@ -323,130 +328,127 @@ export default function ManagerCanteenView() {
               </DialogContent>
             </Dialog>
           )}
-        </div>
+        </>
+      } />
+
+      {/* Stats Cards */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <StatCard
+          label="Pending Orders"
+          value={canteenStats.pending}
+          icon={<Clock className="w-7 h-7" />}
+          colorVariant="warning"
+        />
+        <StatCard
+          label="Active Deliveries"
+          value={canteenStats.active}
+          icon={<Truck className="w-7 h-7" />}
+          colorVariant="info"
+        />
+        <StatCard
+          label="Today's Sales"
+          value={`₹${canteenStats.totalRevenue}`}
+          icon={<IndianRupee className="w-7 h-7" />}
+          colorVariant="success"
+        />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
-        <div className="p-6 rounded-sm border bg-card/50 flex items-center gap-4">
-          <div className="p-3 rounded-sm bg-orange-500/10">
-            <Clock className="w-6 h-6 text-orange-500" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Pending Orders</p>
-            <p className="text-2xl font-bold">{canteenStats.pending}</p>
-          </div>
-        </div>
-        <div className="p-6 rounded-sm border bg-card/50 flex items-center gap-4">
-          <div className="p-3 rounded-sm bg-primary/10">
-            <Truck className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Active Deliveries</p>
-            <p className="text-2xl font-bold">{canteenStats.active}</p>
-          </div>
-        </div>
-        <div className="p-6 rounded-sm border bg-card/50 flex items-center gap-4">
-          <div className="p-3 rounded-sm bg-green-500/10">
-            <IndianRupee className="w-6 h-6 text-green-500" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Today&apos;s Sales</p>
-            <p className="text-2xl font-bold">₹{canteenStats.totalRevenue}</p>
-          </div>
-        </div>
-      </div>
-
+      {/* Kanban Board */}
       {activeTab === 'orders' ? (
-        <div className="space-y-4">
+        <div className="space-y-4 pt-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Live Orders</h2>
-            <Badge variant="secondary" className="bg-primary/5 text-primary">Auto-updates live</Badge>
+            <h2 className="text-2xl font-bold tracking-tight">Live Orders</h2>
+            <Badge variant="secondary" className="bg-primary/10 text-primary border border-border/40 hover:bg-primary/20 transition-colors cursor-default">
+              Auto-updates live
+            </Badge>
           </div>
 
           <div className="flex gap-6 overflow-x-auto pb-4 custom-scrollbar">
-            {['Pending', 'Confirmed', 'Out for Delivery', 'Delivered'].map((status) => (
-              <div key={status} className="flex-1 min-w-[300px] bg-muted/30 rounded-sm p-4 flex flex-col h-[600px]">
-                <div className="flex items-center justify-between mb-4 px-2">
-                  <h3 className="font-bold text-lg">{status}</h3>
-                  <Badge variant="secondary" className="rounded-full">{orders.filter(o => o.status === status).length}</Badge>
-                </div>
-                <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+            {['Pending', 'Confirmed', 'Out for Delivery', 'Delivered'].map((status) => {
+              const columnOrders = orders.filter(o => o.status === status);
+              return (
+                <GlassBoardColumn 
+                  key={status} 
+                  title={status} 
+                  count={columnOrders.length}
+                >
                   <AnimatePresence>
-                    {orders.filter(o => o.status === status).map((order) => (
-                      <motion.div
+                    {columnOrders.map((order) => (
+                      <GlassBoardCard
+                        key={order.id} 
                         layout
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        key={order.id} 
-                        className="p-4 rounded-sm border border-border bg-card shadow-sm hover:shadow-md transition-all flex flex-col gap-3"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <span className="text-xs font-bold text-muted-foreground">#{order.id.slice(-6).toUpperCase()}</span>
-                            <h4 className="font-bold">{order.studentName}</h4>
+                            <span className="text-xs font-bold text-primary mb-1 block tracking-wider">#{order.id.slice(-6).toUpperCase()}</span>
+                            <h4 className="font-bold text-lg leading-tight">{order.studentName}</h4>
                           </div>
-                          <Badge className={
-                            order.status === 'Pending' ? 'bg-orange-500' :
-                            order.status === 'Confirmed' ? 'bg-blue-500' :
-                            order.status === 'Out for Delivery' ? 'bg-indigo-500' :
-                            'bg-green-500'
+                          <StatusBadge status={
+                            order.status === 'Pending' ? 'warning' :
+                            order.status === 'Confirmed' ? 'info' :
+                            order.status === 'Out for Delivery' ? 'pending' :
+                            'success'
                           }>
                             ₹{order.totalAmount}
-                          </Badge>
+                          </StatusBadge>
                         </div>
                         
-                        <p className="text-sm font-medium flex items-center gap-1 text-primary">
-                          <MapPin className="w-3 h-3" /> {order.hostelRoom}
+                        <p className="text-sm font-semibold flex items-center gap-1.5 text-emerald-500 bg-emerald-500/5 py-1 px-2 rounded-sm w-fit border border-emerald-500/10">
+                          <MapPin className="w-3.5 h-3.5" /> {order.hostelRoom}
                         </p>
 
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1.5">
                           {order.items.map((it: any, idx: number) => (
-                            <span key={idx} className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium">
+                            <span key={idx} className="px-2 py-1 rounded bg-muted/50 border border-border/50 text-[11px] font-semibold text-foreground/80">
                               {it.quantity}x {it.name}
                             </span>
                           ))}
                         </div>
                         
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex gap-2 pt-2 border-t border-border/30 mt-1">
                           {order.status === 'Pending' && (
-                            <Button size="sm" onClick={() => updateOrderStatus(order.id, 'Confirmed')} className="flex-1 h-8 text-xs bg-blue-500 hover:bg-blue-600">Accept</Button>
+                            <Button size="sm" onClick={() => updateOrderStatus(order.id, 'Confirmed')} className="flex-1 h-9 text-xs font-bold bg-blue-500 hover:bg-blue-600 shadow-md shadow-blue-500/20">Accept</Button>
                           )}
                           {order.status === 'Confirmed' && (
-                            <Button size="sm" onClick={() => updateOrderStatus(order.id, 'Out for Delivery')} className="flex-1 h-8 text-xs bg-indigo-500 hover:bg-indigo-600">Dispatch</Button>
+                            <Button size="sm" onClick={() => updateOrderStatus(order.id, 'Out for Delivery')} className="flex-1 h-9 text-xs font-bold bg-indigo-500 hover:bg-indigo-600 shadow-md shadow-indigo-500/20">Dispatch</Button>
                           )}
                           {order.status === 'Out for Delivery' && (
-                            <Button size="sm" onClick={() => updateOrderStatus(order.id, 'Delivered')} className="flex-1 h-8 text-xs bg-green-500 hover:bg-green-600">Complete</Button>
+                            <Button size="sm" onClick={() => updateOrderStatus(order.id, 'Delivered')} className="flex-1 h-9 text-xs font-bold bg-green-500 hover:bg-green-600 shadow-md shadow-green-500/20">Complete</Button>
                           )}
                           {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
-                            <Button size="sm" variant="ghost" onClick={() => updateOrderStatus(order.id, 'Cancelled')} className="h-8 text-xs text-destructive hover:bg-destructive/10 px-2">Cancel</Button>
+                            <Button size="sm" variant="ghost" onClick={() => updateOrderStatus(order.id, 'Cancelled')} className="h-9 text-xs font-bold text-destructive hover:bg-destructive/10 hover:text-destructive px-3">Cancel</Button>
                           )}
                         </div>
-                      </motion.div>
+                      </GlassBoardCard>
                     ))}
                   </AnimatePresence>
-                  {orders.filter(o => o.status === status).length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground/50 border border-dashed border-muted/50 rounded-sm">
-                      <p className="text-sm">No orders</p>
-                    </div>
+                  
+                  {columnOrders.length === 0 && (
+                    <EmptyState 
+                      icon={<ShoppingBag className="w-6 h-6" />}
+                      title="No orders"
+                    />
                   )}
-                </div>
-              </div>
-            ))}
+                </GlassBoardColumn>
+              );
+            })}
           </div>
         </div>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Menu Management</h2>
-            <div className="flex items-center gap-2">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <Input placeholder="Search menu..." className="w-64 h-9" />
+            <div className="relative w-full max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input placeholder="Search menu..." className="w-full pl-9 h-10" />
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-sm border border-border bg-card shadow-sm">
+          <div className="bg-card border border-border/40 rounded-sm overflow-hidden shadow-sm">
             <DataTable columns={columns} data={items} />
           </div>
         </div>

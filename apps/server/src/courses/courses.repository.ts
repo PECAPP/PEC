@@ -55,11 +55,20 @@ export class CoursesRepository extends BaseRepository {
   findById(id: string) {
     return this.prisma.course.findUnique({
       where: { id },
+      include: {
+        _count: {
+          select: {
+            enrollments: true
+          }
+        },
+        timetableEntries: true,
+        examSchedules: true
+      }
     });
   }
 
   create(data: CreateCourseDto) {
-    return this.prisma.course.create({ data });
+    return this.prisma.course.create({ data: { ...data, code: data.code || '' } as any });
   }
 
   update(id: string, data: UpdateCourseDto) {

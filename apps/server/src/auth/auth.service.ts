@@ -12,6 +12,10 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import * as otplib from 'otplib';
+// @ts-ignore
+const { authenticator } = otplib;
+import * as qrcode from 'qrcode';
 import { APP_ROLES } from './roles';
 import {
   decryptField,
@@ -99,6 +103,13 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
+    if (user.isTwoFactorEnabled) {
+      return {
+        requires2FA: true,
+        userId: user.id,
+      } as any; // Return intermediate state for 2FA verification
+    }
+
     if (user.failedLoginAttempts > 0 || user.lockedUntil) {
       await this.prisma.user.update({
         where: { id: user.id },
@@ -133,7 +144,7 @@ export class AuthService {
       const created = await tx.user.create({
         data: {
           email,
-          password: hash,
+          password: passwordHash,
           name,
           role: assignedRole,
           passwordChangedAt: new Date(),
@@ -447,6 +458,57 @@ export class AuthService {
     return { changed: true };
   }
 
+  async setup2FA(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException();
+
+    const secret = authenticator.generateSecret();
+    const otpauthUrl = authenticator.keyuri(user.email, 'PEC ERP', secret);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { twoFactorSecret: secret },
+    });
+
+    const qrCodeDataUrl = await qrcode.toDataURL(otpauthUrl);
+    return { qrCodeDataUrl, secret };
+  }
+
+  async verify2FASetup(userId: string, token: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.twoFactorSecret) throw new BadRequestException('2FA not set up');
+
+    const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
+    if (!isValid) throw new UnauthorizedException('Invalid 2FA token');
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { isTwoFactorEnabled: true },
+    });
+
+    return { success: true };
+  }
+
+  async validate2FALogin(userId: string, token: string, context: AuthContext): Promise<AuthResult> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.twoFactorSecret) throw new UnauthorizedException('Invalid user');
+
+    const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
+    if (!isValid) throw new UnauthorizedException('Invalid 2FA token');
+
+    if (user.failedLoginAttempts > 0 || user.lockedUntil) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          failedLoginAttempts: 0,
+          lockedUntil: null,
+        },
+      });
+    }
+
+    return this.issueTokensForUser(user.id, context);
+  }
+
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -514,29 +576,32 @@ export class AuthService {
 
     const existingRole = user.roles?.map((entry: any) => entry.role?.name).filter(Boolean)[0] ?? null;
     const role = profileData.role || existingRole;
-
     if (!role || !APP_ROLES.includes(role as (typeof APP_ROLES)[number])) {
       throw new BadRequestException('Unsupported role');
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
       if (role === 'student') {
+        const enrollmentNumber = profileData.enrollmentNumber?.trim();
+        if (!enrollmentNumber) {
+          throw new BadRequestException('Enrollment number is required');
+        }
         await tx.studentProfile.upsert({
           where: { userId },
           create: {
             userId,
-            enrollmentNumber: profileData.enrollmentNumber,
-            department: profileData.department,
-            semester: Number(profileData.semester),
+            enrollmentNumber,
+            department: profileData.department || 'Unknown',
+            semester: Number(profileData.semester) || 1,
             phone: encryptField(profileData.phone || null),
             dob: profileData.dob ? new Date(profileData.dob) : null,
             address: encryptField(profileData.address || null),
             bio: encryptField(profileData.bio || null),
           },
           update: {
-            enrollmentNumber: profileData.enrollmentNumber,
-            department: profileData.department,
-            semester: Number(profileData.semester),
+            enrollmentNumber,
+            department: profileData.department || 'Unknown',
+            semester: Number(profileData.semester) || 1,
             phone: encryptField(profileData.phone || null),
             dob: profileData.dob ? new Date(profileData.dob) : null,
             address: encryptField(profileData.address || null),
@@ -546,22 +611,26 @@ export class AuthService {
       }
 
       if (role === 'faculty') {
+        const employeeId = profileData.employeeId?.trim();
+        if (!employeeId) {
+          throw new BadRequestException('Employee ID is required');
+        }
         await tx.facultyProfile.upsert({
           where: { userId },
           create: {
             userId,
-            employeeId: profileData.employeeId,
-            department: profileData.department,
-            designation: profileData.designation,
+            employeeId,
+            department: profileData.department || 'Unknown',
+            designation: profileData.designation || 'Unknown',
             phone: encryptField(profileData.phone || null),
             specialization: profileData.specialization || null,
             qualifications: profileData.qualifications || null,
             bio: encryptField(profileData.bio || null),
           },
           update: {
-            employeeId: profileData.employeeId,
-            department: profileData.department,
-            designation: profileData.designation,
+            employeeId,
+            department: profileData.department || 'Unknown',
+            designation: profileData.designation || 'Unknown',
             phone: encryptField(profileData.phone || null),
             specialization: profileData.specialization || null,
             qualifications: profileData.qualifications || null,
@@ -836,6 +905,14 @@ export class AuthService {
   }
 
   private getRefreshExpiryDate(): Date {
-    return new Date(Date.now() + this.refreshTokenTtlDays * 24 * 60 * 60_000);
+    return new Date(Date.now() + this.refreshTokenTtlDays * 24 * 60 * 60 * 1000);
+  }
+
+  public async verifyToken(token: string): Promise<any> {
+    try {
+      return await this.jwtService.verifyAsync(token);
+    } catch {
+      return null;
+    }
   }
 }

@@ -37,7 +37,7 @@ export function FinanceCharts({ summary, transactions }: FinanceChartsProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <div className="lg:col-span-2 bg-card border border-border rounded-sm p-6 shadow-sm">
+      <div className="lg:col-span-2 bg-card border border-border rounded-sm p-3 md:p-6 shadow-sm">
         <h3 className="text-lg font-bold mb-6">Revenue Over Time</h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -61,7 +61,7 @@ export function FinanceCharts({ summary, transactions }: FinanceChartsProps) {
         </div>
       </div>
       
-      <div className="bg-card border border-border rounded-sm p-6 shadow-sm flex flex-col items-center">
+      <div className="bg-card border border-border rounded-sm p-3 md:p-6 shadow-sm flex flex-col items-center">
         <h3 className="text-lg font-bold mb-4 self-start">Fee Breakdown</h3>
         <div className="h-[250px] w-full mt-4">
           <ResponsiveContainer width="100%" height="100%">

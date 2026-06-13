@@ -705,7 +705,7 @@ export default function CampusMap3D({
         style={{ zIndex: 2 }}
         className={`absolute top-3 left-3 backdrop-blur-md rounded-sm px-3 py-2.5 pointer-events-none select-none shadow-lg border transition-all duration-500 ${isDark ? 'bg-slate-900/75 border-slate-700/50' : 'bg-black/55 border-transparent'}`}
       >
-        <p className="text-white/50 text-[9px] font-semibold uppercase tracking-widest mb-1.5">
+        <p className="text-white/50 text-[9px] font-semibold  mb-1.5">
           Legend
         </p>
         <div className="space-y-1.5">

@@ -69,7 +69,7 @@ export default function SecuritySettingsPage() {
   };
 
   return (
-    <div className="  space-y-8 p-4">
+    <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Security & Sessions</h1>
         <p className="text-muted-foreground mt-2">
@@ -78,7 +78,7 @@ export default function SecuritySettingsPage() {
       </div>
 
       <div className="rounded-sm border bg-card text-card-foreground shadow-sm overflow-hidden">
-        <div className="p-6 border-b bg-muted/40 flex items-center space-x-3">
+        <div className="p-3 md:p-6 border-b bg-muted/40 flex items-center space-x-3">
           <div className="p-2 bg-primary/10 text-primary rounded-sm">
             <Shield className="w-5 h-5" />
           </div>
@@ -106,7 +106,7 @@ export default function SecuritySettingsPage() {
                 return (
                   <div
                     key={session.id}
-                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 gap-4 hover:bg-muted/20 transition-colors"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 md:p-6 gap-4 hover:bg-muted/20 transition-colors"
                   >
                     <div className="flex items-start space-x-4">
                       <div className="p-3 bg-secondary rounded-full">

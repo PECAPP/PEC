@@ -6,11 +6,33 @@ export class StudentPortfolioService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getPortfolio(studentId: string) {
-    const resume = await this.prisma.resumeProfile.findUnique({
-      where: { userId: studentId }
-    });
+    const [resume, projects, skills] = await Promise.all([
+      this.prisma.resumeProfile.findUnique({
+        where: { userId: studentId }
+      }),
+      this.prisma.studentProject.findMany({
+        where: { studentId }
+      }),
+      this.prisma.studentSkill.findMany({
+        where: { studentId }
+      })
+    ]);
 
-    return { resume };
+    return { resume, projects, skills };
+  }
+
+  async updateProfile(studentId: string, data: any) {
+    // If studentProfile doesn't exist, we might need to upsert or just ignore if it's not strictly necessary.
+    // The frontend sends { phone, address }. Let's update studentProfile if it exists.
+    try {
+      return await this.prisma.studentProfile.update({
+        where: { userId: studentId },
+        data,
+      });
+    } catch (e) {
+      // If it doesn't exist, that's fine. Return null.
+      return null;
+    }
   }
 
   async syncGitHubRepos(studentId: string, githubUsername: string) {

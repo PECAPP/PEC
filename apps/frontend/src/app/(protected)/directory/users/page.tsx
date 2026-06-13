@@ -47,7 +47,8 @@ export default async function UsersPage() {
   if (!session) redirect('/auth');
 
   // RBAC Check on Server
-  if (session.role !== 'admin' && session.role !== 'faculty') {
+  const isAdminUser = session.role === 'college_admin' || session.role === 'super_admin';
+  if (!isAdminUser && session.role !== 'faculty') {
     redirect('/dashboard');
   }
 
@@ -56,7 +57,7 @@ export default async function UsersPage() {
   return (
     <UserManagementView 
       initialUsers={users} 
-      isAdmin={session.role === 'admin'} 
+      isAdmin={isAdminUser} 
       isFaculty={session.role === 'faculty'} 
     />
   );

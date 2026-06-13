@@ -1,6 +1,9 @@
 import {
   Controller,
   Get,
+  Patch,
+  Param,
+  Body,
   Query,
   UseGuards,
   Request,
@@ -17,6 +20,14 @@ export class StudentPortfolioController {
   getPortfolio(@Query('studentId') studentId: string, @Request() req: any) {
     const id = studentId || req.user?.sub;
     return this.service.getPortfolio(id);
+  }
+
+  @Patch(':id')
+  updatePortfolio(
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    return this.service.updateProfile(id, body);
   }
 
   @Get('github/sync')

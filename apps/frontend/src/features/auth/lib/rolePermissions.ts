@@ -1,7 +1,7 @@
 export type UserRole =
   | "student"
   | "faculty"
-  | "admin";
+  | "college_admin";
 
 export interface RolePermissions {
   canViewDashboard: boolean;
@@ -60,7 +60,7 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canAccessReports: true,
       };
 
-    case "admin":
+    case "college_admin":
       return {
         ...basePermissions,
         canViewDashboard: true,

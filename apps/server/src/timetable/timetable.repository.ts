@@ -22,6 +22,7 @@ export class TimetableRepository extends BaseRepository {
     return this.findManyWithCount(this.prisma.timetable, {
       query,
       defaultLimit: 500,
+      maxLimit: 1000,
       where,
       orderBy: [{ day: 'asc' }, { startTime: 'asc' }],
     });

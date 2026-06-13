@@ -140,7 +140,7 @@ export const AttendanceTable = ({ data }: { data: AttendanceData }) => {
                 <td className="px-2 py-2.5 text-center text-red-500 dark:text-red-400 font-medium text-xs">{c.absent}</td>
                 <td className="px-2 py-2.5 text-center text-amber-500 dark:text-amber-400 font-medium text-xs">{c.late}</td>
                 <td className="px-2 py-2.5 text-center">
-                  <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded ${attendanceBadge(c.percentage)}`}>
+                  <span className={`text-sm font-medium px-1.5 py-0.5 rounded ${attendanceBadge(c.percentage)}`}>
                     {c.percentage}%
                   </span>
                 </td>

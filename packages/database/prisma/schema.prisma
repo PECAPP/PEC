@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["partialIndexes", "tracing"]
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -24,6 +24,8 @@ model User {
   sessionVersion           Int                      @default(0)
   failedLoginAttempts      Int                      @default(0)
   lockedUntil              DateTime?
+  twoFactorSecret          String?
+  isTwoFactorEnabled       Boolean                  @default(false)
   deletedAt                DateTime?
   attendances              Attendance[]             @relation("StudentAttendance")
   canteenOrders            CanteenOrder[]
@@ -49,6 +51,11 @@ model User {
   chatRooms                UserChatRoom[]
   roles                    UserRole[]
   settings                 UserSettings?
+  delegationsFrom          RoleDelegation[]         @relation("DelegationFrom")
+  delegationsTo            RoleDelegation[]         @relation("DelegationTo")
+  securityAuditLogs        SecurityAuditLog[]
+
+
 
   @@index([emailVerified])
   @@index([lockedUntil])
@@ -209,14 +216,21 @@ model CourseMaterial {
 }
 
 model Role {
-  id          String           @id @default(uuid())
-  name        String           @unique
-  description String?
-  isSystem    Boolean          @default(false)
-  hierarchy   Int              @default(1)
-  createdAt   DateTime         @default(now())
-  users       UserRole[]
-  permissions RolePermission[]
+  id            String           @id @default(uuid())
+  name          String           @unique
+  description   String?
+  isSystem      Boolean          @default(false)
+  isSystemAdmin Boolean          @default(false)
+  hierarchy     Int              @default(1)
+  parentRoleId  String?
+  createdAt     DateTime         @default(now())
+  
+  parentRole    Role?            @relation("RoleInheritance", fields: [parentRoleId], references: [id])
+  childRoles    Role[]           @relation("RoleInheritance")
+  
+  users         UserRole[]
+  permissions   RolePermission[]
+  delegations   RoleDelegation[]
 }
 
 model Permission {
@@ -242,16 +256,62 @@ model RolePermission {
 }
 
 model UserRole {
-  userId String
-  roleId String
-  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  roleId     String
+  validFrom  DateTime?
+  validUntil DateTime?
+  grantedBy  String?
+  grantedAt  DateTime  @default(now())
+
+  role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
   @@index([roleId])
 }
 
+model RoleDelegation {
+  id            String    @id @default(uuid())
+  delegatorId   String
+  delegateeId   String
+  roleId        String
+  validFrom     DateTime  @default(now())
+  validUntil    DateTime
+  reason        String?
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  delegator     User      @relation("DelegationFrom", fields: [delegatorId], references: [id], onDelete: Cascade)
+  delegatee     User      @relation("DelegationTo", fields: [delegateeId], references: [id], onDelete: Cascade)
+  role          Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@index([delegateeId])
+  @@index([delegatorId])
+  @@index([roleId])
+}
+
+model SecurityAuditLog {
+  id          String    @id @default(uuid())
+  actorId     String
+  action      String    // e.g. "GRANT_ROLE", "REVOKE_ROLE", "UPDATE_PERMISSION"
+  targetType  String    // e.g. "UserRole", "Permission", "RoleDelegation"
+  targetId    String
+  before      Json?
+  after       Json?
+  reason      String?
+  ipAddress   String?
+  createdAt   DateTime  @default(now())
+
+  actor       User      @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([action])
+  @@index([createdAt])
+}
+
 model RefreshToken {
+
   id                String    @id @default(uuid())
   userId            String
   tokenHash         String    @unique

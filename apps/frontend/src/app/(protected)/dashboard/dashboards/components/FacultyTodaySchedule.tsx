@@ -28,7 +28,7 @@ const item = {
 export function FacultyTodaySchedule({ schedule, onViewFull, onGenerateQR }: Props) {
   const safeSchedule = Array.isArray(schedule) ? schedule : [];
   return (
-    <motion.div variants={item} className="card-elevated p-6">
+    <motion.div variants={item} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Today&apos;s Schedule</h2>
         <Button variant="ghost" size="sm" onClick={onViewFull}>

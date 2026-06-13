@@ -318,7 +318,7 @@ export default function CollegeSettings() {
                 onDragOver={handleDragOver}
                 onDragEnter={handleDragEnter}
                 onDrop={handleDrop}
-                className="border border-dashed border-primary/30 rounded-sm p-8 text-center cursor-pointer hover:bg-secondary/50 hover:border-primary/60 transition-all"
+                className="border border-dashed border-border/40 rounded-sm p-4 md:p-6 text-center cursor-pointer hover:bg-secondary/50 hover:border-border/40 transition-all"
               >
                 <input
                   type="file"
@@ -386,8 +386,8 @@ export default function CollegeSettings() {
             {/* Logo Only Option */}
             <label className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
               logoDisplayMode === 'logo-only' 
-                ? 'border-primary bg-primary/5' 
-                : 'border-border hover:border-primary/50'
+                ? 'border-border/40 bg-primary/5' 
+                : 'border-border hover:border-border/40'
             }`}>
               <input
                 type="radio"
@@ -409,8 +409,8 @@ export default function CollegeSettings() {
             {/* Text Only Option */}
             <label className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
               logoDisplayMode === 'text-only' 
-                ? 'border-primary bg-primary/5' 
-                : 'border-border hover:border-primary/50'
+                ? 'border-border/40 bg-primary/5' 
+                : 'border-border hover:border-border/40'
             }`}>
               <input
                 type="radio"
@@ -430,8 +430,8 @@ export default function CollegeSettings() {
             {/* Both Option */}
             <label className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
               logoDisplayMode === 'both' 
-                ? 'border-primary bg-primary/5' 
-                : 'border-border hover:border-primary/50'
+                ? 'border-border/40 bg-primary/5' 
+                : 'border-border hover:border-border/40'
             }`}>
               <input
                 type="radio"

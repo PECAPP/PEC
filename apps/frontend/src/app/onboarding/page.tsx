@@ -15,19 +15,19 @@ import { completeProfileStatefulAction } from './actions';
 const roleIcons: Record<string, ElementType> = {
   student: GraduationCap,
   faculty: BookOpen,
-  admin: Shield,
+  college_admin: Shield,
 };
 
 const roleDescriptions: Record<string, string> = {
   student: 'Access courses, timetable, and campus services',
   faculty: 'Manage courses, attendance, and grades',
-  admin: 'System configuration and college management',
+  college_admin: 'System configuration and college management',
 };
 
 const roleLabels: Record<string, string> = {
   student: 'Student',
   faculty: 'Faculty',
-  admin: 'Admin',
+  college_admin: 'Admin',
 };
 
 const initialState = {
@@ -191,7 +191,7 @@ export default function Onboarding() {
                 </>
               )}
 
-              {user.role === 'admin' && (
+              {user.role === 'college_admin' && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>

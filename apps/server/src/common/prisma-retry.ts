@@ -1,4 +1,4 @@
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Prisma } from '@pec/database';
 
 export async function withPrismaRetry<T>(
   operation: () => Promise<T>,
@@ -11,7 +11,7 @@ export async function withPrismaRetry<T>(
       return await operation();
     } catch (error) {
       if (
-        error instanceof PrismaClientKnownRequestError &&
+        error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2034' // P2034: Transaction failed due to a write conflict or a deadlock.
       ) {
         attempt++;

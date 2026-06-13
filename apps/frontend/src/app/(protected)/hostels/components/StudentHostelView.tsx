@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Textarea, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate } from "@pec/ui";
+import { Button, Input, Textarea, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, PageBanner } from "@pec/ui";
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -327,23 +327,25 @@ export default function StudentHostelView() {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            Hostel Management
-            {!isOnline && <Badge variant="destructive" className="ml-2">Offline Mode</Badge>}
-            {queuedRequests.length > 0 && <Badge variant="secondary" className="ml-2">{queuedRequests.length} Queued</Badge>}
-          </h1>
-          <p className="text-muted-foreground">Report issues and request outpasses</p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={fetchData} disabled={loading || !isOnline}>
-            <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
-            Refresh
-          </Button>
-
-          {/* Outpass Request Dialog */}
-          <Dialog open={outpassDialogOpen} onOpenChange={setOutpassDialogOpen}>
+      <div className="mb-6">
+        <PageBanner
+          title={
+            <div className="flex items-center gap-2">
+              Hostel Management
+              {!isOnline && <Badge variant="destructive" className="ml-2">Offline Mode</Badge>}
+              {queuedRequests.length > 0 && <Badge variant="secondary" className="ml-2">{queuedRequests.length} Queued</Badge>}
+            </div>
+          }
+          subtitle="Report issues and request outpasses"
+          badgeText="Student Life"
+          actions={
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={fetchData} disabled={loading || !isOnline}>
+                <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
+                Refresh
+              </Button>
+              {/* Outpass Request Dialog */}
+              <Dialog open={outpassDialogOpen} onOpenChange={setOutpassDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="secondary">
                 <Ticket className="w-4 h-4 mr-2" />
@@ -473,30 +475,32 @@ export default function StudentHostelView() {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
+            </div>
+          }
+        />
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="card-elevated p-5">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-sm bg-primary/10"><Home className="w-5 h-5 text-primary" /></div>
             <div><p className="text-sm text-muted-foreground">Total Issues</p><p className="text-2xl font-bold text-foreground">{stats.total}</p></div>
           </div>
         </div>
-        <div className="card-elevated p-5">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-sm bg-warning/10"><AlertCircle className="w-5 h-5 text-warning" /></div>
             <div><p className="text-sm text-muted-foreground">Pending</p><p className="text-2xl font-bold text-foreground">{stats.open}</p></div>
           </div>
         </div>
-        <div className="card-elevated p-5">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-sm bg-success/10"><CheckCircle2 className="w-5 h-5 text-success" /></div>
             <div><p className="text-sm text-muted-foreground">Resolved</p><p className="text-2xl font-bold text-foreground">{stats.resolved}</p></div>
           </div>
         </div>
-        <div className="card-elevated p-5">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-sm bg-indigo-500/10"><Ticket className="w-5 h-5 text-indigo-500" /></div>
             <div><p className="text-sm text-muted-foreground">Outpasses</p><p className="text-2xl font-bold text-foreground">{stats.outpasses}</p></div>
@@ -504,12 +508,16 @@ export default function StudentHostelView() {
         </div>
       </div>
 
-      <div className="card-elevated overflow-hidden">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm overflow-hidden">
         <Tabs value={activeTab.startsWith('issues') ? 'issues' : 'outpasses'} onValueChange={v => setActiveTab(v === 'issues' ? 'issues_all' : 'outpasses')}>
           <div className="px-4 pt-4 border-b border-border">
             <TabsList>
-              <TabsTrigger value="issues">Hostel Issues</TabsTrigger>
-              <TabsTrigger value="outpasses">Digital Outpasses</TabsTrigger>
+              <TabsTrigger value="issues" className="gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5" /> Hostel Issues
+              </TabsTrigger>
+              <TabsTrigger value="outpasses" className="gap-1.5">
+                <Ticket className="w-3.5 h-3.5" /> Digital Outpasses
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -517,15 +525,23 @@ export default function StudentHostelView() {
             <div className="grid gap-6 lg:grid-cols-5 p-4">
               <div className="lg:col-span-2 flex flex-col h-[600px] border border-border rounded-sm overflow-hidden">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                  <TabsList className="w-full m-2 border-b-0">
-                    <TabsTrigger value="issues_all" className="flex-1">All</TabsTrigger>
-                    <TabsTrigger value="issues_pending" className="flex-1">Pending</TabsTrigger>
-                    <TabsTrigger value="issues_assigned" className="flex-1">Assigned</TabsTrigger>
-                    <TabsTrigger value="issues_resolved" className="flex-1">Resolved</TabsTrigger>
+                  <TabsList className="mb-6">
+                    <TabsTrigger value="issues_all" className="flex-1 gap-1.5">
+                      <Home className="w-3.5 h-3.5" /> All
+                    </TabsTrigger>
+                    <TabsTrigger value="issues_pending" className="flex-1 gap-1.5">
+                      <Clock className="w-3.5 h-3.5" /> Pending
+                    </TabsTrigger>
+                    <TabsTrigger value="issues_assigned" className="flex-1 gap-1.5">
+                      <Wrench className="w-3.5 h-3.5" /> Assigned
+                    </TabsTrigger>
+                    <TabsTrigger value="issues_resolved" className="flex-1 gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Resolved
+                    </TabsTrigger>
                   </TabsList>
                   <div className="flex-1 overflow-y-auto divide-y divide-border">
                     {loading ? (
-                      <div className="text-center py-8"><Loader2 className="w-8 h-8 animate-spin  text-muted-foreground" /></div>
+                      <div className="text-center py-4 md:py-8"><Loader2 className="w-8 h-8 animate-spin  text-muted-foreground" /></div>
                     ) : filteredIssues.length === 0 ? (
                       <div className="text-center py-12"><Home className="w-12 h-12  text-muted-foreground/50 mb-4" /><p className="text-muted-foreground">No issues found</p></div>
                     ) : (
@@ -558,7 +574,7 @@ export default function StudentHostelView() {
               <div className="lg:col-span-3">
                 {selectedIssue ? (
                   <div className="h-full flex flex-col border border-border rounded-sm bg-card">
-                    <div className="p-6 border-b border-border">
+                    <div className="p-3 md:p-6 border-b border-border">
                       <div className="flex items-start justify-between">
                         <div>
                           <h2 className="text-lg font-semibold">{selectedIssue.title}</h2>
@@ -582,7 +598,7 @@ export default function StudentHostelView() {
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 p-6 overflow-y-auto">
+                    <div className="flex-1 p-3 md:p-6 overflow-y-auto">
                       <h3 className="font-medium mb-4">Messages</h3>
                       {selectedIssue.responses && selectedIssue.responses.length > 0 ? (
                         <div className="space-y-4">
@@ -593,7 +609,7 @@ export default function StudentHostelView() {
                             </div>
                           ))}
                         </div>
-                      ) : <p className="text-center text-muted-foreground py-8">No messages yet</p>}
+                      ) : <p className="text-center text-muted-foreground py-4 md:py-8">No messages yet</p>}
                     </div>
                     {selectedIssue.status !== 'closed' && (
                       <div className="p-4 border-t border-border flex gap-2">
@@ -635,7 +651,7 @@ export default function StudentHostelView() {
               </div>
               <div className="lg:col-span-3">
                 {selectedOutpass ? (
-                  <div className="h-full flex flex-col border border-border rounded-sm bg-card p-6">
+                  <div className="h-full flex flex-col border border-border rounded-sm bg-card p-3 md:p-6">
                     <div className="flex justify-between items-start mb-6">
                       <div>
                         <h2 className="text-2xl font-bold">{selectedOutpass.destination}</h2>

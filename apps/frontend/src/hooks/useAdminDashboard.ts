@@ -22,6 +22,9 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       totalCourses: 0,
     }
   );
+  const [recentAdmissions, setRecentAdmissions] = useState<any[]>([]);
+  const [departmentOverview, setDepartmentOverview] = useState<any[]>([]);
+  const [financeCharts, setFinanceCharts] = useState<any>(null);
 
   // Course Dialog states
   const [showCourseDialog, setShowCourseDialog] = useState(false);
@@ -53,7 +56,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
   const [courseSearchQuery, setCourseSearchQuery] = useState('');
   const [userSearchQuery, setUserSearchQuery] = useState('');
 
-  const isAdmin = ['admin'].includes(user?.role || '');
+  const isAdmin = ['college_admin'].includes(user?.role || '');
 
   const filteredCourses = (courses || []).filter((course) => {
     const query = courseSearchQuery.toLowerCase();
@@ -75,18 +78,21 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
 
   const fetchAdminData = useCallback(async () => {
     try {
-      const [coursesData, usersData, statsRes] = await Promise.all([
+      const [coursesData, usersData, analyticsRes] = await Promise.all([
         api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
         api.get('/users', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
-        api.get('/admin/dashboard-stats'),
+        api.get('/analytics/dashboard'),
       ]);
 
       setCourses(coursesData);
       setUsers(usersData);
 
-      const serverStats = statsRes.data?.success ? statsRes.data.data : statsRes.data;
-      if (serverStats) {
-        setStats(serverStats);
+      const analyticsData = analyticsRes.data?.success ? analyticsRes.data.data : analyticsRes.data;
+      if (analyticsData) {
+        if (analyticsData.stats) setStats(analyticsData.stats);
+        if (analyticsData.recentAdmissions) setRecentAdmissions(analyticsData.recentAdmissions);
+        if (analyticsData.departmentOverview) setDepartmentOverview(analyticsData.departmentOverview);
+        if (analyticsData.financeCharts) setFinanceCharts(analyticsData.financeCharts);
       }
     } catch (error) {
       console.error('Error fetching admin data:', error);
@@ -273,6 +279,9 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
     courses: filteredCourses,
     users: filteredUsers,
     stats,
+    recentAdmissions,
+    departmentOverview,
+    financeCharts,
     courseSearchQuery,
     setCourseSearchQuery,
     userSearchQuery,

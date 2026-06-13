@@ -12,6 +12,7 @@ exports.departmentSchema = zod_1.z.object({
     code: zod_1.z.string().min(2, 'Code must be at least 2 characters').toUpperCase(),
     hod: zod_1.z.string().optional(),
     description: zod_1.z.string().max(500, 'Description too long').optional(),
+    status: zod_1.z.enum(['active', 'inactive']).optional(),
 }).strict();
 exports.facultySchema = zod_1.z.object({
     id: zod_1.z.string().uuid().optional(),

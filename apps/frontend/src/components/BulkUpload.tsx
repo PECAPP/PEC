@@ -173,7 +173,7 @@ export default function BulkUpload({ entityType, onImport, templateColumns, samp
       <div
         {...getRootProps()}
         className={`border border-dashed rounded-sm p-8 text-center cursor-pointer transition-colors ${
-          isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+          isDragActive ? 'border-border/40 bg-primary/5' : 'border-border hover:border-primary/50'
         }`}
       >
         <input {...getInputProps()} />

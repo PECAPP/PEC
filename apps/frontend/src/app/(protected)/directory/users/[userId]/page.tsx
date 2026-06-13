@@ -61,7 +61,7 @@ export default async function UserDetailPage({ params }: PageProps) {
   if (!session) redirect('/auth');
 
   // RBAC: Only admin, faculty, or the user themselves can view full detail
-  if (session.role !== 'admin' && session.role !== 'faculty' && session.uid !== userId) {
+  if (session.role !== 'college_admin' && session.role !== 'super_admin' && session.role !== 'faculty' && session.uid !== userId) {
     redirect('/dashboard');
   }
 

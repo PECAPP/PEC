@@ -24,6 +24,7 @@ export interface CurrentUser {
   verified: boolean;
   profileComplete: boolean;
   semester?: number | null;
+  isTwoFactorEnabled?: boolean;
 }
 
 export interface UseAuthResult {
@@ -34,7 +35,8 @@ export interface UseAuthResult {
   isAuthenticated: boolean;
   ability?: AppAbility;
   logout: () => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
+  login2FA: (userId: string, token: string) => Promise<void>;
 }
 
 export const clearAuthCache = () => {};
@@ -108,10 +110,27 @@ export function AuthProvider({ children, initialSession }: { children: ReactNode
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      await authClient.login({ email, password });
+      const res = await authClient.login({ email, password });
+      if ((res as any).requires2FA) {
+        return res; // Return to component to handle TOTP step
+      }
       window.location.href = '/dashboard';
+      return res;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login2FA = async (userId: string, token: string) => {
+    setLoading(true);
+    try {
+      await authClient.login2FA({ userId, token });
+      window.location.href = '/dashboard';
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '2FA Login failed');
       throw err;
     } finally {
       setLoading(false);
@@ -127,7 +146,8 @@ export function AuthProvider({ children, initialSession }: { children: ReactNode
       isAuthenticated: !!user,
       ability: user?.ability,
       logout,
-      login
+      login,
+      login2FA
     }}>
       {children}
     </AuthContext.Provider>

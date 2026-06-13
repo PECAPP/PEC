@@ -40,7 +40,7 @@ export default function AddUser() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="card-elevated p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-6">
         {/* User Type */}
         <div className="space-y-2">
           <Label htmlFor="userType">User Type</Label>

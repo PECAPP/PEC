@@ -6,22 +6,22 @@ export const softDeleteExtension = Prisma.defineExtension({
     $allModels: {
       async findMany({ model, operation, args, query }) {
         if (!args.where) args.where = {};
-        if (args.where.deletedAt === undefined) {
-           args.where.deletedAt = null;
+        if ((args.where as any).deletedAt === undefined) {
+           (args.where as any).deletedAt = null;
         }
         return query(args);
       },
       async findFirst({ model, operation, args, query }) {
         if (!args.where) args.where = {};
-        if (args.where.deletedAt === undefined) {
-           args.where.deletedAt = null;
+        if ((args.where as any).deletedAt === undefined) {
+           (args.where as any).deletedAt = null;
         }
         return query(args);
       },
       async count({ model, operation, args, query }) {
         if (!args.where) args.where = {};
-        if (args.where.deletedAt === undefined) {
-           args.where.deletedAt = null;
+        if ((args.where as any).deletedAt === undefined) {
+           (args.where as any).deletedAt = null;
         }
         return query(args);
       },

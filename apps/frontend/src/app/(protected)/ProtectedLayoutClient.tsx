@@ -41,7 +41,7 @@ export function ProtectedLayoutClient({ children, user }: ProtectedLayoutClientP
   }, []);
 
   const pathname = usePathname();
-  const isSpecialModule = ['/chat', '/resume-builder'].some(route => pathname?.startsWith(route));
+  const isSpecialModule = ['/chat'].some(route => pathname?.startsWith(route));
 
   return (
     <div className="min-h-screen relative shadow-none overflow-x-hidden">
@@ -86,7 +86,7 @@ export function ProtectedLayoutClient({ children, user }: ProtectedLayoutClientP
           "relative z-10 w-full min-h-[calc(100vh-4rem)]",
           isSpecialModule 
             ? "p-0 h-full w-full"
-            : "p-4 md:p-5 lg:p-6 ui-section-gap",
+            : "p-2 sm:p-3 md:p-4 lg:p-5 w-full ui-section-gap",
         )}>
           {children}
         </div>

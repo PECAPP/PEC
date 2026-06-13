@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Badge, Button, Input, Skeleton } from "@pec/ui";
+import { Badge, Button, Input, Skeleton, PageBanner } from "@pec/ui";
 import { cn } from "@/lib/utils";
 import { api } from '@pec/api';
 import { usePermissions } from "@/hooks/usePermissions";
@@ -181,34 +181,32 @@ export default function StudentCanteenView() {
   });
 
   return (
-    <div className="  px-4 py-8 ">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
-            <UtensilsCrossed className="w-8 h-8 text-primary" />
-            Night Canteen
-          </h1>
-          <p className="text-muted-foreground">
-            Late night cravings sorted! Ordered straight to your room.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 bg-muted p-1 rounded-sm self-start">
-          <Button
-            variant={view === "menu" ? "secondary" : "ghost"}
-            onClick={() => setView("menu")}
-            className="rounded-sm"
-          >
-            Menu
-          </Button>
-          <Button
-            variant={view === "orders" ? "secondary" : "ghost"}
-            onClick={() => setView("orders")}
-            className="rounded-sm"
-          >
-            My Orders
-          </Button>
-        </div>
+    <div className="  px-4 py-4 md:py-8 ">
+      <div className="mb-8">
+        <PageBanner
+          title="Night Canteen"
+          subtitle="Late night cravings sorted! Ordered straight to your room."
+          icon={<UtensilsCrossed className="w-7 h-7 text-primary" />}
+          badgeText="Student Life"
+          actions={
+            <div className="flex items-center gap-2 bg-muted p-1 rounded-sm self-start">
+              <Button
+                variant={view === "menu" ? "secondary" : "ghost"}
+                onClick={() => setView("menu")}
+                className="rounded-sm"
+              >
+                Menu
+              </Button>
+              <Button
+                variant={view === "orders" ? "secondary" : "ghost"}
+                onClick={() => setView("orders")}
+                className="rounded-sm"
+              >
+                My Orders
+              </Button>
+            </div>
+          }
+        />
       </div>
 
       {view === "menu" ? (
@@ -238,7 +236,7 @@ export default function StudentCanteenView() {
                     {selectedCategory === cat && (
                       <motion.div
                         layoutId="activeCategory"
-                        className="absolute inset-0 bg-primary rounded-full shadow-glow -z-10"
+                        className="absolute inset-0 bg-primary rounded-full shadow-md border border-border/40 -z-10"
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
                       />
                     )}
@@ -278,7 +276,7 @@ export default function StudentCanteenView() {
                     whileHover={{ y: -5, scale: 1.02 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     key={item.id}
-                    className="group relative overflow-hidden rounded-sm border border-white/10 bg-card/80 backdrop-blur-md hover:border-primary/50 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(var(--primary-rgb),0.15)]"
+                    className="group relative overflow-hidden rounded-sm border border-white/10 bg-card/80 backdrop-blur-md hover:border-border/40 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(var(--primary-rgb),0.15)]"
                   >
                     <div className="aspect-[16/9] overflow-hidden bg-muted relative">
                       <img
@@ -326,7 +324,7 @@ export default function StudentCanteenView() {
 
           {/* Cart Section */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-sm border border-white/10 bg-background/60 backdrop-blur-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden">
+            <div className="sticky top-24 rounded-sm border border-white/10 bg-background/60 backdrop-blur-2xl p-3 md:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-primary/50 to-transparent" />
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center gap-2 mb-6 relative z-10">
@@ -396,7 +394,7 @@ export default function StudentCanteenView() {
 
                   <div className="space-y-4 pt-4 border-t border-border">
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <label className="text-xs font-semibold  text-muted-foreground flex items-center gap-2">
                         <MapPin className="w-3 h-3" /> Delivery Address
                       </label>
                       <Input
@@ -429,7 +427,7 @@ export default function StudentCanteenView() {
                         "Confirm Order"
                       )}
                     </Button>
-                    <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest">
+                    <p className="text-[10px] text-center text-muted-foreground ">
                       Cash on Delivery Only
                     </p>
                   </div>
@@ -462,7 +460,7 @@ export default function StudentCanteenView() {
               {myOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="p-6 rounded-sm border border-border bg-card card-shadow relative overflow-hidden hover:border-primary/30 transition-all"
+                  className="p-3 md:p-6 rounded-sm border border-border bg-card card-shadow relative overflow-hidden hover:border-border/40 transition-all"
                 >
                   <div className="absolute top-0 right-0 p-4">
                     <Badge
@@ -482,7 +480,7 @@ export default function StudentCanteenView() {
 
                   <div className="space-y-4">
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                      <p className="text-xs font-bold  text-muted-foreground mb-1">
                         Order #{order.id.slice(-6).toUpperCase()}
                       </p>
                       <p className="text-sm flex items-center gap-1 text-muted-foreground">

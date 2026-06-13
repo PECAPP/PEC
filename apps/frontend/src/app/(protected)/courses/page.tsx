@@ -4,6 +4,7 @@ import { CourseDirectory } from './components/CourseDirectory';
 import { CourseManagement } from './components/CourseManagement';
 import { serverFetch } from '@/lib/server-data';
 import { BookOpen, Settings } from 'lucide-react';
+import { PageBanner } from '@pec/ui';
 
 export const metadata = {
   title: 'Academic Catalog | PEC APP',
@@ -81,7 +82,7 @@ export default async function CoursesPage() {
     .filter(Boolean);
 
   return (
-    <div className=" py-8 px-6  animate-in fade-in duration-500 min-h-screen relative">
+    <div className="animate-in fade-in duration-500 min-h-screen relative">
       {/* Decorative Atmosphere Layer */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute inset-0  opacity-[0.03]" />
@@ -90,16 +91,13 @@ export default async function CoursesPage() {
 
       {session.role === 'student' ? (
         <div className="space-y-10 pb-20">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
-            <div className="flex items-center gap-5">
-              <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm shadow-primary/5">
-                <BookOpen className="w-8 h-8 text-primary shadow-glow" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Course Directory</h1>
-                <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">Explore and enroll in the institutional academic catalog</p>
-              </div>
-            </div>
+          <div className="mb-6">
+            <PageBanner
+              title="Course Directory"
+              subtitle="Explore and enroll in the institutional academic catalog"
+              badgeText="Academics"
+              icon={<BookOpen className="w-7 h-7 text-primary" />}
+            />
           </div>
           
           <CourseDirectory 
@@ -112,16 +110,13 @@ export default async function CoursesPage() {
         </div>
       ) : (
         <div className="space-y-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
-            <div className="flex items-center gap-5">
-              <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm shadow-primary/5">
-                <Settings className="w-8 h-8 text-primary shadow-glow" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Course Management</h1>
-                <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">Manage institutional academic offerings and infrastructure</p>
-              </div>
-            </div>
+          <div className="mb-6">
+            <PageBanner
+              title="Course Management"
+              subtitle="Manage institutional academic offerings and infrastructure"
+              badgeText="Academics"
+              icon={<Settings className="w-7 h-7 text-primary" />}
+            />
           </div>
           
           <CourseManagement 

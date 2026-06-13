@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@pec/ui";
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, PageBanner } from "@pec/ui";
 
 
 import { useState, useEffect } from 'react';
@@ -155,55 +155,52 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
 
   return (
     <div className="space-y-8 pb-12 animate-in fade-in duration-500">
-      {/* Professional Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
-        <div className="flex items-center gap-5">
-           <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm relative overflow-hidden group">
-             <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-             <Settings2 className="w-8 h-8 text-primary shadow-glow relative z-10" />
-           </div>
-           <div>
-             <h1 className="text-3xl font-bold tracking-tight text-foreground">Attendance Management</h1>
-             <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">Mark and verify student attendance records</p>
-           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <PDFExportButton 
-            onExport={async () => {
-              if (!selectedCourse) {
-                toast.error('Select a course to export.');
-                return;
-              }
-              const { exportAttendanceReport } = await import('@/lib/pdfExport');
-              const course = courses.find(c => c.id === selectedCourse);
-              exportAttendanceReport(course?.name || 'Attendance_Report', students, { start: selectedDate, end: selectedDate });
-            }} 
-            label="Export Report"
-          />
-          <Button 
-            variant="outline" 
-            onClick={() => setShowBulkUpload(true)} 
-            className="h-11 rounded-sm px-5 border-border/60 font-bold text-[10px] uppercase tracking-widest gap-2 bg-background hover:bg-muted/40 transition-all border"
-          >
-            <FileSpreadsheet className="w-4 h-4" /> Bulk Upload
-          </Button>
-        </div>
+      <div className="mb-8">
+        <PageBanner
+          title="Attendance Management"
+          subtitle="Mark and verify student attendance records"
+          icon={<Settings2 className="w-7 h-7 text-primary" />}
+          badgeText="Administration"
+          actions={
+            <div className="flex items-center gap-3 flex-wrap">
+              <PDFExportButton 
+                onExport={async () => {
+                  if (!selectedCourse) {
+                    toast.error('Select a course to export.');
+                    return;
+                  }
+                  const { exportAttendanceReport } = await import('@/lib/pdfExport');
+                  const course = courses.find(c => c.id === selectedCourse);
+                  exportAttendanceReport(course?.name || 'Attendance_Report', students, { start: selectedDate, end: selectedDate });
+                }} 
+                label="Export Report"
+              />
+              <Button 
+                variant="outline" 
+                onClick={() => setShowBulkUpload(true)} 
+                className="h-11 rounded-sm px-5 border-border/60 font-medium text-sm gap-2 bg-background hover:bg-muted/40 transition-all border"
+              >
+                <FileSpreadsheet className="w-4 h-4" /> Bulk Upload
+              </Button>
+            </div>
+          }
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3 space-y-8">
           {/* Selection Area */}
-          <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm border-primary/10 relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-8 opacity-5">
+          <div className="bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5">
                <Database className="w-24 h-24 text-primary" />
              </div>
              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 relative z-10">
                <div className="md:col-span-8 space-y-3">
-                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
+                 <label className="text-sm font-medium  text-muted-foreground/60 flex items-center gap-2">
                    <Filter className="w-3 h-3 text-primary" /> Course Selection
                  </label>
                  <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-                   <SelectTrigger className="h-14 font-bold text-lg bg-background border-border/60 rounded-sm px-6 focus:ring-primary/20">
+                   <SelectTrigger className="h-14 font-bold text-lg bg-background border-border/60 rounded-sm px-3 md:px-6 focus:ring-primary/20">
                      <SelectValue placeholder="Select course..." />
                    </SelectTrigger>
                    <SelectContent className="max-h-[400px]">
@@ -216,7 +213,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                  </Select>
                </div>
                <div className="md:col-span-4 space-y-3">
-                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
+                 <label className="text-sm font-medium  text-muted-foreground/60 flex items-center gap-2">
                    <CalendarIcon className="w-3 h-3 text-primary" /> Session Date
                  </label>
                  <Input 
@@ -245,17 +242,17 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                      { label: 'Participation', value: `${Math.round(stats.participationRate)}%`, icon: Activity, color: 'text-indigo-500', bg: 'bg-indigo-500/5' },
                    ].map((item, idx) => (
                      <div key={idx} className={cn(
-                       "relative overflow-hidden p-5 rounded-sm border border-border/40 bg-card/40 backdrop-blur-md flex flex-col gap-4 group transition-all duration-300 hover:border-primary/30 hover:translate-y-[-2px]",
+                       "relative overflow-hidden p-3 md:p-5 rounded-sm border border-border/40 bg-card/40 backdrop-blur-md flex flex-col gap-4 group transition-all duration-300 hover:border-border/40 hover:translate-y-[-2px]",
                        item.bg
                      )}>
                         <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
                           <item.icon className="w-16 h-16" />
                         </div>
                         <div className={cn("w-10 h-10 rounded-sm flex items-center justify-center border border-border/40 bg-background", item.color)}>
-                          <item.icon className="w-5 h-5 shadow-glow" />
+                          <item.icon className="w-5 h-5 shadow-md border border-border/40" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground opacity-60 mb-1">{item.label}</p>
+                          <p className="text-sm font-medium uppercase tracking-[0.15em] text-muted-foreground opacity-60 mb-1">{item.label}</p>
                           <p className="text-2xl font-bold font-display tracking-tight">
                             {item.value}
                           </p>
@@ -265,18 +262,18 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                 </div>
 
                 {/* List  */}
-                <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-2xl">
-                  <div className="bg-muted/30 border-b border-border/40 px-8 py-5 flex items-center justify-between">
+                <div className="bg-card/60 border border-border/40 rounded-sm shadow-2xl overflow-hidden backdrop-blur-sm">
+                  <div className="bg-muted/30 border-b border-border/40 px-4 md:px-8 py-5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-8 bg-primary rounded-full hidden sm:block" />
-                      <span className="text-sm font-bold uppercase tracking-widest text-foreground/80">Student Enrollment List</span>
+                      <span className="text-sm font-bold  text-foreground/80">Student Enrollment List</span>
                     </div>
                     <div className="flex items-center gap-3">
                        <Button 
                          variant="outline" 
                          size="sm"
                          onClick={() => handleBulkMark('present')}
-                         className="h-9 px-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.1em] border-success/30 text-success hover:bg-success/10 transition-all"
+                         className="h-9 px-5 rounded-sm font-medium text-sm uppercase tracking-[0.1em] border-success/30 text-success hover:bg-success/10 transition-all"
                        >
                          Mark All Present
                        </Button>
@@ -284,7 +281,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                          variant="outline" 
                          size="sm"
                          onClick={() => handleBulkMark('absent')}
-                         className="h-9 px-5 rounded-sm font-bold text-[10px] uppercase tracking-[0.1em] border-destructive/30 text-destructive hover:bg-destructive/10 transition-all"
+                         className="h-9 px-5 rounded-sm font-medium text-sm uppercase tracking-[0.1em] border-destructive/30 text-destructive hover:bg-destructive/10 transition-all"
                        >
                          Mark All Absent
                        </Button>
@@ -294,14 +291,14 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                   {loading ? <div className="p-20"><LoadingGrid count={5} /></div> : (
                     <div className="divide-y divide-border/20">
                       {students.map(s => (
-                        <div key={s.id} className="flex items-center justify-between py-6 px-8 hover:bg-primary/[0.02] transition-colors group">
+                        <div key={s.id} className="flex items-center justify-between py-4 md:py-6 px-4 md:px-8 hover:bg-primary/[0.02] transition-colors group">
                            <div className="flex items-center gap-6">
                               <div className="w-12 h-12 rounded-sm bg-muted/40 flex items-center justify-center border border-border/20 font-bold text-primary text-xs shrink-0 group-hover:scale-110 transition-transform">
                                 {s.name.substring(0, 2).toUpperCase()}
                               </div>
                               <div className="flex flex-col">
                                 <span className="text-base font-bold text-foreground group-hover:text-primary transition-colors">{s.name}</span>
-                                <span className="text-xs font-mono text-muted-foreground opacity-60">{s.email}</span>
+                                <span className="text-xs font-medium text-muted-foreground opacity-60">{s.email}</span>
                               </div>
                            </div>
 
@@ -314,7 +311,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                                  key={status.id}
                                  onClick={() => handleMark(s.id, status.id)}
                                  className={cn(
-                                   "flex items-center justify-center gap-2 px-8 py-3 rounded-sm font-bold text-[10px] uppercase tracking-wider transition-all duration-200 border border-transparent",
+                                   "flex items-center justify-center gap-2 px-4 md:px-8 py-3 rounded-sm font-medium text-sm  transition-all duration-200 border border-transparent",
                                    s.status === status.id 
                                      ? status.activeClass 
                                      : "text-muted-foreground font-medium grayscale hover:grayscale-0 hover:bg-background/80"
@@ -330,21 +327,21 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                     </div>
                   )}
 
-                  <div className="p-8 border-t border-border/40 bg-muted/10 flex justify-end">
+                  <div className="p-4 md:p-6 border-t border-border/40 bg-muted/10 flex justify-end">
                     <Button 
                       onClick={handleSave} 
                       disabled={isSaving || !selectedCourse}
-                      className="bg-primary text-primary-foreground font-bold tracking-widest uppercase text-xs h-14 px-16 rounded-sm shadow-glow hover:scale-[1.02] transition-all"
+                      className="bg-primary text-primary-foreground font-bold  text-xs h-14 px-16 rounded-sm shadow-md border border-border/40 hover:scale-[1.02] transition-all"
                     >
-                       {isSaving ? <Loader2 className="w-5 h-5 animate-spin mr-3" /> : <CheckCircle2 className="w-5 h-5 mr-3 shadow-glow" />}
+                       {isSaving ? <Loader2 className="w-5 h-5 animate-spin mr-3" /> : <CheckCircle2 className="w-5 h-5 mr-3 shadow-md border border-border/40" />}
                        Update Attendance
                     </Button>
                   </div>
                 </div>
               </motion.div>
             ) : (
-              <div className="py-32 text-center border border-dashed border-primary/10 rounded-sm bg-primary/[0.01] flex flex-col items-center gap-6">
-                <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
+              <div className="py-32 text-center border border-dashed border-border/40 rounded-sm bg-primary/[0.01] flex flex-col items-center gap-6">
+                <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center border border-border/40">
                   <Database className="w-8 h-8 text-primary/40" />
                 </div>
                 <div className="space-y-1">
@@ -358,9 +355,9 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
 
         {/* Sidebar Info */}
         <div className="space-y-8">
-           <div className="card-elevated p-8 bg-primary/5 border-primary/20 space-y-6 relative overflow-hidden">
+           <div className="bg-primary/5 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-6 relative overflow-hidden">
               <div className="absolute inset-0  opacity-[0.03] -z-10" />
-              <div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center border border-primary/20 shadow-sm transition-transform hover:rotate-12">
+              <div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center border border-border/40 shadow-sm transition-transform hover:rotate-12">
                 <ShieldCheck className="w-6 h-6 text-primary" />
               </div>
               <div className="space-y-2">
@@ -375,7 +372,7 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
                   'Select correct date/course',
                   'Confirm and update records',
                 ].map((rule, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-primary/70">
+                  <li key={idx} className="flex items-center gap-3 text-sm font-medium  text-primary/70">
                     <div className="w-1 h-1 bg-primary rounded-full shrink-0" />
                     {rule}
                   </li>
@@ -391,10 +388,10 @@ export default function AttendanceManager({ userId, userRole, initialData }: any
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <DialogTitle className="text-3xl font-bold uppercase tracking-tight">Institutional Bulk Intake</DialogTitle>
-                  <DialogDescription className="opacity-70 font-bold uppercase tracking-widest text-[11px] italic">Attendance Registry Parity System — CSV/Excel Protocol</DialogDescription>
+                  <DialogDescription className="opacity-70 font-bold  text-[11px] italic">Attendance Registry Parity System — CSV/Excel Protocol</DialogDescription>
                 </div>
                 <div className="w-16 h-16 bg-white/10 rounded-sm flex items-center justify-center border border-white/20">
-                   <Upload className="w-8 h-8 text-white shadow-glow" />
+                   <Upload className="w-8 h-8 text-white shadow-md border border-border/40" />
                 </div>
               </div>
            </DialogHeader>

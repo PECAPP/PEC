@@ -25,7 +25,7 @@ export class BackgroundJobsController {
 
   @Post()
   async enqueue(@Body() body: CreateBackgroundJobDto) {
-    const data = await this.backgroundJobsService.enqueue(body);
+    const data = await this.backgroundJobsService.enqueue(body as any);
     return ok(data);
   }
 

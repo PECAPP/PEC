@@ -17,8 +17,8 @@ export class NightCanteenRepository {
   async findItems(query: NightCanteenItemQueryDto) {
     const where: Prisma.CanteenItemWhereInput = {
       ...(query.category ? { category: query.category } : {}),
-      ...(query.isAvailable
-        ? { isAvailable: query.isAvailable === 'true' }
+      ...(query.isAvailable !== undefined
+        ? { isAvailable: query.isAvailable }
         : {}),
     };
 
@@ -130,9 +130,9 @@ export class NightCanteenRepository {
         items: {
           create: (data.items ?? []).map((item: any) => ({
             itemId: item.itemId,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
+            name: item.name ?? 'Item',
+            quantity: item.quantity ?? 1,
+            price: item.price ?? 0,
           })),
         },
       } as any,
@@ -161,9 +161,9 @@ export class NightCanteenRepository {
                   }
                   return {
                     itemId: item.itemId,
-                    name: item.name,
-                    quantity: item.quantity,
-                    price: item.price,
+                    name: (item as any).name ?? 'Item',
+                    quantity: item.quantity ?? 1,
+                    price: (item as any).price ?? 0,
                   };
                 }),
               },

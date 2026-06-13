@@ -1,5 +1,5 @@
 "use client";
-import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Label } from "@pec/ui";
+import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Label, PageBanner } from "@pec/ui";
 
 
 import React, { useState, useEffect } from 'react';
@@ -29,7 +29,9 @@ import { PrivacySettings } from './components/PrivacySettings';
 import { NotificationSettings } from './components/NotificationSettings';
 import { NetworkSettings } from './components/NetworkSettings';
 import CollegeSettingsTab from './components/CollegeSettingsTab';
-import { Building2, Users } from 'lucide-react';
+import RolesPermissionsTab from './components/RolesPermissionsTab';
+import DlqManagementTab from './components/DlqManagementTab';
+import { Building2, Users, ActivitySquare } from 'lucide-react';
 
 export default function SettingsPage() {
   const { user, loading: authLoading, logout } = useAuth();
@@ -63,7 +65,7 @@ export default function SettingsPage() {
 
   if (!mounted || authLoading) {
     return (
-      <div className=" py-8  space-y-8 animate-in fade-in duration-500">
+      <div className="space-y-8 animate-in fade-in duration-500">
         <div className="flex items-center gap-4">
            <div className="h-12 w-12 bg-muted rounded-sm animate-pulse" />
            <div className="space-y-2">
@@ -77,7 +79,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className=" py-8 px-6  space-y-8 animate-in fade-in duration-500 relative min-h-screen">
+    <div className="space-y-8 animate-in fade-in duration-500 relative min-h-screen">
       {/* Decorative Atmosphere */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute inset-0  opacity-[0.03]" />
@@ -85,28 +87,27 @@ export default function SettingsPage() {
       </div>
 
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/60 relative z-10">
-        <div className="flex items-center gap-5">
-          <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm">
-            <SettingsIcon className="w-8 h-8 text-primary shadow-glow" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Settings</h1>
-            <p className="text-sm text-muted-foreground font-medium italic">Manage your account and application preferences</p>
-          </div>
-        </div>
-        <Button 
-          variant="outline" 
-          onClick={handleSignOut}
-          className="h-11 rounded-sm px-6 border-destructive/20 text-destructive hover:bg-destructive/5 font-bold text-xs tracking-wider gap-2 transition-all uppercase"
-        >
-          <LogOut className="w-4 h-4" /> 
-          Log Out
-        </Button>
+      <div className="mb-6 relative z-10">
+        <PageBanner
+          title="Settings"
+          subtitle="Manage your account and application preferences"
+          badgeText="Preferences"
+          icon={<SettingsIcon className="w-7 h-7 text-primary" />}
+          actions={
+            <Button 
+              variant="outline" 
+              onClick={handleSignOut}
+              className="h-11 rounded-sm px-3 md:px-6 border-destructive/20 text-destructive hover:bg-destructive/5 font-bold text-xs tracking-wider gap-2 transition-all uppercase"
+            >
+              <LogOut className="w-4 h-4" /> 
+              Log Out
+            </Button>
+          }
+        />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
-        <TabsList className="w-full justify-start h-auto p-1 bg-muted/30 rounded-sm border border-border/40 mb-2 flex-wrap gap-1">
+        <TabsList className="justify-start self-start h-auto p-1 bg-card rounded-md border border-border/40 shadow-sm mb-2 overflow-x-auto flex-nowrap gap-1 max-w-full [&::-webkit-scrollbar]:hidden">
           {[
             { id: 'profile', label: 'Profile', icon: User },
             { id: 'appearance', label: 'Appearance', icon: Palette },
@@ -115,12 +116,13 @@ export default function SettingsPage() {
             { id: 'connected', label: 'Network', icon: Globe },
             { id: 'security', label: 'Security', icon: Lock },
             ...(user?.ability?.can('manage', 'all' as any) ? [{ id: 'college', label: 'College Config', icon: Building2 }] : []),
-            ...(user?.ability?.can('manage', 'Role' as any) ? [{ id: 'roles', label: 'Roles', icon: Users }] : [])
+            ...(user?.ability?.can('manage', 'Role' as any) ? [{ id: 'roles', label: 'Roles', icon: Users }] : []),
+            ...(user?.ability?.can('manage', 'all' as any) ? [{ id: 'observability', label: 'Observability', icon: ActivitySquare }] : [])
           ].map(tab => (
             <TabsTrigger 
               key={tab.id} 
               value={tab.id} 
-              className="rounded-sm py-2.5 px-5 gap-2.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all text-xs font-bold uppercase tracking-wider"
+              className="rounded-sm py-2.5 px-5 gap-2.5 transition-all text-xs font-bold"
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
@@ -131,7 +133,7 @@ export default function SettingsPage() {
             <TabsContent value="profile" className="mt-0 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-6">
-                  <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
+                  <div className="bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
                     <div className="flex items-center gap-3 pb-4 border-b border-border/40">
                       <User className="w-5 h-5 text-primary" />
                       <h2 className="text-xl font-bold tracking-tight">Profile Information</h2>
@@ -139,25 +141,25 @@ export default function SettingsPage() {
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                       <div className="space-y-3">
-                        <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Full Name</Label>
+                        <Label className="text-sm font-medium  text-muted-foreground opacity-60">Full Name</Label>
                         <Input value={user?.fullName || 'Ananay Dubey'} className="h-12 rounded-sm bg-background border-border/60 font-bold" readOnly />
                       </div>
                       <div className="space-y-3">
-                        <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Email Address</Label>
+                        <Label className="text-sm font-medium  text-muted-foreground opacity-60">Email Address</Label>
                         <Input value={user?.email || 'student@pec.edu'} className="h-12 rounded-sm bg-muted/40 border-border/40 opacity-70" disabled />
                       </div>
                       <div className="space-y-3">
-                        <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Student ID</Label>
+                        <Label className="text-sm font-medium  text-muted-foreground opacity-60">Student ID</Label>
                         <Input value="PEC2026CS101" className="h-12 rounded-sm bg-muted/40 border-border/40 opacity-70" disabled />
                       </div>
                       <div className="space-y-3">
-                        <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Role</Label>
+                        <Label className="text-sm font-medium  text-muted-foreground opacity-60">Role</Label>
                         <Input value={user?.role?.toUpperCase() || 'STUDENT'} className="h-12 rounded-sm bg-muted/40 border-border/40 opacity-70" disabled />
                       </div>
                     </div>
 
                     <div className="pt-6 flex justify-start">
-                      <Button className="h-12 px-8 rounded-sm bg-primary text-primary-foreground font-bold text-sm tracking-wide gap-2 shadow-glow hover:scale-[1.02] transition-all">
+                      <Button className="h-12 px-4 md:px-8 rounded-sm bg-primary text-primary-foreground font-bold text-sm tracking-wide gap-2 shadow-md border border-border/40 hover:scale-[1.02] transition-all">
                         <RefreshCw className="w-4 h-4" /> Save Changes
                       </Button>
                     </div>
@@ -165,7 +167,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-6">
-                  <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8 animate-in fade-in duration-500 delay-100">
+                  <div className="bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm space-y-8 animate-in fade-in duration-500 delay-100">
                      <div className="flex items-center gap-3 pb-4 border-b border-border/40">
                       <Shield className="w-5 h-5 text-primary" />
                       <h2 className="text-xl font-bold tracking-tight">Account Actions</h2>
@@ -186,7 +188,7 @@ export default function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="appearance" className="mt-0 space-y-8">
-              <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
+              <div className="bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
                 <div className="flex items-center gap-3 pb-4 border-b border-border/40">
                   <Palette className="w-5 h-5 text-primary" />
                   <h2 className="text-xl font-bold tracking-tight">Appearance & Theme</h2>
@@ -194,7 +196,7 @@ export default function SettingsPage() {
 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 mb-1">Color Scheme</h3>
+                    <h3 className="text-sm font-medium  text-muted-foreground opacity-60 mb-1">Color Scheme</h3>
                     <p className="text-[10px] text-muted-foreground italic font-medium mb-4">Choose your preferred lighting environment</p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -213,12 +215,12 @@ export default function SettingsPage() {
                         className={cn(
                           "p-4 rounded-sm border cursor-pointer transition-all flex flex-col items-center gap-3",
                           theme === t.id 
-                            ? "border-primary bg-primary/5 shadow-sm shadow-primary/5" 
-                            : "border-border/40 hover:border-primary/20 bg-background/40 hover:bg-background/80"
+                            ? "border-border/40 bg-primary/5 shadow-sm shadow-primary/5" 
+                            : "border-border/40 hover:border-border/40 bg-background/40 hover:bg-background/80"
                         )}
                       >
                         <t.icon className={cn("w-6 h-6", theme === t.id ? "text-primary" : "text-muted-foreground")} />
-                        <span className="text-xs font-bold uppercase tracking-wider">{t.label}</span>
+                        <span className="text-xs font-bold ">{t.label}</span>
                       </div>
                     ))}
                   </div>
@@ -226,7 +228,7 @@ export default function SettingsPage() {
 
                 <div className="space-y-6 pt-4">
                   <div>
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 mb-1">Accent Color</h3>
+                    <h3 className="text-sm font-medium  text-muted-foreground opacity-60 mb-1">Accent Color</h3>
                     <p className="text-[10px] text-muted-foreground italic font-medium mb-4">Personalize your application's primary color</p>
                   </div>
                   
@@ -260,11 +262,11 @@ export default function SettingsPage() {
                           }}
                           className={cn(
                             "p-4 rounded-sm border cursor-pointer transition-all",
-                            isActive ? "border-primary bg-primary/10 shadow-sm shadow-primary/5" : "border-border/40 hover:bg-muted/50"
+                            isActive ? "border-border/40 bg-primary/10 shadow-sm shadow-primary/5" : "border-border/40 hover:bg-muted/50"
                           )}
                         >
                           <div className={cn("w-full h-8 rounded-sm", acc.color)} />
-                          <p className="text-[10px] font-bold mt-2 text-center uppercase tracking-wider">{acc.name}</p>
+                          <p className="text-sm font-medium mt-2 text-center ">{acc.name}</p>
                         </div>
                       );
                     })}
@@ -297,13 +299,26 @@ export default function SettingsPage() {
             
             {user?.ability?.can('manage', 'Role' as any) && (
               <TabsContent value="roles" className="mt-0">
-                <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
+                <div className="bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
                   <div className="flex items-center gap-3 pb-4 border-b border-border/40">
                     <Users className="w-5 h-5 text-primary" />
                     <h2 className="text-xl font-bold tracking-tight">Roles & Permissions</h2>
                   </div>
                   <p className="text-muted-foreground">Manage system roles and permissions.</p>
-                  {/* RolesPermissionsTab component will be rendered here once extracted */}
+                  <RolesPermissionsTab />
+                </div>
+              </TabsContent>
+            )}
+
+            {user?.ability?.can('manage', 'all' as any) && (
+              <TabsContent value="observability" className="mt-0">
+                <div className="bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm space-y-8 animate-in fade-in duration-500">
+                  <div className="flex items-center gap-3 pb-4 border-b border-border/40">
+                    <ActivitySquare className="w-5 h-5 text-primary" />
+                    <h2 className="text-xl font-bold tracking-tight">System Observability</h2>
+                  </div>
+                  <p className="text-muted-foreground">Monitor system health and background queues.</p>
+                  <DlqManagementTab />
                 </div>
               </TabsContent>
             )}

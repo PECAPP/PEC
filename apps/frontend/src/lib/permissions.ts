@@ -60,7 +60,8 @@ export function getRolePermissions(role: string): UserPermissions {
   const basePermissions = getDefaultPermissions();
 
   switch (role) {
-    case "admin":
+    case "college_admin":
+    case "super_admin":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -108,7 +109,7 @@ export function getRolePermissions(role: string): UserPermissions {
  * Check if user is admin
  */
 export function isAdmin(user: User | null): boolean {
-  return ["admin", "faculty"].includes(user?.role || "");
+  return ["college_admin", "super_admin", "faculty"].includes(user?.role || "");
 }
 
 /**

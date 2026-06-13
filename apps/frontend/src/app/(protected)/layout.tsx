@@ -34,7 +34,7 @@ function LayoutLoading() {
       <div className="absolute top-0 right-0 left-0 h-16 bg-background border-b border-sidebar-border lg:left-64" />
 
       {/* Inline progress bar — not full-screen block */}
-      <div className="pt-24 lg:pl-64 p-6 flex items-center justify-center">
+      <div className="pt-24 lg:pl-64 p-3 md:p-6 flex items-center justify-center">
         <Loader inline />
       </div>
     </div>

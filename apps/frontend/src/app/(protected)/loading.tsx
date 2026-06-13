@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 
 export default function Loading() {
   return (
-    <div className="w-full h-full p-4 space-y-6 animate-in fade-in duration-500">
+    <div className="w-full h-full space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <Skeleton className="h-8 w-64 rounded-sm" />
         <Skeleton className="h-8 w-24 rounded-sm" />

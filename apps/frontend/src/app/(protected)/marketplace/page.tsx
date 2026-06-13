@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, AppShellSkeleton } from "@pec/ui";
+import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Dialog, DialogContent, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, AppShellSkeleton, PageBanner } from "@pec/ui";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -347,6 +347,18 @@ export default function MarketplacePage() {
     }
   };
 
+  const handleToggleHold = async (id: string, currentStatus: string) => {
+    try {
+      const newStatus = currentStatus === 'On Hold' ? 'Available' : 'On Hold';
+      await api.patch(`/marketplace/listings/${id}`, { status: newStatus });
+      toast.success(newStatus === 'On Hold' ? 'Listing placed on hold' : 'Listing resumed');
+      fetchMyListings();
+      fetchListings();
+    } catch {
+      toast.error('Failed to update listing');
+    }
+  };
+
   const openChat = (listing: Listing) => {
     setChatListing(listing);
     setChatOpen(true);
@@ -374,23 +386,13 @@ export default function MarketplacePage() {
   });
 
   return (
-    <div className="  animate-in fade-in duration-500 flex flex-col min-h-[calc(100vh-4rem)] h-[calc(100vh-4rem)]">
-      {/* Institutional Header */}
-      <div className="pt-2 md:pt-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6">
-          <div className="flex items-center gap-5">
-            <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm relative overflow-hidden group">
-              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-              <ShoppingBag className="w-8 h-8 text-primary shadow-glow relative z-10" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">Marketplace</h1>
-              <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">
-                Buy & Sell within PEC campus
-              </p>
-            </div>
-          </div>
-
+    <div className="animate-in fade-in duration-500 flex flex-col h-[calc(100vh-4rem)] space-y-6 w-full">
+      <PageBanner
+        title="Marketplace"
+        subtitle="Buy & Sell within PEC campus"
+        badgeText="Campus Life"
+        icon={<ShoppingBag className="w-7 h-7 text-primary" />}
+        actions={
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
@@ -409,7 +411,7 @@ export default function MarketplacePage() {
               )}
             </Button>
             <Button
-              className="h-10 rounded-sm px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+              className="h-10 rounded-sm px-3 md:px-6 font-medium text-sm  gap-2 transition-all"
               onClick={() => {
                 setEditingListing(null);
                 setFormOpen(true);
@@ -419,36 +421,26 @@ export default function MarketplacePage() {
               Sell Item
             </Button>
           </div>
-        </div>
+        }
+      />
 
-        {/* Tabs */}
-        <div className="border-b border-border/40">
-          <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
-            <TabsList className="h-12 bg-transparent p-0 flex justify-start gap-6 rounded-none">
-              <TabsTrigger
-                value="browse"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
-              >
-                Browse
+      <div className="w-full flex-1 min-h-0">
+        <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full h-full flex flex-col">
+          <div className="mb-6">
+            <TabsList>
+              <TabsTrigger value="browse" className="gap-1.5">
+                <Search className="w-3.5 h-3.5" /> Browse
               </TabsTrigger>
-              <TabsTrigger
-                value="my-listings"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
-              >
-                My Listings
+              <TabsTrigger value="my-listings" className="gap-1.5">
+                <Package className="w-3.5 h-3.5" /> My Listings
               </TabsTrigger>
-              <TabsTrigger
-                value="saved"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
-              >
-                <Heart className="w-3.5 h-3.5 mr-1.5" /> Saved
+              <TabsTrigger value="saved" className="gap-1.5">
+                <Heart className="w-3.5 h-3.5" /> Saved
               </TabsTrigger>
             </TabsList>
-          </Tabs>
-        </div>
-      </div>
+          </div>
 
-      <div className="flex-1 overflow-y-auto mt-6">
+          <div className="flex-1 overflow-y-auto min-h-0 pt-2">
         <div className="space-y-4">
           {/* Search + Filters (browse tab only) */}
           {tab === 'browse' && (
@@ -604,7 +596,7 @@ export default function MarketplacePage() {
                       className={cn(
                         'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap transition-colors',
                         filterCategory === cat.value
-                          ? 'bg-primary text-primary-foreground border-primary'
+                          ? 'bg-primary text-primary-foreground border-border/40'
                           : 'bg-background border-border hover:bg-muted'
                       )}
                     >
@@ -711,7 +703,7 @@ export default function MarketplacePage() {
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0 }}
-                          className="flex items-center gap-4 bg-card border border-border rounded-sm p-3 hover:border-primary/30 hover:shadow-md transition-all h-full"
+                          className="flex items-center gap-4 bg-card border border-border rounded-sm p-3 hover:border-border/40 hover:shadow-md transition-all h-full"
                         >
                           <div
                             className="w-16 h-16 shrink-0 rounded-sm overflow-hidden bg-muted cursor-pointer"
@@ -761,7 +753,7 @@ export default function MarketplacePage() {
                                     Chat
                                   </Button>
                                 ) : (
-                                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                                  <span className="text-xs font-bold text-muted-foreground ">
                                     Your Listing
                                   </span>
                                 )}
@@ -771,6 +763,11 @@ export default function MarketplacePage() {
                             {listing.status === 'Available' && (listing.sellerId === currentUserId) && (
                               <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleMarkSold(listing.id)}>
                                 <CheckCircle2 className="w-3 h-3 mr-1" /> Sold
+                              </Button>
+                            )}
+                            {listing.status !== 'Sold' && (listing.sellerId === currentUserId) && (
+                              <Button size="sm" variant={listing.status === 'On Hold' ? 'default' : 'outline'} className={cn("h-7 text-xs", listing.status === 'On Hold' ? 'bg-amber-500 hover:bg-amber-600' : '')} onClick={() => handleToggleHold(listing.id, listing.status)}>
+                                {listing.status === 'On Hold' ? 'Resume' : 'Hold'}
                               </Button>
                             )}
                             {(listing.sellerId === currentUserId) && (
@@ -822,6 +819,7 @@ export default function MarketplacePage() {
                                 setFormOpen(true);
                               }}
                               onDelete={() => handleDelete(listing.id)}
+                              onToggleHold={handleToggleHold}
                             />
                           ))}
                         </div>
@@ -835,6 +833,8 @@ export default function MarketplacePage() {
         </div>
       )}
     </div>
+  </div>
+    </Tabs>
   </div>
 
   {/* Dialogs & Panels */}

@@ -85,7 +85,7 @@ export class AttendanceRepository extends BaseRepository {
       data: {
         ...data,
         date: new Date(data.date),
-      },
+      } as any,
     });
   }
 

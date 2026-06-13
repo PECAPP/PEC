@@ -15,7 +15,7 @@ export default async function NoticeboardPage() {
     redirect('/auth');
   }
 
-  if (!['student', 'faculty', 'college_admin'].includes(session.role || '')) {
+  if (!['student', 'faculty', 'college_admin', 'super_admin'].includes(session.role || '')) {
     redirect('/dashboard');
   }
 

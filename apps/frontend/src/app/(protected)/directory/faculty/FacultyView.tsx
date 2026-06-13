@@ -10,10 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { facultySchema, FacultyInput } from '@pec/shared';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import {
- Users, UserPlus, Edit, Trash2, Upload, Download,
- Crown, MoreVertical, BookOpen, Loader2, Search
-} from 'lucide-react';
+import { Edit, Eye, Filter, Mail, Phone, Plus, Search, Shield, Trash2, ShieldCheck, MapPin, Download, Import, BookOpen, Users, GraduationCap, Award, Loader2, MoreVertical, Crown, Upload, UserPlus } from 'lucide-react';
 
 import { toast } from 'sonner';
 import BulkUpload from '@/components/BulkUpload';
@@ -232,23 +229,23 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
    {
      accessorKey: 'employeeId',
      header: 'Employee ID',
-     cell: ({ row }) => <span className="font-mono text-xs font-bold text-primary">{row.original.employeeId || '---'}</span>
+     cell: ({ row }) => <span className="font-semibold text-xs text-primary">{row.original.employeeId || '---'}</span>
    },
    {
      accessorKey: 'fullName',
      header: 'Full Name',
-     cell: ({ row }) => <span className="font-bold text-base tracking-tight">{row.original.fullName}</span>
+     cell: ({ row }) => <span className="font-semibold text-sm">{row.original.fullName}</span>
    },
    {
      accessorKey: 'department',
      header: 'Department',
-     cell: ({ row }) => <span className="text-muted-foreground font-bold text-xs uppercase">{row.original.department || 'GLOBAL'}</span>
+     cell: ({ row }) => <span className="text-muted-foreground font-semibold text-xs uppercase">{row.original.department || 'GLOBAL'}</span>
    },
    {
      accessorKey: 'designation',
      header: 'Designation',
      cell: ({ row }) => (
-       <Badge variant="outline" className="rounded-sm border font-bold uppercase text-[9px] tracking-widest px-3 py-1">
+       <Badge variant="secondary" className="font-semibold uppercase text-[10px] px-2.5 py-0.5 bg-purple-500/15 text-purple-500">
          {row.original.designation || 'FACULTY'}
        </Badge>
      )
@@ -265,7 +262,7 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
               {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MoreVertical className="w-4 h-4" />}
              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-sm border border-primary w-56 font-bold shadow-xl">
+            <DropdownMenuContent align="end" className="rounded-sm border border-border/40 w-56 font-bold shadow-xl">
              <DropdownMenuItem onClick={() => openEditDialog(row.original as FacultyMember)} className="cursor-pointer font-bold"><Edit className="w-4 h-4 mr-2" /> Edit Details</DropdownMenuItem>
              <DropdownMenuItem onClick={() => handlePromoteHOD(row.original as FacultyMember)} className="cursor-pointer font-bold text-primary"><Crown className="w-4 h-4 mr-2" /> Appoint as HOD</DropdownMenuItem>
              <DropdownMenuSeparator />
@@ -280,111 +277,114 @@ export function FacultyView({ initialFaculty, isAdmin }: FacultyViewProps) {
 
  return (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-    <div>
-     <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-      <Users className="w-8 h-8 text-primary" /> Faculty Directory
-     </h2>
-     <p className="text-muted-foreground mt-2 font-medium">Manage and view teaching staff profiles.</p>
+   {/* Header Actions removed to consolidate Toolbar */}
+
+   {/* Stats */}
+   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    {[
+     { icon: Users, label: 'Total Faculty', value: optimisticFaculty.length, color: 'text-primary', bg: 'bg-primary/10', border: 'border-border/40' },
+     { icon: GraduationCap, label: 'Professors', value: optimisticFaculty.filter(f => f.designation === 'Professor').length, color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+     { icon: Award, label: 'Ph.D Holders', value: optimisticFaculty.filter(f => (f as any).qualifications?.some((q: any) => q.includes('Ph.D'))).length, color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+     { icon: BookOpen, label: 'Departments', value: new Set(optimisticFaculty.filter(f => f.department).map(f => f.department)).size, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+    ].map(({ icon: Icon, label, value, color, bg, border }) => (
+      <div key={label} className="bg-card p-3 md:p-6 border border-border/40 rounded-sm shadow-sm flex items-center gap-4">
+       <div className={`p-3 rounded-lg border ${border} ${bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${color}`} /></div>
+       <div>
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <p className="text-3xl font-bold mt-1 tracking-tight">{value}</p>
+       </div>
+      </div>
+    ))}
+   </div>
+
+   {/* Filters and Actions */}
+    <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto flex-1">
+     <div className="relative flex-1">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <Input
+      placeholder="Search faculty members..."
+      value={searchTerm}
+      onChange={e => setSearchTerm(e.target.value)}
+      className="pl-9 h-10 w-full"
+     />
     </div>
-    <div className="flex gap-3 w-full md:w-auto">
-     <Button variant="outline" onClick={exportFaculty} className="font-bold border"><Download className="w-4 h-4 mr-2" /> Export</Button>
-     <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="font-bold border"><Upload className="w-4 h-4 mr-2" /> Import</Button>
+    
+    <div className="flex items-center gap-3 w-full md:w-auto">
+     <Button variant="outline" onClick={exportFaculty} className="h-10 font-medium border bg-background rounded-sm shadow-sm px-4"><Download className="w-4 h-4 mr-2" /> Export</Button>
+     <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-10 font-medium border bg-background rounded-sm shadow-sm px-4"><Upload className="w-4 h-4 mr-2" /> Import</Button>
      {isAdmin && (
-      <Button onClick={() => { resetForm(); setEditingFaculty(null); setShowDialog(true); }} className="font-bold border border-transparent hover:border-primary/20">
+      <Button onClick={() => { reset(); setEditingFaculty(null); setShowDialog(true); }} className="h-10 bg-primary text-primary-foreground font-medium rounded-sm px-4 whitespace-nowrap">
        <UserPlus className="w-4 h-4 mr-2" /> Add Faculty
       </Button>
      )}
     </div>
    </div>
 
-   <div className="grid gap-6 md:grid-cols-2">
-    {[
-     { icon: Users, label: 'Total Faculty', value: optimisticFaculty.length, color: 'primary' },
-     { icon: BookOpen, label: 'Departments', value: new Set(optimisticFaculty.filter(f => f.department).map(f => f.department)).size, color: 'success' },
-    ].map(({ icon: Icon, label, value, color }) => (
-     <div key={label} className="card-elevated p-6 border-b-4 border-r-4 border-primary/10">
-      <div className="flex items-center gap-4">
-       <div className={`p-3 rounded-sm bg-${color}/10 border border-${color}/20`}><Icon className={`w-6 h-6 text-${color}`} /></div>
-       <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{label}</p>
-        <p className="text-4xl font-bold mt-1">{value}</p>
-       </div>
-      </div>
-     </div>
-    ))}
-   </div>
-
-   <div className="relative">
-    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-    <Input
-     placeholder="Search faculty members..."
-     value={searchTerm}
-     onChange={e => setSearchTerm(e.target.value)}
-     className="h-14 pl-12 border rounded-sm bg-background/50 font-bold"
-    />
-   </div>
-
-   <div className="card-elevated overflow-hidden border rounded-sm shadow-sm">
+   <div className="flex flex-col gap-4">
     <DataTable columns={columns} data={filtered} onRowClick={(row) => router.push(`/directory/faculty/${row.id}`)} />
+    <div className="flex items-center justify-between">
+     <p className="text-sm font-medium text-muted-foreground">
+      Showing {filtered.length} of {optimisticFaculty.length} faculty
+     </p>
+    </div>
    </div>
 
    <Dialog open={showDialog} onOpenChange={setShowDialog}>
-    <DialogContent className=" rounded-sm border border-primary shadow-sm">
+    <DialogContent className=" rounded-sm border border-border/40 shadow-sm">
      <DialogHeader className="space-y-4">
       <DialogTitle className="text-3xl font-bold">{editingFaculty ? 'Edit Faculty Details' : 'Add New Faculty member'}</DialogTitle>
-      <DialogDescription className="font-bold text-[11px] uppercase tracking-widest text-muted-foreground bg-muted p-2 rounded-sm italic opacity-60">Institutional Faculty Registration</DialogDescription>
+      <DialogDescription className="font-medium text-sm  text-muted-foreground bg-muted p-2 rounded-sm italic opacity-60">Institutional Faculty Registration</DialogDescription>
      </DialogHeader>
      <div className="space-y-6 pt-6">
       <div className="space-y-2">
-       <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Full Name *</label>
+       <label className="text-sm font-medium  text-muted-foreground">Full Name *</label>
        <Input {...register('fullName')} className={`h-12 border rounded-sm font-bold ${errors.fullName ? 'border-destructive' : ''}`} placeholder="e.g. ARJUN SHARMA" />
-       {errors.fullName && <p className="text-[10px] font-bold text-destructive uppercase">{errors.fullName.message}</p>}
+       {errors.fullName && <p className="text-sm font-medium text-destructive uppercase">{errors.fullName.message}</p>}
       </div>
       <div className="grid grid-cols-2 gap-6">
        <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Email Address *</label>
+        <label className="text-sm font-medium  text-muted-foreground">Email Address *</label>
         <Input type="email" {...register('email')} className={`h-12 border rounded-sm font-bold ${errors.email ? 'border-destructive' : ''}`} placeholder="arjun@college.edu" />
-        {errors.email && <p className="text-[10px] font-bold text-destructive uppercase">{errors.email.message}</p>}
+        {errors.email && <p className="text-sm font-medium text-destructive uppercase">{errors.email.message}</p>}
        </div>
        <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Department *</label>
+        <label className="text-sm font-medium  text-muted-foreground">Department *</label>
         <Input {...register('department')} className={`h-12 border rounded-sm font-bold ${errors.department ? 'border-destructive' : ''}`} placeholder="CSE" />
-        {errors.department && <p className="text-[10px] font-bold text-destructive uppercase">{errors.department.message}</p>}
+        {errors.department && <p className="text-sm font-medium text-destructive uppercase">{errors.department.message}</p>}
        </div>
       </div>
       <div className="grid grid-cols-2 gap-6">
        <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Employee ID *</label>
+        <label className="text-sm font-medium  text-muted-foreground">Employee ID *</label>
         <Input {...register('employeeId')} className={`h-12 border rounded-sm font-mono font-bold ${errors.employeeId ? 'border-destructive' : ''}`} placeholder="FAC001" />
-        {errors.employeeId && <p className="text-[10px] font-bold text-destructive uppercase">{errors.employeeId.message}</p>}
+        {errors.employeeId && <p className="text-sm font-medium text-destructive uppercase">{errors.employeeId.message}</p>}
        </div>
        <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Designation *</label>
+        <label className="text-sm font-medium  text-muted-foreground">Designation *</label>
         <Input {...register('designation')} className={`h-12 border rounded-sm font-bold ${errors.designation ? 'border-destructive' : ''}`} placeholder="Associate Professor" />
-        {errors.designation && <p className="text-[10px] font-bold text-destructive uppercase">{errors.designation.message}</p>}
+        {errors.designation && <p className="text-sm font-medium text-destructive uppercase">{errors.designation.message}</p>}
        </div>
       </div>
       <div className="flex gap-4 pt-8">
         <Button 
           onClick={formSubmit(onSubmit)} 
-          className="flex-1 h-14 bg-primary text-white font-bold uppercase tracking-widest text-xs shadow-sm rounded-sm hover:brightness-110 active:scale-[0.98] transition-all" 
+          className="flex-1 h-14 bg-primary text-white font-bold  text-xs shadow-sm rounded-sm hover:brightness-110 active:scale-[0.98] transition-all" 
           disabled={isPending}
         >
           {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
           {editingFaculty ? 'Save Changes' : 'Create Faculty account'}
         </Button>
-        <Button variant="outline" onClick={() => setShowDialog(false)} className="h-14 border font-bold px-8 uppercase tracking-widest text-[10px] rounded-sm">Cancel</Button>
+        <Button variant="outline" onClick={() => setShowDialog(false)} className="h-14 border font-bold px-4 md:px-8  text-[10px] rounded-sm">Cancel</Button>
       </div>
      </div>
     </DialogContent>
    </Dialog>
 
    <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-    <DialogContent className=" border border-primary rounded-sm overflow-hidden p-0">
+    <DialogContent className=" border border-border/40 rounded-sm overflow-hidden p-0">
      <DialogHeader className="bg-primary text-white p-10">
       <DialogTitle className="text-3xl font-bold">Bulk Upload Faculty</DialogTitle>
-      <DialogDescription className="text-white/70 font-bold uppercase tracking-widest text-[11px] mt-2 italic">Standardized CSV/XLSX data upload</DialogDescription>
+      <DialogDescription className="text-white/70 font-bold  text-[11px] mt-2 italic">Standardized CSV/XLSX data upload</DialogDescription>
      </DialogHeader>
      <div className="p-10">
       <BulkUpload

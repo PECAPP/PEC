@@ -117,6 +117,28 @@ export class MarketplaceRepository {
     return this.prisma.marketplaceListing.update({ where: { id }, data: { status: 'Deleted' } });
   }
 
+  async holdListing(id: string, userId: string) {
+    const listing = await this.prisma.marketplaceListing.findUnique({ where: { id } });
+    if (!listing) throw new NotFoundException('Listing not found');
+    if (listing.sellerId !== userId) throw new ForbiddenException('Not your listing');
+    
+    // Toggle between On_Hold and Available, or just set to On_Hold if it's currently Available
+    const newStatus = listing.status === 'On_Hold' ? 'Available' : 'On_Hold';
+    return this.prisma.marketplaceListing.update({ where: { id }, data: { status: newStatus } });
+  }
+
+  async cleanUpStaleChats() {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return this.prisma.marketplaceChat.deleteMany({
+      where: {
+        updatedAt: {
+          lt: thirtyDaysAgo
+        }
+      }
+    });
+  }
+
   // ─── Bookmarks ───────────────────────────────────────────────────────────────
 
   async toggleBookmark(userId: string, listingId: string) {

@@ -137,8 +137,8 @@ html {
   }
 
   :root {
-    --font-sans: "Inter", system-ui, sans-serif;
-    --font-display: "Sora", "Inter", system-ui, sans-serif;
+    /* Fonts are injected by Next.js in layout.tsx via CSS variables */
+    --font-display: var(--font-sans);
     --radius: 0.25rem;
     --motion-fast: 120ms;
     --motion-base: 150ms;
@@ -226,7 +226,7 @@ html {
     --shadow-md: 0 4px 12px hsl(var(--accent-hue) 25% 10% / 0.06);
     --shadow-lg: 0 8px 24px hsl(var(--accent-hue) 25% 10% / 0.08);
     --shadow-xl: 0 16px 48px hsl(var(--accent-hue) 25% 10% / 0.1);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.08);
+    --shadow-glow: 0 4px 12px hsl(var(--primary) / 0.08);
   }
 
   /* ===== DARK MODE ===== */
@@ -289,7 +289,7 @@ html {
     --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.4);
     --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.5);
     --shadow-xl: 0 16px 48px hsl(0 0% 0% / 0.6);
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.08);
+    --shadow-glow: 0 6px 16px hsl(var(--primary) / 0.08);
   }
 
   /* ====================================
@@ -313,7 +313,7 @@ html {
     --primary-rgb: 245, 158, 11;
     --ring: 45 95% 55%;
     --sidebar-primary: 45 95% 55%;
-    --shadow-glow: 0 0 40px hsl(45 95% 55% / 0.15);
+    --shadow-glow: 0 6px 16px hsl(45 95% 55% / 0.15);
 
     --muted: 40 25% 18%;
     --muted-foreground: 40 20% 70%;
@@ -331,7 +331,7 @@ html {
     --primary-rgb: 217, 119, 6;
     --ring: 45 92% 42%;
     --sidebar-primary: 45 92% 42%;
-    --shadow-glow: 0 0 30px hsl(45 92% 42% / 0.12);
+    --shadow-glow: 0 4px 12px hsl(45 92% 42% / 0.12);
 
     --muted: 42 15% 92%;
     --muted-foreground: 42 15% 42%;
@@ -353,7 +353,7 @@ html {
     --primary-foreground: 0 0% 100%;
     --ring: 160 84% 39%;
     --sidebar-primary: 160 84% 39%;
-    --shadow-glow: 0 0 40px hsl(160 84% 39% / 0.12);
+    --shadow-glow: 0 6px 16px hsl(160 84% 39% / 0.12);
   }
 
   .accent-emerald:not(.dark) {
@@ -364,7 +364,7 @@ html {
     --primary-foreground: 0 0% 100%;
     --ring: 160 84% 32%;
     --sidebar-primary: 160 84% 32%;
-    --shadow-glow: 0 0 30px hsl(160 84% 32% / 0.15);
+    --shadow-glow: 0 4px 12px hsl(160 84% 32% / 0.15);
   }
 
   /* Theme 3: Sapphire (Deep Blue Tint) */
@@ -381,7 +381,7 @@ html {
     --primary-foreground: 0 0% 100%;
     --ring: 220 90% 56%;
     --sidebar-primary: 220 90% 56%;
-    --shadow-glow: 0 0 40px hsl(220 90% 56% / 0.12);
+    --shadow-glow: 0 6px 16px hsl(220 90% 56% / 0.12);
   }
 
   .accent-sapphire:not(.dark) {
@@ -392,7 +392,7 @@ html {
     --primary-foreground: 0 0% 100%;
     --ring: 220 90% 45%;
     --sidebar-primary: 220 90% 45%;
-    --shadow-glow: 0 0 30px hsl(220 90% 45% / 0.15);
+    --shadow-glow: 0 4px 12px hsl(220 90% 45% / 0.15);
   }
 
   /* Theme 4: Amethyst (Deep Purple Tint) */
@@ -409,7 +409,7 @@ html {
     --primary-foreground: 0 0% 100%;
     --ring: 270 70% 60%;
     --sidebar-primary: 270 70% 60%;
-    --shadow-glow: 0 0 40px hsl(270 70% 60% / 0.12);
+    --shadow-glow: 0 6px 16px hsl(270 70% 60% / 0.12);
   }
 
   .accent-amethyst:not(.dark) {
@@ -420,7 +420,7 @@ html {
     --primary-foreground: 0 0% 100%;
     --ring: 270 70% 50%;
     --sidebar-primary: 270 70% 50%;
-    --shadow-glow: 0 0 30px hsl(270 70% 50% / 0.15);
+    --shadow-glow: 0 4px 12px hsl(270 70% 50% / 0.15);
   }
 
 
@@ -478,13 +478,7 @@ html {
     line-height: 1.2;
   }
 
-  .protected-shell h1 {
-    @apply text-2xl font-bold tracking-tight text-foreground mb-6;
-  }
 
-  .protected-shell h1+p {
-    @apply text-sm text-muted-foreground;
-  }
 
   p {
     @apply text-foreground/90;

@@ -1,5 +1,5 @@
 'use client';
-import { Card, CardContent, Button } from "@pec/ui";
+import { Card, CardContent, Button, PageBanner } from "@pec/ui";
 
 
 import { useState } from 'react';
@@ -93,27 +93,21 @@ export default function AcademicsHelp() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Button variant="ghost" size="sm" className="mb-4" asChild>
-          <Link href="/help">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Help
-          </Link>
-        </Button>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4"
-        >
-          <div className="p-3 rounded-sm bg-primary/10">
-            <FileText className="w-8 h-8 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Academics</h1>
-            <p className="text-muted-foreground">{articles.length} articles about academic features</p>
-          </div>
-        </motion.div>
+      <div className="mb-6">
+        <PageBanner
+          title="Academics"
+          subtitle={`${articles.length} articles about academic features`}
+          badgeText="Help Center"
+          icon={<FileText className="w-7 h-7 text-primary" />}
+          actions={
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/help">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Help
+              </Link>
+            </Button>
+          }
+        />
       </div>
 
       <AnimatePresence mode="wait">
@@ -133,7 +127,7 @@ export default function AcademicsHelp() {
                 transition={{ delay: index * 0.05 }}
                 onClick={() => setSelectedArticle(index)}
               >
-                <Card className="hover:shadow-md transition-all cursor-pointer group hover:border-primary/50">
+                <Card className="hover:shadow-md transition-all cursor-pointer group hover:border-border/40">
                   <CardContent className="py-4">
                     <div className="flex items-center gap-4">
                       <div className="p-2 rounded-sm bg-secondary group-hover:bg-primary/10 transition-colors">
@@ -177,7 +171,7 @@ export default function AcademicsHelp() {
                 
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-sm bg-primary/10 text-primary">
+                    <div className="p-3 rounded-lg border border-border/40 flex items-center justify-center bg-primary/10 text-primary">
                       {(() => {
                         const Icon = articles[selectedArticle].icon;
                         return <Icon className="w-8 h-8" />;
@@ -193,7 +187,7 @@ export default function AcademicsHelp() {
                     <HelpContent content={articles[selectedArticle].content} />
                   </div>
 
-                  <Card className="bg-primary/5 border-primary/20">
+                  <Card className="bg-primary/5 border-border/40">
                     <CardContent className="p-4 flex items-center justify-between">
                       <div className="flex items-center gap-2 text-primary font-medium">
                         <ClipboardCheck className="w-5 h-5" />

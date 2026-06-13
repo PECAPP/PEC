@@ -99,13 +99,13 @@ export function HowItWorksSection() {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <Button size="lg" asChild className="neo-brutal-btn bg-white text-black hover:bg-yellow-50 border border-black px-10 py-6">
+          <Button size="lg" asChild className=" bg-white text-black hover:bg-yellow-50 border border-black px-10 py-6">
             <Link href="/auth" className="flex items-center gap-2">
               Explore PEC App
               <ArrowRight className="w-5 h-5" />
             </Link>
           </Button>
-          <p className="text-sm text-white/40 mt-4 uppercase tracking-widest font-bold">
+          <p className="text-sm text-white/40 mt-4  font-bold">
             100% Free for PEC Community
           </p>
         </motion.div>

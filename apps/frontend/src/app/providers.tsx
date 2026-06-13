@@ -4,6 +4,7 @@ import { TooltipProvider, Toaster, Toaster as Sonner } from "@pec/ui";
 
 import { ThemeProvider } from 'next-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SocketProvider } from '@/providers/socket-provider';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useEffect } from 'react';
@@ -53,7 +54,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <TooltipProvider delayDuration={0}>
             <Toaster />
             <Sonner />
-            {children}
+            <SocketProvider>
+              {children}
+            </SocketProvider>
           </TooltipProvider>
         </ErrorBoundary>
       </QueryClientProvider>

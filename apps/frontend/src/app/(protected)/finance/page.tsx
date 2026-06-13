@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton } from "@pec/ui";
+import { Button, Input, Badge, Tabs, TabsList, TabsTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton, PageBanner } from "@pec/ui";
 
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -21,7 +21,7 @@ import {
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
-import api from "@pec/api";
+import api, { buildApiUrl } from "@pec/api";
 
 // Shared types and constants
 import { FeeRecord, Transaction, Summary } from './types';
@@ -129,11 +129,37 @@ export default function FinancePage() {
 
   const handleDownloadReceipt = async (txn: Transaction) => {
     try {
-      // Fetch full transaction details for the PDF
-      const res = await api.get(`/finance/transactions/${txn.id}`);
-      const full = (res as any).data;
-      const { exportFeeReceipt } = await import('@/lib/pdfExport');
-      exportFeeReceipt(full);
+      if (!txn.feeRecordId) {
+        toast.error('No fee record associated with this transaction');
+        return;
+      }
+      
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+        
+      const response = await fetch(buildApiUrl(`/pdf/fee-receipt/${txn.feeRecordId}`), {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate receipt');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fee-receipt-${txn.receiptNo}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('Receipt downloaded successfully');
     } catch {
       toast.error('Failed to generate receipt');
     }
@@ -188,58 +214,54 @@ export default function FinancePage() {
     <div className="  animate-in fade-in duration-500 flex flex-col min-h-0">
       {/* Institutional Header */}
       <div className="pt-2 md:pt-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6">
-          <div className="flex items-center gap-5">
-            <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm relative overflow-hidden group">
-              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-              <Wallet className="w-8 h-8 text-primary relative z-10" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">Finance</h1>
-              <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">
-                Fees, Payments &amp; Transactions
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="h-10 rounded-sm px-4 font-bold text-xs gap-2"
-              onClick={() => {
-                fetchFees();
-                fetchSummary();
-              }}
-            >
-              <RefreshCw className="w-4 h-4" />
-              Refresh
-            </Button>
-            {adminRole && (
-              <Button
-                className="h-10 rounded-sm px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
-                onClick={() => setCreateFeeOpen(true)}
-              >
-                <Plus className="w-4 h-4" />
-                Create Fee
-              </Button>
-            )}
-          </div>
+        <div className="mb-6">
+          <PageBanner
+            title="Finance"
+            subtitle="Fees, Payments & Transactions"
+            badgeText="System"
+            actions={
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="h-10 rounded-sm px-4 font-bold text-xs gap-2"
+                  onClick={() => {
+                    fetchFees();
+                    fetchSummary();
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Refresh
+                </Button>
+                {adminRole && (
+                  <Button
+                    className="h-10 rounded-sm px-3 md:px-6 font-medium text-sm gap-2 bg-primary shadow-md border border-border/40 transition-all"
+                    onClick={() => setCreateFeeOpen(true)}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create Fee
+                  </Button>
+                )}
+              </div>
+            }
+          />
         </div>
 
         {/* Tabs */}
         <div className="border-b border-border/40">
           <Tabs value={tab} onValueChange={setTab} className="w-full">
-            <TabsList className="h-12 bg-transparent p-0 flex justify-start gap-6 rounded-none">
+            <TabsList className="mb-6">
               <TabsTrigger
                 value="overview"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+                className="px-4 py-2 font-medium text-sm rounded-sm gap-2"
               >
+                <Wallet className="w-3.5 h-3.5" />
                 Overview
               </TabsTrigger>
               <TabsTrigger
                 value="fees"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+                className="px-4 py-2 font-medium text-sm rounded-sm gap-2"
               >
+                <Clock className="w-3.5 h-3.5" />
                 My Fees
                 {pendingFees.length > 0 && (
                   <span className="ml-1.5 w-5 h-5 rounded-full bg-amber-500/15 text-amber-600 border-amber-500/20 text-[10px] flex items-center justify-center font-bold">
@@ -249,8 +271,9 @@ export default function FinancePage() {
               </TabsTrigger>
               <TabsTrigger
                 value="transactions"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 font-bold text-sm h-full"
+                className="px-4 py-2 font-medium text-sm rounded-sm gap-2"
               >
+                <Receipt className="w-3.5 h-3.5" />
                 Transactions
               </TabsTrigger>
             </TabsList>
@@ -417,7 +440,7 @@ export default function FinancePage() {
                   className={cn(
                     'px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap transition-colors',
                     !feeCategory
-                      ? 'bg-primary text-primary-foreground border-primary'
+                      ? 'bg-primary text-primary-foreground border-border/40'
                       : 'bg-background border-border hover:bg-muted'
                   )}
                 >
@@ -432,7 +455,7 @@ export default function FinancePage() {
                       className={cn(
                         'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap transition-colors',
                         feeCategory === cat.value
-                          ? 'bg-primary text-primary-foreground border-primary'
+                          ? 'bg-primary text-primary-foreground border-border/40'
                           : 'bg-background border-border hover:bg-muted'
                       )}
                     >

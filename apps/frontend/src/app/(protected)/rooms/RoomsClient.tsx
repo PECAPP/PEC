@@ -1,6 +1,6 @@
 'use client';
 import { extractData } from "@/lib/utils";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Button, Input, Badge, AppShellSkeleton } from "@pec/ui";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Button, Input, Badge, AppShellSkeleton, PageBanner } from "@pec/ui";
 import { EmptyState } from '@/components/common/AsyncState';
 
 
@@ -175,19 +175,21 @@ export default function RoomsClient({ initialRooms, session }: { initialRooms: R
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Room Management</h1>
-          <p className="text-muted-foreground">Manage campus rooms and facilities</p>
-        </div>
-        {isAdmin && (
-          <Button onClick={openCreate}>
-            <Plus className="w-4 h-4 mr-2" /> Add Room
-          </Button>
-        )}
-      </div>
+      <PageBanner
+        title="Room Management"
+        subtitle="Manage campus rooms and facilities"
+        badgeText="Infrastructure"
+        icon={<Building2 className="w-7 h-7 text-primary" />}
+        actions={
+          isAdmin && (
+            <Button onClick={openCreate}>
+              <Plus className="w-4 h-4 mr-2" /> Add Room
+            </Button>
+          )
+        }
+      />
 
-      <div className="card-elevated p-4 space-y-4">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 space-y-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -240,7 +242,7 @@ export default function RoomsClient({ initialRooms, session }: { initialRooms: R
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="card-elevated p-5 space-y-3"
+            className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 space-y-3"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
@@ -295,7 +297,7 @@ export default function RoomsClient({ initialRooms, session }: { initialRooms: R
       </div>
 
       {filteredRooms.length === 0 && (
-        <div className="card-elevated p-12 text-center">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
           <Building2 className="w-12 h-12  mb-4 opacity-20" />
           <EmptyState title="No rooms found" description="There are no rooms matching your search criteria." />
         </div>

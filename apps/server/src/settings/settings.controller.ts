@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Body, Req, UseGuards, Post, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Body, Req, UseGuards, Post, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
@@ -16,7 +16,11 @@ export class SettingsController {
 
   @Get()
   async getSettings(@Req() req: Request) {
-    const userId = (req.user as any).uid || (req.user as any).id;
+    const user = req['user'] || (req as any).user;
+    if (!user) {
+      throw new UnauthorizedException('User not found in request');
+    }
+    const userId = user.uid || user.id;
     return this.settingsService.getSettings(userId);
   }
 

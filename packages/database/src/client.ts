@@ -3,10 +3,18 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import { readReplicas } from '@prisma/extension-read-replicas';
 import { AsyncLocalStorage } from 'async_hooks';
+import { randomUUID } from 'crypto';
+import * as dotenv from 'dotenv';
 
 export const dbContext = new AsyncLocalStorage<{ userId?: string; role?: string }>();
 
 const createPrismaClient = () => {
+  if (!process.env.DATABASE_URL) {
+    try {
+      dotenv.config();
+    } catch (e) {}
+  }
+  
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const adapter = new PrismaPg(pool);
   
@@ -32,17 +40,13 @@ const createPrismaClient = () => {
             // Audit trails
             if (userId) {
               if (operation === 'create' || operation === 'createMany') {
-                if (args.data) {
-                  if (Array.isArray(args.data)) {
-                    args.data = args.data.map(d => ({ ...d, createdBy: (d as any).createdBy || userId }));
+                if ((model as string) === 'AcademicCalendar' && (args as any).data) {
+                  const dataObj = (args as any).data;
+                  if (Array.isArray(dataObj)) {
+                    (args as any).data = dataObj.map((d: any) => ({ ...d, createdBy: d.createdBy || userId }));
                   } else {
-                    (args.data as any).createdBy = (args.data as any).createdBy || userId;
+                    dataObj.createdBy = dataObj.createdBy || userId;
                   }
-                }
-              }
-              if (operation === 'update' || operation === 'updateMany') {
-                if (args.data) {
-                  (args.data as any).updatedBy = (args.data as any).updatedBy || userId;
                 }
               }
             }
@@ -53,6 +57,19 @@ const createPrismaClient = () => {
                 args.where = { ...args.where, deletedAt: null };
               }
             }
+
+            // RLS Logic for students
+            if (context?.role === 'student' && ['findMany', 'findFirst', 'count'].includes(operation)) {
+              if (['Attendance', 'AttendanceSession', 'ScoreEntry', 'CgpaEntry'].includes(model as string)) {
+                args.where = args.where || {};
+                if (model === 'CgpaEntry') {
+                  args.where.userId = userId;
+                } else if (model === 'ScoreEntry' || model === 'Attendance') {
+                  args.where.studentId = userId;
+                }
+              }
+            }
+
             const criticalModels = ['FeeRecord', 'Course', 'User'];
             const writeOperations = ['create', 'createMany', 'update', 'updateMany', 'delete', 'deleteMany', 'upsert'];
 
@@ -74,7 +91,7 @@ const createPrismaClient = () => {
                 pool.query(
                   'INSERT INTO "AuditLog" (id, "actorUserId", "actorRole", action, entity, "entityId", method, path, "createdAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())',
                   [
-                    require('crypto').randomUUID(),
+                    randomUUID(),
                     userId,
                     context?.role || 'system',
                     action,

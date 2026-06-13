@@ -63,6 +63,7 @@ interface NavChild {
   label: string;
   path: string;
   permission?: { action: string; subject: string };
+  roles?: UserRole[];
 }
 
 interface NavItem {
@@ -70,6 +71,7 @@ interface NavItem {
   label: string;
   path: string;
   permission?: { action: string; subject: string };
+  roles?: UserRole[];
   children?: NavChild[];
 }
 
@@ -126,7 +128,12 @@ const navItems: NavItem[] = [
     path: '#performance',
     children: [
       { icon: ClipboardCheck, label: 'Attendance', path: '/attendance' },
-      { icon: FileText, label: 'Score Sheet', path: '/score-sheet' },
+      {
+        icon: FileText,
+        label: 'Score Sheet',
+        path: '/score-sheet',
+        roles: ['college_admin', 'faculty'] as UserRole[],
+      },
     ],
   },
   { icon: Briefcase, label: 'Career', path: '/resume-builder' },
@@ -165,6 +172,7 @@ const navItems: NavItem[] = [
     label: 'Observability',
     path: '/admin/observability',
     permission: { action: 'manage', subject: 'all' },
+    roles: ['college_admin'] as UserRole[],
   },
   { icon: HelpCircle, label: 'Help & Support', path: '/help' },
 ];
@@ -237,7 +245,12 @@ export function Sidebar({
     };
   }, [isResizing, onWidthChange]);
 
-  const canSeeItem = (item: NavChild | NavItem) => {
+  const canSeeItem = (item: NavChild | NavItem, userRole?: string) => {
+    // Role whitelist check — if roles are specified, user's role must be in the list
+    if ('roles' in item && item.roles && item.roles.length > 0) {
+      if (!userRole || !item.roles.includes(userRole as UserRole)) return false;
+    }
+    // CASL permission check
     if (!item.permission) return true;
     if (!ability) return false;
     return ability.can(item.permission.action, item.permission.subject as any);
@@ -245,10 +258,10 @@ export function Sidebar({
 
   const filteredItems = navItems.filter((item) => {
     if (item.children) {
-      // Show accordion if at least one child is visible
-      return item.children.some(canSeeItem);
+      // Show accordion if at least one child is visible to this role
+      return item.children.some((child) => canSeeItem(child, _role));
     }
-    return canSeeItem(item);
+    return canSeeItem(item, _role);
   });
 
   const groupedItems = sectionConfig
@@ -284,7 +297,7 @@ export function Sidebar({
     const Icon = item.icon as any;
 
     if (isGroup && item.children) {
-      const visibleChildren = item.children.filter(canSeeItem);
+      const visibleChildren = item.children.filter((child) => canSeeItem(child, _role));
 
       return (
         <li key={item.path} className={cn('w-full flex flex-col')}>
@@ -327,7 +340,10 @@ export function Sidebar({
                       initial={{ opacity: 0, x: -5 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -5 }}
-                      className="swiss-nav-label truncate flex items-center"
+                      className={cn(
+                        "swiss-nav-label truncate flex items-center",
+                        isActive ? "font-bold" : "font-medium"
+                      )}
                     >
                       {item.label}
                     </motion.span>
@@ -355,7 +371,7 @@ export function Sidebar({
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.18, ease: 'easeInOut' }}
-                  className="overflow-hidden pl-4 mt-0.5 space-y-0.5"
+                  className="overflow-hidden pl-3 mt-1 space-y-0.5 border-l border-sidebar-border/50 ml-[22px]"
                 >
                   {visibleChildren.map((child) => {
                     const childActive =
@@ -369,8 +385,8 @@ export function Sidebar({
                           className={cn(
                             'flex items-center w-full px-3 py-1.5 rounded-sm text-sm transition-colors',
                             childActive
-                              ? 'text-primary bg-primary/10 font-medium'
-                              : 'text-sidebar-foreground/65 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+                              ? 'text-primary bg-primary/10 font-bold'
+                              : 'text-sidebar-foreground/65 hover:text-sidebar-foreground hover:bg-sidebar-accent font-medium',
                           )}
                         >
                           <span className="truncate">{child.label}</span>
@@ -421,7 +437,10 @@ export function Sidebar({
                   initial={{ opacity: 0, x: -5 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -5 }}
-                  className="swiss-nav-label truncate flex items-center"
+                  className={cn(
+                    "swiss-nav-label truncate flex items-center",
+                    isActive ? "font-bold" : "font-medium"
+                  )}
                 >
                   {item.label}
                 </motion.span>
@@ -534,7 +553,7 @@ export function Sidebar({
             <div className="space-y-3">
               {groupedItems.map((section) => (
                 <div key={section.title}>
-                  <p className="sidebar-section-label px-2 pb-1">{section.title}</p>
+                  <p className="text-[10.5px] font-bold  text-sidebar-foreground/50 uppercase px-2 pb-1.5 pt-2">{section.title}</p>
                   <ul className="space-y-0.5">{section.items.map(renderNavItem)}</ul>
                 </div>
               ))}

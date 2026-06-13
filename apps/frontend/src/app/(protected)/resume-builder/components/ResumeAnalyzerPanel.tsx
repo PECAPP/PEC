@@ -5,7 +5,6 @@ import { Button, Textarea, Badge, Progress } from "@pec/ui";
 import { Dispatch, SetStateAction } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Sparkles,
   FileText,
   Upload,
   Trash2,
@@ -13,7 +12,8 @@ import {
   RefreshCw,
   CheckCircle2,
   XCircle,
-  Lightbulb,
+  Briefcase,
+  ClipboardCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -32,6 +32,8 @@ type ResumeAnalyzerPanelProps = {
   setJobDescription: Dispatch<SetStateAction<string>>;
   analysisResult: AnalysisResult | null;
   onAnalyze: () => void;
+  analysisNotes: string;
+  setAnalysisNotes: Dispatch<SetStateAction<string>>;
 };
 
 const getScoreColor = (score: number) => {
@@ -50,155 +52,148 @@ export function ResumeAnalyzerPanel({
   setJobDescription,
   analysisResult,
   onAnalyze,
+  analysisNotes,
+  setAnalysisNotes,
 }: ResumeAnalyzerPanelProps) {
   return (
     <div className="space-y-6">
-      <div className="card-elevated p-6 flex flex-col md:flex-row gap-6 items-center justify-between border border-primary/30 bg-card shadow-sm rounded-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-inner">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <div>
-            <h3 className="font-bold text-lg tracking-tight">Analysis source</h3>
-            <p className="text-[10px] text-muted-foreground font-semibold">
-              Select builder data or upload an external file
+      <div className="grid xl:grid-cols-12 gap-8 items-start">
+        
+        {/* LEFT COLUMN: Controls & Input */}
+        <div className="xl:col-span-4 space-y-6">
+          
+          {/* Resume Source Panel */}
+          <div className="card-elevated p-4 md:p-6 border border-border rounded-sm shadow-sm bg-card/50 backdrop-blur-sm">
+            <h3 className="font-bold text-lg tracking-tight mb-2 flex items-center gap-2">
+              <ClipboardCheck className="w-5 h-5 text-primary" /> Resume Source
+            </h3>
+            <p className="text-[10px] text-muted-foreground font-semibold mb-6">
+              Select the resume to evaluate
             </p>
-          </div>
-        </div>
+            
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex bg-muted/40 p-1 rounded-sm w-full border border-border shadow-sm">
+                <button
+                  onClick={() => {
+                    setSelectedResume('current');
+                    setUploadedFile(null);
+                  }}
+                  className={cn(
+                    'flex-1 px-3 py-2 rounded-sm text-sm font-medium transition-all',
+                    selectedResume === 'current'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  <FileText className="w-3.5 h-3.5 mr-2 inline-block" />
+                  Builder data
+                </button>
 
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="flex bg-muted/40 p-1 rounded-sm w-full md:w-auto border border-border shadow-sm">
-            <button
-              onClick={() => {
-                setSelectedResume('current');
-                setUploadedFile(null);
-              }}
-              className={cn(
-                'flex-1 md:flex-none px-6 py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all',
-                selectedResume === 'current'
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground',
+                <div className="relative flex-1">
+                  <input
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg,.webp,image/*"
+                    className="hidden"
+                    id="resume-upload-field"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setUploadedFile(file);
+                        setSelectedResume('upload');
+                        toast.success(`Identity loaded: ${file.name}`);
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => document.getElementById('resume-upload-field')?.click()}
+                    className={cn(
+                      'w-full px-3 py-2 rounded-sm text-sm font-medium transition-all',
+                      selectedResume === 'upload'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    <Upload className="w-3.5 h-3.5 mr-2 inline-block" />
+                    Upload
+                  </button>
+                </div>
+              </div>
+
+              {uploadedFile && (
+                <div className="flex items-center justify-between p-2 px-3 border border-border/40 rounded-sm bg-muted/20">
+                  <span className="text-xs font-medium truncate max-w-[200px]">{uploadedFile.name}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-destructive hover:bg-destructive/10"
+                    onClick={() => {
+                      setUploadedFile(null);
+                      setSelectedResume('current');
+                      toast.info('External file removed');
+                    }}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
               )}
-            >
-              <FileText className="w-3.5 h-3.5 mr-2 inline-block" />
-              Builder data
-            </button>
-
-            <div className="relative flex-1 md:flex-none">
-              <input
-                type="file"
-                accept=".pdf,.png,.jpg,.jpeg,.webp,image/*"
-                className="hidden"
-                id="resume-upload-field"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setUploadedFile(file);
-                    setSelectedResume('upload');
-                    toast.success(`Identity loaded: ${file.name}`);
-                  }
-                }}
-              />
-              <button
-                onClick={() => document.getElementById('resume-upload-field')?.click()}
-                className={cn(
-                  'w-full px-6 py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all',
-                  selectedResume === 'upload'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                <Upload className="w-3.5 h-3.5 mr-2 inline-block" />
-                {uploadedFile ? uploadedFile.name.substring(0, 10) + '...' : 'Upload file'}
-              </button>
             </div>
           </div>
 
-          {uploadedFile && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => {
-                setUploadedFile(null);
-                setSelectedResume('current');
-                toast.info('External file removed');
-              }}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-8 items-start">
-        <div className="space-y-6">
-          <div className="card-elevated p-8 border border-border rounded-sm shadow-sm bg-card/50 backdrop-blur-sm">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-inner">
-                <Target className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-xl tracking-tight">Job description</h3>
-                <p className="text-[10px] text-muted-foreground font-semibold">Requirement parameters</p>
-              </div>
-            </div>
+          {/* Job Requirements Panel */}
+          <div className="card-elevated p-4 md:p-6 border border-border rounded-sm shadow-sm bg-card/50 backdrop-blur-sm">
+            <h3 className="font-bold text-lg tracking-tight mb-2 flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-primary" /> Target Role
+            </h3>
+            <p className="text-[10px] text-muted-foreground font-semibold mb-6">Target position description</p>
 
             <Textarea
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
-              placeholder="Inject target job directives for deep neural analysis..."
-              className="min-h-[300px] bg-background/50 border border-border rounded-sm focus-visible:ring-0 focus:border-primary/50 resize-none leading-relaxed text-sm font-medium transition-all italic"
+              placeholder="Paste the job description or specific requirements here..."
+              className="min-h-[160px] bg-background/50 border border-border rounded-sm focus-visible:ring-0 focus:border-border/40 resize-none leading-relaxed text-sm font-medium transition-all"
             />
 
             <Button
-              className="w-full mt-8 h-14 bg-primary text-primary-foreground font-bold uppercase tracking-[0.25em] text-xs shadow-sm hover:translate-y-[-2px] hover:shadow-sm active:translate-y-[1px] active:shadow-none transition-all rounded-sm"
+              className="w-full mt-6 h-12 bg-primary text-primary-foreground font-bold tracking-wide text-sm shadow-sm hover:translate-y-[-2px] hover:shadow-sm active:translate-y-[1px] active:shadow-none transition-all rounded-sm"
               onClick={onAnalyze}
               disabled={isAnalyzing || !jobDescription.trim()}
             >
               {isAnalyzing ? (
                 <>
-                  <RefreshCw className="w-5 h-5 animate-spin mr-3" /> Processing Directives...
+                  <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Evaluating...
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5 mr-3" /> Bootstrap AI Audit
+                  <Target className="w-4 h-4 mr-2" /> Evaluate Alignment
                 </>
               )}
             </Button>
-
-            {uploadedFile && selectedResume === 'upload' && !isAnalyzing && (
-              <p className="text-[10px] text-center mt-3 text-muted-foreground italic flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-3 h-3 text-success" />
-                Targeting external file: <span className="font-bold text-primary">{uploadedFile.name}</span>
-              </p>
-            )}
           </div>
+        </div>
 
+        {/* RIGHT COLUMN: Results */}
+        <div className="xl:col-span-8 space-y-6 min-h-[500px]">
           {isAnalyzing && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               <StatePanel
-                title="Analyzing resume"
-                description="Checking semantic relevance and ATS keyword coverage..."
+                title="Evaluating Profile"
+                description="Checking requirement alignment and keyword coverage..."
                 className="w-full"
               />
             </motion.div>
           )}
-        </div>
-
-        <div className="space-y-6 min-h-[500px]">
           {analysisResult && !isAnalyzing ? (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
-              <div className="card-elevated p-10 text-center border border-primary/20 rounded-sm bg-primary/5">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">ATS Compatibility Score</p>
+              <div className="card-elevated p-10 text-center border border-border/40 rounded-sm bg-primary/5">
+                <p className="text-sm font-medium text-muted-foreground  mb-4">Alignment Score</p>
                 <div className={cn('text-8xl font-bold mb-6 font-mono tracking-tighter transition-colors', getScoreColor(analysisResult.matchScore))}>
                   {analysisResult.matchScore}%
                 </div>
                 <Progress value={analysisResult.matchScore} className="h-3 border border-border bg-background rounded-sm" />
               </div>
 
-              <div className="card-elevated p-8 border border-border rounded-sm shadow-sm">
-                <h4 className="font-bold text-xs mb-6 flex items-center gap-3 text-muted-foreground uppercase tracking-widest">
+              <div className="card-elevated p-4 md:p-6 border border-border rounded-sm shadow-sm">
+                <h4 className="font-bold text-xs mb-6 flex items-center gap-3 text-muted-foreground ">
                   <Target className="w-4 h-4 text-primary" /> Keyword Analysis
                 </h4>
                 <div className="flex flex-wrap gap-3">
@@ -207,9 +202,9 @@ export function ResumeAnalyzerPanel({
                       key={index}
                       variant="outline"
                       className={cn(
-                        'px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-sm border transition-all',
+                        'px-4 py-1.5 text-sm font-medium  rounded-sm border transition-all',
                         keywordMatchItem.found
-                          ? 'bg-primary/10 text-primary border-primary/30 shadow-sm'
+                          ? 'bg-primary/10 text-primary border-border/40 shadow-sm'
                           : 'opacity-30 grayscale border-dashed border-border',
                       )}
                     >
@@ -221,8 +216,8 @@ export function ResumeAnalyzerPanel({
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-success/5 border border-success/30 p-6 rounded-sm group transition-all hover:bg-success/10">
-                  <h5 className="font-bold text-success text-[10px] mb-4 flex items-center gap-2 uppercase tracking-widest">
+                <div className="p-3 md:p-6 rounded-lg border border-success/20 bg-success/5 group transition-all hover:bg-success/10">
+                  <h5 className="font-bold text-success text-[10px] mb-4 flex items-center gap-2 ">
                     <CheckCircle2 className="w-4 h-4" /> Key Strengths
                   </h5>
                   <ul className="text-xs space-y-2 text-foreground/80 list-none ml-0 leading-relaxed font-medium">
@@ -234,8 +229,8 @@ export function ResumeAnalyzerPanel({
                     ))}
                   </ul>
                 </div>
-                <div className="bg-destructive/5 border border-destructive/30 p-6 rounded-sm group transition-all hover:bg-destructive/10">
-                  <h5 className="font-bold text-destructive text-[10px] mb-4 flex items-center gap-2 uppercase tracking-widest">
+                <div className="p-3 md:p-6 rounded-lg border border-destructive/20 bg-destructive/5 group transition-all hover:bg-destructive/10">
+                  <h5 className="font-bold text-destructive text-[10px] mb-4 flex items-center gap-2 ">
                     <XCircle className="w-4 h-4" /> Improvement Areas
                   </h5>
                   <ul className="text-xs space-y-2 text-foreground/80 list-none ml-0 leading-relaxed font-medium">
@@ -249,15 +244,15 @@ export function ResumeAnalyzerPanel({
                 </div>
               </div>
 
-              <div className="card-elevated p-8 bg-primary/5 border border-primary/20 rounded-sm relative overflow-hidden">
+              <div className="card-elevated p-4 md:p-6 bg-primary/5 border border-border/40 rounded-sm relative overflow-hidden">
                 <div className="absolute top-[-20px] right-[-20px] w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
-                <h4 className="font-bold flex items-center gap-3 mb-6 text-primary uppercase tracking-widest text-[10px]">
-                  <Lightbulb className="w-5 h-5 text-amber-500" /> AI Recommendations
+                <h4 className="font-bold flex items-center gap-3 mb-6 text-primary  text-[10px]">
+                  <ClipboardCheck className="w-5 h-5" /> Improvement Suggestions
                 </h4>
                 <div className="grid gap-6">
                   {analysisResult.suggestions.map((suggestion, index) => (
                     <div key={index} className="flex gap-4 text-sm leading-relaxed text-foreground/90 font-medium group">
-                      <div className="w-6 h-6 shrink-0 bg-primary/10 border border-primary/20 rounded-sm flex items-center justify-center text-primary text-[10px] font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                      <div className="w-6 h-6 shrink-0 bg-primary/10 border border-border/40 rounded-sm flex items-center justify-center text-primary text-sm font-medium group-hover:bg-primary group-hover:text-primary-foreground transition-all">
                         {index + 1}
                       </div>
                       <span>{suggestion}</span>
@@ -265,12 +260,27 @@ export function ResumeAnalyzerPanel({
                   ))}
                 </div>
               </div>
+
+              <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 relative">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-bold text-xs flex items-center gap-2 text-muted-foreground">
+                    <FileText className="w-4 h-4 text-primary" /> Analysis Notes
+                  </h4>
+                  <Badge variant="outline" className="text-[10px]">Editable</Badge>
+                </div>
+                <Textarea
+                  value={analysisNotes}
+                  onChange={(e) => setAnalysisNotes(e.target.value)}
+                  placeholder="Append custom notes, recruiter feedback, or personal action items here..."
+                  className="min-h-[120px] bg-background/50 border border-border rounded-sm focus-visible:ring-0 focus:border-border/40 resize-none text-sm font-medium transition-all"
+                />
+              </div>
             </motion.div>
           ) : !isAnalyzing ? (
             <EmptyState
-              title="Analysis pending"
-              description="Paste a job description and run the audit to generate your alignment report."
-              className="min-h-[420px] flex items-center justify-center font-medium"
+              title="Evaluation Pending"
+              description="Provide the target job requirements to evaluate the profile's alignment."
+              className="h-full min-h-[420px] flex items-center justify-center font-medium"
             />
           ) : null}
         </div>

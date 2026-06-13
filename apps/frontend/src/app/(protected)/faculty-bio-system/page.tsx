@@ -128,7 +128,7 @@ export default function FacultyBioSystemPage() {
   };
 
   const isOwner = user?.uid === facultyId;
-  const isAdmin = user?.role?.includes('admin');
+  const isAdmin = user?.role?.includes('college_admin') || user?.role?.includes('super_admin');
   const canEdit = isOwner || isAdmin;
 
   // Publication handlers
@@ -413,7 +413,7 @@ export default function FacultyBioSystemPage() {
     <div className="space-y-6">
       {/* Header */}
       {profile?.faculty && (
-        <div className="card-elevated p-6">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
               <span className="text-2xl font-bold text-primary">
@@ -449,7 +449,7 @@ export default function FacultyBioSystemPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-8">
+        <TabsList className="mb-6">
           {[
             { id: 'overview', label: 'Overview', icon: FileText },
             { id: 'publications', label: 'Publications', icon: BookOpen },
@@ -460,7 +460,7 @@ export default function FacultyBioSystemPage() {
             <TabsTrigger
               key={id}
               value={id}
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-border/40 data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-xs font-bold  transition-all flex items-center gap-2"
             >
               <Icon className="w-4 h-4" />
               {label}
@@ -471,27 +471,27 @@ export default function FacultyBioSystemPage() {
         {/* Overview */}
         <TabsContent value="overview" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <div className="card-elevated p-5 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 text-center">
               <BookOpen className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalPublications}</p>
               <p className="text-sm text-muted-foreground">Publications</p>
             </div>
-            <div className="card-elevated p-5 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 text-center">
               <Quote className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalCitations}</p>
               <p className="text-sm text-muted-foreground">Total Citations</p>
             </div>
-            <div className="card-elevated p-5 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 text-center">
               <Trophy className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalAwards}</p>
               <p className="text-sm text-muted-foreground">Awards</p>
             </div>
-            <div className="card-elevated p-5 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 text-center">
               <Mic2 className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalConferences}</p>
               <p className="text-sm text-muted-foreground">Conferences</p>
             </div>
-            <div className="card-elevated p-5 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 text-center">
               <Briefcase className="w-8 h-8  mb-2 text-primary" />
               <p className="text-2xl font-bold">{stats.totalConsultations}</p>
               <p className="text-sm text-muted-foreground">Consultations</p>
@@ -499,14 +499,14 @@ export default function FacultyBioSystemPage() {
           </div>
 
           {profile?.faculty?.bio && (
-            <div className="card-elevated p-6 mt-4">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 mt-4">
               <h3 className="text-lg font-semibold mb-3">Biography</h3>
               <p className="text-muted-foreground whitespace-pre-wrap">{profile.faculty.bio}</p>
             </div>
           )}
 
           {profile?.faculty?.qualifications && (
-            <div className="card-elevated p-6 mt-4">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 mt-4">
               <h3 className="text-lg font-semibold mb-3">Qualifications</h3>
               <p className="text-muted-foreground">{profile.faculty.qualifications}</p>
             </div>
@@ -530,7 +530,7 @@ export default function FacultyBioSystemPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="card-elevated p-5"
+                className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -599,7 +599,7 @@ export default function FacultyBioSystemPage() {
           </div>
 
           {(!profile?.publications || profile.publications.length === 0) && (
-            <div className="card-elevated p-12 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
               <BookOpen className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No publications yet.</p>
             </div>
@@ -623,7 +623,7 @@ export default function FacultyBioSystemPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="card-elevated p-5"
+                className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -668,7 +668,7 @@ export default function FacultyBioSystemPage() {
           </div>
 
           {(!profile?.awards || profile.awards.length === 0) && (
-            <div className="card-elevated p-12 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
               <Trophy className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No awards yet.</p>
             </div>
@@ -692,7 +692,7 @@ export default function FacultyBioSystemPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="card-elevated p-5"
+                className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -747,7 +747,7 @@ export default function FacultyBioSystemPage() {
           </div>
 
           {(!profile?.conferences || profile.conferences.length === 0) && (
-            <div className="card-elevated p-12 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
               <Mic2 className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No conferences yet.</p>
             </div>
@@ -771,7 +771,7 @@ export default function FacultyBioSystemPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="card-elevated p-5"
+                className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -833,7 +833,7 @@ export default function FacultyBioSystemPage() {
           </div>
 
           {(!profile?.consultations || profile.consultations.length === 0) && (
-            <div className="card-elevated p-12 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
               <Briefcase className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No consultations yet.</p>
             </div>

@@ -23,8 +23,10 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    require('fs').appendFileSync('C:\\\\Users\\\\dubey\\\\PEC\\\\auth_debug.log', 'AuthGuard started\\n');
     const token = this.extractTokenFromHeader(request);
     if (!token) {
+      require('fs').appendFileSync('C:\\\\Users\\\\dubey\\\\PEC\\\\auth_debug.log', 'Token missing! Headers: ' + JSON.stringify(request.headers) + '\\n');
       throw new UnauthorizedException();
     }
 
@@ -87,31 +89,84 @@ export class AuthGuard implements CanActivate {
 
       // Check Redis cache for permissions
       const cacheKey = `user_perms:${userId}`;
-      let permissions = await this.cacheManager.get(cacheKey);
+      let cachedData = await this.cacheManager.get<{ permissions: any[], isSystemAdmin: boolean }>(cacheKey);
+      
+      let permissions = cachedData?.permissions;
+      let isSystemAdmin = cachedData?.isSystemAdmin || false;
 
       if (!permissions) {
-        // Fetch from DB
-        const roleRecords = await this.prisma.role.findMany({ where: {
-            name: { in: roles.length > 0 ? roles : primaryRole ? [primaryRole] : [] },
+        // 1. Fetch user's direct active roles
+        const activeUserRoles = await this.prisma.userRole.findMany({
+          where: {
+            userId: userId,
+            OR: [ { validFrom: null }, { validFrom: { lte: new Date() } } ],
+            AND: [ { OR: [{ validUntil: null }, { validUntil: { gte: new Date() } }] } ]
           },
-          include: {
-            permissions: {
-              include: { permission: true }
-            }
-          }
+          select: { roleId: true }
         });
 
-        const permsSet = new Map();
-        roleRecords.forEach(role => {
-          role.permissions.forEach(rp => {
-            permsSet.set(rp.permission.id, rp.permission);
+        // 2. Fetch user's delegated active roles
+        const activeDelegations = await this.prisma.roleDelegation.findMany({
+          where: {
+            delegateeId: userId,
+            revokedAt: null,
+            validFrom: { lte: new Date() },
+            validUntil: { gt: new Date() }
+          },
+          select: { roleId: true }
+        });
+
+        const startingRoleIds = new Set([
+          ...activeUserRoles.map(ur => ur.roleId),
+          ...activeDelegations.map(rd => rd.roleId)
+        ]);
+
+        if (startingRoleIds.size === 0 && roles.length > 0) {
+          const tokenRoles = await this.prisma.role.findMany({
+            where: { name: { in: roles } },
+            select: { id: true }
           });
+          tokenRoles.forEach(r => startingRoleIds.add(r.id));
+        }
+
+        // Fetch ALL roles from DB to build inheritance tree in memory
+        const allRoles = await this.prisma.role.findMany({
+          include: { permissions: { include: { permission: true } } }
+        });
+
+        const roleMap = new Map();
+        allRoles.forEach(r => roleMap.set(r.id, r));
+
+        // Traverse inheritance
+        const collectedRoleIds = new Set<string>();
+        const queue = Array.from(startingRoleIds);
+
+        while (queue.length > 0) {
+          const rId = queue.shift()!;
+          if (!collectedRoleIds.has(rId)) {
+            collectedRoleIds.add(rId);
+            const rData = roleMap.get(rId);
+            if (rData && rData.parentRoleId) {
+              queue.push(rData.parentRoleId);
+            }
+          }
+        }
+
+        const permsSet = new Map();
+        
+        collectedRoleIds.forEach(rId => {
+          const rData = roleMap.get(rId);
+          if (rData) {
+            if (rData.isSystemAdmin) isSystemAdmin = true;
+            rData.permissions.forEach((rp: any) => {
+              permsSet.set(rp.permission.id, rp.permission);
+            });
+          }
         });
 
         permissions = Array.from(permsSet.values());
         
-        // Cache for 15 minutes (in ms for cache-manager v5+)
-        await this.cacheManager.set(cacheKey, permissions, 15 * 60 * 1000);
+        await this.cacheManager.set(cacheKey, { permissions, isSystemAdmin }, 15 * 60 * 1000);
       }
 
       request['user'] = {
@@ -119,11 +174,14 @@ export class AuthGuard implements CanActivate {
         role: primaryRole,
         roles,
         permissions,
+        isSystemAdmin,
         uid: userId,
       };
-    } catch (e) {
+
+    } catch (e: any) {
       console.error(e);
-      throw new UnauthorizedException();
+      require('fs').appendFileSync('C:\\\\Users\\\\dubey\\\\PEC\\\\auth_error.log', e.stack || e.toString() + '\\n');
+      throw new UnauthorizedException(e.message || 'Unauthorized');
     }
     return true;
   }

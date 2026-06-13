@@ -217,7 +217,7 @@ export default function ChatPanel({
 
           <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
             {filteredChats.length === 0 ? (
-              <div className="text-center text-sm font-medium text-muted-foreground p-8">
+              <div className="text-center text-sm font-medium text-muted-foreground p-4 md:p-6">
                 {searchQuery ? 'No matching chats found.' : 'No conversations yet.'}
               </div>
             ) : (
@@ -258,7 +258,7 @@ export default function ChatPanel({
                           {chat.listing.title}
                         </p>
                         {lastMsg && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 opacity-60">
+                          <span className="text-sm font-medium  text-muted-foreground shrink-0 opacity-60">
                             {formatDate(chat.updatedAt)}
                           </span>
                         )}
@@ -270,7 +270,7 @@ export default function ChatPanel({
                       <div className="flex items-center gap-1 mt-1.5">
                         <Badge
                           variant="secondary"
-                          className="text-[9px] uppercase tracking-wider font-bold h-4 px-1.5 bg-primary/10 text-primary hover:bg-primary/20"
+                          className="text-[9px]  font-bold h-4 px-1.5 bg-primary/10 text-primary hover:bg-primary/20"
                         >
                           ₹ {chat.listing.price.toLocaleString('en-IN')}
                         </Badge>
@@ -304,7 +304,7 @@ export default function ChatPanel({
                   <h3 className="font-bold text-lg truncate text-foreground leading-tight">
                     {activeChat.listing.title}
                   </h3>
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mt-0.5">
+                  <p className="text-[10px]  font-bold text-muted-foreground mt-0.5">
                     {activeChat.buyer.id === currentUserId
                       ? 'Chatting with Seller'
                       : `Chatting with ${activeChat.buyer.name}`}
@@ -365,7 +365,7 @@ export default function ChatPanel({
                           className={cn(
                             'max-w-[70%] rounded-sm px-4 py-2.5 text-sm font-medium shadow-sm',
                             isMe
-                              ? 'bg-primary text-primary-foreground rounded-tr-sm shadow-glow'
+                              ? 'bg-primary text-primary-foreground rounded-tr-sm shadow-md border border-border/40'
                               : 'bg-card border border-border/40 rounded-tl-sm text-foreground'
                           )}
                         >
@@ -404,7 +404,7 @@ export default function ChatPanel({
                           )}
                           <div
                             className={cn(
-                              'text-[9px] uppercase tracking-widest mt-1.5 font-bold',
+                              'text-[9px]  mt-1.5 font-bold',
                               isMe
                                 ? 'text-primary-foreground/70'
                                 : 'text-muted-foreground opacity-70'
@@ -487,7 +487,7 @@ export default function ChatPanel({
                       size="icon"
                       onClick={handleSend}
                       disabled={sending || !msgText.trim()}
-                      className="absolute right-2 bottom-2 h-9 w-9 rounded-sm bg-primary shadow-glow transition-all"
+                      className="absolute right-2 bottom-2 h-9 w-9 rounded-sm bg-primary shadow-md border border-border/40 transition-all"
                     >
                       {sending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -500,7 +500,7 @@ export default function ChatPanel({
               </div>
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 opacity-50 relative">
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-4 md:p-6 opacity-50 relative">
               <Button
                 variant="ghost"
                 size="icon"

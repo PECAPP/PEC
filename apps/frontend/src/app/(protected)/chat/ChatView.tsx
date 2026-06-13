@@ -33,6 +33,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
   
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(roomFromUrl || (rooms.length > 0 ? rooms[0].id : null));
   const [replyingTo, setReplyingTo] = useState<{ id: string; text: string; senderName: string } | null>(null);
+  const [editingMessage, setEditingMessage] = useState<{ id: string; text: string } | null>(null);
 
   useEffect(() => {
     if (roomFromUrl) {
@@ -50,6 +51,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
     messages,
     loading: messagesLoading,
     sendMessage,
+    editMessage,
     loadMore,
     hasMore,
   } = useChatMessages(selectedRoomId);
@@ -151,6 +153,10 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
                     }}
                     onReply={() => {}}
                     onReplyClick={() => {}}
+                    onEdit={(message) => {
+                      setEditingMessage({ id: message.id, text: message.content });
+                      setReplyingTo(null); // Cancel any reply if we start editing
+                    }}
                   />
                 </div>
               ))}
@@ -167,6 +173,12 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
               roomId={selectedRoomId}
               replyingTo={replyingTo}
               onCancelReply={() => setReplyingTo(null)}
+              editingMessage={editingMessage}
+              onEditSubmit={async (id, newContent) => {
+                await editMessage(id, newContent);
+                setEditingMessage(null);
+              }}
+              onCancelEdit={() => setEditingMessage(null)}
             />
           </div>
         )}

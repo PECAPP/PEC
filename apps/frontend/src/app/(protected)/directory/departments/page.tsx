@@ -15,7 +15,7 @@ export default async function DepartmentsPage() {
     redirect('/auth');
   }
 
-  const isAdmin = ['admin'].includes(session.role || '');
+  const isAdmin = ['college_admin', 'super_admin'].includes(session.role || '');
   
   // Pre-fetch departments on the server
   const departments = await serverFetch('/departments?limit=100');

@@ -117,7 +117,7 @@ class AuthClient {
     return fallback;
   }
 
-  async login(credentials: AuthCredentials): Promise<AuthResponse> {
+  async login(credentials: AuthCredentials): Promise<AuthResponse | { requires2FA: boolean; userId: string }> {
     const csrfToken = this.getCsrfToken();
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
@@ -131,6 +131,26 @@ class AuthClient {
 
     if (!response.ok) {
       const message = await this.parseErrorMessage(response, 'Login failed');
+      throw new Error(message);
+    }
+
+    return response.json();
+  }
+
+  async login2FA(payload: { userId: string; token: string }): Promise<AuthResponse> {
+    const csrfToken = this.getCsrfToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
+    const response = await fetch(authUrl('2fa/login'), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const message = await this.parseErrorMessage(response, '2FA Login failed');
       throw new Error(message);
     }
 

@@ -57,13 +57,18 @@ export default function CommandMenu() {
 
   return (
     <>
-      <div className="relative" onClick={() => setOpen(true)}>
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <div className="relative group cursor-pointer" onClick={() => setOpen(true)}>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
         <Input
-          placeholder="Search... (Ctrl+K)"
-          className="pl-10 bg-white/5 border border-white/10 shadow-sm hover:bg-white/10 transition-colors focus-visible:ring-1 focus-visible:ring-primary cursor-pointer text-foreground placeholder:text-muted-foreground"
+          placeholder="Search..."
+          className="pl-10 pr-20 bg-white/5 backdrop-blur-md border border-white/10 shadow-sm hover:bg-white/10 transition-colors focus-visible:ring-1 focus-visible:ring-primary cursor-pointer text-foreground placeholder:text-muted-foreground/60 h-10 rounded-lg"
           readOnly
         />
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+          <kbd className="inline-flex h-5 items-center justify-center rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">Ctrl</kbd>
+          <span className="text-[10px] text-muted-foreground">+</span>
+          <kbd className="inline-flex h-5 items-center justify-center rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">K</kbd>
+        </div>
       </div>
 
       <CommandDialog open={open} onOpenChange={setOpen}>

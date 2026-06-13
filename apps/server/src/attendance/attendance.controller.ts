@@ -95,7 +95,7 @@ export class AttendanceController {
       req.user,
     );
 
-    return res.redirect(302, url);
+    return res.status(302).redirect(url);
   }
 
   @CheckPolicies((ability) => ability.can('read', 'Attendance'))
@@ -136,10 +136,11 @@ export class AttendanceController {
   @CheckPolicies((ability) => ability.can('create', 'Attendance'))
   @Post()
   async create(
+    @Request() req: any,
     @Body(new ZodValidationPipe(attendanceSchema))
     createAttendanceDto: CreateAttendanceDto,
   ) {
-    const data = await this.attendanceService.create(createAttendanceDto);
+    const data = await this.attendanceService.create(createAttendanceDto, req.user);
     return ok(data);
   }
 
@@ -169,18 +170,19 @@ export class AttendanceController {
   @CheckPolicies((ability) => ability.can('update', 'Attendance'))
   @Patch(':id')
   async update(
+    @Request() req: any,
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body(new ZodValidationPipe(attendanceSchema.partial()))
     updateAttendanceDto: UpdateAttendanceDto,
   ) {
-    const data = await this.attendanceService.update(id, updateAttendanceDto);
+    const data = await this.attendanceService.update(id, updateAttendanceDto, req.user);
     return ok(data);
   }
 
   @CheckPolicies((ability) => ability.can('delete', 'Attendance'))
   @Delete(':id')
-  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    const data = await this.attendanceService.remove(id);
+  async remove(@Request() req: any, @Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    const data = await this.attendanceService.remove(id, req.user);
     return ok(data);
   }
 }

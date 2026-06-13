@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { SendMessageDto } from './dto/send-message.dto';
+import { EventsGateway } from '../events/events.gateway';
 
 type ClubMedia = {
   url: string;
@@ -19,7 +20,10 @@ type ClubMedia = {
 export class ChatService {
   private static readonly CLUB_PREFIX = 'CLUB::';
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventsGateway: EventsGateway,
+  ) {}
 
   private isAdmin(userRoles: string[] = []) {
     return userRoles.includes('college_admin');
@@ -245,7 +249,7 @@ export class ChatService {
       throw new ForbiddenException('You are not a participant of this room');
     }
 
-    return this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content: dto.content,
         senderId,
@@ -260,6 +264,60 @@ export class ChatService {
         },
       },
     });
+
+    // Notify all users in the room
+    const room = await this.prisma.chatRoom.findUnique({
+      where: { id: dto.chatRoomId },
+      include: { participants: true },
+    });
+    
+    if (room) {
+      room.participants.forEach(p => {
+        this.eventsGateway.emitToUser(p.userId, 'newMessage', message);
+      });
+    }
+
+    return message;
+  }
+
+  async editMessage(messageId: string, userId: string, newContent: string) {
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+    });
+
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+
+    if (message.senderId !== userId) {
+      throw new ForbiddenException('You can only edit your own messages');
+    }
+
+    const updatedMessage = await this.prisma.message.update({
+      where: { id: messageId },
+      data: { content: newContent },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    const room = await this.prisma.chatRoom.findUnique({
+      where: { id: message.chatRoomId },
+      include: { participants: true },
+    });
+    
+    if (room) {
+      room.participants.forEach(p => {
+        this.eventsGateway.emitToUser(p.userId, 'messageEdited', updatedMessage);
+      });
+    }
+
+    return updatedMessage;
   }
 
   async getChatUsers(query: string) {
@@ -302,9 +360,22 @@ export class ChatService {
       throw new ForbiddenException('You can only delete your own messages');
     }
 
-    return this.prisma.message.delete({
+    const deletedMessage = await this.prisma.message.delete({
       where: { id: messageId },
     });
+
+    const room = await this.prisma.chatRoom.findUnique({
+      where: { id: message.chatRoomId },
+      include: { participants: true },
+    });
+
+    if (room) {
+      room.participants.forEach(p => {
+        this.eventsGateway.emitToUser(p.userId, 'messageDeleted', { messageId, roomId: message.chatRoomId });
+      });
+    }
+
+    return deletedMessage;
   }
 
   async listClubs(userId: string, userRoles: string[] = []) {
@@ -669,7 +740,7 @@ export class ChatService {
     const club = await this.findClubByReference(clubRoomId);
     await this.ensureParticipant(club.chatRoomId, senderId);
 
-    return this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content: trimmed,
         senderId,
@@ -684,5 +755,18 @@ export class ChatService {
         },
       },
     });
+
+    const clubRoom = await this.prisma.chatRoom.findUnique({
+      where: { id: club.chatRoomId },
+      include: { participants: true },
+    });
+
+    if (clubRoom) {
+      clubRoom.participants.forEach(p => {
+        this.eventsGateway.emitToUser(p.userId, 'newMessage', message);
+      });
+    }
+
+    return message;
   }
 }

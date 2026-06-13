@@ -13,7 +13,7 @@ export function buildAbilityFor(permissions?: CaslPermission[], role?: string | 
 
   // ALWAYS grant full access to admins, regardless of what the backend DB says
   // This prevents issues where the backend has stale or incorrect CASL rules.
-  if (role === 'admin') {
+  if (role === 'college_admin') {
     can('manage', 'all');
   } else if (permissions && permissions.length > 0) {
     permissions.forEach((perm) => {

@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Input, Select, Select
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2, Plus, Trash2, Upload } from 'lucide-react';
+import { Loader2, Plus, Trash2, Upload, Edit, Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -70,7 +70,7 @@ export default function ExaminationsTab() {
   }
 
   const role = user.role;
-  const isCollegeAdmin = ['admin'].includes(role || '');
+  const isCollegeAdmin = ['college_admin'].includes(role || '');
 
   if (isCollegeAdmin) {
     return <CollegeAdminExaminations />;
@@ -104,6 +104,17 @@ function CollegeAdminExaminations() {
   const [dateScope, setDateScope] = useState<'all' | 'upcoming'>('all');
 
   const [scheduleForm, setScheduleForm] = useState({
+    courseId: '',
+    examType: 'Final',
+    date: '',
+    startTime: '',
+    endTime: '',
+    room: '',
+  });
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editScheduleForm, setEditScheduleForm] = useState({
+    id: '',
     courseId: '',
     examType: 'Final',
     date: '',
@@ -196,6 +207,36 @@ function CollegeAdminExaminations() {
     }
   };
 
+  const handleEditScheduleSubmit = async () => {
+    if (!editScheduleForm.date || !editScheduleForm.startTime || !editScheduleForm.endTime || !editScheduleForm.room) {
+      toast.error('Please complete all schedule fields');
+      return;
+    }
+
+    try {
+      await api.patch(`/examinations/schedules/${editScheduleForm.id}`, editScheduleForm);
+      toast.success('Exam schedule updated');
+      setEditModalOpen(false);
+      await loadSchedules();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update schedule');
+    }
+  };
+
+  const openEditModal = (schedule: ExamSchedule) => {
+    setEditScheduleForm({
+      id: schedule.id,
+      courseId: schedule.courseId,
+      examType: schedule.examType,
+      date: schedule.date.split('T')[0],
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      room: schedule.room,
+    });
+    setEditModalOpen(true);
+  };
+
   const handleBulkImport = async (rows: any[]) => {
     let success = 0;
     let failed = 0;
@@ -247,9 +288,13 @@ function CollegeAdminExaminations() {
       </div>
 
       <Tabs defaultValue="schedule" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="schedule">Schedule</TabsTrigger>
-          <TabsTrigger value="upload">Bulk Upload</TabsTrigger>
+        <TabsList className="mb-6">
+          <TabsTrigger value="schedule" className="gap-1.5">
+            <Calendar className="w-3.5 h-3.5" /> Schedule
+          </TabsTrigger>
+          <TabsTrigger value="upload" className="gap-1.5">
+            <Upload className="w-3.5 h-3.5" /> Bulk Upload
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="schedule" className="space-y-4">
@@ -359,7 +404,10 @@ function CollegeAdminExaminations() {
                       <TableCell>
                         <Badge variant="outline">{schedule.examType}</Badge>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right flex justify-end gap-1">
+                        <Button variant="ghost" size="sm" onClick={() => openEditModal(schedule)}>
+                          <Edit className="w-4 h-4 text-primary" />
+                        </Button>
                         <Button variant="ghost" size="sm" onClick={() => handleDeleteSchedule(schedule.id)}>
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
@@ -406,6 +454,52 @@ function CollegeAdminExaminations() {
               },
             ]}
           />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Exam Schedule</DialogTitle>
+            <DialogDescription>Update details for the selected examination schedule.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 gap-3">
+              <Select value={editScheduleForm.courseId} onValueChange={(value) => setEditScheduleForm((p) => ({ ...p, courseId: value }))}>
+                <SelectTrigger><SelectValue placeholder="Course" /></SelectTrigger>
+                <SelectContent>
+                  {courses.map((course) => (
+                    <SelectItem key={course.id} value={course.id}>
+                      {course.code} - {course.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={editScheduleForm.examType} onValueChange={(value) => setEditScheduleForm((p) => ({ ...p, examType: value }))}>
+                <SelectTrigger><SelectValue placeholder="Exam type" /></SelectTrigger>
+                <SelectContent>
+                  {examTypeOptions.map((type) => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Input type="date" value={editScheduleForm.date} onChange={(e) => setEditScheduleForm((p) => ({ ...p, date: e.target.value }))} />
+                <Input placeholder="Room" value={editScheduleForm.room} onChange={(e) => setEditScheduleForm((p) => ({ ...p, room: e.target.value }))} />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Input type="time" value={editScheduleForm.startTime} onChange={(e) => setEditScheduleForm((p) => ({ ...p, startTime: e.target.value }))} />
+                <Input type="time" value={editScheduleForm.endTime} onChange={(e) => setEditScheduleForm((p) => ({ ...p, endTime: e.target.value }))} />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-6">
+              <Button variant="ghost" onClick={() => setEditModalOpen(false)}>Cancel</Button>
+              <Button onClick={handleEditScheduleSubmit}>Save Changes</Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </motion.div>
@@ -487,11 +581,11 @@ function DepartmentUpcomingExams({
         <Table className="border-collapse">
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted border-b border-border/60">
-              <TableHead className="w-40 font-bold uppercase text-[10px] tracking-widest text-primary py-4 border-r border-border/60 text-center">Status & Date</TableHead>
-              <TableHead className="font-bold uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Course Details</TableHead>
-              <TableHead className="font-bold uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Time Slot</TableHead>
-              <TableHead className="font-bold uppercase text-[10px] tracking-widest py-4 border-r border-border/60">Venue</TableHead>
-              <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest py-4">Type</TableHead>
+              <TableHead className="w-40 font-bold uppercase text-[10px]  text-primary py-4 border-r border-border/60 text-center">Status & Date</TableHead>
+              <TableHead className="font-bold uppercase text-[10px]  py-4 border-r border-border/60">Course Details</TableHead>
+              <TableHead className="font-bold uppercase text-[10px]  py-4 border-r border-border/60">Time Slot</TableHead>
+              <TableHead className="font-bold uppercase text-[10px]  py-4 border-r border-border/60">Venue</TableHead>
+              <TableHead className="text-right font-bold uppercase text-[10px]  py-4">Type</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -536,14 +630,14 @@ function DepartmentUpcomingExams({
                         className={`align-top border-r border-border/60 py-6 text-center ${isVerySoon ? 'bg-primary/10' : 'bg-muted/30'}`}
                       >
                         <div className="flex flex-col items-center justify-center space-y-2 sticky top-6">
-                          <span className={`text-[10px] font-bold leading-none px-2 py-1 rounded-full ${isVerySoon ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-muted-foreground/20 text-muted-foreground'}`}>
+                          <span className={`text-sm font-medium leading-none px-2 py-1 rounded-full ${isVerySoon ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-muted-foreground/20 text-muted-foreground'}`}>
                             {diffDays === 0 ? 'TODAY' : diffDays === 1 ? 'TOMORROW' : `${diffDays}D LEFT`}
                           </span>
                           <div className="flex flex-col items-center">
                             <span className="text-3xl font-bold text-foreground tracking-tighter">{examDate.getDate()}</span>
-                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{new Intl.DateTimeFormat('en-US', { month: 'short' }).format(examDate)}</span>
+                            <span className="text-sm font-medium text-muted-foreground ">{new Intl.DateTimeFormat('en-US', { month: 'short' }).format(examDate)}</span>
                             <div className="h-px w-8 bg-border/60 my-1" />
-                            <span className="text-[9px] font-bold text-primary uppercase tracking-tight">{new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(examDate)}</span>
+                            <span className="text-xs font-medium text-primary uppercase tracking-tight">{new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(examDate)}</span>
                           </div>
                         </div>
                       </TableCell>
@@ -563,12 +657,12 @@ function DepartmentUpcomingExams({
                     </TableCell>
                     <TableCell className="py-6 border-r border-border/60">
                       <div className="flex flex-col">
-                        <span className="text-xs font-bold text-foreground/40 uppercase tracking-widest mb-0.5">Venue</span>
-                        <span className="text-sm font-bold text-foreground tracking-widest uppercase">{exam.room}</span>
+                        <span className="text-xs font-bold text-foreground/40  mb-0.5">Venue</span>
+                        <span className="text-sm font-bold text-foreground ">{exam.room}</span>
                       </div>
                     </TableCell>
                     <TableCell className="py-6 text-right">
-                      <Badge variant={isVerySoon ? 'default' : 'outline'} className="font-bold uppercase text-[9px] tracking-widest px-2 shadow-sm">
+                      <Badge variant={isVerySoon ? 'default' : 'outline'} className="font-bold uppercase text-[9px]  px-2 shadow-sm">
                         {exam.examType}
                       </Badge>
                     </TableCell>

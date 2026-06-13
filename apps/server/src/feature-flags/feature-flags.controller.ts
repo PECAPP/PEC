@@ -30,7 +30,7 @@ export class FeatureFlagsController {
   @CheckPolicies((ability) => ability.can('create', 'FeatureFlag'))
   @Post(':key')
   async upsert(@Param('key') key: string, @Body() body: UpsertFeatureFlagDto) {
-    const data = await this.featureFlagsService.upsert(key, body);
+    const data = await this.featureFlagsService.upsert(key, { ...body, enabled: body.enabled ?? false });
     return ok(data);
   }
 }

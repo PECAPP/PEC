@@ -22,6 +22,7 @@ import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 import { ok } from '../common/utils/api-response';
 import { NoticeboardService } from './noticeboard.service';
 import { CreateNoticeDto } from './dto/create-notice.dto';
+import { UpdateNoticeDto } from './dto/update-notice.dto';
 import { ListNoticesDto } from './dto/list-notices.dto';
 import { TogglePinDto } from './dto/toggle-pin.dto';
 
@@ -57,6 +58,16 @@ export class NoticeboardController {
     @Body() body: TogglePinDto,
   ) {
     const data = await this.service.togglePin(id, body.pinned);
+    return ok(data);
+  }
+
+  @CheckPolicies((ability) => ability.can('update', 'Notice'))
+  @Patch(':id')
+  async update(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() body: UpdateNoticeDto,
+  ) {
+    const data = await this.service.update(id, body);
     return ok(data);
   }
 

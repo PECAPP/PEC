@@ -81,7 +81,7 @@ export const GradesTable = ({ data }: { data: GradesData }) => {
       {/* Per-semester sections */}
       {semesters.map((sem) => (
         <div key={sem}>
-          <div className="bg-gray-50 dark:bg-gray-900/40 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+          <div className="bg-gray-50 dark:bg-gray-900/40 px-4 py-1.5 text-[11px] font-semibold  text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
             Semester {sem}
           </div>
           <table className="w-full text-sm">

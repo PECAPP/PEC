@@ -22,6 +22,18 @@ export class AdminService {
     };
   }
 
+  async getAuditLogs(limit: number = 100, offset: number = 0) {
+    const [items, total] = await Promise.all([
+      this.prisma.auditLog.findMany({
+        take: limit,
+        skip: offset,
+        orderBy: { createdAt: 'desc' }
+      }),
+      this.prisma.auditLog.count()
+    ]);
+    return { items, total, limit, offset };
+  }
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3Service: S3Service,

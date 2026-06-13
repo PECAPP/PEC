@@ -235,7 +235,7 @@ export function GoogleTranslate(_props: GoogleTranslateProps) {
           value={language}
           disabled={isTranslating || isBlocked}
           onChange={(e) => handleLanguageChange(e.target.value)}
-          className="h-8 min-w-[130px] rounded-sm border border-border bg-background/50 backdrop-blur-sm px-2.5 pr-8 text-[10px] font-bold uppercase tracking-widest text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all hover:bg-background/80 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="h-8 min-w-[130px] rounded-sm border border-border bg-background/50 backdrop-blur-sm px-2.5 pr-8 text-sm font-medium  text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all hover:bg-background/80 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {languageOptions.map((lang) => (
             <option key={lang.value} value={lang.value} className="bg-background text-foreground">

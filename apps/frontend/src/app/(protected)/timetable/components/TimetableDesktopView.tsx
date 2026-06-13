@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Edit } from 'lucide-react';
 import { EmptyState } from '@/components/common/AsyncState';
 
 interface TimetableDesktopViewProps {
@@ -20,7 +20,7 @@ interface TimetableDesktopViewProps {
   handleDragLeave: (e: React.DragEvent) => void;
   handleDrop: (e: React.DragEvent, day: string, timeSlot: string) => Promise<void>;
   handleDragEnd: () => void;
-  openSlotDialog: (day: string, timeSlot: string) => void;
+  openSlotDialog: (day: string, timeSlot: string, slotId?: string) => void;
   applySlotFilters: (slots: any[]) => any[];
   handleDeleteSlot: (slotId: string) => Promise<void>;
 }
@@ -43,7 +43,7 @@ export default function TimetableDesktopView({
   handleDeleteSlot,
 }: TimetableDesktopViewProps) {
   return (
-    <div className="hidden md:block card-elevated overflow-x-auto overflow-y-auto max-h-[70vh] timetable-scroll-">
+    <div className="hidden md:block bg-card border border-border/40 rounded-sm shadow-sm overflow-x-auto overflow-y-auto max-h-[70vh] timetable-scroll-">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-muted/30">
@@ -78,7 +78,7 @@ export default function TimetableDesktopView({
                       className="border border-border p-2 bg-muted/40 text-center align-middle"
                     >
                       {day === 'Wednesday' && (
-                        <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground/60 vertical-text block rotate-0">
+                        <span className="text-sm font-medium  text-muted-foreground/60 vertical-text block rotate-0">
                           Lunch Break
                         </span>
                       )}
@@ -122,7 +122,7 @@ export default function TimetableDesktopView({
                           {scopedSlots.map((slot: any, idx: number) => (
                             <div
                               key={idx}
-                              className="p-2 bg-primary/10 rounded-sm border border-primary/20 relative"
+                              className="p-2 bg-primary/10 rounded-sm border border-border/40 relative"
                             >
                               <div className="font-medium text-sm text-foreground">
                                 {slot.courseCode || slot.courseName}
@@ -138,7 +138,7 @@ export default function TimetableDesktopView({
                                       slot.room
                                     )}`;
                                   }}
-                                  className="flex items-center gap-1.5 mt-1.5 text-[10px] font-bold text-primary hover:underline group"
+                                  className="flex items-center gap-1.5 mt-1.5 text-sm font-medium text-primary hover:underline group"
                                 >
                                   <span className="bg-primary/10 px-1.5 py-0.5 rounded uppercase tracking-tighter">
                                     {slot.room}
@@ -152,7 +152,7 @@ export default function TimetableDesktopView({
                               {user?.role === 'student' &&
                                 studentAttendanceMap.has(slot.courseId) && (
                                   <div
-                                    className={`mt-2 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+                                    className={`mt-2 px-2 py-0.5 rounded-full text-sm font-medium inline-flex items-center gap-1 ${
                                       (studentAttendanceMap.get(slot.courseId) || 0) < 75
                                         ? 'bg-destructive/10 text-destructive border border-destructive/20'
                                         : 'bg-success/10 text-success border border-success/20'
@@ -176,15 +176,26 @@ export default function TimetableDesktopView({
                               )}
 
                               {canManageAllTimetable && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteSlot(slot.id);
-                                  }}
-                                  className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 p-1 hover:bg-destructive/10 rounded text-destructive transition-all"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </button>
+                                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 flex gap-1 transition-all">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openSlotDialog(day, timeSlot, slot.id);
+                                    }}
+                                    className="p-1 hover:bg-primary/10 rounded text-primary transition-all"
+                                  >
+                                    <Edit className="w-3 h-3" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteSlot(slot.id);
+                                    }}
+                                    className="p-1 hover:bg-destructive/10 rounded text-destructive transition-all"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                </div>
                               )}
                             </div>
                           ))}

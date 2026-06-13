@@ -29,6 +29,8 @@ import {
   requestPasswordResetSchema,
   resetPasswordSchema,
   changePasswordSchema,
+  verify2FASchema,
+  login2FASchema,
 } from './dto/auth.schemas';
 import {
   ChangePasswordInput,
@@ -39,6 +41,8 @@ import {
   SignInInput,
   SignUpInput,
   VerifyEmailInput,
+  Verify2FAInput,
+  Login2FAInput,
 } from './dto/auth.schemas';
 
 @Controller('auth')
@@ -72,6 +76,9 @@ export class AuthController {
       this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
 
       // Strip sensitive tokens before sending to client
+      if ((auth as any).requires2FA) {
+        return { requires2FA: true, userId: (auth as any).userId };
+      }
       const { access_token, refresh_token, ...response } = auth;
       return { ...response, csrfToken };
     } catch (error: any) {
@@ -254,6 +261,51 @@ export class AuthController {
     @Body(new ZodValidationPipe(setRoleSchema)) body: SetRoleInput,
   ) {
     return this.authService.setRole(req.user.sub, body?.role);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('2fa/setup')
+  async setup2FA(@Request() req: any) {
+    return this.authService.setup2FA(req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('2fa/verify')
+  async verify2FA(
+    @Request() req: any,
+    @Body(new ZodValidationPipe(verify2FASchema)) body: Verify2FAInput,
+  ) {
+    return this.authService.verify2FASetup(req.user.sub, body.token);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('2fa/login')
+  @Throttle({ short: { limit: 5, ttl: 60000 } })
+  async login2FA(
+    @Body(new ZodValidationPipe(login2FASchema)) body: Login2FAInput,
+    @Request() req: FastifyRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
+  ) {
+    try {
+      const auth = await this.authService.validate2FALogin(
+        body.userId,
+        body.token,
+        {
+          ipAddress: this.getIp(req),
+          userAgent: this.getUserAgent(req),
+        },
+      );
+      this.setRefreshCookie(res, auth.refresh_token, auth.refresh_expires_at);
+      this.setAccessTokenCookie(res, auth.access_token);
+      const csrfToken = this.setCsrfCookie(res, req);
+      this.setIdentityCookies(res, { uid: auth.user.uid, role: auth.user.role || 'student' });
+
+      const { access_token, refresh_token, ...response } = auth;
+      return { ...response, csrfToken };
+    } catch (error: any) {
+      if (error.status && error.status < 500) throw error;
+      throw new BadRequestException(error.message || '2FA Login failed');
+    }
   }
 
   private extractRefreshTokenFromCookie(

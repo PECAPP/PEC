@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton } from "@pec/ui";
+import { Button, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton, PageBanner } from "@pec/ui";
 
 
 import { useEffect, useMemo, useState } from 'react';
@@ -327,40 +327,37 @@ export default function ScoreSheetPage() {
 
   return (
     <div className="space-y-8">
-      <div className="card-elevated ui-card-pad flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-            Academic Utilities
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">CGPA Calculator</h1>
-          <p className="text-sm text-muted-foreground">
-            Add subjects with credits and grade points to compute SGPA, CGPA, and trends.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button
-            variant="outline"
-            className="gap-2 border-primary/20 hover:bg-primary/5 transition-all font-bold"
-            onClick={async () => {
-              if (entries.length === 0) {
-                toast.error('Add at least one subject to generate hall ticket.');
-                return;
-              }
-              const { exportHallTicket } = await import('@/lib/pdfExport');
-              exportHallTicket(user, entries);
-              toast.success('Hall Ticket generated for End Semester Examination.');
-            }}
-          >
-            <Download className="h-4 w-4" />
-            Hall Ticket
-          </Button>
-          <div className="h-10 w-[1px] bg-border mx-1 hidden md:block" />
-          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-            <Calculator className="h-4 w-4 text-primary" />
-            Synced to PEC ERP.
-          </div>
-        </div>
-      </div>
+      <PageBanner
+        title="CGPA Calculator"
+        subtitle="Add subjects with credits and grade points to compute SGPA, CGPA, and trends."
+        badgeText="Academic Utilities"
+        icon={<Calculator className="w-7 h-7 text-primary" />}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              className="gap-2 border-border/40 hover:bg-primary/5 transition-all font-bold"
+              onClick={async () => {
+                if (entries.length === 0) {
+                  toast.error('Add at least one subject to generate hall ticket.');
+                  return;
+                }
+                const { exportHallTicket } = await import('@/lib/pdfExport');
+                exportHallTicket(user, entries);
+                toast.success('Hall Ticket generated for End Semester Examination.');
+              }}
+            >
+              <Download className="h-4 w-4" />
+              Hall Ticket
+            </Button>
+            <div className="h-10 w-[1px] bg-border mx-1 hidden md:block" />
+            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+              <Calculator className="h-4 w-4 text-primary" />
+              Synced to PEC ERP.
+            </div>
+          </>
+        }
+      />
 
       <div className="grid gap-4 md:grid-cols-4">
         {[
@@ -369,7 +366,7 @@ export default function ScoreSheetPage() {
           { label: 'Current CGPA', value: stats.cgpa.toFixed(2), icon: Calculator },
           { label: 'Latest SGPA', value: stats.latestSgpa.toFixed(2), icon: TrendingUp },
         ].map(({ label, value, icon: Icon }) => (
-          <div key={label} className="card-elevated ui-card-pad flex items-center gap-4">
+          <div key={label} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 flex items-center gap-4">
             <div className="h-12 w-12 rounded-sm bg-primary/10 text-primary flex items-center justify-center">
               <Icon className="h-5 w-5" />
             </div>
@@ -383,10 +380,10 @@ export default function ScoreSheetPage() {
         ))}
       </div>
 
-      <div className="card-elevated ui-card-pad space-y-5">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            <p className="text-[10px]  text-muted-foreground">
               Entry Form
             </p>
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -528,14 +525,14 @@ export default function ScoreSheetPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="card-elevated ui-card-pad space-y-4">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-foreground">Semester Trends</h3>
             <p className="text-xs text-muted-foreground font-bold">
               Best SGPA: {bestSgpa.toFixed(2)}
             </p>
           </div>
-          <div className="h-[250px] w-full pt-4 glow-primary/5 rounded-sm overflow-hidden transition-all hover:bg-primary/[0.02] border border-primary/5">
+          <div className="h-[250px] w-full pt-4 glow-primary/5 rounded-sm overflow-hidden transition-all hover:bg-primary/[0.02] border border-border/40/5">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={trend}>
                 <defs>
@@ -603,7 +600,7 @@ export default function ScoreSheetPage() {
           </div>
         </div>
 
-        <div className="card-elevated ui-card-pad space-y-4">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-4">
           <h3 className="text-lg font-semibold text-foreground">Semester Breakdown</h3>
           {semesterStats.length === 0 ? (
             <p className="text-sm text-muted-foreground">No semester data yet.</p>
@@ -632,11 +629,11 @@ export default function ScoreSheetPage() {
       <div className="space-y-3">
         <h3 className="text-lg font-semibold text-foreground">Subjects Ledger</h3>
         {entries.length === 0 ? (
-          <div className="card-elevated ui-card-pad text-center text-sm text-muted-foreground">
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 text-center text-sm text-muted-foreground">
             No subjects added yet. Add your first subject to start CGPA calculation.
           </div>
         ) : (
-          <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-xl">
+          <div className="bg-card border border-border/40 rounded-sm overflow-hidden shadow-sm">
              <DataTable 
                columns={[
                   {

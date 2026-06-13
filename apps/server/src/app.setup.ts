@@ -82,7 +82,7 @@ export const configureApp = (app: INestApplication): void => {
   // Fastify handles trust proxy and x-powered-by differently, usually in the adapter or via direct config.
 
   if (isProduction()) {
-    fastifyApp.getInstance().addHook('onRequest', (req: FastifyRequest, reply: FastifyReply, done: () => void) => {
+    fastifyApp.getHttpAdapter().getInstance().addHook('onRequest', (req: FastifyRequest, reply: FastifyReply, done: () => void) => {
       const forwardedProto = String(req.headers['x-forwarded-proto'] ?? '')
         .split(',')[0]
         .trim();
@@ -92,7 +92,7 @@ export const configureApp = (app: INestApplication): void => {
         return;
       }
 
-      reply.redirect(301, `https://${req.hostname}${req.url}`);
+      reply.status(301).redirect(`https://${req.hostname}${req.url}`);
     });
   }
 

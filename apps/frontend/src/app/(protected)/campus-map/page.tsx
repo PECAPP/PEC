@@ -15,8 +15,7 @@ import {
   Map,
   Loader2,
 } from 'lucide-react';
-import { Button, AppShellSkeleton } from "@pec/ui";
-import { Badge } from '@pec/ui';
+import { Button, AppShellSkeleton, PageBanner, Badge } from "@pec/ui";
 import { cn } from '@/lib/utils';
 import { api } from '@pec/api';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -54,7 +53,7 @@ type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se' | null;
 
 export default function CampusMap() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'college_admin';
 
   const [regions, setRegions] = useState<MapRegion[]>([]);
   const [roads, setRoads] = useState<MapRoad[]>([]);
@@ -479,165 +478,158 @@ export default function CampusMap() {
       
       {/* Institutional Header */}
       <div className="pt-2 md:pt-6 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6">
-          <div className="flex items-center gap-5">
-            <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm relative overflow-hidden group">
-              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-              <MapPin className="w-8 h-8 text-primary relative z-10" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">Campus Map</h1>
-              <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">
-                Interactive campus layout
-              </p>
-            </div>
-          </div>
+        <PageBanner
+          title="Campus Map"
+          subtitle="Interactive campus layout"
+          badgeText="Campus Life"
+          icon={<MapPin className="w-7 h-7 text-primary" />}
+          actions={
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              {/* View Mode Toggle */}
+              <div className="flex items-center gap-1 border border-border rounded-sm p-1 bg-card">
+                <Button
+                  variant={viewMode === '2d' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('2d')}
+                  className="gap-1 h-7 px-2 text-xs"
+                >
+                  <Map className="w-3.5 h-3.5" /> 2D
+                </Button>
+                <Button
+                  variant={viewMode === '3d' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('3d')}
+                  className="gap-1 h-7 px-2 text-xs"
+                >
+                  <Box className="w-3.5 h-3.5" /> 3D
+                </Button>
+              </div>
 
-          <div className="flex items-center gap-2">
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-1 border border-border rounded-sm p-1 bg-card">
-              <Button
-                variant={viewMode === '2d' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('2d')}
-                className="gap-1 h-7 px-2 text-xs"
-              >
-                <Map className="w-3.5 h-3.5" /> 2D
-              </Button>
-              <Button
-                variant={viewMode === '3d' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('3d')}
-                className="gap-1 h-7 px-2 text-xs"
-              >
-                <Box className="w-3.5 h-3.5" /> 3D
-              </Button>
-            </div>
+              {/* Zoom */}
+              <div className="flex items-center gap-1 border border-border/40 backdrop-blur-md rounded-sm p-1 bg-card/60 shadow-sm relative z-20">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 transition-transform active:scale-95"
+                  onClick={() => setZoom((z) => Math.max(0.5, z - 0.25))}
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </Button>
+                <span className="text-xs w-10 text-center font-medium">{Math.round(zoom * 100)}%</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 transition-transform active:scale-95"
+                  onClick={() => setZoom((z) => Math.min(2, z + 0.25))}
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </Button>
+              </div>
 
-            {/* Zoom */}
-            <div className="flex items-center gap-1 border border-border/40 backdrop-blur-md rounded-sm p-1 bg-card/60 shadow-sm relative z-20">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 transition-transform active:scale-95"
-                onClick={() => setZoom((z) => Math.max(0.5, z - 0.25))}
-              >
-                <ZoomOut className="w-4 h-4" />
-              </Button>
-              <span className="text-xs w-10 text-center font-medium">{Math.round(zoom * 100)}%</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 transition-transform active:scale-95"
-                onClick={() => setZoom((z) => Math.min(2, z + 0.25))}
-              >
-                <ZoomIn className="w-4 h-4" />
-              </Button>
-            </div>
-
-            {/* Admin Tools */}
-            {isAdmin && (
-              <>
-                {editMode ? (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={drawMode === 'building' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setDrawMode(drawMode === 'building' ? 'none' : 'building')}
-                      className="gap-1"
-                    >
-                      <Square className="w-4 h-4" />
-                      Building
-                    </Button>
-                    <Button
-                      variant={drawMode === 'road' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setDrawMode(drawMode === 'road' ? 'none' : 'road')}
-                      className="gap-1"
-                    >
-                      <Route className="w-4 h-4" />
-                      Road
-                    </Button>
-                    {/* Finish Road button - shown when actively drawing a road */}
-                    {newRoad && newRoad.points && newRoad.points.length >= 2 && (
+              {/* Admin Tools */}
+              {isAdmin && (
+                <>
+                  {editMode ? (
+                    <div className="flex items-center gap-2">
                       <Button
-                        variant="default"
+                        variant={drawMode === 'building' ? 'default' : 'outline'}
                         size="sm"
-                        onClick={finishRoad}
-                        className="gap-1 bg-green-600 hover:bg-green-700"
+                        onClick={() => setDrawMode(drawMode === 'building' ? 'none' : 'building')}
+                        className="gap-1"
                       >
-                        <Save className="w-4 h-4" />
-                        Finish Road
+                        <Square className="w-4 h-4" />
+                        Building
                       </Button>
-                    )}
+                      <Button
+                        variant={drawMode === 'road' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setDrawMode(drawMode === 'road' ? 'none' : 'road')}
+                        className="gap-1"
+                      >
+                        <Route className="w-4 h-4" />
+                        Road
+                      </Button>
+                      {/* Finish Road button - shown when actively drawing a road */}
+                      {newRoad && newRoad.points && newRoad.points.length >= 2 && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={finishRoad}
+                          className="gap-1 bg-green-600 hover:bg-green-700"
+                        >
+                          <Save className="w-4 h-4" />
+                          Finish Road
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          // Reset to defaults
+                          const orgId = user?.organizationId || '';
+                          setRegions(
+                            defaultRegions.map((r, i) => ({
+                              ...r,
+                              id: `default-${i}`,
+                              organizationId: orgId,
+                            }))
+                          );
+                          setRoads(
+                            defaultRoads.map((r, i) => ({
+                              ...r,
+                              id: `road-${i}`,
+                              organizationId: orgId,
+                            }))
+                          );
+                          setHasUnsavedChanges(true); // Mark as needing save
+                          toast.success('Map reset to defaults! Click Save to persist.');
+                        }}
+                        className="gap-1 text-orange-600 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        Reset
+                      </Button>
+                      {/* Save Changes button - shown when there are unsaved changes */}
+                      {hasUnsavedChanges && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={saveAllChanges}
+                          className="gap-1 bg-green-600 hover:bg-green-700"
+                        >
+                          <Save className="w-4 h-4" />
+                          Save Changes
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditMode(false);
+                          setDrawMode('none');
+                          setNewRoad(null);
+                          setDrawStart(null);
+                        }}
+                      >
+                        Done
+                      </Button>
+                    </div>
+                  ) : (
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {
-                        // Reset to defaults
-                        const orgId = user?.organizationId || '';
-                        setRegions(
-                          defaultRegions.map((r, i) => ({
-                            ...r,
-                            id: `default-${i}`,
-                            organizationId: orgId,
-                          }))
-                        );
-                        setRoads(
-                          defaultRoads.map((r, i) => ({
-                            ...r,
-                            id: `road-${i}`,
-                            organizationId: orgId,
-                          }))
-                        );
-                        setHasUnsavedChanges(true); // Mark as needing save
-                        toast.success('Map reset to defaults! Click Save to persist.');
-                      }}
-                      className="gap-1 text-orange-600 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950"
+                      onClick={() => setEditMode(true)}
+                      className="gap-1"
                     >
-                      <RotateCcw className="w-4 h-4" />
-                      Reset
+                      <Edit3 className="w-4 h-4" />
+                      Edit Map
                     </Button>
-                    {/* Save Changes button - shown when there are unsaved changes */}
-                    {hasUnsavedChanges && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={saveAllChanges}
-                        className="gap-1 bg-green-600 hover:bg-green-700"
-                      >
-                        <Save className="w-4 h-4" />
-                        Save Changes
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setEditMode(false);
-                        setDrawMode('none');
-                        setNewRoad(null);
-                        setDrawStart(null);
-                      }}
-                    >
-                      Done
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEditMode(true)}
-                    className="gap-1"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                    Edit Map
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+                  )}
+                </>
+              )}
+            </div>
+          }
+        />
       </div>
 
       {/* Legend */}
@@ -874,10 +866,10 @@ export default function CampusMap() {
                         : editMode
                           ? 'cursor-move'
                           : 'cursor-pointer',
-                      'hover:shadow-xl hover:border-primary/50',
+                      'hover:shadow-xl hover:border-border/40',
                       styles.regionVars,
                       (selectedRegion?._id || selectedRegion?.id) === (region._id || region.id) &&
-                        'ring-4 ring-primary/50 ring-offset-2 z-20 shadow-glow',
+                        'ring-4 ring-primary/50 ring-offset-2 z-20 shadow-md border border-border/40',
                       editMode && drawMode === 'none' && 'ring-1 ring-dashed ring-primary/50',
                       (dragging?.region._id || dragging?.region.id) === (region._id || region.id) && 'z-50 opacity-90 scale-105'
                     )}
@@ -888,7 +880,7 @@ export default function CampusMap() {
                       height: `${region.height}%`,
                     }}
                   >
-                    <span className="text-[8px] md:text-[10px] font-bold leading-tight text-foreground pointer-events-none select-none ">
+                    <span className="text-[8px] md:text-sm font-medium leading-tight text-foreground pointer-events-none select-none ">
                       {region.name}
                     </span>
 
@@ -922,7 +914,7 @@ export default function CampusMap() {
               {/* New region preview */}
               {newRegion && newRegion.width && newRegion.height && (
                 <div
-                  className="absolute border border-dashed border-primary bg-primary/20 rounded pointer-events-none"
+                  className="absolute border border-dashed border-border/40 bg-primary/20 rounded pointer-events-none"
                   style={{
                     left: `${newRegion.x}%`,
                     top: `${newRegion.y}%`,
@@ -980,7 +972,7 @@ export default function CampusMap() {
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-full  px-4"
           >
-            <div className="bg-background/80 backdrop-blur-xl rounded-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] p-5 relative overflow-hidden">
+            <div className="bg-background/80 backdrop-blur-xl rounded-sm border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] p-3 md:p-5 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50" />
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-3">
@@ -1002,7 +994,7 @@ export default function CampusMap() {
                      setRoutingStart(regions.find(r => r.name.toLowerCase().includes('gate')) || regions[0] || null);
                      setRoutingEnd(selectedRegion);
                      setSelectedRegion(null);
-                  }} className="flex-1 bg-primary text-primary-foreground shadow-glow hover:scale-[1.02] transition-transform">
+                  }} className="flex-1 bg-primary text-primary-foreground shadow-md border border-border/40 hover:scale-[1.02] transition-transform">
                     <Route className="w-4 h-4 mr-2" /> Navigate Here
                   </Button>
                   <Button size="sm" variant="outline" className="flex-1 border-white/20 hover:bg-white/5 hover:border-white/30 backdrop-blur-md" onClick={() => toast.info('Opening maintenance report...')}>

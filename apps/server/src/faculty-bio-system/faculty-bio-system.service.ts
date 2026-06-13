@@ -62,11 +62,13 @@ export class FacultyBioSystemService {
   }
 
   async createPublication(data: CreatePublicationDto) {
+    const { facultyId, ...rest } = data;
     return this.prisma.facultyPublication.create({
       data: {
-        ...data,
-        citations: data.citations ?? 0,
-      },
+        ...rest,
+        faculty: { connect: { id: facultyId } },
+        citations: rest.citations ?? 0,
+      } as any,
     });
   }
 
@@ -88,7 +90,13 @@ export class FacultyBioSystemService {
   }
 
   async createAward(data: CreateAwardDto) {
-    return this.prisma.facultyAward.create({ data });
+    const { facultyId, ...rest } = data;
+    return this.prisma.facultyAward.create({
+      data: {
+        ...rest,
+        faculty: { connect: { id: facultyId } },
+      } as any
+    });
   }
 
   async updateAward(id: string, data: Partial<CreateAwardDto>) {
@@ -109,7 +117,13 @@ export class FacultyBioSystemService {
   }
 
   async createConference(data: CreateConferenceDto) {
-    return this.prisma.facultyConference.create({ data });
+    const { facultyId, ...rest } = data;
+    return this.prisma.facultyConference.create({
+      data: {
+        ...rest,
+        faculty: { connect: { id: facultyId } },
+      } as any
+    });
   }
 
   async updateConference(id: string, data: Partial<CreateConferenceDto>) {
@@ -130,11 +144,13 @@ export class FacultyBioSystemService {
   }
 
   async createConsultation(data: CreateConsultationDto) {
+    const { facultyId, ...rest } = data;
     return this.prisma.facultyConsultation.create({
       data: {
-        ...data,
-        status: data.status ?? 'active',
-      },
+        ...rest,
+        faculty: { connect: { id: facultyId } },
+        status: rest.status ?? 'active',
+      } as any,
     });
   }
 

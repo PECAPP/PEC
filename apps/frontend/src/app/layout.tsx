@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Bricolage_Grotesque } from 'next/font/google';
 import { Providers } from './providers';
 import { RouteTransitionLoader } from '@/components/layout/RouteTransitionLoader';
 import { cookies } from 'next/headers';
@@ -7,7 +7,7 @@ import { getServerSession } from '@/lib/server-auth';
 import { AuthProvider } from '@/features/auth/hooks/useAuth';
 import './globals.css';
 
-const inter = Inter({
+const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
@@ -38,9 +38,9 @@ export default async function RootLayout({
       lang="en" 
       suppressHydrationWarning 
       data-scroll-behavior="smooth"
-      className={`accent-${savedAccent} ${inter.variable}`}
+      className={`accent-${savedAccent} ${bricolage.variable}`}
     >
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning className="font-sans">
         <RouteTransitionLoader />
         <Providers>
           <AuthProvider initialSession={user}>

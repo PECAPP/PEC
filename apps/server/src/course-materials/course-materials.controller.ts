@@ -12,16 +12,21 @@ import {
   Res,
   NotFoundException,
   BadRequestException,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 import { CourseMaterialsService } from './course-materials.service';
 import { CourseMaterialQueryDto } from './dto/course-material-query.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { Response } from 'express';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { UpdateCourseMaterialDto, updateCourseMaterialSchema } from './dto/update-course-material.dto';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'materials');
 
@@ -41,10 +46,12 @@ export class CourseMaterialsController {
   }
 
   @CheckPolicies((ability) => ability.can('create', 'CourseMaterial'))
+  @UseGuards(RolesGuard)
+  @Roles('college_admin', 'faculty')
   @Post()
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 50 * 1024 * 1024 } }))
   async create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() body: any
   ) {
     if (!file) {
@@ -68,6 +75,18 @@ export class CourseMaterialsController {
     });
   }
 
+  @CheckPolicies((ability) => ability.can('update', 'CourseMaterial'))
+  @UseGuards(RolesGuard)
+  @Roles('college_admin', 'faculty')
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateCourseMaterialSchema))
+    body: UpdateCourseMaterialDto,
+  ) {
+    return this.service.update(id, body);
+  }
+
   @Get('download/:filename')
   async download(@Param('filename') filename: string, @Res() res: Response) {
     const filePath = path.join(UPLOAD_DIR, filename);
@@ -78,6 +97,8 @@ export class CourseMaterialsController {
   }
 
   @CheckPolicies((ability) => ability.can('delete', 'CourseMaterial'))
+  @UseGuards(RolesGuard)
+  @Roles('college_admin', 'faculty')
   @Delete(':id')
   async remove(@Param('id') id: string) {
     // Ideally we should fetch the record and delete the physical file too

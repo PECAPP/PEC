@@ -1,6 +1,4 @@
 import { cookies } from 'next/headers';
-import { getSessionFromToken } from './session';
-import { buildApiUrl } from '@pec/api';
 import { getRolePermissions, UserRole } from '@/features/auth/lib/rolePermissions';
 
 export async function getServerSession() {
@@ -37,7 +35,7 @@ export async function getServerSession() {
     let caslPermissions = permsData.permissions || [];
 
     const role = payload.role;
-    const isAdmin = role === 'admin';
+    const isAdmin = role === 'college_admin';
 
     // DB Fallback if DB is completely empty of permissions
     if (caslPermissions.length === 0) {

@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@pec/database';
 import * as bcrypt from 'bcrypt';
@@ -19,7 +21,10 @@ type UserWithProfiles = Prisma.UserGetPayload<{
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async createAdminUser(data: {
     fullName: string;
@@ -144,6 +149,10 @@ export class UsersService {
       }
     });
 
+    if (data.role) {
+      await this.cacheManager.del(`user_perms:${id}`);
+    }
+
     if (data.role === 'student' && data.department && data.enrollmentNumber) {
       await this.upsertStudentProfile(id, {
         enrollmentNumber: data.enrollmentNumber,
@@ -169,6 +178,7 @@ export class UsersService {
   }
 
   async deleteAdminUser(id: string) {
+    await this.cacheManager.del(`user_perms:${id}`);
     await this.prisma.user.delete({ where: { id } });
     return { deleted: true };
   }

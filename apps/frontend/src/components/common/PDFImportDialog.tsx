@@ -177,7 +177,7 @@ export default function PDFImportDialog({
           {/* File Upload Area */}
           <div
             className={`border border-dashed rounded-sm p-8 text-center transition-colors ${
-              dragActive ? 'border-primary bg-primary/5' : 'border-border'
+              dragActive ? 'border-border/40 bg-primary/5' : 'border-border'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}

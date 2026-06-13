@@ -52,7 +52,7 @@ export function FeaturesSection() {
                   <div className={`w-20 h-20 border ${role.borderColor} flex items-center justify-center mb-8 bg-black/40 group-hover:bg-black/60 transition-colors`}>
                     <role.icon className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-3xl font-bold mb-6 text-white uppercase tracking-wider font-monument">{role.role}</h3>
+                  <h3 className="text-3xl font-bold mb-6 text-white  font-monument">{role.role}</h3>
                   <ul className="space-y-4">
                     {role.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-4 text-white/90 group-hover:text-white transition-colors">

@@ -24,7 +24,7 @@ export async function seedClubs(prisma: PrismaClient) {
   ];
 
   const adminUser = await prisma.user.findFirst({
-    where: { role: 'admin' },
+    where: { role: 'college_admin' },
   });
 
   const students = await prisma.user.findMany({

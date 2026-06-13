@@ -31,7 +31,7 @@ export default function FeeCard({
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         'relative bg-card border rounded-sm p-4 space-y-3 transition-all',
-        overdue ? 'border-red-300 dark:border-red-800' : 'border-border hover:border-primary/30',
+        overdue ? 'border-red-300 dark:border-red-800' : 'border-border hover:border-border/40',
         fee.status === 'paid' && 'opacity-80'
       )}
     >

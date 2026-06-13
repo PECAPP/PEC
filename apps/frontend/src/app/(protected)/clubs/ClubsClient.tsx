@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Textarea, Badge, AppShellSkeleton } from "@pec/ui";
+import { Button, Input, Textarea, Badge, AppShellSkeleton, PageBanner } from "@pec/ui";
 
 
 import { useEffect, useMemo, useState } from 'react';
@@ -119,42 +119,42 @@ export default function ClubsClient({ initialClubs, session }: { initialClubs: C
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Clubs</h1>
-        <p className="text-muted-foreground">
-          {isAdmin
-            ? 'Create and manage clubs, post club-wise updates, and monitor club chats.'
-            : 'Join clubs and participate in club-specific discussions.'}
-        </p>
-      </div>
+      <PageBanner
+        title="Clubs"
+        subtitle={isAdmin
+          ? 'Create and manage clubs, post club-wise updates, and monitor club chats.'
+          : 'Join clubs and participate in club-specific discussions.'}
+        badgeText="Student Life"
+        icon={<Users className="w-7 h-7 text-primary" />}
+      />
 
       {!isAdmin && studentClubStats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <div className="card-elevated ui-card-pad">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Total Clubs</p>
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
+            <p className="text-[10px]  text-muted-foreground">Total Clubs</p>
             <p className="text-2xl font-bold text-foreground">{studentClubStats.total}</p>
           </div>
-          <div className="card-elevated ui-card-pad">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Accepted</p>
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
+            <p className="text-[10px]  text-muted-foreground">Accepted</p>
             <p className="text-2xl font-bold text-foreground">{studentClubStats.joined}</p>
           </div>
-          <div className="card-elevated ui-card-pad">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Pending</p>
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
+            <p className="text-[10px]  text-muted-foreground">Pending</p>
             <p className="text-2xl font-bold text-foreground">{studentClubStats.pending}</p>
           </div>
-          <div className="card-elevated ui-card-pad">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Rejected</p>
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
+            <p className="text-[10px]  text-muted-foreground">Rejected</p>
             <p className="text-2xl font-bold text-foreground">{studentClubStats.rejected}</p>
           </div>
-          <div className="card-elevated ui-card-pad">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Available</p>
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
+            <p className="text-[10px]  text-muted-foreground">Available</p>
             <p className="text-2xl font-bold text-foreground">{studentClubStats.available}</p>
           </div>
         </div>
       )}
 
       {isAdmin && (
-        <div className="card-elevated ui-card-pad space-y-3">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-3">
           <h2 className="text-lg font-semibold text-foreground">Create New Club</h2>
           <div className="flex gap-2">
             <Input
@@ -172,7 +172,7 @@ export default function ClubsClient({ initialClubs, session }: { initialClubs: C
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {clubs.map((club) => (
-          <div key={club.id} className="card-elevated ui-card-pad space-y-3">
+          <div key={club.id} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-lg font-semibold text-foreground">{club.name}</h3>
@@ -199,7 +199,7 @@ export default function ClubsClient({ initialClubs, session }: { initialClubs: C
             )}
 
             {isAdmin && (club.pendingRequestCount || 0) > 0 && (
-              <p className="text-xs text-primary bg-primary/10 border border-primary/20 rounded px-2 py-1">
+              <p className="text-xs text-primary bg-primary/10 border border-border/40 rounded px-2 py-1">
                 {club.pendingRequestCount} pending request
                 {(club.pendingRequestCount || 0) > 1 ? 's' : ''}
               </p>

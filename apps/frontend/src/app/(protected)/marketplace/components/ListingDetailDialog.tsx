@@ -64,7 +64,7 @@ export default function ListingDetailDialog({
           )}
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-3 md:p-6 space-y-5">
           <div className="flex flex-col md:flex-row items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-foreground">{listing.title}</h2>
@@ -72,7 +72,7 @@ export default function ListingDetailDialog({
                 <Badge
                   variant="outline"
                   className={cn(
-                    'text-[10px] font-bold uppercase tracking-wider',
+                    'text-sm font-medium ',
                     CONDITION_COLORS[listing.condition] ?? ''
                   )}
                 >
@@ -80,7 +80,7 @@ export default function ListingDetailDialog({
                 </Badge>
                 <Badge
                   variant="secondary"
-                  className="bg-secondary/20 text-secondary-foreground text-[10px] font-bold uppercase tracking-wider hover:bg-secondary/30"
+                  className="bg-secondary/20 text-secondary-foreground text-sm font-medium  hover:bg-secondary/30"
                 >
                   {listing.category}
                 </Badge>
@@ -98,7 +98,7 @@ export default function ListingDetailDialog({
 
           {/* Seller Info */}
           <div className="flex items-center gap-4 p-4 rounded-sm bg-card border border-border shadow-sm">
-            <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg shrink-0">
+            <div className="w-12 h-12 rounded-full bg-primary/10 border border-border/40 flex items-center justify-center text-primary font-bold text-lg shrink-0">
               {listing.seller.avatar ? (
                 <img
                   src={listing.seller.avatar}
@@ -124,7 +124,7 @@ export default function ListingDetailDialog({
             <div className="flex gap-4 pt-2 border-t border-border/40">
               <Button
                 variant="outline"
-                className="flex-1 h-11 rounded-sm font-bold uppercase tracking-widest text-[10px]"
+                className="flex-1 h-11 rounded-sm font-bold  text-[10px]"
                 onClick={() => onBookmark(listing.id)}
               >
                 <Heart
@@ -133,7 +133,7 @@ export default function ListingDetailDialog({
                 {isBookmarked ? 'Saved' : 'Save Item'}
               </Button>
               <Button
-                className="flex-1 h-11 rounded-sm font-bold uppercase tracking-widest text-[10px] bg-primary shadow-glow transition-all"
+                className="flex-1 h-11 rounded-sm font-bold  text-[10px] bg-primary shadow-md border border-border/40 transition-all"
                 onClick={() => {
                   onChat(listing);
                   onClose();

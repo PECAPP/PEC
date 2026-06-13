@@ -74,7 +74,7 @@ export function FinanceSummaryCard({
 
   if (loading) {
     return (
-      <div className={cn('card-elevated ui-card-pad space-y-4 animate-pulse', className)}>
+      <div className={cn('bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-4 animate-pulse', className)}>
         <div className="h-5 w-32 bg-muted rounded" />
         <div className="h-16 bg-muted rounded-sm" />
         <div className="h-10 bg-muted rounded-sm" />
@@ -93,7 +93,7 @@ export function FinanceSummaryCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn('card-elevated ui-card-pad space-y-4', className)}
+      className={cn('bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-4', className)}
     >
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -186,7 +186,7 @@ export function FinanceSummaryCard({
       )}
 
       {pendingFees.length === 0 && (summary.totalPending || 0) === 0 && (
-        <div className="flex items-center gap-2 p-3 rounded-sm bg-emerald-500/10 border border-emerald-500/20">
+        <div className="p-3 rounded-lg border border-emerald-500/20 flex items-center justify-center rounded-lg border border-emerald-500/20 flex items-center justify-center rounded-lg border border-emerald-500/20 flex items-center justify-center flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <p className="text-xs text-emerald-600 font-medium">All fees paid! You're up to date.</p>
         </div>

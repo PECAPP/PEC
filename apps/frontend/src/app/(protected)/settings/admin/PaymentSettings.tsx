@@ -243,7 +243,7 @@ export default function PaymentSettings({ embedded = false }: { embedded?: boole
                 className={cn(
                   'p-4 rounded-sm border cursor-pointer transition-all',
                   method === 'upi'
-                    ? 'border-primary bg-primary/5'
+                    ? 'border-border/40 bg-primary/5'
                     : 'border-border hover:border-border/80'
                 )}
               >
@@ -271,7 +271,7 @@ export default function PaymentSettings({ embedded = false }: { embedded?: boole
                 className={cn(
                   'p-4 rounded-sm border cursor-pointer transition-all',
                   method === 'bank'
-                    ? 'border-primary bg-primary/5'
+                    ? 'border-border/40 bg-primary/5'
                     : 'border-border hover:border-border/80'
                 )}
               >
@@ -300,7 +300,7 @@ export default function PaymentSettings({ embedded = false }: { embedded?: boole
                 className={cn(
                   'p-4 rounded-sm border cursor-pointer transition-all',
                   method === 'razorpay'
-                    ? 'border-primary bg-primary/5'
+                    ? 'border-border/40 bg-primary/5'
                     : 'border-border hover:border-border/80'
                 )}
               >
@@ -376,7 +376,7 @@ export default function PaymentSettings({ embedded = false }: { embedded?: boole
 
               {/* Preview */}
               {upiId && upiName && (
-                <div className="p-3 bg-secondary/50 rounded-sm border border-border">
+                <div className="p-3 rounded-lg border border-secondary/20 flex items-center justify-center rounded-lg border border-secondary/20 flex items-center justify-center rounded-lg border border-secondary/20 flex items-center justify-center bg-secondary/50 border">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Preview:</p>
                   <div className="space-y-1">
                     <p className="text-sm">
@@ -444,7 +444,7 @@ export default function PaymentSettings({ embedded = false }: { embedded?: boole
 
               {/* Preview */}
               {bankName && accountNumber && (
-                <div className="p-3 bg-secondary/50 rounded-sm border border-border">
+                <div className="p-3 rounded-lg border border-secondary/20 flex items-center justify-center rounded-lg border border-secondary/20 flex items-center justify-center rounded-lg border border-secondary/20 flex items-center justify-center bg-secondary/50 border">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Preview:</p>
                   <div className="space-y-1 text-sm">
                     <p>
@@ -524,7 +524,7 @@ export default function PaymentSettings({ embedded = false }: { embedded?: boole
               </div>
 
               {/* Info Box */}
-              <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-sm border border-blue-200/50 dark:border-blue-800/50">
+              <div className="p-3 rounded-lg border border-blue-50/20 flex items-center justify-center rounded-lg border border-blue-50/20 flex items-center justify-center rounded-lg border border-blue-50/20 flex items-center justify-center bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/50">
                 <div className="flex gap-2">
                   <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-blue-900 dark:text-blue-200">

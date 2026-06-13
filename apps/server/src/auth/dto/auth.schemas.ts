@@ -3,7 +3,7 @@ import { z } from 'zod';
 const appRoles = [
   'student',
   'faculty',
-  'admin',
+  'college_admin',
 ] as const;
 
 export const signInSchema = z.object({
@@ -74,6 +74,15 @@ export const changePasswordSchema = z.object({
     ),
 });
 
+export const verify2FASchema = z.object({
+  token: z.string().length(6),
+});
+
+export const login2FASchema = z.object({
+  userId: z.string().uuid(),
+  token: z.string().length(6),
+});
+
 import { createZodDto } from 'nestjs-zod';
 
 export class SignInInput extends createZodDto(signInSchema) {}
@@ -84,4 +93,6 @@ export class VerifyEmailInput extends createZodDto(verifyEmailSchema) {}
 export class RequestPasswordResetInput extends createZodDto(requestPasswordResetSchema) {}
 export class ResetPasswordInput extends createZodDto(resetPasswordSchema) {}
 export class ChangePasswordInput extends createZodDto(changePasswordSchema) {}
+export class Verify2FAInput extends createZodDto(verify2FASchema) {}
+export class Login2FAInput extends createZodDto(login2FASchema) {}
 

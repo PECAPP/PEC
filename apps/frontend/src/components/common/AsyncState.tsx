@@ -25,7 +25,7 @@ function StatePanel({
       {Icon ? (() => { 
         const IconComponent = Icon as any; 
         return (
-          <div className="mb-4 p-4 rounded-full bg-primary/10 text-primary ring-1 ring-primary/20 shadow-glow relative">
+          <div className="mb-4 p-4 rounded-full bg-primary/10 text-primary ring-1 ring-primary/20 shadow-md border border-primary/20 relative">
              <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
              <IconComponent className="w-8 h-8 relative z-10" />
           </div>

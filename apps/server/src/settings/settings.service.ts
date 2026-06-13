@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -6,17 +6,26 @@ export class SettingsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getSettings(userId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+    try {
+      const settings = await this.prisma.userSettings.upsert({
+        where: { userId },
+        update: {},
+        create: { 
+          user: { connect: { id: userId } }
+        },
+      });
+      return settings;
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        // Race condition: another request just created the settings
+        const existing = await this.prisma.userSettings.findUnique({
+          where: { userId }
+        });
+        if (existing) return existing;
+      }
+      console.error("GET_SETTINGS_ERROR:", error);
+      throw new HttpException(error?.message || 'Unknown error', 500);
     }
-
-    const settings = await this.prisma.userSettings.upsert({
-      where: { userId },
-      update: {},
-      create: { userId },
-    });
-    return settings;
   }
 
   async updateSettings(userId: string, data: any) {

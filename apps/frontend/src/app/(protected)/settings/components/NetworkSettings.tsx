@@ -31,7 +31,7 @@ export function NetworkSettings() {
   return (
     <div className="space-y-6">
       {/* Connected Accounts */}
-      <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-6 animate-in fade-in duration-500">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 bg-card/60 backdrop-blur-sm space-y-6 animate-in fade-in duration-500">
         <div className="flex items-center gap-3 pb-4 border-b border-border/40">
           <Globe className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-bold tracking-tight">Connected Accounts</h2>
@@ -68,7 +68,7 @@ export function NetworkSettings() {
       </div>
 
       {/* Calendar Sync */}
-      <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-6 animate-in fade-in duration-500 delay-75">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 bg-card/60 backdrop-blur-sm space-y-6 animate-in fade-in duration-500 delay-75">
         <div className="flex items-center gap-3 pb-4 border-b border-border/40">
           <Calendar className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-bold tracking-tight">Calendar Sync (iCal)</h2>
@@ -78,7 +78,7 @@ export function NetworkSettings() {
         </p>
         <div className="flex gap-3">
           <Input value={icalUrl} readOnly className="h-11 font-mono text-xs bg-muted/50" />
-          <Button onClick={handleCopy} variant="secondary" className="h-11 px-6 gap-2 font-bold">
+          <Button onClick={handleCopy} variant="secondary" className="h-11 px-3 md:px-6 gap-2 font-bold">
             {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
             {copied ? 'Copied' : 'Copy'}
           </Button>
@@ -86,7 +86,7 @@ export function NetworkSettings() {
       </div>
 
       {/* Device Management */}
-      <div className="card-elevated p-8 bg-card/60 backdrop-blur-sm space-y-6 animate-in fade-in duration-500 delay-150">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 bg-card/60 backdrop-blur-sm space-y-6 animate-in fade-in duration-500 delay-150">
         <div className="flex items-center justify-between pb-4 border-b border-border/40">
           <div className="flex items-center gap-3">
             <Smartphone className="w-5 h-5 text-primary" />
@@ -103,7 +103,7 @@ export function NetworkSettings() {
               <div>
                 <h4 className="font-bold text-sm flex items-center gap-2">
                   {s.device} 
-                  {s.current && <span className="px-2 py-0.5 rounded text-[10px] bg-primary/20 text-primary uppercase tracking-wider">This Device</span>}
+                  {s.current && <span className="px-2 py-0.5 rounded text-[10px] bg-primary/20 text-primary ">This Device</span>}
                 </h4>
                 <p className="text-xs text-muted-foreground mt-1">{s.location} • {s.time}</p>
               </div>

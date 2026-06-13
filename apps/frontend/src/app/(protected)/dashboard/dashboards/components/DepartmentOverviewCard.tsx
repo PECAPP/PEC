@@ -18,7 +18,7 @@ const item = {
 
 export function DepartmentOverviewCard({ departments }: Props) {
   return (
-    <motion.div variants={item} className="card-elevated p-6">
+    <motion.div variants={item} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Department Overview</h2>
         <Link href="/directory/departments">
@@ -28,14 +28,14 @@ export function DepartmentOverviewCard({ departments }: Props) {
           </Button>
         </Link>
       </div>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-1 flex-1">
         {departments.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">No department data available.</p>
         ) : (
-          departments.slice(0, 5).map((dept, idx) => (
-            <div key={idx} className="flex items-center justify-between p-3 rounded-sm border border-border hover:bg-secondary/50 transition-colors">
+          departments.slice(0, 6).map((dept, idx) => (
+            <div key={idx} className="py-3 border-b border-white/5 last:border-0 flex items-center justify-between group hover:bg-muted/10 px-2 -mx-2 rounded-md transition-colors">
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-foreground truncate">{dept.name}</p>
+                <p className="font-medium text-foreground truncate group-hover:text-primary transition-colors">{dept.name}</p>
                 <p className="text-sm text-muted-foreground">{dept.students} students · {dept.faculty} faculty</p>
               </div>
               <div className="flex items-center gap-3">

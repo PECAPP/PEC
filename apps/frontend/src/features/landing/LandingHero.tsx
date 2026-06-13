@@ -177,7 +177,7 @@ export function LandingHero() {
           transition={{ delay: 2, duration: 1 }}
           className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center gap-2"
         >
-          <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Scroll</span>
+          <span className="text-sm font-medium text-white/50 ">Scroll</span>
           <motion.div 
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -238,7 +238,7 @@ export function LandingHero() {
             <Button
               size="lg"
               asChild
-              className="neo-brutal-btn group bg-white text-black px-8 py-6 text-base border border-black"
+              className=" group bg-white text-black px-8 py-6 text-base border border-black"
               aria-label="Student login"
             >
               <Link href="/auth" className="flex items-center gap-3">
@@ -250,7 +250,7 @@ export function LandingHero() {
               size="lg"
               variant="outline"
               asChild
-              className="neo-brutal-btn group bg-transparent border border-white hover:bg-white/10 px-8 py-6 text-base font-bold text-white hover:text-white"
+              className=" group bg-transparent border border-white hover:bg-white/10 px-8 py-6 text-base font-bold text-white hover:text-white"
               aria-label="View Features"
             >
               <a href="#features" className="flex items-center gap-3">

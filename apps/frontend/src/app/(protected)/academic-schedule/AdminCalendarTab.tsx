@@ -286,7 +286,7 @@ export default function AdminCalendarTab() {
   ], []);
 
   return (
-    <div className="  py-8 px-4 ">
+    <div className="  py-4 md:py-8 px-4 ">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Academic Calendar Management</h1>
         <p className="text-muted-foreground">
@@ -322,7 +322,7 @@ export default function AdminCalendarTab() {
             {...getRootProps()}
             className={`
               border border-dashed rounded-sm p-12 text-center cursor-pointer transition-colors
-              ${isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
+              ${isDragActive ? 'border-border/40 bg-primary/5' : 'border-border hover:border-border/40'}
             `}
           >
             <input {...getInputProps()} />
@@ -348,7 +348,7 @@ export default function AdminCalendarTab() {
             )}
           </div>
 
-          <div className="bg-muted/50 rounded-sm p-6">
+          <div className="bg-muted/50 rounded-sm p-3 md:p-6">
             <h3 className="font-semibold mb-3">How it works</h3>
             <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
               <li>Upload your academic calendar PDF</li>
@@ -395,7 +395,7 @@ export default function AdminCalendarTab() {
             </div>
           </div>
 
-          <div className="rounded-sm overflow-hidden card-elevated shadow-sm">
+          <div className="bg-card border border-border/40 rounded-sm overflow-hidden shadow-sm">
             <DataTable columns={columns} data={parsedEvents} />
           </div>
         </div>
@@ -426,7 +426,7 @@ export default function AdminCalendarTab() {
       )}
 
       <Dialog open={isReplaceConfirmOpen} onOpenChange={setIsReplaceConfirmOpen}>
-        <DialogContent className=" w-full p-6 space-y-5">
+        <DialogContent className=" w-full p-3 md:p-6 space-y-5">
           <div className="space-y-2">
             <DialogTitle className="text-xl font-semibold">Save reviewed calendar?</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">

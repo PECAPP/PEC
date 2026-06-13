@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Inject,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@pec/database';
@@ -10,7 +11,7 @@ import { FeeQueryDto } from './dto/fee-query.dto';
 import { CreateFeeDto } from './dto/create-fee.dto';
 import { PayFeeDto } from './dto/pay-fee.dto';
 import { TxnQueryDto } from './dto/txn-query.dto';
-import { randomUUID } from 'crypto';
+import { PAYMENT_GATEWAY, PaymentGatewayProvider } from './payment-gateway.interface';
 
 function generateReceiptNo(): string {
   const ts = Date.now().toString(36).toUpperCase();
@@ -22,7 +23,10 @@ const LATE_FEE_PERCENT = 5; // 5% per month overdue (capped at 20%)
 
 @Injectable()
 export class FinanceRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(PAYMENT_GATEWAY) private readonly paymentGateway: PaymentGatewayProvider
+  ) {}
 
   // ─── Summary ─────────────────────────────────────────────────────────────────
 
@@ -135,8 +139,6 @@ export class FinanceRepository {
   // ─── Payment ──────────────────────────────────────────────────────────────────
 
   async payFee(dto: PayFeeDto, studentId: string) {
-    // Simulated payment handler (mock gateway integration)
-
     const fee = await this.prisma.feeRecord.findUnique({
       where: { id: dto.feeRecordId },
     });
@@ -145,9 +147,44 @@ export class FinanceRepository {
     if (fee.status === 'paid') throw new BadRequestException('Fee already paid');
     if (fee.deletedAt) throw new BadRequestException('Fee record deleted');
 
+    // Calculate late fee if overdue
+    let lateFee = 0;
+    if (new Date(fee.dueDate) < new Date() && !fee.lateFeeApplied) {
+      const monthsOverdue = Math.max(
+        1,
+        Math.ceil((Date.now() - new Date(fee.dueDate).getTime()) / (30 * 24 * 3600 * 1000)),
+      );
+      const pct = Math.min(monthsOverdue * LATE_FEE_PERCENT, 20) / 100;
+      lateFee = Math.round(fee.amount * pct);
+    }
+    const totalAmount = fee.amount + (lateFee > 0 ? lateFee : fee.lateFeeAmount);
+
+    // Call external payment gateway provider
+    const paymentResponse = await this.paymentGateway.processPayment(
+      totalAmount,
+      'INR',
+      { studentId, feeId: fee.id }
+    );
+
+    if (!paymentResponse.success) {
+      // Create a failed transaction log even if payment failed
+      await this.prisma.financeTransaction.create({
+        data: {
+          studentId,
+          feeRecordId: fee.id,
+          amount: totalAmount,
+          paymentMethod: paymentResponse.method,
+          status: 'failed',
+          gatewayTxnId: paymentResponse.transactionId,
+          receiptNo: `F-${generateReceiptNo()}`,
+          notes: paymentResponse.error || 'Payment failed',
+        },
+      });
+      throw new BadRequestException(`Payment failed: ${paymentResponse.error}`);
+    }
+
     // Use transaction to prevent late fee race condition
     return this.prisma.$transaction(async (tx) => {
-      // Re-fetch inside tx to lock it (conceptually, or rely on serializability if configured)
       const currentFee = await tx.feeRecord.findUnique({
         where: { id: dto.feeRecordId },
       });
@@ -155,61 +192,42 @@ export class FinanceRepository {
         throw new BadRequestException('Fee state changed during processing');
       }
 
-      // Apply late fee if overdue
-      let lateFee = 0;
-      if (new Date(currentFee.dueDate) < new Date() && !currentFee.lateFeeApplied) {
-        const monthsOverdue = Math.max(
-          1,
-          Math.ceil((Date.now() - new Date(currentFee.dueDate).getTime()) / (30 * 24 * 3600 * 1000)),
-        );
-        const pct = Math.min(monthsOverdue * LATE_FEE_PERCENT, 20) / 100;
-        lateFee = Math.round(currentFee.amount * pct);
-      }
-
-      const totalAmount = currentFee.amount + (lateFee > 0 ? lateFee : currentFee.lateFeeAmount);
       const receiptNo = generateReceiptNo();
-
-      // Generate mock gateway transaction details
-      const gatewayTxnId = `SIM-${randomUUID()}`; 
-      const paymentMethod = 'online';
-      const paymentStatus = 'success'; 
 
       const transaction = await tx.financeTransaction.create({
         data: {
           studentId,
           feeRecordId: currentFee.id,
           amount: totalAmount,
-          paymentMethod: paymentMethod,
-          status: paymentStatus,
-          gatewayTxnId,
+          paymentMethod: paymentResponse.method,
+          status: 'success',
+          gatewayTxnId: paymentResponse.transactionId,
           receiptNo,
-          notes: dto.notes, // Only notes are trusted from DTO
+          notes: dto.notes, 
         },
       });
 
       const updatedFee = await tx.feeRecord.update({
         where: { id: currentFee.id },
         data: {
-          status: paymentStatus === 'success' ? 'paid' : 'failed',
-          paidDate: paymentStatus === 'success' ? new Date() : null,
-          paymentTransactionId: gatewayTxnId,
+          status: 'paid',
+          paidDate: new Date(),
+          paymentTransactionId: paymentResponse.transactionId,
           lastPaymentAttempt: new Date(),
           lateFeeApplied: lateFee > 0 ? true : currentFee.lateFeeApplied,
           lateFeeAmount: lateFee > 0 ? lateFee : currentFee.lateFeeAmount,
         },
       });
 
-      if (paymentStatus === 'success') {
-        await tx.notification.create({
-          data: {
-            userId: studentId,
-            title: ' Payment Successful',
-            message: `₹${totalAmount.toLocaleString('en-IN')} paid for ${currentFee.category} fee. Receipt: ${receiptNo}`,
-            type: 'success',
-            link: '/finance',
-          },
-        });
-      }
+      await tx.notification.create({
+        data: {
+          userId: studentId,
+          title: ' Payment Successful',
+          message: `₹${totalAmount.toLocaleString('en-IN')} paid for ${currentFee.category} fee. Receipt: ${receiptNo}`,
+          type: 'success',
+          link: '/finance',
+        },
+      });
 
       return { transaction, fee: updatedFee };
     });

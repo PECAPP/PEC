@@ -1,5 +1,7 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { db } from '@pec/database';
+import { createRlsMiddleware } from './rls.middleware';
+
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
@@ -16,6 +18,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   public get role() { return db.role; }
   public get permission() { return db.permission; }
   public get rolePermission() { return db.rolePermission; }
+  public get roleDelegation() { return db.roleDelegation; }
   public get userRole() { return db.userRole; }
   public get refreshToken() { return db.refreshToken; }
   public get emailVerificationToken() { return db.emailVerificationToken; }
@@ -48,6 +51,8 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   public get canteenOrderItem() { return db.canteenOrderItem; }
   public get scoreEntry() { return db.scoreEntry; }
   public get resumeProfile() { return db.resumeProfile; }
+  public get studentProject() { return db.studentProject; }
+  public get studentSkill() { return db.studentSkill; }
 
   public get facultyPublication() { return db.facultyPublication; }
   public get facultyAward() { return db.facultyAward; }
@@ -58,6 +63,8 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   public get marketplaceBookmark() { return db.marketplaceBookmark; }
   public get marketplaceChat() { return db.marketplaceChat; }
   public get marketplaceMessage() { return db.marketplaceMessage; }
+  public get hostelOutpass() { return db.hostelOutpass; }
+  public get userSettings() { return db.userSettings; }
 
   // Database raw operations
   public $transaction = db.$transaction.bind(db);
@@ -68,6 +75,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit() {
     // db connects automatically
+    // RLS filtering is handled safely via Prisma Extensions in the database package.
   }
 
   async onModuleDestroy() {

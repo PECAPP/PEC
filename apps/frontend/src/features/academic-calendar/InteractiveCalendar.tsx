@@ -211,8 +211,8 @@ export function InteractiveCalendar({
                       onClick={() => setSelectedDate(day)}
                       className={cn(
                         "min-h-[100px] md:min-h-[140px] p-4 rounded-sm border transition-all relative flex flex-col items-start gap-4 text-left overflow-hidden group hover:bg-muted/40",
-                        !isCurrentMonth ? "opacity-10 pointer-events-none" : "bg-card hover:border-primary",
-                        isSelected ? "bg-primary text-primary-foreground border-primary z-10" : "border-border/60",
+                        !isCurrentMonth ? "opacity-10 pointer-events-none" : "bg-card hover:border-border/40",
+                        isSelected ? "bg-primary text-primary-foreground border-border/40 z-10" : "border-border/60",
                         isToday && !isSelected ? "border-primary/40 bg-primary/5" : ""
                       )}
                     >

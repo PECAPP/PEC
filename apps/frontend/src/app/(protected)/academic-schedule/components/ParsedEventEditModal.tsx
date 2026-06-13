@@ -36,11 +36,11 @@ export default function ParsedEventEditModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className=" w-full p-0 overflow-hidden bg-background">
-        <div className="p-6 border-b">
+        <div className="p-3 md:p-6 border-b">
           <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-3 md:p-6 space-y-4 max-h-[70vh] overflow-y-auto">
           <BaseEventModalForm
             formData={formData}
             setFormData={(data) => setFormData(data as ParsedEvent)}

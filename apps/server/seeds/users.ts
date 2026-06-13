@@ -66,14 +66,14 @@ export async function seedCoreUsers(passwordHash: string) {
   const admin = await createUserWithRole({
     email: 'admin@pec.edu',
     name: 'PEC College Admin',
-    role: 'admin',
+    role: 'college_admin',
     passwordHash,
   });
 
   await createUserWithRole({
     email: 'ops.admin@pec.edu',
     name: 'Operations Admin',
-    role: 'admin',
+    role: 'college_admin',
     passwordHash,
   });
 

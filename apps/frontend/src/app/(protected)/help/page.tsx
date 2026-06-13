@@ -74,7 +74,7 @@ export default function Help() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="text-center py-8">
+      <div className="text-center py-4 md:py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

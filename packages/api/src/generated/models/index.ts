@@ -44,6 +44,7 @@ export * from './createRoomDto';
 export * from './createTimetableDto';
 export * from './createUserDto';
 export * from './createWaiverRequestDto';
+export * from './dockerControllerGetContainerLogsV1Params';
 export * from './enrollmentsControllerRemoveV1Params';
 export * from './financeControllerGetSummaryV1Params';
 export * from './payFeeDto';

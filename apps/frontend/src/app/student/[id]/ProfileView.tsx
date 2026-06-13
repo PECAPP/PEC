@@ -93,7 +93,7 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
             <div>
               <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                 {userData.fullName}
-                <Badge variant="outline" className="text-[10px] h-5 px-1.5 uppercase tracking-wider bg-success/10 text-success border-success/20">Verified Student</Badge>
+                <Badge variant="outline" className="text-[10px] h-5 px-1.5  bg-success/10 text-success border-success/20">Verified Student</Badge>
               </h1>
               <p className="text-sm text-muted-foreground">{profileData.department || 'Department'} - Semester {profileData.semester ?? '-'}</p>
               <div className="flex items-center gap-3 mt-1.5">
@@ -136,7 +136,7 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
           {/* Quick Stats - Col Span 4 */}
           <motion.div variants={item} className="md:col-span-4 space-y-4">
             <div className="card-elevated p-4">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Academic Snapshot</h2>
+              <h2 className="text-sm font-semibold text-muted-foreground  mb-3">Academic Snapshot</h2>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-sm bg-secondary/30 border border-border">
                   <p className="text-2xl font-bold text-foreground">{cgpaValue}</p>
@@ -188,14 +188,14 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
           {/* Main Content - Col Span 8 */}
           <motion.div variants={item} className="md:col-span-8 space-y-4">
              <div className="card-elevated p-4">
-               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">About</h2>
+               <h2 className="text-sm font-semibold text-muted-foreground  mb-2">About</h2>
                <p className="text-sm text-foreground/80 leading-relaxed">
                  {profileData.bio || "No bio added yet."}
                </p>
              </div>
 
              <div className="card-elevated p-4">
-               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Skills & Technologies</h2>
+               <h2 className="text-sm font-semibold text-muted-foreground  mb-3">Skills & Technologies</h2>
                <div className="flex flex-wrap gap-1.5">
                  {skills.length > 0 ? (
                    skills.map((skill: string) => (
@@ -210,7 +210,7 @@ export function StudentProfileView({ userData, profileData, stats, githubStats, 
              </div>
 
              <div className="card-elevated p-4">
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Verified Credentials</h2>
+                <h2 className="text-sm font-semibold text-muted-foreground  mb-3">Verified Credentials</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                    {documents.length > 0 ? (
                      documents.map((doc: any, i: number) => (

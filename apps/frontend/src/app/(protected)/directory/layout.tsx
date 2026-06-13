@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Users, UserCog, Building2 } from 'lucide-react';
+import { PageBanner } from '@pec/ui';
 
 export default function DirectoryLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -15,34 +16,34 @@ export default function DirectoryLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="flex flex-col h-full space-y-6   w-full p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Directory</h1>
-        <p className="text-muted-foreground">Manage institution users, faculty members, and departments from a centralized view.</p>
-      </div>
+    <div className="flex flex-col h-full space-y-6 w-full">
+      <PageBanner
+        title="Directory"
+        subtitle="Manage institution users, faculty members, and departments from a centralized view."
+        icon={<Building2 className="w-7 h-7 text-primary" />}
+        badgeText="Core System"
+      />
       
-      <div className="border-b border-border">
-        <div className="flex space-x-8">
-          {tabs.map((tab) => {
-            const isActive = pathname.startsWith(tab.path);
-            const Icon = tab.icon;
-            return (
-              <Link 
-                key={tab.path} 
-                href={tab.path as any}
-                className={cn(
-                  "pb-3 text-sm font-medium transition-colors border-b-2 flex items-center gap-2",
-                  isActive 
-                    ? "border-primary text-foreground" 
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
-                )}
-              >
-                <Icon className={cn("w-4 h-4", isActive ? "text-primary" : "text-muted-foreground")} />
-                {tab.name}
-              </Link>
-            );
-          })}
-        </div>
+      <div className="inline-flex h-10 items-center justify-start rounded-xl bg-muted/40 p-1 text-muted-foreground border border-white/5 shadow-inner overflow-x-auto overflow-y-hidden flex-nowrap tabs-list-scroll max-w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {tabs.map((tab) => {
+          const isActive = pathname.startsWith(tab.path);
+          const Icon = tab.icon;
+          return (
+            <Link 
+              key={tab.path} 
+              href={tab.path as any}
+              className={cn(
+                "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-all gap-2 hover:text-foreground",
+                isActive 
+                  ? "bg-primary text-primary-foreground shadow-md border border-white/10" 
+                  : "text-muted-foreground"
+              )}
+            >
+              <Icon className={cn("w-4 h-4", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
+              {tab.name}
+            </Link>
+          );
+        })}
       </div>
       <div className="flex-1 mt-6">
         {children}

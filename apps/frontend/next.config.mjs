@@ -98,7 +98,7 @@ const nextConfig = {
     const isProd = process.env.NODE_ENV === 'production';
     // The destination must be the backend server, never the frontend proxy itself.
     const backendTarget = process.env.INTERNAL_API_URL || 
-      (isProd ? 'http://backend:4000/api' : 'http://localhost:4000/api');
+      (isProd ? 'http://backend:4000/api' : 'http://127.0.0.1:4000/api');
       
     const normalizedTarget = backendTarget.replace(/\/$/, '');
     const apiTarget = normalizedTarget.endsWith('/api')

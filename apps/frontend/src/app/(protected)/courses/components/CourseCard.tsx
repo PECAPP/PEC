@@ -30,7 +30,7 @@ export function CourseCard({
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-20px" }}
-      className="card-elevated group overflow-hidden bg-white dark:bg-black/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all duration-500 rounded-sm shadow-sm dark:shadow-none"
+      className="bg-card border border-border/40 rounded-sm shadow-sm group overflow-hidden bg-white dark:bg-black/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 hover:border-border/40 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all duration-500 rounded-sm shadow-sm dark:shadow-none"
     >
       <div className="h-40 w-full relative overflow-hidden bg-black/10 dark:bg-black/50">
         <ImageWithBlur 
@@ -41,11 +41,11 @@ export function CourseCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 group-hover:opacity-100" />
         
         <div className="absolute top-4 left-4 flex gap-2 z-10">
-          <Badge className="bg-black/60 text-white backdrop-blur-md border border-white/10 text-[10px] font-bold tracking-widest uppercase py-1 px-3 shadow-sm">
+          <Badge className="bg-black/60 text-white backdrop-blur-md border border-white/10 text-sm font-medium  py-1 px-3 shadow-sm">
              {course.code}
           </Badge>
           {enrolled && (
-            <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold tracking-widest uppercase py-1 px-3 backdrop-blur-xl shadow-sm rounded-full">
+            <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-sm font-medium  py-1 px-3 backdrop-blur-xl shadow-sm rounded-full">
               <CheckCircle className="w-3.5 h-3.5 mr-1.5" /> Enrolled
             </Badge>
           )}
@@ -53,14 +53,14 @@ export function CourseCard({
 
         {isFull && !enrolled && (
           <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center z-20">
-            <Badge variant="destructive" className="font-bold tracking-widest uppercase px-6 py-2 shadow-xl shadow-destructive/20 border-destructive/20">
+            <Badge variant="destructive" className="font-bold  px-3 md:px-6 py-2 shadow-xl shadow-destructive/20 border-destructive/20">
                Full Capacity
             </Badge>
           </div>
         )}
       </div>
       
-      <div className="p-5 space-y-5 relative">
+      <div className="p-3 md:p-5 space-y-5 relative">
         <div>
           <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white group-hover:text-primary dark:group-hover:text-primary transition-colors line-clamp-1  dark:">
             {course.name}
@@ -73,14 +73,14 @@ export function CourseCard({
 
         <div className="grid grid-cols-2 gap-4 pb-2">
           <div className="flex flex-col gap-1">
-             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Credits</span>
+             <span className="text-sm font-medium  text-zinc-500">Credits</span>
              <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{course.credits} Units</span>
              </div>
           </div>
           <div className="flex flex-col gap-1">
-             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Schedule</span>
+             <span className="text-sm font-medium  text-zinc-500">Schedule</span>
              <div className="flex items-center gap-2">
                 <GraduationCap className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Sem {course.semester}</span>
@@ -89,7 +89,7 @@ export function CourseCard({
         </div>
 
         <div className="space-y-3 pt-4 border-t border-black/10 dark:border-white/10">
-           <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-zinc-600 dark:text-zinc-400">
+           <div className="flex justify-between items-center text-[10px] uppercase font-bold  text-zinc-600 dark:text-zinc-400">
               <span>Enrollment Status</span>
               <span className={cn(isFull ? "text-destructive font-extrabold" : "text-primary font-extrabold")}>
                 {course.enrolledStudents} / {course.maxStudents}
@@ -102,7 +102,7 @@ export function CourseCard({
                 viewport={{ once: true }}
                 className={cn(
                   "h-full rounded-full transition-all duration-1000",
-                  isFull ? "bg-destructive shadow-glow-destructive" : "bg-primary shadow-glow"
+                  isFull ? "bg-destructive shadow-md" : "bg-primary shadow-md border border-border/40"
                 )}
               />
            </div>
@@ -112,7 +112,7 @@ export function CourseCard({
           {!enrolled && !isFull && onEnroll && (
              <Button 
               onClick={() => onEnroll(course)}
-              className="flex-1 h-10 rounded-sm bg-primary text-primary-foreground font-bold text-[9px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all"
+              className="flex-1 h-10 rounded-sm bg-primary text-primary-foreground font-medium text-xs  shadow-md border border-border/40 hover:scale-[1.02] transition-all"
             >
               Enroll Now
             </Button>
@@ -122,7 +122,7 @@ export function CourseCard({
             variant="ghost" 
             onClick={() => onView(course)} 
             className={cn(
-              "h-10 rounded-sm font-bold text-[9px] uppercase tracking-widest transition-all group/btn bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-zinc-800 dark:text-white border border-black/10 dark:border-white/10",
+              "h-10 rounded-sm font-medium text-xs  transition-all group/btn bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-zinc-800 dark:text-white border border-black/10 dark:border-white/10",
               (enrolled || isFull) ? "flex-1" : "px-5"
             )}
           >

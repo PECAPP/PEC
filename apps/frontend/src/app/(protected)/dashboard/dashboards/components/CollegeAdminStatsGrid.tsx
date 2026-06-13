@@ -42,7 +42,7 @@ export function CollegeAdminStatsGrid({ stats, _formatCurrency }: Props) {
 
 function StatCard({ icon: Icon, label, value, subtext, trend, trendUp, iconColor = 'text-primary' }: any) {
   return (
-    <div className="card-elevated p-5">
+    <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5">
       <div className="flex items-start justify-between">
         <div className={`w-10 h-10 rounded-sm bg-secondary flex items-center justify-center ${iconColor}`}>
           <Icon className="w-5 h-5" />

@@ -1,7 +1,7 @@
 'use client';
 import { Button, Badge, Input } from "@pec/ui";
 
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { DataTable } from '@/components/common/DataTable';
 import { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -57,11 +57,11 @@ export function CoursesTable({
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => (
-        <div className="flex items-center justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={() => onEditCourse(row.original)}>
-            <Edit className="w-4 h-4" />
+        <div className="flex items-center justify-end gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md hover:bg-muted transition-colors" onClick={() => onEditCourse(row.original)}>
+            <Edit className="w-4 h-4 text-muted-foreground" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onDeleteCourse(row.original.id)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md hover:bg-destructive/10 transition-colors" onClick={() => onDeleteCourse(row.original.id)}>
             <Trash2 className="w-4 h-4 text-destructive" />
           </Button>
         </div>
@@ -72,20 +72,21 @@ export function CoursesTable({
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <Input 
-          placeholder="Search courses..." 
-          className=" w-full" 
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-        <Button onClick={onAddCourse} className="w-full sm:w-auto">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input 
+            placeholder="Search courses..." 
+            className="pl-9 h-10 w-full border rounded-sm bg-background/50" 
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </div>
+        <Button onClick={onAddCourse} className="w-full sm:w-auto h-10 bg-primary text-primary-foreground font-medium rounded-sm px-4 whitespace-nowrap">
           <Plus className="w-4 h-4 mr-2" />Add Course
         </Button>
       </div>
 
-      <div className="card-elevated overflow-hidden">
-        <DataTable columns={columns} data={courses} />
-      </div>
+      <DataTable columns={columns} data={courses} />
     </div>
   );
 }

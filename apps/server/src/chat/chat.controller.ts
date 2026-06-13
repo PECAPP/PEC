@@ -9,7 +9,6 @@ import {
   Query,
   UseGuards,
   Request,
-  ParseUUIDPipe,
   ParseIntPipe,
   DefaultValuePipe,
 } from '@nestjs/common';
@@ -71,7 +70,7 @@ export class ChatController {
   @Get('messages/:roomId')
   async findMessages(
     @Request() req: any,
-    @Param('roomId', new ParseUUIDPipe({ version: '4' })) roomId: string,
+    @Param('roomId') roomId: string,
     @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
   ) {
     const data = await this.chatService.findMessages(
@@ -109,9 +108,19 @@ export class ChatController {
   @Delete('message/:id')
   async removeMessage(
     @Request() req: any,
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param('id') id: string,
   ) {
     const data = await this.chatService.deleteMessage(id, req.user.sub);
+    return { success: true, data };
+  }
+
+  @Patch('message/:id')
+  async editMessage(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body('content') content: string,
+  ) {
+    const data = await this.chatService.editMessage(id, req.user.sub, content);
     return { success: true, data };
   }
 
@@ -146,7 +155,7 @@ export class ChatController {
   @Post('clubs/:id/join-request')
   async submitClubJoinRequest(
     @Request() req: any,
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param('id') id: string,
     @Body() body: ClubJoinRequestDto,
   ) {
     const userRoles = Array.isArray(req.user?.roles)
@@ -159,7 +168,7 @@ export class ChatController {
       id,
       req.user.sub,
       body.proposalText,
-      body.media ?? [],
+      (body.media as any[]) ?? [],
       userRoles,
     );
     return { success: true, data };
@@ -183,7 +192,7 @@ export class ChatController {
   @Patch('clubs/requests/:requestId')
   async reviewClubJoinRequest(
     @Request() req: any,
-    @Param('requestId', new ParseUUIDPipe({ version: '4' })) requestId: string,
+    @Param('requestId') requestId: string,
     @Body() body: ClubJoinRequestDecisionDto,
   ) {
     const userRoles = Array.isArray(req.user?.roles)
@@ -205,7 +214,7 @@ export class ChatController {
   @Post('clubs/:id/post')
   async postToClub(
     @Request() req: any,
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param('id') id: string,
     @Body() body: PostClubMessageDto,
   ) {
     const userRoles = Array.isArray(req.user?.roles)

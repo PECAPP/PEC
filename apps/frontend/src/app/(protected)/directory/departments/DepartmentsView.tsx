@@ -194,17 +194,17 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
   {
    accessorKey: 'code',
    header: 'Code',
-   cell: ({ row }) => <span className="font-bold font-mono text-primary text-sm tracking-tight">{row.original.code}</span>
+   cell: ({ row }) => <span className="font-semibold text-primary text-xs">{row.original.code}</span>
   },
   {
    accessorKey: 'name',
    header: 'Name',
-   cell: ({ row }) => <span className="font-bold text-foreground text-base tracking-tight">{row.original.name}</span>
+   cell: ({ row }) => <span className="font-semibold text-foreground text-sm">{row.original.name}</span>
   },
   {
    accessorKey: 'hod',
    header: 'Head of Department',
-   cell: ({ row }) => <span className="text-muted-foreground font-mono text-xs uppercase opacity-70">{row.original.hodName || row.original.hod || '---'}</span>
+   cell: ({ row }) => <span className="text-muted-foreground font-semibold text-xs uppercase opacity-70">{row.original.hodName || row.original.hod || '---'}</span>
   },
   {
    id: 'actions',
@@ -231,96 +231,89 @@ export function DepartmentsView({ initialDepartments, isAdmin }: DepartmentsView
 
  return (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
-   <div className="flex items-center justify-between">
-    <div>
-     <h1 className="text-3xl font-bold tracking-tight">Departments</h1>
-     <p className="text-muted-foreground mt-1 font-medium italic text-[11px]">Manage and track institutional academic departments</p>
+   {/* Header Actions removed to consolidate Toolbar */}
+
+   {/* Stats */}
+   <div className="grid gap-6 md:grid-cols-3">
+    {[
+     { icon: Building2, label: 'Total Departments', value: optimisticDepts.length, color: 'text-primary', bg: 'bg-primary/10', border: 'border-border/40' },
+     { icon: GraduationCap, label: 'Active', value: optimisticDepts.filter(d => d.status !== 'inactive').length, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+     { icon: Users, label: 'HODs Assigned', value: optimisticDepts.filter(d => d.hod).length, color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+    ].map(({ icon: Icon, label, value, color, bg, border }) => (
+      <div key={label} className="bg-card p-3 md:p-6 border border-border/40 rounded-sm shadow-sm flex items-center gap-4">
+       <div className={`p-3 rounded-lg border ${border} ${bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${color}`} /></div>
+       <div>
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <p className="text-3xl font-bold mt-1 tracking-tight">{value}</p>
+       </div>
+      </div>
+    ))}
+   </div>
+
+   {/* Filters and Actions */}
+    <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto flex-1">
+     <div className="relative flex-1">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+     <Input placeholder="Search departments..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-10 w-full" />
     </div>
-    <div className="flex gap-3">
-     <Button variant="outline" onClick={exportDepartments} className="h-11 rounded-sm border font-bold px-6">
-      <Download className="w-4 h-4 mr-2" /> Export
-     </Button>
-     <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-11 rounded-sm border font-bold px-6">
-      <Upload className="w-4 h-4 mr-2" /> Bulk Upload
-     </Button>
+
+    <div className="flex items-center gap-3 w-full md:w-auto">
+     <Button variant="outline" onClick={exportDepartments} className="h-10 font-medium border bg-background rounded-sm shadow-sm px-4"><Download className="w-4 h-4 mr-2" /> Export</Button>
+     <Button variant="outline" onClick={() => setShowBulkUpload(true)} className="h-10 font-medium border bg-background rounded-sm shadow-sm px-4"><Upload className="w-4 h-4 mr-2" /> Bulk Upload</Button>
      {isAdmin && (
-      <Button onClick={() => { resetForm(); setEditingDept(null); setShowDialog(true); }} className="h-11 rounded-sm bg-primary text-white font-bold uppercase tracking-widest text-[10px] px-6">
+      <Button onClick={() => { resetForm(); setEditingDept(null); setShowDialog(true); }} className="h-10 bg-primary text-primary-foreground font-medium rounded-sm px-4 whitespace-nowrap">
        <Plus className="w-4 h-4 mr-2" /> Add Department
       </Button>
      )}
     </div>
    </div>
 
-   <div className="grid gap-6 md:grid-cols-3">
-    {[
-     { icon: Building2, label: 'Departments', value: optimisticDepts.length, color: 'primary' },
-     { icon: GraduationCap, label: 'Active', value: optimisticDepts.filter(d => d.status !== 'inactive').length, color: 'success' },
-     { icon: Users, label: 'HODs Assigned', value: optimisticDepts.filter(d => d.hod).length, color: 'warning' },
-    ].map(({ icon: Icon, label, value, color }) => (
-     <div key={label} className="card-elevated p-6 border-b-4 border-r-4 border-primary/10">
-      <div className="flex items-center gap-4">
-       <div className={`p-3 rounded-sm bg-${color}/10 border border-${color}/20`}><Icon className={`w-6 h-6 text-${color}`} /></div>
-       <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{label}</p>
-        <p className="text-4xl font-bold mt-1">{value}</p>
-       </div>
-      </div>
-     </div>
-    ))}
-   </div>
-
-   <div className="relative">
-    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-    <Input placeholder="Search departments..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="h-14 pl-12 border rounded-sm bg-background/50 font-bold" />
-   </div>
-
-   <div className="card-elevated overflow-hidden border rounded-sm shadow-sm">
-    <DataTable columns={columns} data={filtered} onRowClick={(row) => router.push(`/directory/departments/${row.id}`)} />
-   </div>
+   {/* Table */}
+   <DataTable columns={columns} data={filtered} onRowClick={(row) => router.push(`/directory/departments/${row.id}`)} />
 
    <Dialog open={showDialog} onOpenChange={setShowDialog}>
-    <DialogContent className=" rounded-sm border border-primary shadow-sm">
+    <DialogContent className=" rounded-sm border border-border/40 shadow-sm">
      <DialogHeader className="space-y-4">
       <DialogTitle className="text-3xl font-bold">{editingDept ? 'Edit Department' : 'Add New Department'}</DialogTitle>
-      <DialogDescription className="font-bold text-[11px] uppercase tracking-widest text-muted-foreground bg-muted p-2 rounded-sm italic opacity-60">Institutional Department Details</DialogDescription>
+      <DialogDescription className="font-medium text-sm  text-muted-foreground bg-muted p-2 rounded-sm italic opacity-60">Institutional Department Details</DialogDescription>
      </DialogHeader>
      <div className="space-y-6 pt-4">
       <div className="grid grid-cols-2 gap-6">
        <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Department Code *</label>
+        <label className="text-sm font-medium  text-muted-foreground">Department Code *</label>
         <Input {...register('code')} placeholder="e.g. CS" className={`mt-1 h-12 border rounded-sm font-bold font-mono ${errors.code ? 'border-destructive' : ''}`} />
-        {errors.code && <p className="text-[10px] font-bold text-destructive uppercase">{errors.code.message}</p>}
+        {errors.code && <p className="text-sm font-medium text-destructive uppercase">{errors.code.message}</p>}
        </div>
        <div className="space-y-2">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Department Name *</label>
+        <label className="text-sm font-medium  text-muted-foreground">Department Name *</label>
         <Input {...register('name')} placeholder="e.g. Computer Science" className={`mt-1 h-12 border rounded-sm font-bold ${errors.name ? 'border-destructive' : ''}`} />
-        {errors.name && <p className="text-[10px] font-bold text-destructive uppercase">{errors.name.message}</p>}
+        {errors.name && <p className="text-sm font-medium text-destructive uppercase">{errors.name.message}</p>}
        </div>
       </div>
       <div className="space-y-2">
-       <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Head of Department (HOD)</label>
+       <label className="text-sm font-medium  text-muted-foreground">Head of Department (HOD)</label>
        <Input {...register('hod')} placeholder="e.g. Dr. John Doe" className="mt-1 h-12 border rounded-sm font-bold" />
       </div>
       <div className="space-y-2">
-       <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Description</label>
-       <textarea {...register('description')} placeholder="Describe the department's focus..." className="mt-1 w-full min-h-[100px] p-4 rounded-sm border border-border bg-background/50 font-medium focus:border-primary transition-all" />
+       <label className="text-sm font-medium  text-muted-foreground">Description</label>
+       <textarea {...register('description')} placeholder="Describe the department's focus..." className="mt-1 w-full min-h-[100px] p-4 rounded-sm border border-border bg-background/50 font-medium focus:border-border/40 transition-all" />
       </div>
       <div className="flex gap-4 pt-6">
-       <Button onClick={formSubmit(onSubmit)} className="flex-1 h-14 bg-primary text-white font-bold uppercase tracking-widest text-xs shadow-sm hover:brightness-110 active:scale-[0.98] transition-all">
+       <Button onClick={formSubmit(onSubmit)} className="flex-1 h-14 bg-primary text-white font-bold  text-xs shadow-sm hover:brightness-110 active:scale-[0.98] transition-all">
         {isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
         {editingDept ? 'Save Changes' : 'Create Department'}
        </Button>
-       <Button variant="outline" onClick={() => { setShowDialog(false); setEditingDept(null); resetForm(); }} className="h-14 border font-bold px-8 uppercase tracking-widest text-[10px] rounded-sm">Cancel</Button>
+       <Button variant="outline" onClick={() => { setShowDialog(false); setEditingDept(null); resetForm(); }} className="h-14 border font-bold px-4 md:px-8  text-[10px] rounded-sm">Cancel</Button>
       </div>
      </div>
     </DialogContent>
    </Dialog>
 
    <Dialog open={showBulkUpload} onOpenChange={setShowBulkUpload}>
-    <DialogContent className=" border border-primary rounded-sm overflow-hidden p-0">
+    <DialogContent className=" border border-border/40 rounded-sm overflow-hidden p-0">
      <DialogHeader className="bg-primary text-white p-10">
       <DialogTitle className="text-3xl font-bold">Bulk Upload Departments</DialogTitle>
-      <DialogDescription className="text-white/70 font-bold uppercase tracking-widest text-[11px] mt-2 italic">Standardized CSV/Excel data upload</DialogDescription>
+      <DialogDescription className="text-white/70 font-bold  text-[11px] mt-2 italic">Standardized CSV/Excel data upload</DialogDescription>
      </DialogHeader>
      <div className="p-10">
       <BulkUpload entityType="departments" onImport={handleBulkImport} templateColumns={['name', 'code', 'hod', 'description']} sampleData={[{ name: 'Computer Science', code: 'CS', hod: 'Dr. John Smith', description: 'CSE Dept' }]} />

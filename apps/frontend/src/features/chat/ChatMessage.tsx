@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Button } from "@pec/ui";
 import { cn } from '@/lib/utils';
-import { Download, FileText, Star, Trash2, Copy, MoreVertical, Reply } from 'lucide-react';
+import { Download, FileText, Star, Trash2, Copy, MoreVertical, Reply, Edit } from 'lucide-react';
 import { deleteMessage, toggleStarMessage } from '@/lib/messages.service';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
@@ -58,15 +58,17 @@ interface ChatMessageProps {
   roomId?: string;
   onReply?: (message: Message) => void;
   onReplyClick?: () => void;
+  onEdit?: (message: Message) => void;
 }
 
-export function ChatMessage({ message, showSenderName = true, roomId = '', onReply = () => {}, onReplyClick }: ChatMessageProps) {
+export function ChatMessage({ message, showSenderName = true, roomId = '', onReply = () => {}, onReplyClick, onEdit }: ChatMessageProps) {
   const { user } = useAuth();
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const isStarred = message.starredBy?.includes(user?.uid || "") || false;
   const userRole = user?.role as string;
-  const isAdmin = userRole === "admin";
+  const isAdmin = userRole === "college_admin";
   const canDelete = message.isOwn || isAdmin; // Owner or admin can delete
+  const canEdit = message.isOwn && !!roomId; // Only owner can edit
   const canStar = !!roomId; // Anyone can star if roomId exists
   const canCopy = !!message.content; // Can copy if there's text
 
@@ -147,7 +149,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
             {/* Reply Reference */}
             {message.replyTo && (
               <div 
-                className="mb-2.5 p-2.5 bg-background/30 backdrop-blur-sm rounded-sm border-l-3 border-primary text-xs cursor-pointer hover:bg-background/40 transition-colors"
+                className="mb-2.5 p-2.5 bg-background/30 backdrop-blur-sm rounded-sm border-l-3 border-border/40 text-xs cursor-pointer hover:bg-background/40 transition-colors"
                 onClick={onReplyClick}
               >
                 <p className="font-semibold text-primary text-[11px] mb-0.5">↩️ {message.replyTo.senderName}</p>
@@ -246,6 +248,13 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
                     <DropdownMenuItem onClick={handleStar}>
                       <Star className={`w-4 h-4 mr-2 ${isStarred ? "fill-yellow-400" : ""}`} />
                       {isStarred ? "Unstar" : "Star"}
+                    </DropdownMenuItem>
+                  )}
+
+                  {canEdit && (
+                    <DropdownMenuItem onClick={() => onEdit?.(message)}>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
                     </DropdownMenuItem>
                   )}
 

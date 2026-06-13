@@ -46,7 +46,7 @@ export function CourseInteractionsClient({ isFull, courseId, courseCode, courseN
 
   if (optimisticEnrolled) {
      return (
-        <div className="card-elevated p-4 bg-success/10 border-success/20 flex items-center justify-between mt-6">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 bg-success/10 border-success/20 flex items-center justify-between mt-6">
            <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-success" />
               <span className="font-semibold text-success">You are enrolled in this course!</span>

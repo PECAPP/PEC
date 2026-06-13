@@ -11,10 +11,10 @@ import {
  Mail, Lock, Eye, EyeOff, Loader, 
  AlertCircle, CheckCircle, X, 
  GraduationCap, Users, Building2, Shield,
- ChevronRight, Globe
+ ChevronRight, LogIn, UserPlus
 } from 'lucide-react';
 
-type UserRole = 'student' | 'faculty' | 'admin';
+type UserRole = 'student' | 'faculty' | 'college_admin';
 
 interface AuthClientProps {
  _initialSessionStatus?: boolean;
@@ -58,7 +58,7 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
     redirectPath = '/dashboard';
    } else if (user.role === 'faculty') {
     redirectPath = '/dashboard';
-   } else if (user.role === 'admin') {
+   } else if (user.role === 'college_admin') {
     redirectPath = '/dashboard';
    }
    router.replace(redirectPath as any);
@@ -73,41 +73,69 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
   }));
  };
 
- const handleSignIn = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError('');
-  setSuccess('');
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const { login2FA } = useAuth() as { login2FA: (userId: string, code: string) => Promise<void> };
 
-  const email = formData.email.trim();
-  const password = formData.password;
+  const handleSignIn = async (e: React.FormEvent) => {
+   e.preventDefault();
+   setError('');
+   setSuccess('');
 
-  if (!email) {
-    setError('Email is required');
-    return;
-  }
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    setError('Please enter a valid email');
-    return;
-  }
-  if (!password) {
-    setError('Password is required');
-    return;
-  }
-  if (password.length < 8) {
-    setError('Password must be at least 8 characters');
-    return;
-  }
+   if (requires2FA) {
+     if (!totpCode || totpCode.length !== 6) {
+       setError('Please enter a valid 6-digit code');
+       return;
+     }
+     try {
+       setLoading(true);
+       await login2FA(userId, totpCode);
+       setSuccess('Authenticating...');
+     } catch (err: unknown) {
+       setError((err as Error).message || 'Invalid 2FA code');
+     } finally {
+       setLoading(false);
+     }
+     return;
+   }
 
-  try {
-    setLoading(true);
-    await login(email, password);
-    setSuccess('Signing in...');
-  } catch (err: any) {
-    setError(err.message || 'Failed to sign in');
-  } finally {
-    setLoading(false);
-  }
- };
+   const email = formData.email.trim();
+   const password = formData.password;
+
+   if (!email) {
+     setError('Email is required');
+     return;
+   }
+   if (!/^\S+@\S+\.\S+$/.test(email)) {
+     setError('Please enter a valid email');
+     return;
+   }
+   if (!password) {
+     setError('Password is required');
+     return;
+   }
+   if (password.length < 8) {
+     setError('Password must be at least 8 characters');
+     return;
+   }
+
+   try {
+     setLoading(true);
+     const res = await login(email, password);
+     if (res?.requires2FA) {
+       setRequires2FA(true);
+       setUserId(res.userId);
+       setSuccess('Please enter your 2FA code');
+     } else {
+       setSuccess('Signing in...');
+     }
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to sign in');
+    } finally {
+     setLoading(false);
+   }
+  };
 
  const handleForgotPassword = (e: React.FormEvent) => {
   e.preventDefault();
@@ -136,10 +164,10 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
       </div>
      
      <div className="space-y-2 text-center">
-      <p className="text-[11px] font-bold uppercase tracking-widest text-accent/80">
+      <p className="text-sm font-medium  text-accent/80">
        EXPLORE. INNOVATE. EXCEL.
       </p>
-      <p className="text-[9px] font-bold uppercase tracking-widest text-accent/40 italic">
+      <p className="text-xs font-medium  text-accent/40 italic">
        Punjab Engineering College
       </p>
      </div>
@@ -167,226 +195,221 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
   );
  }
 
- return (
-  <div className="h-screen flex flex-col md:flex-row bg-background overflow-hidden relative font-sans">
-   {/* LEFT SIDE: BRANDING & IMAGE (SWISS - CLEANER & BILINGUAL) */}
-   <div className="hidden md:flex md:w-6/12 bg-black relative flex-col justify-center p-12 lg:p-16 text-white group overflow-hidden border-r border-white/5">
-    <div className="relative z-20 space-y-10 max-w-[560px]">
-     {/* HEADER LOGO + BILINGUAL TITLE */}
-     <div className="flex items-start gap-4 bg-black/50 backdrop-blur-sm border border-white/10 rounded-sm p-4">
-      <div className="w-12 h-12 bg-accent flex items-center justify-center rounded-sm">
-       <Building2 className="w-6 h-6 text-black" />
-      </div>
-      <div className="space-y-0.5">
-        <h2 className="text-base lg:text-lg font-bold text-white uppercase tracking-tight leading-none">
-        Punjab Engineering College 
-       </h2>
-       <p className="text-[11px] font-medium text-white/60">
-        पंजाब इंजीनियरिंग कॉलेज | <span className="font-bold text-accent">Chandigarh</span>
-       </p>
-      </div>
-     </div>
-
-     <motion.div
-      initial={{ opacity: 0, x: -30 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8 }}
-      className="pt-4 bg-black/45 backdrop-blur-sm border border-white/10 rounded-sm p-5 max-w-[520px]"
-     >
-      <h1 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-white">
-       Student <span className="text-accent">Portal</span>
-      </h1>
-      <p className="text-base lg:text-lg text-white/90 font-medium max-w-md mt-4 leading-snug tracking-tight">
-       Official access portal for academics, attendance, and institutional services.
-      </p>
-     </motion.div>
-
-     {/* FACES / SOCIAL PROOF */}
-     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.5 }}
-      className="flex items-center gap-6 pt-5 border-t border-white/10 w-fit bg-black/35 backdrop-blur-sm rounded-sm px-4 pb-3"
-     >
-       <div className="flex -space-x-3">
-        {[1,2,3,4].map(i => (
-         <div key={i} className="w-9 h-9 border border-black bg-muted flex items-center justify-center overflow-hidden rounded-sm">
-          <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" className="w-full h-full object-cover grayscale brightness-110" />
-         </div>
-        ))}
-        <div className="w-9 h-9 border border-black bg-white flex items-center justify-center text-[10px] font-bold text-black rounded-sm">12K+</div>
-       </div>
-       <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">Authorized Users</p>
-     </motion.div>
-    </div>
-
-    {/* BRUTALIST IMAGE OVERLAY */}
-    <div className="absolute inset-0 z-10 opacity-80 group-hover:opacity-100 transition-opacity duration-1000">
-      <img 
+   return (
+   <div className="min-h-screen w-full flex bg-background text-foreground">
+    
+    {/* LEFT SIDE: IMAGE (Hidden on mobile) */}
+    <div className="hidden lg:flex flex-col flex-1 relative bg-muted items-center justify-center overflow-hidden">
+      <motion.img 
+       initial={{ scale: 1 }}
+       animate={{ scale: 1.05 }}
+       transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
        src="/login.webp" 
-       className="w-full h-full object-cover group-hover:scale-105 transition-transform ease-out sepia-[0.15] contrast-[1.05]" 
-       style={{ transitionDuration: '7s' }}
+       className="absolute inset-0 w-full h-full object-cover opacity-90" 
        alt="PEC Academic Block" 
       />
-    </div>
-    <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/88 via-black/55 to-black/35" />
-    
-    <div className="absolute bottom-10 left-12 lg:left-16 z-20 flex items-center gap-4">
-     <Globe className="w-4 h-4 text-white opacity-20" />
-     <p className="text-[10px] text-white/20 font-bold uppercase tracking-[0.25em]">
-      PEC.EDU • CHANDIGARH • 160012
-     </p>
-    </div>
-   </div>
+      {/* Dark overlay just enough to make text readable, no complex gradients */}
+      <div className="absolute inset-0 bg-black/60" />
 
-   {/* RIGHT SIDE: AUTH FORMS (CLEANER SWISS GRID) */}
-   <div className="flex-1 flex items-center justify-center p-6 lg:p-16 bg-background relative overflow-hidden">
-    <motion.div
-     initial={{ opacity: 0, y: 20 }}
-     animate={{ opacity: 1, y: 0 }}
-     className="w-full max-w-[460px] z-10 bg-card/85 backdrop-blur-md border border-border/70 rounded-sm p-6 lg:p-7 shadow-md"
-    >
-     <div className="mb-8 text-center md:text-left">
-      <h2 className="text-4xl font-bold tracking-tight uppercase text-foreground leading-none mb-6">
-       {activeTab === 'signin' ? 'Sign In' : activeTab === 'signup' ? 'Request Access' : 'Recovery'}
-      </h2>
-      <div className="h-1.5 w-16 bg-primary mb-8" />
-      <p className="text-foreground/85 font-medium text-base leading-relaxed tracking-tight">
-       Authenticate via the central university gateway.
-      </p>
-     </div>
-
-     {(error || success) && (
-      <motion.div
-       initial={{ opacity: 0, scale: 0.98 }}
-       animate={{ opacity: 1, scale: 1 }}
-       className={`mb-10 p-4 border flex gap-4 text-xs font-bold uppercase tracking-[0.1em] items-center rounded-sm ${
-        error ? 'bg-destructive/5 border-destructive text-destructive' : 'bg-success/5 border-success text-success'
-       }`}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="relative z-10 p-12 text-center flex flex-col items-center"
       >
-       {error ? <AlertCircle className="w-4 h-4 flex-shrink-0" /> : <CheckCircle className="w-4 h-4 flex-shrink-0" />}
-       <span>{error || success}</span>
+        <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg p-2 overflow-hidden mb-6">
+         <img src="/logo.png" alt="PEC Logo" className="w-full h-full object-contain" />
+        </div>
+        <h1 className="text-5xl font-bold leading-tight tracking-tight text-white drop-shadow-xl mb-4">
+          Punjab Engineering College
+        </h1>
+        <p className="text-lg text-white/80 font-medium max-w-md leading-relaxed drop-shadow-md">
+          Official gateway for academics, attendance, and institutional services.
+        </p>
       </motion.div>
-     )}
+    </div>
 
-     <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="w-full space-y-10">
-      <TabsList className="grid w-full grid-cols-2 bg-muted/90 p-1 h-12 rounded-sm border border-border">
-       <TabsTrigger value="signin" className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold uppercase text-[11px] tracking-widest transition-all">Sign In</TabsTrigger>
-       <TabsTrigger value="signup" className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold uppercase text-[11px] tracking-widest transition-all">Register</TabsTrigger>
-      </TabsList>
-
-       <TabsContent value="signin" className="space-y-6 mt-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-       <form onSubmit={handleSignIn} className="space-y-6">
-        <div className="space-y-3">
-         <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Email Access</label>
-         <div className="relative group">
-          <Mail className="w-4 h-4 absolute left-4 top-4 text-muted-foreground/60 transition-colors group-focus-within:text-primary" />
-          <Input
-           name="email"
-           type="email"
-           placeholder="arjun@pec.edu"
-           value={formData.email}
-           onChange={handleInputChange}
-           autoComplete="username"
-          className="pl-12 h-12 rounded-sm border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
-          />
-         </div>
+    {/* RIGHT SIDE: CLEAN SOLID FORM */}
+    <div className="w-full lg:w-[500px] flex items-center justify-center p-8 bg-card shadow-[-20px_0_40px_-15px_rgba(0,0,0,0.1)] z-10 relative">
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="w-full max-w-sm"
+      >
+        {/* Mobile Logo */}
+        <div className="flex lg:hidden items-center gap-4 mb-8">
+          <div className="w-16 h-16 bg-white rounded-xl shadow-sm p-1.5 border border-border">
+            <img src="/logo.png" alt="PEC Logo" className="w-full h-full object-contain" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold tracking-widest uppercase">PEC</h2>
+            <p className="text-[10px] text-muted-foreground uppercase">Chandigarh</p>
+          </div>
         </div>
 
-        <div className="space-y-3">
-         <div className="flex items-center justify-between">
-          <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Password</label>
-          <button type="button" onClick={() => setActiveTab('forgot')} className="text-[11px] font-semibold text-primary hover:underline transition-colors">Forgot password?</button>
-         </div>
-         <div className="relative group">
-          <Lock className="w-4 h-4 absolute left-4 top-4 text-muted-foreground/60 transition-colors group-focus-within:text-primary" />
-          <Input
-           name="password"
-           type={showPassword ? 'text' : 'password'}
-           placeholder="••••••••"
-           value={formData.password}
-           onChange={handleInputChange}
-           autoComplete="current-password"
-          className="pl-12 pr-12 h-12 rounded-sm border border-border/80 bg-background/90 focus:border-primary font-semibold text-sm transition-all"
-          />
-          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-3.5 text-muted-foreground hover:text-foreground">
-           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
-         </div>
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold tracking-tight mb-2">
+            {activeTab === 'signin' ? 'Welcome back' : activeTab === 'signup' ? 'Request Access' : 'Account Recovery'}
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Authenticate via the central university network.
+          </p>
         </div>
 
-        <Button type="submit" disabled={loading} className="w-full h-12 rounded-sm bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[11px] shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
-         {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Sign In'}
-        </Button>
-       </form>
+        {(error || success) && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`mb-8 p-3 border flex gap-3 text-xs font-semibold items-center rounded-lg ${
+              error ? 'bg-destructive/10 border-destructive/20 text-destructive' : 'bg-success/10 border-success/20 text-success'
+            }`}
+          >
+            {error ? <AlertCircle className="w-4 h-4 flex-shrink-0" /> : <CheckCircle className="w-4 h-4 flex-shrink-0" />}
+            <span>{error || success}</span>
+          </motion.div>
+        )}
 
-        <div className="relative pt-2">
-        <div className="absolute inset-0 flex items-center px-4"><span className="w-full border-t border-border"></span></div>
-        <div className="relative flex justify-center"><span className="bg-background px-4 text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">Authorized Access</span></div>
-       </div>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-muted p-1 h-12 rounded-lg">
+            <TabsTrigger value="signin" className="rounded-md text-muted-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm font-semibold uppercase text-[10px] tracking-widest transition-all gap-1.5 flex items-center justify-center"><LogIn className="w-3.5 h-3.5" />Sign In</TabsTrigger>
+            <TabsTrigger value="signup" className="rounded-md text-muted-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm font-semibold uppercase text-[10px] tracking-widest transition-all gap-1.5 flex items-center justify-center"><UserPlus className="w-3.5 h-3.5" />Register</TabsTrigger>
+          </TabsList>
 
-       <Button 
-        variant="outline" 
-        onClick={() => setShowCredentialsModal(true)}
-        className="w-full h-11 rounded-sm border border-dashed border-border hover:border-primary hover:bg-primary/5 text-[10px] font-bold uppercase tracking-widest transition-all gap-3"
-       >
-        <Shield className="w-4 h-4 text-primary" />
-        Use Test Accounts
-       </Button>
-      </TabsContent>
+          <TabsContent value="signin" className="space-y-6 mt-0">
+            <form onSubmit={handleSignIn} className="space-y-4">
+              {requires2FA ? (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">2FA Verification Code</label>
+                  <div className="relative group">
+                    <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 transition-colors group-focus-within:text-primary" />
+                    <Input
+                      name="totpCode"
+                      type="text"
+                      placeholder="123456"
+                      value={totpCode}
+                      onChange={(e) => setTotpCode(e.target.value)}
+                      className="pl-10 h-12 w-full rounded-lg border-border bg-background focus:ring-2 focus:ring-primary/20 transition-all font-mono tracking-[0.5em] text-center text-lg"
+                      maxLength={6}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Institutional Email</label>
+                    <div className="relative group">
+                      <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 transition-colors group-focus-within:text-primary" />
+                      <Input
+                        name="email"
+                        type="email"
+                        placeholder="arjun@pec.edu"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        autoComplete="username"
+                        className="pl-10 h-12 w-full rounded-lg border-border bg-background hover:bg-muted/50 focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                      />
+                    </div>
+                  </div>
 
-      <TabsContent value="signup" className="mt-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-       <div className="bg-muted/80 border border-border p-8 text-center space-y-6 rounded-sm shadow-inner">
-         <div className="w-14 h-14 bg-primary flex items-center justify-center mx-auto rounded-sm"><Building2 className="w-7 h-7 text-primary-foreground" /></div>
-         <div className="space-y-2">
-          <h3 className="text-xl font-bold uppercase tracking-tight">Institutional Registration</h3>
-          <p className="text-[11px] text-muted-foreground font-semibold tracking-tight uppercase">Accounts are provisioned by the Office of Academic Affairs.</p>
-         </div>
-         <Button onClick={() => router.push('/apply-institution' as any)} className="w-full h-11 rounded-sm uppercase font-bold tracking-widest text-[10px] bg-primary">Open Registration Portal</Button>
-       </div>
-      </TabsContent>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-foreground">Password</label>
+                      <button type="button" onClick={() => setActiveTab('forgot')} className="text-[10px] font-semibold text-muted-foreground hover:text-primary transition-colors">Forgot password?</button>
+                    </div>
+                    <div className="relative group">
+                      <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 transition-colors group-focus-within:text-primary" />
+                      <Input
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        autoComplete="current-password"
+                        className="pl-10 pr-10 h-12 w-full rounded-lg border-border bg-background hover:bg-muted/50 focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                      />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors">
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
 
-      <TabsContent value="forgot" className="mt-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-        <form onSubmit={handleForgotPassword} className="space-y-8">
-        <div className="space-y-2">
-         <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Institutional Email</label>
-         <Input type="email" placeholder="ARJUN@PEC.EDU" className="h-12 rounded-sm border border-border font-medium" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} />
-        </div>
-        <Button type="submit" className="w-full h-11 rounded-sm bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[11px]">Send Reset Link</Button>
-        <Button variant="ghost" onClick={() => setActiveTab('signin')} className="w-full h-10 text-[10px] font-bold uppercase tracking-widest text-primary">Return to Login</Button>
-        </form>
-      </TabsContent>
-     </Tabs>
-    </motion.div>
-   </div>
+              <div className="pt-4">
+                <Button type="submit" disabled={loading} className="w-full h-12 rounded-lg bg-primary text-primary-foreground font-bold hover:brightness-110 transition-all shadow-sm">
+                  {loading ? <Loader className="w-4 h-4 animate-spin" /> : requires2FA ? 'Verify Code' : 'Sign In'}
+                </Button>
+              </div>
+            </form>
+
+            {/* Seamless Test Accounts Trigger */}
+            <div className="mt-8 flex justify-center">
+              <button 
+                onClick={() => setShowCredentialsModal(true)}
+                className="flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors bg-muted/50 px-4 py-2 rounded-full border border-border"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                Quick Access Demo
+              </button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="signup" className="mt-0">
+            <div className="bg-muted border border-border/50 p-8 text-center space-y-6 rounded-xl">
+              <div className="w-16 h-16 bg-white flex items-center justify-center mx-auto rounded-xl border border-border/50 p-2 shadow-sm">
+                <img src="/logo.png" alt="PEC Logo" className="w-full h-full object-contain" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-base font-bold text-foreground">Institutional Access</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">Accounts are provisioned exclusively by the Office of Academic Affairs.</p>
+              </div>
+              <Button onClick={() => router.push('/apply-institution' as any)} variant="outline" className="w-full h-11 rounded-lg font-bold text-xs bg-background">
+                Open Registration Portal
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="forgot" className="mt-0">
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Institutional Email</label>
+                <Input type="email" placeholder="arjun@pec.edu" className="h-12 rounded-lg border-border bg-background focus:ring-2 focus:ring-primary/20 font-medium" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} />
+              </div>
+              <Button type="submit" className="w-full h-12 rounded-lg bg-primary text-primary-foreground font-bold shadow-sm hover:brightness-110 mt-2">
+                Send Reset Link
+              </Button>
+              <Button variant="ghost" onClick={() => setActiveTab('signin')} className="w-full h-10 text-xs font-semibold text-muted-foreground hover:text-foreground">
+                Return to Sign In
+              </Button>
+            </form>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
+    </div>
 
    {/* IDENTITY MODAL */}
    {showCredentialsModal && (
-   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md animate-in fade-in duration-500">
+   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
      <motion.div
-      initial={{ opacity: 0, scale: 0.98, y: 30 }}
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      className="bg-card border border-primary/40 rounded-sm shadow-xl max-w-2xl w-full overflow-hidden"
+      className="bg-card border border-border rounded-xl shadow-2xl max-w-xl w-full overflow-hidden"
      >
-      <div className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground px-8 py-8 relative border-b border-black/10">
-       <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary-foreground/70">Secure Access</p>
-       <h2 className="text-3xl font-bold uppercase tracking-tight mt-2">Test Accounts</h2>
-       <p className="text-[11px] font-bold tracking-widest uppercase text-primary-foreground/75 mt-3">Select a test account to auto-fill sign-in credentials</p>
+      <div className="p-6 relative border-b border-border flex items-start justify-between">
+       <div>
+         <h2 className="text-xl font-bold">Test Accounts</h2>
+         <p className="text-sm text-muted-foreground mt-1">Select a test account to auto-fill sign-in credentials</p>
+       </div>
        <button 
         onClick={() => setShowCredentialsModal(false)}
-        className="absolute top-6 right-6 p-2 rounded-sm hover:bg-white/10 transition-all text-white/60 hover:text-white"
+        className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-all text-muted-foreground hover:text-foreground"
        >
-        <X className="w-5 h-5" />
+        <X className="w-4 h-4" />
        </button>
       </div>
 
-      <div className="px-6 py-6 border-b border-border/60 bg-card">
-       <p className="text-xs text-muted-foreground font-semibold">
-        Choose an account below to populate email and password.
-       </p>
-      </div>
-
-      <div className="p-6 grid gap-3 bg-gradient-to-b from-background to-background/80">
+      <div className="p-6 grid gap-3 bg-muted/30">
        {[
         { r: 'student', e: 'student@pec.edu', p: 'password123', i: GraduationCap, t: 'TEST STUDENT' },
         { r: 'faculty', e: 'faculty@pec.edu', p: 'password123', i: Users, t: 'TEST FACULTY' },
@@ -395,35 +418,23 @@ export default function AuthClient({ _initialSessionStatus = false }: AuthClient
         <button
          key={role.r}
          onClick={() => fillCredentials(role.e, role.p)}
-         className="flex items-center gap-4 p-4 border border-border/80 bg-background hover:bg-muted/50 hover:border-primary/40 transition-all group rounded-sm text-left"
+         className="flex items-center gap-4 p-4 border border-border bg-card hover:bg-muted hover:border-border/80 transition-all group rounded-xl text-left shadow-sm hover:shadow"
         >
-         <div className="w-12 h-12 bg-primary/90 text-primary-foreground flex items-center justify-center group-hover:scale-105 transition-transform rounded-sm shadow-md">
+         <div className="w-12 h-12 bg-primary/10 text-primary flex items-center justify-center rounded-lg">
           <role.i className="w-5 h-5" />
          </div>
-         <div className="flex-1 text-left">
-          <h4 className="font-bold text-sm uppercase text-foreground group-hover:text-primary transition-colors">{role.t}</h4>
-          <p className="text-[10px] font-mono text-muted-foreground uppercase opacity-70 font-bold mt-0.5">{role.e}</p>
+         <div className="flex-1">
+          <h4 className="font-bold text-sm text-foreground">{role.t}</h4>
+          <p className="text-xs font-mono text-muted-foreground mt-0.5">{role.e}</p>
          </div>
          <div className="flex items-center gap-3">
-          <span className="text-[9px] uppercase tracking-wider font-bold border border-primary/30 text-primary bg-primary/5 px-2 py-1 rounded-sm">
+          <span className="text-[10px] font-bold border border-border text-muted-foreground bg-muted px-2 py-0.5 rounded-md capitalize">
            {role.r.replace('_', ' ')}
           </span>
-          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
          </div>
         </button>
        ))}
-      </div>
-
-      <div className="bg-muted/40 px-6 py-4 border-t border-border flex items-center justify-between gap-3">
-       <p className="text-[9px] text-muted-foreground uppercase tracking-[0.24em] font-bold opacity-65">For Demonstration in Sandbox Environment</p>
-       <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setShowCredentialsModal(false)}
-        className="text-[10px] uppercase tracking-wider font-bold"
-       >
-        Continue Manually
-       </Button>
       </div>
      </motion.div>
     </div>

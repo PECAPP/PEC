@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Mail, Phone, BookOpen, Users, Award, MapPin, Loader2,
+  ArrowLeft, Mail, Phone, BookOpen, Users, Award, MapPin,
   Trophy, Mic2, Briefcase, FileText, Quote, Calendar, Building2, ExternalLink
 } from 'lucide-react';
 
@@ -90,7 +90,7 @@ export default function FacultyDetail() {
       className="space-y-6"
     >
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 z-10 relative">
         <Link href="/directory/faculty">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="w-5 h-5" />
@@ -104,7 +104,7 @@ export default function FacultyDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card Sidebar */}
-        <div className="card-elevated p-6 lg:sticky lg:top-24 self-start">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 lg:sticky lg:top-24 self-start">
           <div className="text-center mb-6">
             <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center  mb-4">
               <span className="text-3xl font-bold text-primary">
@@ -156,7 +156,7 @@ export default function FacultyDetail() {
         {/* Main Content Tabs */}
         <div className="lg:col-span-2">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-4 md:gap-8 overflow-x-auto overflow-y-hidden hide-scrollbar">
+            <TabsList className="mb-6">
               {[
                 { id: 'overview', label: 'Overview', icon: FileText },
                 { id: 'publications', label: 'Publications', icon: BookOpen },
@@ -167,7 +167,7 @@ export default function FacultyDetail() {
                 <TabsTrigger
                   key={id}
                   value={id}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-border/40 data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-[10px] md:text-xs font-bold  transition-all flex items-center gap-2 whitespace-nowrap"
                 >
                   <Icon className="w-4 h-4" />
                   {label}
@@ -179,36 +179,36 @@ export default function FacultyDetail() {
               {/* OVERVIEW TAB */}
               <TabsContent value="overview" className="m-0 space-y-6">
                 <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                  <div className="card-elevated p-4 text-center">
+                  <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 text-center">
                     <BookOpen className="w-6 h-6  mb-2 text-primary" />
                     <p className="text-xl font-bold">{stats.totalPublications}</p>
                     <p className="text-xs text-muted-foreground">Papers</p>
                   </div>
-                  <div className="card-elevated p-4 text-center">
+                  <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 text-center">
                     <Quote className="w-6 h-6  mb-2 text-primary" />
                     <p className="text-xl font-bold">{stats.totalCitations}</p>
                     <p className="text-xs text-muted-foreground">Citations</p>
                   </div>
-                  <div className="card-elevated p-4 text-center">
+                  <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 text-center">
                     <Trophy className="w-6 h-6  mb-2 text-primary" />
                     <p className="text-xl font-bold">{stats.totalAwards}</p>
                     <p className="text-xs text-muted-foreground">Awards</p>
                   </div>
-                  <div className="card-elevated p-4 text-center">
+                  <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 text-center">
                     <Briefcase className="w-6 h-6  mb-2 text-primary" />
                     <p className="text-xl font-bold">{stats.totalConsultations}</p>
                     <p className="text-xs text-muted-foreground">Consults</p>
                   </div>
                 </div>
 
-                <div className="card-elevated p-6">
+                <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
                   <h3 className="text-lg font-semibold text-foreground mb-3">About</h3>
                   <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
                     {member.bio || 'Biography details are not available yet.'}
                   </p>
                 </div>
 
-                <div className="card-elevated p-6">
+                <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
                   <h3 className="text-lg font-semibold text-foreground mb-4">
                     <Award className="w-5 h-5 inline-block mr-2 text-primary" />
                     Qualifications
@@ -218,7 +218,7 @@ export default function FacultyDetail() {
                   </p>
                 </div>
 
-                <div className="card-elevated p-6">
+                <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
                   <h3 className="text-lg font-semibold text-foreground mb-4">
                     <BookOpen className="w-5 h-5 inline-block mr-2 text-primary" />
                     Current Courses
@@ -226,7 +226,7 @@ export default function FacultyDetail() {
                   {Array.isArray(courses) && courses.length > 0 ? (
                     <div className="space-y-3">
                       {courses.map((course, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 rounded-sm bg-secondary/30">
+                        <div key={idx} className="p-3 rounded-lg border border-secondary/20 flex items-center justify-between bg-secondary/30">
                           <div>
                             <p className="font-medium text-foreground">{course.name}</p>
                             <p className="text-sm text-muted-foreground">{course.code}</p>
@@ -247,7 +247,7 @@ export default function FacultyDetail() {
               {/* PUBLICATIONS TAB */}
               <TabsContent value="publications" className="m-0 space-y-4">
                 {(profile.publications || []).length === 0 ? (
-                  <div className="card-elevated p-12 text-center">
+                  <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
                     <BookOpen className="w-12 h-12  mb-4 opacity-20" />
                     <p className="text-muted-foreground">No publications listed.</p>
                   </div>
@@ -258,7 +258,7 @@ export default function FacultyDetail() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="card-elevated p-5"
+                      className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
@@ -304,7 +304,8 @@ export default function FacultyDetail() {
                           </div>
                         )}
                       </div>
-                    </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      </motion.div>
                   ))
                 )}
               </TabsContent>
@@ -312,7 +313,7 @@ export default function FacultyDetail() {
               {/* AWARDS TAB */}
               <TabsContent value="awards" className="m-0 space-y-4">
                 {(profile.awards || []).length === 0 ? (
-                  <div className="card-elevated p-12 text-center">
+                  <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
                     <Trophy className="w-12 h-12  mb-4 opacity-20" />
                     <p className="text-muted-foreground">No awards listed.</p>
                   </div>
@@ -323,7 +324,7 @@ export default function FacultyDetail() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="card-elevated p-5"
+                      className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5"
                     >
                       <div className="flex items-start gap-4">
                         <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-1">
@@ -332,7 +333,7 @@ export default function FacultyDetail() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h3 className="font-semibold">{award.title}</h3>
-                            <Badge variant="outline" className="text-xs uppercase tracking-widest">
+                            <Badge variant="outline" className="text-xs ">
                               {award.category}
                             </Badge>
                           </div>
@@ -359,7 +360,7 @@ export default function FacultyDetail() {
               {/* CONFERENCES TAB */}
               <TabsContent value="conferences" className="m-0 space-y-4">
                 {(profile.conferences || []).length === 0 ? (
-                  <div className="card-elevated p-12 text-center">
+                  <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
                     <Mic2 className="w-12 h-12  mb-4 opacity-20" />
                     <p className="text-muted-foreground">No conferences listed.</p>
                   </div>
@@ -370,13 +371,13 @@ export default function FacultyDetail() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="card-elevated p-5 border-l-4 border-l-primary"
+                      className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 border-l-4 border-l-primary"
                     >
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between flex-wrap gap-2">
                           <h3 className="font-semibold text-lg">{conf.name}</h3>
                           {conf.role && (
-                            <Badge variant="secondary" className="text-xs uppercase tracking-widest">
+                            <Badge variant="secondary" className="text-xs ">
                               {conf.role}
                             </Badge>
                           )}
@@ -412,7 +413,7 @@ export default function FacultyDetail() {
               {/* CONSULTATIONS TAB */}
               <TabsContent value="consultations" className="m-0 space-y-4">
                 {(profile.consultations || []).length === 0 ? (
-                  <div className="card-elevated p-12 text-center">
+                  <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
                     <Briefcase className="w-12 h-12  mb-4 opacity-20" />
                     <p className="text-muted-foreground">No consultations listed.</p>
                   </div>
@@ -423,7 +424,7 @@ export default function FacultyDetail() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="card-elevated p-5"
+                      className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
@@ -438,7 +439,7 @@ export default function FacultyDetail() {
                                     ? 'secondary'
                                     : 'outline'
                               }
-                              className="text-xs uppercase tracking-widest"
+                              className="text-xs "
                             >
                               {consult.status}
                             </Badge>
@@ -446,7 +447,7 @@ export default function FacultyDetail() {
                           {consult.description && (
                             <p className="text-sm text-muted-foreground mt-3">{consult.description}</p>
                           )}
-                          <div className="flex flex-wrap gap-3 mt-4 text-sm font-mono bg-primary/5 text-primary p-2 rounded-sm inline-flex">
+                          <div className="p-2 rounded-lg border border-border/40 inline-flex flex-wrap items-center gap-3 mt-4 text-sm font-mono bg-primary/5 text-primary">
                             {consult.startDate && (
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" /> From{' '}

@@ -1,13 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/pec',
-    },
-  },
-});
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/pec';
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Seeding database with mock data...');
@@ -214,7 +213,7 @@ async function main() {
   // Seed Faculty Profiles & Achievements
   console.log('Seeding Faculty Profiles...');
   const facultyUsers = await prisma.user.findMany({
-    where: { role: { in: ['admin', 'faculty'] } } // Assume some are admins or faculty
+    where: { role: { in: ['college_admin', 'faculty'] } } // Assume some are admins or faculty
   });
   
   // If no faculty exist, let's create a few explicitly
@@ -377,4 +376,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

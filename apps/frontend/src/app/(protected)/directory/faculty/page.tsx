@@ -15,7 +15,7 @@ export default async function FacultyPage() {
     redirect('/auth');
   }
 
-  const isAdmin = ['admin'].includes(session.role || '');
+  const isAdmin = ['college_admin', 'super_admin'].includes(session.role || '');
   
   // Pre-fetch faculty on the server
   // Note: we're reusing /users with role=faculty filter

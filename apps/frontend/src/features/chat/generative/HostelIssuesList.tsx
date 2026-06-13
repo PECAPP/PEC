@@ -66,7 +66,7 @@ export const HostelIssuesList = ({ data }: { data: HostelIssuesData }) => {
           <div key={idx} className="border border-gray-100 dark:border-gray-700 rounded-sm p-3 hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors">
             <div className="flex justify-between items-start gap-2 mb-1.5">
               <h4 className="font-semibold text-xs text-gray-800 dark:text-gray-200 line-clamp-1">{issue.title || 'Untitled Issue'}</h4>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getStatusStyle(issue.status)}`}>
+              <span className={`text-sm font-medium px-2 py-0.5 rounded border ${getStatusStyle(issue.status)}`}>
                 {issue.status}
               </span>
             </div>

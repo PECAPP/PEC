@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Textarea, Badge, Switch, Label, formatDate, AppShellSkeleton } from "@pec/ui";
+import { Button, Input, Textarea, Badge, Switch, Label, formatDate, AppShellSkeleton, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, PageBanner } from "@pec/ui";
 
 
 import { useEffect, useMemo, useState } from 'react';
@@ -15,6 +15,7 @@ import {
   Tag,
   Plus,
   Settings2,
+  Edit2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -24,6 +25,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { MediaUpload, UploadedMedia } from '@/features/clubs/MediaUpload';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSocket } from '@/providers/socket-provider';
 
 import { NoticeMedia, NoticeItem } from './types';
 
@@ -53,7 +55,17 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
   const [media, setMedia] = useState<NoticeMedia[]>([]);
   const [posting, setPosting] = useState(false);
 
-  const isAdmin = useMemo(() => user?.role === 'admin', [user?.role]);
+  // Edit states
+  const [editingNotice, setEditingNotice] = useState<NoticeItem | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [editCategory, setEditCategory] = useState<NoticeItem['category']>('update');
+  const [editPriorityLevel, setEditPriorityLevel] = useState<number>(2);
+  const [editPinned, setEditPinned] = useState(false);
+  const [editMedia, setEditMedia] = useState<NoticeMedia[]>([]);
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const isAdmin = useMemo(() => user?.role === 'college_admin', [user?.role]);
 
   const loadNotices = async () => {
     try {
@@ -68,13 +80,54 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
     }
   };
 
+  const { socket, isConnected } = useSocket();
+
+  useEffect(() => {
+    if (socket && isConnected) {
+      const handleNewNotice = (notice: NoticeItem) => {
+        setNotices(prev => {
+          if (prev.some(n => n.id === notice.id)) return prev;
+          return [notice, ...prev].sort((a, b) => {
+            if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+            if (a.priorityLevel !== b.priorityLevel) return b.priorityLevel - a.priorityLevel;
+            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+          });
+        });
+      };
+
+      const handleNoticeUpdated = (notice: NoticeItem) => {
+        setNotices(prev => {
+          return prev.map(n => n.id === notice.id ? notice : n).sort((a, b) => {
+            if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+            if (a.priorityLevel !== b.priorityLevel) return b.priorityLevel - a.priorityLevel;
+            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+          });
+        });
+      };
+
+      const handleNoticeDeleted = ({ id }: { id: string }) => {
+        setNotices(prev => prev.filter(n => n.id !== id));
+      };
+
+      socket.on('newNotice', handleNewNotice);
+      socket.on('noticeUpdated', handleNoticeUpdated);
+      socket.on('noticeDeleted', handleNoticeDeleted);
+
+      return () => {
+        socket.off('newNotice', handleNewNotice);
+        socket.off('noticeUpdated', handleNoticeUpdated);
+        socket.off('noticeDeleted', handleNoticeDeleted);
+      };
+    }
+  }, [socket, isConnected]);
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
       router.replace('/auth');
       return;
     }
-    if (!['student', 'faculty', 'admin'].includes(user.role || '')) {
+    if (!['student', 'faculty', 'college_admin', 'super_admin'].includes(user.role || '')) {
       router.replace('/dashboard');
       return;
     }
@@ -148,6 +201,54 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
     }
   };
 
+  const openEditModal = (notice: NoticeItem) => {
+    setEditingNotice(notice);
+    setEditTitle(notice.title);
+    setEditContent(notice.content);
+    setEditCategory(notice.category);
+    setEditPriorityLevel(notice.priorityLevel);
+    setEditPinned(notice.pinned);
+    setEditMedia(notice.media || []);
+  };
+
+  const saveEdit = async () => {
+    if (!editingNotice) return;
+    const trimmedTitle = editTitle.trim();
+    const trimmedContent = editContent.trim();
+
+    if (!trimmedTitle || !trimmedContent) {
+      toast.error('Required fields: Title and Content');
+      return;
+    }
+
+    try {
+      setSavingEdit(true);
+      await api.patch(`/noticeboard/${editingNotice.id}`, {
+        title: trimmedTitle,
+        content: trimmedContent,
+        category: editCategory,
+        important: editPriorityLevel === 3,
+        priorityLevel: editPriorityLevel,
+        pinned: editPinned,
+        mediaJson: editMedia.length > 0 ? JSON.stringify(editMedia.map((item) => ({
+          url: item.url,
+          kind: item.kind,
+          name: item.name,
+          mimeType: item.mimeType,
+          sizeBytes: item.sizeBytes,
+        }))) : null,
+      });
+      toast.success('Notice updated successfully');
+      setEditingNotice(null);
+      await loadNotices();
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error?.response?.data?.error?.message || 'Failed to update notice');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   const removeNotice = async (id: string) => {
     if (!confirm('Are you sure you want to remove this notice?')) return;
     try {
@@ -185,35 +286,28 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-500">
       {/* Institutional Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
-        <div className="flex items-center gap-5">
-          <div className="p-3.5 bg-primary/10 rounded-sm border border-primary/20 shadow-sm relative overflow-hidden group">
-            <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-            <Megaphone className="w-8 h-8 text-primary shadow-glow relative z-10" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Noticeboard</h1>
-            <p className="text-sm text-muted-foreground font-medium italic mt-1 font-display">
-              Campus-wide announcements and academic updates
-            </p>
-          </div>
-        </div>
-        {isAdmin && (
-          <Button
-            className="h-10 rounded-sm px-6 font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
-            onClick={() =>
-              document.getElementById('post-notice-form')?.scrollIntoView({ behavior: 'smooth' })
-            }
-          >
-            <Plus className="w-4 h-4" /> New Announcement
-          </Button>
-        )}
-      </div>
+      <PageBanner
+        title="Noticeboard"
+        subtitle="Campus-wide announcements and academic updates"
+        badgeText="Communications"
+        icon={<Megaphone className="w-7 h-7 text-primary" />}
+        actions={
+          isAdmin && (
+            <Button
+              onClick={() =>
+                document.getElementById('post-notice-form')?.scrollIntoView({ behavior: 'smooth' })
+              }
+            >
+              <Plus className="w-4 h-4 mr-2" /> New Announcement
+            </Button>
+          )
+        }
+      />
 
       {isAdmin && (
         <div
           id="post-notice-form"
-          className="card-elevated p-6 bg-card/60 backdrop-blur-sm border-primary/10 space-y-4"
+          className="bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm space-y-4"
         >
           <div className="flex items-center gap-3">
             <Settings2 className="w-5 h-5 text-primary" />
@@ -222,7 +316,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+              <Label className="text-sm font-medium  text-muted-foreground opacity-60">
                 Title
               </Label>
               <Input
@@ -234,11 +328,11 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+              <Label className="text-sm font-medium  text-muted-foreground opacity-60">
                 Category
               </Label>
               <select
-                className="h-11 w-full rounded-sm border border-border/60 bg-background px-4 text-xs font-bold uppercase tracking-wider focus:ring-primary/20"
+                className="h-11 w-full rounded-sm border border-border/60 bg-background px-4 text-xs font-bold  focus:ring-primary/20"
                 value={category}
                 onChange={(event) => setCategory(event.target.value as NoticeItem['category'])}
               >
@@ -252,7 +346,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+            <Label className="text-sm font-medium  text-muted-foreground opacity-60">
               Content
             </Label>
             <Textarea
@@ -269,13 +363,13 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
               <div className="flex items-center gap-3">
                 <Label
                   htmlFor="notice-priority"
-                  className="text-[10px] font-bold uppercase tracking-widest opacity-80"
+                  className="text-sm font-medium  opacity-80"
                 >
                   Priority
                 </Label>
                 <select
                   id="notice-priority"
-                  className="h-8 rounded-sm border border-border/60 bg-background px-2 text-xs font-bold uppercase tracking-wider focus:ring-primary/20"
+                  className="h-8 rounded-sm border border-border/60 bg-background px-2 text-xs font-bold  focus:ring-primary/20"
                   value={priorityLevel}
                   onChange={(e) => setPriorityLevel(Number(e.target.value))}
                 >
@@ -289,7 +383,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                 <Switch id="notice-pinned" checked={pinned} onCheckedChange={setPinned} />
                 <Label
                   htmlFor="notice-pinned"
-                  className="text-[10px] font-bold uppercase tracking-widest opacity-80"
+                  className="text-sm font-medium  opacity-80"
                 >
                   Pin to Top
                 </Label>
@@ -303,7 +397,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
             <Button
               onClick={createNotice}
               disabled={posting}
-              className="h-11 px-10 rounded-sm bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all"
+              className="h-11 px-10 rounded-sm bg-primary text-primary-foreground font-medium text-sm  shadow-md border border-border/40 hover:scale-[1.02] transition-all"
             >
               {posting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -325,7 +419,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               className={cn(
-                'card-elevated p-6 bg-card/90 backdrop-blur-sm border-border hover:border-primary/40 transition-all group',
+                'bg-card/90 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm hover:border-border/40 transition-all group',
                 notice.priorityLevel === 3 &&
                   'border-l-4 border-l-destructive shadow-sm shadow-destructive/5',
                 notice.priorityLevel === 2 &&
@@ -339,7 +433,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                   <div className="flex items-center gap-3 flex-wrap">
                     <Badge
                       className={cn(
-                        'px-3 py-1 rounded-sm font-bold text-[10px] uppercase tracking-wider',
+                        'px-3 py-1 rounded-sm font-medium text-sm ',
                         notice.category === 'alert'
                           ? 'bg-destructive/10 text-destructive'
                           : notice.category === 'event'
@@ -352,23 +446,23 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                     {notice.pinned && (
                       <Badge
                         variant="secondary"
-                        className="px-3 py-1 rounded-sm font-bold text-[10px] uppercase tracking-wider border border-primary/20 text-primary"
+                        className="px-3 py-1 rounded-sm font-medium text-sm  border border-border/40 text-primary"
                       >
                         <Pin className="h-3 w-3 mr-1.5" /> Pinned
                       </Badge>
                     )}
                     {notice.priorityLevel === 3 && (
-                      <Badge className="px-3 py-1 rounded-sm font-bold text-[10px] uppercase tracking-wider bg-destructive text-destructive-foreground shadow-sm shadow-destructive/20">
+                      <Badge className="px-3 py-1 rounded-sm font-medium text-sm  bg-destructive text-destructive-foreground shadow-sm shadow-destructive/20">
                         High Priority
                       </Badge>
                     )}
                     {notice.priorityLevel === 2 && (
-                      <Badge className="px-3 py-1 rounded-sm font-bold text-[10px] uppercase tracking-wider bg-orange-500/15 text-orange-600 border-orange-500/20">
+                      <Badge className="px-3 py-1 rounded-sm font-medium text-sm  bg-orange-500/15 text-orange-600 border-orange-500/20">
                         Medium Priority
                       </Badge>
                     )}
                     {notice.priorityLevel === 1 && (
-                      <Badge className="px-3 py-1 rounded-sm font-bold text-[10px] uppercase tracking-wider bg-emerald-500/15 text-emerald-600 border-emerald-500/20">
+                      <Badge className="px-3 py-1 rounded-sm font-medium text-sm  bg-emerald-500/15 text-emerald-600 border-emerald-500/20">
                         Low Priority
                       </Badge>
                     )}
@@ -382,7 +476,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                     {notice.content}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-4 pt-3 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 border-t border-border/10">
+                  <div className="flex flex-wrap items-center gap-4 pt-3 text-xs font-medium  text-muted-foreground/60 border-t border-border/10">
                     <div className="flex items-center gap-2">
                       <User className="w-3 h-3 text-primary/60" />
                       Authored by <span className="text-foreground/80">{notice.authorName}</span>
@@ -399,8 +493,16 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => openEditModal(notice)}
+                      className="h-10 px-4 rounded-sm font-medium text-sm transition-all"
+                    >
+                      <Edit2 className="h-4 w-4 mr-2" /> Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => togglePin(notice.id, !notice.pinned)}
-                      className="h-10 px-4 rounded-sm font-bold text-[10px] uppercase tracking-widest transition-all"
+                      className="h-10 px-4 rounded-sm font-medium text-sm  transition-all"
                     >
                       {notice.pinned ? 'Unpin' : 'Pin'}
                     </Button>
@@ -408,7 +510,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                       variant="ghost"
                       size="sm"
                       onClick={() => removeNotice(notice.id)}
-                      className="h-10 px-4 rounded-sm font-bold text-[10px] uppercase tracking-widest text-destructive hover:bg-destructive/5 transition-all"
+                      className="h-10 px-4 rounded-sm font-medium text-sm  text-destructive hover:bg-destructive/5 transition-all"
                     >
                       <Trash2 className="h-4 w-4 mr-2" /> Delete
                     </Button>
@@ -421,7 +523,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                   {notice.media.map((item, index) => (
                     <div
                       key={`${notice.id}-${index}`}
-                      className="group/media relative aspect-video rounded-sm overflow-hidden border border-border/40 bg-muted/20 hover:border-primary/30 transition-all shadow-sm"
+                      className="group/media relative aspect-video rounded-sm overflow-hidden border border-border/40 bg-muted/20 hover:border-border/40 transition-all shadow-sm"
                     >
                       {item.kind === 'image' ? (
                         <a
@@ -447,7 +549,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                             className="flex flex-col items-center gap-1.5"
                           >
                             <Tag className="w-4 h-4 text-primary" />
-                            <span className="text-[8px] font-bold uppercase tracking-widest text-primary truncate  px-1">
+                            <span className="text-[8px] font-bold  text-primary truncate  px-1">
                               {item.name || 'View'}
                             </span>
                           </a>
@@ -462,8 +564,8 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
         </AnimatePresence>
 
         {notices.length === 0 && (
-          <div className="py-24 text-center border border-dashed border-primary/10 rounded-sm bg-primary/[0.01] flex flex-col items-center gap-6">
-            <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
+          <div className="py-24 text-center border border-dashed border-border/40 rounded-sm bg-primary/[0.01] flex flex-col items-center gap-6">
+            <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center border border-border/40">
               <Megaphone className="w-8 h-8 text-primary/40" />
             </div>
             <div className="space-y-1">
@@ -478,6 +580,104 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
           </div>
         )}
       </div>
+
+      <Dialog open={!!editingNotice} onOpenChange={(open) => !open && setEditingNotice(null)}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Edit Announcement</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Title</Label>
+                <Input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="rounded-sm"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Category</Label>
+                <select
+                  className="h-10 w-full rounded-sm border border-border/60 bg-background px-4 text-sm font-medium focus:ring-primary/20"
+                  value={editCategory}
+                  onChange={(e) => setEditCategory(e.target.value as NoticeItem['category'])}
+                >
+                  {categories.map((item) => (
+                    <option key={item} value={item}>{item.toUpperCase()}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Content</Label>
+              <Textarea
+                rows={4}
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="rounded-sm resize-none"
+              />
+            </div>
+            <div className="flex gap-4">
+              <div className="space-y-1.5 flex-1">
+                <Label>Priority</Label>
+                <select
+                  className="h-10 w-full rounded-sm border border-border/60 bg-background px-4 text-sm font-medium focus:ring-primary/20"
+                  value={editPriorityLevel}
+                  onChange={(e) => setEditPriorityLevel(Number(e.target.value))}
+                >
+                  <option value={3}>High</option>
+                  <option value={2}>Medium</option>
+                  <option value={1}>Low</option>
+                </select>
+              </div>
+              <div className="space-y-1.5 flex-1 flex flex-col justify-center">
+                <Label>Pin to Top</Label>
+                <Switch checked={editPinned} onCheckedChange={setEditPinned} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Media</Label>
+              <MediaUpload 
+                onMediaAdd={async (uploaded) => {
+                  try {
+                    const dataUrl = await fileToDataUrl(uploaded.file);
+                    setEditMedia((prev) => [...prev, {
+                      id: uploaded.id,
+                      url: dataUrl,
+                      kind: uploaded.kind,
+                      name: uploaded.name,
+                      mimeType: uploaded.mimeType,
+                      sizeBytes: uploaded.file.size,
+                    }]);
+                  } catch (e) {
+                    toast.error('Failed to attach media');
+                  }
+                }} 
+                onMediaRemove={(id) => setEditMedia(prev => prev.filter(m => m.id !== id))} 
+              />
+              {editMedia.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {editMedia.map((m, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs truncate max-w-[150px]">
+                      {m.name || 'Attachment'}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditingNotice(null)} disabled={savingEdit}>
+              Cancel
+            </Button>
+            <Button onClick={saveEdit} disabled={savingEdit}>
+              {savingEdit && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

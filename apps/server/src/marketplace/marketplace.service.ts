@@ -29,6 +29,7 @@ export class MarketplaceService {
   createListing(sellerId: string, data: CreateListingDto) { return this.repo.createListing(sellerId, data); }
   updateListing(id: string, userId: string, data: UpdateListingDto) { return this.repo.updateListing(id, userId, data); }
   deleteListing(id: string, userId: string) { return this.repo.deleteListing(id, userId); }
+  holdListing(id: string, userId: string) { return this.repo.holdListing(id, userId); }
 
   toggleBookmark(userId: string, listingId: string) { return this.repo.toggleBookmark(userId, listingId); }
   getBookmarks(userId: string) { return this.repo.getBookmarks(userId); }

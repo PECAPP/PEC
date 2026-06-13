@@ -20,10 +20,11 @@ export class AttendanceConsumer {
         action: 'CREATE',
         entity: 'Attendance',
         entityId: data.id || 'unknown',
-        actorId: data.actorId || 'system',
-        details: data,
-        ipAddress: '127.0.0.1',
-        userAgent: 'AttendanceConsumer',
+        actorUserId: data.actorId || 'system',
+        method: 'AMQP',
+        path: 'attendance.created',
+        ip: '127.0.0.1',
+        metadata: JSON.stringify(data),
       },
     });
 

@@ -104,6 +104,7 @@ export function useResumeBuilder() {
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [analysisNotes, setAnalysisNotes] = useState("");
 
   const getDraftStorageKey = (uid?: string | null) => `${RESUME_DRAFT_STORAGE_KEY_PREFIX}${uid || "guest"}`;
 
@@ -550,6 +551,8 @@ export function useResumeBuilder() {
     uploadedFile,
     setUploadedFile,
     settings,
+    analysisNotes,
+    setAnalysisNotes,
   };
 }
 

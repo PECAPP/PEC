@@ -24,7 +24,7 @@ export function NoticeboardCard({ notices, onViewAll, className }: Props) {
   const safeNotices = Array.isArray(notices) ? notices : [];
 
   return (
-    <div className={`card-elevated ui-card-pad flex h-full flex-col ${className || ''}`}>
+    <div className={`bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 flex h-full flex-col ${className || ''}`}>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
           <Bell className="h-5 w-5 text-primary" />
@@ -44,7 +44,7 @@ export function NoticeboardCard({ notices, onViewAll, className }: Props) {
             {safeNotices.slice(0, 4).map((notice, index) => (
               <div
                 key={`${notice.id || 'notice'}-${index}`}
-                className="rounded-sm border border-border bg-secondary/10 p-4 hover:border-primary/30 hover:bg-secondary/20 transition-colors duration-300 cursor-pointer"
+                className="rounded-sm border border-border bg-secondary/10 p-4 hover:border-border/40 hover:bg-secondary/20 transition-colors duration-300 cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
@@ -69,7 +69,7 @@ export function NoticeboardCard({ notices, onViewAll, className }: Props) {
                   </div>
                   {notice.publishedAt && (
                     <div className="shrink-0 flex flex-col items-end justify-start pt-1">
-                      <span className="text-[11px] font-bold text-foreground/80">
+                      <span className="text-sm font-medium text-foreground/80">
                         {formatDate(notice.publishedAt)}
                       </span>
                       <span className="text-lg font-bold text-foreground/90 leading-none">

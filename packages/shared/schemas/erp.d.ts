@@ -9,18 +9,21 @@ export declare const departmentSchema: z.ZodObject<{
     code: z.ZodString;
     hod: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
+    status: z.ZodOptional<z.ZodEnum<["active", "inactive"]>>;
 }, "strict", z.ZodTypeAny, {
     name: string;
     code: string;
     id?: string | undefined;
     hod?: string | undefined;
     description?: string | undefined;
+    status?: "active" | "inactive" | undefined;
 }, {
     name: string;
     code: string;
     id?: string | undefined;
     hod?: string | undefined;
     description?: string | undefined;
+    status?: "active" | "inactive" | undefined;
 }>;
 export declare const facultySchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
@@ -168,13 +171,13 @@ export declare const attendanceSessionSchema: z.ZodObject<{
     createdAt: z.ZodOptional<z.ZodString>;
     endedAt: z.ZodOptional<z.ZodString>;
 }, "strict", z.ZodTypeAny, {
+    active: boolean;
     date: string;
     courseId: string;
     facultyId: string;
     courseName: string;
     startTime: string;
     qrCode: string;
-    active: boolean;
     expiresAt: string;
     attendanceCount: number;
     id?: string | undefined;

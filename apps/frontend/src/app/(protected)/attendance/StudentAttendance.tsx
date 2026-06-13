@@ -1,5 +1,5 @@
 'use client';
-import { Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Textarea, Button, formatDate } from "@pec/ui";
+import { Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Textarea, Button, formatDate, PageBanner } from "@pec/ui";
 
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -222,7 +222,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
     {
       accessorKey: 'courseCode',
       header: 'Code',
-      cell: ({ row }) => <Badge className="bg-black/60 text-white border-white/10 px-2 py-0.5 text-[9px] font-bold tracking-widest">{row.original.courseCode}</Badge>
+      cell: ({ row }) => <Badge className="bg-black/60 text-white border-white/10 px-2 py-0.5 text-xs font-medium ">{row.original.courseCode}</Badge>
     },
     {
       accessorKey: 'courseName',
@@ -290,7 +290,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
         const course = courses.find((c: any) => c.courseId === row.original.subject);
         return (
           <div className="flex items-center gap-3">
-            <span className="px-2 py-0.5 bg-muted rounded font-mono text-[10px] font-bold text-primary">{course?.courseCode || 'CORE'}</span>
+            <span className="px-2 py-0.5 bg-muted rounded font-mono text-sm font-medium text-primary">{course?.courseCode || 'CORE'}</span>
             <span className="text-sm font-bold text-foreground opacity-80">{course?.courseName || 'Academic Session'}</span>
           </div>
         );
@@ -303,7 +303,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
         const isPresent = row.original.status === 'present';
         return (
           <Badge className={cn(
-            "px-4 py-1 rounded-full font-bold text-[9px] uppercase tracking-widest border",
+            "px-4 py-1 rounded-full font-medium text-xs  border",
             isPresent ? "bg-success/10 text-success border-success/30" : "bg-destructive/10 text-destructive border-destructive/30"
           )}>
             {isPresent ? 'Present' : 'Absent'}
@@ -317,37 +317,37 @@ export default function StudentAttendance({ userId, initialData }: any) {
 
   return (
     <div className="space-y-10 pb-12 animate-in fade-in duration-500">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border/40">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-            <Activity className="w-8 h-8 text-primary shadow-glow" />
-            Attendance
-          </h1>
-          <p className="text-sm text-muted-foreground font-medium italic mt-1">View your attendance summary and eligibility status</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Badge 
-            className={cn(
-              "h-10 px-6 rounded-sm font-bold text-[10px] uppercase tracking-wider border",
-              isEligible 
-                ? "bg-success/10 text-success border-success/30" 
-                : "bg-destructive/10 text-destructive border-destructive/30"
-            )}
-          >
-            {isEligible ? (
-              <span className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5" /> Eligible</span>
-            ) : (
-              <span className="flex items-center gap-2"><ShieldAlert className="w-3.5 h-3.5" /> At Risk</span>
-            )}
-          </Badge>
-        </div>
+      <div className="mb-8">
+        <PageBanner
+          title="Attendance"
+          subtitle="View your attendance summary and eligibility status"
+          icon={<Activity className="w-7 h-7 text-primary" />}
+          badgeText="Academic Life"
+          actions={
+            <div className="flex items-center gap-4">
+              <Badge 
+                className={cn(
+                  "h-10 px-3 md:px-6 rounded-sm font-medium text-sm border",
+                  isEligible 
+                    ? "bg-success/10 text-success border-success/30" 
+                    : "bg-destructive/10 text-destructive border-destructive/30"
+                )}
+              >
+                {isEligible ? (
+                  <span className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5" /> Eligible</span>
+                ) : (
+                  <span className="flex items-center gap-2"><ShieldAlert className="w-3.5 h-3.5" /> At Risk</span>
+                )}
+              </Badge>
+            </div>
+          }
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Analytics Card */}
-        <div className="lg:col-span-2 card-elevated p-8 bg-card/60 backdrop-blur-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+        <div className="lg:col-span-2 bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5 group-hover:opacity-10 transition-opacity">
             <TrendingUp className="w-32 h-32 text-primary" />
           </div>
           
@@ -385,7 +385,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
                 <span className="text-4xl font-bold font-display tracking-tight text-primary">
                   {Math.round(overallPercentage)}%
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground opacity-60">Cumulative</span>
+                <span className="text-sm font-medium uppercase tracking-[0.1em] text-muted-foreground opacity-60">Cumulative</span>
               </div>
             </div>
 
@@ -404,11 +404,11 @@ export default function StudentAttendance({ userId, initialData }: any) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-sm bg-success/5 border border-success/20 space-y-1">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-success">Attended</p>
+                  <p className="text-xs font-medium  text-success">Attended</p>
                   <p className="text-xl font-bold font-display">{totalPresent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
                 </div>
                 <div className="p-4 rounded-sm bg-destructive/5 border border-destructive/20 space-y-1">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-destructive">Missed</p>
+                  <p className="text-xs font-medium  text-destructive">Missed</p>
                   <p className="text-xl font-bold font-display">{totalAbsent}<span className="text-xs text-muted-foreground ml-1">Sessions</span></p>
                 </div>
               </div>
@@ -417,10 +417,10 @@ export default function StudentAttendance({ userId, initialData }: any) {
         </div>
 
         {/* Secondary Info Card - Eligibility Protocol */}
-        <div className="card-elevated p-8 bg-primary/5 border-primary/20 flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-primary/5 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 flex flex-col justify-between relative overflow-hidden">
           <div className="absolute inset-0  opacity-[0.03] -z-10" />
           <div className="space-y-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center border border-primary/20 shadow-sm">
+            <div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center border border-border/40 shadow-sm">
               <ShieldCheck className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold tracking-tight">Eligibility Guidelines</h3>
@@ -431,7 +431,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
           <div className="pt-6">
             <button
               onClick={() => setIsWaiverDialogOpen(true)}
-              className="w-full h-10 rounded-sm bg-white/5 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+              className="w-full h-10 rounded-sm bg-white/5 border border-white/10 text-white font-medium text-sm  flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
             >
               Request Waiver <ArrowRight className="w-3 h-3" />
             </button>
@@ -451,7 +451,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
           <form onSubmit={handleWaiverSubmit} className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Course (optional)</label>
+                <label className="text-xs font-semibold  text-muted-foreground">Course (optional)</label>
                 <select
                   value={waiverForm.courseId}
                   onChange={(e) => setWaiverForm((prev) => ({ ...prev, courseId: e.target.value }))}
@@ -466,7 +466,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Supporting Document URL (optional)</label>
+                <label className="text-xs font-semibold  text-muted-foreground">Supporting Document URL (optional)</label>
                 <div className="space-y-2">
                   <div className="flex gap-2">
                     <Input
@@ -515,7 +515,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
 
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">From Date</label>
+                <label className="text-xs font-semibold  text-muted-foreground">From Date</label>
                 <Input
                   type="date"
                   value={waiverForm.fromDate}
@@ -524,7 +524,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">To Date</label>
+                <label className="text-xs font-semibold  text-muted-foreground">To Date</label>
                 <Input
                   type="date"
                   value={waiverForm.toDate}
@@ -535,7 +535,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Reason</label>
+              <label className="text-xs font-semibold  text-muted-foreground">Reason</label>
               <Textarea
                 value={waiverForm.reason}
                 onChange={(e) => setWaiverForm((prev) => ({ ...prev, reason: e.target.value }))}
@@ -561,7 +561,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
           </form>
 
           <div className="mt-2 border-t border-border/50 pt-4 space-y-3">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Recent Requests</h4>
+            <h4 className="text-sm font-bold  text-muted-foreground">Recent Requests</h4>
             <div className="max-h-56 overflow-auto rounded-sm border border-border/40 divide-y divide-border/30">
               {waiverRequests.length === 0 ? (
                 <div className="p-4 text-sm text-muted-foreground">No waiver requests submitted yet.</div>
@@ -581,12 +581,12 @@ export default function StudentAttendance({ userId, initialData }: any) {
                     </div>
                     <Badge
                       className={cn(
-                        'uppercase text-[10px] font-bold tracking-wider',
+                        'uppercase text-sm font-medium tracking-wider',
                         request.status === 'approved'
                           ? 'bg-success/10 text-success border-success/30'
                           : request.status === 'rejected'
                             ? 'bg-destructive/10 text-destructive border-destructive/30'
-                            : 'bg-primary/10 text-primary border-primary/30'
+                            : 'bg-primary/10 text-primary border-border/40'
                       )}
                     >
                       {request.status}
@@ -605,7 +605,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
           <h2 className="text-xl font-bold tracking-tight">Course Attendance</h2>
         </div>
         
-        <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-xl">
+        <div className="bg-card border border-border/40 rounded-sm overflow-hidden shadow-sm">
            <DataTable columns={courseColumns} data={courseAttendance} />
         </div>
       </div>
@@ -616,7 +616,7 @@ export default function StudentAttendance({ userId, initialData }: any) {
            <h2 className="text-xl font-bold tracking-tight">Attendance History</h2>
          </div>
          
-         <div className="card-elevated overflow-hidden bg-card/60 backdrop-blur-sm shadow-xl">
+         <div className="bg-card border border-border/40 rounded-sm overflow-hidden shadow-sm">
             <DataTable columns={historyColumns} data={attendanceRecords} />
          </div>
       </div>

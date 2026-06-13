@@ -18,56 +18,53 @@ const item = {
 
 export function RecentAdmissionsCard({ recentAdmissions }: Props) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <motion.div variants={item} className="card-elevated p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-foreground">Recent Admissions</h2>
-            <Link href="/directory/users">
-              <Button variant="ghost" size="sm">
-                View All
-                <ArrowUpRight className="w-3.5 h-3.5 ml-2" />
-              </Button>
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {recentAdmissions.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No recent admissions.</p>
-            ) : (
-              recentAdmissions.map((student) => (
-                <div key={student.id} className="flex items-center justify-between p-3 rounded-sm bg-secondary/30">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <UserCheck className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground text-sm">{student.fullName}</p>
-                      <p className="text-xs text-muted-foreground">{student.department || 'N/A'} · {student.createdAt ? formatDate(student.createdAt) : 'N/A'}</p>
-                    </div>
+    <div className="space-y-6">
+      <motion.div variants={item} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-foreground">Recent Admissions</h2>
+          <Link href="/directory/users">
+            <Button variant="ghost" size="sm">
+              View All
+              <ArrowUpRight className="w-3.5 h-3.5 ml-2" />
+            </Button>
+          </Link>
+        </div>
+        <div className="flex flex-col gap-1">
+          {recentAdmissions.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No recent admissions.</p>
+          ) : (
+            recentAdmissions.map((student) => (
+              <div key={student.id} className="py-3 border-b border-white/5 last:border-0 flex items-center justify-between group hover:bg-muted/10 px-2 -mx-2 rounded-md transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <UserCheck className="w-4 h-4 text-primary" />
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${student.status === 'active' ? 'bg-green-500/10 text-green-600 border border-green-500/20' : 'bg-yellow-500/10 text-yellow-600 border border-yellow-500/20'}`}>
-                    {student.status === 'active' ? 'Approved' : 'Pending'}
-                  </span>
+                  <div>
+                    <p className="font-medium text-foreground text-sm group-hover:text-primary transition-colors">{student.fullName}</p>
+                    <p className="text-xs text-muted-foreground">{student.department || 'N/A'} · {student.createdAt ? formatDate(student.createdAt) : 'N/A'}</p>
+                  </div>
                 </div>
-              ))
-            )}
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${student.status === 'active' ? 'bg-green-500/10 text-green-600 border border-green-500/20' : 'bg-yellow-500/10 text-yellow-600 border border-yellow-500/20'}`}>
+                  {student.status === 'active' ? 'Approved' : 'Pending'}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </motion.div>
+
+      <motion.div variants={item} className="p-4 rounded-sm bg-orange-500/10 border border-orange-500/20 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-orange-600" />
+          <div>
+            <h3 className="font-medium text-foreground text-sm">Action Required</h3>
+            <p className="text-xs text-muted-foreground">Pending profile approvals</p>
           </div>
-        </motion.div>
-      </div>
-      <div className="space-y-6">
-        <motion.div variants={item} className="p-4 rounded-sm bg-orange-500/10 border border-orange-500/20">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-orange-600 mt-0.5" />
-            <div>
-              <h3 className="font-medium text-foreground">Action Required</h3>
-              <p className="text-sm text-muted-foreground mt-1">Pending profile approvals</p>
-              <Link href="/directory/users?filter=pending">
-                <Button size="sm" variant="link" className="px-0 h-auto mt-2 text-orange-600">Review</Button>
-              </Link>
-            </div>
-          </div>
-        </motion.div>
-      </div>
+        </div>
+        <Link href="/directory/users?filter=pending">
+          <Button size="sm" variant="outline" className="h-8 text-orange-600 border-orange-500/20 hover:bg-orange-500/10">Review</Button>
+        </Link>
+      </motion.div>
     </div>
   );
 }

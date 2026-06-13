@@ -35,7 +35,7 @@ export function ChatSidebar({
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
   const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
   const _isStudent = userRole === "student";
-  const isChatAdmin = userRole === "admin";
+  const isChatAdmin = userRole === "college_admin";
 
   // Helper: Get display title for DMs (show other person's name)
   const getRoomDisplayTitle = (room: ChatRoom): string => {
@@ -292,7 +292,7 @@ export function ChatSidebar({
 
         {/* Debug/Role Indicator */}
         <div className="p-2 border-t border-border bg-muted/20">
-          <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest font-mono">
+          <p className="text-[10px] text-center text-muted-foreground  font-mono">
             {userRole || "Guest"} view
           </p>
         </div>

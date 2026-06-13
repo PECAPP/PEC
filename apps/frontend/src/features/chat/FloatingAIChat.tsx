@@ -428,7 +428,7 @@ const FloatingAIChat = () => {
               onMouseDown={(e) => handleResizeStart(e, "nw")}
               onTouchStart={(e) => handleResizeStart(e, "nw")}
             >
-              <div className="w-1.5 h-1.5 border-t border-l border-muted-foreground/60 rounded-tl-[1px] hover:border-primary" />
+              <div className="w-1.5 h-1.5 border-t border-l border-muted-foreground/60 rounded-tl-[1px] hover:border-border/40" />
             </div>
             <div className="p-4 border-b flex items-center justify-between bg-muted/30 backdrop-blur-md">
               <div className="flex items-center gap-3">

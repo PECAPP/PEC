@@ -11,6 +11,7 @@ export const departmentSchema = z.object({
   code: z.string().min(2, 'Code must be at least 2 characters').toUpperCase(),
   hod: z.string().optional(),
   description: z.string().max(500, 'Description too long').optional(),
+  status: z.enum(['active', 'inactive']).optional(),
 }).strict();
 
 export const facultySchema = z.object({

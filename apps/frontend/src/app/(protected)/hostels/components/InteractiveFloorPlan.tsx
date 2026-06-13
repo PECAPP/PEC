@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Badge } from '@pec/ui';
 
 interface InteractiveFloorPlanProps {
   issues: any[];
+  rooms?: any[];
   onRoomClick: (room: string) => void;
 }
 
 // A simple mock floor plan SVG for demonstration purposes.
 // In a real app, you would load an actual SVG path per floor and map room coordinates.
-const ROOMS = [
+const ROOM_LAYOUTS = [
   { id: 'A-101', x: 50, y: 50, w: 100, h: 80 },
   { id: 'A-102', x: 150, y: 50, w: 100, h: 80 },
   { id: 'A-103', x: 250, y: 50, w: 100, h: 80 },
@@ -19,7 +20,7 @@ const ROOMS = [
   { id: 'A-204', x: 350, y: 200, w: 100, h: 80 },
 ];
 
-export const InteractiveFloorPlan: React.FC<InteractiveFloorPlanProps> = ({ issues, onRoomClick }) => {
+export const InteractiveFloorPlan: React.FC<InteractiveFloorPlanProps> = ({ issues, rooms = [], onRoomClick }) => {
   const getRoomIssueCount = (room: string) => {
     return issues.filter(i => i.roomNumber === room && i.status !== 'closed' && i.status !== 'resolved').length;
   };
@@ -28,6 +29,17 @@ export const InteractiveFloorPlan: React.FC<InteractiveFloorPlanProps> = ({ issu
     return issues.filter(i => i.roomNumber === room && i.isEscalated).length;
   };
 
+  const mergedRooms = useMemo(() => {
+    return ROOM_LAYOUTS.map(layout => {
+      // Find room from DB, if exists
+      const dbRoom = rooms.find(r => r.name === layout.id);
+      return {
+        ...layout,
+        isAvailable: dbRoom ? dbRoom.isAvailable : false, // False if not found in DB
+      };
+    });
+  }, [rooms]);
+
   return (
     <div className="relative w-full   border border-border rounded-sm bg-card overflow-hidden">
       <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
@@ -35,16 +47,17 @@ export const InteractiveFloorPlan: React.FC<InteractiveFloorPlanProps> = ({ issu
         <div className="flex gap-2">
           <Badge variant="secondary" className="bg-red-500/10 text-red-500 border-red-500/20">Escalated</Badge>
           <Badge variant="secondary" className="bg-orange-500/10 text-orange-500 border-orange-500/20">Open Issues</Badge>
-          <Badge variant="secondary" className="bg-green-500/10 text-green-500 border-green-500/20">Clear</Badge>
+          <Badge variant="secondary" className="bg-green-500/10 text-green-500 border-green-500/20">Available</Badge>
+          <Badge variant="secondary" className="bg-muted text-muted-foreground border-border/40">Full</Badge>
         </div>
       </div>
-      <div className="p-8 overflow-auto flex justify-center bg-muted/5">
+      <div className="p-4 md:p-6 overflow-auto flex justify-center bg-muted/5">
         <svg width="500" height="330" className="">
           {/* Corridor */}
           <rect x="20" y="140" width="460" height="50" fill="currentColor" className="text-muted/30" rx="4" />
           <text x="250" y="170" fill="currentColor" className="text-muted-foreground text-sm font-bold text-center" textAnchor="middle">Main Corridor</text>
 
-          {ROOMS.map(room => {
+          {mergedRooms.map(room => {
             const issueCount = getRoomIssueCount(room.id);
             const escalatedCount = getRoomEscalatedCount(room.id);
             
@@ -60,9 +73,13 @@ export const InteractiveFloorPlan: React.FC<InteractiveFloorPlanProps> = ({ issu
               strokeColor = "stroke-orange-500";
               fillColor = "fill-orange-500/10";
               textColor = "fill-orange-500 font-bold";
-            } else {
+            } else if (room.isAvailable) {
               fillColor = "fill-green-500/5";
               strokeColor = "stroke-green-500/30";
+              textColor = "fill-green-500 font-bold";
+            } else {
+              fillColor = "fill-muted/20";
+              strokeColor = "stroke-border/50";
             }
 
             return (
@@ -83,7 +100,7 @@ export const InteractiveFloorPlan: React.FC<InteractiveFloorPlanProps> = ({ issu
                   <circle cx={room.x + room.w - 15} cy={room.y + 15} r="10" className={escalatedCount > 0 ? 'fill-red-500' : 'fill-orange-500'} />
                 )}
                 {issueCount > 0 && (
-                  <text x={room.x + room.w - 15} y={room.y + 19} textAnchor="middle" fill="white" className="text-[10px] font-bold">
+                  <text x={room.x + room.w - 15} y={room.y + 19} textAnchor="middle" fill="white" className="text-sm font-medium">
                     {issueCount}
                   </text>
                 )}

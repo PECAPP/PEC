@@ -14,6 +14,7 @@ import {
   CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell,
 } from 'recharts';
 import { api } from '@pec/api';
+import { PageBanner, Button } from '@pec/ui';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -155,7 +156,7 @@ function ContainerList({ containers, onAction, onLogs, actionInFlight }: {
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm whitespace-nowrap">
         <thead>
-          <tr className="border-b border-border text-muted-foreground text-xs uppercase tracking-wider bg-muted/5">
+          <tr className="border-b border-border text-muted-foreground text-xs  bg-muted/5">
             <th className="px-4 py-3 font-semibold">Container</th>
             <th className="px-4 py-3 font-semibold">State</th>
             <th className="px-4 py-3 font-semibold">CPU</th>
@@ -453,20 +454,25 @@ export default function ObservabilityAdmin() {
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="px-4 py-8 max-w-screen-2xl mx-auto space-y-8">
+    <div className="max-w-screen-2xl mx-auto space-y-8">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Activity className="w-8 h-8 text-primary" /> System Observability
-          </h1>
-          <p className="text-muted-foreground mt-1">Real-time infrastructure monitoring &amp; Docker control</p>
-        </div>
-        <button onClick={() => { fetchMetrics(); fetchContainers(); fetchRabbit(); }} disabled={metricsLoading}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
-          <RefreshCcw className={`w-4 h-4 ${metricsLoading ? 'animate-spin' : ''}`} /> Refresh All
-        </button>
+      <div className="mb-6">
+        <PageBanner
+          title="System Observability"
+          subtitle="Real-time infrastructure monitoring & Docker control"
+          badgeText="Admin Tools"
+          icon={<Activity className="w-7 h-7 text-primary" />}
+          actions={
+            <Button 
+              onClick={() => { fetchMetrics(); fetchContainers(); fetchRabbit(); }} 
+              disabled={metricsLoading}
+              className="gap-2"
+            >
+              <RefreshCcw className={`w-4 h-4 ${metricsLoading ? 'animate-spin' : ''}`} /> Refresh All
+            </Button>
+          }
+        />
       </div>
 
       {/* Stat cards */}
@@ -738,7 +744,7 @@ export default function ObservabilityAdmin() {
         <div className="px-4 py-3 border-b border-border bg-muted/20 flex justify-between items-center">
           <h2 className="font-bold flex items-center gap-2 text-sm"><Activity className="w-4 h-4 text-primary" /> Grafana — Live Metrics Explorer</h2>
           <div className="flex gap-3 items-center">
-            <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-500 font-bold uppercase tracking-wider rounded-sm border border-emerald-500/20">Live</span>
+            <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-500 font-bold  rounded-sm border border-emerald-500/20">Live</span>
             <a href="http://localhost:3000" target="_blank" rel="noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors">Open Full UI ↗</a>
           </div>
         </div>
@@ -760,7 +766,7 @@ export default function ObservabilityAdmin() {
         </div>
         <div className="p-4">
           {metricsLoading && !metrics ? (
-            <div className="flex justify-center p-8"><RefreshCcw className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            <div className="flex justify-center p-4 md:p-6"><RefreshCcw className="w-8 h-8 animate-spin text-muted-foreground" /></div>
           ) : (
             <pre className="text-xs bg-muted/50 p-4 rounded-md overflow-x-auto max-h-72 border border-border text-foreground font-mono">
               {metrics || 'No metrics data available.'}

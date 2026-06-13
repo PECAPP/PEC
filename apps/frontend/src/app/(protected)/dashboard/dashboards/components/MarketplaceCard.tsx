@@ -81,7 +81,7 @@ export function MarketplaceCard({
 
   if (loading) {
     return (
-      <div className={cn('card-elevated ui-card-pad space-y-4 animate-pulse', className)}>
+      <div className={cn('bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-4 animate-pulse', className)}>
         <div className="h-5 w-32 bg-muted rounded" />
         <div className="grid grid-cols-2 gap-2">
           {[1, 2, 3, 4].map((i) => (
@@ -96,7 +96,7 @@ export function MarketplaceCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn('card-elevated ui-card-pad flex h-full flex-col', className)}
+      className={cn('bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 flex h-full flex-col', className)}
     >
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
@@ -121,7 +121,7 @@ export function MarketplaceCard({
           {listings.map((listing) => (
             <div
               key={listing.id}
-              className="group relative border border-border bg-secondary/10 rounded-sm overflow-hidden cursor-pointer hover:bg-secondary/20 hover:border-primary/40 transition-colors duration-300"
+              className="group relative border border-border bg-secondary/10 rounded-sm overflow-hidden cursor-pointer hover:bg-secondary/20 hover:border-border/40 transition-colors duration-300"
               onClick={onViewAll}
             >
               {/* Image */}
@@ -165,7 +165,7 @@ export function MarketplaceCard({
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-3 py-8 text-muted-foreground">
+        <div className="flex flex-col items-center gap-3 py-4 md:py-8 text-muted-foreground">
           <ShoppingBag className="w-8 h-8" />
           <p className="text-xs">No listings yet</p>
         </div>
@@ -175,7 +175,7 @@ export function MarketplaceCard({
         {/* Quick action */}
         <Can I="create" a="MarketplaceListing">
           <Button
-            className="w-full h-10 rounded-sm font-bold text-[10px] uppercase tracking-widest gap-2 bg-primary shadow-glow transition-all"
+            className="w-full h-10 rounded-sm font-medium text-sm  gap-2 bg-primary shadow-md border border-border/40 transition-all"
             onClick={onCreateListing}
           >
             <Plus className="w-4 h-4" />

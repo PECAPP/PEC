@@ -25,10 +25,22 @@ export class CourseMaterialsRepository {
   create(data: CreateCourseMaterialDto) {
     return this.prisma.courseMaterial.create({
       data: {
-        ...data,
+        courseId: data.courseId,
+        courseName: data.courseName,
+        courseCode: data.courseCode,
+        title: data.title,
+        fileURL: data.fileURL,
+        uploadedBy: data.uploadedBy,
         description: data.description ?? '',
         type: data.type ?? 'other',
       },
+    });
+  }
+
+  update(id: string, data: Partial<CreateCourseMaterialDto>) {
+    return this.prisma.courseMaterial.update({
+      where: { id },
+      data,
     });
   }
 

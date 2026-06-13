@@ -61,7 +61,7 @@ export function UserDetailView({
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="card-elevated p-6 space-y-4">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold flex items-center gap-2"><User className="w-5 h-5" /> Info</h2>
           <div className="space-y-2 text-sm">
              <p><span className="text-muted-foreground">Email:</span> {user.email}</p>
@@ -69,7 +69,7 @@ export function UserDetailView({
              <p><span className="text-muted-foreground">DOB:</span> {formatDate(user.dateOfBirth)}</p>
           </div>
         </div>
-        <div className="card-elevated p-6 space-y-4">
+        <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold flex items-center gap-2"><Building2 className="w-5 h-5" /> Academic</h2>
           <div className="space-y-2 text-sm">
              <p><span className="text-muted-foreground">Dept:</span> {user.department}</p>
@@ -83,7 +83,7 @@ export function UserDetailView({
 
       {user.role === 'student' && (
         <div className="space-y-6">
-           <div className="card-elevated p-6">
+           <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><BookOpen className="w-5 h-5" /> Courses</h2>
               <div className="grid gap-2">
                  {enrollments.map(e => (
@@ -95,7 +95,7 @@ export function UserDetailView({
               </div>
            </div>
 
-           <div className="card-elevated p-6">
+           <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Award className="w-5 h-5" /> Grades</h2>
               <div className="grid gap-2">
                  {grades.map(g => (

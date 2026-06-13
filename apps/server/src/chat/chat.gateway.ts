@@ -69,10 +69,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!user) return;
 
     // Save message to DB
-    const message = await this.chatService.createMessage(user.id, payload.roomId, payload.content);
+    const message = await this.chatService.sendMessage({ chatRoomId: payload.roomId, content: payload.content }, user.sub || user.id);
 
     // Broadcast to everyone in the room
     this.server.to(payload.roomId).emit('newMessage', message);
+    
+    return message;
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('editMessage')
+  async handleEditMessage(
+    @MessageBody() payload: { messageId: string; content: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = (client as any).user;
+    if (!user) return;
+
+    const message = await this.chatService.editMessage(payload.messageId, user.id, payload.content);
+
+    // Broadcast to everyone in the room
+    this.server.to(message.chatRoomId).emit('messageEdited', message);
     
     return message;
   }

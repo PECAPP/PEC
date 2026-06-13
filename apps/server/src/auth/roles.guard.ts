@@ -40,7 +40,7 @@ export class RolesGuard implements CanActivate {
           : [];
 
     assignedRoles = assignedRoles.map(role => 
-      ['college_admin', 'super_admin'].includes(role) ? 'admin' : role
+      ['super_admin'].includes(role) ? 'college_admin' : role
     );
 
     if (assignedRoles.length === 0) {

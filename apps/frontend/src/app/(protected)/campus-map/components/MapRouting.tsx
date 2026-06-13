@@ -14,13 +14,11 @@ export function MapRouting({ startRegion, endRegion, roads, containerWidth, cont
   const [pathPoints, setPathPoints] = useState<{x: number, y: number}[]>([]);
 
   useEffect(() => {
-    if (!startRegion || !endRegion) {
+    if (!startRegion || !endRegion || roads.length === 0) {
       setPathPoints([]);
       return;
     }
 
-    // A simple mock routing that connects start center -> a road -> end center
-    // In a real app, you'd use A* or Dijkstra on the road network
     const startCenter = {
       x: startRegion.x + startRegion.width / 2,
       y: startRegion.y + startRegion.height / 2,
@@ -31,27 +29,110 @@ export function MapRouting({ startRegion, endRegion, roads, containerWidth, cont
       y: endRegion.y + endRegion.height / 2,
     };
 
-    // Find closest road point to start
-    let closestStartRoadPoint = startCenter;
-    let closestEndRoadPoint = endCenter;
+    // 1. Build the graph of road points
+    const graph = new Map<string, {x: number, y: number, neighbors: string[]}>();
+    
+    const ptKey = (p: {x: number, y: number}) => `${p.x},${p.y}`;
+    const dist = (p1: {x: number, y: number}, p2: {x: number, y: number}) => Math.hypot(p1.x - p2.x, p1.y - p2.y);
+
+    roads.forEach(road => {
+      for (let i = 0; i < road.points.length; i++) {
+        const p = road.points[i];
+        const key = ptKey(p);
+        if (!graph.has(key)) {
+          graph.set(key, { ...p, neighbors: [] });
+        }
+        if (i > 0) {
+          const prev = road.points[i - 1];
+          const prevKey = ptKey(prev);
+          graph.get(key)!.neighbors.push(prevKey);
+          graph.get(prevKey)!.neighbors.push(key);
+        }
+      }
+    });
+
+    // 2. Find closest start and end points on the road network
+    let startNodeKey = '';
+    let endNodeKey = '';
     let minStartDist = Infinity;
     let minEndDist = Infinity;
 
-    roads.forEach(road => {
-      road.points.forEach(p => {
-        const dStart = Math.hypot(p.x - startCenter.x, p.y - startCenter.y);
-        const dEnd = Math.hypot(p.x - endCenter.x, p.y - endCenter.y);
-        if (dStart < minStartDist) { minStartDist = dStart; closestStartRoadPoint = p; }
-        if (dEnd < minEndDist) { minEndDist = dEnd; closestEndRoadPoint = p; }
-      });
-    });
+    for (const [key, node] of Array.from(graph.entries())) {
+      const dStart = dist(node, startCenter);
+      const dEnd = dist(node, endCenter);
+      if (dStart < minStartDist) { minStartDist = dStart; startNodeKey = key; }
+      if (dEnd < minEndDist) { minEndDist = dEnd; endNodeKey = key; }
+    }
 
-    setPathPoints([
-      startCenter,
-      closestStartRoadPoint,
-      closestEndRoadPoint,
-      endCenter
-    ]);
+    if (!startNodeKey || !endNodeKey) {
+      setPathPoints([startCenter, endCenter]);
+      return;
+    }
+
+    // 3. A* Algorithm
+    const openSet = new Set([startNodeKey]);
+    const cameFrom = new Map<string, string>();
+    const gScore = new Map<string, number>();
+    const fScore = new Map<string, number>();
+
+    for (const key of Array.from(graph.keys())) {
+      gScore.set(key, Infinity);
+      fScore.set(key, Infinity);
+    }
+    
+    gScore.set(startNodeKey, 0);
+    fScore.set(startNodeKey, dist(graph.get(startNodeKey)!, graph.get(endNodeKey)!));
+
+    let currentKey = '';
+    let found = false;
+
+    while (openSet.size > 0) {
+      // Get node in openSet with lowest fScore
+      let minF = Infinity;
+      for (const key of Array.from(openSet)) {
+        const f = fScore.get(key) || Infinity;
+        if (f < minF) { minF = f; currentKey = key; }
+      }
+
+      if (currentKey === endNodeKey) {
+        found = true;
+        break;
+      }
+
+      openSet.delete(currentKey);
+      const current = graph.get(currentKey)!;
+
+      for (const neighborKey of current.neighbors) {
+        const neighbor = graph.get(neighborKey)!;
+        const tentativeG = (gScore.get(currentKey) || Infinity) + dist(current, neighbor);
+        
+        if (tentativeG < (gScore.get(neighborKey) || Infinity)) {
+          cameFrom.set(neighborKey, currentKey);
+          gScore.set(neighborKey, tentativeG);
+          fScore.set(neighborKey, tentativeG + dist(neighbor, graph.get(endNodeKey)!));
+          if (!openSet.has(neighborKey)) {
+            openSet.add(neighborKey);
+          }
+        }
+      }
+    }
+
+    // 4. Reconstruct path
+    if (found) {
+      const path = [];
+      let curr = endNodeKey;
+      while (cameFrom.has(curr)) {
+        path.push(graph.get(curr)!);
+        curr = cameFrom.get(curr)!;
+      }
+      path.push(graph.get(startNodeKey)!);
+      path.reverse();
+
+      setPathPoints([startCenter, ...path, endCenter]);
+    } else {
+      // Fallback
+      setPathPoints([startCenter, graph.get(startNodeKey)!, graph.get(endNodeKey)!, endCenter]);
+    }
 
   }, [startRegion, endRegion, roads]);
 

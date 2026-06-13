@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger, Badge, SearchResultsSkeleton } from "@pec/ui";
+import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger, Badge, SearchResultsSkeleton, PageBanner } from "@pec/ui";
 
 
 import { motion } from 'framer-motion';
@@ -41,15 +41,19 @@ export default function Search() {
   return (
     <div className="space-y-6">
       {/* Search Header */}
-      <div className="bg-card border-b border-border -mx-6 -mt-6 p-6 mb-6">
-        <div className=" ">
-          <h1 className="text-2xl font-bold mb-4">Search Results</h1>
+      <div className="bg-card border-b border-border -mx-6 -mt-6 p-3 md:p-6 mb-6">
+        <PageBanner
+          title="Search Results"
+          subtitle="Search across users, courses, and pages"
+          badgeText="Global"
+        />
+        <div className="mt-4 max-w-2xl">
           <form onSubmit={handleSearchSubmit} className="relative">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-12 text-lg bg-background"
+              className="pl-10 h-12 text-lg bg-background shadow-sm"
               placeholder="Search users, courses, and pages..."
             />
             <Button type="submit" className="absolute right-1.5 top-1.5 bottom-1.5">
@@ -74,30 +78,34 @@ export default function Search() {
             </div>
           ) : (
             <Tabs defaultValue="all" className="w-full">
-              <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
+              <TabsList className="mb-6">
                 <TabsTrigger 
                   value="all" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-border/40 data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-3 gap-2"
                 >
+                  <SearchIcon className="w-3.5 h-3.5" />
                   All Results
                 </TabsTrigger>
                 <TabsTrigger 
                   value="people" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-border/40 data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-3 gap-2"
                 >
+                  <UsersIcon className="w-3.5 h-3.5" />
                   People <Badge variant="secondary" className="ml-2">{results.users.length}</Badge>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="pages" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-border/40 data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-3 gap-2"
                 >
-                   Pages <Badge variant="secondary" className="ml-2">{results.pages.length}</Badge>
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  Pages <Badge variant="secondary" className="ml-2">{results.pages.length}</Badge>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="subjects" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-border/40 data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-3 gap-2"
                 >
-                   Courses <Badge variant="secondary" className="ml-2">{results.subjects.length}</Badge>
+                  <BookOpen className="w-3.5 h-3.5" />
+                  Courses <Badge variant="secondary" className="ml-2">{results.subjects.length}</Badge>
                 </TabsTrigger>
               </TabsList>
 

@@ -46,7 +46,7 @@ export const getCollegeSettingsControllerGetSettingsV1Url = () => {
 
 
 
-  return `/api/v1/pec-settings`
+  return `/api/v1/college-settings`
 }
 
 export const collegeSettingsControllerGetSettingsV1 = async ( options?: RequestInit): Promise<collegeSettingsControllerGetSettingsV1Response> => {
@@ -66,7 +66,7 @@ export const collegeSettingsControllerGetSettingsV1 = async ( options?: RequestI
 
 export const getCollegeSettingsControllerGetSettingsV1QueryKey = () => {
     return [
-    `/api/v1/pec-settings`
+    `/api/v1/college-settings`
     ] as const;
     }
 
@@ -152,7 +152,7 @@ export const getCollegeSettingsControllerUpdateSettingsV1Url = () => {
 
 
 
-  return `/api/v1/pec-settings`
+  return `/api/v1/college-settings`
 }
 
 export const collegeSettingsControllerUpdateSettingsV1 = async ( options?: RequestInit): Promise<collegeSettingsControllerUpdateSettingsV1Response> => {

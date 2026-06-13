@@ -1,7 +1,7 @@
 'use client';
 import { extractData } from "@/lib/utils";
 import api from "@pec/api";
-import { Button, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton } from "@pec/ui";
+import { Button, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatDate, AppShellSkeleton, PageBanner } from "@pec/ui";
 
 
 import { useState, useEffect, useRef } from 'react';
@@ -11,6 +11,7 @@ import {
   Upload,
   Download,
   Trash2,
+  Edit,
   Plus,
   Loader2,
   BookOpen,
@@ -67,17 +68,17 @@ export default function CourseMaterials() {
     setLoading(false);
   }, [authLoading, user, router]);
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <AppShellSkeleton />
     );
   }
 
   if (isAdmin || isFaculty) {
-    return <MaterialsManager userId={user.uid} userRole={user.role} />;
+    return <MaterialsManager userId={user.id} userRole={user.role} />;
   }
 
-  return <StudentMaterialsView userId={user.uid} />;
+  return <StudentMaterialsView userId={user.id} />;
 }
 
 function MaterialsManager({ userId, userRole }: { userId: string; userRole: string }) {
@@ -93,9 +94,10 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
     description: '',
     type: 'lecture-notes' as CourseMaterial['type'],
   });
+  const [editingMaterialId, setEditingMaterialId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const isAdmin = userRole.includes('admin');
+  const isAdmin = userRole.includes('college_admin') || userRole.includes('super_admin');
 
   const fetcher = async () => {
     let coursesData = [];
@@ -146,40 +148,62 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
   const materials = data?.materialsData || [];
   const materialsApiAvailable = data?.materialsApiAvailable ?? true;
 
-  const handleUpload = async () => {
-    if (!materialForm.title || !materialForm.courseId || !selectedFile) {
+  const handleSave = async () => {
+    if (!materialForm.title || !materialForm.courseId || (!selectedFile && !editingMaterialId)) {
       toast.error('Please fill all required fields and select a file');
       return;
     }
 
     setUploading(true);
     try {
-      const course = courses.find(c => c.id === materialForm.courseId);
-      
-      const formData = new FormData();
-      formData.append('courseId', materialForm.courseId);
-      formData.append('courseName', course?.name || '');
-      formData.append('courseCode', course?.code || '');
-      formData.append('title', materialForm.title);
-      formData.append('description', materialForm.description);
-      formData.append('type', materialForm.type);
-      formData.append('uploadedBy', userId);
-      formData.append('file', selectedFile);
+      if (editingMaterialId) {
+        await api.patch(`/course-materials/${editingMaterialId}`, {
+          courseId: materialForm.courseId,
+          title: materialForm.title,
+          description: materialForm.description,
+          type: materialForm.type,
+        });
+        toast.success('Material updated successfully');
+      } else {
+        const course = courses.find(c => c.id === materialForm.courseId);
+        
+        const formData = new FormData();
+        formData.append('courseId', materialForm.courseId);
+        formData.append('courseName', course?.name || '');
+        formData.append('courseCode', course?.code || '');
+        formData.append('title', materialForm.title);
+        formData.append('description', materialForm.description);
+        formData.append('type', materialForm.type);
+        formData.append('uploadedBy', userId);
+        formData.append('file', selectedFile!);
 
-      await api.post('/course-materials', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+        await api.post('/course-materials', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Material uploaded successfully');
+      }
       
-      toast.success('Material uploaded successfully');
       setShowUploadDialog(false);
       resetForm();
       mutate();
     } catch (error) {
-      console.error('Error uploading material:', error);
-      toast.error('Failed to upload material');
+      console.error('Error saving material:', error);
+      toast.error('Failed to save material');
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleEdit = (material: CourseMaterial) => {
+    setEditingMaterialId(material.id);
+    setMaterialForm({
+      courseId: material.courseId,
+      title: material.title,
+      description: material.description,
+      type: material.type,
+    });
+    setSelectedFile(null);
+    setShowUploadDialog(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -234,6 +258,7 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
       type: 'lecture-notes',
     });
     setSelectedFile(null);
+    setEditingMaterialId(null);
   };
 
   const getTypeIcon = (type: string) => {
@@ -258,22 +283,24 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Course Materials</h1>
-          <p className="text-muted-foreground">Upload and manage course materials</p>
-        </div>
-        <div className="button-group">
-          <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
-            <Upload className="w-4 h-4 mr-2" /> Bulk Upload
-          </Button>
-          <Button onClick={() => { resetForm(); setShowUploadDialog(true); }}>
-            <Plus className="w-4 h-4 mr-2" /> Upload Material
-          </Button>
-        </div>
-      </div>
+      <PageBanner
+        title="Course Materials"
+        subtitle="Upload and manage course materials"
+        badgeText="Faculty Console"
+        icon={<BookOpen className="w-7 h-7 text-primary" />}
+        actions={
+          <>
+            <Button variant="outline" onClick={() => setShowBulkUpload(true)}>
+              <Upload className="w-4 h-4 mr-2" /> Bulk Upload
+            </Button>
+            <Button onClick={() => { resetForm(); setShowUploadDialog(true); }}>
+              <Plus className="w-4 h-4 mr-2" /> Upload Material
+            </Button>
+          </>
+        }
+      />
 
-      <div className="card-elevated p-4">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4">
         <Select value={selectedCourse || 'all'} onValueChange={(val) => setSelectedCourse(val === 'all' ? '' : val)}>
           <SelectTrigger>
             <SelectValue placeholder="All courses" />
@@ -289,12 +316,12 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
 
       <div className="space-y-4">
         {!materialsApiAvailable && (
-          <div className="card-elevated p-4 text-sm text-muted-foreground">
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 text-sm text-muted-foreground">
             Course materials backend is not configured yet.
           </div>
         )}
         {filteredMaterials.length === 0 ? (
-          <div className="card-elevated p-12 text-center">
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
             <FileText className="w-12 h-12  mb-4 opacity-20" />
             <p className="text-muted-foreground">No materials uploaded yet</p>
           </div>
@@ -305,11 +332,11 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className="card-elevated p-6"
+              className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6"
             >
               <div className="flex items-start justify-between">
                 <div className="flex gap-4 flex-1">
-                  <div className="p-3 rounded-sm bg-primary/10 text-primary">
+                  <div className="p-3 rounded-lg border border-border/40 flex items-center justify-center bg-primary/10 text-primary">
                     {getTypeIcon(material.type)}
                   </div>
                   <div className="flex-1">
@@ -330,6 +357,9 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
                       <Download className="w-4 h-4 mr-2" /> Download
                     </a>
                   </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handleEdit(material)}>
+                    <Edit className="w-4 h-4 text-primary" />
+                  </Button>
                   <Button size="sm" variant="ghost" onClick={() => handleDelete(material.id)}>
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
@@ -344,8 +374,8 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Upload Course Material</DialogTitle>
-            <DialogDescription>Add a new material for your course</DialogDescription>
+            <DialogTitle>{editingMaterialId ? 'Edit Course Material' : 'Upload Course Material'}</DialogTitle>
+            <DialogDescription>{editingMaterialId ? 'Update material details' : 'Add a new material for your course'}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -382,17 +412,19 @@ function MaterialsManager({ userId, userRole }: { userId: string; userRole: stri
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label className="text-sm font-medium">File</label>
-              <Input 
-                type="file" 
-                onChange={e => setSelectedFile(e.target.files?.[0] || null)} 
-                className="mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" 
-              />
-              <p className="text-xs text-muted-foreground mt-1">Select a file (PDF, DOCX, ZIP) - Max 50MB</p>
-            </div>
-            <Button onClick={handleUpload} disabled={uploading} className="w-full">
-              {uploading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading...</> : <><Upload className="w-4 h-4 mr-2" /> Upload Material</>}
+            {!editingMaterialId && (
+              <div>
+                <label className="text-sm font-medium">File</label>
+                <Input 
+                  type="file" 
+                  onChange={e => setSelectedFile(e.target.files?.[0] || null)} 
+                  className="mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" 
+                />
+                <p className="text-xs text-muted-foreground mt-1">Select a file (PDF, DOCX, ZIP) - Max 50MB</p>
+              </div>
+            )}
+            <Button onClick={handleSave} disabled={uploading} className="w-full">
+              {uploading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : <><Upload className="w-4 h-4 mr-2" /> {editingMaterialId ? 'Save Changes' : 'Upload Material'}</>}
             </Button>
           </div>
         </DialogContent>
@@ -501,12 +533,14 @@ function StudentMaterialsView({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Course Materials</h1>
-        <p className="text-muted-foreground">Access learning resources for your courses</p>
-      </div>
+      <PageBanner
+        title="Course Materials"
+        subtitle="Access learning resources for your courses"
+        badgeText="Academics"
+        icon={<BookOpen className="w-7 h-7 text-primary" />}
+      />
 
-      <div className="card-elevated p-4">
+      <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <Select value={filterCourse} onValueChange={setFilterCourse}>
             <SelectTrigger className="flex-1">
@@ -537,12 +571,12 @@ function StudentMaterialsView({ userId }: { userId: string }) {
 
       <div className="space-y-4">
         {!materialsApiAvailable && (
-          <div className="card-elevated p-4 text-sm text-muted-foreground">
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 text-sm text-muted-foreground">
             Course materials backend is not configured yet.
           </div>
         )}
         {filteredMaterials.length === 0 ? (
-          <div className="card-elevated p-12 text-center">
+          <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
             <FileText className="w-12 h-12  mb-4 opacity-20" />
             <p className="text-muted-foreground">No materials available</p>
           </div>
@@ -553,11 +587,11 @@ function StudentMaterialsView({ userId }: { userId: string }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className="card-elevated p-6"
+              className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6"
             >
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex gap-4 flex-1 min-w-0">
-                  <div className="p-3 rounded-sm bg-primary/10 text-primary flex-shrink-0">
+                  <div className="p-3 rounded-lg border border-border/40 flex items-center justify-center bg-primary/10 text-primary flex-shrink-0">
                     {getTypeIcon(material.type)}
                   </div>
                   <div className="flex-1 min-w-0">

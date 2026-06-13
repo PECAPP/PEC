@@ -1,18 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Request } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
-@UseGuards(AuthGuard, PoliciesGuard)
+@UseGuards(AuthGuard, RolesGuard, PoliciesGuard)
+@Roles('college_admin')
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Post()
-  @CheckPolicies((ability) => ability.can('create', 'Permission'))
-  create(@Body() createPermissionDto: any) {
-    return this.permissionsService.create(createPermissionDto);
+  @CheckPolicies((ability) => ability.can('manage', 'Permission'))
+  create(@Request() req: any, @Body() createPermissionDto: any) {
+    return this.permissionsService.create(createPermissionDto, req.user.uid);
   }
 
   @Get()
@@ -31,14 +34,14 @@ export class PermissionsController {
   }
 
   @Patch(':id')
-  @CheckPolicies((ability) => ability.can('update', 'Permission'))
-  update(@Param('id') id: string, @Body() updatePermissionDto: any) {
-    return this.permissionsService.update(id, updatePermissionDto);
+  @CheckPolicies((ability) => ability.can('manage', 'Permission'))
+  update(@Request() req: any, @Param('id') id: string, @Body() updatePermissionDto: any) {
+    return this.permissionsService.update(id, updatePermissionDto, req.user.uid);
   }
 
   @Delete(':id')
-  @CheckPolicies((ability) => ability.can('delete', 'Permission'))
-  remove(@Param('id') id: string) {
-    return this.permissionsService.remove(id);
+  @CheckPolicies((ability) => ability.can('manage', 'Permission'))
+  remove(@Request() req: any, @Param('id') id: string) {
+    return this.permissionsService.remove(id, req.user.uid);
   }
 }

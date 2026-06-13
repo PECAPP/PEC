@@ -57,8 +57,14 @@ export class EnrollmentsRepository extends BaseRepository {
   create(data: CreateEnrollmentDto) {
     return this.prisma.enrollment.create({
       data: {
-        ...data,
         enrolledAt: data.enrolledAt ? new Date(data.enrolledAt) : new Date(),
+        status: data.status,
+        semester: data.semester,
+        batch: data.batch,
+        courseName: data.courseName || '',
+        courseCode: data.courseCode || '',
+        student: { connect: { id: data.studentId } },
+        course: { connect: { id: data.courseId } }
       },
     });
   }
@@ -87,9 +93,9 @@ export class EnrollmentsRepository extends BaseRepository {
       return { blocked: true, reason: 'Capacity full' };
     }
 
-    // 2. Prerequisites Check
     if ((course as any).prerequisiteIds && (course as any).prerequisiteIds.length > 0) {
-      const studentHistory = await this.prisma.enrollment.findMany({ where: { studentId, status: 'active' }, // In a real system we'd check for status 'completed'
+      const studentHistory = await this.prisma.enrollment.findMany({ 
+        where: { studentId, status: { in: ['completed', 'active'] } },
         select: { courseCode: true }
       });
       const historicalCodes = studentHistory.map(h => h.courseCode);

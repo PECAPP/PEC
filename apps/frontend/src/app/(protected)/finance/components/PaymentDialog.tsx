@@ -76,7 +76,7 @@ export default function PaymentDialog({
           {/* Glassmorphic Background Blur Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
           
-          <div className="p-6 relative z-10">
+          <div className="p-3 md:p-6 relative z-10">
             <DialogHeader className="mb-6">
               <DialogTitle className="flex items-center gap-3 text-2xl">
                 <div className="p-2 bg-primary/10 rounded-sm">
@@ -95,7 +95,7 @@ export default function PaymentDialog({
               className="space-y-4"
             >
               {/* Sleek Invoice Preview */}
-              <div className="relative rounded-sm bg-muted/30 border border-border/50 p-5 space-y-3 backdrop-blur-sm overflow-hidden">
+              <div className="relative rounded-sm bg-muted/30 border border-border/50 p-3 md:p-5 space-y-3 backdrop-blur-sm overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                 
                 <h3 className="text-sm font-semibold text-foreground/90">{fee.description}</h3>
@@ -117,7 +117,7 @@ export default function PaymentDialog({
                 <div className="border-t-2 border-dashed border-border/50 my-2" />
                 
                 <div className="flex justify-between items-end">
-                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Total Due</span>
+                  <span className="text-sm font-bold text-muted-foreground ">Total Due</span>
                   <span className="text-primary text-3xl font-bold tracking-tight">₹{fmt(total)}</span>
                 </div>
               </div>
@@ -133,7 +133,7 @@ export default function PaymentDialog({
                       className={cn(
                         'py-2 px-3 rounded-sm border text-sm font-medium transition-colors',
                         method === m
-                          ? 'bg-primary text-primary-foreground border-primary'
+                          ? 'bg-primary text-primary-foreground border-border/40'
                           : 'border-border hover:bg-muted'
                       )}
                     >
@@ -154,7 +154,7 @@ export default function PaymentDialog({
                 </div>
               )}
 
-              <div className="flex items-start gap-2 p-3 rounded-sm bg-blue-500/10 border border-blue-500/20">
+              <div className="p-3 rounded-lg border border-blue-500/20 flex items-center justify-center rounded-lg border border-blue-500/20 flex items-center justify-center rounded-lg border border-blue-500/20 flex items-center justify-center flex items-start gap-2 bg-blue-500/10 border border-blue-500/20">
                 <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                 <p className="text-xs text-blue-600">
                   This is a simulated payment in test mode. No real money will be charged.
@@ -191,7 +191,7 @@ export default function PaymentDialog({
                 <motion.div
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                  className="absolute inset-2 rounded-full border border-primary/30"
+                  className="absolute inset-2 rounded-full border border-border/40"
                 />
                 <CreditCard className="w-8 h-8 text-primary animate-pulse" />
               </div>
@@ -215,7 +215,7 @@ export default function PaymentDialog({
               initial={{ opacity: 0, scale: 0.9, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="flex flex-col items-center gap-6 py-8"
+              className="flex flex-col items-center gap-6 py-4 md:py-8"
             >
               <motion.div 
                 initial={{ scale: 0 }}
@@ -245,7 +245,7 @@ export default function PaymentDialog({
                   )}
                 </div>
               </div>
-              <Button onClick={onClose} className="w-full h-10 mt-4 rounded-sm shadow-glow bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button onClick={onClose} className="w-full h-10 mt-4 rounded-sm shadow-md border border-border/40 bg-primary hover:bg-primary/90 text-primary-foreground">
                 Done
               </Button>
             </motion.div>

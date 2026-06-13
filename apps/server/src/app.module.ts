@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
@@ -24,11 +25,14 @@ import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { BackgroundJobsModule } from './background-jobs/background-jobs.module';
 import { NightCanteenModule } from './night-canteen/night-canteen.module';
 import { HostelIssuesModule } from './hostel-issues/hostel-issues.module';
+import { HostelOutpassModule } from './hostel-outpass/hostel-outpass.module';
 import { CampusMapModule } from './campus-map/campus-map.module';
 import { CourseMaterialsModule } from './course-materials/course-materials.module';
 import { NoticeboardModule } from './noticeboard/noticeboard.module';
 import { AiModule } from './ai/ai.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { EventsModule } from './events/events.module';
+import { PdfModule } from './pdf/pdf.module';
 import { SocialSyncModule } from './social-sync/social-sync.module';
 import { StudentPortfolioModule } from './student-portfolio/student-portfolio.module';
 import { AttendanceSessionModule } from './attendance-session/attendance-session.module';
@@ -39,7 +43,6 @@ import { AcademicCalendarModule } from './academic-calendar/academic-calendar.mo
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
-import { CanteenModule } from './canteen/canteen.module';
 import { AdminModule } from './admin/admin.module';
 import { CollegeSettingsModule } from './college-settings/college-settings.module';
 import { ClubsModule } from './clubs/clubs.module';
@@ -48,6 +51,8 @@ import { FinanceModule } from './finance/finance.module';
 import { RolesMgmtModule } from './roles/roles-mgmt.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CaslModule } from './casl/casl.module';
+import { DelegationModule } from './delegation/delegation.module';
+
 import { GlobalCacheModule } from './cache/global-cache.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 
@@ -55,8 +60,12 @@ import { CommonServicesModule } from './common/common.module';
 import { SettingsModule } from './settings/settings.module';
 import { UploadModule } from './upload/upload.module';
 import { DlqModule } from './dlq/dlq.module';
+import { GradingModule } from './grading/grading.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { RlsInterceptor } from './prisma/rls.interceptor';
 
 @Module({
+
   imports: [
     CommonServicesModule,
     GlobalCacheModule,
@@ -65,7 +74,9 @@ import { DlqModule } from './dlq/dlq.module';
     CaslModule,
     PermissionsModule,
     RolesMgmtModule,
+    DelegationModule,
     AuthModule,
+
     UsersModule,
     PrismaModule,
     ChatModule,
@@ -77,9 +88,9 @@ import { DlqModule } from './dlq/dlq.module';
     DepartmentsModule,
     FeatureFlagsModule,
     BackgroundJobsModule,
-    CanteenModule,
     NightCanteenModule,
     HostelIssuesModule,
+    HostelOutpassModule,
     CampusMapModule,
     CourseMaterialsModule,
     NoticeboardModule,
@@ -88,6 +99,8 @@ import { DlqModule } from './dlq/dlq.module';
     AiModule,
     AttendanceSessionModule,
     RoomsModule,
+    EventsModule,
+    PdfModule,
     SocialSyncModule,
     StudentPortfolioModule,
     FacultyBioSystemModule,
@@ -100,6 +113,8 @@ import { DlqModule } from './dlq/dlq.module';
     UploadModule,
     DlqModule,
     CqrsModule,
+    GradingModule,
+    AnalyticsModule,
     WinstonModule.forRoot({
       transports: [
         new winston.transports.Console({
@@ -131,8 +146,13 @@ import { DlqModule } from './dlq/dlq.module';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RlsInterceptor,
+    },
   ],
 })
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer

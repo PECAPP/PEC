@@ -66,6 +66,16 @@ export class MarketplaceController {
     return ok(data);
   }
 
+  @CheckPolicies((ability) => ability.can('update', 'MarketplaceListing'))
+  @Post('listings/:id/hold')
+  async holdListing(
+    @Param('id') id: string,
+    @Request() req: any,
+  ) {
+    const data = await this.service.holdListing(id, req.user.sub);
+    return ok(data);
+  }
+
   @CheckPolicies((ability) => ability.can('delete', 'MarketplaceListing'))
   @Delete('listings/:id')
   async deleteListing(@Param('id') id: string, @Request() req: any) {

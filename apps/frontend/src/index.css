@@ -159,7 +159,7 @@ body {
     --shadow-md: 0 4px 12px hsl(var(--accent-hue) 25% 10% / 0.06);
     --shadow-lg: 0 8px 24px hsl(var(--accent-hue) 25% 10% / 0.08);
     --shadow-xl: 0 16px 48px hsl(var(--accent-hue) 25% 10% / 0.1);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.08);
+    --shadow-glow: 0 4px 12px hsl(var(--primary) / 0.08);
   }
 
   /* ===== DARK MODE ===== */
@@ -222,7 +222,7 @@ body {
     --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.4);
     --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.5);
     --shadow-xl: 0 16px 48px hsl(0 0% 0% / 0.6);
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.08);
+    --shadow-glow: 0 6px 16px hsl(var(--primary) / 0.08);
   }
 
   /* ====================================
@@ -246,7 +246,7 @@ body {
     --primary-rgb: 245, 158, 11;
     --ring: 45 95% 55%;
     --sidebar-primary: 45 95% 55%;
-    --shadow-glow: 0 0 40px hsl(45 95% 55% / 0.15);
+    --shadow-glow: 0 6px 16px hsl(45 95% 55% / 0.15);
     
     --muted: 40 20% 15%;
     --muted-foreground: 40 20% 70%;
@@ -266,7 +266,7 @@ body {
     --primary-rgb: 217, 119, 6;
     --ring: 45 95% 45%;
     --sidebar-primary: 45 95% 45%;
-    --shadow-glow: 0 0 30px hsl(45 95% 45% / 0.15);
+    --shadow-glow: 0 4px 12px hsl(45 95% 45% / 0.15);
 
     --muted: 40 10% 92%;
     --muted-foreground: 40 10% 40%;
@@ -290,7 +290,7 @@ body {
     --primary-foreground: 0 0% 100%;
     --ring: 160 84% 39%;
     --sidebar-primary: 160 84% 39%;
-    --shadow-glow: 0 0 40px hsl(160 84% 39% / 0.12);
+    --shadow-glow: 0 6px 16px hsl(160 84% 39% / 0.12);
   }
 
   .accent-emerald:not(.dark) {
@@ -301,7 +301,7 @@ body {
     --primary-foreground: 0 0% 100%;
     --ring: 160 84% 32%;
     --sidebar-primary: 160 84% 32%;
-    --shadow-glow: 0 0 30px hsl(160 84% 32% / 0.15);
+    --shadow-glow: 0 4px 12px hsl(160 84% 32% / 0.15);
   }
 
   /* Theme 3: Sapphire (Deep Blue Tint) */
@@ -318,7 +318,7 @@ body {
     --primary-foreground: 0 0% 100%;
     --ring: 220 90% 56%;
     --sidebar-primary: 220 90% 56%;
-    --shadow-glow: 0 0 40px hsl(220 90% 56% / 0.12);
+    --shadow-glow: 0 6px 16px hsl(220 90% 56% / 0.12);
   }
 
   .accent-sapphire:not(.dark) {
@@ -329,7 +329,7 @@ body {
     --primary-foreground: 0 0% 100%;
     --ring: 220 90% 45%;
     --sidebar-primary: 220 90% 45%;
-    --shadow-glow: 0 0 30px hsl(220 90% 45% / 0.15);
+    --shadow-glow: 0 4px 12px hsl(220 90% 45% / 0.15);
   }
 
   /* Theme 4: Amethyst (Deep Purple Tint) */
@@ -346,7 +346,7 @@ body {
     --primary-foreground: 0 0% 100%;
     --ring: 270 70% 60%;
     --sidebar-primary: 270 70% 60%;
-    --shadow-glow: 0 0 40px hsl(270 70% 60% / 0.12);
+    --shadow-glow: 0 6px 16px hsl(270 70% 60% / 0.12);
   }
 
   .accent-amethyst:not(.dark) {
@@ -357,7 +357,7 @@ body {
     --primary-foreground: 0 0% 100%;
     --ring: 270 70% 50%;
     --sidebar-primary: 270 70% 50%;
-    --shadow-glow: 0 0 30px hsl(270 70% 50% / 0.15);
+    --shadow-glow: 0 4px 12px hsl(270 70% 50% / 0.15);
   }
 
 

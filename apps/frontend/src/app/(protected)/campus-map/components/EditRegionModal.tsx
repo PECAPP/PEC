@@ -20,7 +20,7 @@ export default function EditRegionModal({
 
   return (
     <Dialog open={!!editingRegion} onOpenChange={(open) => !open && setEditingRegion(null)}>
-      <DialogContent className=" w-full p-5">
+      <DialogContent className=" w-full p-3 md:p-5">
         <DialogTitle className="font-bold text-lg mb-4">
           {editingRegion.id ? 'Edit Building' : 'New Building'}
         </DialogTitle>

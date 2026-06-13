@@ -8,10 +8,10 @@ export class CalendarSyncController {
 
   @Get(':icalToken.ics')
   async generateCalendar(@Param('icalToken') icalToken: string, @Res() res: Response) {
-    // userSettings model does not exist in schema, mocking user lookup
-    const settings = {
-      user: { name: 'Student' }
-    };
+    const settings = await this.prisma.userSettings.findUnique({
+      where: { id: icalToken },
+      include: { user: { select: { name: true } } }
+    });
 
     if (!settings) {
       throw new NotFoundException('Invalid Calendar Token');

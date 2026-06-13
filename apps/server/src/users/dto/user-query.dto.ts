@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createZodDto } from "nestjs-zod";
 
 export enum UserRole {
-  ADMIN = 'admin',
+  ADMIN = 'college_admin',
   FACULTY = 'faculty',
   STUDENT = 'student',
 }

@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Textarea, Badge, Progress, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger, AppShellSkeleton } from "@pec/ui";
+import { Button, Input, Textarea, Badge, Progress, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger, AppShellSkeleton, PageBanner } from "@pec/ui";
 
 
 import { useState, useEffect } from 'react';
@@ -257,12 +257,12 @@ export default function StudentPortfolioPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Student Portfolio</h1>
-          <p className="text-muted-foreground">Showcase your projects, skills, and GitHub work</p>
-        </div>
-        <div className="flex gap-2">
+      <PageBanner
+        title="Student Portfolio"
+        subtitle="Showcase your projects, skills, and GitHub work"
+        badgeText="Career"
+        icon={<Briefcase className="w-7 h-7 text-primary" />}
+        actions={
           <Button variant="outline" onClick={syncGitHub} disabled={githubLoading}>
             {githubLoading ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -271,20 +271,28 @@ export default function StudentPortfolioPage() {
             )}
             Sync GitHub
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-8">
-          {['projects', 'skills', 'github'].map((tab) => (
-            <TabsTrigger
-              key={tab}
-              value={tab}
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-0 py-3 text-xs font-bold uppercase tracking-widest transition-all capitalize"
-            >
-              {tab}
-            </TabsTrigger>
-          ))}
+        <TabsList className="mb-6">
+          {[
+            { id: 'projects', label: 'Projects', icon: Briefcase },
+            { id: 'skills', label: 'Skills', icon: Code2 },
+            { id: 'github', label: 'GitHub Sync', icon: Github },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-border/40 data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-3 text-xs font-bold transition-all capitalize gap-2"
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {tab.label}
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         <TabsContent value="projects" className="mt-6">
@@ -301,7 +309,7 @@ export default function StudentPortfolioPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="card-elevated p-5 space-y-3"
+                className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 space-y-3"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -367,7 +375,7 @@ export default function StudentPortfolioPage() {
           </div>
 
           {projects.length === 0 && (
-            <div className="card-elevated p-12 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
               <Briefcase className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">No projects yet. Add your first project!</p>
             </div>
@@ -387,7 +395,7 @@ export default function StudentPortfolioPage() {
               if (categorySkills.length === 0) return null;
 
               return (
-                <div key={id} className="card-elevated p-5 space-y-4">
+                <div key={id} className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 space-y-4">
                   <div className="flex items-center gap-2">
                     <Icon className="w-5 h-5 text-primary" />
                     <h3 className="font-semibold">{label}</h3>
@@ -427,7 +435,7 @@ export default function StudentPortfolioPage() {
           </div>
 
           {skills.length === 0 && (
-            <div className="card-elevated p-12 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
               <Code2 className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">
                 No skills added yet. Start building your skill profile!
@@ -455,7 +463,7 @@ export default function StudentPortfolioPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="card-elevated p-5 space-y-3"
+                className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5 space-y-3"
               >
                 <div className="flex items-start justify-between">
                   <h3 className="font-semibold truncate flex-1">{repo.name}</h3>
@@ -496,7 +504,7 @@ export default function StudentPortfolioPage() {
           </div>
 
           {githubRepos.length === 0 && (
-            <div className="card-elevated p-12 text-center">
+            <div className="bg-card border border-border/40 rounded-sm shadow-sm p-12 text-center">
               <Github className="w-12 h-12  mb-4 opacity-20" />
               <p className="text-muted-foreground">
                 No GitHub repos loaded. Configure your GitHub username in profile settings and sync.
