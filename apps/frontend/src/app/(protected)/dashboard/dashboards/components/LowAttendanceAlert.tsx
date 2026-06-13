@@ -21,7 +21,7 @@ export function LowAttendanceAlert({ lowAttendanceCount, onViewStudents }: Props
   }
 
   return (
-    <motion.div variants={item} className="p-4 rounded-xl bg-warning/10 border border-warning/20">
+    <motion.div variants={item} className="p-4 rounded-sm bg-warning/10 border border-warning/20">
       <div className="flex items-start gap-3">
         <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
         <div>

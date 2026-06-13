@@ -1,3 +1,4 @@
+import { formatDate } from "@pec/ui";
 import React from 'react';
 import { Calendar } from 'lucide-react';
 
@@ -19,7 +20,7 @@ export const EventsList = ({ data }: { data: EventsData }) => {
 
   if (events.length === 0) {
     return (
-      <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
         No upcoming calendar events.
       </div>
     );
@@ -39,7 +40,7 @@ export const EventsList = ({ data }: { data: EventsData }) => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 flex items-center justify-between text-white">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4" />
@@ -51,10 +52,10 @@ export const EventsList = ({ data }: { data: EventsData }) => {
           <div key={idx} className="flex gap-3 relative last:pb-0 pb-3 border-b last:border-0 border-gray-50 dark:border-gray-700/50">
             <div className="w-12 text-center shrink-0">
               <span className="block text-xs font-bold text-gray-700 dark:text-gray-300">
-                {new Date(event.date).toLocaleDateString(undefined, { day: '2-digit' })}
+                {formatDate(event.date)}
               </span>
               <span className="block text-[10px] text-gray-400 uppercase">
-                {new Date(event.date).toLocaleDateString(undefined, { month: 'short' })}
+                {formatDate(event.date)}
               </span>
             </div>
             <div className="flex-1 min-w-0">

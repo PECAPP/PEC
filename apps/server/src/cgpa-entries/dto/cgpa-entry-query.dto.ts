@@ -1,20 +1,17 @@
-import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsUUID, Min } from 'class-validator';
-import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CgpaEntryQueryDto extends PaginationQueryDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  semester?: number;
+export const cgpaEntryQuerySchema = z.object({
+  userId: z.string().optional(),
+  semester: z.string().optional(),
+  sortBy: z.string().optional(),
+  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  sortOrder: z.any().optional(),
+});
 
-  @IsOptional()
-  @IsUUID('4')
-  userId?: string;
 
-  @IsOptional()
-  @IsIn(['createdAt', 'semester', 'subjectName'])
-  sortBy?: 'createdAt' | 'semester' | 'subjectName';
+
+export class CgpaEntryQueryDto extends createZodDto(cgpaEntryQuerySchema) {
 }
 

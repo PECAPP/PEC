@@ -15,6 +15,10 @@ export class CourseMaterialsService {
     return this.repo.create(data);
   }
 
+  update(id: string, data: Partial<CreateCourseMaterialDto>) {
+    return this.repo.update(id, data);
+  }
+
   delete(id: string) {
     return this.repo.delete(id);
   }

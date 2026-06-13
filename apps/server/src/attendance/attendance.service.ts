@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { AttendanceRepository } from './attendance.repository';
 import { QueueService } from '../background-jobs/queue.service';
@@ -12,10 +11,11 @@ import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { CreateWaiverRequestDto } from './dto/create-waiver-request.dto';
 import * as ExcelJS from 'exceljs';
-import { createReadStream } from 'fs';
-import { mkdir, stat, writeFile } from 'fs/promises';
-import { extname, join, resolve } from 'path';
-import { randomUUID } from 'crypto';
+import { resolve } from 'path';
+
+import { S3Service } from '../common/services/s3.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { assertCourseOwnership } from '../common/utils/ownership.utils';
 
 @Injectable()
 export class AttendanceService {
@@ -23,54 +23,64 @@ export class AttendanceService {
     private readonly repo: AttendanceRepository,
     private readonly queue: QueueService,
     private readonly messaging: MessagingService,
+    private readonly s3: S3Service,
+    private readonly prisma: PrismaService,
   ) {}
 
   private readonly PEC_COORDINATES = { lat: 30.7673, lng: 76.7863 };
   private readonly MAX_DISTANCE_METERS = 100;
   private readonly WAIVER_UPLOAD_DIR = resolve(process.cwd(), 'uploads', 'waivers');
 
-  async create(data: CreateAttendanceDto) {
-    if (data.lat && data.lng) {
+  async create(data: CreateAttendanceDto, user?: any) {
+    if (user?.role === 'faculty') {
+      await assertCourseOwnership(user.sub, data.courseId, this.prisma);
+    }
+
+    if (data.lat !== undefined && data.lng !== undefined) {
+      const lat = Number(data.lat);
+      const lng = Number(data.lng);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        throw new BadRequestException('Invalid coordinates provided.');
+      }
+
       const distance = this.calculateDistance(
-        data.lat,
-        data.lng,
+        lat,
+        lng,
         this.PEC_COORDINATES.lat,
         this.PEC_COORDINATES.lng
       );
       
-      if (distance > this.MAX_DISTANCE_METERS) {
-        throw new Error(`Location mismatch: You must be on PEC Campus to mark attendance (Current distance: ${Math.round(distance)}m)`);
+      if (isNaN(distance) || distance > this.MAX_DISTANCE_METERS) {
+        throw new BadRequestException(`Location mismatch: You must be on PEC Campus to mark attendance (Current distance: ${isNaN(distance) ? 'unknown' : Math.round(distance)}m)`);
       }
     }
     
     const created = await this.repo.create(data);
 
     // enqueue a background job for async processing (notifications, analytics, etc.)
-    try {
-      await this.queue.addJob('attendance-created', {
-        attendanceId: created.id,
-        studentId: created.studentId,
-        courseId: created.courseId,
-        date: created.date,
-        status: created.status,
-      });
-    } catch (e) {
-      // Log and continue - background jobs should not block the main flow
+    // Fire and forget so we don't block the main flow if RabbitMQ is slow
+    this.queue.addJob('attendance-created', {
+      attendanceId: created.id,
+      studentId: created.studentId,
+      courseId: created.courseId,
+      date: created.date,
+      status: created.status,
+    }).catch(e => {
+      // In a real production app we'd fall back to an outbox pattern (saving event to DB table)
       console.error('Failed to enqueue attendance-created job', e?.message || e);
-    }
+    });
 
-    // Also publish via RabbitMQ for other services
-    try {
-      await this.messaging.emitAttendanceCreated({
-        attendanceId: created.id,
-        studentId: created.studentId,
-        courseId: created.courseId,
-        date: created.date,
-        status: created.status,
-      });
-    } catch (e) {
+    // Also publish via RabbitMQ for other services (Fire and forget)
+    this.messaging.emitAttendanceCreated({
+      attendanceId: created.id,
+      studentId: created.studentId,
+      courseId: created.courseId,
+      date: created.date,
+      status: created.status,
+    }).catch(e => {
       console.error('Failed to publish attendance.created event', e?.message || e);
-    }
+    });
 
     return created;
   }
@@ -108,42 +118,17 @@ export class AttendanceService {
     return this.repo.getWaiverRequestsForStudent(studentId);
   }
 
-  async uploadWaiverDocument(file: Express.Multer.File, studentId: string) {
-    const maxBytes = 5 * 1024 * 1024;
-    if (!file.buffer || file.size <= 0) {
-      throw new BadRequestException('Uploaded file is empty');
+  async uploadWaiverDocument(fileKey: string, studentId: string) {
+    if (!fileKey) {
+      throw new BadRequestException('No file key provided');
     }
 
-    if (file.size > maxBytes) {
-      throw new BadRequestException('File size exceeds 5 MB limit');
-    }
-
-    const allowedMimeTypes = new Set([
-      'application/pdf',
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-    ]);
-
-    if (!allowedMimeTypes.has(file.mimetype)) {
-      throw new BadRequestException('Only PDF, JPG, PNG and WEBP files are allowed');
-    }
-
-    await mkdir(this.WAIVER_UPLOAD_DIR, { recursive: true });
-
-    const ext = extname(file.originalname || '').toLowerCase();
-    const safeExt = ext && ext.length <= 8 ? ext : file.mimetype === 'application/pdf' ? '.pdf' : '.bin';
-    const fileName = `${studentId}_${Date.now()}_${randomUUID()}${safeExt}`;
-    const filePath = join(this.WAIVER_UPLOAD_DIR, fileName);
-
-    await writeFile(filePath, file.buffer);
+    // In a real application, you might want to verify the file exists in MinIO here
+    // e.g. await this.s3.statObject(fileKey);
 
     return {
-      fileName,
-      url: `/api/attendance/waivers/files/${fileName}`,
-      originalName: file.originalname,
-      mimeType: file.mimetype,
-      size: file.size,
+      fileName: fileKey,
+      url: `/api/attendance/waivers/files/${fileKey}`,
     };
   }
 
@@ -153,40 +138,13 @@ export class AttendanceService {
     }
 
     const roles = new Set([...(user.roles ?? []), user.role].filter(Boolean));
-    const isPrivileged = roles.has('college_admin') || roles.has('admin');
+    const isPrivileged = roles.has('college_admin');
     if (!isPrivileged && !fileName.startsWith(`${user.sub}_`)) {
       throw new ForbiddenException('You are not allowed to access this document');
     }
 
-    const filePath = join(this.WAIVER_UPLOAD_DIR, fileName);
-    let fileStats;
-    try {
-      fileStats = await stat(filePath);
-    } catch {
-      throw new NotFoundException('Document not found');
-    }
-
-    if (!fileStats.isFile()) {
-      throw new NotFoundException('Document not found');
-    }
-
-    const ext = extname(fileName).toLowerCase();
-    const mimeType =
-      ext === '.pdf'
-        ? 'application/pdf'
-        : ext === '.jpg' || ext === '.jpeg'
-          ? 'image/jpeg'
-          : ext === '.png'
-            ? 'image/png'
-            : ext === '.webp'
-              ? 'image/webp'
-              : 'application/octet-stream';
-
-    return {
-      stream: createReadStream(filePath),
-      mimeType,
-      contentDisposition: `inline; filename="${fileName}"`,
-    };
+    const url = await this.s3.getSignedDownloadUrl(fileName);
+    return { url };
   }
 
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -216,7 +174,15 @@ export class AttendanceService {
     return this.repo.getStudentSummary(studentId);
   }
 
-  update(id: string, data: UpdateAttendanceDto) {
+  async update(id: string, data: UpdateAttendanceDto, user?: any) {
+    if (user?.role === 'faculty') {
+      const attendance = await this.repo.findById(id);
+      if (!attendance) throw new BadRequestException('Attendance not found');
+      await assertCourseOwnership(user.sub, attendance.courseId, this.prisma);
+      if (data.courseId && data.courseId !== attendance.courseId) {
+        await assertCourseOwnership(user.sub, data.courseId, this.prisma);
+      }
+    }
     return this.repo.update(id, data);
   }
 
@@ -258,11 +224,16 @@ export class AttendanceService {
     });
   }
 
-  remove(id: string) {
+  async remove(id: string, user?: any) {
+    if (user?.role === 'faculty') {
+      const attendance = await this.repo.findById(id);
+      if (!attendance) throw new BadRequestException('Attendance not found');
+      await assertCourseOwnership(user.sub, attendance.courseId, this.prisma);
+    }
     return this.repo.remove(id);
   }
 
-  async generateExcel(courseId: string) {
+  async generateExcel(courseId: string, stream: any) {
     const data = await this.repo.findMany({ courseId, limit: 1000 });
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Attendance');
@@ -285,11 +256,10 @@ export class AttendanceService {
       });
     });
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    return Buffer.from(buffer);
+    await workbook.xlsx.write(stream);
   }
 
-  async generateStudentExcel(studentId: string) {
+  async generateStudentExcel(studentId: string, stream: any) {
     const data = await this.repo.findMany({ studentId, limit: 1000 });
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('My Attendance');
@@ -310,7 +280,6 @@ export class AttendanceService {
       });
     });
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    return Buffer.from(buffer);
+    await workbook.xlsx.write(stream);
   }
 }

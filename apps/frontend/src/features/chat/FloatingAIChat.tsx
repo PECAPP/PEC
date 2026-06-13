@@ -11,15 +11,12 @@ declare global {
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Send, Sparkles, X, Minimize2, Mic, Volume2, VolumeX } from "lucide-react";
+import { Bot, Send, X, Mic, Volume2, VolumeX } from "lucide-react";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import api, {  isAuthError  } from "@pec/api";
+import {  isAuthError  } from "@pec/api";
 import {  buildApiUrl  } from "@pec/api";
 import {  authClient  } from "@pec/api";
-import { GradesTable, AttendanceTable, ScheduleTable, SuggestionChips } from "./GenerativeUI";
 import { useRouter } from "next/navigation";
 import { useResizable } from "./hooks/useResizable";
 import { useSpeechToText } from "./hooks/useSpeechToText";
@@ -59,7 +56,7 @@ TOOLS AND BEHAVIOR:
 9. NAVIGATION — when user asks to go to, visit, open, or be taken to any page:
    ALWAYS call the navigate_to_page tool. Do NOT write the path as text.
    Valid pages: Marketplace, Attendance, Grades, Timetable, Noticeboard, Canteen, Finance, Profile, Clubs, Hostel, Dashboard.
-   After the tool runs, write a short friendly confirmation (e.g. "Taking you to the Marketplace now! 🛒").
+   After the tool runs, write a short friendly confirmation (e.g. "Taking you to the Marketplace now! ").
 
 10. QUICK REPLIES — always end with 2-3 options:
 <UI:SuggestionChip>["option 1", "option 2", "option 3"]</UI>
@@ -163,14 +160,12 @@ const FloatingAIChat = () => {
 
       const aiResponseId = (Date.now() + 1).toString();
       const fullUrl = buildApiUrl('/ai/completion');
-      const token = authClient.getAccessToken();
 
       const fetchRes = await fetch(fullUrl, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify(requestBody)
       });
@@ -221,19 +216,19 @@ const FloatingAIChat = () => {
                 };
 
                 if (data.tool) {
-                  let thinkingText = "⚙️ Working...";
-                  if (data.tool === "get_user_grades") thinkingText = "📊 Fetching your academic transcript...";
-                  else if (data.tool === "get_user_attendance") thinkingText = "📅 Calculating your attendance & predictions...";
-                  else if (data.tool === "get_user_schedule") thinkingText = "🗓️ Loading your weekly timetable...";
-                  else if (data.tool === "navigate_to_page") thinkingText = "🚦 Navigating...";
-                  else if (data.tool === "search_marketplace") thinkingText = "🛍️ Searching the marketplace...";
-                  else if (data.tool === "get_upcoming_events") thinkingText = "🎉 Finding upcoming college events...";
-                  else if (data.tool === "search_college_notices") thinkingText = "🔍 Scanning college notices...";
-                  else if (data.tool === "get_hostel_issues") thinkingText = "🔧 Loading reported hostel issues...";
-                  else if (data.tool === "get_canteen_menu") thinkingText = "🍔 Fetching day canteen menu...";
-                  else if (data.tool === "get_night_canteen_menu") thinkingText = "🌙 Fetching night canteen menu...";
-                  else if (data.tool === "get_clubs") thinkingText = "👥 Retrieving list of student clubs...";
-                  else if (data.tool === "get_finance_summary") thinkingText = "💳 Gathering your pending dues & fee status...";
+                  let thinkingText = "️ Working...";
+                  if (data.tool === "get_user_grades") thinkingText = " Fetching your academic transcript...";
+                  else if (data.tool === "get_user_attendance") thinkingText = " Calculating your attendance & predictions...";
+                  else if (data.tool === "get_user_schedule") thinkingText = "️ Loading your weekly timetable...";
+                  else if (data.tool === "navigate_to_page") thinkingText = " Navigating...";
+                  else if (data.tool === "search_marketplace") thinkingText = "️ Searching the marketplace...";
+                  else if (data.tool === "get_upcoming_events") thinkingText = " Finding upcoming college events...";
+                  else if (data.tool === "search_college_notices") thinkingText = " Scanning college notices...";
+                  else if (data.tool === "get_hostel_issues") thinkingText = " Loading reported hostel issues...";
+                  else if (data.tool === "get_canteen_menu") thinkingText = " Fetching day canteen menu...";
+                  else if (data.tool === "get_night_canteen_menu") thinkingText = " Fetching night canteen menu...";
+                  else if (data.tool === "get_clubs") thinkingText = " Retrieving list of student clubs...";
+                  else if (data.tool === "get_finance_summary") thinkingText = " Gathering your pending dues & fee status...";
                   
                   ensureMessageExists(`_${thinkingText}_`);
                   setMessages(prev => 
@@ -255,7 +250,7 @@ const FloatingAIChat = () => {
                         : msg
                     )
                   );
-                  setTimeout(() => router.push(navPath), 600);
+                  setTimeout(() => router.push(navPath as any), 600);
                 } else if (data.gradesData) {
                   ensureMessageExists();
                   fullText += `<UI:GradesTable>${JSON.stringify(data.gradesData)}</UI>`;
@@ -339,7 +334,7 @@ const FloatingAIChat = () => {
                 } else if (data.error) {
                   throw new Error(data.error);
                 }
-              } catch (e) {
+              } catch (_e) {
                 // Ignore parse errors from chunk fragmentation
               }
             }
@@ -415,7 +410,7 @@ const FloatingAIChat = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 0 }}
             style={{ width: `${width}px`, height: `${height}px` }}
-            className="fixed bottom-20 lg:bottom-6 right-6 z-50 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] flex flex-col rounded-2xl border bg-card shadow-2xl overflow-hidden glassmorphism"
+            className="fixed bottom-20 lg:bottom-6 right-6 z-50 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] flex flex-col rounded-sm border bg-card shadow-2xl overflow-hidden glassmorphism"
           >
             {/* Resize Handles (North, West, North-West) */}
             <div
@@ -433,11 +428,11 @@ const FloatingAIChat = () => {
               onMouseDown={(e) => handleResizeStart(e, "nw")}
               onTouchStart={(e) => handleResizeStart(e, "nw")}
             >
-              <div className="w-1.5 h-1.5 border-t border-l border-muted-foreground/60 rounded-tl-[1px] hover:border-primary" />
+              <div className="w-1.5 h-1.5 border-t border-l border-muted-foreground/60 rounded-tl-[1px] hover:border-border/40" />
             </div>
             <div className="p-4 border-b flex items-center justify-between bg-muted/30 backdrop-blur-md">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-sm bg-primary/10 flex items-center justify-center">
                   <Bot className="h-5 w-5 text-primary" />
                 </div>
                 <div>
@@ -482,7 +477,7 @@ const FloatingAIChat = () => {
               ))}
               {isTyping && (
                 <div className="flex justify-start">
-                  <div className="bg-muted px-4 py-2.5 rounded-2xl rounded-tl-none flex gap-1">
+                  <div className="bg-muted px-4 py-2.5 rounded-sm rounded-tl-none flex gap-1">
                     <span className="w-1.5 h-1.5 bg-foreground/20 rounded-full animate-bounce [animation-delay:-0.3s]" />
                     <span className="w-1.5 h-1.5 bg-foreground/20 rounded-full animate-bounce [animation-delay:-0.15s]" />
                     <span className="w-1.5 h-1.5 bg-foreground/20 rounded-full animate-bounce" />
@@ -494,16 +489,16 @@ const FloatingAIChat = () => {
 
             <div className="p-4 border-t bg-background/50">
               {micError && (
-                <div className="mb-2 flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800/40">
+                <div className="mb-2 flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-sm border border-red-200 dark:border-red-800/40">
                   <span className="flex-1">{micError}</span>
                   <button onClick={() => setMicError(null)} className="text-red-400 hover:text-red-600 font-bold leading-none ml-1">×</button>
                 </div>
               )}
-              <div className="flex items-end gap-2 bg-muted/50 p-2 rounded-xl border focus-within:ring-2 ring-primary/20 transition-all">
+              <div className="flex items-end gap-2 bg-muted/50 p-2 rounded-sm border focus-within:ring-2 ring-primary/20 transition-all">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 shrink-0 rounded-lg transition-colors ${
+                  className={`h-9 w-9 shrink-0 rounded-sm transition-colors ${
                     isListening
                       ? 'text-red-500 animate-pulse bg-red-100 dark:bg-red-900/30'
                       : 'text-muted-foreground hover:text-primary'
@@ -526,7 +521,7 @@ const FloatingAIChat = () => {
                     isListening
                       ? interimText
                         ? interimText
-                        : "🎤 Listening… speak now"
+                        : " Listening… speak now"
                       : "Ask me anything..."
                   }
                   className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 resize-none max-h-32"
@@ -536,7 +531,7 @@ const FloatingAIChat = () => {
                   onClick={() => handleSend()}
                   disabled={isTyping || (!inputValue.trim() && !interimText.trim())}
                   size="icon"
-                  className="h-9 w-9 rounded-lg shrink-0"
+                  className="h-9 w-9 rounded-sm shrink-0"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

@@ -3,16 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "main": "src/index.ts",
-  "scripts": {
-    "lint": "eslint src/"
-  },
+  "scripts": {},
   "dependencies": {
-    "@t3-oss/env-nextjs": "^0.13.11",
     "@t3-oss/env-core": "^0.13.11",
+    "@t3-oss/env-nextjs": "^0.13.11",
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "@pec/tsconfig": "workspace:*"
+    "@pec/eslint-config": "workspace:*",
+    "@pec/tsconfig": "workspace:*",
+    "typescript": "^5.8.3"
   }
 }

@@ -22,8 +22,7 @@ export class EnrollmentsRepository extends BaseRepository {
     const { take, skip } = this.resolvePagination(query, 20, 200);
 
     const [items, total] = await Promise.all([
-      this.prisma.enrollment.findMany({
-        where,
+      this.prisma.enrollment.findMany({ where,
         take,
         skip,
         orderBy: { enrolledAt: 'desc' },
@@ -58,8 +57,14 @@ export class EnrollmentsRepository extends BaseRepository {
   create(data: CreateEnrollmentDto) {
     return this.prisma.enrollment.create({
       data: {
-        ...data,
         enrolledAt: data.enrolledAt ? new Date(data.enrolledAt) : new Date(),
+        status: data.status,
+        semester: data.semester,
+        batch: data.batch,
+        courseName: data.courseName || '',
+        courseCode: data.courseCode || '',
+        student: { connect: { id: data.studentId } },
+        course: { connect: { id: data.courseId } }
       },
     });
   }
@@ -88,10 +93,9 @@ export class EnrollmentsRepository extends BaseRepository {
       return { blocked: true, reason: 'Capacity full' };
     }
 
-    // 2. Prerequisites Check
     if ((course as any).prerequisiteIds && (course as any).prerequisiteIds.length > 0) {
-      const studentHistory = await this.prisma.enrollment.findMany({
-        where: { studentId, status: 'active' }, // In a real system we'd check for status 'completed'
+      const studentHistory = await this.prisma.enrollment.findMany({ 
+        where: { studentId, status: { in: ['completed', 'active'] } },
         select: { courseCode: true }
       });
       const historicalCodes = studentHistory.map(h => h.courseCode);
@@ -106,20 +110,17 @@ export class EnrollmentsRepository extends BaseRepository {
 
   async findConflicts(studentId: string, targetCourseId: string) {
     const [currentEnrollments, newCourseSlots] = await Promise.all([
-      this.prisma.enrollment.findMany({
-        where: { studentId, status: 'active' },
+      this.prisma.enrollment.findMany({ where: { studentId, status: 'active' },
         select: { courseId: true }
       }),
-      this.prisma.timetable.findMany({
-        where: { courseId: targetCourseId }
+      this.prisma.timetable.findMany({ where: { courseId: targetCourseId }
       })
     ]);
 
     const currentCourseIds = currentEnrollments.map(e => e.courseId);
     if (currentCourseIds.length === 0) return [];
 
-    const existingSlots = await this.prisma.timetable.findMany({
-      where: { courseId: { in: currentCourseIds } }
+    const existingSlots = await this.prisma.timetable.findMany({ where: { courseId: { in: currentCourseIds } }
     });
 
     const conflicts: any[] = [];

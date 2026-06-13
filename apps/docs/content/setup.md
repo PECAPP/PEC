@@ -1,39 +1,80 @@
-# PEC App - Institutional Setup and Operational Lifecycle
+# PEC App - Setup Guide
 
-This definitive guide provides high-fidelity protocols for the installation, configuration, and operational deployment of the PEC App platform.
-
----
-
-## 1. Institutional Prerequisites
-
-Before initiating the deployment lifecycle, ensure the following localized or cloud-based infrastructure is available. These requirements are optimized for the PEC-ERP-v5 standard and have been tested for high-concurrency academic workloads.
-
-### Minimum Technical Specification
-
-- **Computational Environment**: Node.js v20.10.0 (LTS) or higher.
-- **Package Orchestration**: pnpm v9.12.3 — configured in `packageManager` field of root `package.json`. Install via `npm install -g pnpm@9.12.3`.
-- **Data Persistence**: PostgreSQL v16+ (Local instance or managed institutional service).
-- **Cache and Queue**: Redis — required for ThrottlerStorageRedisService (rate limiting) and Bull (background job queue). Default: `redis://localhost:6379`.
-- **Security Protocols**: Functional Git installation for version-controlled alignment.
-- **Hardware Acceleration**: Minimum 16GB RAM recommended for development with Turbopack.
-- **Operating System**: Windows 11 / Linux (Ubuntu 22.04 LTS+) / macOS Sonoma.
+This guide provides instructions for the installation, configuration, and local deployment of the PEC App platform.
 
 ---
 
-## 2. Infrastructure Initialization and Repository Synchronization
+## 1. Prerequisites
 
-### Core Repository Synchronization
+Before setting up the project, ensure you have the following installed:
+
+- **Node.js**: v22 LTS (Recommended).
+- **Package Manager**: pnpm v9+ (`npm install -g pnpm`).
+- **Database**: PostgreSQL v16+ (Local or managed service).
+- **Cache and Queue**: Redis (Default: `redis://localhost:6379`).
+- **Operating System**: Windows, macOS, or Linux.
+
+---
+
+## 2. Initialization
+
+### Clone the Repository
 
 ```bash
 # Install pnpm if not already installed
 npm install -g pnpm@9.12.3
 
 # Clone the institutional master branch
-git clone <repository-url>
-cd pec-app
+git clone https://github.com/PECAPP/PEC
+cd PEC
 ```
 
-### Dependency Orchestration (pnpm Monorepo)
+### Install Dependencies
+
+The project utilizes a pnpm workspace monorepo. A single `pnpm install` at the root resolves all workspace dependencies simultaneously.
+
+```bash
+# Install all workspace dependencies (frontend + server + packages)
+pnpm install
+```
+
+### One-Command Full Setup
+
+```bash
+# Install + push DB schema + generate Prisma client + seed data
+pnpm run setup
+# PEC App - Setup Guide
+
+This guide provides instructions for the installation, configuration, and local deployment of the PEC App platform.
+
+---
+
+## 1. Prerequisites
+
+Before setting up the project, ensure you have the following installed:
+
+- **Node.js**: v22 LTS (Recommended).
+- **Package Manager**: pnpm v9+ (`npm install -g pnpm`).
+- **Database**: PostgreSQL v16+ (Local or managed service).
+- **Cache and Queue**: Redis (Default: `redis://localhost:6379`).
+- **Operating System**: Windows, macOS, or Linux.
+
+---
+
+## 2. Initialization
+
+### Clone the Repository
+
+```bash
+# Install pnpm if not already installed
+npm install -g pnpm@9.12.3
+
+# Clone the institutional master branch
+git clone https://github.com/PECAPP/PEC
+cd PEC
+```
+
+### Install Dependencies
 
 The project utilizes a pnpm workspace monorepo. A single `pnpm install` at the root resolves all workspace dependencies simultaneously.
 
@@ -51,32 +92,32 @@ pnpm run setup
 
 ---
 
-## 3. Institutional Configuration (Environment Security)
+## 3. Environment Configuration
 
-### A. Frontend Orchestration (`apps/frontend/.env`)
+### A. Frontend Configuration (`apps/frontend/.env`)
 
-Provision a `.env` file in the `apps/frontend/` directory.
+Create a `.env` file in the `apps/frontend/` directory.
 
 ```env
-# Institutional API Orchestration
+# API
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 BACKEND_API_URL=http://localhost:4000
 
-# Intelligence Layer (Google Gemini 2.5 Flash)
+# AI / Gemini
 NEXT_PUBLIC_GEMINI_API_KEY=your_key
 GEMINI_API_KEY=your_key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-### B. Backend API Security (`apps/server/.env`)
+### B. Backend Configuration (`apps/server/.env`)
 
-Provision a `.env` file in the `apps/server/` directory.
+Create a `.env` file in the `apps/server/` directory.
 
 ```env
-# Relational Persistence (PostgreSQL 16)
+# Database
 DATABASE_URL="postgresql://postgres:password@localhost:5432/pec_db?schema=public"
 
-# Authentication Security (Institutional High-Entropy Secret)
+# Auth
 JWT_SECRET="your_64_char_institutional_cryptographic_secret"
 JWT_EXPIRES_IN="15m"
 REFRESH_TOKEN_TTL_DAYS=7
@@ -84,54 +125,43 @@ REFRESH_TOKEN_TTL_DAYS=7
 # Field-Level Encryption for PII (AES-256-GCM)
 FIELD_ENCRYPTION_KEY="your_32_char_aes256_gcm_key"
 
-# Server Operational Presets
+# Server
 PORT=4000
 NODE_ENV=development
 CORS_ORIGINS=http://localhost:3000
 CORS_ALLOW_CREDENTIALS=true
 REQUEST_BODY_LIMIT=1mb
-
-# Redis (Rate Limiting + Bull Queue)
-REDIS_URL=redis://localhost:6379
-
-# AI Services
-OPENAI_API_KEY=your_openai_key          # For /ai/completion endpoint
-GITHUB_TOKEN=your_github_token         # Optional: GitHub API higher rate limits
-
-# Background Jobs
-BACKGROUND_JOB_WORKER_ENABLED=true
-
-# Account Security
-AUTH_LOCK_THRESHOLD=5
-AUTH_LOCK_MINUTES=15
 ```
 
 ---
 
-## 4. Database Engineering and High-Fidelity Seeding
+## 4. Database Setup
 
-### Schema Synchronization (Persistence Tier)
+### Schema Synchronization
 
 ```bash
 # From root (recommended)
-pnpm --filter pec-server db:push
-pnpm --filter pec-server prisma:generate
+pnpm --filter @pec/database push
+pnpm --filter @pec/database generate
 
-# Or from apps/server/ directory
-npx prisma generate
+# Or from packages/database/ directory
+cd packages/database
 npx prisma db push
+npx prisma generate
+cd ../..
 ```
 
-### Data Hydration (Institutional Seeding)
+### Database Seeding
 
-Execute the high-fidelity seeding sequence to populate the database with foundational academic records and departments.
+Run the seed script to populate the database with starter data. 
+**Note**: The seed script performs a complete clean of the database, and then sequentially populates: Departments, Core College Admins (default password: `password123`), Faculty and Students with profiles, Courses, Academic Records (Attendance, Exams), the full Timetable, Campus Facilities (Hostels, Canteens), Noticeboard announcements, Chat/Communication history, Marketplace listings, and Finance records.
 
 ```bash
 # From root (recommended)
 pnpm --filter pec-server db:seed
 
 # Or from apps/server/ directory
-npm run db:seed
+pnpm run db:seed
 ```
 
 ### Database Management Scripts
@@ -145,9 +175,9 @@ The server includes several database utility scripts in `apps/server/scripts/`:
 
 ---
 
-## 5. Operational Execution and Development Lifecycle
+## 5. Running the Application
 
-### Native Development Workflow (pnpm Monorepo)
+### Local Development
 
 ```bash
 # Start both frontend and backend concurrently (kills port 3001 first)
@@ -158,10 +188,30 @@ pnpm run frontend   # Next.js on port 3000
 pnpm run api        # NestJS on port 4000
 ```
 
-### Containerized Environment (Docker/Portainer)
+### Docker Compose Workflow (Optional)
+
+#### Development Setup
+If you prefer to run the development environment via Docker instead of local Node/PostgreSQL:
 
 ```bash
-# Provision the full institutional stack via Compose
+# Start backend and database only
+docker compose -f docker-compose.dev.yml up -d
+
+# Start backend, database, AND frontend
+docker compose -f docker-compose.dev.yml --profile frontend up -d
+
+# View live logs
+docker compose -f docker-compose.dev.yml logs -f --tail=100
+
+# Stop containers
+docker compose -f docker-compose.dev.yml down
+```
+
+#### Production Setup
+To run the production container stack:
+
+```bash
+# Start the full stack via Compose
 pnpm run prod:docker
 
 # Stop all services
@@ -170,276 +220,202 @@ pnpm run prod:docker:down
 
 ---
 
-## 6. Post-Deployment Verification Sequence
+## 6. Verification Steps
 
 1. **API Readiness Check**: Navigate to `http://localhost:4000/api/health` — expect `{"status":"ok"}`.
 2. **Swagger API Docs**: Navigate to `http://localhost:4000/api/docs` to explore all endpoints.
 3. **Prometheus Metrics**: Navigate to `http://localhost:4000/metrics` to verify Prometheus endpoint.
 4. **Hydration Check**: Access the login portal at `http://localhost:3000` using seeded credentials.
-5. **Spatial Topology Loading**: Navigate to `/campus-map` to verify 3D Three.js rendering and 2D/3D toggle.
-6. **Cognitive Loop Check**: Interact with 'Saathi' AI assistant to verify the Gemini API bridge.
+5. **3D Campus Map Check**: Navigate to `/campus-map` to verify 3D Three.js rendering and 2D/3D toggle.
+6. **AI Assistant Check**: Interact with 'Saathi' AI assistant to verify the Gemini API bridge.
 7. **Real-time Sync Check**: Open two browser tabs in the `/chat` route and verify Socket.io message delivery.
 8. **Redis Check**: Open the NestJS logs and confirm no Redis connection errors on startup.
 9. **Feature Flags**: Log in as admin and navigate to the admin dashboard to verify the feature flags panel.
 
 ---
 
-## 7. Institutional Troubleshooting and Maintenance Matrix
+## 7. Troubleshooting & Common Fixes
 
-- **Database Connection Failure**: Verify PostgreSQL service status and `DATABASE_URL` credentials.
-- **Port Conflicts**: Use Resource Monitor to terminate legacy node processes on ports 3000/4000.
-- **Prisma Client Drift**: Re-execute `npx prisma generate` to synchronize the local TypeScript client.
-- **Token Invalidation**: Ensure `JWT_SECRET` is identical across across all nodes.
-
----
-
-## 8. Strategic Roadmap for System Maintenance
-
-- **Daily Protocol**: Automated database snapshots and query log exports to encrypted off-site storage.
-- **Weekly Protocol**: API performance profiling to identify any query paths showing latency.
-- **Monthly Protocol**: Security patch reviews for all npm dependencies and Prisma schema optimizations.
-- **Quarterly Protocol**: Institutional governance audit of user roles and access logs.
+- **Auth Loop Stuck on Dashboard**: Sometimes during development, updating files or restarting causes a stale Next.js cache issue resulting in an infinite authentication loop on the dashboard. **Fix**: Go to your browser's site settings, clear all site data (cookies and local storage), and log in again.
+- **Database Connection Failure**: Verify PostgreSQL service status, host, and `DATABASE_URL` credentials.
+- **Port Conflicts**: Ensure ports 3000, 4000, and 5432 are free. Use Resource Monitor to terminate conflicting node processes.
+- **Prisma Client Errors**: If the backend cannot find the Prisma client, re-run `pnpm --filter @pec/database generate`.
+- **Missing Env File**: Run `node scripts/check_env.js` from the root to verify all necessary environment variables are set.
 
 ---
 
-**Registry**: PEC-SETUP-OPS-002
-**Operational Standard**: PEC-OPS-v5.0
-**Document Version**: V2.6-STABLE
-**Status**: ACTIVE
-**Lines Targeted**: ~250
+## 8. Quick Start (Copy/Paste)
+
+Assuming `.env.local` and `apps/server/.env` are created, paste this into your terminal from the root directory for a fresh start:
+
+```bash
+pnpm install
+pnpm --filter @pec/database push
+pnpm --filter @pec/database generate
+pnpm --filter pec-server db:seed
+pnpm run dev
+```
 
 ---
 
-This guide is the setup manual for the PEC App platform.
-All references to placements, recruiters, jobs, and finance have been purged.
-EOF
+## 9. Seeding & Mock Data Controls
 
+The platform supports two distinct seeding methods depending on whether you are running a modular development reset or a larger simulation test.
 
-## --- APPENDED FROM SETUP_GUIDE.md ---
+### A. Modular Seeding (`seed.ts`)
+The main seed script runs in 15 sequential stages to populate the database with starter data. It clears the database (unless bypassed by setting `SKIP_WIPE=true` in the environment) and populates:
+1. **Clear Database**: Wipes transactional and user tables.
+2. **Departments**: Seeds 5 base departments.
+3. **Core Users**: Creates default administrative log-ins.
+4. **Faculty**: Seeds professors and assigns HODs.
+5. **Students**: Seeds students and creates profiles.
+6. **Courses**: Sets up courses assigned to instructors.
+7. **Academic Records**: Generates enrollment entries, attendance records, and exam timetables.
+8. **Timetables**: Generates timetable periods.
+9. **Campus Facilities**: Sets up hostel issues and canteen menus.
+10. **Noticeboard**: Populates announcements.
+11. **Communication**: Populates real-time chatrooms and message histories.
+12. **Academic Calendar**: Populates semester events and holiday markers.
+13. **Marketplace**: Populates peer-to-peer listings.
+14. **Finance**: Populates fee records and invoices.
+15. **Permissions**: Maps action/subject permissions to roles.
 
-PEC CAMPUS ERP - COMPLETE SETUP GUIDE (WINDOWS + CROSS-PLATFORM)
-Date: 2026-04-03
+#### Seeded Credentials (Password for all: `password123`)
+* **College Admin**: `admin@pec.edu` or `ops.admin@pec.edu`
+* **HOD / Faculty**: `faculty@pec.edu`
+* **Student**: `student@pec.edu`
 
-This guide helps you run the complete project (frontend + backend + database).
+### B. Development Scale Seeding (`seed-dev.ts`)
+For scale/performance testing, running `npx tsx packages/database/scripts/seed-dev.ts` generates:
+* **5 Departments** with randomized names.
+* **20 Courses** with variable credit loads.
+* **100 Fake Students** with random enrollments (each enrolled in 3 random courses).
 
-======================================================================
-1) PREREQUISITES
-======================================================================
+---
 
-Install these first:
-- Git
-- Node.js 20.x LTS (recommended)
-- npm (comes with Node.js)
-- PostgreSQL 16+ (for local setup)
-- Docker Desktop (optional, only for Docker setup)
+## 10. WebSocket Event Registry
 
-Check versions:
-- node -v
-- npm -v
-- git --version
-- psql --version (if using local PostgreSQL)
-- docker --version (if using Docker)
+The real-time messaging subsystem utilizes Socket.io. Clients connect to the gateway and authenticate via JWT query parameters. The table below lists all events available in the chat module:
 
-======================================================================
-2) CLONE AND INSTALL DEPENDENCIES
-======================================================================
+| Event Name | Direction | Payload Schema | Action / Side Effects |
+| :--- | :---: | :--- | :--- |
+| `joinRoom` | Client $\rightarrow$ Server | `roomId` (string) | Joins the client socket to the target room ID. Returns `{ event: "joinedRoom", roomId }`. |
+| `leaveRoom` | Client $\rightarrow$ Server | `roomId` (string) | Removes the client socket from the room ID. Returns `{ event: "leftRoom", roomId }`. |
+| `sendMessage` | Client $\rightarrow$ Server | `{ roomId: string, content: string }` | Saves the message to the DB, broadcasts `newMessage` to room. Returns the saved message entity. |
+| `newMessage` | Server $\rightarrow$ Client | Message entity JSON payload | Broadcasts new messages in real-time to all clients joined in the room. |
 
-From your terminal:
+---
 
-1. Clone and enter repo
-   git clone <your-repo-url>
-   cd PEC
+## 11. RAG Vector Ingestion Guide
 
-2. Install root dependencies
-   npm install --legacy-peer-deps
+The platform uses **Qdrant** for Vector database indexing and the OpenAI embeddings model (`text-embedding-3-small`) to power context-grounded queries in the Saathi AI assistant.
 
-3. Install backend dependencies
-   cd server
-   npm install --legacy-peer-deps
-   cd ..
+### Vector Ingestion Mechanics
+1. **Notice Processing**: Noticeboard announcements are parsed into plain text blocks.
+2. **Embedding Generation**: Texts are vectorized using the OpenAI API (or GitHub models endpoint: `https://models.github.ai/inference`).
+3. **Qdrant Storage**: Vectors are indexed in the `college_notices` Qdrant collection.
+4. **RAG Search**: The `RagService` generates queries vectors and searches Qdrant for the top 3 matches using cosine similarity.
 
-Notes:
-- This is a monorepo with root, server, and shared packages.
-- Installing both root and server dependencies is required.
+---
 
-======================================================================
-3) ENVIRONMENT FILES
-======================================================================
+## 12. Redis & Background Jobs Register
 
-You need 2 env files:
-- .env.local (project root)
-- server/.env
+The platform utilizes a dual background task architecture: a custom database-backed polling worker for scheduled operations and RabbitMQ for asynchronous queue jobs.
 
----------------------------------------------------------------------
-3A) Create .env.local (ROOT)
----------------------------------------------------------------------
+### A. Custom Database Poller (`BackgroundJobsService`)
+A lightweight background loop polls the `BackgroundJob` table.
+* **Poll Interval**: 5 seconds (configurable via `BACKGROUND_JOB_POLL_INTERVAL_MS`).
+* **Stale Lock Timeout**: 60 seconds (re-queues processing jobs that crashed).
+* **Job Retries**: Retries failed jobs with exponential backoff (`Math.min(60000, 2 ** attempts * 1000)`).
 
-Create file: .env.local
-Use this minimum config:
+#### Standard Background Jobs
+* **`audit-log.prune`**: Periodically deletes audit logs older than the configured `retentionDays` threshold (default: 30 days).
+* **`attendance.check-low`**: Iterates through active student attendance records. If a student's calculated attendance percentage falls below the required threshold (e.g. 75%), a daily push notification warning is generated.
 
-NEXT_PUBLIC_API_URL=http://localhost:3000
-INTERNAL_API_URL=http://localhost:4000
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+### B. RabbitMQ Worker Integration (`QueueService`)
+Asynchronous queue workers handle heavy task offloading over RabbitMQ:
+* **RabbitMQ Host**: `amqp://localhost:5672` (queue: `background_jobs_queue`).
+* **DLX Configuration**: Integrates a Dead Letter Exchange (`dlx`) routing failed payloads to a Dead Letter Queue (`dead_letter`) for auditing.
+* **Email Worker**: Listens for the `send-email` event to asynchronously process institutional emails.
 
-Optional values from .env.example (only if your feature needs them):
-- NEXT_PUBLIC_UPI_ID
-- NEXT_PUBLIC_UPI_NAME
-- NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-- NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-- NEXT_PUBLIC_REMOVEBG_API_KEY
-- GEMINI_API_KEY
+---
 
-Important:
-- INTERNAL_API_URL should point to backend (http://localhost:4000)
-- NEXT_PUBLIC_API_URL can stay http://localhost:3000 because Next.js rewrites /api to backend
+## 13. Sentry & Prometheus Monitoring Setup
 
----------------------------------------------------------------------
-3B) Create server/.env (BACKEND)
----------------------------------------------------------------------
+### A. Prometheus Metrics
+The NestJS server integrates `@willsoto/nestjs-prometheus` to expose core metrics:
+* **Metrics Endpoint**: `http://localhost:4000/metrics`
+* **Scraped Metrics**: Node.js event loop lag, memory usage, heap garbage collection, and HTTP request durations.
 
-Create file: server/.env
-You can start by copying server/.env.example, then edit values.
+### B. Sentry Error Capture
+The global exception filter (`GlobalExceptionFilter`) acts as the capture boundary:
+* **Dynamic Import**: To prevent bundle bloat, Sentry is loaded dynamically (`import('@sentry/node')`).
+* **Filtering**: Only unhandled exceptions (status code $\ge$ 500) are reported to Sentry.
 
-Minimum recommended local values:
+---
 
-NODE_ENV=development
-PORT=4000
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/pec
-JWT_SECRET=replace-with-a-long-random-secret
+## 14. Performance Profiling Guide
 
-CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-CORS_ALLOW_CREDENTIALS=true
-CORS_MAX_AGE_SECONDS=86400
-REQUEST_BODY_LIMIT=1mb
+To profile application bottlenecks and trace database queries during local development:
 
-Optional but recommended hardening:
-FIELD_ENCRYPTION_KEY=replace-with-a-separate-long-random-secret
-CAPTCHA_BYPASS_TOKEN=
-ACCESS_TOKEN_TTL=15m
-REFRESH_TOKEN_TTL_DAYS=7
-AUTH_LOCK_THRESHOLD=5
-AUTH_LOCK_MINUTES=15
-REFRESH_COOKIE_NAME=refresh_token
-FEATURE_FLAG_CACHE_TTL_MS=30000
-BACKGROUND_JOB_WORKER_ENABLED=true
-BACKGROUND_JOB_POLL_INTERVAL_MS=5000
-BACKGROUND_JOB_STALE_LOCK_MS=60000
+### A. OpenTelemetry (OTel) Tracing
+OTel is initialized in `tracing.ts` before the NestJS bootstrapper loads.
+* **Exporter**: Sends tracing payloads via HTTP to `http://localhost:4318/v1/traces`.
+* **Telemetry Collector**: You can run an OpenTelemetry Collector or Jaeger container to visualize service spans.
 
-Optional AI keys (if using AI modules):
-OPENAI_API_KEY=
-GITHUB_AI_API_KEY=
-GITHUB_TOKEN=
+### B. Database Query Profiling
+Prisma logs queries using native adapters. To log all SQL queries executed against PostgreSQL to stdout, modify your Prisma client instantiation in `packages/database/src/index.ts` or set the debugging environment variable:
+```bash
+DEBUG="prisma:query" pnpm run dev
+```
 
-======================================================================
-4) PREPARE DATABASE (LOCAL POSTGRES)
-======================================================================
+---
 
-Make sure PostgreSQL is running and DB exists (example DB: pec).
+## 15. Git Hooks & Linting Standards
 
-Then run:
+We enforce strict formatting rules to maintain repository cleanliness.
 
-cd server
-npx prisma generate
-npx prisma db push --accept-data-loss
-npm run db:seed
-cd ..
+### A. Husky Pre-commit Hooks
+The project installs Husky hooks (`.husky/pre-commit`) during setup. The pre-commit hook runs `lint-staged` which executes:
+* Prettier formatting on modified files.
+* Eslint verification on all staged code blocks.
 
-What these do:
-- prisma generate: generates Prisma client
-- prisma db push: syncs schema to DB
-- db:seed: inserts starter data
+### B. Linter Execution
+To manually scan and auto-fix linter issues across the monorepo:
+```bash
+# Run linting on all apps and packages
+pnpm run lint
+```
 
-======================================================================
-5) RUN THE FULL STACK (LOCAL)
-======================================================================
+---
 
-Option A (recommended): run frontend + backend together
-- From repo root:
-  npm run dev:host
+## Appendix: Environment Variables Reference
 
-This starts:
-- Frontend (Next.js): http://localhost:3000
-- Backend (NestJS): http://localhost:4000
+### Frontend (`apps/frontend/.env`)
+| Variable | Required | Default | Purpose |
+| :--- | :---: | :--- | :--- |
+| `NEXT_PUBLIC_API_URL` | Yes | `http://localhost:3000/api` | Base route for Next.js internal API rewrites to the backend. |
+| `BACKEND_API_URL` | Yes | `http://localhost:4000` | Direct internal Docker/Server route to the NestJS API. |
+| `NEXT_PUBLIC_SITE_URL` | Yes | `http://localhost:3000` | Base URL for the frontend application. |
+| `NEXT_PUBLIC_GEMINI_API_KEY` | No | - | Allows Gemini AI requests directly from the client if needed. |
 
-Option B: run separately in 2 terminals
-- Terminal 1 (root): npm run frontend
-- Terminal 2 (root): npm run api
-
-======================================================================
-6) VERIFY EVERYTHING IS WORKING
-======================================================================
-
-Open these URLs:
-- Frontend app: http://localhost:3000
-- Backend base route: http://localhost:4000/api
-- Backend Swagger docs (dev mode): http://localhost:4000/api/docs
-
-If frontend API calls fail, re-check:
-- .env.local has INTERNAL_API_URL=http://localhost:4000
-- server/.env has correct CORS_ORIGINS including localhost:3000
-- backend is running on port 4000
-
-======================================================================
-7) DOCKER WORKFLOW (ALTERNATIVE)
-======================================================================
-
-If you prefer Docker instead of local PostgreSQL + local Node:
-
-Production-style compose:
-- docker compose up -d --build
-
-Development compose:
-- Backend + DB only:
-  docker compose -f docker-compose.dev.yml up -d
-- Include frontend profile too:
-  docker compose -f docker-compose.dev.yml --profile frontend up -d
-
-Useful logs:
-- npm run dev:docker:logs
-
-Stop containers:
-- docker compose -f docker-compose.dev.yml down
-- docker compose down
-
-======================================================================
-8) COMMON FIXES
-======================================================================
-
-1. Port already in use (3000/4000/5432)
-- Stop conflicting process or change ports/env values.
-
-2. Prisma client errors
-- cd server
-- npx prisma generate
-
-3. DB auth/connection issues
-- Verify DATABASE_URL credentials, host, and db name.
-- Ensure PostgreSQL service/container is running.
-
-4. Dependency conflicts
-- Reinstall with:
-  npm install --legacy-peer-deps
-  cd server && npm install --legacy-peer-deps
-
-5. Missing env file
-- Quick check from root:
-  npm run check:env
-
-======================================================================
-9) QUICK START (COPY/PASTE)
-======================================================================
-
-After creating .env.local and server/.env, run:
-
-npm install --legacy-peer-deps
-cd server
-npm install --legacy-peer-deps
-npx prisma generate
-npx prisma db push --accept-data-loss
-npm run db:seed
-cd ..
-npm run dev:host
-
-Then open: http://localhost:3000
-
-End of guide.
+### Backend (`apps/server/.env`)
+| Variable | Required | Default | Purpose |
+| :--- | :---: | :--- | :--- |
+| `DATABASE_URL` | Yes | - | Full connection string to the PostgreSQL database. |
+| `JWT_SECRET` | Yes | - | High-entropy 64-char key for signing access and refresh tokens. |
+| `FIELD_ENCRYPTION_KEY` | Yes | - | AES-256-GCM key used to encrypt PII in the database. |
+| `PORT` | No | `4000` | The port the NestJS server will bind to. |
+| `NODE_ENV` | No | `development` | Environment mode (`development`, `production`, `test`). |
+| `CORS_ORIGINS` | Yes | `http://localhost:3000` | Comma-separated list of allowed origins. |
+| `REDIS_URL` | Yes | `redis://localhost:6379` | Connection string for the local Redis instance. |
+| `OPENAI_API_KEY` | No | - | Required if using the OpenAI completion endpoints (Resume Analyzer). |
+| `GEMINI_API_KEY` | No | - | Required for the RAG service and Saathi AI assistant responses. |
+| `GITHUB_TOKEN` | No | - | Elevates the GitHub API rate limit for student portfolio sync. |
+| `BACKGROUND_JOB_WORKER_ENABLED` | No | `true` | Set to false to disable Bull workers on this specific node. |
+| `AUTH_LOCK_THRESHOLD` | No | `5` | Failed login attempts before account lockout. |
+| `AUTH_LOCK_MINUTES` | No | `15` | Duration of account lockout. |
+| `JWT_EXPIRES_IN` | No | `15m` | Token expiration duration (e.g., `15m`, `1h`). |
+| `REFRESH_TOKEN_TTL_DAYS` | No | `7` | Refresh token duration in days. |
+| `CORS_ALLOW_CREDENTIALS` | No | `true` | Boolean flag to allow sending cookies/credentials in CORS requests. |
+| `REQUEST_BODY_LIMIT` | No | `1mb` | Maximum request payload size limit. |

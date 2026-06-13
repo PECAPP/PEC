@@ -287,7 +287,7 @@ export async function seedAcademicCalendar(adminId: string) {
     )
   );
 
-  console.log(`   ✓ Created ${createdEvents.length} academic calendar events for 2026`);
+  console.log(`    Created ${createdEvents.length} academic calendar events for 2026`);
   return createdEvents;
 }
 

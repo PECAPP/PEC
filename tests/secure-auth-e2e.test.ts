@@ -33,12 +33,12 @@ async function runTest(name: string, fn: () => Promise<void>): Promise<void> {
       message: "Success",
       duration,
     });
-    console.log(`✓ ${name} (${duration}ms)`);
+    console.log(` ${name} (${duration}ms)`);
   } catch (error) {
     const duration = Date.now() - startTime;
     const message = error instanceof Error ? error.message : String(error);
     results.push({ scenario: name, status: "FAIL", message, duration });
-    console.error(`✗ ${name} (${duration}ms): ${message}`);
+    console.error(` ${name} (${duration}ms): ${message}`);
   }
 }
 
@@ -487,7 +487,7 @@ async function testLogoutRevokesTokens() {
 
 // Run all tests
 async function runAllTests() {
-  console.log("🔐 Starting Secure Authentication Flow Tests\n");
+  console.log(" Starting Secure Authentication Flow Tests\n");
 
   await runTest(
     "Signup with Email Verification",
@@ -507,7 +507,7 @@ async function runAllTests() {
   await runTest("Logout Revokes Refresh Tokens", testLogoutRevokesTokens);
 
   // Print summary
-  console.log("\n📊 Test Summary");
+  console.log("\n Test Summary");
   console.log("═".repeat(50));
   const passed = results.filter((r) => r.status === "PASS").length;
   const failed = results.filter((r) => r.status === "FAIL").length;
@@ -521,11 +521,11 @@ async function runAllTests() {
     results
       .filter((r) => r.status === "FAIL")
       .forEach((r) => {
-        console.log(`  ✗ ${r.scenario}`);
+        console.log(`   ${r.scenario}`);
         console.log(`    ${r.message}`);
       });
   } else {
-    console.log("\n✅ All tests passed!");
+    console.log("\n All tests passed!");
   }
 }
 

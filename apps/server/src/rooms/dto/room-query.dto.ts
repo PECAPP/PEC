@@ -1,21 +1,17 @@
-import { IsOptional, IsString, IsBoolean } from 'class-validator';
-import { Type } from 'class-transformer';
-import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class RoomQueryDto extends PaginationQueryDto {
-  @IsOptional()
-  @IsString()
-  building?: string;
+export const roomQuerySchema = z.object({
+  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  sortOrder: z.any().optional(),
+  building: z.string().optional(),
+  type: z.string().optional(),
+  floor: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  isAvailable: z.preprocess((a) => a === undefined ? undefined : a === 'true', z.boolean().optional()),
+});
 
-  @IsOptional()
-  @IsString()
-  type?: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  floor?: number;
 
-  @IsOptional()
-  @IsBoolean()
-  isAvailable?: boolean;
+export class RoomQueryDto extends createZodDto(roomQuerySchema) {
 }

@@ -9,18 +9,21 @@ export declare const departmentSchema: z.ZodObject<{
     code: z.ZodString;
     hod: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+    status: z.ZodOptional<z.ZodEnum<["active", "inactive"]>>;
+}, "strict", z.ZodTypeAny, {
     name: string;
     code: string;
     id?: string | undefined;
     hod?: string | undefined;
     description?: string | undefined;
+    status?: "active" | "inactive" | undefined;
 }, {
     name: string;
     code: string;
     id?: string | undefined;
     hod?: string | undefined;
     description?: string | undefined;
+    status?: "active" | "inactive" | undefined;
 }>;
 export declare const facultySchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
@@ -31,7 +34,7 @@ export declare const facultySchema: z.ZodObject<{
     designation: z.ZodString;
     specialization: z.ZodOptional<z.ZodString>;
     phone: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     fullName: string;
     email: string;
     department: string;
@@ -64,7 +67,7 @@ export declare const attendanceSchema: z.ZodObject<{
     facultyId: z.ZodOptional<z.ZodString>;
     lat: z.ZodOptional<z.ZodNumber>;
     lng: z.ZodOptional<z.ZodNumber>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     status: "present" | "absent" | "late";
     studentId: string;
     subject: string;
@@ -96,7 +99,7 @@ export declare const attendanceSchema: z.ZodObject<{
 export declare const AuthLoginSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     email: string;
     password: string;
 }, {
@@ -108,7 +111,7 @@ export declare const AuthSignupSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
     role: z.ZodDefault<z.ZodEnum<["student", "faculty", "college_admin"]>>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     fullName: string;
     email: string;
     password: string;
@@ -137,7 +140,7 @@ export declare const AuthResponseSchema: z.ZodObject<{
         role: string;
     }>;
     token: z.ZodString;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     user: {
         id: string;
         fullName: string;
@@ -167,14 +170,14 @@ export declare const attendanceSessionSchema: z.ZodObject<{
     attendanceCount: z.ZodDefault<z.ZodNumber>;
     createdAt: z.ZodOptional<z.ZodString>;
     endedAt: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
+    active: boolean;
     date: string;
     courseId: string;
     facultyId: string;
     courseName: string;
     startTime: string;
     qrCode: string;
-    active: boolean;
     expiresAt: string;
     attendanceCount: number;
     id?: string | undefined;
@@ -204,7 +207,7 @@ export declare const courseSchema: z.ZodObject<{
     instructor: z.ZodOptional<z.ZodString>;
     semester: z.ZodOptional<z.ZodNumber>;
     status: z.ZodDefault<z.ZodEnum<["active", "inactive", "archived"]>>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     name: string;
     code: string;
     status: "active" | "inactive" | "archived";
@@ -238,7 +241,7 @@ export declare const userSchema: z.ZodObject<{
     designation: z.ZodOptional<z.ZodString>;
     specialization: z.ZodOptional<z.ZodString>;
     phone: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     status: "active" | "inactive" | "suspended";
     fullName: string;
     email: string;
@@ -275,7 +278,7 @@ export declare const enrollmentSchema: z.ZodObject<{
     batch: z.ZodOptional<z.ZodString>;
     status: z.ZodDefault<z.ZodEnum<["active", "inactive", "completed", "withdrawn"]>>;
     enrolledAt: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     status: "active" | "inactive" | "completed" | "withdrawn";
     studentId: string;
     courseId: string;
@@ -308,9 +311,12 @@ export declare const hostelIssueSchema: z.ZodObject<{
     studentName: z.ZodString;
     organizationId: z.ZodOptional<z.ZodString>;
     responses: z.ZodOptional<z.ZodUnknown>;
+    images: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    slaDeadline: z.ZodOptional<z.ZodString>;
+    isEscalated: z.ZodOptional<z.ZodBoolean>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     description: string;
     status: "pending" | "assigned" | "resolved" | "closed";
     studentId: string;
@@ -323,6 +329,9 @@ export declare const hostelIssueSchema: z.ZodObject<{
     createdAt?: string | undefined;
     organizationId?: string | undefined;
     responses?: unknown;
+    images?: string[] | undefined;
+    slaDeadline?: string | undefined;
+    isEscalated?: boolean | undefined;
     updatedAt?: string | undefined;
 }, {
     description: string;
@@ -337,7 +346,62 @@ export declare const hostelIssueSchema: z.ZodObject<{
     createdAt?: string | undefined;
     organizationId?: string | undefined;
     responses?: unknown;
+    images?: string[] | undefined;
+    slaDeadline?: string | undefined;
+    isEscalated?: boolean | undefined;
     updatedAt?: string | undefined;
+}>;
+export declare const hostelOutpassSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    studentId: z.ZodString;
+    studentName: z.ZodOptional<z.ZodString>;
+    hostelName: z.ZodString;
+    roomNumber: z.ZodString;
+    reason: z.ZodString;
+    destination: z.ZodString;
+    departureDate: z.ZodString;
+    returnDate: z.ZodString;
+    status: z.ZodDefault<z.ZodEnum<["Pending", "Approved", "Rejected", "Active", "Completed"]>>;
+    approvedBy: z.ZodOptional<z.ZodString>;
+    qrCode: z.ZodOptional<z.ZodString>;
+    evidenceUrl: z.ZodOptional<z.ZodString>;
+    images: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    createdAt: z.ZodOptional<z.ZodString>;
+    updatedAt: z.ZodOptional<z.ZodString>;
+}, "strict", z.ZodTypeAny, {
+    status: "Pending" | "Approved" | "Rejected" | "Active" | "Completed";
+    studentId: string;
+    roomNumber: string;
+    hostelName: string;
+    reason: string;
+    destination: string;
+    departureDate: string;
+    returnDate: string;
+    id?: string | undefined;
+    qrCode?: string | undefined;
+    createdAt?: string | undefined;
+    studentName?: string | undefined;
+    images?: string[] | undefined;
+    updatedAt?: string | undefined;
+    approvedBy?: string | undefined;
+    evidenceUrl?: string | undefined;
+}, {
+    studentId: string;
+    roomNumber: string;
+    hostelName: string;
+    reason: string;
+    destination: string;
+    departureDate: string;
+    returnDate: string;
+    id?: string | undefined;
+    status?: "Pending" | "Approved" | "Rejected" | "Active" | "Completed" | undefined;
+    qrCode?: string | undefined;
+    createdAt?: string | undefined;
+    studentName?: string | undefined;
+    images?: string[] | undefined;
+    updatedAt?: string | undefined;
+    approvedBy?: string | undefined;
+    evidenceUrl?: string | undefined;
 }>;
 export declare const timetableSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
@@ -353,35 +417,35 @@ export declare const timetableSchema: z.ZodObject<{
     department: z.ZodOptional<z.ZodString>;
     semester: z.ZodOptional<z.ZodNumber>;
     batch: z.ZodOptional<z.ZodString>;
-}, "passthrough", z.ZodTypeAny, z.objectOutputType<{
-    id: z.ZodOptional<z.ZodString>;
-    courseId: z.ZodOptional<z.ZodString>;
-    courseName: z.ZodString;
-    courseCode: z.ZodString;
-    facultyId: z.ZodOptional<z.ZodString>;
-    facultyName: z.ZodOptional<z.ZodString>;
-    day: z.ZodEnum<["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]>;
-    startTime: z.ZodString;
-    endTime: z.ZodString;
-    room: z.ZodString;
-    department: z.ZodOptional<z.ZodString>;
-    semester: z.ZodOptional<z.ZodNumber>;
-    batch: z.ZodOptional<z.ZodString>;
-}, z.ZodTypeAny, "passthrough">, z.objectInputType<{
-    id: z.ZodOptional<z.ZodString>;
-    courseId: z.ZodOptional<z.ZodString>;
-    courseName: z.ZodString;
-    courseCode: z.ZodString;
-    facultyId: z.ZodOptional<z.ZodString>;
-    facultyName: z.ZodOptional<z.ZodString>;
-    day: z.ZodEnum<["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]>;
-    startTime: z.ZodString;
-    endTime: z.ZodString;
-    room: z.ZodString;
-    department: z.ZodOptional<z.ZodString>;
-    semester: z.ZodOptional<z.ZodNumber>;
-    batch: z.ZodOptional<z.ZodString>;
-}, z.ZodTypeAny, "passthrough">>;
+}, "strict", z.ZodTypeAny, {
+    courseName: string;
+    startTime: string;
+    courseCode: string;
+    day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+    endTime: string;
+    room: string;
+    id?: string | undefined;
+    department?: string | undefined;
+    courseId?: string | undefined;
+    facultyId?: string | undefined;
+    semester?: number | undefined;
+    batch?: string | undefined;
+    facultyName?: string | undefined;
+}, {
+    courseName: string;
+    startTime: string;
+    courseCode: string;
+    day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+    endTime: string;
+    room: string;
+    id?: string | undefined;
+    department?: string | undefined;
+    courseId?: string | undefined;
+    facultyId?: string | undefined;
+    semester?: number | undefined;
+    batch?: string | undefined;
+    facultyName?: string | undefined;
+}>;
 export declare const examinationSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     courseId: z.ZodString;
@@ -390,7 +454,7 @@ export declare const examinationSchema: z.ZodObject<{
     startTime: z.ZodString;
     endTime: z.ZodString;
     room: z.ZodString;
-}, "strip", z.ZodTypeAny, {
+}, "strict", z.ZodTypeAny, {
     date: string;
     courseId: string;
     startTime: string;
@@ -415,5 +479,137 @@ export type CourseInput = z.infer<typeof courseSchema>;
 export type UserInput = z.infer<typeof userSchema>;
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
 export type HostelIssueInput = z.infer<typeof hostelIssueSchema>;
+export type HostelOutpassInput = z.infer<typeof hostelOutpassSchema>;
 export type TimetableInput = z.infer<typeof timetableSchema>;
 export type ExaminationInput = z.infer<typeof examinationSchema>;
+export declare const academicCalendarEventSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    title: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    startDate: z.ZodString;
+    endDate: z.ZodString;
+    type: z.ZodEnum<["academic", "holiday", "exam", "event"]>;
+    isPublic: z.ZodDefault<z.ZodBoolean>;
+}, "strict", z.ZodTypeAny, {
+    type: "academic" | "holiday" | "exam" | "event";
+    title: string;
+    startDate: string;
+    endDate: string;
+    isPublic: boolean;
+    id?: string | undefined;
+    description?: string | undefined;
+}, {
+    type: "academic" | "holiday" | "exam" | "event";
+    title: string;
+    startDate: string;
+    endDate: string;
+    id?: string | undefined;
+    description?: string | undefined;
+    isPublic?: boolean | undefined;
+}>;
+export declare const canteenOrderSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    studentId: z.ZodString;
+    items: z.ZodArray<z.ZodObject<{
+        itemId: z.ZodString;
+        quantity: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        itemId: string;
+        quantity: number;
+    }, {
+        itemId: string;
+        quantity: number;
+    }>, "many">;
+    totalAmount: z.ZodNumber;
+    status: z.ZodDefault<z.ZodEnum<["pending", "preparing", "ready", "delivered", "cancelled"]>>;
+    instructions: z.ZodOptional<z.ZodString>;
+}, "strict", z.ZodTypeAny, {
+    status: "pending" | "preparing" | "ready" | "delivered" | "cancelled";
+    studentId: string;
+    items: {
+        itemId: string;
+        quantity: number;
+    }[];
+    totalAmount: number;
+    id?: string | undefined;
+    instructions?: string | undefined;
+}, {
+    studentId: string;
+    items: {
+        itemId: string;
+        quantity: number;
+    }[];
+    totalAmount: number;
+    id?: string | undefined;
+    status?: "pending" | "preparing" | "ready" | "delivered" | "cancelled" | undefined;
+    instructions?: string | undefined;
+}>;
+export declare const canteenItemSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    name: z.ZodString;
+    price: z.ZodNumber;
+    category: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    image: z.ZodOptional<z.ZodString>;
+    isAvailable: z.ZodDefault<z.ZodBoolean>;
+    stock: z.ZodDefault<z.ZodNumber>;
+}, "strict", z.ZodTypeAny, {
+    name: string;
+    category: string;
+    price: number;
+    isAvailable: boolean;
+    stock: number;
+    id?: string | undefined;
+    description?: string | undefined;
+    image?: string | undefined;
+}, {
+    name: string;
+    category: string;
+    price: number;
+    id?: string | undefined;
+    description?: string | undefined;
+    image?: string | undefined;
+    isAvailable?: boolean | undefined;
+    stock?: number | undefined;
+}>;
+export declare const campusMapRegionSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    name: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    category: z.ZodString;
+    coordinates: z.ZodArray<z.ZodObject<{
+        lat: z.ZodNumber;
+        lng: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        lat: number;
+        lng: number;
+    }, {
+        lat: number;
+        lng: number;
+    }>, "many">;
+    color: z.ZodOptional<z.ZodString>;
+}, "strict", z.ZodTypeAny, {
+    name: string;
+    category: string;
+    coordinates: {
+        lat: number;
+        lng: number;
+    }[];
+    id?: string | undefined;
+    description?: string | undefined;
+    color?: string | undefined;
+}, {
+    name: string;
+    category: string;
+    coordinates: {
+        lat: number;
+        lng: number;
+    }[];
+    id?: string | undefined;
+    description?: string | undefined;
+    color?: string | undefined;
+}>;
+export type AcademicCalendarEventInput = z.infer<typeof academicCalendarEventSchema>;
+export type CanteenOrderInput = z.infer<typeof canteenOrderSchema>;
+export type CanteenItemInput = z.infer<typeof canteenItemSchema>;
+export type CampusMapRegionInput = z.infer<typeof campusMapRegionSchema>;

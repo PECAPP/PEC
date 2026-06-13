@@ -73,15 +73,15 @@ export function StudentDashboard({ initialData, user: initialUser }: StudentDash
        <div className="space-y-6 md:space-y-8">
           <div className="flex justify-between items-center">
              <div className="space-y-2">
-                <div className="h-8 w-64 bg-muted animate-pulse rounded-md" />
-                <div className="h-4 w-48 bg-muted animate-pulse rounded-md" />
+                <div className="h-8 w-64 bg-muted animate-pulse rounded-sm" />
+                <div className="h-4 w-48 bg-muted animate-pulse rounded-sm" />
              </div>
-             <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
+             <div className="h-10 w-32 bg-muted animate-pulse rounded-sm" />
           </div>
-          <LoadingGrid count={3} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" itemClassName="h-24 rounded-md" />
+          <LoadingGrid count={3} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" itemClassName="h-24 rounded-sm" />
           <div className="grid gap-5 md:gap-6 xl:grid-cols-3">
-             <div className="lg:col-span-2 h-64 bg-muted animate-pulse rounded-xl" />
-             <div className="h-64 bg-muted animate-pulse rounded-xl" />
+             <div className="lg:col-span-2 h-64 bg-muted animate-pulse rounded-sm" />
+             <div className="h-64 bg-muted animate-pulse rounded-sm" />
           </div>
        </div>
     );

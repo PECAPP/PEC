@@ -1,0 +1,64 @@
+import { getServerSession } from '@/lib/server-auth';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { UserManagementView } from './UserManagementView';
+import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
+
+export const metadata = {
+  title: 'User Management | PEC APP ERP',
+  description: 'Manage institutional user accounts and roles.',
+};
+
+async function getUsers() {
+  const API = resolveInternalApiBaseUrl();
+  
+  try {
+     const res = await fetch(`${API}/users`, { 
+        method: 'GET',
+        headers: {
+           'Cookie': (await cookies()).toString(),
+           'Content-Type': 'application/json',
+           'Accept': 'application/json'
+        },
+        next: { revalidate: 60 } 
+     });
+     
+     if (!res.ok) {
+        console.error(`Users fetch failed: ${res.status} ${res.statusText}`);
+        return [];
+     }
+     
+     const data = await res.json();
+     // Handle both nested (data.data) and flat (data) response formats
+     const users = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+     return users.map((u: any) => ({
+        ...u,
+        fullName: u.fullName || u.name || '',
+        status: u.status || 'active',
+     }));
+  } catch (error) {
+     console.error('Error fetching users server-side:', error);
+     return [];
+  }
+}
+
+export default async function UsersPage() {
+  const session = await getServerSession();
+  if (!session) redirect('/auth');
+
+  // RBAC Check on Server
+  const isAdminUser = session.role === 'college_admin' || session.role === 'super_admin';
+  if (!isAdminUser && session.role !== 'faculty') {
+    redirect('/dashboard');
+  }
+
+  const users = await getUsers();
+
+  return (
+    <UserManagementView 
+      initialUsers={users} 
+      isAdmin={isAdminUser} 
+      isFaculty={session.role === 'faculty'} 
+    />
+  );
+}

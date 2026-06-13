@@ -1,7 +1,6 @@
 import React from 'react';
 import { Trash2, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button, Dialog, DialogContent, DialogTitle, Input } from '@pec/ui';
 import { MapRegion } from './mapConfig';
 
 export default function EditRegionModal({
@@ -20,17 +19,11 @@ export default function EditRegionModal({
   if (!editingRegion) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={() => setEditingRegion(null)}
-    >
-      <div
-        className="bg-card rounded-xl border border-border shadow-2xl p-5 w-full max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="font-bold text-lg mb-4">
+    <Dialog open={!!editingRegion} onOpenChange={(open) => !open && setEditingRegion(null)}>
+      <DialogContent className=" w-full p-3 md:p-5">
+        <DialogTitle className="font-bold text-lg mb-4">
           {editingRegion.id ? 'Edit Building' : 'New Building'}
-        </h3>
+        </DialogTitle>
 
         <div className="space-y-3">
           <div>
@@ -54,7 +47,7 @@ export default function EditRegionModal({
             <select
               value={editingRegion.category}
               onChange={(e) => setEditingRegion({ ...editingRegion, category: e.target.value })}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="w-full rounded-sm border border-input bg-background px-3 py-2 text-sm"
             >
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
@@ -86,7 +79,7 @@ export default function EditRegionModal({
             Save
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

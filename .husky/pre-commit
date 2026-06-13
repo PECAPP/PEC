@@ -1,5 +1,12 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Auto-sync API if backend models changed
+if git diff --cached --name-only | grep -q "apps/server/src"; then
+  echo "Backend changes detected. Syncing API..."
+  pnpm sync:api
+  git add packages/api/src/generated
+fi
+
 npx lint-staged
 

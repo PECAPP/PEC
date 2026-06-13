@@ -20,7 +20,7 @@ export const CanteenMenuList = ({ data, isNight = false }: { data: CanteenData; 
 
   if (items.length === 0) {
     return (
-      <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
         No canteen items available at the moment.
       </div>
     );
@@ -30,7 +30,7 @@ export const CanteenMenuList = ({ data, isNight = false }: { data: CanteenData; 
   const title = isNight ? 'Night Canteen Menu' : 'Day Canteen Menu';
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
       <div className={`bg-gradient-to-r ${gradient} px-4 py-3 flex items-center justify-between text-white`}>
         <div className="flex items-center gap-2">
           <Utensils className="w-4 h-4" />

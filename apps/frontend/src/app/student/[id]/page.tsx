@@ -4,27 +4,26 @@ import { User } from 'lucide-react';
 
 import Link from 'next/link';
 import { getServerSession } from '@/lib/server-auth';
+import { cookies } from 'next/headers';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-async function getStudentData(id: string, token?: string) {
+async function getStudentData(id: string) {
   const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
   
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Cookie': (await cookies()).toString(),
   };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
 
   try {
     const [userRes, profileRes, summaryRes] = await Promise.all([
       fetch(`${base}/users/${id}`, { headers, next: { revalidate: 60 } }),
       fetch(`${base}/student-profiles/${id}`, { headers, next: { revalidate: 60 } }),
-      token ? fetch(`${base}/attendance/summary?studentId=${id}`, { headers, next: { revalidate: 60 } }) : Promise.resolve(null),
+      fetch(`${base}/attendance/summary?studentId=${id}`, { headers, next: { revalidate: 60 } }),
     ]);
 
     if (!userRes.ok) return null;
@@ -63,7 +62,7 @@ async function getGithubStats(username: string) {
 export default async function PublicStudentProfilePage({ params }: PageProps) {
   const { id } = await params;
   const session = await getServerSession();
-  const data = await getStudentData(id, session?.token);
+  const data = await getStudentData(id);
 
   if (!data || !data.userData) {
     return (

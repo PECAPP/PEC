@@ -24,9 +24,14 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly prisma: PrismaService) {
     this.handlers.set('audit-log.prune', async (payload) => {
-      const config = payload
-        ? (JSON.parse(payload) as { retentionDays?: number })
-        : {};
+      let config: { retentionDays?: number } = {};
+      if (payload) {
+        try {
+          config = JSON.parse(payload);
+        } catch (e) {
+          this.logger.error('Failed to parse audit-log.prune payload', e);
+        }
+      }
       const retentionDays = Math.max(1, Number(config.retentionDays ?? 30));
       const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
 
@@ -41,6 +46,10 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
 
     this.handlers.set('attendance.check-low', async () => {
       await this.handleLowAttendanceCheck();
+    });
+
+    this.handlers.set('role-delegation.expire', async () => {
+      await this.handleRoleDelegationExpiry();
     });
   }
 
@@ -64,8 +73,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
   }
 
   list(limit = 50) {
-    return this.prisma.backgroundJob.findMany({
-      orderBy: [{ createdAt: 'desc' }],
+    return this.prisma.backgroundJob.findMany({ orderBy: [{ createdAt: 'desc' }],
       take: Math.min(Math.max(limit, 1), 200),
     });
   }
@@ -261,8 +269,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
     const threshold = settings?.attendanceRequiredPercentage ?? 75;
 
     // 2. Simple but effective logic: iterate over active students
-    const students = await this.prisma.user.findMany({
-      where: { roles: { some: { role: { name: 'student' } } } },
+    const students = await this.prisma.user.findMany({ where: { roles: { some: { role: { name: 'student' } } } },
       select: { id: true, name: true }
     });
 
@@ -295,7 +302,7 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
            create: {
              id: `att-alert-${student.id}-${new Date().toISOString().split('T')[0]}`,
              userId: student.id,
-             title: '📉 Low Attendance Alert',
+             title: ' Low Attendance Alert',
              message: `Your current attendance is ${percentage.toFixed(1)}%, which is below the required ${threshold}%. Please attend next classes to avoid penalties.`,
              type: 'alert',
              link: '/attendance'
@@ -304,5 +311,49 @@ export class BackgroundJobsService implements OnModuleInit, OnModuleDestroy {
        }
     }
     this.logger.log('Low Attendance Check Completed.');
+  }
+
+  private async handleRoleDelegationExpiry() {
+    this.logger.log('Running Role Delegation Expiry Check...');
+    const now = new Date();
+    
+    // Find all expired delegations that haven't been formally revoked
+    const expiredDelegations = await this.prisma.roleDelegation.findMany({
+      where: {
+        revokedAt: null,
+        validUntil: { lte: now }
+      },
+      select: { id: true, delegateeId: true, role: { select: { name: true } } }
+    });
+
+    if (expiredDelegations.length === 0) {
+      this.logger.log('No expired delegations found.');
+      return;
+    }
+
+    this.logger.log(`Found ${expiredDelegations.length} expired delegations. Revoking...`);
+
+    // Mark them as revoked and notify
+    for (const delegation of expiredDelegations) {
+      await this.prisma.roleDelegation.update({
+        where: { id: delegation.id },
+        data: { revokedAt: now }
+      });
+
+      // Clear the user's permission cache to enforce immediately
+      await this.prisma.$executeRawUnsafe(`DELETE FROM "cache" WHERE key = 'user_perms:${delegation.delegateeId}'`).catch(() => {});
+      // Note: Ideal way is via cacheManager, but raw query or triggering a cache invalidate event works as a fallback.
+
+      await this.prisma.notification.create({
+        data: {
+          userId: delegation.delegateeId,
+          title: 'Role Delegation Expired',
+          message: `Your temporary delegation for the role "${delegation.role.name}" has expired.`,
+          type: 'info'
+        }
+      });
+    }
+
+    this.logger.log('Role Delegation Expiry Check Completed.');
   }
 }

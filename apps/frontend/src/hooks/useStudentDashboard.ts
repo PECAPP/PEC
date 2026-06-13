@@ -58,7 +58,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     if (summary && typeof summary === 'object') {
       const statsObj = summary.totalSummary || {};
       const summaryCourses = Array.isArray(summary.courses) ? summary.courses : [];
-      const fallbackCourses = Array.isArray(allCourses) ? allCourses : [];
+      const _fallbackCourses = Array.isArray(allCourses) ? allCourses : [];
       
       // Enrich enrolled courses with full details from summary (now comprehensive)
       const normalizedEnrolled: Course[] = summaryCourses.map((course: any, index: number) => {
@@ -148,7 +148,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
 
   const fetchCollegeSettings = useCallback(async () => {
     try {
-      const response = await api.get('/college-settings');
+      const response = await api.get('/pec-settings');
       const data = response.data?.success ? response.data.data : response.data;
       if (data) {
         const value = Number(data?.attendanceRequiredPercentage);
@@ -236,7 +236,7 @@ export function useStudentDashboard(initialData?: any, initialUser?: any) {
     if (authLoading) return;
 
     if (!user) {
-      router.replace('/auth');
+      // Let middleware handle the redirect — don't force it from client
       return;
     }
 

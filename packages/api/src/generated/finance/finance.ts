@@ -30,10 +30,8 @@ import type {
   PayFeeDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -66,7 +64,7 @@ export const getFinanceControllerGetSummaryV1Url = (params: FinanceControllerGet
 
 export const financeControllerGetSummaryV1 = async (params: FinanceControllerGetSummaryV1Params, options?: RequestInit): Promise<financeControllerGetSummaryV1Response> => {
 
-  return customInstance<financeControllerGetSummaryV1Response>(getFinanceControllerGetSummaryV1Url(params),
+  return fetchWithAuth<financeControllerGetSummaryV1Response>(getFinanceControllerGetSummaryV1Url(params),
   {
     ...options,
     method: 'GET'
@@ -86,16 +84,16 @@ export const getFinanceControllerGetSummaryV1QueryKey = (params?: FinanceControl
     }
 
 
-export const getFinanceControllerGetSummaryV1QueryOptions = <TData = Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError = unknown>(params: FinanceControllerGetSummaryV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFinanceControllerGetSummaryV1QueryOptions = <TData = Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError = unknown>(params: FinanceControllerGetSummaryV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFinanceControllerGetSummaryV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>> = ({ signal }) => financeControllerGetSummaryV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>> = ({ signal }) => financeControllerGetSummaryV1(params, { signal });
 
 
 
@@ -115,7 +113,7 @@ export function useFinanceControllerGetSummaryV1<TData = Awaited<ReturnType<type
           TError,
           Awaited<ReturnType<typeof financeControllerGetSummaryV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFinanceControllerGetSummaryV1<TData = Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError = unknown>(
@@ -125,16 +123,16 @@ export function useFinanceControllerGetSummaryV1<TData = Awaited<ReturnType<type
           TError,
           Awaited<ReturnType<typeof financeControllerGetSummaryV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFinanceControllerGetSummaryV1<TData = Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError = unknown>(
- params: FinanceControllerGetSummaryV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: FinanceControllerGetSummaryV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFinanceControllerGetSummaryV1<TData = Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError = unknown>(
- params: FinanceControllerGetSummaryV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: FinanceControllerGetSummaryV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetSummaryV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -172,7 +170,7 @@ export const getFinanceControllerGetFeesV1Url = () => {
 
 export const financeControllerGetFeesV1 = async ( options?: RequestInit): Promise<financeControllerGetFeesV1Response> => {
 
-  return customInstance<financeControllerGetFeesV1Response>(getFinanceControllerGetFeesV1Url(),
+  return fetchWithAuth<financeControllerGetFeesV1Response>(getFinanceControllerGetFeesV1Url(),
   {
     ...options,
     method: 'GET'
@@ -192,16 +190,16 @@ export const getFinanceControllerGetFeesV1QueryKey = () => {
     }
 
 
-export const getFinanceControllerGetFeesV1QueryOptions = <TData = Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFinanceControllerGetFeesV1QueryOptions = <TData = Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFinanceControllerGetFeesV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetFeesV1>>> = ({ signal }) => financeControllerGetFeesV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetFeesV1>>> = ({ signal }) => financeControllerGetFeesV1({ signal });
 
 
 
@@ -221,7 +219,7 @@ export function useFinanceControllerGetFeesV1<TData = Awaited<ReturnType<typeof 
           TError,
           Awaited<ReturnType<typeof financeControllerGetFeesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFinanceControllerGetFeesV1<TData = Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError = unknown>(
@@ -231,16 +229,16 @@ export function useFinanceControllerGetFeesV1<TData = Awaited<ReturnType<typeof 
           TError,
           Awaited<ReturnType<typeof financeControllerGetFeesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFinanceControllerGetFeesV1<TData = Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFinanceControllerGetFeesV1<TData = Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetFeesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -278,7 +276,7 @@ export const getFinanceControllerCreateFeeV1Url = () => {
 
 export const financeControllerCreateFeeV1 = async (createFeeDto: CreateFeeDto, options?: RequestInit): Promise<financeControllerCreateFeeV1Response> => {
 
-  return customInstance<financeControllerCreateFeeV1Response>(getFinanceControllerCreateFeeV1Url(),
+  return fetchWithAuth<financeControllerCreateFeeV1Response>(getFinanceControllerCreateFeeV1Url(),
   {
     ...options,
     method: 'POST',
@@ -291,15 +289,15 @@ export const financeControllerCreateFeeV1 = async (createFeeDto: CreateFeeDto, o
 
 
 export const getFinanceControllerCreateFeeV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerCreateFeeV1>>, TError,{data: CreateFeeDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerCreateFeeV1>>, TError,{data: CreateFeeDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof financeControllerCreateFeeV1>>, TError,{data: CreateFeeDto}, TContext> => {
 
 const mutationKey = ['financeControllerCreateFeeV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -307,7 +305,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof financeControllerCreateFeeV1>>, {data: CreateFeeDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  financeControllerCreateFeeV1(data,requestOptions)
+          return  financeControllerCreateFeeV1(data,)
         }
 
 
@@ -322,7 +320,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FinanceControllerCreateFeeV1MutationError = unknown
 
     export const useFinanceControllerCreateFeeV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerCreateFeeV1>>, TError,{data: CreateFeeDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerCreateFeeV1>>, TError,{data: CreateFeeDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof financeControllerCreateFeeV1>>,
         TError,
@@ -353,7 +351,7 @@ export const getFinanceControllerUpdateFeeV1Url = (id: string,) => {
 
 export const financeControllerUpdateFeeV1 = async (id: string, options?: RequestInit): Promise<financeControllerUpdateFeeV1Response> => {
 
-  return customInstance<financeControllerUpdateFeeV1Response>(getFinanceControllerUpdateFeeV1Url(id),
+  return fetchWithAuth<financeControllerUpdateFeeV1Response>(getFinanceControllerUpdateFeeV1Url(id),
   {
     ...options,
     method: 'PATCH'
@@ -366,15 +364,15 @@ export const financeControllerUpdateFeeV1 = async (id: string, options?: Request
 
 
 export const getFinanceControllerUpdateFeeV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerUpdateFeeV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerUpdateFeeV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof financeControllerUpdateFeeV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['financeControllerUpdateFeeV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -382,7 +380,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof financeControllerUpdateFeeV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  financeControllerUpdateFeeV1(id,requestOptions)
+          return  financeControllerUpdateFeeV1(id,)
         }
 
 
@@ -397,7 +395,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FinanceControllerUpdateFeeV1MutationError = unknown
 
     export const useFinanceControllerUpdateFeeV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerUpdateFeeV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerUpdateFeeV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof financeControllerUpdateFeeV1>>,
         TError,
@@ -428,7 +426,7 @@ export const getFinanceControllerDeleteFeeV1Url = (id: string,) => {
 
 export const financeControllerDeleteFeeV1 = async (id: string, options?: RequestInit): Promise<financeControllerDeleteFeeV1Response> => {
 
-  return customInstance<financeControllerDeleteFeeV1Response>(getFinanceControllerDeleteFeeV1Url(id),
+  return fetchWithAuth<financeControllerDeleteFeeV1Response>(getFinanceControllerDeleteFeeV1Url(id),
   {
     ...options,
     method: 'DELETE'
@@ -441,15 +439,15 @@ export const financeControllerDeleteFeeV1 = async (id: string, options?: Request
 
 
 export const getFinanceControllerDeleteFeeV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerDeleteFeeV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerDeleteFeeV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof financeControllerDeleteFeeV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['financeControllerDeleteFeeV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -457,7 +455,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof financeControllerDeleteFeeV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  financeControllerDeleteFeeV1(id,requestOptions)
+          return  financeControllerDeleteFeeV1(id,)
         }
 
 
@@ -472,7 +470,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FinanceControllerDeleteFeeV1MutationError = unknown
 
     export const useFinanceControllerDeleteFeeV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerDeleteFeeV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerDeleteFeeV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof financeControllerDeleteFeeV1>>,
         TError,
@@ -503,7 +501,7 @@ export const getFinanceControllerBulkMonthlyV1Url = () => {
 
 export const financeControllerBulkMonthlyV1 = async ( options?: RequestInit): Promise<financeControllerBulkMonthlyV1Response> => {
 
-  return customInstance<financeControllerBulkMonthlyV1Response>(getFinanceControllerBulkMonthlyV1Url(),
+  return fetchWithAuth<financeControllerBulkMonthlyV1Response>(getFinanceControllerBulkMonthlyV1Url(),
   {
     ...options,
     method: 'POST'
@@ -516,15 +514,15 @@ export const financeControllerBulkMonthlyV1 = async ( options?: RequestInit): Pr
 
 
 export const getFinanceControllerBulkMonthlyV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerBulkMonthlyV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerBulkMonthlyV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof financeControllerBulkMonthlyV1>>, TError,void, TContext> => {
 
 const mutationKey = ['financeControllerBulkMonthlyV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -532,7 +530,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof financeControllerBulkMonthlyV1>>, void> = () => {
 
 
-          return  financeControllerBulkMonthlyV1(requestOptions)
+          return  financeControllerBulkMonthlyV1()
         }
 
 
@@ -547,7 +545,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FinanceControllerBulkMonthlyV1MutationError = unknown
 
     export const useFinanceControllerBulkMonthlyV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerBulkMonthlyV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerBulkMonthlyV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof financeControllerBulkMonthlyV1>>,
         TError,
@@ -578,7 +576,7 @@ export const getFinanceControllerPayFeeV1Url = () => {
 
 export const financeControllerPayFeeV1 = async (payFeeDto: PayFeeDto, options?: RequestInit): Promise<financeControllerPayFeeV1Response> => {
 
-  return customInstance<financeControllerPayFeeV1Response>(getFinanceControllerPayFeeV1Url(),
+  return fetchWithAuth<financeControllerPayFeeV1Response>(getFinanceControllerPayFeeV1Url(),
   {
     ...options,
     method: 'POST',
@@ -591,15 +589,15 @@ export const financeControllerPayFeeV1 = async (payFeeDto: PayFeeDto, options?: 
 
 
 export const getFinanceControllerPayFeeV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerPayFeeV1>>, TError,{data: PayFeeDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerPayFeeV1>>, TError,{data: PayFeeDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof financeControllerPayFeeV1>>, TError,{data: PayFeeDto}, TContext> => {
 
 const mutationKey = ['financeControllerPayFeeV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -607,7 +605,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof financeControllerPayFeeV1>>, {data: PayFeeDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  financeControllerPayFeeV1(data,requestOptions)
+          return  financeControllerPayFeeV1(data,)
         }
 
 
@@ -622,7 +620,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FinanceControllerPayFeeV1MutationError = unknown
 
     export const useFinanceControllerPayFeeV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerPayFeeV1>>, TError,{data: PayFeeDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerPayFeeV1>>, TError,{data: PayFeeDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof financeControllerPayFeeV1>>,
         TError,
@@ -653,7 +651,7 @@ export const getFinanceControllerMarkPaidV1Url = (id: string,) => {
 
 export const financeControllerMarkPaidV1 = async (id: string, options?: RequestInit): Promise<financeControllerMarkPaidV1Response> => {
 
-  return customInstance<financeControllerMarkPaidV1Response>(getFinanceControllerMarkPaidV1Url(id),
+  return fetchWithAuth<financeControllerMarkPaidV1Response>(getFinanceControllerMarkPaidV1Url(id),
   {
     ...options,
     method: 'POST'
@@ -666,15 +664,15 @@ export const financeControllerMarkPaidV1 = async (id: string, options?: RequestI
 
 
 export const getFinanceControllerMarkPaidV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerMarkPaidV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerMarkPaidV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof financeControllerMarkPaidV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['financeControllerMarkPaidV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -682,7 +680,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof financeControllerMarkPaidV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  financeControllerMarkPaidV1(id,requestOptions)
+          return  financeControllerMarkPaidV1(id,)
         }
 
 
@@ -697,7 +695,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FinanceControllerMarkPaidV1MutationError = unknown
 
     export const useFinanceControllerMarkPaidV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerMarkPaidV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof financeControllerMarkPaidV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof financeControllerMarkPaidV1>>,
         TError,
@@ -728,7 +726,7 @@ export const getFinanceControllerGetTransactionsV1Url = () => {
 
 export const financeControllerGetTransactionsV1 = async ( options?: RequestInit): Promise<financeControllerGetTransactionsV1Response> => {
 
-  return customInstance<financeControllerGetTransactionsV1Response>(getFinanceControllerGetTransactionsV1Url(),
+  return fetchWithAuth<financeControllerGetTransactionsV1Response>(getFinanceControllerGetTransactionsV1Url(),
   {
     ...options,
     method: 'GET'
@@ -748,16 +746,16 @@ export const getFinanceControllerGetTransactionsV1QueryKey = () => {
     }
 
 
-export const getFinanceControllerGetTransactionsV1QueryOptions = <TData = Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFinanceControllerGetTransactionsV1QueryOptions = <TData = Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFinanceControllerGetTransactionsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>> = ({ signal }) => financeControllerGetTransactionsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>> = ({ signal }) => financeControllerGetTransactionsV1({ signal });
 
 
 
@@ -777,7 +775,7 @@ export function useFinanceControllerGetTransactionsV1<TData = Awaited<ReturnType
           TError,
           Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFinanceControllerGetTransactionsV1<TData = Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError = unknown>(
@@ -787,16 +785,16 @@ export function useFinanceControllerGetTransactionsV1<TData = Awaited<ReturnType
           TError,
           Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFinanceControllerGetTransactionsV1<TData = Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFinanceControllerGetTransactionsV1<TData = Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -834,7 +832,7 @@ export const getFinanceControllerGetTransactionV1Url = (id: string,) => {
 
 export const financeControllerGetTransactionV1 = async (id: string, options?: RequestInit): Promise<financeControllerGetTransactionV1Response> => {
 
-  return customInstance<financeControllerGetTransactionV1Response>(getFinanceControllerGetTransactionV1Url(id),
+  return fetchWithAuth<financeControllerGetTransactionV1Response>(getFinanceControllerGetTransactionV1Url(id),
   {
     ...options,
     method: 'GET'
@@ -854,16 +852,16 @@ export const getFinanceControllerGetTransactionV1QueryKey = (id: string,) => {
     }
 
 
-export const getFinanceControllerGetTransactionV1QueryOptions = <TData = Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFinanceControllerGetTransactionV1QueryOptions = <TData = Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFinanceControllerGetTransactionV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>> = ({ signal }) => financeControllerGetTransactionV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>> = ({ signal }) => financeControllerGetTransactionV1(id, { signal });
 
 
 
@@ -883,7 +881,7 @@ export function useFinanceControllerGetTransactionV1<TData = Awaited<ReturnType<
           TError,
           Awaited<ReturnType<typeof financeControllerGetTransactionV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFinanceControllerGetTransactionV1<TData = Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError = unknown>(
@@ -893,16 +891,16 @@ export function useFinanceControllerGetTransactionV1<TData = Awaited<ReturnType<
           TError,
           Awaited<ReturnType<typeof financeControllerGetTransactionV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFinanceControllerGetTransactionV1<TData = Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFinanceControllerGetTransactionV1<TData = Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof financeControllerGetTransactionV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

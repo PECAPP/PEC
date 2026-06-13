@@ -10,13 +10,12 @@
     "generate": "orval"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.96.0",
-    "axios": "^1.7.9"
+    "@tanstack/react-query": "^5.96.0"
   },
   "devDependencies": {
     "@orval/query": "^8.15.0",
+    "@pec/tsconfig": "workspace:*",
     "orval": "^8.15.0",
-    "typescript": "^5.8.3",
-    "@pec/tsconfig": "workspace:*"
+    "typescript": "^5.8.3"
   }
 }

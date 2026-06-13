@@ -35,9 +35,14 @@ function extractErrorMessage(value: unknown): string | undefined {
   if (typeof value === "object") {
     const record = value as Record<string, unknown>;
 
+    if (record.errors && Array.isArray(record.errors)) {
+      const errs = record.errors.map(e => `${e.path}: ${e.message}`).join(', ');
+      if (errs) return `Validation failed: ${errs}`;
+    }
+
     for (const key of ["message", "error", "detail", "title", "reason"]) {
       const nested = extractErrorMessage(record[key]);
-      if (nested) return nested;
+      if (nested && nested !== "Validation failed") return nested;
     }
 
     const values = Object.values(record)
@@ -55,34 +60,31 @@ function extractErrorMessage(value: unknown): string | undefined {
   return undefined;
 }
 
-function hasRefreshMarkerCookie(): boolean {
-  if (typeof document === "undefined") return false;
-
-  return document.cookie
-    .split(";")
-    .some((cookie) => cookie.trim().startsWith("refresh_present="));
-}
-
-async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  let token = authClient.getAccessToken();
-
-  // Recover access token once after a hard refresh when only refresh cookie exists.
-  if (!token && !url.includes('/auth/refresh') && hasRefreshMarkerCookie()) {
-    try {
-      token = await authClient.refreshAccessToken();
-    } catch {
-      // Keep request flow consistent and let the eventual response handling surface the error.
-    }
-  }
-
+export async function fetchWithAuth<T = any>(url: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers);
-  
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
   
   if (!headers.has('Content-Type') && options.body && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
+  }
+
+  // Add CSRF Token for mutating methods
+  const method = options.method?.toUpperCase() || 'GET';
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    if (typeof document !== 'undefined') {
+      const isProd = window.location.protocol === 'https:';
+      const cookiePrefix = isProd ? '__Host-' : '';
+      
+      const readCookie = (name: string) => {
+        const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const match = document.cookie.match(new RegExp(`(?:^|; )${escaped}=([^;]*)`));
+        return match ? decodeURIComponent(match[1]) : null;
+      };
+      
+      const csrfToken = readCookie(`${cookiePrefix}csrf_token`) ?? readCookie('csrf_token');
+      if (csrfToken && !headers.has('X-CSRF-Token')) {
+        headers.set('X-CSRF-Token', csrfToken);
+      }
+    }
   }
 
   // Handle URL formation + params
@@ -98,18 +100,14 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   // Handle 401 Unauthorized with Refresh Token rotation
   if (response.status === 401 && !url.includes('/auth/refresh')) {
     try {
-      if (!authClient.hasRefreshSession()) {
-        throw new Error('No active refresh session');
-      }
-      const newToken = await authClient.refreshAccessToken();
-      headers.set('Authorization', `Bearer ${newToken}`);
+      await authClient.refreshAccessToken();
+      // Re-issue the request, the browser will attach the new HttpOnly cookie
       response = await fetch(fullUrl, {
         ...options,
         headers,
         credentials: options.credentials ?? 'include',
       });
     } catch {
-      authClient.resetSession();
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('auth-failed'));
       }
@@ -141,8 +139,8 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
 }
 
 /**
- * Lightweight native fetch wrapper that emulates the Axios interface
- * used throughout the application, allowing us to remove the 30KB Axios dependency.
+ * Lightweight native fetch wrapper that emulates the http client interface
+ * used throughout the application, allowing us to remove the 30KB http client dependency.
  */
 export const api = {
   get: async <T = any>(url: string, options?: any): Promise<{ data: T }> => {
@@ -165,7 +163,7 @@ export const api = {
     const data = await fetchWithAuth(url, { ...options, method: 'DELETE' });
     return { data };
   },
-  // emulating axios.create for consistency if needed elsewhere
+  // emulating http client.create for consistency if needed elsewhere
   create: (config: any) => api,
   defaults: {
     headers: {

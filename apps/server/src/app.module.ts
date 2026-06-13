@@ -1,9 +1,12 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { CqrsModule } from '@nestjs/cqrs';
-import { LoggerModule } from 'nestjs-pino';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 import Redis from 'ioredis';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { AppController } from './app.controller';
@@ -22,11 +25,14 @@ import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { BackgroundJobsModule } from './background-jobs/background-jobs.module';
 import { NightCanteenModule } from './night-canteen/night-canteen.module';
 import { HostelIssuesModule } from './hostel-issues/hostel-issues.module';
+import { HostelOutpassModule } from './hostel-outpass/hostel-outpass.module';
 import { CampusMapModule } from './campus-map/campus-map.module';
 import { CourseMaterialsModule } from './course-materials/course-materials.module';
 import { NoticeboardModule } from './noticeboard/noticeboard.module';
 import { AiModule } from './ai/ai.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { EventsModule } from './events/events.module';
+import { PdfModule } from './pdf/pdf.module';
 import { SocialSyncModule } from './social-sync/social-sync.module';
 import { StudentPortfolioModule } from './student-portfolio/student-portfolio.module';
 import { AttendanceSessionModule } from './attendance-session/attendance-session.module';
@@ -37,7 +43,6 @@ import { AcademicCalendarModule } from './academic-calendar/academic-calendar.mo
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { InputSanitizationMiddleware } from './common/middleware/input-sanitization.middleware';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
-import { CanteenModule } from './canteen/canteen.module';
 import { AdminModule } from './admin/admin.module';
 import { CollegeSettingsModule } from './college-settings/college-settings.module';
 import { ClubsModule } from './clubs/clubs.module';
@@ -46,14 +51,32 @@ import { FinanceModule } from './finance/finance.module';
 import { RolesMgmtModule } from './roles/roles-mgmt.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CaslModule } from './casl/casl.module';
+import { DelegationModule } from './delegation/delegation.module';
+
+import { GlobalCacheModule } from './cache/global-cache.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
+
+import { CommonServicesModule } from './common/common.module';
+import { SettingsModule } from './settings/settings.module';
+import { UploadModule } from './upload/upload.module';
+import { DlqModule } from './dlq/dlq.module';
+import { GradingModule } from './grading/grading.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { RlsInterceptor } from './prisma/rls.interceptor';
 
 @Module({
+
   imports: [
+    CommonServicesModule,
+    GlobalCacheModule,
+    MaintenanceModule,
     PrometheusModule.register(),
     CaslModule,
     PermissionsModule,
     RolesMgmtModule,
+    DelegationModule,
     AuthModule,
+
     UsersModule,
     PrismaModule,
     ChatModule,
@@ -65,9 +88,9 @@ import { CaslModule } from './casl/casl.module';
     DepartmentsModule,
     FeatureFlagsModule,
     BackgroundJobsModule,
-    CanteenModule,
     NightCanteenModule,
     HostelIssuesModule,
+    HostelOutpassModule,
     CampusMapModule,
     CourseMaterialsModule,
     NoticeboardModule,
@@ -76,6 +99,8 @@ import { CaslModule } from './casl/casl.module';
     AiModule,
     AttendanceSessionModule,
     RoomsModule,
+    EventsModule,
+    PdfModule,
     SocialSyncModule,
     StudentPortfolioModule,
     FacultyBioSystemModule,
@@ -84,11 +109,20 @@ import { CaslModule } from './casl/casl.module';
     AcademicCalendarModule,
     MarketplaceModule,
     FinanceModule,
+    SettingsModule,
+    UploadModule,
+    DlqModule,
     CqrsModule,
-    LoggerModule.forRoot({
-      pinoHttp: {
-        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
-      },
+    GradingModule,
+    AnalyticsModule,
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          format: process.env.NODE_ENV === 'production' 
+            ? winston.format.combine(winston.format.timestamp(), winston.format.json())
+            : winston.format.combine(winston.format.timestamp(), winston.format.colorize(), winston.format.simple()),
+        }),
+      ],
     }),
     ThrottlerModule.forRootAsync({
       useFactory: () => ({
@@ -99,6 +133,7 @@ import { CaslModule } from './casl/casl.module';
         ],
       }),
     }),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [
@@ -111,8 +146,13 @@ import { CaslModule } from './casl/casl.module';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RlsInterceptor,
+    },
   ],
 })
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer

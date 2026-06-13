@@ -43,13 +43,12 @@ export class MarketplaceRepository {
 
     const [total, items] = await Promise.all([
       this.prisma.marketplaceListing.count({ where }),
-      this.prisma.marketplaceListing.findMany({
-        where,
+      this.prisma.marketplaceListing.findMany({ where,
         orderBy: { [sortBy]: sortOrder },
         take: limit,
         skip: offset,
         include: {
-          seller: { select: { id: true, name: true, avatar: true, studentProfile: { select: { phone: true } } } },
+          seller: { select: { id: true, name: true, avatar: true } },
           _count: { select: { bookmarks: true } },
         },
       }),
@@ -62,18 +61,17 @@ export class MarketplaceRepository {
     return this.prisma.marketplaceListing.findUnique({
       where: { id },
       include: {
-        seller: { select: { id: true, name: true, avatar: true, studentProfile: { select: { phone: true } } } },
+        seller: { select: { id: true, name: true, avatar: true } },
         _count: { select: { bookmarks: true } },
       },
     });
   }
 
   async findMyListings(sellerId: string) {
-    return this.prisma.marketplaceListing.findMany({
-      where: { sellerId, NOT: { status: 'Deleted' } },
+    return this.prisma.marketplaceListing.findMany({ where: { sellerId, NOT: { status: 'Deleted' } },
       orderBy: { createdAt: 'desc' },
       include: {
-        seller: { select: { id: true, name: true, avatar: true, studentProfile: { select: { phone: true } } } },
+        seller: { select: { id: true, name: true, avatar: true } },
         _count: { select: { bookmarks: true } },
       },
     });
@@ -119,6 +117,28 @@ export class MarketplaceRepository {
     return this.prisma.marketplaceListing.update({ where: { id }, data: { status: 'Deleted' } });
   }
 
+  async holdListing(id: string, userId: string) {
+    const listing = await this.prisma.marketplaceListing.findUnique({ where: { id } });
+    if (!listing) throw new NotFoundException('Listing not found');
+    if (listing.sellerId !== userId) throw new ForbiddenException('Not your listing');
+    
+    // Toggle between On_Hold and Available, or just set to On_Hold if it's currently Available
+    const newStatus = listing.status === 'On_Hold' ? 'Available' : 'On_Hold';
+    return this.prisma.marketplaceListing.update({ where: { id }, data: { status: newStatus } });
+  }
+
+  async cleanUpStaleChats() {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return this.prisma.marketplaceChat.deleteMany({
+      where: {
+        updatedAt: {
+          lt: thirtyDaysAgo
+        }
+      }
+    });
+  }
+
   // ─── Bookmarks ───────────────────────────────────────────────────────────────
 
   async toggleBookmark(userId: string, listingId: string) {
@@ -134,8 +154,7 @@ export class MarketplaceRepository {
   }
 
   async getBookmarks(userId: string) {
-    const bookmarks = await this.prisma.marketplaceBookmark.findMany({
-      where: { userId },
+    const bookmarks = await this.prisma.marketplaceBookmark.findMany({ where: { userId },
       include: {
         listing: {
           include: {
@@ -150,8 +169,7 @@ export class MarketplaceRepository {
   }
 
   async getBookmarkedIds(userId: string) {
-    const bookmarks = await this.prisma.marketplaceBookmark.findMany({
-      where: { userId },
+    const bookmarks = await this.prisma.marketplaceBookmark.findMany({ where: { userId },
       select: { listingId: true },
     });
     return bookmarks.map((b) => b.listingId);
@@ -177,8 +195,7 @@ export class MarketplaceRepository {
   }
 
   async getMyChats(userId: string) {
-    return this.prisma.marketplaceChat.findMany({
-      where: { OR: [{ buyerId: userId }, { listing: { sellerId: userId } }] },
+    return this.prisma.marketplaceChat.findMany({ where: { OR: [{ buyerId: userId }, { listing: { sellerId: userId } }] },
       include: {
         listing: { select: { id: true, title: true, images: true, price: true, sellerId: true } },
         buyer: { select: { id: true, name: true, avatar: true } },
@@ -197,8 +214,7 @@ export class MarketplaceRepository {
     if (chat.buyerId !== userId && chat.listing.sellerId !== userId) {
       throw new ForbiddenException('Not a participant');
     }
-    return this.prisma.marketplaceMessage.findMany({
-      where: { chatId },
+    return this.prisma.marketplaceMessage.findMany({ where: { chatId },
       orderBy: { createdAt: 'asc' },
       include: { sender: { select: { id: true, name: true, avatar: true } } },
     });
@@ -219,5 +235,93 @@ export class MarketplaceRepository {
     });
     await this.prisma.marketplaceChat.update({ where: { id: chatId }, data: { updatedAt: new Date() } });
     return message;
+  }
+
+  async createOffer(chatId: string, senderId: string, amount: number) {
+    const chat = await this.prisma.marketplaceChat.findUnique({
+      where: { id: chatId },
+      include: { listing: { select: { sellerId: true } } },
+    });
+    if (!chat) throw new NotFoundException('Chat not found');
+    if (chat.buyerId !== senderId && chat.listing.sellerId !== senderId) {
+      throw new ForbiddenException('Not a participant');
+    }
+
+    // A buyer or seller can make an offer. Usually buyer.
+    const text = `Made an offer of ₹${amount}`;
+    
+    // Create the message and update chat in a transaction
+    const [message] = await this.prisma.$transaction([
+      this.prisma.marketplaceMessage.create({
+        data: { 
+          chatId, 
+          senderId, 
+          text, 
+          isOffer: true, 
+          offerAmount: amount, 
+          offerStatus: 'PENDING' 
+        },
+        include: { sender: { select: { id: true, name: true, avatar: true } } },
+      }),
+      this.prisma.marketplaceChat.update({
+        where: { id: chatId },
+        data: { 
+          updatedAt: new Date(),
+          offerAmount: amount,
+          offerStatus: 'PENDING'
+        }
+      })
+    ]);
+
+    return message;
+  }
+
+  async updateOffer(chatId: string, messageId: string, userId: string, status: string) {
+    const chat = await this.prisma.marketplaceChat.findUnique({
+      where: { id: chatId },
+      include: { listing: { select: { sellerId: true } } },
+    });
+    if (!chat) throw new NotFoundException('Chat not found');
+    if (chat.buyerId !== userId && chat.listing.sellerId !== userId) {
+      throw new ForbiddenException('Not a participant');
+    }
+
+    const message = await this.prisma.marketplaceMessage.findUnique({ where: { id: messageId } });
+    if (!message || message.chatId !== chatId || !message.isOffer) {
+      throw new NotFoundException('Offer not found');
+    }
+
+    // Only the receiver can accept/reject. The sender can withdraw.
+    if (status === 'WITHDRAWN' && message.senderId !== userId) {
+      throw new ForbiddenException('Only sender can withdraw offer');
+    }
+    if ((status === 'ACCEPTED' || status === 'REJECTED') && message.senderId === userId) {
+      throw new ForbiddenException('Cannot accept/reject your own offer');
+    }
+
+    const [updatedMessage] = await this.prisma.$transaction([
+      this.prisma.marketplaceMessage.update({
+        where: { id: messageId },
+        data: { offerStatus: status },
+        include: { sender: { select: { id: true, name: true, avatar: true } } },
+      }),
+      this.prisma.marketplaceChat.update({
+        where: { id: chatId },
+        data: {
+          updatedAt: new Date(),
+          offerStatus: status
+        }
+      })
+    ]);
+
+    // If accepted, maybe update listing status to 'Sold' or 'Reserved'
+    if (status === 'ACCEPTED') {
+      await this.prisma.marketplaceListing.update({
+        where: { id: chat.listingId },
+        data: { status: 'Sold' }
+      });
+    }
+
+    return updatedMessage;
   }
 }

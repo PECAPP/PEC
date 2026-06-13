@@ -1,12 +1,7 @@
 export type UserRole =
   | "college_admin"
   | "faculty"
-  | "student"
-  | "moderator"
-  | "user"
-  | "placement_officer"
-  | "recruiter"
-  | "super_admin";
+  | "student";
 
 export interface User {
   id: string;
@@ -33,8 +28,8 @@ export interface StudentProfile {
   city: string;
   state: string;
   bio?: string;
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export interface FacultyProfile {
@@ -48,8 +43,9 @@ export interface FacultyProfile {
   specialization: string;
   qualifications: string;
   bio?: string;
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  user?: User;
 }
 
 export interface CollegeAdminProfile {
@@ -62,7 +58,7 @@ export interface CollegeAdminProfile {
   phone: string;
   responsibilities: string;
   bio?: string;
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 

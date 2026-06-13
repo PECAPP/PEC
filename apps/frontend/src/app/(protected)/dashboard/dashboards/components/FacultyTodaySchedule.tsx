@@ -25,10 +25,10 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
-export function FacultyTodaySchedule({ schedule, onViewFull }: Props) {
+export function FacultyTodaySchedule({ schedule, onViewFull, onGenerateQR }: Props) {
   const safeSchedule = Array.isArray(schedule) ? schedule : [];
   return (
-    <motion.div variants={item} className="card-elevated p-6">
+    <motion.div variants={item} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Today&apos;s Schedule</h2>
         <Button variant="ghost" size="sm" onClick={onViewFull}>
@@ -67,7 +67,7 @@ function ScheduleItem({ courseId,  time, course, section, room, students, status
   };
 
   return (
-    <div className={`p-3 rounded-lg border ${statusStyles[status]} flex items-center gap-4`}>
+    <div className={`p-3 rounded-sm border ${statusStyles[status]} flex items-center gap-4`}>
       <div className="flex items-center gap-2 w-28 shrink-0">
         <Clock className="w-4 h-4 text-muted-foreground" />
         <span className="text-sm font-medium">{time}</span>
@@ -80,7 +80,7 @@ function ScheduleItem({ courseId,  time, course, section, room, students, status
       {status === 'ongoing' && (
         <div className="flex items-center gap-2 shrink-0">
           <span className="px-2 py-0.5 text-xs font-medium bg-accent text-accent-foreground rounded-full hidden sm:inline-flex">Live</span>
-          <Button size="sm" onClick={() => onGenerateQR?.(courseId)} className="h-7 text-xs shadow-md shadow-primary/20">
+          <Button size="sm" onClick={() => onGenerateQR?.(courseId)} className="h-7 text-xs shadow-sm shadow-primary/20">
             <QrCode className="w-3 h-3 mr-1" /> QR Attend
           </Button>
         </div>
@@ -88,4 +88,5 @@ function ScheduleItem({ courseId,  time, course, section, room, students, status
     </div>
   );
 }
+
 

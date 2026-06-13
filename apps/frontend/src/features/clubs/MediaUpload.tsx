@@ -141,7 +141,7 @@ export function MediaUpload({
           {uploadedFiles.map((media) => (
             <div
               key={media.id}
-              className="flex items-center justify-between p-3 bg-muted rounded-lg"
+              className="flex items-center justify-between p-3 bg-muted rounded-sm"
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className="text-primary">{getMediaIcon(media.kind)}</div>

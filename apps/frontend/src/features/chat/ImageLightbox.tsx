@@ -37,7 +37,7 @@ export function ImageLightbox({ imageUrl, onClose }: ImageLightboxProps) {
           exit={{ scale: 0.9, opacity: 0 }}
           src={imageUrl}
           alt="Lightbox"
-          className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+          className="max-w-[90vw] max-h-[90vh] object-contain rounded-sm shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         />
       </motion.div>

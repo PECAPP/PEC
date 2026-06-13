@@ -1,13 +1,3 @@
-const LOCAL_DEV_ORIGINS = [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:4173',
-  'http://127.0.0.1:4173',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://localhost:3001',
-  'http://127.0.0.1:3001',
-];
 
 const parseBoolean = (
   value: string | undefined,
@@ -34,17 +24,7 @@ export const getAllowedCorsOrigins = (): string[] => {
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-  if (configuredOrigins.length > 0) {
-    return configuredOrigins;
-  }
-
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      'CORS_ORIGINS must be explicitly configured in production. Refusing to enable permissive CORS.',
-    );
-  }
-
-  return LOCAL_DEV_ORIGINS;
+  return configuredOrigins;
 };
 
 export const getCorsConfig = () => {
@@ -68,6 +48,7 @@ export const getCorsConfig = () => {
       'Content-Type',
       'Origin',
       'X-Captcha-Token',
+      'X-CSRF-Token',
       'X-Request-Id',
       'X-Requested-With',
     ],

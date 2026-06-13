@@ -1,5 +1,6 @@
 export interface MapRegion {
   id: string;
+  _id?: string;
   name: string;
   description: string;
   x: number;
@@ -13,6 +14,7 @@ export interface MapRegion {
 
 export interface MapRoad {
   id: string;
+  _id?: string;
   points: { x: number; y: number }[]; // Array of waypoints for polyline
   width: number;
   organizationId?: string;

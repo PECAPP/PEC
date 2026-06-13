@@ -23,7 +23,7 @@ export function UserDialog({
 }: UserDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle>{editingUser ? 'Edit User' : 'Create New User'}</DialogTitle>
           <DialogDescription>
@@ -60,7 +60,7 @@ export function UserDialog({
                 <SelectContent>
                   <SelectItem value="student">Student</SelectItem>
                   <SelectItem value="faculty">Faculty</SelectItem>
-                  <SelectItem value="college_admin">College Admin</SelectItem>
+                  <SelectItem value="college_admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>

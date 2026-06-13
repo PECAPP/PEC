@@ -4,7 +4,7 @@ import { extractData } from "@/lib/utils";
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { User, Course, DashboardStats, AdminDashboardData } from '../../shared/types';
+import { User, Course, DashboardStats, AdminDashboardData } from '@pec/shared';
 import api from "@pec/api";
 import { toast } from 'sonner';
 
@@ -13,8 +13,8 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
   const { user, loading: authLoading } = useAuth();
 
   const [loading, setLoading] = useState(!initialData);
-  const [courses, setCourses] = useState<Course[]>(initialData?.courses || []);
-  const [users, setUsers] = useState<User[]>(initialData?.users || []);
+  const [courses, setCourses] = useState<Course[]>((initialData?.courses as Course[]) || []);
+  const [users, setUsers] = useState<User[]>((initialData?.users as User[]) || []);
   const [stats, setStats] = useState<DashboardStats>(
     initialData?.stats || {
       totalStudents: 0,
@@ -22,6 +22,9 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       totalCourses: 0,
     }
   );
+  const [recentAdmissions, setRecentAdmissions] = useState<any[]>([]);
+  const [departmentOverview, setDepartmentOverview] = useState<any[]>([]);
+  const [financeCharts, setFinanceCharts] = useState<any>(null);
 
   // Course Dialog states
   const [showCourseDialog, setShowCourseDialog] = useState(false);
@@ -75,18 +78,21 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
 
   const fetchAdminData = useCallback(async () => {
     try {
-      const [coursesData, usersData, statsRes] = await Promise.all([
+      const [coursesData, usersData, analyticsRes] = await Promise.all([
         api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
         api.get('/users', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
-        api.get('/admin/dashboard-stats'),
+        api.get('/analytics/dashboard'),
       ]);
 
       setCourses(coursesData);
       setUsers(usersData);
 
-      const serverStats = statsRes.data?.success ? statsRes.data.data : statsRes.data;
-      if (serverStats) {
-        setStats(serverStats);
+      const analyticsData = analyticsRes.data?.success ? analyticsRes.data.data : analyticsRes.data;
+      if (analyticsData) {
+        if (analyticsData.stats) setStats(analyticsData.stats);
+        if (analyticsData.recentAdmissions) setRecentAdmissions(analyticsData.recentAdmissions);
+        if (analyticsData.departmentOverview) setDepartmentOverview(analyticsData.departmentOverview);
+        if (analyticsData.financeCharts) setFinanceCharts(analyticsData.financeCharts);
       }
     } catch (error) {
       console.error('Error fetching admin data:', error);
@@ -98,7 +104,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
     if (authLoading) return;
 
     if (!user) {
-      router.replace('/auth');
+      // Let middleware handle the redirect — don't force it from client
       return;
     }
 
@@ -117,7 +123,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
     void (async () => {
       try {
         await fetchAdminData();
-      } catch (error) {
+      } catch (_error) {
         toast.error('Failed to load admin data');
       } finally {
         setLoading(false);
@@ -162,7 +168,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       setShowCourseDialog(false);
       resetCourseForm();
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to create course');
     }
   };
@@ -181,7 +187,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       setEditingCourse(null);
       resetCourseForm();
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update course');
     }
   };
@@ -192,7 +198,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       await api.delete(`/courses/${courseId}`);
       toast.success('Course deleted successfully!');
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete course');
     }
   };
@@ -207,7 +213,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       setShowUserDialog(false);
       resetUserForm();
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to create user');
     }
   };
@@ -224,7 +230,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       setEditingUser(null);
       resetUserForm();
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update user');
     }
   };
@@ -235,7 +241,7 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
       await api.delete(`/users/${userId}`);
       toast.success('User deleted successfully!');
       await fetchAdminData();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete user');
     }
   };
@@ -273,6 +279,9 @@ export function useAdminDashboard(initialData?: AdminDashboardData) {
     courses: filteredCourses,
     users: filteredUsers,
     stats,
+    recentAdmissions,
+    departmentOverview,
+    financeCharts,
     courseSearchQuery,
     setCourseSearchQuery,
     userSearchQuery,

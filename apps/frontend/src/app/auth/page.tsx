@@ -16,7 +16,7 @@ export default async function AuthPage() {
 
   return (
     <main className="bg-background">
-      <AuthClient initialSessionStatus={false} />
+      <AuthClient _initialSessionStatus={false} />
     </main>
   );
 }

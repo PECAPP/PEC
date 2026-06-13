@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Users, BookOpen, FileText } from 'lucide-react';
+import { StatCard } from '@pec/ui';
 
 interface StatsProps {
   stats: {
@@ -14,58 +15,52 @@ interface StatsProps {
 
 export function AdminStatsCards({ stats, onTabChange }: StatsProps) {
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
       <motion.div 
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 
-        className="card-elevated p-5 cursor-pointer hover:border-primary/50 transition-colors"
         onClick={() => onTabChange("users")}
+        className="cursor-pointer h-full"
       >
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-primary/10">
-            <Users className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Total Students</p>
-            <p className="text-2xl font-bold text-foreground">{stats.totalStudents}</p>
-          </div>
-        </div>
+        <StatCard 
+          className="h-full"
+          label="Total Students" 
+          value={stats.totalStudents} 
+          icon={<Users className="w-5 h-5" />} 
+          colorVariant="success" 
+        />
       </motion.div>
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ delay: 0.05 }} 
-        className="card-elevated p-5 cursor-pointer hover:border-primary/50 transition-colors"
         onClick={() => onTabChange("users")}
+        className="cursor-pointer h-full"
       >
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-foreground/10">
-            <BookOpen className="w-5 h-5 text-foreground" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Total Faculty</p>
-            <p className="text-2xl font-bold text-foreground">{stats.totalFaculty}</p>
-          </div>
-        </div>
+        <StatCard 
+          className="h-full"
+          label="Total Faculty" 
+          value={stats.totalFaculty} 
+          icon={<BookOpen className="w-5 h-5" />} 
+          colorVariant="info" 
+        />
       </motion.div>
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ delay: 0.1 }} 
-        className="card-elevated p-5 cursor-pointer hover:border-primary/50 transition-colors"
         onClick={() => onTabChange("courses")}
+        className="cursor-pointer h-full"
       >
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-foreground/10">
-            <FileText className="w-5 h-5 text-foreground" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Total Courses</p>
-            <p className="text-2xl font-bold text-foreground">{stats.totalCourses}</p>
-          </div>
-        </div>
+        <StatCard 
+          className="h-full"
+          label="Total Courses" 
+          value={stats.totalCourses} 
+          icon={<FileText className="w-5 h-5" />} 
+          colorVariant="warning" 
+        />
       </motion.div>
     </div>
   );

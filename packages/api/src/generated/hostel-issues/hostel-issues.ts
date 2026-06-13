@@ -29,10 +29,8 @@ import type {
   UpdateHostelIssueDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -58,7 +56,7 @@ export const getHostelIssuesControllerFindManyV1Url = () => {
 
 export const hostelIssuesControllerFindManyV1 = async ( options?: RequestInit): Promise<hostelIssuesControllerFindManyV1Response> => {
 
-  return customInstance<hostelIssuesControllerFindManyV1Response>(getHostelIssuesControllerFindManyV1Url(),
+  return fetchWithAuth<hostelIssuesControllerFindManyV1Response>(getHostelIssuesControllerFindManyV1Url(),
   {
     ...options,
     method: 'GET'
@@ -78,16 +76,16 @@ export const getHostelIssuesControllerFindManyV1QueryKey = () => {
     }
 
 
-export const getHostelIssuesControllerFindManyV1QueryOptions = <TData = Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getHostelIssuesControllerFindManyV1QueryOptions = <TData = Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getHostelIssuesControllerFindManyV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>> = ({ signal }) => hostelIssuesControllerFindManyV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>> = ({ signal }) => hostelIssuesControllerFindManyV1({ signal });
 
 
 
@@ -107,7 +105,7 @@ export function useHostelIssuesControllerFindManyV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useHostelIssuesControllerFindManyV1<TData = Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError = unknown>(
@@ -117,16 +115,16 @@ export function useHostelIssuesControllerFindManyV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useHostelIssuesControllerFindManyV1<TData = Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useHostelIssuesControllerFindManyV1<TData = Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindManyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -164,7 +162,7 @@ export const getHostelIssuesControllerCreateV1Url = () => {
 
 export const hostelIssuesControllerCreateV1 = async (createHostelIssueDto: CreateHostelIssueDto, options?: RequestInit): Promise<hostelIssuesControllerCreateV1Response> => {
 
-  return customInstance<hostelIssuesControllerCreateV1Response>(getHostelIssuesControllerCreateV1Url(),
+  return fetchWithAuth<hostelIssuesControllerCreateV1Response>(getHostelIssuesControllerCreateV1Url(),
   {
     ...options,
     method: 'POST',
@@ -177,15 +175,15 @@ export const hostelIssuesControllerCreateV1 = async (createHostelIssueDto: Creat
 
 
 export const getHostelIssuesControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerCreateV1>>, TError,{data: CreateHostelIssueDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerCreateV1>>, TError,{data: CreateHostelIssueDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerCreateV1>>, TError,{data: CreateHostelIssueDto}, TContext> => {
 
 const mutationKey = ['hostelIssuesControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -193,7 +191,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof hostelIssuesControllerCreateV1>>, {data: CreateHostelIssueDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  hostelIssuesControllerCreateV1(data,requestOptions)
+          return  hostelIssuesControllerCreateV1(data,)
         }
 
 
@@ -208,7 +206,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type HostelIssuesControllerCreateV1MutationError = unknown
 
     export const useHostelIssuesControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerCreateV1>>, TError,{data: CreateHostelIssueDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerCreateV1>>, TError,{data: CreateHostelIssueDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof hostelIssuesControllerCreateV1>>,
         TError,
@@ -239,7 +237,7 @@ export const getHostelIssuesControllerFindOneV1Url = (id: string,) => {
 
 export const hostelIssuesControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<hostelIssuesControllerFindOneV1Response> => {
 
-  return customInstance<hostelIssuesControllerFindOneV1Response>(getHostelIssuesControllerFindOneV1Url(id),
+  return fetchWithAuth<hostelIssuesControllerFindOneV1Response>(getHostelIssuesControllerFindOneV1Url(id),
   {
     ...options,
     method: 'GET'
@@ -259,16 +257,16 @@ export const getHostelIssuesControllerFindOneV1QueryKey = (id: string,) => {
     }
 
 
-export const getHostelIssuesControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getHostelIssuesControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getHostelIssuesControllerFindOneV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>> = ({ signal }) => hostelIssuesControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>> = ({ signal }) => hostelIssuesControllerFindOneV1(id, { signal });
 
 
 
@@ -288,7 +286,7 @@ export function useHostelIssuesControllerFindOneV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useHostelIssuesControllerFindOneV1<TData = Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError = unknown>(
@@ -298,16 +296,16 @@ export function useHostelIssuesControllerFindOneV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useHostelIssuesControllerFindOneV1<TData = Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useHostelIssuesControllerFindOneV1<TData = Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof hostelIssuesControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -346,7 +344,7 @@ export const getHostelIssuesControllerUpdateV1Url = (id: string,) => {
 export const hostelIssuesControllerUpdateV1 = async (id: string,
     updateHostelIssueDto: UpdateHostelIssueDto, options?: RequestInit): Promise<hostelIssuesControllerUpdateV1Response> => {
 
-  return customInstance<hostelIssuesControllerUpdateV1Response>(getHostelIssuesControllerUpdateV1Url(id),
+  return fetchWithAuth<hostelIssuesControllerUpdateV1Response>(getHostelIssuesControllerUpdateV1Url(id),
   {
     ...options,
     method: 'PATCH',
@@ -359,15 +357,15 @@ export const hostelIssuesControllerUpdateV1 = async (id: string,
 
 
 export const getHostelIssuesControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerUpdateV1>>, TError,{id: string;data: UpdateHostelIssueDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerUpdateV1>>, TError,{id: string;data: UpdateHostelIssueDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerUpdateV1>>, TError,{id: string;data: UpdateHostelIssueDto}, TContext> => {
 
 const mutationKey = ['hostelIssuesControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -375,7 +373,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof hostelIssuesControllerUpdateV1>>, {id: string;data: UpdateHostelIssueDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  hostelIssuesControllerUpdateV1(id,data,requestOptions)
+          return  hostelIssuesControllerUpdateV1(id,data,)
         }
 
 
@@ -390,7 +388,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type HostelIssuesControllerUpdateV1MutationError = unknown
 
     export const useHostelIssuesControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerUpdateV1>>, TError,{id: string;data: UpdateHostelIssueDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerUpdateV1>>, TError,{id: string;data: UpdateHostelIssueDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof hostelIssuesControllerUpdateV1>>,
         TError,
@@ -421,7 +419,7 @@ export const getHostelIssuesControllerRemoveV1Url = (id: string,) => {
 
 export const hostelIssuesControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<hostelIssuesControllerRemoveV1Response> => {
 
-  return customInstance<hostelIssuesControllerRemoveV1Response>(getHostelIssuesControllerRemoveV1Url(id),
+  return fetchWithAuth<hostelIssuesControllerRemoveV1Response>(getHostelIssuesControllerRemoveV1Url(id),
   {
     ...options,
     method: 'DELETE'
@@ -434,15 +432,15 @@ export const hostelIssuesControllerRemoveV1 = async (id: string, options?: Reque
 
 
 export const getHostelIssuesControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['hostelIssuesControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -450,7 +448,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof hostelIssuesControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  hostelIssuesControllerRemoveV1(id,requestOptions)
+          return  hostelIssuesControllerRemoveV1(id,)
         }
 
 
@@ -465,7 +463,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type HostelIssuesControllerRemoveV1MutationError = unknown
 
     export const useHostelIssuesControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof hostelIssuesControllerRemoveV1>>,
         TError,
@@ -496,7 +494,7 @@ export const getHostelIssuesControllerReplyV1Url = (id: string,) => {
 
 export const hostelIssuesControllerReplyV1 = async (id: string, options?: RequestInit): Promise<hostelIssuesControllerReplyV1Response> => {
 
-  return customInstance<hostelIssuesControllerReplyV1Response>(getHostelIssuesControllerReplyV1Url(id),
+  return fetchWithAuth<hostelIssuesControllerReplyV1Response>(getHostelIssuesControllerReplyV1Url(id),
   {
     ...options,
     method: 'POST'
@@ -509,15 +507,15 @@ export const hostelIssuesControllerReplyV1 = async (id: string, options?: Reques
 
 
 export const getHostelIssuesControllerReplyV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerReplyV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerReplyV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerReplyV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['hostelIssuesControllerReplyV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -525,7 +523,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof hostelIssuesControllerReplyV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  hostelIssuesControllerReplyV1(id,requestOptions)
+          return  hostelIssuesControllerReplyV1(id,)
         }
 
 
@@ -540,7 +538,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type HostelIssuesControllerReplyV1MutationError = unknown
 
     export const useHostelIssuesControllerReplyV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerReplyV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof hostelIssuesControllerReplyV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof hostelIssuesControllerReplyV1>>,
         TError,

@@ -1,29 +1,17 @@
-import { IsString, IsOptional, IsNumber, IsBoolean } from 'class-validator';
-import { Type } from 'class-transformer';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateRoomDto {
-  @IsString()
-  name: string;
+export const createRoomSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  capacity: z.preprocess((a) => a === undefined ? 0 : parseInt(a as string, 10), z.number().int()),
+  building: z.string(),
+  floor: z.preprocess((a) => a === undefined ? 0 : parseInt(a as string, 10), z.number().int()),
+  facilities: z.string().optional(),
+  isAvailable: z.boolean().optional(),
+});
 
-  @IsString()
-  type: string;
 
-  @Type(() => Number)
-  @IsNumber()
-  capacity: number;
 
-  @IsString()
-  building: string;
-
-  @Type(() => Number)
-  @IsNumber()
-  floor: number;
-
-  @IsOptional()
-  @IsString()
-  facilities?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isAvailable?: boolean;
+export class CreateRoomDto extends createZodDto(createRoomSchema) {
 }

@@ -5,19 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { CreateUserDtoRole } from './createUserDtoRole';
-import type { CreateUserDtoStatus } from './createUserDtoStatus';
 
-export interface CreateUserDto {
-  fullName: string;
-  email: string;
-  role: CreateUserDtoRole;
-  status?: CreateUserDtoStatus;
-  department?: string;
-  enrollmentNumber?: string;
-  semester?: number;
-  employeeId?: string;
-  designation?: string;
-  specialization?: string;
-  phone?: string;
-}
+export interface CreateUserDto { [key: string]: unknown }

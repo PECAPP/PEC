@@ -9,8 +9,8 @@ import {
   Query,
   Request,
   UseGuards,
-  ForbiddenException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
@@ -66,6 +66,16 @@ export class MarketplaceController {
     return ok(data);
   }
 
+  @CheckPolicies((ability) => ability.can('update', 'MarketplaceListing'))
+  @Post('listings/:id/hold')
+  async holdListing(
+    @Param('id') id: string,
+    @Request() req: any,
+  ) {
+    const data = await this.service.holdListing(id, req.user.sub);
+    return ok(data);
+  }
+
   @CheckPolicies((ability) => ability.can('delete', 'MarketplaceListing'))
   @Delete('listings/:id')
   async deleteListing(@Param('id') id: string, @Request() req: any) {
@@ -114,12 +124,34 @@ export class MarketplaceController {
   }
 
   @Post('chats/:chatId/messages')
+  @Throttle({ short: { limit: 5, ttl: 60000 } }) // 5 messages per minute
   async sendMessage(
     @Param('chatId') chatId: string,
     @Request() req: any,
     @Body('text') text: string,
   ) {
     const data = await this.service.sendMessage(chatId, req.user.sub, text);
+    return ok(data);
+  }
+
+  @Post('chats/:chatId/offers')
+  async createOffer(
+    @Param('chatId') chatId: string,
+    @Request() req: any,
+    @Body('amount') amount: number,
+  ) {
+    const data = await this.service.createOffer(chatId, req.user.sub, amount);
+    return ok(data);
+  }
+
+  @Patch('chats/:chatId/offers/:messageId')
+  async updateOffer(
+    @Param('chatId') chatId: string,
+    @Param('messageId') messageId: string,
+    @Request() req: any,
+    @Body('status') status: string,
+  ) {
+    const data = await this.service.updateOffer(chatId, messageId, req.user.sub, status);
     return ok(data);
   }
 }

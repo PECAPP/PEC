@@ -169,7 +169,7 @@ export function useFacultyDashboard(initialData?: any, serverUser?: any) {
     if (authLoading) return;
 
     if (!user || user.role !== 'faculty') {
-      router.replace('/auth');
+      // Let middleware handle the redirect — don't force it from client
       return;
     }
 

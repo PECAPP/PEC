@@ -1,32 +1,15 @@
-import {
-  IsDateString,
-  IsInt,
-  IsOptional,
-  IsString,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateBackgroundJobDto {
-  @IsString()
-  @MaxLength(120)
-  type!: string;
+export const createBackgroundJobSchema = z.object({
+  type: z.string(),
+  payload: z.string().optional(),
+  dedupeKey: z.string().optional(),
+  runAt: z.string().optional(),
+  maxAttempts: z.number().int().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  payload?: string;
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(160)
-  dedupeKey?: string;
 
-  @IsOptional()
-  @IsDateString()
-  runAt?: string;
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  maxAttempts?: number;
+export class CreateBackgroundJobDto extends createZodDto(createBackgroundJobSchema) {
 }

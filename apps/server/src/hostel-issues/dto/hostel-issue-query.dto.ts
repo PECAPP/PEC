@@ -1,31 +1,18 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
-import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class HostelIssueQueryDto extends PaginationQueryDto {
-  @IsOptional()
-  @IsString()
-  studentId?: string;
+export const hostelIssueQuerySchema = z.object({  limit: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  offset: z.preprocess((a) => a === undefined ? undefined : parseInt(a as string, 10), z.number().int().optional()),
+  sortOrder: z.any().optional(),
+  studentId: z.string().optional(),
+  status: z.string().optional(),
+  status__ne: z.string().optional(),
+  category: z.string().optional(),
+  priority: z.string().optional(),
+  sortBy: z.string().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  status?: string;
 
-  @IsOptional()
-  @IsString()
-  status__ne?: string;
 
-  @IsOptional()
-  @IsString()
-  category?: string;
-
-  @IsOptional()
-  @IsString()
-  priority?: string;
-
-  @IsOptional()
-  organizationId?: string | string[];
-
-  @IsOptional()
-  @IsIn(['createdAt', 'updatedAt', 'priority', 'status'])
-  sortBy?: 'createdAt' | 'updatedAt' | 'priority' | 'status';
+export class HostelIssueQueryDto extends createZodDto(hostelIssueQuerySchema) {
 }

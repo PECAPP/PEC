@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Clock, CheckCircle2, IndianRupee, CreditCard } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button, formatDate } from "@pec/ui";
+import { Badge } from '@pec/ui';
 import { cn } from '@/lib/utils';
 import { FeeRecord } from '../types';
 import { CATEGORIES, STATUS_CONFIG, fmt, isOverdue } from '../constants';
@@ -30,8 +30,8 @@ export default function FeeCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'relative bg-card border rounded-xl p-4 space-y-3 transition-all',
-        overdue ? 'border-red-300 dark:border-red-800' : 'border-border hover:border-primary/30',
+        'relative bg-card border rounded-sm p-4 space-y-3 transition-all',
+        overdue ? 'border-red-300 dark:border-red-800' : 'border-border hover:border-border/40',
         fee.status === 'paid' && 'opacity-80'
       )}
     >
@@ -47,7 +47,7 @@ export default function FeeCard({
       )}
 
       <div className="flex items-start gap-3">
-        <div className={cn('p-2.5 rounded-lg border', cat.bg)}>
+        <div className={cn('p-2.5 rounded-sm border', cat.bg)}>
           <Icon className={cn('w-4 h-4', cat.color)} />
         </div>
         <div className="flex-1 min-w-0">
@@ -80,11 +80,7 @@ export default function FeeCard({
             )}
           >
             Due:{' '}
-            {new Date(fee.dueDate).toLocaleDateString('en-IN', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
-            })}
+            {formatDate(fee.dueDate)}
           </p>
         </div>
 
@@ -102,7 +98,7 @@ export default function FeeCard({
       {fee.status === 'paid' && fee.paidDate && (
         <p className="text-[10px] text-emerald-600 flex items-center gap-1">
           <CheckCircle2 className="w-3 h-3" />
-          Paid on {new Date(fee.paidDate).toLocaleDateString('en-IN')}
+          Paid on {formatDate(fee.paidDate)}
           {fee.paymentTransactionId && ` · ${fee.paymentTransactionId}`}
         </p>
       )}

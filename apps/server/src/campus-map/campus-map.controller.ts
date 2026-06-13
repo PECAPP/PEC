@@ -8,7 +8,9 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
@@ -29,6 +31,8 @@ export class CampusMapController {
   constructor(private readonly service: CampusMapService) {}
 
   @CheckPolicies((ability) => ability.can('read', 'CampusMap'))
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300) // 5 minutes
   @Get()
   async listRegions(@Query() query: CampusMapQueryDto) {
     const result = await this.service.findRegions(query);
@@ -40,6 +44,8 @@ export class CampusMapController {
   }
 
   @CheckPolicies((ability) => ability.can('read', 'CampusMap'))
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300) // 5 minutes
   @Get(':id')
   async getRegion(@Param('id') id: string) {
     const data = await this.service.findRegionById(id);
@@ -77,6 +83,8 @@ export class CampusMapRoadsController {
   constructor(private readonly service: CampusMapService) {}
 
   @CheckPolicies((ability) => ability.can('read', 'CampusMap'))
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300) // 5 minutes
   @Get()
   async listRoads(@Query() query: CampusMapQueryDto) {
     const result = await this.service.findRoads(query);
@@ -88,6 +96,8 @@ export class CampusMapRoadsController {
   }
 
   @CheckPolicies((ability) => ability.can('read', 'CampusMap'))
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300) // 5 minutes
   @Get(':id')
   async getRoad(@Param('id') id: string) {
     const data = await this.service.findRoadById(id);

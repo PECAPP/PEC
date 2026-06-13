@@ -3,7 +3,7 @@ import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitl
 
 
 import { useEffect, useState } from "react";
-import { useAbility } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import {  buildApiUrl  } from "@pec/api";
 import {  authClient  } from "@pec/api";
 
@@ -23,8 +23,8 @@ interface Role {
   }[];
 }
 
-export default function RolesAdminPage() {
-  const ability = useAbility();
+export default function RolesManagement() {
+  const { ability } = useAuth();
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,14 +33,12 @@ export default function RolesAdminPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const token = authClient.getAccessToken();
-
       const [rolesRes, permsRes] = await Promise.all([
         fetch(buildApiUrl("/roles"), {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         }),
         fetch(buildApiUrl("/permissions"), {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         }),
       ]);
 
@@ -61,11 +59,10 @@ export default function RolesAdminPage() {
 
   const handleCreateRole = async () => {
     if (!newRoleName) return;
-    const token = authClient.getAccessToken();
     await fetch(buildApiUrl("/roles"), {
       method: "POST",
+      credentials: 'include',
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ name: newRoleName, description: "Custom Role" }),
@@ -89,11 +86,10 @@ export default function RolesAdminPage() {
       updatedPermIds = updatedPermIds.filter((id) => id !== permissionId);
     }
 
-    const token = authClient.getAccessToken();
     await fetch(buildApiUrl(`/roles/${roleId}`), {
       method: "PATCH",
+      credentials: 'include',
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

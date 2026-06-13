@@ -2,47 +2,55 @@ import {
   Controller,
   Get,
   Post,
-  UploadedFile,
+  Body,
   UseGuards,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminService } from './admin.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
-
-
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 import { ok } from '../common/utils/api-response';
-import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('admin')
-@UseGuards(AuthGuard, PoliciesGuard)
-  @CheckPolicies((ability) => ability.can('read', 'Admin'))
+@UseGuards(AuthGuard, RolesGuard, PoliciesGuard)
+@Roles('college_admin')
+@CheckPolicies((ability) => ability.can('read', 'Admin'))
 export class AdminController {
+  constructor(private readonly adminService: AdminService) {}
+
   @Get('dashboard-stats')
   @UseInterceptors(CacheInterceptor)
   @CacheKey('dashboard-stats-cache')
+  @CacheTTL(60000)
   async getStats() {
     const data = await this.adminService.getDashboardStats();
     return ok(data);
   }
 
-  constructor(private readonly adminService: AdminService) {}
+  @Get('audit-logs')
+  async getAuditLogs(@Query('limit') limit?: string, @Query('offset') offset?: string) {
+    const data = await this.adminService.getAuditLogs(
+      limit ? parseInt(limit, 10) : 100,
+      offset ? parseInt(offset, 10) : 0
+    );
+    return ok(data.items, { total: data.total, limit: data.limit, offset: data.offset });
+  }
 
-  @Post('bulk/users')
-  @UseInterceptors(FileInterceptor('file'))
-  async bulkUsers(@UploadedFile() file: Express.Multer.File) {
-    const results = await this.adminService.processUserBulk(file);
+  @Post('upload-students')
+  async uploadStudents(@Body() body: { fileKey: string }) {
+    const results = await this.adminService.processUserBulk(body.fileKey);
     return ok(results);
   }
 
-  @Post('bulk/attendance')
-  @UseInterceptors(FileInterceptor('file'))
-  async bulkAttendance(@UploadedFile() file: Express.Multer.File) {
-    const results = await this.adminService.processAttendanceBulk(file);
+  @Post('upload-timetable')
+  async uploadTimetable(@Body() body: { fileKey: string }) {
+    const results = await this.adminService.processAttendanceBulk(body.fileKey);
     return ok(results);
   }
 }
-

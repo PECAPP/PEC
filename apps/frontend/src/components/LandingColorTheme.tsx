@@ -1,8 +1,8 @@
+'use client';
 import { Button } from "@pec/ui";
-import { ChevronLeft, ChevronRight, Palette } from "lucide-react";
-
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { safeLocalStorage } from "@/lib/ssr-safe";
 
 // Unified accent color themes - must match index.css definitions
 const accentThemes = [
@@ -12,46 +12,50 @@ const accentThemes = [
   { id: "amethyst", name: "Amethyst", color: "#8B5CF6" },
 ];
 
+/**
+ * Apply an accent theme class to the document root.
+ * Guarded with typeof document check — safe to call in useEffect.
+ */
+function applyAccentTheme(accentId: string) {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  accentThemes.forEach(({ id }) => root.classList.remove(`accent-${id}`));
+  root.classList.add(`accent-${accentId}`);
+}
+
 export function LandingColorTheme() {
+  // SSR-SAFE: Default to 0, hydrate from localStorage in useEffect.
+  // If we read localStorage in useState initializer, server renders index 0
+  // but client may have a saved value → hydration mismatch.
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const rawSavedAccent = localStorage.getItem("accent-color");
+    const rawSavedAccent = safeLocalStorage.get("accent-color");
     const savedAccent = !rawSavedAccent || rawSavedAccent === "golden" ? "pec-gold" : rawSavedAccent;
     const index = accentThemes.findIndex((t) => t.id === savedAccent);
     if (index !== -1) {
       setCurrentIndex(index);
       applyAccentTheme(savedAccent);
-      localStorage.setItem("accent-color", savedAccent);
+      safeLocalStorage.set("accent-color", savedAccent);
     }
   }, []);
 
-  const applyAccentTheme = (accentId: string) => {
-    const root = document.documentElement;
-    // Remove all existing accent classes
-    accentThemes.forEach(({ id }) => root.classList.remove(`accent-${id}`));
-    // Add the new accent class
-    root.classList.add(`accent-${accentId}`);
-  };
-
   const cycleTheme = (direction: "next" | "prev") => {
-    let newIndex;
-    if (direction === "next") {
-      newIndex = (currentIndex + 1) % accentThemes.length;
-    } else {
-      newIndex = (currentIndex - 1 + accentThemes.length) % accentThemes.length;
-    }
+    const newIndex =
+      direction === "next"
+        ? (currentIndex + 1) % accentThemes.length
+        : (currentIndex - 1 + accentThemes.length) % accentThemes.length;
 
     const newTheme = accentThemes[newIndex];
     setCurrentIndex(newIndex);
-    localStorage.setItem("accent-color", newTheme.id);
+    safeLocalStorage.set("accent-color", newTheme.id);
     applyAccentTheme(newTheme.id);
   };
 
   const currentTheme = accentThemes[currentIndex];
 
   return (
-    <div className="flex items-center gap-1 bg-accent/10 rounded-lg p-0.5 border border-accent/20">
+    <div className="flex items-center gap-1 bg-accent/10 rounded-sm p-0.5 border border-accent/20">
       <Button
         variant="ghost"
         size="icon"

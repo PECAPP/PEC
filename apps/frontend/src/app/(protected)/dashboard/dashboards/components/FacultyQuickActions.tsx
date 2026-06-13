@@ -3,7 +3,7 @@ import { Button } from "@pec/ui";
 
 
 import { motion } from 'framer-motion';
-import { ClipboardCheck, FileText, TrendingUp, Calendar } from 'lucide-react';
+import { ClipboardCheck } from 'lucide-react';
 
 interface Props {
   onAction: (path: string) => void;
@@ -16,7 +16,7 @@ const item = {
 
 export function FacultyQuickActions({ onAction }: Props) {
   return (
-    <motion.div variants={item} className="card-elevated p-6">
+    <motion.div variants={item} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
       <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
       <div className="space-y-2">
         <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => onAction('/attendance')}>

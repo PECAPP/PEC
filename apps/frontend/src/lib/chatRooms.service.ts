@@ -15,7 +15,7 @@ export async function findUserByEmail(email: string) {
   }
 }
 
-export async function createOrFindDMRoom(userId: string, otherUserId: string, organizationId: string) {
+export async function createOrFindDMRoom(userId: string, otherUserId: string, _organizationId: string) {
   // First, check if a DM already exists
   try {
     const res = await api.get("/chat/rooms");
@@ -56,7 +56,7 @@ export async function fetchChatUsers() {
   }
 }
 
-export async function fetchChatRooms(user: any): Promise<ChatRoom[]> {
+export async function fetchChatRooms(_user: any): Promise<ChatRoom[]> {
   try {
     const res = await api.get("/chat/rooms");
     const rooms = res.data?.data || res.data || [];

@@ -15,10 +15,8 @@ import type {
   UseMutationResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -44,7 +42,7 @@ export const getAiControllerGetCompletionV1Url = () => {
 
 export const aiControllerGetCompletionV1 = async ( options?: RequestInit): Promise<aiControllerGetCompletionV1Response> => {
 
-  return customInstance<aiControllerGetCompletionV1Response>(getAiControllerGetCompletionV1Url(),
+  return fetchWithAuth<aiControllerGetCompletionV1Response>(getAiControllerGetCompletionV1Url(),
   {
     ...options,
     method: 'POST'
@@ -57,15 +55,15 @@ export const aiControllerGetCompletionV1 = async ( options?: RequestInit): Promi
 
 
 export const getAiControllerGetCompletionV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof aiControllerGetCompletionV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof aiControllerGetCompletionV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof aiControllerGetCompletionV1>>, TError,void, TContext> => {
 
 const mutationKey = ['aiControllerGetCompletionV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -73,7 +71,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof aiControllerGetCompletionV1>>, void> = () => {
 
 
-          return  aiControllerGetCompletionV1(requestOptions)
+          return  aiControllerGetCompletionV1()
         }
 
 
@@ -88,7 +86,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AiControllerGetCompletionV1MutationError = unknown
 
     export const useAiControllerGetCompletionV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof aiControllerGetCompletionV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof aiControllerGetCompletionV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof aiControllerGetCompletionV1>>,
         TError,

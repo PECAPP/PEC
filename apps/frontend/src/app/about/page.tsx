@@ -107,7 +107,7 @@ const benefits = [
 
 const roleFeatures = [
   {
-    role: "College Administrators",
+    role: "Admins",
     icon: Building2,
     features: [
       "Department & faculty management",
@@ -214,7 +214,7 @@ export default function About() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
               <GraduationCap className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl">PEC</span>
@@ -303,9 +303,9 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-card border border-border rounded-xl p-6 hover:shadow-lg hover:border-primary/30 transition-all"
+                className="bg-card border border-border rounded-sm p-6 hover:shadow-lg hover:border-primary/30 transition-all"
               >
-                <div className="w-12 h-12 bg-foreground/5 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-foreground/5 rounded-sm flex items-center justify-center mb-4">
                   <module.icon className="w-6 h-6 text-foreground" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{module.title}</h3>
@@ -351,7 +351,7 @@ export default function About() {
                     transition={{ delay: index * 0.1 }}
                     className="flex gap-4"
                   >
-                    <div className="w-10 h-10 bg-foreground/5 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-foreground/5 rounded-sm flex items-center justify-center flex-shrink-0">
                       <benefit.icon className="w-5 h-5 text-foreground" />
                     </div>
                     <div>
@@ -369,10 +369,10 @@ export default function About() {
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="bg-secondary/50 rounded-2xl p-8 border border-border"
+              className="bg-secondary/50 rounded-sm p-8 border border-border"
             >
               <div className="grid grid-cols-2 gap-6">
-                <div className="bg-card rounded-xl p-6 text-center border border-border">
+                <div className="bg-card rounded-sm p-6 text-center border border-border">
                   <div className="text-4xl font-bold text-foreground mb-1">
                     60%
                   </div>
@@ -380,13 +380,13 @@ export default function About() {
                     Less Admin Work
                   </div>
                 </div>
-                <div className="bg-card rounded-xl p-6 text-center border border-border">
+                <div className="bg-card rounded-sm p-6 text-center border border-border">
                   <div className="text-4xl font-bold text-foreground mb-1">
                     99.9%
                   </div>
                   <div className="text-sm text-muted-foreground">Uptime SLA</div>
                 </div>
-                <div className="bg-card rounded-xl p-6 text-center border border-border">
+                <div className="bg-card rounded-sm p-6 text-center border border-border">
                   <div className="text-4xl font-bold text-foreground mb-1">
                     24/7
                   </div>
@@ -394,7 +394,7 @@ export default function About() {
                     Support Available
                   </div>
                 </div>
-                <div className="bg-card rounded-xl p-6 text-center border border-border">
+                <div className="bg-card rounded-sm p-6 text-center border border-border">
                   <div className="text-4xl font-bold text-foreground mb-1">
                     500+
                   </div>
@@ -433,7 +433,7 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-card border border-border rounded-xl p-6 hover:border-primary/30 transition-all text-center"
+                className="bg-card border border-border rounded-sm p-6 hover:border-primary/30 transition-all text-center"
               >
                 <value.icon className="w-12 h-12 text-foreground mb-4 mx-auto" />
                 <h3 className="text-lg font-bold text-foreground mb-2">
@@ -476,9 +476,9 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow"
+                className="bg-card border border-border rounded-sm p-6 hover:shadow-lg transition-shadow"
               >
-                <div className="w-12 h-12 bg-foreground/5 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-foreground/5 rounded-sm flex items-center justify-center mb-4">
                   <role.icon className="w-6 h-6 text-foreground" />
                 </div>
                 <h3 className="text-lg font-semibold mb-4">{role.role}</h3>
@@ -506,10 +506,10 @@ export default function About() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-card border border-border rounded-2xl p-8 md:p-12"
+            className="bg-card border border-border rounded-sm p-8 md:p-12"
           >
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 bg-foreground/5 rounded-xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-foreground/5 rounded-sm flex items-center justify-center">
                 <Shield className="w-7 h-7 text-foreground" />
               </div>
               <div>
@@ -573,7 +573,7 @@ export default function About() {
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="bg-card border border-border rounded-xl px-6 data-[state=open]:shadow-md transition-shadow"
+                  className="bg-card border border-border rounded-sm px-6 data-[state=open]:shadow-md transition-shadow"
                 >
                   <AccordionTrigger className="text-left font-semibold hover:no-underline py-5">
                     {faq.question}

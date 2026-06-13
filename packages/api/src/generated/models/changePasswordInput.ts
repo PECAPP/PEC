@@ -6,12 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface ChangePasswordInput {
-  /** Current valid password */
-  currentPassword: string;
-  /**
-     * New strong password
-     * @minLength 8
-     */
-  newPassword: string;
-}
+export interface ChangePasswordInput { [key: string]: unknown }

@@ -2,7 +2,7 @@
 
 ## 1. Summary of Contribution
 
-Provide a high-fidelity summary of the changes you are making to the PEC App platform. Describe the problem you are solving, the new features you are introducing, or the bug you are fixing in the academic management or campus logistics modules.
+Provide a clear and detailed description of the changes you are introducing, the problem they solve, and the context around them (e.g. academic management updates or campus logistics fixes).
 
 ---
 
@@ -12,39 +12,32 @@ Please select the type of contribution by marking with an [x]:
 - [ ] Bug Fix (non-breaking change which fixes an issue)
 - [ ] New Feature (non-breaking change which adds functional capability)
 - [ ] Refactoring (optimizing existing code without change in behavior)
-- [ ] Documentation (updates to README.md, FEATURES.md, ARCHITECTURE.md, etc.)
+- [ ] Documentation (updates to README.md, setup.md, architecture.md, etc.)
 - [ ] Security (fixing a vulnerability or patching a dependency)
 
 ---
 
-## 3. High-Fidelity Verification Checklist
+## 3. Verification Checklist
 
-Please verify that your contribution meets the institutional standards:
-- [ ] Verified that no prohibited modules (Recruiters, Assignments, Finance) are introduced.
-- [ ] The code passes all linting (`npm run lint`) and builds successfully (`npm run build`).
+Please verify that your contribution meets the repository guidelines:
+- [ ] Verified that the code complies with repository guidelines and does not introduce prohibited modules or unused code.
+- [ ] The code passes all linting (`pnpm run lint` or `turbo run lint`) and builds successfully.
 - [ ] New Zod validation schemas have been added to the `shared/` directory for any new data inputs.
-- [ ] New API endpoints are correctly guarded using NestJS Role-Based Access Control (RBAC).
-- [ ] Every component is 100% type-safe and avoids the use of `any`.
-- [ ] Added or updated relevant documentation in the `docs/` directory.
+- [ ] New API endpoints are correctly guarded using NestJS Role-Based Access Control (RBAC) or CASL guards.
+- [ ] Every component is type-safe and avoids the use of `any`.
+- [ ] Added or updated relevant documentation in the `docs/` or `apps/docs/` directories.
 
 ---
 
-## 4. Operational Impact and Performance
+## 4. Performance & Impact
 
-Describe the impact of this change on the sub-second responsiveness mandate:
-- **TTI (Time to Interactive)**: Does this change increase the initial JavaScript delivery?
-- **Query Resolution**: Have new Prisma queries been optimized with proper indexing?
-- **Data Integrity**: Does this change maintain 100% relational consistency in the PostgreSQL database?
+Describe the impact of this change on performance:
+- **Client Bundles**: Does this change increase the initial JavaScript delivery?
+- **Query Resolution**: Have new Prisma queries been optimized with proper indexing or select statements?
+- **Data Integrity**: Does this change maintain relational consistency in the database?
 
 ---
 
 ## 5. Additional Context and Documentation
 
-Provide any screenshots, 3D topology previews, or additional notes that will help the Architecture Council in the review process.
-
----
-
-**PEC Technical Operations Group**
-Standard: PEC-PR-TEMPLATE-2026
-Status: ACTIVE
-EOF
+Provide any screenshots, WebGL map captures, or additional notes that will help the maintainers in the review process.

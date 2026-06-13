@@ -1,6 +1,6 @@
 /**
- * Secure Auth Client with Refresh Token Rotation, Session Management & RBAC
- * Handles secure cookie + header-based token delivery for web + mobile clients
+ * Secure Auth Client with HttpOnly Sessions & Next.js BFF proxy
+ * Handles secure cookie-based authentication. No tokens are exposed to JS.
  */
 
 import { buildApiUrl } from './api-base';
@@ -20,9 +20,6 @@ export interface SignUpCredentials {
 }
 
 export interface AuthResponse {
-  access_token: string;
-  refresh_token?: string;
-  refresh_expires_at?: string;
   user: {
     uid: string;
     email: string;
@@ -46,13 +43,21 @@ export interface ChangePasswordPayload {
 }
 
 class AuthClient {
-  private accessToken: string | null = null;
-  private refreshToken: string | null = null;
   private isRefreshing = false;
   private refreshSubscribers: Array<{
-    resolve: (token: string) => void;
+    resolve: () => void;
     reject: (error: Error) => void;
   }> = [];
+
+  private get isProd(): boolean {
+    return typeof window !== 'undefined'
+      ? window.location.protocol === 'https:'
+      : false;
+  }
+
+  private get cookiePrefix(): string {
+    return this.isProd ? '__Host-' : '';
+  }
 
   private readCookie(name: string): string | null {
     if (typeof document === 'undefined') return null;
@@ -61,38 +66,27 @@ class AuthClient {
     return match ? decodeURIComponent(match[1]) : null;
   }
 
-  private writeAccessTokenCookie(token: string | null): void {
-    if (typeof document === 'undefined') return;
-
-    if (!token) {
-      document.cookie = 'access_token=; path=/; max-age=0; samesite=strict;';
-      return;
-    }
-
-    // Keep access token available across full page reloads in the browser.
-    const oneHourSeconds = 60 * 60;
-    document.cookie = `access_token=${encodeURIComponent(token)}; path=/; max-age=${oneHourSeconds}; samesite=strict;`;
+  private getCsrfToken(): string | null {
+    // Try prefixed name first, fall back to unprefixed for dev
+    return this.readCookie(`${this.cookiePrefix}csrf_token`) ?? this.readCookie('csrf_token');
   }
 
-  private clearSession(): void {
-    this.accessToken = null;
-    this.refreshToken = null;
-    this.writeAccessTokenCookie(null);
-    if (typeof document !== 'undefined') {
-      document.cookie = 'refresh_present=; path=/; max-age=0; samesite=strict;';
-      document.cookie = 'user_id=; path=/; max-age=0; samesite=strict;';
-      document.cookie = 'user_role=; path=/; max-age=0; samesite=strict;';
-    }
+  private hasRefreshSession(): boolean {
+    // Check for the presence of the refresh session cookie
+    return (
+      this.readCookie(`${this.cookiePrefix}refresh_session`) !== null ||
+      this.readCookie('refresh_session') !== null
+    );
   }
 
-  private waitForRefresh(): Promise<string> {
+  private waitForRefresh(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.refreshSubscribers.push({ resolve, reject });
     });
   }
 
-  private notifyRefreshSubscribers(token: string): void {
-    this.refreshSubscribers.forEach(({ resolve }) => resolve(token));
+  private notifyRefreshSubscribers(): void {
+    this.refreshSubscribers.forEach(({ resolve }) => resolve());
     this.refreshSubscribers = [];
   }
 
@@ -123,10 +117,14 @@ class AuthClient {
     return fallback;
   }
 
-  async login(credentials: AuthCredentials): Promise<AuthResponse> {
+  async login(credentials: AuthCredentials): Promise<AuthResponse | { requires2FA: boolean; userId: string }> {
+    const csrfToken = this.getCsrfToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
     const response = await fetch(authUrl('login'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(credentials),
       credentials: 'include',
     });
@@ -136,22 +134,37 @@ class AuthClient {
       throw new Error(message);
     }
 
-    const data: AuthResponse = await response.json();
-    this.accessToken = data.access_token;
-
-    if (data.refresh_token) {
-      this.refreshToken = data.refresh_token;
-    }
-
-    return data;
+    return response.json();
   }
 
-  async signup(
-    credentials: SignUpCredentials
-  ): Promise<AuthResponse & { emailVerificationToken?: string }> {
+  async login2FA(payload: { userId: string; token: string }): Promise<AuthResponse> {
+    const csrfToken = this.getCsrfToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
+    const response = await fetch(authUrl('2fa/login'), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const message = await this.parseErrorMessage(response, '2FA Login failed');
+      throw new Error(message);
+    }
+
+    return response.json();
+  }
+
+  async signup(credentials: SignUpCredentials): Promise<AuthResponse & { emailVerificationToken?: string }> {
+    const csrfToken = this.getCsrfToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
     const response = await fetch(authUrl('register'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(credentials),
       credentials: 'include',
     });
@@ -161,39 +174,34 @@ class AuthClient {
       throw new Error(message);
     }
 
-    const data = await response.json();
-    this.accessToken = data.access_token;
-
-    if (data.refresh_token) {
-      this.refreshToken = data.refresh_token;
-    }
-
-    return data;
+    return response.json();
   }
 
-  async refreshAccessToken(): Promise<string> {
+  async refreshAccessToken(): Promise<void> {
     if (this.isRefreshing) {
       return this.waitForRefresh();
     }
 
     if (!this.hasRefreshSession()) {
-      this.clearSession();
       throw new Error('No active refresh session');
     }
 
     this.isRefreshing = true;
 
     try {
+      const csrfToken = this.getCsrfToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
       const response = await fetch(authUrl('refresh'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({}),
         credentials: 'include',
       });
 
       if (!response.ok) {
         if (response.status === 400 || response.status === 401 || response.status === 403) {
-          this.clearSession();
           const message = await this.parseErrorMessage(response, 'No active refresh session');
           throw new Error(message);
         }
@@ -202,19 +210,9 @@ class AuthClient {
         throw new Error(message);
       }
 
-      const data: AuthResponse = await response.json();
-      this.accessToken = data.access_token;
-      this.writeAccessTokenCookie(this.accessToken);
-
-      if (data.refresh_token) {
-        this.refreshToken = data.refresh_token;
-      }
-
-      this.notifyRefreshSubscribers(this.accessToken);
-      return this.accessToken;
+      this.notifyRefreshSubscribers();
     } catch (error) {
       const normalizedError = error instanceof Error ? error : new Error('Token refresh failed');
-      this.clearSession();
       this.notifyRefreshSubscribersError(normalizedError);
       throw normalizedError;
     } finally {
@@ -224,20 +222,18 @@ class AuthClient {
 
   async logout(): Promise<void> {
     try {
-      const body = this.refreshToken
-        ? JSON.stringify({ refreshToken: this.refreshToken })
-        : JSON.stringify({});
+      const csrfToken = this.getCsrfToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
 
       await fetch(authUrl('logout'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body,
+        headers,
+        body: JSON.stringify({}),
         credentials: 'include',
       });
     } catch {
       // Log to service but don't fail logout
-    } finally {
-      this.clearSession();
     }
   }
 
@@ -290,21 +286,20 @@ class AuthClient {
   }
 
   async changePassword(payload: ChangePasswordPayload): Promise<{ changed: boolean }> {
-    const token = this.getAccessToken();
+    const csrfToken = this.getCsrfToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
     const response = await fetch(authUrl('change-password'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers,
       body: JSON.stringify(payload),
       credentials: 'include',
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-        this.clearSession();
-      }
       const message = await this.parseErrorMessage(response, 'Password change failed');
       throw new Error(message);
     }
@@ -313,19 +308,12 @@ class AuthClient {
   }
 
   async fetchPermissions(): Promise<any[]> {
-    const token = this.getAccessToken();
     const response = await fetch(authUrl('me/permissions'), {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
       credentials: 'include',
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-        this.clearSession();
-      }
       return [];
     }
 
@@ -333,44 +321,23 @@ class AuthClient {
     return data.permissions || [];
   }
 
-  getAccessToken(): string | null {
-    if (this.accessToken) return this.accessToken;
 
-    // Recovery after page reload.
-    const fromCookie = this.readCookie('access_token');
-    if (fromCookie) {
-      this.accessToken = fromCookie;
-      return fromCookie;
-    }
-
-    return null;
-  }
-
-  getRefreshToken(): string | null {
-    return this.refreshToken;
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.getAccessToken();
-  }
-
-  setAccessToken(token: string): void {
-    this.accessToken = token;
-    this.writeAccessTokenCookie(token);
-  }
-
-  setRefreshToken(token: string): void {
-    this.refreshToken = token;
-  }
-
-  hasRefreshSession(): boolean {
-    if (this.refreshToken) return true;
-    return this.readCookie('refresh_present') === '1';
-  }
-
-  resetSession(): void {
-    this.clearSession();
-  }
 }
 
-export const authClient = new AuthClient();
+export const authClient: AuthClient =
+  typeof window !== 'undefined'
+    ? new AuthClient()
+    : (new Proxy({} as AuthClient, {
+        get(_, prop) {
+          return () => {
+            throw new Error(
+              `[AuthClient] Attempted to call ${String(prop)} on the server. ` +
+              'Use a request-scoped AuthClient instance in SSR/RSC contexts.'
+            );
+          };
+        },
+      }) as AuthClient);
+
+export function createAuthClient(): AuthClient {
+  return new AuthClient();
+}

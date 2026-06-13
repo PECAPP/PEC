@@ -1,7 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Button } from "@pec/ui";
 import { cn } from '@/lib/utils';
-import { Download, FileText, Star, Trash2, Copy, MoreVertical, Reply } from 'lucide-react';
-import { ChatMessage as ChatMessageType } from '@/lib/messages.service';
+import { Download, FileText, Star, Trash2, Copy, MoreVertical, Reply, Edit } from 'lucide-react';
 import { deleteMessage, toggleStarMessage } from '@/lib/messages.service';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
@@ -59,15 +58,17 @@ interface ChatMessageProps {
   roomId?: string;
   onReply?: (message: Message) => void;
   onReplyClick?: () => void;
+  onEdit?: (message: Message) => void;
 }
 
-export function ChatMessage({ message, showSenderName = true, roomId = '', onReply = () => {}, onReplyClick }: ChatMessageProps) {
+export function ChatMessage({ message, showSenderName = true, roomId = '', onReply = () => {}, onReplyClick, onEdit }: ChatMessageProps) {
   const { user } = useAuth();
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const isStarred = message.starredBy?.includes(user?.uid || "") || false;
   const userRole = user?.role as string;
-  const isAdmin = userRole === "admin" || userRole === "college_admin";
+  const isAdmin = userRole === "college_admin";
   const canDelete = message.isOwn || isAdmin; // Owner or admin can delete
+  const canEdit = message.isOwn && !!roomId; // Only owner can edit
   const canStar = !!roomId; // Anyone can star if roomId exists
   const canCopy = !!message.content; // Can copy if there's text
 
@@ -88,7 +89,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
     try {
       await deleteMessage(roomId, message.id, true);
       toast.success("Message deleted");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to delete message");
     }
   };
@@ -98,7 +99,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
     try {
       await toggleStarMessage(roomId, message.id, user.uid, !isStarred);
       toast.success(isStarred ? "Removed from starred" : "Added to starred");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to star message");
     }
   };
@@ -128,7 +129,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
       <div className="flex flex-col gap-1.5 max-w-[85%] md:max-w-[80%] px-3">
         {showSenderName && !message.isOwn && (
           <Link 
-            href={`/users/${message.senderId}`} 
+            href={`/directory/users/${message.senderId}` as any} 
             className="text-xs font-bold px-2 hover:underline transition-colors"
             style={{ color: getUserColor(message.senderId) }}
           >
@@ -139,7 +140,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
         <div className="relative">
           <div
             className={cn(
-              'rounded-2xl px-4 py-2.5 shadow-md transition-all duration-200',
+              'rounded-sm px-4 py-2.5 shadow-md transition-all duration-200',
               message.isOwn 
                 ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-md' 
                 : 'bg-card border border-border text-foreground rounded-bl-md hover:shadow-lg'
@@ -148,7 +149,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
             {/* Reply Reference */}
             {message.replyTo && (
               <div 
-                className="mb-2.5 p-2.5 bg-background/30 backdrop-blur-sm rounded-lg border-l-3 border-primary text-xs cursor-pointer hover:bg-background/40 transition-colors"
+                className="mb-2.5 p-2.5 bg-background/30 backdrop-blur-sm rounded-sm border-l-3 border-border/40 text-xs cursor-pointer hover:bg-background/40 transition-colors"
                 onClick={onReplyClick}
               >
                 <p className="font-semibold text-primary text-[11px] mb-0.5">↩️ {message.replyTo.senderName}</p>
@@ -161,7 +162,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
               <img 
                 src={message.mediaUrl} 
                 alt="Shared image" 
-                className="rounded-lg mb-2 max-w-full cursor-pointer hover:opacity-90"
+                className="rounded-sm mb-2 max-w-full cursor-pointer hover:opacity-90"
                 onClick={() => setLightboxImage(message.mediaUrl!)}
               />
             )}
@@ -170,7 +171,7 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
               <video 
                 src={message.mediaUrl} 
                 controls 
-                className="rounded-lg mb-2 max-w-xs"
+                className="rounded-sm mb-2 max-w-xs"
               />
             )}
 
@@ -178,16 +179,16 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
               <a
                 href={message.mediaUrl}
                 download={message.fileName || "download"}
-                className="flex items-center gap-3 p-3 bg-background/10 rounded-xl mb-2 hover:bg-background/20 hover:scale-[1.02] transition-all cursor-pointer border border-border/50"
+                className="flex items-center gap-3 p-3 bg-background/10 rounded-sm mb-2 hover:bg-background/20 hover:scale-[1.02] transition-all cursor-pointer border border-border/50"
               >
-                <div className="p-2 bg-primary/10 rounded-lg">
+                <div className="p-2 bg-primary/10 rounded-sm">
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate">{message.fileName || "File"}</p>
                   <p className="text-xs opacity-70">{formatFileSize(message.fileSize)}</p>
                 </div>
-                <div className="p-2 bg-primary/20 rounded-lg">
+                <div className="p-2 bg-primary/20 rounded-sm">
                   <Download className="w-4 h-4 text-primary" />
                 </div>
               </a>
@@ -247,6 +248,13 @@ export function ChatMessage({ message, showSenderName = true, roomId = '', onRep
                     <DropdownMenuItem onClick={handleStar}>
                       <Star className={`w-4 h-4 mr-2 ${isStarred ? "fill-yellow-400" : ""}`} />
                       {isStarred ? "Unstar" : "Star"}
+                    </DropdownMenuItem>
+                  )}
+
+                  {canEdit && (
+                    <DropdownMenuItem onClick={() => onEdit?.(message)}>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
                     </DropdownMenuItem>
                   )}
 

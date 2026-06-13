@@ -1,9 +1,10 @@
 import { prisma, daysAgo, daysFromNow } from './utils';
 import type { StudentSeed } from './data';
+import * as crypto from 'crypto';
 
 function receiptNo() {
   const ts = Date.now().toString(36).toUpperCase();
-  const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+  const rand = crypto.randomUUID().split('-')[0].toUpperCase();
   return `PEC-${ts}-${rand}`;
 }
 
@@ -41,7 +42,7 @@ export async function seedFinance(students: StudentSeed[]) {
           amount: 42500,
           paymentMethod: i % 3 === 0 ? 'upi' : i % 3 === 1 ? 'neft' : 'online',
           status: 'success',
-          gatewayTxnId: `GW-${Date.now()}-${i}`,
+          gatewayTxnId: `GW-${crypto.randomUUID()}`,
           receiptNo: receiptNo(),
           createdAt: daysAgo(20 + i),
         },
@@ -73,7 +74,7 @@ export async function seedFinance(students: StudentSeed[]) {
           amount: 22000,
           paymentMethod: 'online',
           status: 'success',
-          gatewayTxnId: `GW-HOSTEL-${Date.now()}-${i}`,
+          gatewayTxnId: `GW-HOSTEL-${crypto.randomUUID()}`,
           receiptNo: receiptNo(),
           createdAt: daysAgo(15 + i),
         },
@@ -135,5 +136,5 @@ export async function seedFinance(students: StudentSeed[]) {
     }
   }
 
-  console.log(`  ✓ Created ${fees} fee records and ${txns} transactions`);
+  console.log(`   Created ${fees} fee records and ${txns} transactions`);
 }

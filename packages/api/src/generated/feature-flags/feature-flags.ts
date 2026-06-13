@@ -28,10 +28,8 @@ import type {
   UpsertFeatureFlagDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -57,7 +55,7 @@ export const getFeatureFlagsControllerListAllV1Url = () => {
 
 export const featureFlagsControllerListAllV1 = async ( options?: RequestInit): Promise<featureFlagsControllerListAllV1Response> => {
 
-  return customInstance<featureFlagsControllerListAllV1Response>(getFeatureFlagsControllerListAllV1Url(),
+  return fetchWithAuth<featureFlagsControllerListAllV1Response>(getFeatureFlagsControllerListAllV1Url(),
   {
     ...options,
     method: 'GET'
@@ -77,16 +75,16 @@ export const getFeatureFlagsControllerListAllV1QueryKey = () => {
     }
 
 
-export const getFeatureFlagsControllerListAllV1QueryOptions = <TData = Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFeatureFlagsControllerListAllV1QueryOptions = <TData = Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFeatureFlagsControllerListAllV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>> = ({ signal }) => featureFlagsControllerListAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>> = ({ signal }) => featureFlagsControllerListAllV1({ signal });
 
 
 
@@ -106,7 +104,7 @@ export function useFeatureFlagsControllerListAllV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFeatureFlagsControllerListAllV1<TData = Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError = unknown>(
@@ -116,16 +114,16 @@ export function useFeatureFlagsControllerListAllV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFeatureFlagsControllerListAllV1<TData = Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFeatureFlagsControllerListAllV1<TData = Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerListAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -163,7 +161,7 @@ export const getFeatureFlagsControllerGetByKeyV1Url = (key: string,) => {
 
 export const featureFlagsControllerGetByKeyV1 = async (key: string, options?: RequestInit): Promise<featureFlagsControllerGetByKeyV1Response> => {
 
-  return customInstance<featureFlagsControllerGetByKeyV1Response>(getFeatureFlagsControllerGetByKeyV1Url(key),
+  return fetchWithAuth<featureFlagsControllerGetByKeyV1Response>(getFeatureFlagsControllerGetByKeyV1Url(key),
   {
     ...options,
     method: 'GET'
@@ -183,16 +181,16 @@ export const getFeatureFlagsControllerGetByKeyV1QueryKey = (key: string,) => {
     }
 
 
-export const getFeatureFlagsControllerGetByKeyV1QueryOptions = <TData = Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError = unknown>(key: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFeatureFlagsControllerGetByKeyV1QueryOptions = <TData = Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError = unknown>(key: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getFeatureFlagsControllerGetByKeyV1QueryKey(key);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>> = ({ signal }) => featureFlagsControllerGetByKeyV1(key, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>> = ({ signal }) => featureFlagsControllerGetByKeyV1(key, { signal });
 
 
 
@@ -212,7 +210,7 @@ export function useFeatureFlagsControllerGetByKeyV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFeatureFlagsControllerGetByKeyV1<TData = Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError = unknown>(
@@ -222,16 +220,16 @@ export function useFeatureFlagsControllerGetByKeyV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useFeatureFlagsControllerGetByKeyV1<TData = Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError = unknown>(
- key: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ key: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useFeatureFlagsControllerGetByKeyV1<TData = Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError = unknown>(
- key: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ key: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof featureFlagsControllerGetByKeyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -270,7 +268,7 @@ export const getFeatureFlagsControllerUpsertV1Url = (key: string,) => {
 export const featureFlagsControllerUpsertV1 = async (key: string,
     upsertFeatureFlagDto: UpsertFeatureFlagDto, options?: RequestInit): Promise<featureFlagsControllerUpsertV1Response> => {
 
-  return customInstance<featureFlagsControllerUpsertV1Response>(getFeatureFlagsControllerUpsertV1Url(key),
+  return fetchWithAuth<featureFlagsControllerUpsertV1Response>(getFeatureFlagsControllerUpsertV1Url(key),
   {
     ...options,
     method: 'POST',
@@ -283,15 +281,15 @@ export const featureFlagsControllerUpsertV1 = async (key: string,
 
 
 export const getFeatureFlagsControllerUpsertV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof featureFlagsControllerUpsertV1>>, TError,{key: string;data: UpsertFeatureFlagDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof featureFlagsControllerUpsertV1>>, TError,{key: string;data: UpsertFeatureFlagDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof featureFlagsControllerUpsertV1>>, TError,{key: string;data: UpsertFeatureFlagDto}, TContext> => {
 
 const mutationKey = ['featureFlagsControllerUpsertV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -299,7 +297,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof featureFlagsControllerUpsertV1>>, {key: string;data: UpsertFeatureFlagDto}> = (props) => {
           const {key,data} = props ?? {};
 
-          return  featureFlagsControllerUpsertV1(key,data,requestOptions)
+          return  featureFlagsControllerUpsertV1(key,data,)
         }
 
 
@@ -314,7 +312,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type FeatureFlagsControllerUpsertV1MutationError = unknown
 
     export const useFeatureFlagsControllerUpsertV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof featureFlagsControllerUpsertV1>>, TError,{key: string;data: UpsertFeatureFlagDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof featureFlagsControllerUpsertV1>>, TError,{key: string;data: UpsertFeatureFlagDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof featureFlagsControllerUpsertV1>>,
         TError,

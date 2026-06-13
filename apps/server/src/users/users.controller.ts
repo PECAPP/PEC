@@ -14,8 +14,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { PoliciesGuard } from '../auth/guards/policies.guard';
-import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserQueryDto } from './dto/user-query.dto';
@@ -28,17 +26,17 @@ import { userSchema } from '@pec/shared';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Post()
   async create(
     @Body(new ZodValidationPipe(userSchema))
     body: CreateUserDto,
   ) {
-    const data = await this.usersService.createAdminUser(body);
+    const data = await this.usersService.createAdminUser(body as any);
     return { success: true, data };
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Get()
   async findMany(@Request() req: any, @Query() query: UserQueryDto) {
     const userRoles = Array.isArray(req.user?.roles)
@@ -70,7 +68,7 @@ export class UsersController {
     };
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Get('search')
   async search(@Query('email') email: string) {
     const user = await this.usersService.findOne(email);
@@ -78,14 +76,14 @@ export class UsersController {
     return this.usersService.toPublicUserRecord(user as any);
   }
 
-  @Roles('student', 'faculty', 'college_admin', 'admin', 'moderator')
+  @Roles('student', 'faculty', 'college_admin')
   @Get(':id')
   async findOne(
     @Request() req: any,
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
     const isOwner = req.user?.sub === id;
-    const elevatedRoles = new Set(['college_admin', 'admin', 'moderator']);
+    const elevatedRoles = new Set(['college_admin']);
     const userRoles = Array.isArray(req.user?.roles)
       ? req.user.roles
       : req.user?.role
@@ -107,7 +105,7 @@ export class UsersController {
     return this.usersService.toPublicUserRecord(user as any);
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
@@ -118,7 +116,7 @@ export class UsersController {
     return { success: true, data };
   }
 
-  @Roles('college_admin', 'admin', 'moderator', 'faculty')
+  @Roles('college_admin', 'faculty')
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     const data = await this.usersService.deleteAdminUser(id);

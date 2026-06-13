@@ -35,10 +35,8 @@ import type {
   SendMessageDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -64,7 +62,7 @@ export const getChatControllerFindAllV1Url = () => {
 
 export const chatControllerFindAllV1 = async ( options?: RequestInit): Promise<chatControllerFindAllV1Response> => {
 
-  return customInstance<chatControllerFindAllV1Response>(getChatControllerFindAllV1Url(),
+  return fetchWithAuth<chatControllerFindAllV1Response>(getChatControllerFindAllV1Url(),
   {
     ...options,
     method: 'GET'
@@ -84,16 +82,16 @@ export const getChatControllerFindAllV1QueryKey = () => {
     }
 
 
-export const getChatControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getChatControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getChatControllerFindAllV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerFindAllV1>>> = ({ signal }) => chatControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerFindAllV1>>> = ({ signal }) => chatControllerFindAllV1({ signal });
 
 
 
@@ -113,7 +111,7 @@ export function useChatControllerFindAllV1<TData = Awaited<ReturnType<typeof cha
           TError,
           Awaited<ReturnType<typeof chatControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerFindAllV1<TData = Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError = unknown>(
@@ -123,16 +121,16 @@ export function useChatControllerFindAllV1<TData = Awaited<ReturnType<typeof cha
           TError,
           Awaited<ReturnType<typeof chatControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerFindAllV1<TData = Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useChatControllerFindAllV1<TData = Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -179,7 +177,7 @@ export const getChatControllerFindMessagesV1Url = (roomId: string,
 export const chatControllerFindMessagesV1 = async (roomId: string,
     params: ChatControllerFindMessagesV1Params, options?: RequestInit): Promise<chatControllerFindMessagesV1Response> => {
 
-  return customInstance<chatControllerFindMessagesV1Response>(getChatControllerFindMessagesV1Url(roomId,params),
+  return fetchWithAuth<chatControllerFindMessagesV1Response>(getChatControllerFindMessagesV1Url(roomId,params),
   {
     ...options,
     method: 'GET'
@@ -201,16 +199,16 @@ export const getChatControllerFindMessagesV1QueryKey = (roomId: string,
 
 
 export const getChatControllerFindMessagesV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError = unknown>(roomId: string,
-    params: ChatControllerFindMessagesV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+    params: ChatControllerFindMessagesV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getChatControllerFindMessagesV1QueryKey(roomId,params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>> = ({ signal }) => chatControllerFindMessagesV1(roomId,params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>> = ({ signal }) => chatControllerFindMessagesV1(roomId,params, { signal });
 
 
 
@@ -231,7 +229,7 @@ export function useChatControllerFindMessagesV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof chatControllerFindMessagesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerFindMessagesV1<TData = Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError = unknown>(
@@ -242,18 +240,18 @@ export function useChatControllerFindMessagesV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof chatControllerFindMessagesV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerFindMessagesV1<TData = Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError = unknown>(
  roomId: string,
-    params: ChatControllerFindMessagesV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+    params: ChatControllerFindMessagesV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useChatControllerFindMessagesV1<TData = Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError = unknown>(
  roomId: string,
-    params: ChatControllerFindMessagesV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+    params: ChatControllerFindMessagesV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerFindMessagesV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -298,7 +296,7 @@ export const getChatControllerGetChatUsersV1Url = (params: ChatControllerGetChat
 
 export const chatControllerGetChatUsersV1 = async (params: ChatControllerGetChatUsersV1Params, options?: RequestInit): Promise<chatControllerGetChatUsersV1Response> => {
 
-  return customInstance<chatControllerGetChatUsersV1Response>(getChatControllerGetChatUsersV1Url(params),
+  return fetchWithAuth<chatControllerGetChatUsersV1Response>(getChatControllerGetChatUsersV1Url(params),
   {
     ...options,
     method: 'GET'
@@ -318,16 +316,16 @@ export const getChatControllerGetChatUsersV1QueryKey = (params?: ChatControllerG
     }
 
 
-export const getChatControllerGetChatUsersV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError = unknown>(params: ChatControllerGetChatUsersV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getChatControllerGetChatUsersV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError = unknown>(params: ChatControllerGetChatUsersV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getChatControllerGetChatUsersV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>> = ({ signal }) => chatControllerGetChatUsersV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>> = ({ signal }) => chatControllerGetChatUsersV1(params, { signal });
 
 
 
@@ -347,7 +345,7 @@ export function useChatControllerGetChatUsersV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerGetChatUsersV1<TData = Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError = unknown>(
@@ -357,16 +355,16 @@ export function useChatControllerGetChatUsersV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerGetChatUsersV1<TData = Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError = unknown>(
- params: ChatControllerGetChatUsersV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: ChatControllerGetChatUsersV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useChatControllerGetChatUsersV1<TData = Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError = unknown>(
- params: ChatControllerGetChatUsersV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: ChatControllerGetChatUsersV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetChatUsersV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -404,7 +402,7 @@ export const getChatControllerCreateRoomV1Url = () => {
 
 export const chatControllerCreateRoomV1 = async (createRoomDto: CreateRoomDto, options?: RequestInit): Promise<chatControllerCreateRoomV1Response> => {
 
-  return customInstance<chatControllerCreateRoomV1Response>(getChatControllerCreateRoomV1Url(),
+  return fetchWithAuth<chatControllerCreateRoomV1Response>(getChatControllerCreateRoomV1Url(),
   {
     ...options,
     method: 'POST',
@@ -417,15 +415,15 @@ export const chatControllerCreateRoomV1 = async (createRoomDto: CreateRoomDto, o
 
 
 export const getChatControllerCreateRoomV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateRoomV1>>, TError,{data: CreateRoomDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateRoomV1>>, TError,{data: CreateRoomDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateRoomV1>>, TError,{data: CreateRoomDto}, TContext> => {
 
 const mutationKey = ['chatControllerCreateRoomV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -433,7 +431,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerCreateRoomV1>>, {data: CreateRoomDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  chatControllerCreateRoomV1(data,requestOptions)
+          return  chatControllerCreateRoomV1(data,)
         }
 
 
@@ -448,7 +446,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ChatControllerCreateRoomV1MutationError = unknown
 
     export const useChatControllerCreateRoomV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateRoomV1>>, TError,{data: CreateRoomDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateRoomV1>>, TError,{data: CreateRoomDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof chatControllerCreateRoomV1>>,
         TError,
@@ -479,7 +477,7 @@ export const getChatControllerSendMessageV1Url = () => {
 
 export const chatControllerSendMessageV1 = async (sendMessageDto: SendMessageDto, options?: RequestInit): Promise<chatControllerSendMessageV1Response> => {
 
-  return customInstance<chatControllerSendMessageV1Response>(getChatControllerSendMessageV1Url(),
+  return fetchWithAuth<chatControllerSendMessageV1Response>(getChatControllerSendMessageV1Url(),
   {
     ...options,
     method: 'POST',
@@ -492,15 +490,15 @@ export const chatControllerSendMessageV1 = async (sendMessageDto: SendMessageDto
 
 
 export const getChatControllerSendMessageV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessageV1>>, TError,{data: SendMessageDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessageV1>>, TError,{data: SendMessageDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessageV1>>, TError,{data: SendMessageDto}, TContext> => {
 
 const mutationKey = ['chatControllerSendMessageV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -508,7 +506,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerSendMessageV1>>, {data: SendMessageDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  chatControllerSendMessageV1(data,requestOptions)
+          return  chatControllerSendMessageV1(data,)
         }
 
 
@@ -523,7 +521,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ChatControllerSendMessageV1MutationError = unknown
 
     export const useChatControllerSendMessageV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessageV1>>, TError,{data: SendMessageDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessageV1>>, TError,{data: SendMessageDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof chatControllerSendMessageV1>>,
         TError,
@@ -554,7 +552,7 @@ export const getChatControllerRemoveMessageV1Url = (id: string,) => {
 
 export const chatControllerRemoveMessageV1 = async (id: string, options?: RequestInit): Promise<chatControllerRemoveMessageV1Response> => {
 
-  return customInstance<chatControllerRemoveMessageV1Response>(getChatControllerRemoveMessageV1Url(id),
+  return fetchWithAuth<chatControllerRemoveMessageV1Response>(getChatControllerRemoveMessageV1Url(id),
   {
     ...options,
     method: 'DELETE'
@@ -567,15 +565,15 @@ export const chatControllerRemoveMessageV1 = async (id: string, options?: Reques
 
 
 export const getChatControllerRemoveMessageV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerRemoveMessageV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerRemoveMessageV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof chatControllerRemoveMessageV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['chatControllerRemoveMessageV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -583,7 +581,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerRemoveMessageV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  chatControllerRemoveMessageV1(id,requestOptions)
+          return  chatControllerRemoveMessageV1(id,)
         }
 
 
@@ -598,7 +596,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ChatControllerRemoveMessageV1MutationError = unknown
 
     export const useChatControllerRemoveMessageV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerRemoveMessageV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerRemoveMessageV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof chatControllerRemoveMessageV1>>,
         TError,
@@ -629,7 +627,7 @@ export const getChatControllerListClubsV1Url = () => {
 
 export const chatControllerListClubsV1 = async ( options?: RequestInit): Promise<chatControllerListClubsV1Response> => {
 
-  return customInstance<chatControllerListClubsV1Response>(getChatControllerListClubsV1Url(),
+  return fetchWithAuth<chatControllerListClubsV1Response>(getChatControllerListClubsV1Url(),
   {
     ...options,
     method: 'GET'
@@ -649,16 +647,16 @@ export const getChatControllerListClubsV1QueryKey = () => {
     }
 
 
-export const getChatControllerListClubsV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getChatControllerListClubsV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getChatControllerListClubsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListClubsV1>>> = ({ signal }) => chatControllerListClubsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListClubsV1>>> = ({ signal }) => chatControllerListClubsV1({ signal });
 
 
 
@@ -678,7 +676,7 @@ export function useChatControllerListClubsV1<TData = Awaited<ReturnType<typeof c
           TError,
           Awaited<ReturnType<typeof chatControllerListClubsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerListClubsV1<TData = Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError = unknown>(
@@ -688,16 +686,16 @@ export function useChatControllerListClubsV1<TData = Awaited<ReturnType<typeof c
           TError,
           Awaited<ReturnType<typeof chatControllerListClubsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerListClubsV1<TData = Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useChatControllerListClubsV1<TData = Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -735,7 +733,7 @@ export const getChatControllerCreateClubV1Url = () => {
 
 export const chatControllerCreateClubV1 = async (createClubDto: CreateClubDto, options?: RequestInit): Promise<chatControllerCreateClubV1Response> => {
 
-  return customInstance<chatControllerCreateClubV1Response>(getChatControllerCreateClubV1Url(),
+  return fetchWithAuth<chatControllerCreateClubV1Response>(getChatControllerCreateClubV1Url(),
   {
     ...options,
     method: 'POST',
@@ -748,15 +746,15 @@ export const chatControllerCreateClubV1 = async (createClubDto: CreateClubDto, o
 
 
 export const getChatControllerCreateClubV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateClubV1>>, TError,{data: CreateClubDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateClubV1>>, TError,{data: CreateClubDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateClubV1>>, TError,{data: CreateClubDto}, TContext> => {
 
 const mutationKey = ['chatControllerCreateClubV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -764,7 +762,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerCreateClubV1>>, {data: CreateClubDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  chatControllerCreateClubV1(data,requestOptions)
+          return  chatControllerCreateClubV1(data,)
         }
 
 
@@ -779,7 +777,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ChatControllerCreateClubV1MutationError = unknown
 
     export const useChatControllerCreateClubV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateClubV1>>, TError,{data: CreateClubDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerCreateClubV1>>, TError,{data: CreateClubDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof chatControllerCreateClubV1>>,
         TError,
@@ -811,7 +809,7 @@ export const getChatControllerSubmitClubJoinRequestV1Url = (id: string,) => {
 export const chatControllerSubmitClubJoinRequestV1 = async (id: string,
     clubJoinRequestDto: ClubJoinRequestDto, options?: RequestInit): Promise<chatControllerSubmitClubJoinRequestV1Response> => {
 
-  return customInstance<chatControllerSubmitClubJoinRequestV1Response>(getChatControllerSubmitClubJoinRequestV1Url(id),
+  return fetchWithAuth<chatControllerSubmitClubJoinRequestV1Response>(getChatControllerSubmitClubJoinRequestV1Url(id),
   {
     ...options,
     method: 'POST',
@@ -824,15 +822,15 @@ export const chatControllerSubmitClubJoinRequestV1 = async (id: string,
 
 
 export const getChatControllerSubmitClubJoinRequestV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSubmitClubJoinRequestV1>>, TError,{id: string;data: ClubJoinRequestDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSubmitClubJoinRequestV1>>, TError,{id: string;data: ClubJoinRequestDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof chatControllerSubmitClubJoinRequestV1>>, TError,{id: string;data: ClubJoinRequestDto}, TContext> => {
 
 const mutationKey = ['chatControllerSubmitClubJoinRequestV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -840,7 +838,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerSubmitClubJoinRequestV1>>, {id: string;data: ClubJoinRequestDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  chatControllerSubmitClubJoinRequestV1(id,data,requestOptions)
+          return  chatControllerSubmitClubJoinRequestV1(id,data,)
         }
 
 
@@ -855,7 +853,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ChatControllerSubmitClubJoinRequestV1MutationError = unknown
 
     export const useChatControllerSubmitClubJoinRequestV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSubmitClubJoinRequestV1>>, TError,{id: string;data: ClubJoinRequestDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSubmitClubJoinRequestV1>>, TError,{id: string;data: ClubJoinRequestDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof chatControllerSubmitClubJoinRequestV1>>,
         TError,
@@ -886,7 +884,7 @@ export const getChatControllerListClubJoinRequestsV1Url = () => {
 
 export const chatControllerListClubJoinRequestsV1 = async ( options?: RequestInit): Promise<chatControllerListClubJoinRequestsV1Response> => {
 
-  return customInstance<chatControllerListClubJoinRequestsV1Response>(getChatControllerListClubJoinRequestsV1Url(),
+  return fetchWithAuth<chatControllerListClubJoinRequestsV1Response>(getChatControllerListClubJoinRequestsV1Url(),
   {
     ...options,
     method: 'GET'
@@ -906,16 +904,16 @@ export const getChatControllerListClubJoinRequestsV1QueryKey = () => {
     }
 
 
-export const getChatControllerListClubJoinRequestsV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getChatControllerListClubJoinRequestsV1QueryOptions = <TData = Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getChatControllerListClubJoinRequestsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>> = ({ signal }) => chatControllerListClubJoinRequestsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>> = ({ signal }) => chatControllerListClubJoinRequestsV1({ signal });
 
 
 
@@ -935,7 +933,7 @@ export function useChatControllerListClubJoinRequestsV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerListClubJoinRequestsV1<TData = Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError = unknown>(
@@ -945,16 +943,16 @@ export function useChatControllerListClubJoinRequestsV1<TData = Awaited<ReturnTy
           TError,
           Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useChatControllerListClubJoinRequestsV1<TData = Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useChatControllerListClubJoinRequestsV1<TData = Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListClubJoinRequestsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -993,7 +991,7 @@ export const getChatControllerReviewClubJoinRequestV1Url = (requestId: string,) 
 export const chatControllerReviewClubJoinRequestV1 = async (requestId: string,
     clubJoinRequestDecisionDto: ClubJoinRequestDecisionDto, options?: RequestInit): Promise<chatControllerReviewClubJoinRequestV1Response> => {
 
-  return customInstance<chatControllerReviewClubJoinRequestV1Response>(getChatControllerReviewClubJoinRequestV1Url(requestId),
+  return fetchWithAuth<chatControllerReviewClubJoinRequestV1Response>(getChatControllerReviewClubJoinRequestV1Url(requestId),
   {
     ...options,
     method: 'PATCH',
@@ -1006,15 +1004,15 @@ export const chatControllerReviewClubJoinRequestV1 = async (requestId: string,
 
 
 export const getChatControllerReviewClubJoinRequestV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerReviewClubJoinRequestV1>>, TError,{requestId: string;data: ClubJoinRequestDecisionDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerReviewClubJoinRequestV1>>, TError,{requestId: string;data: ClubJoinRequestDecisionDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof chatControllerReviewClubJoinRequestV1>>, TError,{requestId: string;data: ClubJoinRequestDecisionDto}, TContext> => {
 
 const mutationKey = ['chatControllerReviewClubJoinRequestV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -1022,7 +1020,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerReviewClubJoinRequestV1>>, {requestId: string;data: ClubJoinRequestDecisionDto}> = (props) => {
           const {requestId,data} = props ?? {};
 
-          return  chatControllerReviewClubJoinRequestV1(requestId,data,requestOptions)
+          return  chatControllerReviewClubJoinRequestV1(requestId,data,)
         }
 
 
@@ -1037,7 +1035,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ChatControllerReviewClubJoinRequestV1MutationError = unknown
 
     export const useChatControllerReviewClubJoinRequestV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerReviewClubJoinRequestV1>>, TError,{requestId: string;data: ClubJoinRequestDecisionDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerReviewClubJoinRequestV1>>, TError,{requestId: string;data: ClubJoinRequestDecisionDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof chatControllerReviewClubJoinRequestV1>>,
         TError,
@@ -1069,7 +1067,7 @@ export const getChatControllerPostToClubV1Url = (id: string,) => {
 export const chatControllerPostToClubV1 = async (id: string,
     postClubMessageDto: PostClubMessageDto, options?: RequestInit): Promise<chatControllerPostToClubV1Response> => {
 
-  return customInstance<chatControllerPostToClubV1Response>(getChatControllerPostToClubV1Url(id),
+  return fetchWithAuth<chatControllerPostToClubV1Response>(getChatControllerPostToClubV1Url(id),
   {
     ...options,
     method: 'POST',
@@ -1082,15 +1080,15 @@ export const chatControllerPostToClubV1 = async (id: string,
 
 
 export const getChatControllerPostToClubV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerPostToClubV1>>, TError,{id: string;data: PostClubMessageDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerPostToClubV1>>, TError,{id: string;data: PostClubMessageDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof chatControllerPostToClubV1>>, TError,{id: string;data: PostClubMessageDto}, TContext> => {
 
 const mutationKey = ['chatControllerPostToClubV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -1098,7 +1096,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerPostToClubV1>>, {id: string;data: PostClubMessageDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  chatControllerPostToClubV1(id,data,requestOptions)
+          return  chatControllerPostToClubV1(id,data,)
         }
 
 
@@ -1113,7 +1111,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ChatControllerPostToClubV1MutationError = unknown
 
     export const useChatControllerPostToClubV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerPostToClubV1>>, TError,{id: string;data: PostClubMessageDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerPostToClubV1>>, TError,{id: string;data: PostClubMessageDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof chatControllerPostToClubV1>>,
         TError,

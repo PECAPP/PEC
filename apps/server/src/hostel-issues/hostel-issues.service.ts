@@ -17,7 +17,20 @@ export class HostelIssuesService {
   }
 
   create(data: CreateHostelIssueDto) {
-    return this.repo.create(data);
+    const priority = data.priority || 'medium';
+    const slaDeadline = new Date();
+    
+    if (priority === 'emergency') {
+      slaDeadline.setHours(slaDeadline.getHours() + 2); // 2 hours for emergency
+    } else if (priority === 'high') {
+      slaDeadline.setHours(slaDeadline.getHours() + 12); // 12 hours for high
+    } else if (priority === 'medium') {
+      slaDeadline.setHours(slaDeadline.getHours() + 48); // 48 hours for medium
+    } else {
+      slaDeadline.setHours(slaDeadline.getHours() + 120); // 5 days for low
+    }
+    
+    return this.repo.create({ ...data, slaDeadline: slaDeadline.toISOString() } as any);
   }
 
   update(id: string, data: UpdateHostelIssueDto) {

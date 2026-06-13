@@ -33,6 +33,8 @@ export class PoliciesGuard implements CanActivate {
       this.execPolicyHandler(handler, ability),
     );
     
+    console.log('POLICIES GUARD: isAllowed:', isAllowed, 'for handlers:', policyHandlers);
+
     if (!isAllowed) {
        throw new ForbiddenException('Insufficient permissions to access this resource.');
     }

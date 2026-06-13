@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { InteractiveCalendar } from "@/features/academic-calendar/InteractiveCalendar";
-import AdminAcademicCalendarPage from "@/app/(protected)/admin/academic-calendar/page";
 import api from "@pec/api";
 
 export default function CalendarTab() {
@@ -12,16 +11,8 @@ export default function CalendarTab() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const isAdmin = ["college_admin", "super_admin", "admin"].includes(
-    user?.role || ""
-  );
-
   useEffect(() => {
     if (authLoading) return;
-    if (isAdmin) {
-      setLoading(false);
-      return;
-    }
 
     async function loadEvents() {
       try {
@@ -36,7 +27,7 @@ export default function CalendarTab() {
     }
 
     loadEvents();
-  }, [authLoading, isAdmin]);
+  }, [authLoading]);
 
   if (authLoading || loading) {
     return (
@@ -46,9 +37,7 @@ export default function CalendarTab() {
     );
   }
 
-  if (isAdmin) {
-    return <AdminAcademicCalendarPage />;
-  }
+
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">

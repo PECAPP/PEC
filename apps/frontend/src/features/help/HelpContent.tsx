@@ -9,7 +9,7 @@ export function HelpContent({ content }: HelpContentProps) {
   const parts = content.split(/(\*\*.*?\*\*)/g);
 
   return (
-    <div className="bg-card p-6 rounded-2xl border border-border whitespace-pre-wrap leading-relaxed text-foreground/90">
+    <div className="bg-card p-6 rounded-sm border border-border whitespace-pre-wrap leading-relaxed text-foreground/90">
       {parts.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           // Remove the ** and wrap in strong tag

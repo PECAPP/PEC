@@ -5,24 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { CreateCourseDtoStatus } from './createCourseDtoStatus';
 
-export interface CreateCourseDto {
-  code: string;
-  name: string;
-  /**
-     * @minimum 1
-     * @maximum 20
-     */
-  credits: number;
-  instructor: string;
-  instructorId?: string;
-  department: string;
-  /**
-     * @minimum 1
-     * @maximum 8
-     */
-  semester: number;
-  status: CreateCourseDtoStatus;
-  id?: string;
-}
+export interface CreateCourseDto { [key: string]: unknown }

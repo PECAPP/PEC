@@ -42,7 +42,7 @@ const unwrap = <T>(payload: T | ApiSuccess<T>): T => {
   return payload as T;
 };
 
-const toChatMessage = (message: ApiMessage): ChatMessage => {
+export const toChatMessage = (message: ApiMessage): ChatMessage => {
   const parsedPayload = (() => {
     try {
       if (
@@ -140,16 +140,16 @@ export async function sendMessage(
 export async function deleteMessage(
   roomId: string,
   messageId: string,
-  hardDelete = false,
+  _hardDelete = false,
 ) {
   await api.delete(`/chat/message/${messageId}`);
 }
 
 export async function toggleStarMessage(
-  roomId: string,
-  messageId: string,
-  userId: string,
-  starred: boolean,
+  _roomId: string,
+  _messageId: string,
+  _userId: string,
+  _starred: boolean,
 ) {
   return;
 }

@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { getServerSession } from '@/lib/server-auth';
-import { redirect } from 'next/navigation';
 
 const profileSchema = z.object({
   role: z.string(),
@@ -43,7 +42,7 @@ export async function completeProfileStatefulAction(prevState: any, formData: Fo
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(session.token ? { Authorization: `Bearer ${session.token}` } : {}),
+        ...((session as any).token ? { Authorization: `Bearer ${(session as any).token}` } : {}),
       },
       body: JSON.stringify({
         ...validated.data,
@@ -63,7 +62,7 @@ export async function completeProfileStatefulAction(prevState: any, formData: Fo
     revalidatePath('/onboarding');
 
     return { success: true, error: null };
-  } catch (error) {
+  } catch (_error) {
     return { success: false, error: 'An unexpected error occurred' };
   }
 }

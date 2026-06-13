@@ -1,29 +1,18 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateCourseMaterialDto {
-  @IsString()
-  courseId: string;
+export const createCourseMaterialSchema = z.object({
+  courseId: z.string(),
+  courseName: z.string(),
+  courseCode: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  fileURL: z.string(),
+  type: z.any().optional(),
+  uploadedBy: z.string(),
+});
 
-  @IsString()
-  courseName: string;
 
-  @IsString()
-  courseCode: string;
 
-  @IsString()
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsString()
-  fileURL: string;
-
-  @IsOptional()
-  @IsIn(['lecture-notes', 'reference', 'assignment', 'video', 'other'])
-  type?: 'lecture-notes' | 'reference' | 'assignment' | 'video' | 'other';
-
-  @IsString()
-  uploadedBy: string;
+export class CreateCourseMaterialDto extends createZodDto(createCourseMaterialSchema) {
 }

@@ -32,12 +32,16 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException('Authentication required');
     }
 
-    const assignedRoles =
+    let assignedRoles =
       user.roles && user.roles.length > 0
         ? user.roles
         : user.role
           ? [user.role]
           : [];
+
+    assignedRoles = assignedRoles.map(role => 
+      ['super_admin'].includes(role) ? 'college_admin' : role
+    );
 
     if (assignedRoles.length === 0) {
       throw new ForbiddenException('User role is not assigned');

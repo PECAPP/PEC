@@ -6,7 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface RequestPasswordResetInput {
-  /** Email address to send reset link */
-  email: string;
-}
+export interface RequestPasswordResetInput { [key: string]: unknown }

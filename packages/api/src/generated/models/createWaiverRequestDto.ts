@@ -6,19 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface CreateWaiverRequestDto {
-  /** Course UUID (optional for general waiver) */
-  courseId?: string;
-  /** Course code for display snapshot */
-  courseCode?: string;
-  /** Course name for display snapshot */
-  courseName?: string;
-  /** Waiver start date */
-  fromDate: string;
-  /** Waiver end date */
-  toDate: string;
-  /** Reason for waiver request */
-  reason: string;
-  /** Supporting document URL */
-  supportingDocUrl?: string;
-}
+export interface CreateWaiverRequestDto { [key: string]: unknown }

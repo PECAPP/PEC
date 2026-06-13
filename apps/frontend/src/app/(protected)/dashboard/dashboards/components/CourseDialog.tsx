@@ -23,7 +23,7 @@ export function CourseDialog({
 }: CourseDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className=" max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editingCourse ? 'Edit Course' : 'Create New Course'}</DialogTitle>
           <DialogDescription>
@@ -111,7 +111,7 @@ export function CourseDialog({
               value={courseForm.description} 
               onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })} 
               placeholder="Course description..." 
-              className="mt-1 w-full min-h-[80px] p-2 rounded-md border border-border bg-background" 
+              className="mt-1 w-full min-h-[80px] p-2 rounded-sm border border-border bg-background" 
             />
           </div>
           <div className="flex gap-2 pt-4">

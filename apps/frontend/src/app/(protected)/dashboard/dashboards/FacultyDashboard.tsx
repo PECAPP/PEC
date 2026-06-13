@@ -18,7 +18,7 @@ import { LowAttendanceAlert } from './components/LowAttendanceAlert';
 import { FacultyQuickActions } from './components/FacultyQuickActions';
 import { NoticeboardCard } from './components/NoticeboardCard';
 
-const container = {
+const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -59,7 +59,7 @@ export function FacultyDashboard({ initialData, user: serverUser }: FacultyDashb
 
   return (
     <motion.div
-      variants={container}
+      variants={containerVariants}
       initial="hidden"
       animate="show"
       className="space-y-6"
@@ -99,7 +99,7 @@ export function FacultyDashboard({ initialData, user: serverUser }: FacultyDashb
 
       {/* QR Attendance Modal */}
       <Dialog open={showQRModal} onOpenChange={setShowQRModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle>QR Attendance</DialogTitle>
           </DialogHeader>
@@ -115,7 +115,7 @@ export function FacultyDashboard({ initialData, user: serverUser }: FacultyDashb
 
       {/* Schedule Manager Modal */}
       <Dialog open={showScheduleManager} onOpenChange={setShowScheduleManager}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className=" max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Manage Schedule</DialogTitle>
           </DialogHeader>

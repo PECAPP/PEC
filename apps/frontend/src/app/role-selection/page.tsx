@@ -44,7 +44,7 @@ const roleOptions: RoleOption[] = [
   },
   {
     value: 'college_admin',
-    label: 'College Admin',
+    label: 'Admin',
     description: 'Manage institution, users, departments, and financial operations',
     icon: Building2,
     color: 'bg-foreground/60'
@@ -53,12 +53,12 @@ const roleOptions: RoleOption[] = [
 
 export default function RoleSelection() {
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleRoleSelect = async () => {
-    if (!selectedRole || !token || !user?.id) return;
+    if (!selectedRole || !user?.id) return;
 
     setLoading(true);
 
@@ -67,7 +67,6 @@ export default function RoleSelection() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ role: selectedRole }),
         credentials: 'include',
@@ -89,7 +88,7 @@ export default function RoleSelection() {
     }
   };
 
-  if (!token || !user?.id) {
+  if (!user?.id) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -145,7 +144,7 @@ export default function RoleSelection() {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between mb-2">
                       <div
-                        className={`w-12 h-12 rounded-lg ${role.color} flex items-center justify-center`}
+                        className={`w-12 h-12 rounded-sm ${role.color} flex items-center justify-center`}
                       >
                         <Icon className="w-6 h-6 text-background" />
                       </div>

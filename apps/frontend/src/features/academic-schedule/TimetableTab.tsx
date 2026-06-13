@@ -6,11 +6,9 @@ import { Button, Badge, Dialog, DialogContent, DialogDescription, DialogHeader, 
 import { useEffect, useState } from "react";
 import {
   Calendar,
-  Clock,
   Loader2,
   Plus,
   Trash2,
-  Edit,
   Save,
   GripVertical,
   Upload,
@@ -18,14 +16,11 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
-  LayoutGrid,
   List,
-  Map as MapIcon,
 } from "lucide-react";
 import BulkUpload from "@/components/BulkUpload";
 
 import PDFExportButton from "@/components/common/PDFExportButton";
-import * as ExcelJS from "exceljs";
 import { useRouter } from 'next/navigation';
 
 import api from "@pec/api";
@@ -97,7 +92,7 @@ const getFacultyPayload = (course: any) => {
   return { facultyId, facultyName };
 };
 
-const isAxiosStatus = (error: unknown, status: number) =>
+const isHttpStatus = (error: unknown, status: number) =>
   (error as any)?.response?.status === status;
 
 const fetchAllPages = async <T,>(
@@ -184,7 +179,7 @@ export default function TimetableTab() {
   const [studentAttendanceMap, setStudentAttendanceMap] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
-    if (authLoading) return; // Wait for ({} as any) to load
+    if (authLoading) return; // Wait for auth to load
 
     if (!user) {
       router.replace('/auth');
@@ -231,7 +226,7 @@ export default function TimetableTab() {
 
   const fetchData = async () => {
     try {
-      const allCourses = await api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
+      const allCourses = await fetchAllPages<any>('/courses');
       let facultyOwnedCourses =
         isFaculty && user?.uid
           ? allCourses.filter(
@@ -283,7 +278,7 @@ export default function TimetableTab() {
       
       setCourses(coursesData);
 
-      const timetableItems = await api.get('/timetable', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
+      const timetableItems = await fetchAllPages<any>('/timetable');
       const timetableData: any = {};
 
       timetableItems.forEach((item: any) => {
@@ -418,6 +413,7 @@ export default function TimetableTab() {
       })),
     );
 
+    const ExcelJS = await import("exceljs");
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Timetable");
     
@@ -451,13 +447,13 @@ export default function TimetableTab() {
 
   const handleAutoGenerate = async () => {
     if (!canAutoGenerate) {
-      toast.error("Only college admins can auto-generate timetables");
+      toast.error("Only Admins can auto-generate timetables");
       return;
     }
 
     setGenerating(true);
     try {
-      const allCoursesRaw = await api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
+      const allCoursesRaw = await fetchAllPages<any>('/courses');
       const allCourses: CourseSchedule[] = allCoursesRaw.map((course: any) => {
         const { facultyId, facultyName } = getFacultyPayload(course);
         return {
@@ -491,7 +487,7 @@ export default function TimetableTab() {
         return result;
       };
 
-      const existingTimetable = await api.get('/timetable', { params: { limit: 2000 } }).then(res => extractData<any>(res.data));
+      const existingTimetable = await fetchAllPages<any>('/timetable');
       const deleteChunks = chunkArray(existingTimetable, 20);
       for (const chunk of deleteChunks) {
         const deleteResults = await Promise.allSettled(
@@ -500,7 +496,7 @@ export default function TimetableTab() {
         const fatalDeleteErrors = deleteResults
           .filter((result): result is PromiseRejectedResult => result.status === "rejected")
           .map((result) => result.reason)
-          .filter((error) => !isAxiosStatus(error, 404));
+          .filter((error) => !isHttpStatus(error, 404));
 
         if (fatalDeleteErrors.length > 0) {
           throw fatalDeleteErrors[0];
@@ -533,7 +529,7 @@ export default function TimetableTab() {
       toast.success(`Timetable generated! ${summary}`);
     } catch (error) {
       console.error("Error generating timetable:", error);
-      if (isAxiosStatus(error, 401)) {
+      if (isHttpStatus(error, 401)) {
         toast.error("Session expired. Please login again.");
         router.replace("/auth");
         return;
@@ -651,12 +647,12 @@ export default function TimetableTab() {
     }
   };
 
-  const openSlotDialog = (day: string, timeSlot: string) => {
+  const openSlotDialog = (day: string, timeSlot: string, slotIdToEdit?: string) => {
     const key = `${day}-${timeSlot}`;
     const slotsInCell = timetable[key] || [];
     
-    // Only edit the first slot by default. If empty, starts a new form.
-    const slot = slotsInCell.length > 0 ? slotsInCell[0] : null;
+    // Only edit the specific slot if provided, else edit the first slot by default. If empty, starts a new form.
+    const slot = slotIdToEdit ? slotsInCell.find((s: any) => s.id === slotIdToEdit) : (slotsInCell.length > 0 ? slotsInCell[0] : null);
 
     setSelectedSlot({ day, timeSlot, ...slot });
     setSlotForm({
@@ -670,7 +666,7 @@ export default function TimetableTab() {
     if (!selectedSlot) return;
 
     const key = `${selectedSlot.day}-${selectedSlot.timeSlot}`;
-    const existingSlot = timetable[key];
+    const _existingSlot = timetable[key];
     const course = courses.find((c) => c.id === slotForm.courseId);
 
     if (!course) {
@@ -727,7 +723,7 @@ export default function TimetableTab() {
     );
   };
 
-  const availableFacultySlots = DAYS
+  const _availableFacultySlots = DAYS
     .flatMap((day) =>
       TIME_SLOTS.filter((timeSlot) => timeSlot !== "13:00-14:00").map((timeSlot) => {
         const key = `${day}-${timeSlot}`;
@@ -895,8 +891,8 @@ export default function TimetableTab() {
   if (loading) {
     return (
       <div className="space-y-6 md:space-y-8">
-        <div className="h-8 w-56 bg-muted rounded-md animate-pulse" />
-        <LoadingGrid count={3} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" itemClassName="h-28 rounded-md" />
+        <div className="h-8 w-56 bg-muted rounded-sm animate-pulse" />
+        <LoadingGrid count={3} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" itemClassName="h-28 rounded-sm" />
       </div>
     );
   }
@@ -1008,8 +1004,8 @@ export default function TimetableTab() {
               coursesWrapperOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
             }`}
           >
-          <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
-            <div className="available-courses-wrapper rounded-lg border border-border/40 bg-background/30 p-3">
+          <div className="rounded-sm border border-border/60 bg-muted/20 p-3">
+            <div className="available-courses-wrapper rounded-sm border border-border/40 bg-background/30 p-3">
               <div className="flex flex-wrap gap-3">
                 {courses.map((course) => (
                   <div
@@ -1017,7 +1013,7 @@ export default function TimetableTab() {
                     draggable
                     onDragStart={(e) => handleDragStart(e, course)}
                     onDragEnd={handleDragEnd}
-                    className="px-4 py-3 bg-primary/10 border-2 border-primary/20 rounded-lg cursor-move hover:bg-primary/20 active:bg-primary/30 transition-all select-none md:hover:shadow-md md:hover:border-primary/40 opacity-100 hover:opacity-95"
+                    className="px-4 py-3 bg-primary/10 border border-primary/20 rounded-sm cursor-move hover:bg-primary/20 active:bg-primary/30 transition-all select-none md:hover:shadow-md md:hover:border-primary/40 opacity-100 hover:opacity-95"
                   >
                     <div className="flex items-center gap-3">
                       <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
@@ -1058,11 +1054,11 @@ export default function TimetableTab() {
       />
 
       {/* Mobile Primary Actions Toolbar */}
-      <div className="md:hidden grid grid-cols-3 gap-2 mb-6 p-2 rounded-2xl bg-muted/20 border border-border/40">
+      <div className="md:hidden grid grid-cols-3 gap-2 mb-6 p-2 rounded-sm bg-muted/20 border border-border/40">
         <Button 
           variant="outline"
           size="sm"
-          className="h-10 text-[9px] font-black uppercase tracking-tighter rounded-xl"
+          className="h-10 text-xs font-medium uppercase tracking-tighter rounded-sm"
           onClick={async () => {
              const { exportTimetablePDF } = await import('@/lib/pdfExport');
              const timetableData = Object.entries(timetable).flatMap(([key, slots]: [string, any]) => {
@@ -1085,7 +1081,7 @@ export default function TimetableTab() {
         <Button 
           variant="outline"
           size="sm"
-          className="h-10 text-[9px] font-black uppercase tracking-tighter rounded-xl"
+          className="h-10 text-xs font-medium uppercase tracking-tighter rounded-sm"
           onClick={exportTimetable}
         >
           <Download className="w-3.5 h-3.5 mr-1" />
@@ -1094,7 +1090,7 @@ export default function TimetableTab() {
         <Button 
           variant={isWeeklyView ? "default" : "outline"}
           size="sm"
-          className={`h-10 text-[9px] font-black uppercase tracking-tighter rounded-xl ${isWeeklyView ? 'glow-primary ring-2 ring-primary/20' : ''}`}
+          className={`h-10 text-xs font-medium uppercase tracking-tighter rounded-sm ${isWeeklyView ? 'glow-primary ring-2 ring-primary/20' : ''}`}
           onClick={() => setIsWeeklyView(!isWeeklyView)}
         >
           {isWeeklyView ? <List className="w-3.5 h-3.5 mr-1" /> : <Calendar className="w-3.5 h-3.5 mr-1" />}
@@ -1110,9 +1106,9 @@ export default function TimetableTab() {
               <button
                 key={day}
                 onClick={() => setSelectedDay(day)}
-                className={`snap-center shrink-0 min-w-[70px] py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 flex flex-col items-center gap-1.5 ${
+                className={`snap-center shrink-0 min-w-[70px] py-2 rounded-sm text-sm font-medium  transition-all border flex flex-col items-center gap-1.5 ${
                   selectedDay === day
-                    ? "bg-primary border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary-rgb),0.35)] scale-105 z-10"
+                    ? "bg-primary border-border/40 text-primary-foreground shadow-[0_0_15px_rgba(var(--primary-rgb),0.35)] scale-105 z-10"
                     : "bg-surface/60 backdrop-blur-sm text-muted-foreground border-border/50 hover:border-primary/30 hover:bg-muted/30"
                 }`}
                 style={selectedDay !== day ? { backgroundColor: `hsla(${30 + (DAYS.indexOf(day) * 40)}, 40%, 15%, 0.1)` } : {}}
@@ -1139,7 +1135,7 @@ export default function TimetableTab() {
           <div className="space-y-6">
             {DAYS.map((day) => (
               <div key={day} className="space-y-3">
-                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary/70 px-1 border-l-2 border-primary ml-1">
+                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-primary/70 px-1 border-l-2 border-border/40 ml-1">
                   {day}
                 </h3>
                 <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
@@ -1148,9 +1144,9 @@ export default function TimetableTab() {
                     const data = applySlotFilters(timetable[key] || []);
                     if (data.length === 0) return null;
                     return (
-                      <div key={slot} className="bg-card border border-border/60 rounded-xl p-3 flex items-center gap-3 hover:border-primary/40 transition-colors shadow-sm">
-                        <div className="flex flex-col items-center justify-center bg-muted/30 rounded-lg p-2 min-w-[60px]">
-                           <span className="text-[10px] font-bold text-foreground">{slot.split('-')[0]}</span>
+                      <div key={slot} className="bg-card border border-border/60 rounded-sm p-3 flex items-center gap-3 hover:border-primary/40 transition-colors shadow-sm">
+                        <div className="flex flex-col items-center justify-center bg-muted/30 rounded-sm p-2 min-w-[60px]">
+                           <span className="text-sm font-medium text-foreground">{slot.split('-')[0]}</span>
                            <span className="text-[8px] text-muted-foreground uppercase">{slot.split('-')[1]}</span>
                         </div>
                         <div className="flex-1">
@@ -1188,7 +1184,7 @@ export default function TimetableTab() {
                   <div key={timeSlot} className="flex items-center gap-4 opacity-50 my-4">
                     <span className="text-xs font-mono text-muted-foreground w-12 text-right">{timeSlot.split('-')[0]}</span>
                     <div className="h-[1px] flex-1 bg-border border-dashed border-b"></div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Lunch</span>
+                    <span className="text-xs font-bold  text-muted-foreground">Lunch</span>
                     <div className="h-[1px] flex-1 bg-border border-dashed border-b"></div>
                   </div>
                 );
@@ -1205,12 +1201,12 @@ export default function TimetableTab() {
                       <span className="text-[10px] text-muted-foreground">{timeSlot.split('-')[1]}</span>
                     </div>
                     {isLive ? (
-                      <div className="flex-1 p-3 rounded-2xl border-2 border-primary bg-primary/5 flex items-center justify-center min-h-[80px] relative">
+                      <div className="flex-1 p-3 rounded-sm border border-border/40 bg-primary/5 flex items-center justify-center min-h-[80px] relative">
                         <span className="absolute -top-3 left-4 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">NOW</span>
                         <span className="text-xs text-primary font-medium">Free Slot</span>
                       </div>
                     ) : (
-                      <div className="flex-1 p-3 rounded-2xl border border-dashed border-border bg-muted/5 flex items-center justify-center min-h-[80px]">
+                      <div className="flex-1 p-3 rounded-sm border border-dashed border-border bg-muted/5 flex items-center justify-center min-h-[80px]">
                         <span className="text-xs text-muted-foreground/40 font-medium">Free Slot</span>
                       </div>
                     )}
@@ -1232,7 +1228,7 @@ export default function TimetableTab() {
                     {filteredSlots.map((slot: any, idx: number) => (
                       <div 
                         key={idx} 
-                        className={`relative overflow-hidden rounded-2xl border-l-4 p-4 transition-all
+                        className={`relative overflow-hidden rounded-sm border-l-4 p-4 transition-all
                           ${isLive ? 'bg-card border-l-primary shadow-lg ring-1 ring-primary/20' : ''}
                           ${!isLive && !isCompleted ? 'bg-card border-l-primary shadow-sm hover:shadow-md' : ''}
                           ${isCompleted ? 'bg-muted/10 border-l-muted-foreground/30 shadow-none' : ''}
@@ -1242,18 +1238,18 @@ export default function TimetableTab() {
                         {isLive && (
                           <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-primary/10 px-2 py-1 rounded-full">
                             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                            <span className="text-[10px] font-bold text-primary">LIVE</span>
+                            <span className="text-sm font-medium text-primary">LIVE</span>
                           </div>
                         )}
                         {isCompleted && (
                           <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-muted">
-                            <span className="text-[10px] font-bold text-muted-foreground">COMPLETED</span>
+                            <span className="text-sm font-medium text-muted-foreground">COMPLETED</span>
                           </div>
                         )}
                         <div className="relative z-10">
                           <h4 className={`font-bold text-lg line-clamp-1 ${isCompleted ? 'text-muted-foreground' : 'text-foreground'}`}>{slot.courseName}</h4>
                           <div className="flex items-center gap-2 mt-1 mb-3">
-                            <Badge variant={isCompleted ? "outline" : "secondary"} className="text-[10px] uppercase tracking-wider font-bold">{slot.courseCode}</Badge>
+                            <Badge variant={isCompleted ? "outline" : "secondary"} className="text-[10px]  font-bold">{slot.courseCode}</Badge>
                             <span className="text-xs text-muted-foreground">|</span>
                             <span className={`text-xs font-medium px-2 py-0.5 rounded text-nowrap ${isLive ? 'text-primary bg-primary/10' : 'text-muted-foreground bg-muted'}`}>Room {slot.room}</span>
                           </div>
@@ -1312,7 +1308,7 @@ export default function TimetableTab() {
                         className="border border-border p-2 bg-muted/40 text-center align-middle"
                       >
                         {day === "Wednesday" && (
-                          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground/60 vertical-text block rotate-0">
+                          <span className="text-sm font-medium tracking-[0.2em] uppercase text-muted-foreground/60 vertical-text block rotate-0">
                             Lunch Break
                           </span>
                         )}
@@ -1356,7 +1352,7 @@ export default function TimetableTab() {
                             {scopedSlots.map((slot: any, idx: number) => (
                               <div
                                 key={idx}
-                                className="p-2 bg-primary/10 rounded-lg border border-primary/20 relative"
+                                className="p-2 bg-primary/10 rounded-sm border border-primary/20 relative"
                               >
                                 <div className="font-medium text-sm text-foreground">
                                   {slot.courseCode || slot.courseName}
@@ -1370,7 +1366,7 @@ export default function TimetableTab() {
                                       e.stopPropagation();
                                       window.location.href = `/campus-map?search=${encodeURIComponent(slot.room)}`;
                                     }}
-                                    className="flex items-center gap-1.5 mt-1.5 text-[10px] font-bold text-primary hover:underline group"
+                                    className="flex items-center gap-1.5 mt-1.5 text-sm font-medium text-primary hover:underline group"
                                   >
                                     <span className="bg-primary/10 px-1.5 py-0.5 rounded uppercase tracking-tighter">
                                       {slot.room}
@@ -1380,7 +1376,7 @@ export default function TimetableTab() {
                                 )}
                                 
                                 {user.role === "student" && studentAttendanceMap.has(slot.courseId) && (
-                                  <div className={`mt-2 px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+                                  <div className={`mt-2 px-2 py-0.5 rounded-full text-sm font-medium inline-flex items-center gap-1 ${
                                     (studentAttendanceMap.get(slot.courseId) || 0) < 75 
                                       ? "bg-destructive/10 text-destructive border border-destructive/20" 
                                       : "bg-success/10 text-success border border-success/20"
@@ -1594,7 +1590,7 @@ export default function TimetableTab() {
 
             {/* Auto-populated Fields Info */}
             {extraClassForm.courseId && extraClassForm.slotKey && !extraClassForm.slotKey.endsWith("-") && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg space-y-2 text-sm">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-sm space-y-2 text-sm">
                 <p className="font-medium text-blue-900">Auto-populated from course:</p>
                 <div className="text-xs text-blue-800 space-y-1">
                   {(() => {
@@ -1664,4 +1660,5 @@ export default function TimetableTab() {
     </div>
   );
 }
+
 

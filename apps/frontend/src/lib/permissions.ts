@@ -61,6 +61,7 @@ export function getRolePermissions(role: string): UserPermissions {
 
   switch (role) {
     case "college_admin":
+    case "super_admin":
       return {
         ...basePermissions,
         canViewDashboard: true,
@@ -108,7 +109,7 @@ export function getRolePermissions(role: string): UserPermissions {
  * Check if user is admin
  */
 export function isAdmin(user: User | null): boolean {
-  return ["college_admin", "faculty"].includes(user?.role || "");
+  return ["college_admin", "super_admin", "faculty"].includes(user?.role || "");
 }
 
 /**
@@ -128,14 +129,14 @@ export function isStudent(user: User | null): boolean {
 /**
  * Check if user is placement officer
  */
-export function isPlacementOfficer(user: User | null): boolean {
+export function isPlacementOfficer(_user: User | null): boolean {
   return false;
 }
 
 /**
  * Check if user is recruiter
  */
-export function isRecruiter(user: User | null): boolean {
+export function isRecruiter(_user: User | null): boolean {
   return false;
 }
 

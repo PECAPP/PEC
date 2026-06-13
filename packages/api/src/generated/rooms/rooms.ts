@@ -29,10 +29,8 @@ import type {
   RoomsControllerGetAvailabilityV1Params
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -58,7 +56,7 @@ export const getRoomsControllerFindManyV1Url = () => {
 
 export const roomsControllerFindManyV1 = async ( options?: RequestInit): Promise<roomsControllerFindManyV1Response> => {
 
-  return customInstance<roomsControllerFindManyV1Response>(getRoomsControllerFindManyV1Url(),
+  return fetchWithAuth<roomsControllerFindManyV1Response>(getRoomsControllerFindManyV1Url(),
   {
     ...options,
     method: 'GET'
@@ -78,16 +76,16 @@ export const getRoomsControllerFindManyV1QueryKey = () => {
     }
 
 
-export const getRoomsControllerFindManyV1QueryOptions = <TData = Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getRoomsControllerFindManyV1QueryOptions = <TData = Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getRoomsControllerFindManyV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerFindManyV1>>> = ({ signal }) => roomsControllerFindManyV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerFindManyV1>>> = ({ signal }) => roomsControllerFindManyV1({ signal });
 
 
 
@@ -107,7 +105,7 @@ export function useRoomsControllerFindManyV1<TData = Awaited<ReturnType<typeof r
           TError,
           Awaited<ReturnType<typeof roomsControllerFindManyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRoomsControllerFindManyV1<TData = Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError = unknown>(
@@ -117,16 +115,16 @@ export function useRoomsControllerFindManyV1<TData = Awaited<ReturnType<typeof r
           TError,
           Awaited<ReturnType<typeof roomsControllerFindManyV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRoomsControllerFindManyV1<TData = Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useRoomsControllerFindManyV1<TData = Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindManyV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -164,7 +162,7 @@ export const getRoomsControllerCreateV1Url = () => {
 
 export const roomsControllerCreateV1 = async (createRoomDto: CreateRoomDto, options?: RequestInit): Promise<roomsControllerCreateV1Response> => {
 
-  return customInstance<roomsControllerCreateV1Response>(getRoomsControllerCreateV1Url(),
+  return fetchWithAuth<roomsControllerCreateV1Response>(getRoomsControllerCreateV1Url(),
   {
     ...options,
     method: 'POST',
@@ -177,15 +175,15 @@ export const roomsControllerCreateV1 = async (createRoomDto: CreateRoomDto, opti
 
 
 export const getRoomsControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerCreateV1>>, TError,{data: CreateRoomDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerCreateV1>>, TError,{data: CreateRoomDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof roomsControllerCreateV1>>, TError,{data: CreateRoomDto}, TContext> => {
 
 const mutationKey = ['roomsControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -193,7 +191,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof roomsControllerCreateV1>>, {data: CreateRoomDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  roomsControllerCreateV1(data,requestOptions)
+          return  roomsControllerCreateV1(data,)
         }
 
 
@@ -208,7 +206,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RoomsControllerCreateV1MutationError = unknown
 
     export const useRoomsControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerCreateV1>>, TError,{data: CreateRoomDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerCreateV1>>, TError,{data: CreateRoomDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof roomsControllerCreateV1>>,
         TError,
@@ -246,7 +244,7 @@ export const getRoomsControllerGetAvailabilityV1Url = (params: RoomsControllerGe
 
 export const roomsControllerGetAvailabilityV1 = async (params: RoomsControllerGetAvailabilityV1Params, options?: RequestInit): Promise<roomsControllerGetAvailabilityV1Response> => {
 
-  return customInstance<roomsControllerGetAvailabilityV1Response>(getRoomsControllerGetAvailabilityV1Url(params),
+  return fetchWithAuth<roomsControllerGetAvailabilityV1Response>(getRoomsControllerGetAvailabilityV1Url(params),
   {
     ...options,
     method: 'GET'
@@ -266,16 +264,16 @@ export const getRoomsControllerGetAvailabilityV1QueryKey = (params?: RoomsContro
     }
 
 
-export const getRoomsControllerGetAvailabilityV1QueryOptions = <TData = Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError = unknown>(params: RoomsControllerGetAvailabilityV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getRoomsControllerGetAvailabilityV1QueryOptions = <TData = Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError = unknown>(params: RoomsControllerGetAvailabilityV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getRoomsControllerGetAvailabilityV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>> = ({ signal }) => roomsControllerGetAvailabilityV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>> = ({ signal }) => roomsControllerGetAvailabilityV1(params, { signal });
 
 
 
@@ -295,7 +293,7 @@ export function useRoomsControllerGetAvailabilityV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRoomsControllerGetAvailabilityV1<TData = Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError = unknown>(
@@ -305,16 +303,16 @@ export function useRoomsControllerGetAvailabilityV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRoomsControllerGetAvailabilityV1<TData = Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError = unknown>(
- params: RoomsControllerGetAvailabilityV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: RoomsControllerGetAvailabilityV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useRoomsControllerGetAvailabilityV1<TData = Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError = unknown>(
- params: RoomsControllerGetAvailabilityV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: RoomsControllerGetAvailabilityV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerGetAvailabilityV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -352,7 +350,7 @@ export const getRoomsControllerFindOneV1Url = (id: string,) => {
 
 export const roomsControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<roomsControllerFindOneV1Response> => {
 
-  return customInstance<roomsControllerFindOneV1Response>(getRoomsControllerFindOneV1Url(id),
+  return fetchWithAuth<roomsControllerFindOneV1Response>(getRoomsControllerFindOneV1Url(id),
   {
     ...options,
     method: 'GET'
@@ -372,16 +370,16 @@ export const getRoomsControllerFindOneV1QueryKey = (id: string,) => {
     }
 
 
-export const getRoomsControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getRoomsControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getRoomsControllerFindOneV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerFindOneV1>>> = ({ signal }) => roomsControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomsControllerFindOneV1>>> = ({ signal }) => roomsControllerFindOneV1(id, { signal });
 
 
 
@@ -401,7 +399,7 @@ export function useRoomsControllerFindOneV1<TData = Awaited<ReturnType<typeof ro
           TError,
           Awaited<ReturnType<typeof roomsControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRoomsControllerFindOneV1<TData = Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError = unknown>(
@@ -411,16 +409,16 @@ export function useRoomsControllerFindOneV1<TData = Awaited<ReturnType<typeof ro
           TError,
           Awaited<ReturnType<typeof roomsControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRoomsControllerFindOneV1<TData = Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useRoomsControllerFindOneV1<TData = Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomsControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -458,7 +456,7 @@ export const getRoomsControllerUpdateV1Url = (id: string,) => {
 
 export const roomsControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<roomsControllerUpdateV1Response> => {
 
-  return customInstance<roomsControllerUpdateV1Response>(getRoomsControllerUpdateV1Url(id),
+  return fetchWithAuth<roomsControllerUpdateV1Response>(getRoomsControllerUpdateV1Url(id),
   {
     ...options,
     method: 'PATCH'
@@ -471,15 +469,15 @@ export const roomsControllerUpdateV1 = async (id: string, options?: RequestInit)
 
 
 export const getRoomsControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerUpdateV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerUpdateV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof roomsControllerUpdateV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['roomsControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -487,7 +485,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof roomsControllerUpdateV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  roomsControllerUpdateV1(id,requestOptions)
+          return  roomsControllerUpdateV1(id,)
         }
 
 
@@ -502,7 +500,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RoomsControllerUpdateV1MutationError = unknown
 
     export const useRoomsControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerUpdateV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerUpdateV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof roomsControllerUpdateV1>>,
         TError,
@@ -533,7 +531,7 @@ export const getRoomsControllerRemoveV1Url = (id: string,) => {
 
 export const roomsControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<roomsControllerRemoveV1Response> => {
 
-  return customInstance<roomsControllerRemoveV1Response>(getRoomsControllerRemoveV1Url(id),
+  return fetchWithAuth<roomsControllerRemoveV1Response>(getRoomsControllerRemoveV1Url(id),
   {
     ...options,
     method: 'DELETE'
@@ -546,15 +544,15 @@ export const roomsControllerRemoveV1 = async (id: string, options?: RequestInit)
 
 
 export const getRoomsControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof roomsControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['roomsControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -562,7 +560,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof roomsControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  roomsControllerRemoveV1(id,requestOptions)
+          return  roomsControllerRemoveV1(id,)
         }
 
 
@@ -577,7 +575,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RoomsControllerRemoveV1MutationError = unknown
 
     export const useRoomsControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof roomsControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof roomsControllerRemoveV1>>,
         TError,

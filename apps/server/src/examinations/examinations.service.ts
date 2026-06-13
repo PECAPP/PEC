@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateExamScheduleDto } from './dto/create-exam-schedule.dto';
+import { UpdateExamScheduleDto } from './dto/update-exam-schedule.dto';
 import { ExamQueryDto } from './dto/exam-query.dto';
 
 @Injectable()
@@ -45,6 +46,23 @@ export class ExaminationsService {
       throw new NotFoundException('Course not found');
     }
 
+    // Clash detection
+    const clash = await this.prisma.examSchedule.findFirst({
+      where: {
+        room: dto.room,
+        date: new Date(dto.date),
+        deletedAt: null,
+        AND: [
+          { startTime: { lt: dto.endTime } },
+          { endTime: { gt: dto.startTime } },
+        ],
+      },
+    });
+
+    if (clash) {
+      throw new ConflictException(`Room ${dto.room} is already booked for ${clash.courseName} from ${clash.startTime} to ${clash.endTime}`);
+    }
+
     return this.prisma.examSchedule.create({
       data: {
         courseId: course.id,
@@ -67,7 +85,7 @@ export class ExaminationsService {
     const offset = Math.max(query.offset ?? 0, 0);
     const requesterRoles = requester?.roles ?? [];
     const isAdminScope = requesterRoles.some((role) =>
-      ['college_admin', 'admin', 'moderator'].includes(role),
+      ['college_admin'].includes(role),
     );
     const scopedDepartment = isAdminScope
       ? query.department
@@ -84,8 +102,8 @@ export class ExaminationsService {
     }
 
     const where = {
-      deletedAt: null,
       ...(query.courseId ? { courseId: query.courseId } : {}),
+      ...(query.examType ? { examType: query.examType } : {}),
       ...(scopedDepartment
         ? {
             course: {
@@ -132,6 +150,30 @@ export class ExaminationsService {
       limit,
       offset,
     };
+  }
+
+  async updateSchedule(id: string, dto: UpdateExamScheduleDto) {
+    const dataToUpdate: any = { ...dto };
+    if (dto.date) {
+      dataToUpdate.date = new Date(dto.date);
+    }
+    
+    // If course is updated, also update courseName and courseCode
+    if (dto.courseId) {
+      const course = await this.prisma.course.findUnique({
+        where: { id: dto.courseId },
+        select: { name: true, code: true },
+      });
+      if (course) {
+        dataToUpdate.courseName = course.name;
+        dataToUpdate.courseCode = course.code;
+      }
+    }
+
+    return this.prisma.examSchedule.update({
+      where: { id },
+      data: dataToUpdate,
+    });
   }
 
   async deleteSchedule(id: string) {

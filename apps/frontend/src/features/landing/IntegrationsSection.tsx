@@ -35,7 +35,7 @@ export function IntegrationsSection() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border-2 border-sky-600 mb-4 neo-brutal-shadow">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-black border border-sky-600 mb-4 shadow-sm">
             <Code2 className="w-4 h-4 text-sky-400" />
             <span className="text-sm font-medium text-sky-400">Integrations</span>
           </div>
@@ -76,7 +76,7 @@ export function IntegrationsSection() {
                 idx === 0 ? 'bg-blue-900/40 border-blue-400' :
                 idx === 1 ? 'bg-sky-800/40 border-sky-400' :
                 'bg-cyan-900/40 border-cyan-400'
-              } border-2 rounded-none p-8 hover:shadow-none neo-brutal-shadow transition-all duration-300 group cursor-default`}
+              } border rounded-none p-8 hover:shadow-none shadow-sm transition-all duration-300 group cursor-default`}
             >
               <motion.div
                 whileHover={{ rotate: 10, scale: 1.1 }}
@@ -84,7 +84,7 @@ export function IntegrationsSection() {
                     idx === 0 ? 'bg-black border-blue-400' :
                     idx === 1 ? 'bg-black border-sky-400' :
                     'bg-black border-cyan-400'
-                } border-2 flex items-center justify-center mb-4 neo-brutal-shadow`}
+                } border flex items-center justify-center mb-4 shadow-sm`}
               >
                 {item.icon && <item.icon className={`w-6 h-6 ${
                   idx === 0 ? 'text-blue-300' :
@@ -107,7 +107,7 @@ export function IntegrationsSection() {
           <Button
             size="lg"
             variant="outline"
-            className="rounded-lg border-accent/30 hover:border-accent/60 hover:bg-accent/5"
+            className="rounded-sm border-accent/30 hover:border-accent/60 hover:bg-accent/5"
             asChild
           >
             <a href="#">

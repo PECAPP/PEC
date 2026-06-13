@@ -1,3 +1,4 @@
+import { formatDate } from "@pec/ui";
 import React from 'react';
 import { Wallet, AlertTriangle } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export const FinanceSummaryCard = ({ data }: { data: FinanceData }) => {
   const overdueCount = data.overdueCount ?? 0;
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
       <div className="bg-gradient-to-r from-red-600 to-rose-600 px-4 py-3 flex items-center justify-between text-white">
         <div className="flex items-center gap-2">
           <Wallet className="w-4 h-4" />
@@ -43,11 +44,11 @@ export const FinanceSummaryCard = ({ data }: { data: FinanceData }) => {
       <div className="p-3">
         {/* KPI Metrics */}
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="bg-red-50/50 dark:bg-red-950/10 border border-red-100/50 dark:border-red-900/30 rounded-lg p-2 text-center">
+          <div className="bg-red-50/50 dark:bg-red-950/10 border border-red-100/50 dark:border-red-900/30 rounded-sm p-2 text-center">
             <div className="text-[9px] text-red-600/70 dark:text-red-400/70 uppercase font-semibold">Total Pending</div>
             <div className="text-xs font-bold text-red-600 dark:text-red-400 mt-0.5">₹{totalPending}</div>
           </div>
-          <div className="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-100/50 dark:border-emerald-900/30 rounded-lg p-2 text-center">
+          <div className="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-100/50 dark:border-emerald-900/30 rounded-sm p-2 text-center">
             <div className="text-[9px] text-emerald-600/70 dark:text-emerald-400/70 uppercase font-semibold">Total Paid</div>
             <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">₹{totalPaid}</div>
           </div>
@@ -58,7 +59,7 @@ export const FinanceSummaryCard = ({ data }: { data: FinanceData }) => {
           <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1">
             <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Pending Invoices</div>
             {pendingFees.map((fee, idx) => (
-              <div key={idx} className={`border rounded-lg p-2 flex justify-between items-center gap-3 ${fee.overdue ? 'bg-red-50/20 border-red-100 dark:border-red-950/50' : 'bg-gray-50/20 border-gray-100 dark:border-gray-800'}`}>
+              <div key={idx} className={`border rounded-sm p-2 flex justify-between items-center gap-3 ${fee.overdue ? 'bg-red-50/20 border-red-100 dark:border-red-950/50' : 'bg-gray-50/20 border-gray-100 dark:border-gray-800'}`}>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold text-[11px] text-gray-700 dark:text-gray-300 truncate">{fee.description}</span>
@@ -67,7 +68,7 @@ export const FinanceSummaryCard = ({ data }: { data: FinanceData }) => {
                     )}
                   </div>
                   <div className="text-[9px] text-gray-400 dark:text-gray-500 mt-0.5">
-                    Due: {new Date(fee.dueDate).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}
+                    Due: {formatDate(fee.dueDate)}
                   </div>
                 </div>
                 <span className={`text-xs font-bold shrink-0 ${fee.overdue ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}`}>

@@ -5,15 +5,5 @@
  * The PEC APP ERP Institutional API Service
  * OpenAPI spec version: 1.0
  */
-import type { CreateEnrollmentDtoStatus } from './createEnrollmentDtoStatus';
 
-export interface CreateEnrollmentDto {
-  studentId: string;
-  courseId: string;
-  courseName: string;
-  courseCode: string;
-  semester?: number;
-  batch?: string;
-  status?: CreateEnrollmentDtoStatus;
-  enrolledAt?: string;
-}
+export interface CreateEnrollmentDto { [key: string]: unknown }

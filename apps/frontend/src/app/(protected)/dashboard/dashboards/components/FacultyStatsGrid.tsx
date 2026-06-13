@@ -52,9 +52,9 @@ export function FacultyStatsGrid({ stats }: Props) {
 
 function StatCard({ icon: Icon, label, value, subtext, iconColor = 'text-primary' }: any) {
   return (
-    <div className="card-elevated p-5">
+    <div className="bg-card border border-border/40 rounded-sm shadow-sm p-3 md:p-5">
       <div className="flex items-start justify-between">
-        <div className={`w-10 h-10 rounded-lg bg-secondary flex items-center justify-center ${iconColor}`}>
+        <div className={`w-10 h-10 rounded-sm bg-secondary flex items-center justify-center ${iconColor}`}>
           <Icon className="w-5 h-5" />
         </div>
       </div>

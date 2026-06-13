@@ -38,4 +38,10 @@ export class AttendanceSessionRepository {
       where: { id },
     });
   }
+
+  async countBySession(sessionId: string): Promise<number> {
+    return this.prisma.attendance.count({
+      where: { sessionId },
+    });
+  }
 }

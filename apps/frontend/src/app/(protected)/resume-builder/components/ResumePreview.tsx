@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { FileText } from "lucide-react";
 import { ResumeData } from "@/utils/resumeUtils";
 
 interface ResumePreviewProps {
@@ -21,22 +20,34 @@ export function ResumePreview({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       className={cn(
-        "xl:col-span-6 flex justify-center w-full overflow-x-auto pb-10",
-        preview ? "xl:col-span-12 relative mx-auto max-w-5xl" : "",
+        "xl:col-span-6 min-w-0 w-full overflow-x-auto overflow-y-hidden",
+        preview ? "xl:col-span-12 relative" : "",
       )}
     >
-      <div
-        className="bg-white text-black shadow-[0_25px_65px_rgba(0,0,0,0.5)] border-2 border-black/5 origin-top-left transition-all duration-300 ease-out"
-        style={{
-          width: "8.5in",
-          minHeight: "11in",
-          transform: preview ? "none" : `scale(${zoom})`,
-          transformOrigin: preview ? "top center" : "top left",
-          margin: preview ? "0 auto" : "0",
-        }}
-        id="resume-preview-document"
-      >
-        <div className="p-[0.6in] relative">
+      <div className={cn(
+        "min-w-full w-max flex justify-center items-start pt-2 pb-10",
+        preview ? "p-12" : ""
+      )}>
+        {/* Scaled Layout Wrapper */}
+        <div
+          className="relative transition-all duration-300 ease-out"
+          style={{
+            width: preview ? "8.5in" : `calc(8.5in * ${zoom})`,
+            minHeight: preview ? "11in" : `calc(11in * ${zoom})`,
+          }}
+        >
+          {/* Actual Document */}
+          <div
+            className="absolute top-0 left-0 bg-white text-black shadow-[0_25px_65px_rgba(0,0,0,0.5)] border border-black/5 transition-all duration-300 ease-out"
+            style={{
+              width: "8.5in",
+              minHeight: "11in",
+              transform: preview ? "none" : `scale(${zoom})`,
+              transformOrigin: "top left",
+            }}
+            id="resume-preview-document"
+          >
+            <div className="p-[0.6in] relative">
           
 
           {/* Resume Header */}
@@ -71,7 +82,7 @@ export function ResumePreview({
           <div className="space-y-8">
             {/* Education */}
             <section>
-              <h2 className="text-xs font-bold text-black border-b border-black/30 mb-4 uppercase tracking-widest pb-1">Education</h2>
+              <h2 className="text-xs font-bold text-black border-b border-black/30 mb-4  pb-1">Education</h2>
               <div className="space-y-6">
                 {resumeData.education.map((edu, i) => (
                   <div key={i} className="relative">
@@ -96,7 +107,7 @@ export function ResumePreview({
             {/* Experience */}
             {resumeData.experience.length > 0 && (
               <section>
-                <h2 className="text-xs font-bold text-black border-b border-black/30 mb-4 uppercase tracking-widest pb-1">Work Experience</h2>
+                <h2 className="text-xs font-bold text-black border-b border-black/30 mb-4  pb-1">Work Experience</h2>
                 <div className="space-y-8">
                   {resumeData.experience.map((exp, i) => (
                     <div key={i}>
@@ -124,7 +135,7 @@ export function ResumePreview({
             {/* Projects */}
             {resumeData.projects.length > 0 && (
               <section>
-                <h2 className="text-xs font-bold text-black border-b border-black/30 mb-4 uppercase tracking-widest pb-1">Projects</h2>
+                <h2 className="text-xs font-bold text-black border-b border-black/30 mb-4  pb-1">Projects</h2>
                 <div className="space-y-8">
                   {resumeData.projects.map((proj, i) => (
                     <div key={i}>
@@ -147,7 +158,7 @@ export function ResumePreview({
 
             {/* Skills */}
             <section>
-              <h2 className="text-xs font-bold text-black border-b border-black/30 mb-4 uppercase tracking-widest pb-1">Skills & Interests</h2>
+              <h2 className="text-xs font-bold text-black border-b border-black/30 mb-4  pb-1">Skills & Interests</h2>
               <div className="grid gap-3 text-xs">
                 {resumeData.skills.technical && (
                   <div className="flex gap-4">
@@ -180,7 +191,8 @@ export function ResumePreview({
           
         </div>
       </div>
-      
+      </div>
+      </div>
     </motion.div>
   );
 }

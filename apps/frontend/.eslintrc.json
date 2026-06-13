@@ -1,6 +1,5 @@
 {
   "extends": [
-    "../../.eslintrc.json",
-    "next/core-web-vitals"
+    "../../packages/eslint-config/next.js"
   ]
 }

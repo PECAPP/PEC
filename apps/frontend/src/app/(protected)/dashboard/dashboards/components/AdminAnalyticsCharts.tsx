@@ -9,7 +9,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  LineChart,
   Line,
   AreaChart,
   Area,
@@ -19,10 +18,12 @@ export function AdminAnalyticsCharts({
   totalStudents = 0,
   totalFaculty = 0,
   adminCount = 0,
+  financeCharts,
 }: {
   totalStudents?: number;
   totalFaculty?: number;
   adminCount?: number;
+  financeCharts?: any;
 }) {
   const safeStudents = isNaN(totalStudents) ? 0 : totalStudents;
   const safeFaculty = isNaN(totalFaculty) ? 0 : totalFaculty;
@@ -34,14 +35,16 @@ export function AdminAnalyticsCharts({
     { name: 'Admins', count: safeAdmins, color: 'hsl(var(--warning))' },
   ];
 
-  const projectedVsActualRevenueData = [
-    { month: 'Jan', projected: 50000, actual: 48000 },
-    { month: 'Feb', projected: 55000, actual: 52000 },
-    { month: 'Mar', projected: 60000, actual: 65000 },
-    { month: 'Apr', projected: 58000, actual: 56000 },
-    { month: 'May', projected: 62000, actual: 68000 },
-    { month: 'Jun', projected: 65000, actual: 72000 },
-  ];
+  const projectedVsActualRevenueData = financeCharts?.revenue?.length 
+    ? financeCharts.revenue.map((r: any) => ({ month: r.name, actual: r.total, projected: r.total * 1.1 }))
+    : [
+        { month: 'Jan', projected: 50000, actual: 48000 },
+        { month: 'Feb', projected: 55000, actual: 52000 },
+        { month: 'Mar', projected: 60000, actual: 65000 },
+        { month: 'Apr', projected: 58000, actual: 56000 },
+        { month: 'May', projected: 62000, actual: 68000 },
+        { month: 'Jun', projected: 65000, actual: 72000 },
+      ];
 
   return (
     <div className="grid gap-6 md:grid-cols-2 animate-in slide-in-from-bottom-4 duration-700">
@@ -76,7 +79,7 @@ export function AdminAnalyticsCharts({
                   backgroundColor: 'hsl(var(--card))',
                   borderColor: 'hsl(var(--border))',
                   borderRadius: '4px',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: 'var(--shadow-sm)',
                   fontSize: '12px',
                   fontWeight: 'bold',
                 }}
@@ -127,7 +130,7 @@ export function AdminAnalyticsCharts({
                   backgroundColor: 'hsl(var(--card))',
                   borderColor: 'hsl(var(--border))',
                   borderRadius: '4px',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: 'var(--shadow-sm)',
                   fontSize: '12px',
                 }}
               />
@@ -157,3 +160,4 @@ export function AdminAnalyticsCharts({
 }
 
 import { BarChart3 } from 'lucide-react';
+

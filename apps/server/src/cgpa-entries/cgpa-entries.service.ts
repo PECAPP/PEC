@@ -11,9 +11,7 @@ import { UpdateCgpaEntryDto } from './dto/update-cgpa-entry.dto';
 const ELEVATED_ROLES = new Set([
   'faculty',
   'college_admin',
-  'admin',
   'moderator',
-  'super_admin',
 ]);
 
 @Injectable()

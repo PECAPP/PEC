@@ -1,7 +1,8 @@
 import { Button, Input, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "@pec/ui";
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, CreditCard, MessageSquare, PlusCircle } from 'lucide-react';
+import React from 'react';
 
 type SearchableRoute = {
   title: string;
@@ -56,13 +57,18 @@ export default function CommandMenu() {
 
   return (
     <>
-      <div className="relative" onClick={() => setOpen(true)}>
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <div className="relative group cursor-pointer" onClick={() => setOpen(true)}>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
         <Input
-          placeholder="Search... (Ctrl+K)"
-          className="pl-10 bg-background border border-input shadow-sm focus-visible:ring-1 focus-visible:ring-primary cursor-pointer text-foreground placeholder:text-muted-foreground"
+          placeholder="Search..."
+          className="pl-10 pr-20 bg-white/5 backdrop-blur-md border border-white/10 shadow-sm hover:bg-white/10 transition-colors focus-visible:ring-1 focus-visible:ring-primary cursor-pointer text-foreground placeholder:text-muted-foreground/60 h-10 rounded-lg"
           readOnly
         />
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+          <kbd className="inline-flex h-5 items-center justify-center rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">Ctrl</kbd>
+          <span className="text-[10px] text-muted-foreground">+</span>
+          <kbd className="inline-flex h-5 items-center justify-center rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">K</kbd>
+        </div>
       </div>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
@@ -106,6 +112,33 @@ export default function CommandMenu() {
           <CommandSeparator />
 
           <CommandGroup heading="Actions">
+            <CommandItem
+              onSelect={() => {
+                setOpen(false);
+                router.push('/finance');
+              }}
+            >
+              <CreditCard className="mr-2 h-4 w-4 text-emerald-500" />
+              <span>Pay Exam / Semester Fee</span>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setOpen(false);
+                router.push('/chat');
+              }}
+            >
+              <MessageSquare className="mr-2 h-4 w-4 text-blue-500" />
+              <span>Message an Instructor</span>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setOpen(false);
+                router.push('/dashboard');
+              }}
+            >
+              <PlusCircle className="mr-2 h-4 w-4 text-orange-500" />
+              <span>Create Marketplace Listing</span>
+            </CommandItem>
             <CommandItem
               onSelect={() => {
                 setOpen(false);

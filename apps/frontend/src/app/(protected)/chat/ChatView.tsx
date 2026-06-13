@@ -33,6 +33,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
   
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(roomFromUrl || (rooms.length > 0 ? rooms[0].id : null));
   const [replyingTo, setReplyingTo] = useState<{ id: string; text: string; senderName: string } | null>(null);
+  const [editingMessage, setEditingMessage] = useState<{ id: string; text: string } | null>(null);
 
   useEffect(() => {
     if (roomFromUrl) {
@@ -50,6 +51,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
     messages,
     loading: messagesLoading,
     sendMessage,
+    editMessage,
     loadMore,
     hasMore,
   } = useChatMessages(selectedRoomId);
@@ -94,7 +96,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
           userRole={(user.role as any) || 'student'}
           userId={user.uid}
           loading={roomsLoading}
-          isMobileOpen={isMobileSidebarOpen}
+          _isMobileOpen={isMobileSidebarOpen}
           onMobileClose={() => setIsMobileSidebarOpen(false)}
         />
       </div>
@@ -114,7 +116,7 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
             {selectedRoom && (
               <button
                 onClick={() => setIsInfoDialogOpen(true)}
-                className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-lg transition-colors overflow-hidden max-w-full text-left"
+                className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-sm transition-colors overflow-hidden  text-left"
               >
                 <div className="flex-1 overflow-hidden">
                   <h2 className="text-base font-semibold truncate">{selectedRoom.title}</h2>
@@ -151,6 +153,10 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
                     }}
                     onReply={() => {}}
                     onReplyClick={() => {}}
+                    onEdit={(message) => {
+                      setEditingMessage({ id: message.id, text: message.content });
+                      setReplyingTo(null); // Cancel any reply if we start editing
+                    }}
                   />
                 </div>
               ))}
@@ -167,6 +173,12 @@ export function ChatView({ user, initialRooms }: ChatViewProps) {
               roomId={selectedRoomId}
               replyingTo={replyingTo}
               onCancelReply={() => setReplyingTo(null)}
+              editingMessage={editingMessage}
+              onEditSubmit={async (id, newContent) => {
+                await editMessage(id, newContent);
+                setEditingMessage(null);
+              }}
+              onCancelEdit={() => setEditingMessage(null)}
             />
           </div>
         )}

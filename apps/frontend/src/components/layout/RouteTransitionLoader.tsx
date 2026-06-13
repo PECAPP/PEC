@@ -2,7 +2,6 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState, Suspense } from 'react';
-import { Loader } from '@pec/ui';
 
 const isModifiedEvent = (event: MouseEvent | ReactMouseEvent) =>
   event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
@@ -18,48 +17,39 @@ function RouteTransitionLoaderInner() {
   }, [pathname, searchParams]);
 
   const previousRouteKeyRef = useRef(currentRouteKey);
-  const startTimerRef = useRef<number | null>(null);
   const mountedRef = useRef(false);
 
   const startNavigation = () => {
-    if (!mountedRef.current) return;
-    if (startTimerRef.current !== null) {
-      window.clearTimeout(startTimerRef.current);
+    if (mountedRef.current) {
+      // Defer the state update to the next event loop tick to avoid scheduling updates during React's insertion effect phase
+      setTimeout(() => {
+        if (mountedRef.current) {
+          setIsNavigating(true);
+        }
+      }, 0);
     }
-    // Defer state update so we don't flash for fast loads (200ms threshold)
-    startTimerRef.current = window.setTimeout(() => {
-      if (mountedRef.current) {
-        setIsNavigating(true);
-      }
-      startTimerRef.current = null;
-    }, 200);
   };
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
-      if (startTimerRef.current !== null) {
-        window.clearTimeout(startTimerRef.current);
-        startTimerRef.current = null;
-      }
     };
   }, []);
+
 
   useEffect(() => {
     if (previousRouteKeyRef.current !== currentRouteKey) {
       setIsNavigating(false);
       previousRouteKeyRef.current = currentRouteKey;
-      if (startTimerRef.current !== null) {
-        window.clearTimeout(startTimerRef.current);
-        startTimerRef.current = null;
-      }
     }
   }, [currentRouteKey]);
 
   useEffect(() => {
     if (!isNavigating) return;
-    const timeout = window.setTimeout(() => setIsNavigating(false), 15000);
+    const timeout = window.setTimeout(() => {
+      setIsNavigating(false);
+    }, 15000);
     return () => window.clearTimeout(timeout);
   }, [isNavigating]);
 
@@ -146,8 +136,36 @@ function RouteTransitionLoaderInner() {
   }
 
   return (
-    <div role="status" aria-live="polite" aria-label="Loading page">
-      <Loader />
+    <div
+      role="status"
+      aria-live="polite"
+      aria-label="Loading page"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 99999,
+        height: '3px',
+        background: 'transparent',
+      }}
+    >
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          background: 'hsl(var(--primary))',
+          animation: 'route-progress 1.4s cubic-bezier(0.65,0.815,0.735,0.395) infinite',
+          boxShadow: '0 0 10px hsl(var(--primary) / 0.6)',
+        }}
+      />
+      <style>{`
+        @keyframes route-progress {
+          0%   { transform: translateX(-100%) scaleX(0.4); }
+          50%  { transform: translateX(10%) scaleX(1.1); }
+          100% { transform: translateX(110%) scaleX(0.4); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -3,8 +3,6 @@ import React, { useState, useCallback } from 'react';
 import { Upload, X, FileText, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
 import { toast } from 'sonner';
-import Papa from 'papaparse';
-
 interface PDFImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -71,32 +69,34 @@ export default function PDFImportDialog({
   };
 
   const parseCSV = (csvFile: File) => {
-    Papa.parse(csvFile, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        if (results.errors.length > 0) {
-          toast.error('Error parsing CSV file');
-          console.error('CSV Parse Errors:', results.errors);
-          return;
-        }
+    import('papaparse').then((Papa) => {
+      Papa.default.parse(csvFile, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (results.errors.length > 0) {
+            toast.error('Error parsing CSV file');
+            console.error('CSV Parse Errors:', results.errors);
+            return;
+          }
 
-        // Validate columns
-        const fileColumns = Object.keys(results.data[0] || {});
-        const missingColumns = templateColumns.filter(col => !fileColumns.includes(col));
-        
-        if (missingColumns.length > 0) {
-          toast.error(`Missing required columns: ${missingColumns.join(', ')}`);
-          return;
-        }
+          // Validate columns
+          const fileColumns = Object.keys(results.data[0] || {});
+          const missingColumns = templateColumns.filter(col => !fileColumns.includes(col));
+          
+          if (missingColumns.length > 0) {
+            toast.error(`Missing required columns: ${missingColumns.join(', ')}`);
+            return;
+          }
 
-        setParsedData(results.data as any[]);
-        toast.success(`Parsed ${results.data.length} rows successfully`);
-      },
-      error: (error) => {
-        toast.error('Failed to parse CSV file');
-        console.error('Parse Error:', error);
-      }
+          setParsedData(results.data as any[]);
+          toast.success(`Parsed ${results.data.length} rows successfully`);
+        },
+        error: (error: any) => {
+          toast.error('Failed to parse CSV file');
+          console.error('Parse Error:', error);
+        }
+      });
     });
   };
 
@@ -125,8 +125,9 @@ export default function PDFImportDialog({
     }
   };
 
-  const downloadTemplate = () => {
-    const csv = Papa.unparse({
+  const downloadTemplate = async () => {
+    const Papa = await import('papaparse');
+    const csv = Papa.default.unparse({
       fields: templateColumns,
       data: sampleData.length > 0 ? sampleData : [templateColumns.reduce((obj, col) => ({ ...obj, [col]: '' }), {})]
     });
@@ -158,7 +159,7 @@ export default function PDFImportDialog({
 
         <div className="space-y-4">
           {/* Template Download */}
-          <div className="flex justify-between items-center p-4 border border-border rounded-lg bg-muted/20">
+          <div className="flex justify-between items-center p-4 border border-border rounded-sm bg-muted/20">
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-primary" />
               <div>
@@ -175,8 +176,8 @@ export default function PDFImportDialog({
 
           {/* File Upload Area */}
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive ? 'border-primary bg-primary/5' : 'border-border'
+            className={`border border-dashed rounded-sm p-8 text-center transition-colors ${
+              dragActive ? 'border-border/40 bg-primary/5' : 'border-border'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}

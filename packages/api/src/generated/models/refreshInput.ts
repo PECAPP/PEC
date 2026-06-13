@@ -6,7 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface RefreshInput {
-  /** Refresh token string */
-  refreshToken?: string;
-}
+export interface RefreshInput { [key: string]: unknown }

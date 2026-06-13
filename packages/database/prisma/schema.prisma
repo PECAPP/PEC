@@ -24,6 +24,9 @@ model User {
   sessionVersion           Int                      @default(0)
   failedLoginAttempts      Int                      @default(0)
   lockedUntil              DateTime?
+  twoFactorSecret          String?
+  isTwoFactorEnabled       Boolean                  @default(false)
+  deletedAt                DateTime?
   attendances              Attendance[]             @relation("StudentAttendance")
   canteenOrders            CanteenOrder[]
   cgpaEntries              CgpaEntry[]
@@ -47,8 +50,33 @@ model User {
   studentProfile           StudentProfile?
   chatRooms                UserChatRoom[]
   roles                    UserRole[]
+  settings                 UserSettings?
+  delegationsFrom          RoleDelegation[]         @relation("DelegationFrom")
+  delegationsTo            RoleDelegation[]         @relation("DelegationTo")
+  securityAuditLogs        SecurityAuditLog[]
+
+
+
   @@index([emailVerified])
   @@index([lockedUntil])
+  @@index([email], map: "idx_user_active", where: raw("(\"deletedAt\" IS NULL)"))
+}
+
+model UserSettings {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  theme              String   @default("system")
+  accentColor        String   @default("pec-gold")
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  locale             String   @default("en")
+  timezone           String   @default("Asia/Kolkata")
+  sidebarState       String   @default("expanded")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model CgpaEntry {
@@ -72,26 +100,53 @@ model CgpaEntry {
 }
 
 model HostelIssue {
-  id             String   @id @default(uuid())
-  title          String   @default("")
+  id             String    @id @default(uuid())
+  title          String    @default("")
   studentId      String
   studentName    String?
-  hostelName     String   @default("Hostel")
+  hostelName     String    @default("Hostel")
   roomNumber     String
   category       String
   description    String
-  status         String   @default("Open")
-  priority       String   @default("Medium")
+  images         String[]  @default([])
+  status         String    @default("Open")
+  priority       String    @default("Medium")
   organizationId String?
   responses      Json?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  slaDeadline    DateTime?
+  isEscalated    Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([studentId, status])
   @@index([hostelName, status])
   @@index([category])
   @@index([createdAt])
   @@index([organizationId])
+  @@index([isEscalated])
+}
+
+model HostelOutpass {
+  id            String   @id @default(uuid())
+  studentId     String
+  studentName   String?
+  hostelName    String
+  roomNumber    String
+  reason        String
+  destination   String
+  departureDate DateTime
+  returnDate    DateTime
+  status        String   @default("Pending") // Pending, Approved, Rejected, Active, Completed
+  approvedBy    String?
+  qrCode        String?  @unique
+  evidenceUrl   String?
+  images        String[] @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([studentId, status])
+  @@index([hostelName, status])
+  @@index([status, departureDate])
 }
 
 model CampusMapRegion {
@@ -161,21 +216,28 @@ model CourseMaterial {
 }
 
 model Role {
-  id          String           @id @default(uuid())
-  name        String           @unique
-  description String?
-  isSystem    Boolean          @default(false)
-  hierarchy   Int              @default(1)
-  createdAt   DateTime         @default(now())
-  users       UserRole[]
-  permissions RolePermission[]
+  id            String           @id @default(uuid())
+  name          String           @unique
+  description   String?
+  isSystem      Boolean          @default(false)
+  isSystemAdmin Boolean          @default(false)
+  hierarchy     Int              @default(1)
+  parentRoleId  String?
+  createdAt     DateTime         @default(now())
+  
+  parentRole    Role?            @relation("RoleInheritance", fields: [parentRoleId], references: [id])
+  childRoles    Role[]           @relation("RoleInheritance")
+  
+  users         UserRole[]
+  permissions   RolePermission[]
+  delegations   RoleDelegation[]
 }
 
 model Permission {
   id          String           @id @default(uuid())
-  action      String           // e.g. "create", "read", "update", "delete", "manage"
-  subject     String           // e.g. "HostelIssue", "all"
-  conditions  Json?            // e.g. { "studentId": "{{id}}" }
+  action      String // e.g. "create", "read", "update", "delete", "manage"
+  subject     String // e.g. "HostelIssue", "all"
+  conditions  Json? // e.g. { "studentId": "{{id}}" }
   description String?
   createdAt   DateTime         @default(now())
   roles       RolePermission[]
@@ -194,16 +256,62 @@ model RolePermission {
 }
 
 model UserRole {
-  userId String
-  roleId String
-  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  roleId     String
+  validFrom  DateTime?
+  validUntil DateTime?
+  grantedBy  String?
+  grantedAt  DateTime  @default(now())
+
+  role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
   @@index([roleId])
 }
 
+model RoleDelegation {
+  id            String    @id @default(uuid())
+  delegatorId   String
+  delegateeId   String
+  roleId        String
+  validFrom     DateTime  @default(now())
+  validUntil    DateTime
+  reason        String?
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  delegator     User      @relation("DelegationFrom", fields: [delegatorId], references: [id], onDelete: Cascade)
+  delegatee     User      @relation("DelegationTo", fields: [delegateeId], references: [id], onDelete: Cascade)
+  role          Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@index([delegateeId])
+  @@index([delegatorId])
+  @@index([roleId])
+}
+
+model SecurityAuditLog {
+  id          String    @id @default(uuid())
+  actorId     String
+  action      String    // e.g. "GRANT_ROLE", "REVOKE_ROLE", "UPDATE_PERMISSION"
+  targetType  String    // e.g. "UserRole", "Permission", "RoleDelegation"
+  targetId    String
+  before      Json?
+  after       Json?
+  reason      String?
+  ipAddress   String?
+  createdAt   DateTime  @default(now())
+
+  actor       User      @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([action])
+  @@index([createdAt])
+}
+
 model RefreshToken {
+
   id                String    @id @default(uuid())
   userId            String
   tokenHash         String    @unique
@@ -231,6 +339,8 @@ model EmailVerificationToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+  @@index([expiresAt]) // For scheduled pruning of expired tokens
+  @@index([usedAt]) // For cleanup of used tokens
 }
 
 model PasswordResetToken {
@@ -243,6 +353,8 @@ model PasswordResetToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+  @@index([expiresAt]) // For scheduled pruning of expired tokens
+  @@index([usedAt]) // For cleanup of used tokens
 }
 
 model StudentProfile {
@@ -263,18 +375,22 @@ model StudentProfile {
 }
 
 model FacultyProfile {
-  id             String   @id @default(uuid())
-  userId         String   @unique
-  employeeId     String   @unique
+  id             String                @id @default(uuid())
+  userId         String                @unique
+  employeeId     String                @unique
   department     String
   designation    String
   phone          String?
   specialization String?
   qualifications String?
   bio            String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  publications   FacultyPublication[]
+  awards         FacultyAward[]
+  conferences    FacultyConference[]
+  consultations  FacultyConsultation[]
 
   @@index([department, designation])
 }
@@ -311,8 +427,6 @@ model Course {
   timetableEntries Timetable[]    @relation("CourseTimetable")
 
   @@index([department, semester])
-  @@index([status])
-  @@index([deletedAt])
   @@index([status], map: "idx_course_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
@@ -331,7 +445,7 @@ model Enrollment {
 
   @@unique([studentId, courseId])
   @@index([studentId, status])
-  @@index([courseId])
+  @@index([courseId, status])
   @@index([enrolledAt])
 }
 
@@ -355,18 +469,18 @@ model FeeRecord {
   createdAt               DateTime             @default(now())
   updatedAt               DateTime             @updatedAt
   deletedAt               DateTime?
-  student                 User                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student                 User                 @relation(fields: [studentId], references: [id])
   transactions            FinanceTransaction[]
 
   @@index([studentId, status])
   @@index([category, status])
   @@index([dueDate])
-  @@index([deletedAt])
+  @@index([status, dueDate])
   @@index([studentId, status], map: "idx_feerecord_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model FinanceTransaction {
-  id            String    @id @default(uuid())
+  id            String    @id @default(cuid())
   studentId     String
   feeRecordId   String
   amount        Float
@@ -376,12 +490,11 @@ model FinanceTransaction {
   receiptNo     String    @unique
   notes         String?
   createdAt     DateTime  @default(now())
-  feeRecord     FeeRecord @relation(fields: [feeRecordId], references: [id], onDelete: Cascade)
-  student       User      @relation("FinanceTransactions", fields: [studentId], references: [id], onDelete: Cascade)
+  feeRecord     FeeRecord @relation(fields: [feeRecordId], references: [id])
+  student       User      @relation("FinanceTransactions", fields: [studentId], references: [id])
 
-  @@index([studentId])
-  @@index([feeRecordId])
-  @@index([status])
+  @@index([studentId, status])
+  @@index([feeRecordId, status])
   @@index([createdAt])
 }
 
@@ -423,7 +536,7 @@ model Room {
 }
 
 model ChatRoom {
-  id           String         @id @default(uuid())
+  id           String         @id @default(cuid())
   name         String
   isGroup      Boolean        @default(true)
   createdAt    DateTime       @default(now())
@@ -443,18 +556,17 @@ model Notice {
   important     Boolean   @default(false)
   priorityLevel Int       @default(1)
   pinned        Boolean   @default(false)
-  mediaJson   String?
-  authorId    String?
-  publishedAt DateTime  @default(now())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  author      User?     @relation("NoticeAuthor", fields: [authorId], references: [id])
+  mediaJson     String?
+  authorId      String?
+  publishedAt   DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  author        User?     @relation("NoticeAuthor", fields: [authorId], references: [id])
 
   @@index([pinned, priorityLevel, publishedAt])
   @@index([category, publishedAt])
   @@index([authorId])
-  @@index([deletedAt, publishedAt])
   @@index([category], map: "idx_notice_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
@@ -533,7 +645,7 @@ model UserChatRoom {
 }
 
 model Attendance {
-  id        String             @id @default(uuid())
+  id        String             @id @default(cuid())
   date      DateTime
   status    String
   subject   String
@@ -590,7 +702,7 @@ model ExamSchedule {
   course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@index([courseId, date])
-  @@index([deletedAt])
+  @@index([courseId], map: "idx_exam_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
 model Job {
@@ -607,8 +719,6 @@ model Job {
   @@index([deadline])
   @@index([type, location])
   @@index([company])
-  @@index([deletedAt, deadline])
-  @@index([deletedAt])
   @@index([deadline], map: "idx_job_active", where: raw("(\"deletedAt\" IS NULL)"))
 }
 
@@ -707,7 +817,7 @@ model CanteenOrderItem {
   name     String
   quantity Int
   price    Float
-  item     CanteenItem  @relation(fields: [itemId], references: [id])
+  item     CanteenItem  @relation(fields: [itemId], references: [id], onDelete: Cascade)
   order    CanteenOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
@@ -777,8 +887,9 @@ model StudentSkill {
 }
 
 model FacultyPublication {
-  id         String   @id @default(uuid())
+  id         String         @id @default(uuid())
   facultyId  String
+  faculty    FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   title      String
   journal    String?
   conference String?
@@ -786,55 +897,58 @@ model FacultyPublication {
   doi        String?
   url        String?
   abstract   String?
-  citations  Int      @default(0)
+  citations  Int            @default(0)
   coAuthors  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 
   @@index([facultyId])
   @@index([facultyId, year])
 }
 
 model FacultyAward {
-  id          String   @id @default(uuid())
+  id          String         @id @default(uuid())
   facultyId   String
+  faculty     FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   title       String
   description String?
   awardedBy   String?
   year        Int
-  category    String   @default("academic")
-  createdAt   DateTime @default(now())
+  category    String         @default("academic")
+  createdAt   DateTime       @default(now())
 
   @@index([facultyId])
   @@index([facultyId, year])
 }
 
 model FacultyConference {
-  id                String    @id @default(uuid())
+  id                String         @id @default(uuid())
   facultyId         String
+  faculty           FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   name              String
   location          String?
   startDate         DateTime?
   endDate           DateTime?
-  role              String?   @default("presenter")
+  role              String?        @default("presenter")
   presentationTitle String?
   description       String?
-  createdAt         DateTime  @default(now())
+  createdAt         DateTime       @default(now())
 
   @@index([facultyId])
   @@index([facultyId, startDate])
 }
 
 model FacultyConsultation {
-  id           String    @id @default(uuid())
+  id           String         @id @default(uuid())
   facultyId    String
+  faculty      FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   organization String
   description  String?
   startDate    DateTime?
   endDate      DateTime?
-  status       String    @default("active")
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  status       String         @default("active")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   @@index([facultyId])
   @@index([facultyId, status])
@@ -900,14 +1014,16 @@ model MarketplaceBookmark {
 }
 
 model MarketplaceChat {
-  id        String               @id @default(uuid())
-  listingId String
-  buyerId   String
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-  buyer     User                 @relation("MarketplaceBuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
-  listing   MarketplaceListing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  messages  MarketplaceMessage[]
+  id          String               @id @default(uuid())
+  listingId   String
+  buyerId     String
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  offerAmount Float?
+  offerStatus String? // "PENDING", "ACCEPTED", "REJECTED"
+  buyer       User                 @relation("MarketplaceBuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
+  listing     MarketplaceListing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  messages    MarketplaceMessage[]
 
   @@unique([listingId, buyerId])
   @@index([listingId])
@@ -915,14 +1031,17 @@ model MarketplaceChat {
 }
 
 model MarketplaceMessage {
-  id        String          @id @default(uuid())
-  chatId    String
-  senderId  String
-  text      String
-  createdAt DateTime        @default(now())
-  chat      MarketplaceChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender    User            @relation("MarketplaceMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  id          String          @id @default(cuid())
+  chatId      String
+  senderId    String
+  text        String
+  isOffer     Boolean         @default(false)
+  offerAmount Float?
+  offerStatus String? // "PENDING", "ACCEPTED", "REJECTED", "WITHDRAWN"
+  createdAt   DateTime        @default(now())
+  chat        MarketplaceChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender      User            @relation("MarketplaceMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
-  @@index([chatId])
+  @@index([chatId, createdAt])
   @@index([senderId])
 }

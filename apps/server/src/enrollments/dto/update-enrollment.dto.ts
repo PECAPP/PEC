@@ -1,17 +1,4 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { enrollmentSchema } from '@pec/shared';
 
-export class UpdateEnrollmentDto {
-  @IsOptional()
-  @IsString()
-  status?: string;
-
-  @IsOptional()
-  @IsString()
-  batch?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  semester?: number;
-}
+export class UpdateEnrollmentDto extends createZodDto(enrollmentSchema.partial()) {}

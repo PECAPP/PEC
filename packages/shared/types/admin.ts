@@ -20,7 +20,7 @@ export interface CollegeSettings {
   cloudinaryCloudName?: string;
   cloudinaryPreset?: string;
   attendanceRequiredPercentage?: number;
-  lastUpdated: any;
+  lastUpdated: Date | string;
   updatedBy: string;
 }
 
@@ -36,9 +36,20 @@ export interface PlacementSettings {
   placementSeasonEnd: string;
   requireCompanyVerification: boolean;
   companyVerificationDocuments: string[];
-  notifyOnNewJob: boolean;
   notifyOnApplicationUpdate: boolean;
   notifyOnDriveRegistration: boolean;
-  updatedAt: any;
+  updatedAt: Date | string;
   updatedBy: string;
+}
+
+export interface DashboardStats {
+  totalStudents: number;
+  totalFaculty: number;
+  totalCourses: number;
+}
+
+export interface AdminDashboardData {
+  courses: unknown[];
+  users: unknown[];
+  stats: DashboardStats;
 }

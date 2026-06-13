@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCollegeSettings } from "./useCollegeSettings";
+import { safeLocalStorage } from "@/lib/ssr-safe";
 
 export function useCollegeBrandingColors() {
   const { settings } = useCollegeSettings();
@@ -42,15 +43,15 @@ export function useCollegeBrandingColors() {
     )}%`;
   };
 
-  // Apply color to CSS variables
+  // Apply color to CSS variables — guarded for SSR safety
   const applyColorToCss = (color: string) => {
+    if (typeof document === 'undefined') return;
     const hsl = hexToHSL(color);
     document.documentElement.style.setProperty("--primary", hsl);
   };
 
   useEffect(() => {
-    // Load saved color preference from localStorage on mount
-    const saved = localStorage.getItem("accentColor");
+    const saved = safeLocalStorage.get("accentColor");
     if (saved && availableColors.includes(saved)) {
       setSelectedColorState(saved);
       applyColorToCss(saved);
@@ -63,7 +64,7 @@ export function useCollegeBrandingColors() {
   const setColor = (color: string) => {
     if (availableColors.includes(color)) {
       setSelectedColorState(color);
-      localStorage.setItem("accentColor", color);
+      safeLocalStorage.set("accentColor", color);
       applyColorToCss(color);
     }
   };

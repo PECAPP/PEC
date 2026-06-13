@@ -15,6 +15,7 @@ export default function ProductCard({
   onView,
   onEdit,
   onDelete,
+  onToggleHold,
 }: {
   listing: Listing;
   isBookmarked: boolean;
@@ -24,6 +25,7 @@ export default function ProductCard({
   onView: (listing: Listing) => void;
   onEdit: (listing: Listing) => void;
   onDelete: (id: string) => void;
+  onToggleHold?: (id: string, currentStatus: string) => void;
 }) {
   const isMine = listing.sellerId === currentUserId;
   const imgSrc = listing.images[0] || '/placeholder-product.png';
@@ -34,7 +36,7 @@ export default function ProductCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="group relative bg-card/90 backdrop-blur-sm border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300"
+      className="group relative bg-card/90 backdrop-blur-sm border border-border rounded-sm overflow-hidden shadow-sm hover:shadow-xl hover:border-border/40 transition-all duration-300"
     >
       {/* Image */}
       <div
@@ -52,14 +54,19 @@ export default function ProductCard({
         />
         {listing.status === 'Sold' && (
           <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
-            <Badge className="bg-red-500 text-white text-sm px-3 py-1">SOLD</Badge>
+            <Badge className="bg-red-500/15 text-red-600 border-red-500/20 text-sm px-3 py-1">SOLD</Badge>
+          </div>
+        )}
+        {listing.status === 'On Hold' && (
+          <div className="absolute inset-0 bg-background/40 flex items-center justify-center">
+            <Badge className="bg-amber-500/80 text-white border-amber-500/20 text-sm px-3 py-1">ON HOLD</Badge>
           </div>
         )}
         <div className="absolute top-3 right-3">
           <Badge
             variant="outline"
             className={cn(
-              'text-[10px] font-bold uppercase tracking-wider border shadow-sm backdrop-blur-md bg-background/80',
+              'text-sm font-medium  border shadow-sm backdrop-blur-md bg-background/80',
               CONDITION_COLORS[listing.condition] ?? ''
             )}
           >
@@ -95,7 +102,7 @@ export default function ProductCard({
           </h3>
         </div>
 
-        <div className="flex items-center gap-1.5 text-primary font-bold bg-primary/10 w-fit px-2.5 py-1 rounded-lg">
+        <div className="flex items-center gap-1.5 text-primary font-bold bg-primary/10 w-fit px-2.5 py-1 rounded-sm">
           <IndianRupee className="w-4 h-4" />
           <span className="text-lg tracking-tight">{listing.price.toLocaleString('en-IN')}</span>
         </div>
@@ -115,18 +122,28 @@ export default function ProductCard({
         <div className="flex gap-2 pt-2 border-t border-border/40">
           {isMine ? (
             <>
+              {onToggleHold && listing.status !== 'Sold' && (
+                <Button
+                  size="sm"
+                  variant={listing.status === 'On Hold' ? 'default' : 'outline'}
+                  className={cn("flex-1 h-8 rounded-sm font-medium text-xs", listing.status === 'On Hold' ? 'bg-amber-500 hover:bg-amber-600' : '')}
+                  onClick={() => onToggleHold(listing.id, listing.status)}
+                >
+                  {listing.status === 'On Hold' ? 'Resume' : 'Hold'}
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="outline"
-                className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider"
+                className="flex-1 h-8 rounded-sm font-medium text-xs "
                 onClick={() => onEdit(listing)}
               >
-                <Edit2 className="w-3 h-3 mr-1.5" /> Edit
+                <Edit2 className="w-3 h-3 mr-1" /> Edit
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="h-8 rounded-sm text-destructive hover:text-destructive hover:bg-destructive/10 px-2"
                 onClick={() => onDelete(listing.id)}
               >
                 <Trash2 className="w-4 h-4" />
@@ -137,7 +154,7 @@ export default function ProductCard({
               <Button
                 size="sm"
                 variant="outline"
-                className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider"
+                className="flex-1 h-8 rounded-sm font-medium text-sm "
                 onClick={() => onView(listing)}
               >
                 <Eye className="w-3 h-3 mr-1.5" /> View
@@ -145,7 +162,7 @@ export default function ProductCard({
               {listing.status !== 'Sold' && (
                 <Button
                   size="sm"
-                  className="flex-1 h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider bg-primary shadow-glow transition-all"
+                  className="flex-1 h-8 rounded-sm font-medium text-sm  bg-primary shadow-md border border-border/40 transition-all"
                   onClick={() => onChat(listing)}
                 >
                   <MessageCircle className="w-3 h-3 mr-1.5" /> Chat

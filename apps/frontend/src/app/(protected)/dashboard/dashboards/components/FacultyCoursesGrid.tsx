@@ -25,7 +25,7 @@ const item = {
 export function FacultyCoursesGrid({ courses, onManage }: Props) {
   const safeCourses = Array.isArray(courses) ? courses : [];
   return (
-    <motion.div variants={item} className="card-elevated p-6">
+    <motion.div variants={item} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">My Courses</h2>
         <Button variant="ghost" size="sm" onClick={onManage}>
@@ -57,7 +57,7 @@ export function FacultyCoursesGrid({ courses, onManage }: Props) {
 
 function CourseCard({ code, name, students, progress, avgAttendance }: any) {
   return (
-    <div className="p-4 rounded-lg border border-border hover:border-accent/30 transition-colors">
+    <div className="p-4 rounded-sm border border-border hover:border-accent/30 transition-colors">
       <div className="flex items-start justify-between mb-2">
         <div>
           <span className="text-xs font-medium text-accent">{code}</span>

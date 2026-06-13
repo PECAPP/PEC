@@ -116,6 +116,7 @@ export class AiAcademicToolsService {
 
     const entries = await this.prisma.cgpaEntry.findMany({
       where: { userId },
+      take: 500,
       orderBy: [{ semester: 'asc' }, { createdAt: 'desc' }],
       select: {
         subjectName: true,
@@ -238,6 +239,7 @@ export class AiAcademicToolsService {
 
     const enrollments = await this.prisma.enrollment.findMany({
       where: { studentId: userId, status: 'active' },
+      take: 200,
       select: { courseId: true, courseCode: true, courseName: true, batch: true },
     });
 
@@ -345,6 +347,7 @@ export class AiAcademicToolsService {
     try {
       const enrollments = await this.prisma.enrollment.findMany({
         where: { studentId: userId, status: 'active' },
+        take: 200,
         orderBy: { enrolledAt: 'desc' },
         select: {
           courseId: true,

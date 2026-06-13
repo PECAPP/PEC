@@ -31,10 +31,8 @@ import type {
   UpdateCanteenOrderDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -60,7 +58,7 @@ export const getNightCanteenControllerListItemsV1Url = () => {
 
 export const nightCanteenControllerListItemsV1 = async ( options?: RequestInit): Promise<nightCanteenControllerListItemsV1Response> => {
 
-  return customInstance<nightCanteenControllerListItemsV1Response>(getNightCanteenControllerListItemsV1Url(),
+  return fetchWithAuth<nightCanteenControllerListItemsV1Response>(getNightCanteenControllerListItemsV1Url(),
   {
     ...options,
     method: 'GET'
@@ -80,16 +78,16 @@ export const getNightCanteenControllerListItemsV1QueryKey = () => {
     }
 
 
-export const getNightCanteenControllerListItemsV1QueryOptions = <TData = Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getNightCanteenControllerListItemsV1QueryOptions = <TData = Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getNightCanteenControllerListItemsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>> = ({ signal }) => nightCanteenControllerListItemsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>> = ({ signal }) => nightCanteenControllerListItemsV1({ signal });
 
 
 
@@ -109,7 +107,7 @@ export function useNightCanteenControllerListItemsV1<TData = Awaited<ReturnType<
           TError,
           Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNightCanteenControllerListItemsV1<TData = Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError = unknown>(
@@ -119,16 +117,16 @@ export function useNightCanteenControllerListItemsV1<TData = Awaited<ReturnType<
           TError,
           Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNightCanteenControllerListItemsV1<TData = Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useNightCanteenControllerListItemsV1<TData = Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListItemsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -166,7 +164,7 @@ export const getNightCanteenControllerCreateItemV1Url = () => {
 
 export const nightCanteenControllerCreateItemV1 = async (createCanteenItemDto: CreateCanteenItemDto, options?: RequestInit): Promise<nightCanteenControllerCreateItemV1Response> => {
 
-  return customInstance<nightCanteenControllerCreateItemV1Response>(getNightCanteenControllerCreateItemV1Url(),
+  return fetchWithAuth<nightCanteenControllerCreateItemV1Response>(getNightCanteenControllerCreateItemV1Url(),
   {
     ...options,
     method: 'POST',
@@ -179,15 +177,15 @@ export const nightCanteenControllerCreateItemV1 = async (createCanteenItemDto: C
 
 
 export const getNightCanteenControllerCreateItemV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateItemV1>>, TError,{data: CreateCanteenItemDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateItemV1>>, TError,{data: CreateCanteenItemDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateItemV1>>, TError,{data: CreateCanteenItemDto}, TContext> => {
 
 const mutationKey = ['nightCanteenControllerCreateItemV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -195,7 +193,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof nightCanteenControllerCreateItemV1>>, {data: CreateCanteenItemDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  nightCanteenControllerCreateItemV1(data,requestOptions)
+          return  nightCanteenControllerCreateItemV1(data,)
         }
 
 
@@ -210,7 +208,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NightCanteenControllerCreateItemV1MutationError = unknown
 
     export const useNightCanteenControllerCreateItemV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateItemV1>>, TError,{data: CreateCanteenItemDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateItemV1>>, TError,{data: CreateCanteenItemDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof nightCanteenControllerCreateItemV1>>,
         TError,
@@ -241,7 +239,7 @@ export const getNightCanteenControllerGetItemV1Url = (id: string,) => {
 
 export const nightCanteenControllerGetItemV1 = async (id: string, options?: RequestInit): Promise<nightCanteenControllerGetItemV1Response> => {
 
-  return customInstance<nightCanteenControllerGetItemV1Response>(getNightCanteenControllerGetItemV1Url(id),
+  return fetchWithAuth<nightCanteenControllerGetItemV1Response>(getNightCanteenControllerGetItemV1Url(id),
   {
     ...options,
     method: 'GET'
@@ -261,16 +259,16 @@ export const getNightCanteenControllerGetItemV1QueryKey = (id: string,) => {
     }
 
 
-export const getNightCanteenControllerGetItemV1QueryOptions = <TData = Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getNightCanteenControllerGetItemV1QueryOptions = <TData = Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getNightCanteenControllerGetItemV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>> = ({ signal }) => nightCanteenControllerGetItemV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>> = ({ signal }) => nightCanteenControllerGetItemV1(id, { signal });
 
 
 
@@ -290,7 +288,7 @@ export function useNightCanteenControllerGetItemV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNightCanteenControllerGetItemV1<TData = Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError = unknown>(
@@ -300,16 +298,16 @@ export function useNightCanteenControllerGetItemV1<TData = Awaited<ReturnType<ty
           TError,
           Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNightCanteenControllerGetItemV1<TData = Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useNightCanteenControllerGetItemV1<TData = Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetItemV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -348,7 +346,7 @@ export const getNightCanteenControllerUpsertItemV1Url = (id: string,) => {
 export const nightCanteenControllerUpsertItemV1 = async (id: string,
     createCanteenItemDto: CreateCanteenItemDto, options?: RequestInit): Promise<nightCanteenControllerUpsertItemV1Response> => {
 
-  return customInstance<nightCanteenControllerUpsertItemV1Response>(getNightCanteenControllerUpsertItemV1Url(id),
+  return fetchWithAuth<nightCanteenControllerUpsertItemV1Response>(getNightCanteenControllerUpsertItemV1Url(id),
   {
     ...options,
     method: 'POST',
@@ -361,15 +359,15 @@ export const nightCanteenControllerUpsertItemV1 = async (id: string,
 
 
 export const getNightCanteenControllerUpsertItemV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpsertItemV1>>, TError,{id: string;data: CreateCanteenItemDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpsertItemV1>>, TError,{id: string;data: CreateCanteenItemDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpsertItemV1>>, TError,{id: string;data: CreateCanteenItemDto}, TContext> => {
 
 const mutationKey = ['nightCanteenControllerUpsertItemV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -377,7 +375,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof nightCanteenControllerUpsertItemV1>>, {id: string;data: CreateCanteenItemDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  nightCanteenControllerUpsertItemV1(id,data,requestOptions)
+          return  nightCanteenControllerUpsertItemV1(id,data,)
         }
 
 
@@ -392,7 +390,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NightCanteenControllerUpsertItemV1MutationError = unknown
 
     export const useNightCanteenControllerUpsertItemV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpsertItemV1>>, TError,{id: string;data: CreateCanteenItemDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpsertItemV1>>, TError,{id: string;data: CreateCanteenItemDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof nightCanteenControllerUpsertItemV1>>,
         TError,
@@ -424,7 +422,7 @@ export const getNightCanteenControllerUpdateItemV1Url = (id: string,) => {
 export const nightCanteenControllerUpdateItemV1 = async (id: string,
     updateCanteenItemDto: UpdateCanteenItemDto, options?: RequestInit): Promise<nightCanteenControllerUpdateItemV1Response> => {
 
-  return customInstance<nightCanteenControllerUpdateItemV1Response>(getNightCanteenControllerUpdateItemV1Url(id),
+  return fetchWithAuth<nightCanteenControllerUpdateItemV1Response>(getNightCanteenControllerUpdateItemV1Url(id),
   {
     ...options,
     method: 'PATCH',
@@ -437,15 +435,15 @@ export const nightCanteenControllerUpdateItemV1 = async (id: string,
 
 
 export const getNightCanteenControllerUpdateItemV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateItemV1>>, TError,{id: string;data: UpdateCanteenItemDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateItemV1>>, TError,{id: string;data: UpdateCanteenItemDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateItemV1>>, TError,{id: string;data: UpdateCanteenItemDto}, TContext> => {
 
 const mutationKey = ['nightCanteenControllerUpdateItemV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -453,7 +451,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof nightCanteenControllerUpdateItemV1>>, {id: string;data: UpdateCanteenItemDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  nightCanteenControllerUpdateItemV1(id,data,requestOptions)
+          return  nightCanteenControllerUpdateItemV1(id,data,)
         }
 
 
@@ -468,7 +466,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NightCanteenControllerUpdateItemV1MutationError = unknown
 
     export const useNightCanteenControllerUpdateItemV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateItemV1>>, TError,{id: string;data: UpdateCanteenItemDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateItemV1>>, TError,{id: string;data: UpdateCanteenItemDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof nightCanteenControllerUpdateItemV1>>,
         TError,
@@ -499,7 +497,7 @@ export const getNightCanteenControllerDeleteItemV1Url = (id: string,) => {
 
 export const nightCanteenControllerDeleteItemV1 = async (id: string, options?: RequestInit): Promise<nightCanteenControllerDeleteItemV1Response> => {
 
-  return customInstance<nightCanteenControllerDeleteItemV1Response>(getNightCanteenControllerDeleteItemV1Url(id),
+  return fetchWithAuth<nightCanteenControllerDeleteItemV1Response>(getNightCanteenControllerDeleteItemV1Url(id),
   {
     ...options,
     method: 'DELETE'
@@ -512,15 +510,15 @@ export const nightCanteenControllerDeleteItemV1 = async (id: string, options?: R
 
 
 export const getNightCanteenControllerDeleteItemV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteItemV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteItemV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteItemV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['nightCanteenControllerDeleteItemV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -528,7 +526,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof nightCanteenControllerDeleteItemV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  nightCanteenControllerDeleteItemV1(id,requestOptions)
+          return  nightCanteenControllerDeleteItemV1(id,)
         }
 
 
@@ -543,7 +541,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NightCanteenControllerDeleteItemV1MutationError = unknown
 
     export const useNightCanteenControllerDeleteItemV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteItemV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteItemV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof nightCanteenControllerDeleteItemV1>>,
         TError,
@@ -574,7 +572,7 @@ export const getNightCanteenControllerListOrdersV1Url = () => {
 
 export const nightCanteenControllerListOrdersV1 = async ( options?: RequestInit): Promise<nightCanteenControllerListOrdersV1Response> => {
 
-  return customInstance<nightCanteenControllerListOrdersV1Response>(getNightCanteenControllerListOrdersV1Url(),
+  return fetchWithAuth<nightCanteenControllerListOrdersV1Response>(getNightCanteenControllerListOrdersV1Url(),
   {
     ...options,
     method: 'GET'
@@ -594,16 +592,16 @@ export const getNightCanteenControllerListOrdersV1QueryKey = () => {
     }
 
 
-export const getNightCanteenControllerListOrdersV1QueryOptions = <TData = Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getNightCanteenControllerListOrdersV1QueryOptions = <TData = Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getNightCanteenControllerListOrdersV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>> = ({ signal }) => nightCanteenControllerListOrdersV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>> = ({ signal }) => nightCanteenControllerListOrdersV1({ signal });
 
 
 
@@ -623,7 +621,7 @@ export function useNightCanteenControllerListOrdersV1<TData = Awaited<ReturnType
           TError,
           Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNightCanteenControllerListOrdersV1<TData = Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError = unknown>(
@@ -633,16 +631,16 @@ export function useNightCanteenControllerListOrdersV1<TData = Awaited<ReturnType
           TError,
           Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNightCanteenControllerListOrdersV1<TData = Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useNightCanteenControllerListOrdersV1<TData = Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerListOrdersV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -680,7 +678,7 @@ export const getNightCanteenControllerCreateOrderV1Url = () => {
 
 export const nightCanteenControllerCreateOrderV1 = async (createCanteenOrderDto: CreateCanteenOrderDto, options?: RequestInit): Promise<nightCanteenControllerCreateOrderV1Response> => {
 
-  return customInstance<nightCanteenControllerCreateOrderV1Response>(getNightCanteenControllerCreateOrderV1Url(),
+  return fetchWithAuth<nightCanteenControllerCreateOrderV1Response>(getNightCanteenControllerCreateOrderV1Url(),
   {
     ...options,
     method: 'POST',
@@ -693,15 +691,15 @@ export const nightCanteenControllerCreateOrderV1 = async (createCanteenOrderDto:
 
 
 export const getNightCanteenControllerCreateOrderV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateOrderV1>>, TError,{data: CreateCanteenOrderDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateOrderV1>>, TError,{data: CreateCanteenOrderDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateOrderV1>>, TError,{data: CreateCanteenOrderDto}, TContext> => {
 
 const mutationKey = ['nightCanteenControllerCreateOrderV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -709,7 +707,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof nightCanteenControllerCreateOrderV1>>, {data: CreateCanteenOrderDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  nightCanteenControllerCreateOrderV1(data,requestOptions)
+          return  nightCanteenControllerCreateOrderV1(data,)
         }
 
 
@@ -724,7 +722,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NightCanteenControllerCreateOrderV1MutationError = unknown
 
     export const useNightCanteenControllerCreateOrderV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateOrderV1>>, TError,{data: CreateCanteenOrderDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerCreateOrderV1>>, TError,{data: CreateCanteenOrderDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof nightCanteenControllerCreateOrderV1>>,
         TError,
@@ -755,7 +753,7 @@ export const getNightCanteenControllerGetOrderV1Url = (id: string,) => {
 
 export const nightCanteenControllerGetOrderV1 = async (id: string, options?: RequestInit): Promise<nightCanteenControllerGetOrderV1Response> => {
 
-  return customInstance<nightCanteenControllerGetOrderV1Response>(getNightCanteenControllerGetOrderV1Url(id),
+  return fetchWithAuth<nightCanteenControllerGetOrderV1Response>(getNightCanteenControllerGetOrderV1Url(id),
   {
     ...options,
     method: 'GET'
@@ -775,16 +773,16 @@ export const getNightCanteenControllerGetOrderV1QueryKey = (id: string,) => {
     }
 
 
-export const getNightCanteenControllerGetOrderV1QueryOptions = <TData = Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getNightCanteenControllerGetOrderV1QueryOptions = <TData = Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getNightCanteenControllerGetOrderV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>> = ({ signal }) => nightCanteenControllerGetOrderV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>> = ({ signal }) => nightCanteenControllerGetOrderV1(id, { signal });
 
 
 
@@ -804,7 +802,7 @@ export function useNightCanteenControllerGetOrderV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNightCanteenControllerGetOrderV1<TData = Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError = unknown>(
@@ -814,16 +812,16 @@ export function useNightCanteenControllerGetOrderV1<TData = Awaited<ReturnType<t
           TError,
           Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useNightCanteenControllerGetOrderV1<TData = Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useNightCanteenControllerGetOrderV1<TData = Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof nightCanteenControllerGetOrderV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -862,7 +860,7 @@ export const getNightCanteenControllerUpdateOrderV1Url = (id: string,) => {
 export const nightCanteenControllerUpdateOrderV1 = async (id: string,
     updateCanteenOrderDto: UpdateCanteenOrderDto, options?: RequestInit): Promise<nightCanteenControllerUpdateOrderV1Response> => {
 
-  return customInstance<nightCanteenControllerUpdateOrderV1Response>(getNightCanteenControllerUpdateOrderV1Url(id),
+  return fetchWithAuth<nightCanteenControllerUpdateOrderV1Response>(getNightCanteenControllerUpdateOrderV1Url(id),
   {
     ...options,
     method: 'PATCH',
@@ -875,15 +873,15 @@ export const nightCanteenControllerUpdateOrderV1 = async (id: string,
 
 
 export const getNightCanteenControllerUpdateOrderV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateOrderV1>>, TError,{id: string;data: UpdateCanteenOrderDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateOrderV1>>, TError,{id: string;data: UpdateCanteenOrderDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateOrderV1>>, TError,{id: string;data: UpdateCanteenOrderDto}, TContext> => {
 
 const mutationKey = ['nightCanteenControllerUpdateOrderV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -891,7 +889,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof nightCanteenControllerUpdateOrderV1>>, {id: string;data: UpdateCanteenOrderDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  nightCanteenControllerUpdateOrderV1(id,data,requestOptions)
+          return  nightCanteenControllerUpdateOrderV1(id,data,)
         }
 
 
@@ -906,7 +904,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NightCanteenControllerUpdateOrderV1MutationError = unknown
 
     export const useNightCanteenControllerUpdateOrderV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateOrderV1>>, TError,{id: string;data: UpdateCanteenOrderDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerUpdateOrderV1>>, TError,{id: string;data: UpdateCanteenOrderDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof nightCanteenControllerUpdateOrderV1>>,
         TError,
@@ -937,7 +935,7 @@ export const getNightCanteenControllerDeleteOrderV1Url = (id: string,) => {
 
 export const nightCanteenControllerDeleteOrderV1 = async (id: string, options?: RequestInit): Promise<nightCanteenControllerDeleteOrderV1Response> => {
 
-  return customInstance<nightCanteenControllerDeleteOrderV1Response>(getNightCanteenControllerDeleteOrderV1Url(id),
+  return fetchWithAuth<nightCanteenControllerDeleteOrderV1Response>(getNightCanteenControllerDeleteOrderV1Url(id),
   {
     ...options,
     method: 'DELETE'
@@ -950,15 +948,15 @@ export const nightCanteenControllerDeleteOrderV1 = async (id: string, options?: 
 
 
 export const getNightCanteenControllerDeleteOrderV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteOrderV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteOrderV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteOrderV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['nightCanteenControllerDeleteOrderV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -966,7 +964,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof nightCanteenControllerDeleteOrderV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  nightCanteenControllerDeleteOrderV1(id,requestOptions)
+          return  nightCanteenControllerDeleteOrderV1(id,)
         }
 
 
@@ -981,7 +979,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type NightCanteenControllerDeleteOrderV1MutationError = unknown
 
     export const useNightCanteenControllerDeleteOrderV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteOrderV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof nightCanteenControllerDeleteOrderV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof nightCanteenControllerDeleteOrderV1>>,
         TError,

@@ -14,12 +14,17 @@ const isProd = process.env.NODE_ENV === 'production';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  typedRoutes: false,
+  typedRoutes: true,
   // standalone is only needed for production Docker images, skip in dev
   ...(isProd && { output: 'standalone' }),
   transpilePackages: ['@pec/shared', '@pec/database', '@pec/ui'],
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
+  },
+  // Allow Nginx-proxied dev access from pec.edu.in
+  allowedDevOrigins: ['pec.edu.in'],
+  turbopack: {
+    root: path.resolve(__dirname, '../..'),
   },
 
   // ─── Experimental ────────────────────────────────────────────────────────────
@@ -41,6 +46,11 @@ const nextConfig = {
       '@radix-ui/react-tooltip',
       'class-variance-authority',
     ],
+    // Cache client-side navigations longer so re-visits don't recompile
+    staleTimes: {
+      dynamic: 30,   // seconds — dynamic pages stay cached in router
+      static: 180,   // seconds — static pages stay cached much longer
+    },
   },
 
   // ─── Images ──────────────────────────────────────────────────────────────────
@@ -54,12 +64,7 @@ const nextConfig = {
   },
 
   // ─── Turbopack alias (dev) ────────────────────────────────────────────────────
-  turbopack: {
-    root: path.join(__dirname, '../../'),
-    resolveAlias: {
-      canvas: emptyModuleAlias,
-    },
-  },
+  // Removed turbopack block to avoid illegal path errors.
 
   // ─── Webpack alias (build / test) ────────────────────────────────────────────
   webpack(config) {
@@ -93,7 +98,7 @@ const nextConfig = {
     const isProd = process.env.NODE_ENV === 'production';
     // The destination must be the backend server, never the frontend proxy itself.
     const backendTarget = process.env.INTERNAL_API_URL || 
-      (isProd ? 'http://backend:4000/api' : 'http://localhost:4000/api');
+      (isProd ? 'http://backend:4000/api' : 'http://127.0.0.1:4000/api');
       
     const normalizedTarget = backendTarget.replace(/\/$/, '');
     const apiTarget = normalizedTarget.endsWith('/api')
@@ -101,6 +106,10 @@ const nextConfig = {
       : `${normalizedTarget}/api`;
 
     return [
+      {
+        source: '/rabbitmq/api/:path*',
+        destination: 'http://localhost:15672/api/:path*',
+      },
       {
         source: '/api/v1/:path*',
         destination: `${apiTarget}/v1/:path*`,
@@ -118,14 +127,12 @@ const withBundleAnalyzer = withBundleAnalyzerInit({ enabled: process.env.ANALYZE
 export default withSentryConfig(
   withBundleAnalyzer(nextConfig),
   {
-    silent: true,
-    org: "pec",
-    project: "pec-frontend",
+    // Set via environment variables (SENTRY_ORG, SENTRY_PROJECT)
+    // or .sentryclirc file.
   },
   {
     widenClientFileUpload: true,
     transpileClientSDK: true,
     hideSourceMaps: true,
-    disableLogger: true,
   }
 );

@@ -84,7 +84,7 @@ export function CourseSkeleton() {
           </div>
         </div>
         <div className="flex gap-2 pt-2">
-          <div className="h-8 flex-1 bg-muted/50 animate-pulse rounded-md" />
+          <div className="h-8 flex-1 bg-muted/50 animate-pulse rounded-sm" />
         </div>
       </div>
     </div>

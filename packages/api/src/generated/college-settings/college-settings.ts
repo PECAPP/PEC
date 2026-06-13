@@ -24,10 +24,8 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -53,7 +51,7 @@ export const getCollegeSettingsControllerGetSettingsV1Url = () => {
 
 export const collegeSettingsControllerGetSettingsV1 = async ( options?: RequestInit): Promise<collegeSettingsControllerGetSettingsV1Response> => {
 
-  return customInstance<collegeSettingsControllerGetSettingsV1Response>(getCollegeSettingsControllerGetSettingsV1Url(),
+  return fetchWithAuth<collegeSettingsControllerGetSettingsV1Response>(getCollegeSettingsControllerGetSettingsV1Url(),
   {
     ...options,
     method: 'GET'
@@ -73,16 +71,16 @@ export const getCollegeSettingsControllerGetSettingsV1QueryKey = () => {
     }
 
 
-export const getCollegeSettingsControllerGetSettingsV1QueryOptions = <TData = Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getCollegeSettingsControllerGetSettingsV1QueryOptions = <TData = Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getCollegeSettingsControllerGetSettingsV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>> = ({ signal }) => collegeSettingsControllerGetSettingsV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>> = ({ signal }) => collegeSettingsControllerGetSettingsV1({ signal });
 
 
 
@@ -102,7 +100,7 @@ export function useCollegeSettingsControllerGetSettingsV1<TData = Awaited<Return
           TError,
           Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCollegeSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError = unknown>(
@@ -112,16 +110,16 @@ export function useCollegeSettingsControllerGetSettingsV1<TData = Awaited<Return
           TError,
           Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useCollegeSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useCollegeSettingsControllerGetSettingsV1<TData = Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof collegeSettingsControllerGetSettingsV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -159,7 +157,7 @@ export const getCollegeSettingsControllerUpdateSettingsV1Url = () => {
 
 export const collegeSettingsControllerUpdateSettingsV1 = async ( options?: RequestInit): Promise<collegeSettingsControllerUpdateSettingsV1Response> => {
 
-  return customInstance<collegeSettingsControllerUpdateSettingsV1Response>(getCollegeSettingsControllerUpdateSettingsV1Url(),
+  return fetchWithAuth<collegeSettingsControllerUpdateSettingsV1Response>(getCollegeSettingsControllerUpdateSettingsV1Url(),
   {
     ...options,
     method: 'PATCH'
@@ -172,15 +170,15 @@ export const collegeSettingsControllerUpdateSettingsV1 = async ( options?: Reque
 
 
 export const getCollegeSettingsControllerUpdateSettingsV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof collegeSettingsControllerUpdateSettingsV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof collegeSettingsControllerUpdateSettingsV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof collegeSettingsControllerUpdateSettingsV1>>, TError,void, TContext> => {
 
 const mutationKey = ['collegeSettingsControllerUpdateSettingsV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -188,7 +186,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof collegeSettingsControllerUpdateSettingsV1>>, void> = () => {
 
 
-          return  collegeSettingsControllerUpdateSettingsV1(requestOptions)
+          return  collegeSettingsControllerUpdateSettingsV1()
         }
 
 
@@ -203,7 +201,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CollegeSettingsControllerUpdateSettingsV1MutationError = unknown
 
     export const useCollegeSettingsControllerUpdateSettingsV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof collegeSettingsControllerUpdateSettingsV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof collegeSettingsControllerUpdateSettingsV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof collegeSettingsControllerUpdateSettingsV1>>,
         TError,

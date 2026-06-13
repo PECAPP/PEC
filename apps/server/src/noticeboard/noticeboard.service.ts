@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateNoticeDto } from './dto/create-notice.dto';
+import { UpdateNoticeDto } from './dto/update-notice.dto';
 import { ListNoticesDto } from './dto/list-notices.dto';
+import { EventsGateway } from '../events/events.gateway';
 
 type NoticeMedia = {
   url: string;
@@ -13,7 +15,10 @@ type NoticeMedia = {
 
 @Injectable()
 export class NoticeboardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
   private parseMedia(mediaJson: string | null): NoticeMedia[] {
     if (!mediaJson) {
@@ -34,7 +39,6 @@ export class NoticeboardService {
     const offset = Math.max(query.offset ?? 0, 0);
 
     const where = {
-      deletedAt: null,
       ...(query.category ? { category: query.category } : {}),
       ...(query.priorityLevel ? { priorityLevel: query.priorityLevel } : {}),
     };
@@ -114,7 +118,7 @@ export class NoticeboardService {
       },
     });
 
-    return {
+    const responsePayload = {
       id: created.id,
       title: created.title,
       content: created.content,
@@ -130,6 +134,10 @@ export class NoticeboardService {
       createdAt: created.createdAt,
       updatedAt: created.updatedAt,
     };
+
+    this.eventsGateway.emitToAll('newNotice', responsePayload);
+
+    return responsePayload;
   }
 
   async togglePin(id: string, pinned: boolean) {
@@ -153,6 +161,70 @@ export class NoticeboardService {
     });
   }
 
+  async update(id: string, dto: UpdateNoticeDto) {
+    const prismaAny = this.prisma as any;
+    const existing = await prismaAny.notice.findFirst({
+      where: { id, deletedAt: null },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Notice not found');
+    }
+
+    const dataToUpdate: any = {};
+    if (dto.title !== undefined) dataToUpdate.title = dto.title.trim();
+    if (dto.content !== undefined) dataToUpdate.content = dto.content.trim();
+    if (dto.category !== undefined) dataToUpdate.category = dto.category;
+    if (dto.important !== undefined) dataToUpdate.important = dto.important;
+    if (dto.priorityLevel !== undefined) dataToUpdate.priorityLevel = dto.priorityLevel;
+    if (dto.pinned !== undefined) dataToUpdate.pinned = dto.pinned;
+    
+    if (dto.mediaJson !== undefined) {
+      if (dto.mediaJson === null) {
+        dataToUpdate.mediaJson = null;
+      } else {
+        const parsed = this.parseMedia(dto.mediaJson);
+        dataToUpdate.mediaJson = JSON.stringify(parsed);
+      }
+    }
+
+    const updated = await prismaAny.notice.update({
+      where: { id },
+      data: dataToUpdate,
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    const responsePayload = {
+      id: updated.id,
+      title: updated.title,
+      content: updated.content,
+      category: updated.category,
+      important: updated.important,
+      priorityLevel: updated.priorityLevel,
+      pinned: updated.pinned,
+      media: this.parseMedia(updated.mediaJson),
+      authorId: updated.author?.id ?? null,
+      authorName: updated.author?.name ?? 'Unknown',
+      authorEmail: updated.author?.email ?? null,
+      publishedAt: updated.publishedAt,
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
+    };
+
+    this.eventsGateway.emitToAll('noticeUpdated', responsePayload);
+
+    return responsePayload;
+  }
+
   async remove(id: string) {
     const prismaAny = this.prisma as any;
     const existing = await prismaAny.notice.findFirst({
@@ -164,12 +236,16 @@ export class NoticeboardService {
       throw new NotFoundException('Notice not found');
     }
 
-    return prismaAny.notice.update({
+    const deleted = await prismaAny.notice.update({
       where: { id },
       data: { deletedAt: new Date() },
       select: {
         id: true,
       },
     });
+
+    this.eventsGateway.emitToAll('noticeDeleted', { id });
+
+    return deleted;
   }
 }

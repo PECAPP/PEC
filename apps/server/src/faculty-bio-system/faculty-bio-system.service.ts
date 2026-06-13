@@ -12,25 +12,26 @@ export class FacultyBioSystemService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getFullProfile(facultyId: string) {
-    const [facultyProfile, publications, awards, conferences, consultations] = await Promise.all([
-      this.prisma.facultyProfile.findUnique({
-        where: { userId: facultyId },
-        include: { user: true },
-      }),
-      this.prisma.facultyPublication.findMany({
-        where: { facultyId },
+    const facultyProfile = await this.prisma.facultyProfile.findUnique({
+      where: { userId: facultyId },
+      include: { user: true },
+    });
+
+    if (!facultyProfile) {
+      return null;
+    }
+
+    const [publications, awards, conferences, consultations] = await Promise.all([
+      this.prisma.facultyPublication.findMany({ where: { facultyId: facultyProfile.id },
         orderBy: { year: 'desc' },
       }),
-      this.prisma.facultyAward.findMany({
-        where: { facultyId },
+      this.prisma.facultyAward.findMany({ where: { facultyId: facultyProfile.id },
         orderBy: { year: 'desc' },
       }),
-      this.prisma.facultyConference.findMany({
-        where: { facultyId },
+      this.prisma.facultyConference.findMany({ where: { facultyId: facultyProfile.id },
         orderBy: { startDate: 'desc' },
       }),
-      this.prisma.facultyConsultation.findMany({
-        where: { facultyId },
+      this.prisma.facultyConsultation.findMany({ where: { facultyId: facultyProfile.id },
         orderBy: { createdAt: 'desc' },
       }),
     ]);
@@ -52,18 +53,22 @@ export class FacultyBioSystemService {
   }
 
   async getPublications(facultyId: string) {
-    return this.prisma.facultyPublication.findMany({
-      where: { facultyId },
+    const profile = await this.prisma.facultyProfile.findUnique({ where: { userId: facultyId } });
+    if (!profile) return [];
+    return this.prisma.facultyPublication.findMany({ where: { facultyId: profile.id },
       orderBy: { year: 'desc' },
+      take: 50,
     });
   }
 
   async createPublication(data: CreatePublicationDto) {
+    const { facultyId, ...rest } = data;
     return this.prisma.facultyPublication.create({
       data: {
-        ...data,
-        citations: data.citations ?? 0,
-      },
+        ...rest,
+        faculty: { connect: { id: facultyId } },
+        citations: rest.citations ?? 0,
+      } as any,
     });
   }
 
@@ -76,14 +81,22 @@ export class FacultyBioSystemService {
   }
 
   async getAwards(facultyId: string) {
-    return this.prisma.facultyAward.findMany({
-      where: { facultyId },
+    const profile = await this.prisma.facultyProfile.findUnique({ where: { userId: facultyId } });
+    if (!profile) return [];
+    return this.prisma.facultyAward.findMany({ where: { facultyId: profile.id },
       orderBy: { year: 'desc' },
+      take: 50,
     });
   }
 
   async createAward(data: CreateAwardDto) {
-    return this.prisma.facultyAward.create({ data });
+    const { facultyId, ...rest } = data;
+    return this.prisma.facultyAward.create({
+      data: {
+        ...rest,
+        faculty: { connect: { id: facultyId } },
+      } as any
+    });
   }
 
   async updateAward(id: string, data: Partial<CreateAwardDto>) {
@@ -95,14 +108,22 @@ export class FacultyBioSystemService {
   }
 
   async getConferences(facultyId: string) {
-    return this.prisma.facultyConference.findMany({
-      where: { facultyId },
+    const profile = await this.prisma.facultyProfile.findUnique({ where: { userId: facultyId } });
+    if (!profile) return [];
+    return this.prisma.facultyConference.findMany({ where: { facultyId: profile.id },
       orderBy: { startDate: 'desc' },
+      take: 50,
     });
   }
 
   async createConference(data: CreateConferenceDto) {
-    return this.prisma.facultyConference.create({ data });
+    const { facultyId, ...rest } = data;
+    return this.prisma.facultyConference.create({
+      data: {
+        ...rest,
+        faculty: { connect: { id: facultyId } },
+      } as any
+    });
   }
 
   async updateConference(id: string, data: Partial<CreateConferenceDto>) {
@@ -114,18 +135,22 @@ export class FacultyBioSystemService {
   }
 
   async getConsultations(facultyId: string) {
-    return this.prisma.facultyConsultation.findMany({
-      where: { facultyId },
+    const profile = await this.prisma.facultyProfile.findUnique({ where: { userId: facultyId } });
+    if (!profile) return [];
+    return this.prisma.facultyConsultation.findMany({ where: { facultyId: profile.id },
       orderBy: { createdAt: 'desc' },
+      take: 50,
     });
   }
 
   async createConsultation(data: CreateConsultationDto) {
+    const { facultyId, ...rest } = data;
     return this.prisma.facultyConsultation.create({
       data: {
-        ...data,
-        status: data.status ?? 'active',
-      },
+        ...rest,
+        faculty: { connect: { id: facultyId } },
+        status: rest.status ?? 'active',
+      } as any,
     });
   }
 

@@ -15,8 +15,6 @@ export function useSearchPage() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState({
     users: [] as any[],
-    jobs: [] as any[],
-    drives: [] as any[],
     pages: [] as any[],
     subjects: [] as any[],
   });
@@ -26,56 +24,21 @@ export function useSearchPage() {
     setLoading(true);
 
     try {
-      const [usersRes, jobsRes, subjectsRes] = await Promise.allSettled([
+      const [usersRes, subjectsRes] = await Promise.allSettled([
         api.get('/users', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
-        api.get('/jobs', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
         api.get('/courses', { params: { limit: 2000 } }).then(res => extractData<any>(res.data)),
       ]);
 
       const lowerTerm = term.trim().toLowerCase();
-      const users =
-        usersRes.status === 'fulfilled'
-          ? usersRes.value || []
-          : [];
-      const jobs =
-        jobsRes.status === 'fulfilled'
-          ? jobsRes.value || []
-          : [];
-      const subjects =
-        subjectsRes.status === 'fulfilled'
-          ? subjectsRes.value || []
-          : [];
+      const users = usersRes.status === 'fulfilled' ? usersRes.value || [] : [];
+      const subjects = subjectsRes.status === 'fulfilled' ? subjectsRes.value || [] : [];
 
       const filteredUsers = users
-        .map((u: any) => ({
-          ...u,
-          fullName: u.fullName || u.name || '',
-        }))
+        .map((u: any) => ({ ...u, fullName: u.fullName || u.name || '' }))
         .filter((u: any) =>
           String(u.fullName || '').toLowerCase().includes(lowerTerm) ||
           String(u.email || '').toLowerCase().includes(lowerTerm),
         );
-
-      const filteredJobs = jobs.filter(
-        (j: any) =>
-          String(j.title || '').toLowerCase().includes(lowerTerm) ||
-          String(j.company || j.companyName || '').toLowerCase().includes(lowerTerm),
-      );
-
-      const filteredDrives = filteredJobs
-        .map((job: any) => ({
-          id: `drive-${job.id}`,
-          companyName: job.company || job.companyName,
-          role: job.title,
-          date: job.deadline,
-          location: job.location,
-          status: 'upcoming' // Default status
-        }))
-        .sort((a: any, b: any) => {
-          const left = new Date(a.date || 0).getTime();
-          const right = new Date(b.date || 0).getTime();
-          return left - right;
-        });
 
       const filteredSubjects = subjects.filter(
         (c: any) =>
@@ -83,15 +46,13 @@ export function useSearchPage() {
           String(c.code || '').toLowerCase().includes(lowerTerm),
       );
 
-      const filteredPages = searchableRoutes.filter(route => 
-         route.title.toLowerCase().includes(lowerTerm) || 
-         route.keywords.some(k => k.toLowerCase().includes(lowerTerm))
+      const filteredPages = searchableRoutes.filter(route =>
+         route.title.toLowerCase().includes(lowerTerm) ||
+         route.keywords.some((k: string) => k.toLowerCase().includes(lowerTerm))
       );
 
       setResults({
         users: filteredUsers,
-        jobs: filteredJobs,
-        drives: filteredDrives,
         pages: filteredPages,
         subjects: filteredSubjects,
       });
@@ -119,8 +80,6 @@ export function useSearchPage() {
   const hasResults = useMemo(
     () =>
       results.users.length > 0 ||
-      results.jobs.length > 0 ||
-      results.drives.length > 0 ||
       results.pages.length > 0 ||
       results.subjects.length > 0,
     [results],

@@ -18,22 +18,12 @@ type RequestEntry = {
   expiresAt: number;
 };
 
-type ViolationEntry = {
-  count: number;
-  expiresAt: number;
-};
 
-type BanEntry = {
-  expiresAt: number;
-  reason: string;
-};
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {
   private readonly logger = new Logger(RateLimitGuard.name);
   private readonly requests = new Map<string, RequestEntry>();
-  private readonly violations = new Map<string, ViolationEntry>();
-  private readonly ipBans = new Map<string, BanEntry>();
   private readonly defaultWindowMs = 60_000;
   private readonly defaultLimit = 120;
   private readonly authWindowMs = 60_000;
@@ -61,21 +51,7 @@ export class RateLimitGuard implements CanActivate {
 
     this.cleanupExpired(now);
 
-    const activeBan = this.ipBans.get(ip);
-    if (activeBan && activeBan.expiresAt > now) {
-      throw new HttpException(
-        {
-          success: false,
-          error: 'IP temporarily banned due to abusive traffic',
-          reason: activeBan.reason,
-          retryAfterSeconds: Math.max(
-            1,
-            Math.ceil((activeBan.expiresAt - now) / 1000),
-          ),
-        },
-        HttpStatus.TOO_MANY_REQUESTS,
-      );
-    }
+
 
     const customLimits = this.reflector.getAllAndOverride<RateLimitOptions>(
       RATE_LIMIT_OPTIONS_KEY,
@@ -92,41 +68,6 @@ export class RateLimitGuard implements CanActivate {
         expiresAt: now + routeLimits.windowMs,
       });
     } else if (existing.count >= routeLimits.limit) {
-      const violation = this.incrementViolation(ip, now, routeLimits.windowMs);
-      const shouldRequireCaptcha =
-        violation.count >= routeLimits.requireCaptchaAfterExceeded;
-
-      if (violation.count >= routeLimits.banAfterExceeded) {
-        const banUntil = now + routeLimits.banDurationMs;
-        this.ipBans.set(ip, {
-          expiresAt: banUntil,
-          reason: `Exceeded limit on ${path}`,
-        });
-        this.logger.warn(
-          `Banned IP ${ip} until ${new Date(banUntil).toISOString()} on ${path}`,
-        );
-      }
-
-      const captchaSatisfied = this.isCaptchaSatisfied(request);
-      if (
-        shouldRequireCaptcha &&
-        !captchaSatisfied &&
-        this.isSensitivePath(path)
-      ) {
-        throw new HttpException(
-          {
-            success: false,
-            error: 'Additional verification required',
-            captchaRequired: true,
-            retryAfterSeconds: Math.max(
-              1,
-              Math.ceil((existing.expiresAt - now) / 1000),
-            ),
-          },
-          HttpStatus.FORBIDDEN,
-        );
-      }
-
       throw new HttpException(
         {
           success: false,
@@ -135,10 +76,6 @@ export class RateLimitGuard implements CanActivate {
             1,
             Math.ceil((existing.expiresAt - now) / 1000),
           ),
-          captchaRequired:
-            shouldRequireCaptcha &&
-            this.isSensitivePath(path) &&
-            !captchaSatisfied,
         },
         HttpStatus.TOO_MANY_REQUESTS,
       );
@@ -147,22 +84,7 @@ export class RateLimitGuard implements CanActivate {
       this.requests.set(key, existing);
     }
 
-    const ipViolation = this.violations.get(ip);
-    if (
-      ipViolation &&
-      ipViolation.count >= routeLimits.requireCaptchaAfterExceeded &&
-      this.isSensitivePath(path) &&
-      !this.isCaptchaSatisfied(request)
-    ) {
-      throw new HttpException(
-        {
-          success: false,
-          error: 'Additional verification required',
-          captchaRequired: true,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
+
 
     return true;
   }
@@ -212,41 +134,7 @@ export class RateLimitGuard implements CanActivate {
     };
   }
 
-  private incrementViolation(
-    ip: string,
-    now: number,
-    windowMs: number,
-  ): ViolationEntry {
-    const current = this.violations.get(ip);
-    if (!current || current.expiresAt <= now) {
-      const fresh = { count: 1, expiresAt: now + windowMs };
-      this.violations.set(ip, fresh);
-      return fresh;
-    }
 
-    current.count += 1;
-    this.violations.set(ip, current);
-    return current;
-  }
-
-  private isSensitivePath(routePath: string): boolean {
-    return (
-      routePath.includes('/auth/') ||
-      routePath.includes('/otp') ||
-      routePath.includes('/payment') ||
-      routePath.includes('/finance')
-    );
-  }
-
-  private isCaptchaSatisfied(request: any): boolean {
-    const expected = process.env.CAPTCHA_BYPASS_TOKEN;
-    if (!expected) {
-      return true;
-    }
-
-    const provided = String(request?.headers?.['x-captcha-token'] ?? '');
-    return provided.length > 0 && provided === expected;
-  }
 
   private extractClientIp(request: any): string {
     const forwarded = request?.headers?.['x-forwarded-for'];
@@ -263,16 +151,6 @@ export class RateLimitGuard implements CanActivate {
       }
     }
 
-    for (const [ip, value] of this.violations.entries()) {
-      if (value.expiresAt <= now) {
-        this.violations.delete(ip);
-      }
-    }
 
-    for (const [ip, value] of this.ipBans.entries()) {
-      if (value.expiresAt <= now) {
-        this.ipBans.delete(ip);
-      }
-    }
   }
 }

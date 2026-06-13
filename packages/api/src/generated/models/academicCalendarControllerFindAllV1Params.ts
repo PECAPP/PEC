@@ -7,8 +7,8 @@
  */
 
 export type AcademicCalendarControllerFindAllV1Params = {
-month: number;
-year: number;
+startDate: string;
+endDate: string;
 eventType: string;
 category: string;
 };

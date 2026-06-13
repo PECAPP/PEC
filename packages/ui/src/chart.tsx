@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
+import DOMPurify from "dompurify";
 
 import { cn } from "./utils";
 
@@ -67,12 +68,9 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
+  const rawCss = Object.entries(THEMES)
+    .map(
+      ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
@@ -82,8 +80,17 @@ ${colorConfig
   .join("\n")}
 }
 `,
-          )
-          .join("\n"),
+    )
+    .join("\n");
+
+  const safeCss = typeof window === 'undefined' 
+    ? rawCss.replace(/<\/style>/gi, '') 
+    : DOMPurify.sanitize(`<style>${rawCss}</style>`, { ADD_TAGS: ['style'] }).replace(/<\/?style>/gi, '');
+
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: safeCss,
       }}
     />
   );
@@ -156,7 +163,7 @@ const ChartTooltipContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
+          "grid min-w-[8rem] items-start gap-1.5 rounded-sm border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
           className,
         )}
       >

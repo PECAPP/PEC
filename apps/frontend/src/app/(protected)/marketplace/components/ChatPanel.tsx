@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Search, ChevronDown, IndianRupee, Loader2, MessageCircle } from 'lucide-react';
-import { Button, Input, Badge, Textarea, Dialog, DialogContent, DialogTitle } from '@pec/ui';
+import { Button, Input, Badge, Textarea, Dialog, DialogContent, DialogTitle, formatDate } from "@pec/ui";
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Listing, Chat, ChatMessage } from '../types';
 import api from '@pec/api';
+import { useMarketplaceSocket } from '../hooks/useMarketplaceSocket';
 
 export default function ChatPanel({
   open,
@@ -27,6 +28,8 @@ export default function ChatPanel({
   const [sending, setSending] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showOfferForm, setShowOfferForm] = useState(false);
+  const [offerAmount, setOfferAmount] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -36,6 +39,18 @@ export default function ChatPanel({
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Hook up WebSockets
+  const { lastMessage, typingUsers, emitTyping } = useMarketplaceSocket(activeChatId);
+
+  useEffect(() => {
+    if (lastMessage && lastMessage.chatId === activeChatId) {
+      setMessages(prev => {
+        if (prev.some(m => m.id === lastMessage.id)) return prev;
+        return [...prev, lastMessage];
+      });
+    }
+  }, [lastMessage, activeChatId]);
 
   // When a listing is passed, auto-open that chat
   useEffect(() => {
@@ -91,16 +106,71 @@ export default function ChatPanel({
       const res = await api.post(`/marketplace/chats/${activeChatId}/messages`, {
         text: msgText.trim(),
       });
+      // Do not manually append here if we rely purely on WebSocket broadcast,
+      // but if we want instant optimistic update, we keep it and let the WebSocket
+      // duplicate check handle it.
       const raw = (res as any).data;
       const newMsg = raw?.data ?? raw;
-      setMessages((prev) => [...prev, newMsg]);
+      setMessages((prev) => {
+        if (prev.some(m => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
       setMsgText('');
+      emitTyping(false);
       onChatsRefresh();
     } catch {
       toast.error('Failed to send message');
     } finally {
       setSending(false);
     }
+  };
+
+  const handleMakeOffer = async () => {
+    if (!offerAmount || isNaN(Number(offerAmount)) || !activeChatId) return;
+    setSending(true);
+    try {
+      const res = await api.post(`/marketplace/chats/${activeChatId}/offers`, {
+        amount: Number(offerAmount),
+      });
+      const raw = (res as any).data;
+      const newMsg = raw?.data ?? raw;
+      setMessages((prev) => {
+        if (prev.some(m => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
+      setShowOfferForm(false);
+      setOfferAmount('');
+      onChatsRefresh();
+      toast.success('Offer sent!');
+    } catch {
+      toast.error('Failed to send offer');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleUpdateOffer = async (messageId: string, status: string) => {
+    if (!activeChatId) return;
+    try {
+      const res = await api.patch(`/marketplace/chats/${activeChatId}/offers/${messageId}`, {
+        status,
+      });
+      const raw = (res as any).data;
+      const updatedMsg = raw?.data ?? raw;
+      
+      setMessages((prev) => prev.map(m => m.id === updatedMsg.id ? updatedMsg : m));
+      onChatsRefresh();
+      if (status === 'ACCEPTED') toast.success('Offer accepted!');
+      else if (status === 'REJECTED') toast.error('Offer rejected');
+      else if (status === 'WITHDRAWN') toast.info('Offer withdrawn');
+    } catch {
+      toast.error('Failed to update offer');
+    }
+  };
+
+  const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMsgText(e.target.value);
+    emitTyping(e.target.value.length > 0);
   };
 
   const safeChats = Array.isArray(chats) ? chats : [];
@@ -117,7 +187,7 @@ export default function ChatPanel({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="w-full max-w-4xl h-[100dvh] md:h-[800px] max-h-screen md:max-h-[85vh] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-none md:border border-border/50 shadow-2xl rounded-none md:rounded-2xl flex flex-col md:flex-row gap-0 [&>button]:hidden">
+      <DialogContent className="w-full  h-[100dvh] md:h-[800px] max-h-screen md:max-h-[85vh] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-none md:border border-border/50 shadow-2xl rounded-none md:rounded-sm flex flex-col md:flex-row gap-0 [&>button]:hidden">
         <DialogTitle className="sr-only">Marketplace Chats</DialogTitle>
 
         {/* Left Pane: Chat List */}
@@ -138,7 +208,7 @@ export default function ChatPanel({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search chats..."
-                className="pl-9 h-10 rounded-xl bg-background/50 border-border/60 focus:bg-background"
+                className="pl-9 h-10 rounded-sm bg-background/50 border-border/60 focus:bg-background"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -147,7 +217,7 @@ export default function ChatPanel({
 
           <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
             {filteredChats.length === 0 ? (
-              <div className="text-center text-sm font-medium text-muted-foreground p-8">
+              <div className="text-center text-sm font-medium text-muted-foreground p-4 md:p-6">
                 {searchQuery ? 'No matching chats found.' : 'No conversations yet.'}
               </div>
             ) : (
@@ -163,7 +233,7 @@ export default function ChatPanel({
                     key={chat.id}
                     onClick={() => openExistingChat(chat.id)}
                     className={cn(
-                      'w-full flex items-start gap-3 p-3 rounded-xl transition-all text-left',
+                      'w-full flex items-start gap-3 p-3 rounded-sm transition-all text-left',
                       isActive ? 'bg-primary/10 shadow-sm' : 'hover:bg-muted/60'
                     )}
                   >
@@ -188,8 +258,8 @@ export default function ChatPanel({
                           {chat.listing.title}
                         </p>
                         {lastMsg && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 opacity-60">
-                            {new Date(chat.updatedAt).toLocaleDateString()}
+                          <span className="text-sm font-medium  text-muted-foreground shrink-0 opacity-60">
+                            {formatDate(chat.updatedAt)}
                           </span>
                         )}
                       </div>
@@ -200,7 +270,7 @@ export default function ChatPanel({
                       <div className="flex items-center gap-1 mt-1.5">
                         <Badge
                           variant="secondary"
-                          className="text-[9px] uppercase tracking-wider font-bold h-4 px-1.5 bg-primary/10 text-primary hover:bg-primary/20"
+                          className="text-[9px]  font-bold h-4 px-1.5 bg-primary/10 text-primary hover:bg-primary/20"
                         >
                           ₹ {chat.listing.price.toLocaleString('en-IN')}
                         </Badge>
@@ -225,7 +295,7 @@ export default function ChatPanel({
               {/* Active Chat Header */}
               <div className="px-4 md:px-5 py-3 md:py-4 border-b border-border/40 shrink-0 flex items-center gap-3 bg-card/40 backdrop-blur-md">
                 <button
-                  className="md:hidden p-2 -ml-2 rounded-xl hover:bg-muted/80 text-muted-foreground"
+                  className="md:hidden p-2 -ml-2 rounded-sm hover:bg-muted/80 text-muted-foreground"
                   onClick={() => setActiveChatId(null)}
                 >
                   <ChevronDown className="w-5 h-5 rotate-90" />
@@ -234,13 +304,13 @@ export default function ChatPanel({
                   <h3 className="font-bold text-lg truncate text-foreground leading-tight">
                     {activeChat.listing.title}
                   </h3>
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mt-0.5">
+                  <p className="text-[10px]  font-bold text-muted-foreground mt-0.5">
                     {activeChat.buyer.id === currentUserId
                       ? 'Chatting with Seller'
                       : `Chatting with ${activeChat.buyer.name}`}
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary shrink-0">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-primary/10 text-primary shrink-0">
                   <IndianRupee className="w-4 h-4" />
                   <span className="font-bold tracking-tight">
                     {activeChat.listing.price.toLocaleString('en-IN')}
@@ -250,11 +320,20 @@ export default function ChatPanel({
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="rounded-xl shrink-0"
+                  className="rounded-sm shrink-0"
                 >
                   <X className="w-5 h-5" />
                 </Button>
               </div>
+
+              {/* Offer Banner */}
+              {activeChat.offerStatus === 'PENDING' && (
+                <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2 flex items-center justify-between">
+                  <p className="text-sm font-medium text-yellow-600 dark:text-yellow-500">
+                    Pending offer of ₹{activeChat.offerAmount?.toLocaleString('en-IN')}
+                  </p>
+                </div>
+              )}
 
               {/* Messages Area */}
               <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4">
@@ -284,16 +363,48 @@ export default function ChatPanel({
                         </div>
                         <div
                           className={cn(
-                            'max-w-[70%] rounded-2xl px-4 py-2.5 text-sm font-medium shadow-sm',
+                            'max-w-[70%] rounded-sm px-4 py-2.5 text-sm font-medium shadow-sm',
                             isMe
-                              ? 'bg-primary text-primary-foreground rounded-tr-sm shadow-glow'
+                              ? 'bg-primary text-primary-foreground rounded-tr-sm shadow-md border border-border/40'
                               : 'bg-card border border-border/40 rounded-tl-sm text-foreground'
                           )}
                         >
-                          {msg.text}
+                          {msg.isOffer ? (
+                            <div className="flex flex-col gap-2 min-w-[200px]">
+                              <div className="font-bold text-lg mb-1">
+                                Offer: ₹{msg.offerAmount?.toLocaleString('en-IN')}
+                              </div>
+                              <Badge 
+                                variant="secondary" 
+                                className={cn(
+                                  "self-start text-[10px]", 
+                                  msg.offerStatus === 'ACCEPTED' ? "bg-green-500/20 text-green-500" :
+                                  msg.offerStatus === 'REJECTED' ? "bg-red-500/20 text-red-500" :
+                                  msg.offerStatus === 'WITHDRAWN' ? "bg-gray-500/20 text-gray-500" :
+                                  "bg-yellow-500/20 text-yellow-500"
+                                )}
+                              >
+                                {msg.offerStatus}
+                              </Badge>
+                              {msg.offerStatus === 'PENDING' && (
+                                <div className="flex gap-2 mt-2 pt-2 border-t border-border/20">
+                                  {!isMe ? (
+                                    <>
+                                      <Button size="sm" variant="success" className="flex-1 h-7 text-xs" onClick={() => handleUpdateOffer(msg.id, 'ACCEPTED')}>Accept</Button>
+                                      <Button size="sm" variant="destructive" className="flex-1 h-7 text-xs" onClick={() => handleUpdateOffer(msg.id, 'REJECTED')}>Reject</Button>
+                                    </>
+                                  ) : (
+                                    <Button size="sm" variant="outline" className="w-full h-7 text-xs" onClick={() => handleUpdateOffer(msg.id, 'WITHDRAWN')}>Withdraw</Button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            msg.text
+                          )}
                           <div
                             className={cn(
-                              'text-[9px] uppercase tracking-widest mt-1.5 font-bold',
+                              'text-[9px]  mt-1.5 font-bold',
                               isMe
                                 ? 'text-primary-foreground/70'
                                 : 'text-muted-foreground opacity-70'
@@ -309,42 +420,87 @@ export default function ChatPanel({
                     );
                   })
                 )}
+                {Object.entries(typingUsers).some(([uid, isT]) => isT && uid !== currentUserId) && (
+                  <div className="flex gap-3 animate-pulse">
+                    <div className="max-w-[70%] rounded-sm px-4 py-2.5 text-sm font-medium bg-card border border-border/40 text-muted-foreground">
+                      Typing...
+                    </div>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
               {/* Message Input Area */}
               <div className="p-3 md:p-4 bg-card/40 backdrop-blur-md border-t border-border/40 shrink-0">
-                <div className="flex items-end gap-2 relative">
-                  <Textarea
-                    placeholder="Type your message..."
-                    value={msgText}
-                    onChange={(e) => setMsgText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSend();
-                      }
-                    }}
-                    className="w-full min-h-[52px] max-h-[120px] rounded-2xl resize-none bg-background/80 border-border/60 focus:ring-primary/20 p-3.5 pr-14 text-sm font-medium"
-                    rows={1}
-                  />
-                  <Button
-                    size="icon"
-                    onClick={handleSend}
-                    disabled={sending || !msgText.trim()}
-                    className="absolute right-2 bottom-2 h-9 w-9 rounded-xl bg-primary shadow-glow transition-all"
-                  >
-                    {sending ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <MessageCircle className="w-4 h-4 fill-current" />
-                    )}
-                  </Button>
-                </div>
+                {showOfferForm ? (
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input 
+                        type="number"
+                        placeholder="Offer amount..." 
+                        value={offerAmount}
+                        onChange={(e) => setOfferAmount(e.target.value)}
+                        className="pl-9 h-11 rounded-sm"
+                      />
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowOfferForm(false)}
+                      className="h-11 rounded-sm"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleMakeOffer}
+                      disabled={sending || !offerAmount}
+                      className="h-11 rounded-sm bg-primary"
+                    >
+                      {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send Offer'}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-end gap-2 relative">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setShowOfferForm(true)}
+                      title="Make an Offer"
+                      className="h-[52px] w-[52px] rounded-sm shrink-0 border-border/60"
+                    >
+                      <IndianRupee className="w-5 h-5 text-muted-foreground" />
+                    </Button>
+                    <Textarea
+                      placeholder="Type your message..."
+                      value={msgText}
+                      onChange={handleTyping}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSend();
+                        }
+                      }}
+                      className="w-full min-h-[52px] max-h-[120px] rounded-sm resize-none bg-background/80 border-border/60 focus:ring-primary/20 p-3.5 pr-14 text-sm font-medium"
+                      rows={1}
+                    />
+                    <Button
+                      size="icon"
+                      onClick={handleSend}
+                      disabled={sending || !msgText.trim()}
+                      className="absolute right-2 bottom-2 h-9 w-9 rounded-sm bg-primary shadow-md border border-border/40 transition-all"
+                    >
+                      {sending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <MessageCircle className="w-4 h-4 fill-current" />
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 opacity-50 relative">
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-4 md:p-6 opacity-50 relative">
               <Button
                 variant="ghost"
                 size="icon"

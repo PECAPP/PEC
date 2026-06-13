@@ -30,10 +30,8 @@ import type {
   UpdateEnrollmentDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -59,7 +57,7 @@ export const getEnrollmentsControllerFindAllV1Url = () => {
 
 export const enrollmentsControllerFindAllV1 = async ( options?: RequestInit): Promise<enrollmentsControllerFindAllV1Response> => {
 
-  return customInstance<enrollmentsControllerFindAllV1Response>(getEnrollmentsControllerFindAllV1Url(),
+  return fetchWithAuth<enrollmentsControllerFindAllV1Response>(getEnrollmentsControllerFindAllV1Url(),
   {
     ...options,
     method: 'GET'
@@ -79,16 +77,16 @@ export const getEnrollmentsControllerFindAllV1QueryKey = () => {
     }
 
 
-export const getEnrollmentsControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getEnrollmentsControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getEnrollmentsControllerFindAllV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>> = ({ signal }) => enrollmentsControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>> = ({ signal }) => enrollmentsControllerFindAllV1({ signal });
 
 
 
@@ -108,7 +106,7 @@ export function useEnrollmentsControllerFindAllV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useEnrollmentsControllerFindAllV1<TData = Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError = unknown>(
@@ -118,16 +116,16 @@ export function useEnrollmentsControllerFindAllV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useEnrollmentsControllerFindAllV1<TData = Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useEnrollmentsControllerFindAllV1<TData = Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentsControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -165,7 +163,7 @@ export const getEnrollmentsControllerCreateV1Url = () => {
 
 export const enrollmentsControllerCreateV1 = async (createEnrollmentDto: CreateEnrollmentDto, options?: RequestInit): Promise<enrollmentsControllerCreateV1Response> => {
 
-  return customInstance<enrollmentsControllerCreateV1Response>(getEnrollmentsControllerCreateV1Url(),
+  return fetchWithAuth<enrollmentsControllerCreateV1Response>(getEnrollmentsControllerCreateV1Url(),
   {
     ...options,
     method: 'POST',
@@ -178,15 +176,15 @@ export const enrollmentsControllerCreateV1 = async (createEnrollmentDto: CreateE
 
 
 export const getEnrollmentsControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerCreateV1>>, TError,{data: CreateEnrollmentDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerCreateV1>>, TError,{data: CreateEnrollmentDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerCreateV1>>, TError,{data: CreateEnrollmentDto}, TContext> => {
 
 const mutationKey = ['enrollmentsControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -194,7 +192,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentsControllerCreateV1>>, {data: CreateEnrollmentDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  enrollmentsControllerCreateV1(data,requestOptions)
+          return  enrollmentsControllerCreateV1(data,)
         }
 
 
@@ -209,7 +207,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type EnrollmentsControllerCreateV1MutationError = unknown
 
     export const useEnrollmentsControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerCreateV1>>, TError,{data: CreateEnrollmentDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerCreateV1>>, TError,{data: CreateEnrollmentDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof enrollmentsControllerCreateV1>>,
         TError,
@@ -247,7 +245,7 @@ export const getEnrollmentsControllerRemoveV1Url = (params: EnrollmentsControlle
 
 export const enrollmentsControllerRemoveV1 = async (params: EnrollmentsControllerRemoveV1Params, options?: RequestInit): Promise<enrollmentsControllerRemoveV1Response> => {
 
-  return customInstance<enrollmentsControllerRemoveV1Response>(getEnrollmentsControllerRemoveV1Url(params),
+  return fetchWithAuth<enrollmentsControllerRemoveV1Response>(getEnrollmentsControllerRemoveV1Url(params),
   {
     ...options,
     method: 'DELETE'
@@ -260,15 +258,15 @@ export const enrollmentsControllerRemoveV1 = async (params: EnrollmentsControlle
 
 
 export const getEnrollmentsControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerRemoveV1>>, TError,{params: EnrollmentsControllerRemoveV1Params}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerRemoveV1>>, TError,{params: EnrollmentsControllerRemoveV1Params}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerRemoveV1>>, TError,{params: EnrollmentsControllerRemoveV1Params}, TContext> => {
 
 const mutationKey = ['enrollmentsControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -276,7 +274,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentsControllerRemoveV1>>, {params: EnrollmentsControllerRemoveV1Params}> = (props) => {
           const {params} = props ?? {};
 
-          return  enrollmentsControllerRemoveV1(params,requestOptions)
+          return  enrollmentsControllerRemoveV1(params,)
         }
 
 
@@ -291,7 +289,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type EnrollmentsControllerRemoveV1MutationError = unknown
 
     export const useEnrollmentsControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerRemoveV1>>, TError,{params: EnrollmentsControllerRemoveV1Params}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerRemoveV1>>, TError,{params: EnrollmentsControllerRemoveV1Params}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof enrollmentsControllerRemoveV1>>,
         TError,
@@ -323,7 +321,7 @@ export const getEnrollmentsControllerUpdateV1Url = (id: string,) => {
 export const enrollmentsControllerUpdateV1 = async (id: string,
     updateEnrollmentDto: UpdateEnrollmentDto, options?: RequestInit): Promise<enrollmentsControllerUpdateV1Response> => {
 
-  return customInstance<enrollmentsControllerUpdateV1Response>(getEnrollmentsControllerUpdateV1Url(id),
+  return fetchWithAuth<enrollmentsControllerUpdateV1Response>(getEnrollmentsControllerUpdateV1Url(id),
   {
     ...options,
     method: 'PATCH',
@@ -336,15 +334,15 @@ export const enrollmentsControllerUpdateV1 = async (id: string,
 
 
 export const getEnrollmentsControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerUpdateV1>>, TError,{id: string;data: UpdateEnrollmentDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerUpdateV1>>, TError,{id: string;data: UpdateEnrollmentDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerUpdateV1>>, TError,{id: string;data: UpdateEnrollmentDto}, TContext> => {
 
 const mutationKey = ['enrollmentsControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -352,7 +350,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentsControllerUpdateV1>>, {id: string;data: UpdateEnrollmentDto}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  enrollmentsControllerUpdateV1(id,data,requestOptions)
+          return  enrollmentsControllerUpdateV1(id,data,)
         }
 
 
@@ -367,7 +365,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type EnrollmentsControllerUpdateV1MutationError = unknown
 
     export const useEnrollmentsControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerUpdateV1>>, TError,{id: string;data: UpdateEnrollmentDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentsControllerUpdateV1>>, TError,{id: string;data: UpdateEnrollmentDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof enrollmentsControllerUpdateV1>>,
         TError,

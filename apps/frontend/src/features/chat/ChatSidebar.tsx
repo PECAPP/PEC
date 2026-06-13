@@ -1,5 +1,5 @@
 import { Input, Button } from "@pec/ui";
-import { Hash, Users, Building2, Search, Menu, Plus, MessageCircle } from "lucide-react";
+import { Hash, Users, Building2, Search, Plus, MessageCircle } from "lucide-react";
 import { ChatRoom } from '@pec/shared';
 import { UserRole } from '@pec/shared';
 import { cn } from "@/lib/utils";
@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { NewChatDialog } from "@/features/chat/NewChatDialog";
 import { CreateGroupDialog } from "@/features/chat/CreateGroupDialog";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 interface Props {
   rooms: ChatRoom[];
@@ -16,7 +16,7 @@ interface Props {
   loading?: boolean;
   userRole: UserRole;
   userId?: string; // NEW: for DM name display
-  isMobileOpen?: boolean;
+  _isMobileOpen?: boolean;
   onMobileClose?: () => void;
 }
 
@@ -27,14 +27,14 @@ export function ChatSidebar({
   loading,
   userRole,
   userId,
-  isMobileOpen = false,
+  _isMobileOpen = false,
   onMobileClose,
 }: Props) {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
   const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
-  const isStudent = userRole === "student";
+  const _isStudent = userRole === "student";
   const isChatAdmin = userRole === "college_admin";
 
   // Helper: Get display title for DMs (show other person's name)
@@ -150,7 +150,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -177,7 +177,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -204,7 +204,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -231,7 +231,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -258,7 +258,7 @@ export function ChatSidebar({
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
                         className={cn(
-                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-left",
+                          "chat-room-item w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 text-left",
                           selectedRoom === room.id
                             ? "bg-primary text-primary-foreground font-medium shadow-md shadow-primary/20"
                             : "text-foreground/70 hover:text-foreground hover:bg-secondary"
@@ -292,7 +292,7 @@ export function ChatSidebar({
 
         {/* Debug/Role Indicator */}
         <div className="p-2 border-t border-border bg-muted/20">
-          <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest font-mono">
+          <p className="text-[10px] text-center text-muted-foreground  font-mono">
             {userRole || "Guest"} view
           </p>
         </div>
@@ -311,7 +311,7 @@ export function ChatSidebar({
           open={isCreateGroupOpen}
           onOpenChange={setIsCreateGroupOpen}
           onGroupCreated={onRoomChange}
-          currentUser={{
+          _currentUser={{
             uid: user.uid,
             organizationId: user.organizationId
           }}

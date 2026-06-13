@@ -10,10 +10,10 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onGroupCreated: (roomId: string) => void;
-  currentUser: { uid: string; organizationId: string };
+  _currentUser: { uid: string; organizationId: string };
 }
 
-export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, currentUser }: Props) {
+export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, _currentUser }: Props) {
   const [name, setName] = useState("");
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -135,7 +135,7 @@ export function CreateGroupDialog({ open, onOpenChange, onGroupCreated, currentU
               </div>
             )}
 
-            <div className="max-h-40 overflow-y-auto border rounded-md mt-2">
+            <div className="max-h-40 overflow-y-auto border rounded-sm mt-2">
               {isSearching ? (
                 <div className="p-4 flex justify-center">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />

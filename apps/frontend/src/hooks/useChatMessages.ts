@@ -1,12 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ChatMessage, subscribeToMessages, sendMessage as apiSendMessage, sendMediaMessage as apiSendMedia } from '@/lib/messages.service';
+import { ChatMessage, sendMessage as apiSendMessage, sendMediaMessage as apiSendMedia, toChatMessage } from '@/lib/messages.service';
+import { useSocket } from '@/providers/socket-provider';
+import api from '@pec/api';
 
 export function useChatMessages(roomId: string | null) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [limit, setLimit] = useState(20);
-  const lastRoomId = useRef<string | null>(null);
+  const _lastRoomId = useRef<string | null>(null);
+
+  const { socket, isConnected } = useSocket();
 
   useEffect(() => {
     if (!roomId) {
@@ -15,24 +19,66 @@ export function useChatMessages(roomId: string | null) {
       return;
     }
 
+    let isMounted = true;
     setLoading(true);
     
-    // Subscribe to messages (polling)
-    const unsubscribe = subscribeToMessages(roomId, (newMessages) => {
-      setMessages(newMessages);
-      setLoading(false);
-      // If we got fewer than the limit, there are no more messages (simplistic check for polling)
-      if (newMessages.length < limit) {
-        setHasMore(false);
-      } else {
-        setHasMore(true);
+    // Fetch initial messages
+    const fetchMessages = async () => {
+      try {
+        const res = await api.get(`/chat/messages/${roomId}`, { params: { limit } });
+        if (!isMounted) return;
+        const data = res.data && typeof res.data === 'object' && 'data' in res.data ? (res.data as any).data : res.data;
+        const mapped = Array.isArray(data) ? data.map(toChatMessage) : [];
+        setMessages(mapped);
+        setHasMore(mapped.length >= limit);
+      } catch (err) {
+        console.error('Failed to fetch messages', err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
-    }, limit);
+    };
+
+    fetchMessages();
+
+    // Socket event listeners
+    if (socket && isConnected) {
+      const handleNewMessage = (msg: any) => {
+        if (msg.chatRoomId === roomId) {
+          setMessages(prev => {
+            if (prev.some(m => m.id === msg.id)) return prev;
+            return [...prev, toChatMessage(msg)];
+          });
+        }
+      };
+
+      const handleMessageDeleted = ({ messageId, roomId: eventRoomId }: { messageId: string, roomId: string }) => {
+        if (eventRoomId === roomId) {
+          setMessages(prev => prev.filter(m => m.id !== messageId));
+        }
+      };
+
+      const handleMessageEdited = (msg: any) => {
+        if (msg.chatRoomId === roomId) {
+          setMessages(prev => prev.map(m => m.id === msg.id ? toChatMessage(msg) : m));
+        }
+      };
+
+      socket.on('newMessage', handleNewMessage);
+      socket.on('messageDeleted', handleMessageDeleted);
+      socket.on('messageEdited', handleMessageEdited);
+
+      return () => {
+        isMounted = false;
+        socket.off('newMessage', handleNewMessage);
+        socket.off('messageDeleted', handleMessageDeleted);
+        socket.off('messageEdited', handleMessageEdited);
+      };
+    }
 
     return () => {
-      unsubscribe();
+      isMounted = false;
     };
-  }, [roomId, limit]);
+  }, [roomId, limit, socket, isConnected]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
@@ -48,6 +94,10 @@ export function useChatMessages(roomId: string | null) {
     await apiSendMedia(roomId, mediaUrl, type, options);
   }, []);
 
+  const editMessage = useCallback(async (messageId: string, newContent: string) => {
+    await api.patch(`/chat/message/${messageId}`, { content: newContent });
+  }, []);
+
   return {
     messages,
     loading,
@@ -55,5 +105,6 @@ export function useChatMessages(roomId: string | null) {
     loadMore,
     sendMessage,
     sendMedia,
+    editMessage,
   };
 }

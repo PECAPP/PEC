@@ -71,7 +71,7 @@ export function LandingHero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 + 0.3 }}
                   whileHover={{ y: -2 }}
-                  className="text-sm font-semibold text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-200"
+                  className="text-sm font-semibold text-white/90 hover:text-white px-4 py-2 rounded-sm hover:bg-white/10 transition-all duration-200"
                 >
                   {link}
                 </motion.a>
@@ -85,7 +85,7 @@ export function LandingHero() {
               <Button
                 size="sm"
                 asChild
-                className="rounded-lg bg-white/20 text-white hover:bg-white/30 font-semibold px-6 backdrop-blur-sm border border-white/30 transition-all duration-200"
+                className="rounded-sm bg-white/20 text-white hover:bg-white/30 font-semibold px-6 backdrop-blur-sm border border-white/30 transition-all duration-200"
                 aria-label="Get started with test credentials"
               >
                 <Link href="/auth">Get Started</Link>
@@ -141,7 +141,7 @@ export function LandingHero() {
               rotate: [0, 5, 0]
             }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 right-[10%] w-32 h-32 bg-white/5 backdrop-blur-xl border border-white/20 -rotate-12 neo-brutal-shadow"
+            className="absolute top-1/4 right-[10%] w-32 h-32 bg-white/5 backdrop-blur-xl border border-white/20 -rotate-12 shadow-sm"
           />
           <motion.div
             animate={{ 
@@ -149,7 +149,7 @@ export function LandingHero() {
               rotate: [0, -8, 0]
             }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-1/4 left-[5%] w-48 h-48 bg-yellow-500/5 backdrop-blur-sm border-yellow-500/20 rotate-12 neo-brutal-shadow"
+            className="absolute bottom-1/4 left-[5%] w-48 h-48 bg-yellow-500/5 backdrop-blur-sm border-yellow-500/20 rotate-12 shadow-sm"
           />
         </div>
 
@@ -177,7 +177,7 @@ export function LandingHero() {
           transition={{ delay: 2, duration: 1 }}
           className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center gap-2"
         >
-          <span className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em]">Scroll</span>
+          <span className="text-sm font-medium text-white/50 ">Scroll</span>
           <motion.div 
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -213,10 +213,10 @@ export function LandingHero() {
             initial={{ opacity: 0, filter: "blur(10px)", y: 30 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.1] max-w-[1100px] mx-auto mb-8 tracking-tight"
+            className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] max-w-[1100px] mx-auto mb-8 tracking-tight"
             style={{ fontFamily: "'Monument Extended', serif" }}
           >
-            <span className="bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 bg-clip-text text-transparent drop-shadow-[5px_5px_0px_rgba(0,0,0,0.3)] inline-block">
+            <span className="bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 bg-clip-text text-transparent drop-shadow-sm inline-block">
               Your Entire Campus,<br className="hidden lg:block" /> All in One Place
             </span>
           </motion.h1>
@@ -238,7 +238,7 @@ export function LandingHero() {
             <Button
               size="lg"
               asChild
-              className="neo-brutal-btn group bg-white text-black px-8 py-6 text-base border-2 border-black"
+              className=" group bg-white text-black px-8 py-6 text-base border border-black"
               aria-label="Student login"
             >
               <Link href="/auth" className="flex items-center gap-3">
@@ -250,7 +250,7 @@ export function LandingHero() {
               size="lg"
               variant="outline"
               asChild
-              className="neo-brutal-btn group bg-transparent border-2 border-white hover:bg-white/10 px-8 py-6 text-base font-bold text-white hover:text-white"
+              className=" group bg-transparent border border-white hover:bg-white/10 px-8 py-6 text-base font-bold text-white hover:text-white"
               aria-label="View Features"
             >
               <a href="#features" className="flex items-center gap-3">

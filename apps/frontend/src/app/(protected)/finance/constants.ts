@@ -58,18 +58,22 @@ export const CATEGORIES = [
 export const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   pending: {
     label: 'Pending',
-    color: 'bg-amber-500/15 text-amber-600 border-amber-500/20',
+    color: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-600 border border-amber-500/30 backdrop-blur-sm',
     icon: Clock,
   },
   paid: {
     label: 'Paid',
-    color: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/20',
+    color: 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-600 border border-emerald-500/30 backdrop-blur-sm shadow-[0_0_10px_rgba(16,185,129,0.2)]',
     icon: CheckCircle2,
   },
-  failed: { label: 'Failed', color: 'bg-red-500/15 text-red-600 border-red-500/20', icon: XCircle },
+  failed: { 
+    label: 'Failed', 
+    color: 'bg-gradient-to-r from-red-500/20 to-rose-500/20 text-red-600 border border-red-500/30 backdrop-blur-sm', 
+    icon: XCircle 
+  },
   waived: {
     label: 'Waived',
-    color: 'bg-gray-500/15 text-gray-600 border-gray-500/20',
+    color: 'bg-gradient-to-r from-slate-500/20 to-gray-500/20 text-slate-600 border border-slate-500/30 backdrop-blur-sm',
     icon: ShieldCheck,
   },
 };

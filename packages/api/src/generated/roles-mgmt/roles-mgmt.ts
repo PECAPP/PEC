@@ -24,10 +24,8 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -53,7 +51,7 @@ export const getRolesMgmtControllerCreateV1Url = () => {
 
 export const rolesMgmtControllerCreateV1 = async ( options?: RequestInit): Promise<rolesMgmtControllerCreateV1Response> => {
 
-  return customInstance<rolesMgmtControllerCreateV1Response>(getRolesMgmtControllerCreateV1Url(),
+  return fetchWithAuth<rolesMgmtControllerCreateV1Response>(getRolesMgmtControllerCreateV1Url(),
   {
     ...options,
     method: 'POST'
@@ -66,15 +64,15 @@ export const rolesMgmtControllerCreateV1 = async ( options?: RequestInit): Promi
 
 
 export const getRolesMgmtControllerCreateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerCreateV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerCreateV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerCreateV1>>, TError,void, TContext> => {
 
 const mutationKey = ['rolesMgmtControllerCreateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -82,7 +80,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof rolesMgmtControllerCreateV1>>, void> = () => {
 
 
-          return  rolesMgmtControllerCreateV1(requestOptions)
+          return  rolesMgmtControllerCreateV1()
         }
 
 
@@ -97,7 +95,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RolesMgmtControllerCreateV1MutationError = unknown
 
     export const useRolesMgmtControllerCreateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerCreateV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerCreateV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof rolesMgmtControllerCreateV1>>,
         TError,
@@ -128,7 +126,7 @@ export const getRolesMgmtControllerFindAllV1Url = () => {
 
 export const rolesMgmtControllerFindAllV1 = async ( options?: RequestInit): Promise<rolesMgmtControllerFindAllV1Response> => {
 
-  return customInstance<rolesMgmtControllerFindAllV1Response>(getRolesMgmtControllerFindAllV1Url(),
+  return fetchWithAuth<rolesMgmtControllerFindAllV1Response>(getRolesMgmtControllerFindAllV1Url(),
   {
     ...options,
     method: 'GET'
@@ -148,16 +146,16 @@ export const getRolesMgmtControllerFindAllV1QueryKey = () => {
     }
 
 
-export const getRolesMgmtControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getRolesMgmtControllerFindAllV1QueryOptions = <TData = Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getRolesMgmtControllerFindAllV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>> = ({ signal }) => rolesMgmtControllerFindAllV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>> = ({ signal }) => rolesMgmtControllerFindAllV1({ signal });
 
 
 
@@ -177,7 +175,7 @@ export function useRolesMgmtControllerFindAllV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRolesMgmtControllerFindAllV1<TData = Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError = unknown>(
@@ -187,16 +185,16 @@ export function useRolesMgmtControllerFindAllV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRolesMgmtControllerFindAllV1<TData = Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useRolesMgmtControllerFindAllV1<TData = Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindAllV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -234,7 +232,7 @@ export const getRolesMgmtControllerFindOneV1Url = (id: string,) => {
 
 export const rolesMgmtControllerFindOneV1 = async (id: string, options?: RequestInit): Promise<rolesMgmtControllerFindOneV1Response> => {
 
-  return customInstance<rolesMgmtControllerFindOneV1Response>(getRolesMgmtControllerFindOneV1Url(id),
+  return fetchWithAuth<rolesMgmtControllerFindOneV1Response>(getRolesMgmtControllerFindOneV1Url(id),
   {
     ...options,
     method: 'GET'
@@ -254,16 +252,16 @@ export const getRolesMgmtControllerFindOneV1QueryKey = (id: string,) => {
     }
 
 
-export const getRolesMgmtControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getRolesMgmtControllerFindOneV1QueryOptions = <TData = Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getRolesMgmtControllerFindOneV1QueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>> = ({ signal }) => rolesMgmtControllerFindOneV1(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>> = ({ signal }) => rolesMgmtControllerFindOneV1(id, { signal });
 
 
 
@@ -283,7 +281,7 @@ export function useRolesMgmtControllerFindOneV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRolesMgmtControllerFindOneV1<TData = Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError = unknown>(
@@ -293,16 +291,16 @@ export function useRolesMgmtControllerFindOneV1<TData = Awaited<ReturnType<typeo
           TError,
           Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useRolesMgmtControllerFindOneV1<TData = Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useRolesMgmtControllerFindOneV1<TData = Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rolesMgmtControllerFindOneV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -340,7 +338,7 @@ export const getRolesMgmtControllerUpdateV1Url = (id: string,) => {
 
 export const rolesMgmtControllerUpdateV1 = async (id: string, options?: RequestInit): Promise<rolesMgmtControllerUpdateV1Response> => {
 
-  return customInstance<rolesMgmtControllerUpdateV1Response>(getRolesMgmtControllerUpdateV1Url(id),
+  return fetchWithAuth<rolesMgmtControllerUpdateV1Response>(getRolesMgmtControllerUpdateV1Url(id),
   {
     ...options,
     method: 'PATCH'
@@ -353,15 +351,15 @@ export const rolesMgmtControllerUpdateV1 = async (id: string, options?: RequestI
 
 
 export const getRolesMgmtControllerUpdateV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerUpdateV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerUpdateV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerUpdateV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['rolesMgmtControllerUpdateV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -369,7 +367,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof rolesMgmtControllerUpdateV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  rolesMgmtControllerUpdateV1(id,requestOptions)
+          return  rolesMgmtControllerUpdateV1(id,)
         }
 
 
@@ -384,7 +382,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RolesMgmtControllerUpdateV1MutationError = unknown
 
     export const useRolesMgmtControllerUpdateV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerUpdateV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerUpdateV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof rolesMgmtControllerUpdateV1>>,
         TError,
@@ -415,7 +413,7 @@ export const getRolesMgmtControllerRemoveV1Url = (id: string,) => {
 
 export const rolesMgmtControllerRemoveV1 = async (id: string, options?: RequestInit): Promise<rolesMgmtControllerRemoveV1Response> => {
 
-  return customInstance<rolesMgmtControllerRemoveV1Response>(getRolesMgmtControllerRemoveV1Url(id),
+  return fetchWithAuth<rolesMgmtControllerRemoveV1Response>(getRolesMgmtControllerRemoveV1Url(id),
   {
     ...options,
     method: 'DELETE'
@@ -428,15 +426,15 @@ export const rolesMgmtControllerRemoveV1 = async (id: string, options?: RequestI
 
 
 export const getRolesMgmtControllerRemoveV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerRemoveV1>>, TError,{id: string}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerRemoveV1>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['rolesMgmtControllerRemoveV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -444,7 +442,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof rolesMgmtControllerRemoveV1>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  rolesMgmtControllerRemoveV1(id,requestOptions)
+          return  rolesMgmtControllerRemoveV1(id,)
         }
 
 
@@ -459,7 +457,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RolesMgmtControllerRemoveV1MutationError = unknown
 
     export const useRolesMgmtControllerRemoveV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerRemoveV1>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rolesMgmtControllerRemoveV1>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof rolesMgmtControllerRemoveV1>>,
         TError,

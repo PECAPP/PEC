@@ -26,7 +26,7 @@ export function EnrolledCoursesCard({
   return (
     <div
       ref={containerRef}
-      className={`xl:col-span-2 card-elevated ui-card-pad h-fit ${className ?? ''}`}
+      className={`xl:col-span-2 bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 h-fit ${className ?? ''}`}
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -51,7 +51,7 @@ export function EnrolledCoursesCard({
           enrolledCoursesList.slice(0, 4).map((course, index) => (
             <div 
               key={`${course.id ?? 'course'}-${course.code ?? 'code'}-${course.semester ?? 'sem'}-${index}`} 
-              className="p-4 rounded-xl border border-border bg-card/50 hover:bg-accent/50 hover:border-accent transition-all group cursor-pointer relative overflow-hidden"
+              className="p-4 rounded-sm border border-border bg-card/50 hover:bg-accent/30 hover:border-border/40 transition-colors duration-300 group cursor-pointer relative overflow-hidden"
               onClick={() => onCourseClick(course.id)}
             >
               <div className="flex items-start justify-between relative z-10">
@@ -60,7 +60,7 @@ export function EnrolledCoursesCard({
                   <p className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">{course.name}</p>
                 </div>
               </div>
-              <div className="mt-4 flex items-center justify-between text-[10px] text-muted-foreground font-medium uppercase tracking-wider relative z-10">
+              <div className="mt-4 flex items-center justify-between text-[10px] text-muted-foreground font-medium  relative z-10">
                 <span>{course.credits} Credits</span>
                 <span className="group-hover:text-primary transition-colors">Sem {course.semester}</span>
               </div>

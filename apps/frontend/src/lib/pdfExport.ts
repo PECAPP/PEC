@@ -1,10 +1,9 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { saveAs } from "file-saver";
 
 // Institution branding
 const INSTITUTION_NAME = "PEC Campus OS";
-const INSTITUTION_LOGO = ""; // Add logo URL if available
+const _INSTITUTION_LOGO = ""; // Add logo URL if available
 
 /**
  * Generate PDF with institution header
@@ -750,7 +749,7 @@ export function exportFeeReceipt(txn: {
     doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(16, 185, 129);
-    doc.text("✓ PAID", 105, cur, { align: "center" });
+    doc.text(" PAID", 105, cur, { align: "center" });
     doc.setTextColor(0, 0, 0);
     cur += 10;
   }

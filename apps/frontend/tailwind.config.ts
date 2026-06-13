@@ -9,6 +9,9 @@ export default {
     "./src/**/*.{ts,tsx}",
     "../../packages/ui/src/**/*.{ts,tsx}"
   ],
+  safelist: [
+    'text-4xl', 'text-5xl', 'md:text-6xl', 'mt-3', 'text-lg'
+  ],
   prefix: "",
   theme: {
     container: {
@@ -20,7 +23,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         monument: ['"Monument Extended"', 'sans-serif'],
       },
       colors: {

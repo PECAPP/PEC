@@ -1,5 +1,5 @@
 'use client';
-import { Button, Input, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, useToast } from "@pec/ui";
+import { Button, Input, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, useToast, PageBanner } from "@pec/ui";
 
 
 import { motion } from 'framer-motion';
@@ -25,22 +25,26 @@ export default function AddCourse() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6 max-w-2xl"
+      className="space-y-6 "
     >
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard?role=college_admin">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Create New Course</h1>
-          <p className="text-muted-foreground">Add a new course to the curriculum</p>
-        </div>
+      <div className="mb-6">
+        <PageBanner
+          title="Create New Course"
+          subtitle="Add a new course to the curriculum"
+          badgeText="Course Editor"
+          actions={
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/dashboard?role=college_admin">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Link>
+            </Button>
+          }
+        />
       </div>
 
-      <form onSubmit={handleSubmit} className="card-elevated p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 space-y-6">
         {/* Course Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">

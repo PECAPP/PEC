@@ -7,14 +7,14 @@ import {
   UserMinus, 
   Edit, 
   X,
-  Mail,
-  Calendar,
   Hash,
-  MessageCircle
+  MessageCircle,
+  Info,
+  Settings
 } from "lucide-react";
 
 import { ChatRoom } from '@pec/shared';
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { 
   getMembersForGroup,
   addMemberToGroup, 
@@ -44,7 +44,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
 
   const isDM = room?.type === "dm";
   const userRole = user?.role as string;
-  const isAdmin = room?.admins?.includes(user?.uid || "") || userRole === "admin" || userRole === "college_admin";
+  const isAdmin = room?.admins?.includes(user?.uid || "") || userRole === "college_admin";
   const canDeleteRoom = !!room && (isDM || (room.type === "group" && !room.isSystem && isAdmin));
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
       await removeMemberFromGroup(room.id, userId);
       toast.success("Member removed");
       await loadMembers();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to remove member");
     }
   };
@@ -117,7 +117,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
         toast.success("User promoted to admin");
       }
       await loadMembers();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update admin status");
     }
   };
@@ -132,7 +132,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
       });
       toast.success("Group info updated");
       setIsEditing(false);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update group info");
     }
   };
@@ -234,7 +234,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
         {isDM ? (
           // DM Info
           <div className="space-y-4">
-            <div className="p-4 rounded-lg bg-secondary/50">
+            <div className="p-4 rounded-sm bg-secondary/50">
               <h3 className="font-medium mb-2">Chat Info</h3>
               <p className="text-sm text-muted-foreground">
                 This is a private conversation between you and another user.
@@ -250,9 +250,20 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
           // Group Info & Management
           <Tabs defaultValue="info" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="info">Info</TabsTrigger>
-              <TabsTrigger value="members">Members</TabsTrigger>
-              {isAdmin && <TabsTrigger value="settings">Settings</TabsTrigger>}
+              <TabsTrigger value="info" className="gap-1.5">
+                <Info className="w-3.5 h-3.5" />
+                Info
+              </TabsTrigger>
+              <TabsTrigger value="members" className="gap-1.5">
+                <Users className="w-3.5 h-3.5" />
+                Members
+              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="settings" className="gap-1.5">
+                  <Settings className="w-3.5 h-3.5" />
+                  Settings
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="info" className="space-y-4">
@@ -312,7 +323,7 @@ export function ChatInfoDialog({ open, onOpenChange, room, onRoomSelect }: Props
                       <div
                         key={member.uid}
                         onClick={() => handleMemberClick(member)}
-                        className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary cursor-pointer transition-colors"
+                        className="flex items-center justify-between p-3 rounded-sm bg-secondary/50 hover:bg-secondary cursor-pointer transition-colors"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">

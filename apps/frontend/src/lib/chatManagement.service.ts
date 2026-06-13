@@ -28,11 +28,11 @@ export async function removeMemberFromGroup(roomId: string, userId: string) {
   await api.delete(`/chat/room/${roomId}/participants/${userId}`);
 }
 
-export async function makeUserAdmin(roomId: string, userId: string) {
+export async function makeUserAdmin(_roomId: string, _userId: string) {
   return;
 }
 
-export async function removeUserAdmin(roomId: string, userId: string) {
+export async function removeUserAdmin(_roomId: string, _userId: string) {
   return;
 }
 

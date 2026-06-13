@@ -2,7 +2,7 @@
 import { Button, Badge, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@pec/ui";
 
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   format, 
   isSameDay, 
@@ -77,7 +77,7 @@ export function InteractiveCalendar({
   const [eventTypeFilter, setEventTypeFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [_isSidebarCollapsed, _setIsSidebarCollapsed] = useState(false);
 
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
@@ -153,23 +153,23 @@ export function InteractiveCalendar({
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         {/* Calendar Area */}
         <div className="xl:col-span-8 space-y-4">
-          <div className="bg-card border border-border rounded-lg p-6 shadow-sm relative overflow-hidden">
+          <div className="bg-card border border-border rounded-sm p-6 shadow-sm relative overflow-hidden">
             {/* Calendar Controls */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 border-b border-border pb-5">
               <div className="flex items-baseline gap-3">
-                <h3 className="text-3xl font-bold tracking-tight text-foreground uppercase">
+                <h3 className="text-2xl font-bold tracking-tight text-foreground">
                   {format(currentMonth, 'MMMM')}
                 </h3>
-                <span className="text-3xl font-light text-muted-foreground/30 tracking-tight">
+                <span className="text-2xl font-medium text-muted-foreground/60 tracking-tight">
                   {format(currentMonth, 'yyyy')}
                 </span>
               </div>
-              <div className="flex gap-0 bg-muted/20 p-0 rounded-sm border border-border self-stretch sm:self-auto overflow-hidden">
-                <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="rounded-none h-12 w-12 hover:bg-background transition-all border-r border-border">
-                  <ChevronLeft className="h-6 w-6" />
+              <div className="flex gap-1 bg-muted/30 p-1 rounded-sm border border-border self-stretch sm:self-auto overflow-hidden">
+                <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="rounded-sm h-10 w-10 hover:bg-background transition-all">
+                  <ChevronLeft className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={handleNextMonth} className="rounded-none h-12 w-12 hover:bg-background transition-all">
-                  <ChevronRight className="h-6 w-6" />
+                <Button variant="ghost" size="icon" onClick={handleNextMonth} className="rounded-sm h-10 w-10 hover:bg-background transition-all">
+                  <ChevronRight className="h-5 w-5" />
                 </Button>
               </div>
             </div>
@@ -177,7 +177,7 @@ export function InteractiveCalendar({
             {/* Calendar Grid Header */}
             <div className="grid grid-cols-7 gap-0 border-b border-border/20 mb-4">
               {WEEKDAYS.map((day) => (
-                <div key={day} className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 py-4 border-r last:border-r-0 border-border/10">
+                <div key={day} className="text-center text-xs font-semibold text-muted-foreground py-3 border-r last:border-r-0 border-border/10">
                   {day}
                 </div>
               ))}
@@ -211,14 +211,14 @@ export function InteractiveCalendar({
                       onClick={() => setSelectedDate(day)}
                       className={cn(
                         "min-h-[100px] md:min-h-[140px] p-4 rounded-sm border transition-all relative flex flex-col items-start gap-4 text-left overflow-hidden group hover:bg-muted/40",
-                        !isCurrentMonth ? "opacity-10 pointer-events-none" : "bg-card hover:border-primary",
-                        isSelected ? "bg-primary text-primary-foreground border-primary z-10" : "border-border/60",
+                        !isCurrentMonth ? "opacity-10 pointer-events-none" : "bg-card hover:border-border/40",
+                        isSelected ? "bg-primary text-primary-foreground border-border/40 z-10" : "border-border/60",
                         isToday && !isSelected ? "border-primary/40 bg-primary/5" : ""
                       )}
                     >
                       <div className="flex justify-between w-full items-start">
                         <span className={cn(
-                          "text-2xl font-bold tracking-tight transition-all font-display",
+                          "text-lg font-semibold tracking-tight transition-all",
                           isSelected ? "text-primary-foreground" : "text-foreground",
                           isToday && !isSelected ? "text-primary" : ""
                         )}>
@@ -226,30 +226,30 @@ export function InteractiveCalendar({
                         </span>
                         {isToday && (
                           <div className={cn(
-                            "w-1.5 h-1.5 rounded-full",
+                            "w-1.5 h-1.5 rounded-full mt-2",
                             isSelected ? "bg-primary-foreground" : "bg-primary"
                           )} />
                         )}
                       </div>
                       
-                      <div className="flex flex-col gap-1.5 w-full mt-auto">
+                      <div className="flex flex-col gap-1 w-full mt-auto">
                         {dayEvents.slice(0, 3).map((event) => (
                           <div
                             key={event.id}
                             className={cn(
-                              "text-[9px] px-2 py-1 border-l-2 font-bold transition-all leading-tight uppercase tracking-wider",
+                              "text-[10px] px-2 py-0.5 rounded-sm border-l-2 font-medium transition-all truncate",
                               isSelected 
                                 ? "bg-primary-foreground/10 text-primary-foreground border-white/40" 
                                 : getEventColor(event.eventType)
                             )}
                             title={event.title}
                           >
-                            <span className="truncate block">{event.title}</span>
+                            <span>{event.title}</span>
                           </div>
                         ))}
                         {dayEvents.length > 2 && (
                           <div className={cn(
-                            "text-[9px] px-2 py-0.5 font-black uppercase tracking-widest opacity-60",
+                            "text-[10px] px-2 py-0.5 font-medium opacity-80",
                             isSelected ? "text-primary-foreground" : "text-muted-foreground"
                           )}>
                             + {dayEvents.length - 2} More
@@ -264,35 +264,35 @@ export function InteractiveCalendar({
           </div>
 
           {/* Filtering Controls */}
-          <div className="bg-card border border-border rounded-sm p-8 flex flex-wrap items-center gap-8 shadow-sm">
-            <div className="flex items-center gap-3">
-              <Filter className="w-5 h-5 text-primary" />
-              <h4 className="font-bold text-xs uppercase tracking-[0.2em] text-muted-foreground font-display">Refine Scope</h4>
+          <div className="bg-card border border-border rounded-sm p-6 flex flex-wrap items-center gap-6 shadow-sm">
+            <div className="flex items-center gap-2 text-primary">
+              <Filter className="w-4 h-4" />
+              <h4 className="font-semibold text-sm">Filters</h4>
             </div>
             
-            <div className="h-10 w-[1px] bg-border hidden md:block" />
+            <div className="h-8 w-[1px] bg-border hidden md:block" />
  
-            <div className="flex items-center gap-4 flex-1">
+            <div className="flex items-center gap-3 flex-1">
               <Select value={eventTypeFilter} onValueChange={setEventTypeFilter}>
-                <SelectTrigger className="w-[200px] rounded-sm border-border bg-background focus:ring-0 uppercase text-[10px] font-black tracking-widest h-12">
+                <SelectTrigger className="w-[180px] rounded-sm h-10 text-sm">
                   <SelectValue placeholder="Event Type" />
                 </SelectTrigger>
-                <SelectContent className="rounded-sm border-border bg-card">
-                  <SelectItem value="all" className="uppercase text-[10px] font-bold">All Types</SelectItem>
+                <SelectContent className="rounded-sm">
+                  <SelectItem value="all">All Types</SelectItem>
                   {uniqueEventTypes.map((type) => (
-                    <SelectItem key={type} value={type} className="uppercase text-[10px] font-bold">{EVENT_LABELS[type] || type}</SelectItem>
+                    <SelectItem key={type} value={type}>{EVENT_LABELS[type] || type}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
  
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[200px] rounded-sm border-border bg-background focus:ring-0 uppercase text-[10px] font-black tracking-widest h-12">
+                <SelectTrigger className="w-[180px] rounded-sm h-10 text-sm">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
-                <SelectContent className="rounded-sm border-border bg-card">
-                  <SelectItem value="all" className="uppercase text-[10px] font-bold">All Categories</SelectItem>
+                <SelectContent className="rounded-sm">
+                  <SelectItem value="all">All Categories</SelectItem>
                   {uniqueCategories.map((cat) => (
-                    <SelectItem key={cat} value={cat} className="uppercase text-[10px] font-bold">{CATEGORY_LABELS[cat] || cat}</SelectItem>
+                    <SelectItem key={cat} value={cat}>{CATEGORY_LABELS[cat] || cat}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -301,14 +301,14 @@ export function InteractiveCalendar({
         </div>
 
         {/* Sidebar Area - Daily Agenda */}
-        <div className="xl:col-span-4 space-y-8">
+        <div className="xl:col-span-4 space-y-6">
           <div className="bg-card border border-border rounded-sm overflow-hidden shadow-sm sticky top-8">
             {/* Sidebar Header */}
-            <div className="bg-muted/10 p-10 border-b border-border flex items-center justify-between bg-grid-pattern">
-              <div className="space-y-2">
-                <h3 className="font-bold text-2xl tracking-tight uppercase font-display">Daily Brief</h3>
-                <div className="flex items-center gap-2 text-[10px] text-primary font-black uppercase tracking-[0.2em]">
-                  {selectedDate ? format(selectedDate, 'EEEE · MMM d') : 'Select a date'}
+            <div className="bg-muted/30 p-6 border-b border-border flex items-center justify-between">
+              <div className="space-y-1">
+                <h3 className="font-semibold text-lg tracking-tight">Daily Brief</h3>
+                <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                  {selectedDate ? format(selectedDate, 'EEEE, MMM d') : 'Select a date'}
                 </div>
               </div>
               {isAdmin && onCreateEventAtDate && (
@@ -316,9 +316,8 @@ export function InteractiveCalendar({
                   size="sm"
                   onClick={() => selectedDate && onCreateEventAtDate(format(selectedDate, 'yyyy-MM-dd'))}
                   disabled={!selectedDate}
-                  className="rounded-none h-10 px-4 font-black uppercase tracking-widest"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4 mr-1.5" />
                   Add Event
                 </Button>
               )}
@@ -335,18 +334,18 @@ export function InteractiveCalendar({
                   className="space-y-4"
                 >
                   {selectedDateEvents.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-24 text-center">
-                      <h4 className="font-bold text-xs uppercase tracking-[0.3em] text-muted-foreground/40 mb-4 font-display">Structural Void</h4>
-                      <p className="text-[10px] text-muted-foreground/30 max-w-[180px] font-bold uppercase tracking-widest leading-loose">
-                        No events mapped for this coordinates.
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                      <h4 className="font-semibold text-sm text-muted-foreground mb-2">No Events</h4>
+                      <p className="text-xs text-muted-foreground/70 max-w-[180px]">
+                        There are no events scheduled for this day.
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-6 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-[1px] before:bg-border/20">
+                    <div className="space-y-3 relative before:absolute before:left-[17px] before:top-4 before:bottom-4 before:w-[1px] before:bg-border/40">
                       {selectedDateEvents.map((event) => (
                         <motion.button
                           key={event.id}
-                          whileHover={{ x: 6 }}
+                          whileHover={{ x: 4 }}
                           onClick={() => {
                             setSelectedEvent(event);
                             setIsDetailOpen(true);
@@ -354,33 +353,31 @@ export function InteractiveCalendar({
                           className="w-full text-left pl-10 relative group"
                         >
                           <div className={cn(
-                            "absolute left-0 top-1.5 w-[35px] h-[35px] rounded-xl flex items-center justify-center border bg-background group-hover:scale-110 transition-all duration-300 z-10 shadow-lg",
-                            getEventDotColor(event.eventType).replace('bg-', 'border-').split(' ')[0], // Border color from dot color
-                          )}>
-                            <div className={cn("w-2 h-2 rounded-full", getEventDotColor(event.eventType))} />
-                          </div>
+                            "absolute left-[11px] top-4 w-3 h-3 rounded-full border bg-background z-10",
+                            getEventDotColor(event.eventType).replace('bg-', 'border-').split(' ')[0]
+                          )} />
 
-                          <div className="bg-muted/5 group-hover:bg-muted/10 border border-border/60 group-hover:border-primary p-6 rounded-sm transition-all duration-300">
-                            <div className="flex items-start justify-between gap-4 mb-4">
-                              <h4 className="font-bold text-sm tracking-tight text-foreground uppercase font-display leading-tight">
+                          <div className="bg-card hover:bg-muted/30 border border-border/60 hover:border-border p-4 rounded-sm transition-all duration-200">
+                            <div className="flex items-start justify-between gap-3 mb-2">
+                              <h4 className="font-semibold text-sm leading-snug">
                                 {event.title}
                               </h4>
                               <Badge variant="outline" className={cn(
-                                "text-[8px] h-5 rounded-none px-2 font-black uppercase tracking-widest shrink-0 border-border",
+                                "text-[10px] px-1.5 py-0 rounded-sm shrink-0 border-border",
                                 getEventColor(event.eventType)
                               )}>
                                 {getEventLabel(event.eventType)}
                               </Badge>
                             </div>
                             
-                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                                <Clock className="w-3 h-3 text-primary" />
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                                <Clock className="w-3 h-3 text-muted-foreground/70" />
                                 {event.startTime || 'All Day'}
                               </div>
                               {event.location && (
-                                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-bold uppercase tracking-widest truncate max-w-[150px]">
-                                  <MapPin className="w-3 h-3 text-primary" />
+                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium truncate max-w-[150px]">
+                                  <MapPin className="w-3 h-3 text-muted-foreground/70" />
                                   <span className="truncate">{event.location}</span>
                                 </div>
                               )}
@@ -395,19 +392,15 @@ export function InteractiveCalendar({
             </div>
 
             {/* Legend Section */}
-            <div className="p-8 bg-muted/10 border-t border-border/10">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-6 flex items-center gap-3">
-                <div className="w-4 h-[1px] bg-primary/40" />
-                Index
+            <div className="p-6 bg-muted/20 border-t">
+              <h4 className="text-xs font-semibold text-muted-foreground mb-4">
+                Legend
               </h4>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 {Object.entries(EVENT_LABELS).map(([type, label]) => (
-                  <div key={type} className="flex items-center justify-between group cursor-default">
-                    <div className="flex items-center gap-3">
-                      <div className={cn("w-2 h-2 rounded-sm rotate-45", getEventDotColor(type))} />
-                      <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest">{label}</span>
-                    </div>
-                    <div className="w-8 h-[1px] bg-border/10" />
+                  <div key={type} className="flex items-center gap-2">
+                    <div className={cn("w-2 h-2 rounded-full", getEventDotColor(type))} />
+                    <span className="text-xs text-muted-foreground">{label}</span>
                   </div>
                 ))}
               </div>

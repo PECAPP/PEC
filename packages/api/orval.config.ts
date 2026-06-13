@@ -8,11 +8,12 @@ export default defineConfig({
       target: 'src/generated/endpoints.ts',
       schemas: 'src/generated/models',
       client: 'react-query',
+      httpClient: 'fetch',
       prettier: true,
       override: {
         mutator: {
-          path: 'src/axios-instance.ts',
-          name: 'customInstance',
+          path: 'src/api.ts',
+          name: 'fetchWithAuth',
         },
       },
     },

@@ -1,14 +1,13 @@
-import { IsArray, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateCampusMapRoadDto {
-  @IsArray()
-  points: Array<{ x: number; y: number }>;
+export const createCampusMapRoadSchema = z.object({
+  points: z.array(z.any()),
+  width: z.number(),
+  organizationId: z.string().optional(),
+});
 
-  @IsNumber()
-  @Min(0)
-  width: number;
 
-  @IsOptional()
-  @IsString()
-  organizationId?: string;
+
+export class CreateCampusMapRoadDto extends createZodDto(createCampusMapRoadSchema) {
 }

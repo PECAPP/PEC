@@ -2,7 +2,7 @@ import { Button, Textarea, ScrollArea } from "@pec/ui";
 import { useState, useRef, useEffect, KeyboardEvent, forwardRef, useImperativeHandle } from 'react';
 import { Send, Paperclip, X } from 'lucide-react';
 
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 import { toast } from 'sonner';
 import { getFileType, uploadMedia, validateFileSize } from '@/lib/cloudinary.service';
@@ -29,6 +29,9 @@ interface ChatInputProps {
   roomId?: string; // For media upload
   replyingTo?: { id: string; text: string; senderName: string } | null;
   onCancelReply?: () => void;
+  editingMessage?: { id: string; text: string } | null;
+  onEditSubmit?: (messageId: string, newContent: string) => void;
+  onCancelEdit?: () => void;
 }
 
 export interface ChatInputRef {
@@ -41,7 +44,10 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
   placeholder = 'Type a message...',
   replyingTo = null,
   onCancelReply,
-  roomId = ''
+  roomId = '',
+  editingMessage = null,
+  onEditSubmit,
+  onCancelEdit
 }, ref) {
   const { user } = useAuth();
   const [message, setMessage] = useState('');
@@ -61,6 +67,20 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
     fetchUsers();
   }, [user?.uid]);
 
+  useEffect(() => {
+    if (editingMessage) {
+      setMessage(editingMessage.text);
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        // Set cursor to the end
+        const len = editingMessage.text.length;
+        textareaRef.current.setSelectionRange(len, len);
+      }
+    } else if (!replyingTo) {
+      setMessage('');
+    }
+  }, [editingMessage]);
+
   const fetchUsers = async () => {
     try {
       const users = (await fetchChatUsers()).filter((u) => u.uid !== user?.uid);
@@ -74,18 +94,24 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
   const handleSend = () => {
     const trimmedMessage = message.trim();
     if (trimmedMessage && !disabled) {
-      // Find mentions in text
-      const mentions = allUsers
-        .filter(u => trimmedMessage.includes(`@${u.fullName}`))
-        .map(u => u.uid);
+      if (editingMessage && onEditSubmit) {
+        onEditSubmit(editingMessage.id, trimmedMessage);
+        setMessage('');
+        if (onCancelEdit) onCancelEdit();
+      } else {
+        // Find mentions in text
+        const mentions = allUsers
+          .filter(u => trimmedMessage.includes(`@${u.fullName}`))
+          .map(u => u.uid);
 
-      onSend(trimmedMessage, { 
-        mentions: mentions.length > 0 ? mentions : undefined,
-        parentId: replyingTo?.id,
-        replyTo: replyingTo ? { text: replyingTo.text, senderName: replyingTo.senderName } : undefined
-      });
-      setMessage('');
-      if (onCancelReply) onCancelReply();
+        onSend(trimmedMessage, { 
+          mentions: mentions.length > 0 ? mentions : undefined,
+          parentId: replyingTo?.id,
+          replyTo: replyingTo ? { text: replyingTo.text, senderName: replyingTo.senderName } : undefined
+        });
+        setMessage('');
+        if (onCancelReply) onCancelReply();
+      }
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
@@ -135,7 +161,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
   return (
     <div className="flex flex-col w-full relative">
       {/* Reply Preview */}
-      {replyingTo && (
+      {replyingTo && !editingMessage && (
         <div className="bg-secondary/30 border-b border-border/50">
           <div className="px-4 py-2 flex justify-between items-center">
             <div className="flex-1 min-w-0 flex items-center gap-2">
@@ -152,15 +178,33 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
         </div>
       )}
 
+      {/* Edit Preview */}
+      {editingMessage && (
+        <div className="bg-primary/5 border-b border-border/50">
+          <div className="px-4 py-2 flex justify-between items-center">
+            <div className="flex-1 min-w-0 flex items-center gap-2">
+              <div className="w-1 h-10 bg-primary rounded-full"></div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-primary">Editing message</p>
+                <p className="text-sm text-muted-foreground truncate">{editingMessage.text}</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted transition-all" onClick={onCancelEdit}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Mention Dropdown */}
       {showMentions && filteredMentionUsers.length > 0 && (
-        <div className="absolute bottom-full left-4 right-4 mb-2 bg-card border border-border shadow-xl rounded-xl overflow-hidden animate-scale-in z-50">
+        <div className="absolute bottom-full left-4 right-4 mb-2 bg-card border border-border shadow-xl rounded-sm overflow-hidden animate-scale-in z-50">
           <ScrollArea className="h-48">
             <div className="p-2 space-y-1">
               {filteredMentionUsers.map(u => (
                 <button
                   key={u.uid}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent text-left rounded-lg transition-colors"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent text-left rounded-sm transition-colors"
                   onClick={() => insertMention(u)}
                 >
                   <div 
@@ -236,7 +280,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(function ChatI
               </>
             )}
 
-            <div className="flex-1 bg-secondary/50 rounded-3xl border border-border/50 px-4 py-2 flex items-center gap-2">
+            <div className="flex-1 bg-secondary/50 rounded-sm border border-border/50 px-4 py-2 flex items-center gap-2">
               <Textarea
                 ref={textareaRef}
                 value={message}

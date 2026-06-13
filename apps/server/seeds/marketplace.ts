@@ -135,7 +135,7 @@ const DUMMY_LISTINGS = [
   // Furniture
   {
     title: 'Foldable Study Chair (Comfortable)',
-    description: 'Cushioned foldable chair with armrests. Used for 1 year. A bit dusty but structurally solid.',
+    description: 'Cushioned foldable chair with armrests. Used for 1 year. Perfect for long coding or JEE prep sessions. A bit dusty but structurally solid.',
     price: 500,
     category: 'Furniture',
     condition: 'Good',
@@ -145,7 +145,7 @@ const DUMMY_LISTINGS = [
   },
   {
     title: 'Wooden Bookshelf (3-tier)',
-    description: 'Fits nicely beside a hostel bed. Holds about 30–35 books. No damage, colour slightly faded.',
+    description: 'Fits nicely beside a hostel bed. Holds about 30–35 books like RD Sharma and HC Verma. No damage, colour slightly faded.',
     price: 700,
     category: 'Furniture',
     condition: 'Used',
@@ -274,9 +274,9 @@ const DUMMY_LISTINGS = [
 
   // Other
   {
-    title: 'Electric Kettle 1L (Prestige)',
-    description: 'Perfect for hostel nights. Boils fast, no leaks. Comes with original lid.',
-    price: 500,
+    title: 'Milton Thermosteel Flask (1L)',
+    description: 'Keeps water hot for Maggi or tea in the winter. Very little use, selling because I got a new one.',
+    price: 350,
     category: 'Other',
     condition: 'Good',
     images: [
@@ -284,9 +284,9 @@ const DUMMY_LISTINGS = [
     ],
   },
   {
-    title: 'Table Lamp with USB Charging Port',
-    description: 'White LED, 3 brightness levels. USB port on the base. Works fine, selling because going home.',
-    price: 350,
+    title: 'Pigeon Electric Kettle (1.5L)',
+    description: 'Essential for hostel life! Ideal for making Maggi, coffee, and tea at 2 AM. Very clean.',
+    price: 400,
     category: 'Other',
     condition: 'Like New',
     images: [
@@ -364,7 +364,7 @@ export async function seedMarketplace(students: StudentSeed[] = []) {
     created++;
   }
 
-  console.log(`  ✓ Created ${created} marketplace listings`);
+  console.log(`   Created ${created} marketplace listings`);
 
   // Seed some chats
   const listings = await prisma.marketplaceListing.findMany({ take: 5, orderBy: { createdAt: 'desc' } });
@@ -388,5 +388,26 @@ export async function seedMarketplace(students: StudentSeed[] = []) {
     });
     chatsCreated++;
   }
-  console.log(`  ✓ Created ${chatsCreated} marketplace chats`);
+  console.log(`   Created ${chatsCreated} marketplace chats`);
+
+  // Seed Bookmarks
+  let bookmarksCreated = 0;
+  for (const listing of listings) {
+    const bookmarker = studentPool.find(s => s.id !== listing.sellerId);
+    if (!bookmarker) continue;
+    
+    // Ignore duplicate errors if any
+    try {
+      await prisma.marketplaceBookmark.create({
+        data: {
+          userId: bookmarker.id,
+          listingId: listing.id,
+        }
+      });
+      bookmarksCreated++;
+    } catch (e) {
+      // Ignored
+    }
+  }
+  console.log(`   Created ${bookmarksCreated} marketplace bookmarks`);
 }

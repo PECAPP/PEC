@@ -1,6 +1,5 @@
 'use client';
-
-import { motion } from "framer-motion";
+import { FileText, Sparkles } from "lucide-react";
 import { LoadingGrid } from "@/components/common/AsyncState";
 import { useResumeBuilder } from "@/hooks/useResumeBuilder";
 
@@ -10,11 +9,13 @@ import { ResumeEditor } from "./components/ResumeEditor";
 import { ResumePreview } from "./components/ResumePreview";
 import dynamic from "next/dynamic";
 
+import { Tabs, TabsList, TabsTrigger } from "@pec/ui";
+
 const ResumeAnalyzerPanel = dynamic(
   () => import("./components/ResumeAnalyzerPanel").then((mod) => mod.ResumeAnalyzerPanel),
   {
     ssr: false,
-    loading: () => <div className="card-elevated ui-card-pad min-h-[320px] animate-pulse" />,
+    loading: () => <div className="bg-card border border-border/40 rounded-sm shadow-sm p-4 md:p-6 min-h-[320px] animate-pulse" />,
   },
 );
 
@@ -51,21 +52,23 @@ export default function ResumeBuilderIvyLeague() {
     uploadedFile,
     setUploadedFile,
     settings,
+    analysisNotes,
+    setAnalysisNotes,
   } = useResumeBuilder();
 
   if (loading) {
     return (
-      <div className="p-8 space-y-8 max-w-7xl mx-auto">
-        <div className="h-10 w-64 bg-muted rounded-md animate-pulse" />
-        <LoadingGrid count={3} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" itemClassName="h-48 rounded-xl" />
+      <div className="space-y-8">
+        <div className="h-10 w-64 bg-muted rounded-sm animate-pulse" />
+        <LoadingGrid count={3} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" itemClassName="h-48 rounded-sm" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-12 space-y-6">
+    <div className="flex flex-col h-full space-y-6 w-full">
       <ResumeHeader
-        settings={settings}
+        _settings={settings}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         zoom={zoom}
@@ -78,7 +81,14 @@ export default function ResumeBuilderIvyLeague() {
         downloadPDF={downloadPDF}
       />
 
-      <div className="w-full mx-auto px-4 lg:px-8 py-6">
+      <div className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="mb-6">
+            <TabsList>
+              <TabsTrigger value="builder"><FileText className="w-3.5 h-3.5 mr-1.5" />Builder</TabsTrigger>
+              <TabsTrigger value="analyzer"><Sparkles className="w-3.5 h-3.5 mr-1.5" />Evaluation</TabsTrigger>
+            </TabsList>
+          </div>
         {activeTab === "builder" && (
           <div className="grid xl:grid-cols-12 gap-8 items-start">
             {!preview && (
@@ -115,8 +125,11 @@ export default function ResumeBuilderIvyLeague() {
             setJobDescription={setJobDescription}
             analysisResult={analysisResult}
             onAnalyze={() => handleAnalyze()}
+            analysisNotes={analysisNotes}
+            setAnalysisNotes={setAnalysisNotes}
           />
         )}
+        </Tabs>
       </div>
     </div>
   );

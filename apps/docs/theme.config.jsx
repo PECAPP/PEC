@@ -1,7 +1,7 @@
 export default {
   logo: <strong>PEC App Documentation</strong>,
   project: {
-    link: 'https://github.com/pec-app/omnifow',
+    link: 'https://github.com/pecapp/pec',
   },
   useNextSeoProps() {
     return {

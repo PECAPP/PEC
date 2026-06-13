@@ -24,8 +24,7 @@ export class CampusMapRepository {
     };
 
     const total = await this.prisma.campusMapRegion.count({ where });
-    const items = await this.prisma.campusMapRegion.findMany({
-      where,
+    const items = await this.prisma.campusMapRegion.findMany({ where,
       orderBy: { [query.sortBy ?? 'createdAt']: query.sortOrder ?? 'asc' },
       take: query.limit,
       skip: query.offset,
@@ -43,7 +42,7 @@ export class CampusMapRepository {
       data: {
         ...data,
         description: data.description ?? '',
-      },
+      } as any,
     });
   }
 
@@ -67,8 +66,7 @@ export class CampusMapRepository {
     };
 
     const total = await this.prisma.campusMapRoad.count({ where });
-    const items = await this.prisma.campusMapRoad.findMany({
-      where,
+    const items = await this.prisma.campusMapRoad.findMany({ where,
       orderBy: { [query.sortBy ?? 'createdAt']: query.sortOrder ?? 'asc' },
       take: query.limit,
       skip: query.offset,

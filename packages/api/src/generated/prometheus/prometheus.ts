@@ -20,10 +20,8 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -49,7 +47,7 @@ export const getPrometheusControllerIndexV1Url = () => {
 
 export const prometheusControllerIndexV1 = async ( options?: RequestInit): Promise<prometheusControllerIndexV1Response> => {
 
-  return customInstance<prometheusControllerIndexV1Response>(getPrometheusControllerIndexV1Url(),
+  return fetchWithAuth<prometheusControllerIndexV1Response>(getPrometheusControllerIndexV1Url(),
   {
     ...options,
     method: 'GET'
@@ -69,16 +67,16 @@ export const getPrometheusControllerIndexV1QueryKey = () => {
     }
 
 
-export const getPrometheusControllerIndexV1QueryOptions = <TData = Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getPrometheusControllerIndexV1QueryOptions = <TData = Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getPrometheusControllerIndexV1QueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof prometheusControllerIndexV1>>> = ({ signal }) => prometheusControllerIndexV1({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof prometheusControllerIndexV1>>> = ({ signal }) => prometheusControllerIndexV1({ signal });
 
 
 
@@ -98,7 +96,7 @@ export function usePrometheusControllerIndexV1<TData = Awaited<ReturnType<typeof
           TError,
           Awaited<ReturnType<typeof prometheusControllerIndexV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function usePrometheusControllerIndexV1<TData = Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError = unknown>(
@@ -108,16 +106,16 @@ export function usePrometheusControllerIndexV1<TData = Awaited<ReturnType<typeof
           TError,
           Awaited<ReturnType<typeof prometheusControllerIndexV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function usePrometheusControllerIndexV1<TData = Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function usePrometheusControllerIndexV1<TData = Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof prometheusControllerIndexV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

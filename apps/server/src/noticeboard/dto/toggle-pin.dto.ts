@@ -1,6 +1,11 @@
-import { IsBoolean } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class TogglePinDto {
-  @IsBoolean()
-  pinned!: boolean;
+export const togglePinSchema = z.object({
+  pinned: z.boolean(),
+});
+
+
+
+export class TogglePinDto extends createZodDto(togglePinSchema) {
 }

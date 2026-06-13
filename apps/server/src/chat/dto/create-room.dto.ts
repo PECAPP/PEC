@@ -1,22 +1,13 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsOptional,
-  IsString,
-  IsUUID,
-  MinLength,
-} from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateRoomDto {
-  @IsString()
-  @MinLength(2)
-  name: string;
+export const createRoomSchema = z.object({
+  name: z.string(),
+  isGroup: z.boolean().optional(),
+  userIds: z.array(z.any()),
+});
 
-  @IsOptional()
-  @IsBoolean()
-  isGroup?: boolean;
 
-  @IsArray()
-  @IsUUID('4', { each: true })
-  userIds: string[];
+
+export class CreateRoomDto extends createZodDto(createRoomSchema) {
 }

@@ -1,7 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as ExcelJS from 'exceljs';
 import * as bcrypt from 'bcrypt';
+import { S3Service } from '../common/services/s3.service';
 
 @Injectable()
 export class AdminService {
@@ -9,7 +10,7 @@ export class AdminService {
     const [students, faculty, courses, departments] = await Promise.all([
       this.prisma.user.count({ where: { roles: { some: { role: { name: 'student' } } } } }),
       this.prisma.user.count({ where: { roles: { some: { role: { name: 'faculty' } } } } }),
-      this.prisma.course.count({ where: { deletedAt: null } }),
+      this.prisma.course.count(),
       this.prisma.department.count(),
     ]);
 
@@ -21,15 +22,31 @@ export class AdminService {
     };
   }
 
-  constructor(private readonly prisma: PrismaService) {}
+  async getAuditLogs(limit: number = 100, offset: number = 0) {
+    const [items, total] = await Promise.all([
+      this.prisma.auditLog.findMany({
+        take: limit,
+        skip: offset,
+        orderBy: { createdAt: 'desc' }
+      }),
+      this.prisma.auditLog.count()
+    ]);
+    return { items, total, limit, offset };
+  }
 
-  async processUserBulk(file: Express.Multer.File) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3Service: S3Service,
+  ) {}
+
+  async processUserBulk(fileKey: string) {
+    const buffer = await this.s3Service.getObjectBuffer(fileKey);
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(file.buffer as any);
+    await workbook.xlsx.load(buffer as any);
     const worksheet = workbook.worksheets[0];
 
     const data: any[] = [];
-    let headers: string[] = [];
+    const headers: string[] = [];
 
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) {
@@ -82,13 +99,14 @@ export class AdminService {
     return results;
   }
 
-  async processAttendanceBulk(file: Express.Multer.File) {
+  async processAttendanceBulk(fileKey: string) {
+    const buffer = await this.s3Service.getObjectBuffer(fileKey);
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(file.buffer as any);
+    await workbook.xlsx.load(buffer as any);
     const worksheet = workbook.worksheets[0];
 
     const data: any[] = [];
-    let headers: string[] = [];
+    const headers: string[] = [];
 
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) {

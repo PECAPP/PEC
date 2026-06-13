@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { SendMessageDto } from './dto/send-message.dto';
+import { EventsGateway } from '../events/events.gateway';
 
 type ClubMedia = {
   url: string;
@@ -19,7 +20,10 @@ type ClubMedia = {
 export class ChatService {
   private static readonly CLUB_PREFIX = 'CLUB::';
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventsGateway: EventsGateway,
+  ) {}
 
   private isAdmin(userRoles: string[] = []) {
     return userRoles.includes('college_admin');
@@ -72,8 +76,7 @@ export class ChatService {
       return this.findDefaultRoomsForCollegeAdmin(userId);
     }
 
-    const userChatRooms = await this.prisma.userChatRoom.findMany({
-      where: { userId },
+    const userChatRooms = await this.prisma.userChatRoom.findMany({ where: { userId },
       include: {
         chatRoom: {
           include: {
@@ -96,8 +99,7 @@ export class ChatService {
     const rooms = userChatRooms.map((ucr) => ucr.chatRoom);
 
     if (isFaculty) {
-      const clubs = await this.prisma.club.findMany({
-        select: { chatRoomId: true },
+      const clubs = await this.prisma.club.findMany({ select: { chatRoomId: true },
       });
       const clubRoomIds = new Set(clubs.map((club) => club.chatRoomId));
       return rooms.filter(
@@ -109,8 +111,7 @@ export class ChatService {
   }
 
   private async findDefaultRoomsForCollegeAdmin(userId: string) {
-    const departments = await this.prisma.department.findMany({
-      select: {
+    const departments = await this.prisma.department.findMany({ select: {
         name: true,
         timetableLabel: true,
       },
@@ -126,13 +127,11 @@ export class ChatService {
     });
 
     const clubRoomIds = (
-      await this.prisma.club.findMany({
-        select: { chatRoomId: true },
+      await this.prisma.club.findMany({ select: { chatRoomId: true },
       })
     ).map((club) => club.chatRoomId);
 
-    const rooms = await this.prisma.chatRoom.findMany({
-      where: {
+    const rooms = await this.prisma.chatRoom.findMany({ where: {
         OR: [
           {
             isGroup: true,
@@ -164,8 +163,7 @@ export class ChatService {
 
     const roomIds = rooms.map((room) => room.id);
     if (roomIds.length > 0) {
-      const existingMemberships = await this.prisma.userChatRoom.findMany({
-        where: {
+      const existingMemberships = await this.prisma.userChatRoom.findMany({ where: {
           userId,
           chatRoomId: { in: roomIds },
         },
@@ -199,8 +197,7 @@ export class ChatService {
       throw new ForbiddenException('You are not a participant of this room');
     }
 
-    return this.prisma.message.findMany({
-      where: { chatRoomId: roomId },
+    return this.prisma.message.findMany({ where: { chatRoomId: roomId },
       orderBy: { createdAt: 'asc' },
       take: limit,
       include: {
@@ -252,7 +249,7 @@ export class ChatService {
       throw new ForbiddenException('You are not a participant of this room');
     }
 
-    return this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content: dto.content,
         senderId,
@@ -267,12 +264,65 @@ export class ChatService {
         },
       },
     });
+
+    // Notify all users in the room
+    const room = await this.prisma.chatRoom.findUnique({
+      where: { id: dto.chatRoomId },
+      include: { participants: true },
+    });
+    
+    if (room) {
+      room.participants.forEach(p => {
+        this.eventsGateway.emitToUser(p.userId, 'newMessage', message);
+      });
+    }
+
+    return message;
+  }
+
+  async editMessage(messageId: string, userId: string, newContent: string) {
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+    });
+
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+
+    if (message.senderId !== userId) {
+      throw new ForbiddenException('You can only edit your own messages');
+    }
+
+    const updatedMessage = await this.prisma.message.update({
+      where: { id: messageId },
+      data: { content: newContent },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    const room = await this.prisma.chatRoom.findUnique({
+      where: { id: message.chatRoomId },
+      include: { participants: true },
+    });
+    
+    if (room) {
+      room.participants.forEach(p => {
+        this.eventsGateway.emitToUser(p.userId, 'messageEdited', updatedMessage);
+      });
+    }
+
+    return updatedMessage;
   }
 
   async getChatUsers(query: string) {
     if (!query || query.trim().length === 0) {
-      return this.prisma.user.findMany({
-        select: {
+      return this.prisma.user.findMany({ select: {
           id: true,
           name: true,
           email: true,
@@ -282,8 +332,7 @@ export class ChatService {
       });
     }
 
-    return this.prisma.user.findMany({
-      where: {
+    return this.prisma.user.findMany({ where: {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { email: { contains: query, mode: 'insensitive' } },
@@ -311,9 +360,22 @@ export class ChatService {
       throw new ForbiddenException('You can only delete your own messages');
     }
 
-    return this.prisma.message.delete({
+    const deletedMessage = await this.prisma.message.delete({
       where: { id: messageId },
     });
+
+    const room = await this.prisma.chatRoom.findUnique({
+      where: { id: message.chatRoomId },
+      include: { participants: true },
+    });
+
+    if (room) {
+      room.participants.forEach(p => {
+        this.eventsGateway.emitToUser(p.userId, 'messageDeleted', { messageId, roomId: message.chatRoomId });
+      });
+    }
+
+    return deletedMessage;
   }
 
   async listClubs(userId: string, userRoles: string[] = []) {
@@ -324,8 +386,7 @@ export class ChatService {
       return [];
     }
 
-    const clubs = await this.prisma.club.findMany({
-      include: {
+    const clubs = await this.prisma.club.findMany({ include: {
         chatRoom: {
           include: {
             participants: {
@@ -397,8 +458,7 @@ export class ChatService {
       throw new BadRequestException('Club already exists');
     }
 
-    const adminUsers = await this.prisma.user.findMany({
-      where: { roles: { some: { role: { name: 'college_admin' } } } },
+    const adminUsers = await this.prisma.user.findMany({ where: { roles: { some: { role: { name: 'college_admin' } } } },
       select: { id: true },
     });
 
@@ -545,8 +605,7 @@ export class ChatService {
       return [];
     }
 
-    const requests = await this.prisma.clubJoinRequest.findMany({
-      where: isAdmin ? {} : { requesterId: userId },
+    const requests = await this.prisma.clubJoinRequest.findMany({ where: isAdmin ? {} : { requesterId: userId },
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
       include: {
         club: { select: { id: true, name: true, chatRoomId: true } },
@@ -681,7 +740,7 @@ export class ChatService {
     const club = await this.findClubByReference(clubRoomId);
     await this.ensureParticipant(club.chatRoomId, senderId);
 
-    return this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content: trimmed,
         senderId,
@@ -696,5 +755,18 @@ export class ChatService {
         },
       },
     });
+
+    const clubRoom = await this.prisma.chatRoom.findUnique({
+      where: { id: club.chatRoomId },
+      include: { participants: true },
+    });
+
+    if (clubRoom) {
+      clubRoom.participants.forEach(p => {
+        this.eventsGateway.emitToUser(p.userId, 'newMessage', message);
+      });
+    }
+
+    return message;
   }
 }

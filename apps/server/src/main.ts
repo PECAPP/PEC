@@ -1,33 +1,25 @@
+import './tracing'; // Initialize OpenTelemetry before anything else
+// Strictly validate environment variables on boot
 try { require('dotenv/config'); } catch (e) {}
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { join } from 'path';
-import { Logger } from 'nestjs-pino';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useLogger(app.get(Logger));
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({ trustProxy: true }),
+    { bufferLogs: true }
+  );
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   configureApp(app);
 
-  let protoPath = join(process.cwd(), '../../packages/protos/hello.proto');
-  if (!require('fs').existsSync(protoPath)) {
-    protoPath = join(process.cwd(), 'packages/protos/hello.proto');
-  }
-  if (!require('fs').existsSync(protoPath)) {
-    protoPath = '/app/packages/protos/hello.proto';
-  }
 
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.GRPC,
-    options: {
-      package: 'hello',
-      protoPath,
-      url: '0.0.0.0:50051',
-    },
-  });
 
   // Also connect a RabbitMQ microservice listener so this app can consume events
   app.connectMicroservice<MicroserviceOptions>({
@@ -62,6 +54,14 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   await app.startAllMicroservices();
-  await app.listen(process.env.PORT ?? 4000, '0.0.0.0');
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
+
+// trigger rebuild
+
+// trigger rebuild again
+
+// trigger rebuild again 3
+// trigger 4

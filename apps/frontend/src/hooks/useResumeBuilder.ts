@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCollegeSettings } from "@/hooks/useCollegeSettings";
-import api from "@pec/api";
-import { AXIOS_INSTANCE } from "@pec/api";
+import { api } from '@pec/api';
+import { safeLocalStorage } from "@/lib/ssr-safe";
 import {
   ResumeData,
   PersonalInfo,
@@ -104,12 +104,13 @@ export function useResumeBuilder() {
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [analysisNotes, setAnalysisNotes] = useState("");
 
   const getDraftStorageKey = (uid?: string | null) => `${RESUME_DRAFT_STORAGE_KEY_PREFIX}${uid || "guest"}`;
 
   const readLocalResumeDraft = useCallback((uid?: string | null): ResumeData | null => {
     try {
-      const raw = localStorage.getItem(getDraftStorageKey(uid));
+      const raw = safeLocalStorage.get(getDraftStorageKey(uid));
       if (!raw) return null;
       return JSON.parse(raw) as ResumeData;
     } catch {
@@ -118,7 +119,7 @@ export function useResumeBuilder() {
   }, []);
 
   const writeLocalResumeDraft = useCallback((payload: ResumeData, uid?: string | null) => {
-    localStorage.setItem(getDraftStorageKey(uid), JSON.stringify(payload));
+    safeLocalStorage.set(getDraftStorageKey(uid), JSON.stringify(payload));
   }, []);
 
   useEffect(() => {
@@ -144,12 +145,12 @@ export function useResumeBuilder() {
         const localDraft = readLocalResumeDraft(user.uid);
         let profileDoc: any = { exists: () => false, data: () => ({}) };
         try {
-          const { data: pRes } = await AXIOS_INSTANCE.get('/api/v1/student-portfolio?userId=' + user.uid);
+          const { data: pRes } = await api.get('/student-portfolio?userId=' + user.uid);
           const pData = pRes?.data || pRes;
           if (pData) {
             profileDoc = { exists: () => true, data: () => pData };
           }
-        } catch (e) { /* no profile yet */ }
+        } catch (_e) { /* no profile yet */ }
         if (profileDoc.exists()) {
           const profile = profileDoc.data();
           setResumeData((prev) => {
@@ -210,7 +211,7 @@ export function useResumeBuilder() {
     try {
       writeLocalResumeDraft(resumeData, user?.uid || null);
       if (user?.uid) {
-        await AXIOS_INSTANCE.patch('/api/v1/student-portfolio/' + user.uid, {
+        await api.patch('/student-portfolio/' + user.uid, {
             phone: resumeData.personalInfo.phone || null,
             address: resumeData.personalInfo.location || null,
           });
@@ -550,5 +551,8 @@ export function useResumeBuilder() {
     uploadedFile,
     setUploadedFile,
     settings,
+    analysisNotes,
+    setAnalysisNotes,
   };
 }
+

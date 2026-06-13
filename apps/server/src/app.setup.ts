@@ -1,16 +1,22 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { NextFunction, Request, Response, json, urlencoded } from 'express';
-import helmet from 'helmet';
+import { INestApplication } from '@nestjs/common';
+import { AuditInterceptor } from './interceptors/audit.interceptor';
+import { ZodValidationFilter } from './filters/zod-validation.filter';
+import { ZodValidationPipe } from 'nestjs-zod';
+import { FastifyRequest, FastifyReply } from 'fastify';
+import helmet from '@fastify/helmet';
 import {
   getAllowedCorsOrigins,
   getBodySizeLimit,
   getCorsConfig,
   isProduction,
 } from './config/runtime-config';
-
 import { VersioningType } from '@nestjs/common';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import fastifyCookie from '@fastify/cookie';
 
 export const configureApp = (app: INestApplication): void => {
+  const fastifyApp = app as NestFastifyApplication;
+  fastifyApp.register(fastifyCookie);
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
@@ -37,7 +43,7 @@ export const configureApp = (app: INestApplication): void => {
       }
 
       console.error(`[CORS Error] Origin rejected: "${origin}". Allowed origins:`, Array.from(allowedOrigins));
-      callback(new Error(`Origin not allowed by CORS: ${origin}`));
+      callback(null, false);
     },
     methods: corsConfig.allowedMethods,
     allowedHeaders: corsConfig.allowedHeaders,
@@ -46,66 +52,55 @@ export const configureApp = (app: INestApplication): void => {
     maxAge: corsConfig.maxAgeSeconds,
   });
 
-  app.use(
-    helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'none'"],
-          baseUri: ["'self'"],
-          connectSrc: ["'self'"],
-          fontSrc: ["'self'", 'data:'],
-          formAction: ["'self'"],
-          frameAncestors: ["'none'"],
-          imgSrc: ["'self'", 'data:'],
-          objectSrc: ["'none'"],
-          scriptSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          upgradeInsecureRequests: isProduction() ? [] : null,
-        },
+  fastifyApp.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"],
+        baseUri: ["'self'"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'", 'data:'],
+        formAction: ["'self'"],
+        frameAncestors: ["'none'"],
+        imgSrc: ["'self'", 'data:'],
+        objectSrc: ["'none'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        upgradeInsecureRequests: isProduction() ? [] : null,
       },
-      frameguard: { action: 'deny' },
-      hsts: isProduction()
-        ? {
-            maxAge: 31_536_000,
-            includeSubDomains: true,
-            preload: true,
-          }
-        : false,
-      noSniff: true,
-      referrerPolicy: { policy: 'no-referrer' },
-    }),
-  );
+    },
+    frameguard: { action: 'deny' },
+    hsts: isProduction()
+      ? {
+          maxAge: 31_536_000,
+          includeSubDomains: true,
+          preload: true,
+        }
+      : false,
+    crossOriginResourcePolicy: false,
+  });
 
-  const expressApp = app.getHttpAdapter().getInstance();
-  expressApp.disable('x-powered-by');
-  expressApp.set('trust proxy', 1);
-  expressApp.use(json({ limit: bodySizeLimit }));
-  expressApp.use(urlencoded({ extended: false, limit: bodySizeLimit }));
+  // Fastify handles trust proxy and x-powered-by differently, usually in the adapter or via direct config.
 
   if (isProduction()) {
-    app.use((req: Request, res: Response, next: NextFunction) => {
+    fastifyApp.getHttpAdapter().getInstance().addHook('onRequest', (req: FastifyRequest, reply: FastifyReply, done: () => void) => {
       const forwardedProto = String(req.headers['x-forwarded-proto'] ?? '')
         .split(',')[0]
         .trim();
 
-      if (req.secure || forwardedProto === 'https') {
-        next();
+      if (req.protocol === 'https' || forwardedProto === 'https') {
+        done();
         return;
       }
 
-      res.redirect(301, `https://${req.headers.host}${req.url}`);
+      reply.status(301).redirect(`https://${req.hostname}${req.url}`);
     });
   }
 
+  app.useGlobalInterceptors(new AuditInterceptor());
+  app.useGlobalFilters(new ZodValidationFilter());
+
   app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
+    new ZodValidationPipe()
   );
 };
 

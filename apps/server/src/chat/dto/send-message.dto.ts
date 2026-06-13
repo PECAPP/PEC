@@ -1,11 +1,12 @@
-import { IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class SendMessageDto {
-  @IsUUID('4')
-  chatRoomId: string;
+export const sendMessageSchema = z.object({
+  chatRoomId: z.string(),
+  content: z.string(),
+});
 
-  @IsString()
-  @MinLength(1)
-  @MaxLength(5000)
-  content: string;
+
+
+export class SendMessageDto extends createZodDto(sendMessageSchema) {
 }

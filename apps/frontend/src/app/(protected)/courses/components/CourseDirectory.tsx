@@ -5,24 +5,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger, Badge, ImageWithBlur, Input, 
 import { useState, useTransition, useOptimistic } from 'react';
 import { 
   Search, 
-  GraduationCap, 
-  Loader2, 
-  BookOpen, 
-  Clock, 
-  Plus, 
-  X,
-  CheckCircle2,
+  BookOpen,
   Filter,
-  Layers,
-  ChevronRight
+  Layers
 } from 'lucide-react';
 
-import { EmptyState, LoadingGrid } from '@/components/common/AsyncState';
 import { CourseCard } from './CourseCard';
 import { toast } from 'sonner';
 import { enrollInCourseAction, dropCourseAction } from '../actions';
 import { Course } from '@pec/shared';
-import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CourseDirectoryProps {
@@ -34,7 +25,7 @@ interface CourseDirectoryProps {
 }
 
 export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnrolledCourses = [], user, studentProfile }: CourseDirectoryProps) {
-  const [courses, setCourses] = useState(initialCourses);
+  const [courses, _setCourses] = useState(initialCourses);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState(Array.from(new Set(initialEnrolledIds)));
   
   const [optimisticEnrolledIds, setOptimisticEnrolledIds] = useOptimistic(
@@ -47,11 +38,11 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
 
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState(studentProfile?.department || 'all');
-  const [semesterFilter, setSemesterFilter] = useState(studentProfile?.semester?.toString() || 'all');
+  const [semesterFilter, _setSemesterFilter] = useState(studentProfile?.semester?.toString() || 'all');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
-  const [loadingSchedule, setLoadingSchedule] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [_loadingSchedule, setLoadingSchedule] = useState(false);
+  const [_isPending, startTransition] = useTransition();
 
   const handleEnroll = async (course: Course) => {
     startTransition(async () => {
@@ -88,14 +79,14 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
     });
   };
 
-  const fetchCourseSchedule = async (courseId: string) => {
+  const fetchCourseSchedule = async (_courseId: string) => {
      setLoadingSchedule(true);
      setTimeout(() => setLoadingSchedule(false), 500);
   };
 
   const departments = [...new Set(courses.map(c => c.department))];
 
-  const getCourseImage = (dept: string, name: string) => {
+  const getCourseImage = (dept: string, _name: string) => {
     const deptImages: Record<string, string> = {
       'Computer Science': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80',
       'Electronics': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
@@ -143,17 +134,19 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
     <div className="space-y-8 pb-10">
       <Tabs defaultValue="enrolled" className="space-y-10 group/tabs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <TabsList className="h-14 p-1.5 bg-muted/20 backdrop-blur-md rounded-2xl border border-border/20 gap-1 relative overflow-hidden">
+          <TabsList className="h-14 p-1.5 bg-muted/20 backdrop-blur-md rounded-sm border border-border/20 gap-1 relative overflow-hidden">
             <TabsTrigger 
               value="enrolled" 
-              className="rounded-xl px-8 h-full font-bold text-[10px] uppercase tracking-widest data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-inner transition-all duration-300"
+              className="rounded-sm px-4 md:px-8 h-full font-medium text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-inner transition-all duration-300 gap-2"
             >
+              <BookOpen className="w-4 h-4" />
               My Curriculum ({enrolled.length})
             </TabsTrigger>
             <TabsTrigger 
               value="available" 
-              className="rounded-xl px-8 h-full font-bold text-[10px] uppercase tracking-widest data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-inner transition-all duration-300"
+              className="rounded-sm px-4 md:px-8 h-full font-medium text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-inner transition-all duration-300 gap-2"
             >
+              <Layers className="w-4 h-4" />
               Open Enrollment ({available.length})
             </TabsTrigger>
           </TabsList>
@@ -163,19 +156,19 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 transition-colors group-focus-within/search:text-primary" />
                <Input 
                 placeholder="Search catalog..." 
-                className="h-14 pl-11 rounded-2xl bg-white/5 border-border/20 focus:bg-white/10 hover:bg-white/10 transition-all font-bold placeholder:font-normal placeholder:text-muted-foreground/60 shadow-inner"
+                className="h-14 pl-11 rounded-sm bg-white/5 border-border/20 focus:bg-white/10 hover:bg-white/10 transition-all font-bold placeholder:font-normal placeholder:text-muted-foreground/60 shadow-inner"
                 value={searchTerm} 
                 onChange={e => setSearchTerm(e.target.value)} 
                />
              </div>
              
              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-               <SelectTrigger className="h-14 w-[180px] rounded-2xl bg-white/5 border-border/20 hover:bg-white/10 font-bold transition-all shadow-inner">
+               <SelectTrigger className="h-14 w-[180px] rounded-sm bg-white/5 border-border/20 hover:bg-white/10 font-bold transition-all shadow-inner">
                  <div className="flex items-center gap-2"><Filter className="w-3.5 h-3.5 text-muted-foreground/80" /><SelectValue placeholder="Org" /></div>
                </SelectTrigger>
-               <SelectContent className="rounded-2xl border-border/20 shadow-2xl bg-card/95 backdrop-blur-xl">
-                  <SelectItem value="all" className="font-bold text-[10px] uppercase tracking-widest py-3">All Departments</SelectItem>
-                  {departments.map(d => <SelectItem key={d} value={d} className="font-bold text-[10px] uppercase tracking-widest py-3">{d}</SelectItem>)}
+               <SelectContent className="rounded-sm border-border/20 shadow-2xl bg-card/95 backdrop-blur-xl">
+                  <SelectItem value="all" className="font-medium text-sm  py-3">All Departments</SelectItem>
+                  {departments.map(d => <SelectItem key={d} value={d} className="font-medium text-sm  py-3">{d}</SelectItem>)}
                </SelectContent>
              </Select>
           </div>
@@ -201,8 +194,8 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
             </motion.div>
           </AnimatePresence>
           {available.length === 0 && (
-            <div className="py-32 text-center rounded-3xl border-2 border-dashed border-border/40 bg-muted/5 flex flex-col items-center gap-6">
-               <div className="p-6 bg-background rounded-full border border-border/40 shadow-sm"><Layers className="w-8 h-8 text-muted-foreground/40" /></div>
+            <div className="py-32 text-center rounded-sm border border-dashed border-border/40 bg-muted/5 flex flex-col items-center gap-6">
+               <div className="p-3 md:p-6 bg-background rounded-full border border-border/40 shadow-sm"><Layers className="w-8 h-8 text-muted-foreground/40" /></div>
                <p className="text-sm font-medium text-muted-foreground italic">No matching elective courses identified in the catalog.</p>
             </div>
           )}
@@ -222,17 +215,17 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
             ))}
           </div>
           {enrolled.length === 0 && (
-            <div className="py-32 text-center rounded-3xl border-2 border-dashed border-border/40 bg-muted/5 flex flex-col items-center gap-6">
-               <div className="p-6 bg-background rounded-full border border-border/40 shadow-sm"><BookOpen className="w-8 h-8 text-muted-foreground/40" /></div>
+            <div className="py-32 text-center rounded-sm border border-dashed border-border/40 bg-muted/5 flex flex-col items-center gap-6">
+               <div className="p-3 md:p-6 bg-background rounded-full border border-border/40 shadow-sm"><BookOpen className="w-8 h-8 text-muted-foreground/40" /></div>
                <p className="text-sm font-medium text-muted-foreground italic">You are not currently enrolled in any courses for the active semester.</p>
-               <Button variant="outline" className="h-12 rounded-xl px-8 font-bold text-[10px] uppercase tracking-widest border-primary/20 text-primary shadow-sm" onClick={() => (document.querySelector('[value="available"]') as any)?.click()}>Explore Electives</Button>
+               <Button variant="outline" className="h-12 rounded-sm px-4 md:px-8 font-medium text-sm  border-border/40 text-primary shadow-sm" onClick={() => (document.querySelector('[value="available"]') as any)?.click()}>Explore Electives</Button>
             </div>
           )}
         </TabsContent>
       </Tabs>
 
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-3xl border-border/20 bg-card/95 backdrop-blur-2xl shadow-2xl">
+        <DialogContent className=" p-0 overflow-hidden rounded-sm border-border/20 bg-card/95 backdrop-blur-2xl shadow-2xl">
            <DialogHeader className="sr-only">
              <DialogTitle>{selectedCourse?.name || 'Course Details'}</DialogTitle>
              <DialogDescription>View course catalog information and syllabus details</DialogDescription>
@@ -244,40 +237,40 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent opacity-90" />
                    <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between">
                       <div className="space-y-1.5">
-                        <Badge className="bg-primary/20 text-primary border-primary/30 backdrop-blur-md px-2.5 py-0.5 font-bold text-[9px] tracking-widest uppercase shadow-glow">{selectedCourse.code}</Badge>
-                        <h2 className="text-2xl font-bold tracking-tight text-foreground drop-shadow-md">{selectedCourse.name}</h2>
+                        <Badge className="bg-primary/20 text-primary border border-border/40 backdrop-blur-md px-2.5 py-0.5 font-medium text-xs shadow-md">{selectedCourse.code}</Badge>
+                        <h2 className="text-2xl font-bold tracking-tight text-foreground ">{selectedCourse.name}</h2>
                       </div>
                    </div>
                 </div>
                 
-                <div className="p-6 space-y-6">
+                <div className="p-3 md:p-6 space-y-6">
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
-                         <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Faculty Lead</span>
+                      <div className="bg-white/5 border border-white/5 rounded-sm p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
+                         <span className="text-xs font-medium  text-muted-foreground">Faculty Lead</span>
                          <p className="text-xs font-semibold text-foreground/90">{selectedCourse.facultyName.replace(/\b[A-Z]+\b/g, m => m.charAt(0) + m.slice(1).toLowerCase())}</p>
                       </div>
-                      <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
-                         <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Academic Units</span>
+                      <div className="bg-white/5 border border-white/5 rounded-sm p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
+                         <span className="text-xs font-medium  text-muted-foreground">Academic Units</span>
                          <p className="text-xs font-semibold text-foreground/90">{selectedCourse.credits} Credits</p>
                       </div>
-                      <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
-                         <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Level</span>
+                      <div className="bg-white/5 border border-white/5 rounded-sm p-3 flex flex-col gap-1 transition-colors hover:bg-white/10">
+                         <span className="text-xs font-medium  text-muted-foreground">Level</span>
                          <p className="text-xs font-semibold text-foreground/90">Semester {selectedCourse.semester}</p>
                       </div>
                    </div>
 
                    <div className="space-y-2 px-1">
-                      <h4 className="text-[9px] font-bold uppercase tracking-widest text-primary">Catalog Description</h4>
+                      <h4 className="text-xs font-medium  text-primary">Catalog Description</h4>
                       <p className="text-sm text-foreground/80 leading-relaxed font-medium">
                         {selectedCourse.description || "Comprehensive curriculum details for this institutional module will be provided during the orientation session."}
                       </p>
                    </div>
                    
                    <div className="flex gap-3 pt-4 mt-4 border-t border-border/10">
-                      <Button className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-glow hover:scale-[1.02] transition-all" onClick={() => setShowDetailsDialog(false)}>
+                      <Button className="flex-1 h-11 rounded-sm bg-primary text-primary-foreground font-medium text-sm  shadow-md border border-border/40 hover:scale-[1.02] transition-all" onClick={() => setShowDetailsDialog(false)}>
                          Go to Course Materials
                       </Button>
-                      <Button variant="outline" className="h-11 rounded-xl px-8 font-bold text-[10px] uppercase tracking-widest border-border/20 hover:bg-white/5" onClick={() => setShowDetailsDialog(false)}>Close</Button>
+                      <Button variant="outline" className="h-11 rounded-sm px-4 md:px-8 font-medium text-sm  border-border/20 hover:bg-white/5" onClick={() => setShowDetailsDialog(false)}>Close</Button>
                    </div>
                 </div>
              </div>
@@ -287,4 +280,5 @@ export function CourseDirectory({ initialCourses, initialEnrolledIds, initialEnr
     </div>
   );
 }
+
 

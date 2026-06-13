@@ -29,10 +29,8 @@ import type {
   CreateBackgroundJobDto
 } from '../models';
 
-import { customInstance } from '../../axios-instance';
+import { fetchWithAuth } from '../../api';
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
@@ -65,7 +63,7 @@ export const getBackgroundJobsControllerListV1Url = (params: BackgroundJobsContr
 
 export const backgroundJobsControllerListV1 = async (params: BackgroundJobsControllerListV1Params, options?: RequestInit): Promise<backgroundJobsControllerListV1Response> => {
 
-  return customInstance<backgroundJobsControllerListV1Response>(getBackgroundJobsControllerListV1Url(params),
+  return fetchWithAuth<backgroundJobsControllerListV1Response>(getBackgroundJobsControllerListV1Url(params),
   {
     ...options,
     method: 'GET'
@@ -85,16 +83,16 @@ export const getBackgroundJobsControllerListV1QueryKey = (params?: BackgroundJob
     }
 
 
-export const getBackgroundJobsControllerListV1QueryOptions = <TData = Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError = unknown>(params: BackgroundJobsControllerListV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getBackgroundJobsControllerListV1QueryOptions = <TData = Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError = unknown>(params: BackgroundJobsControllerListV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError, TData>>, }
 ) => {
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getBackgroundJobsControllerListV1QueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>> = ({ signal }) => backgroundJobsControllerListV1(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>> = ({ signal }) => backgroundJobsControllerListV1(params, { signal });
 
 
 
@@ -114,7 +112,7 @@ export function useBackgroundJobsControllerListV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof backgroundJobsControllerListV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useBackgroundJobsControllerListV1<TData = Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError = unknown>(
@@ -124,16 +122,16 @@ export function useBackgroundJobsControllerListV1<TData = Awaited<ReturnType<typ
           TError,
           Awaited<ReturnType<typeof backgroundJobsControllerListV1>>
         > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useBackgroundJobsControllerListV1<TData = Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError = unknown>(
- params: BackgroundJobsControllerListV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: BackgroundJobsControllerListV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useBackgroundJobsControllerListV1<TData = Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError = unknown>(
- params: BackgroundJobsControllerListV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: BackgroundJobsControllerListV1Params, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof backgroundJobsControllerListV1>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -171,7 +169,7 @@ export const getBackgroundJobsControllerEnqueueV1Url = () => {
 
 export const backgroundJobsControllerEnqueueV1 = async (createBackgroundJobDto: CreateBackgroundJobDto, options?: RequestInit): Promise<backgroundJobsControllerEnqueueV1Response> => {
 
-  return customInstance<backgroundJobsControllerEnqueueV1Response>(getBackgroundJobsControllerEnqueueV1Url(),
+  return fetchWithAuth<backgroundJobsControllerEnqueueV1Response>(getBackgroundJobsControllerEnqueueV1Url(),
   {
     ...options,
     method: 'POST',
@@ -184,15 +182,15 @@ export const backgroundJobsControllerEnqueueV1 = async (createBackgroundJobDto: 
 
 
 export const getBackgroundJobsControllerEnqueueV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueV1>>, TError,{data: CreateBackgroundJobDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueV1>>, TError,{data: CreateBackgroundJobDto}, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueV1>>, TError,{data: CreateBackgroundJobDto}, TContext> => {
 
 const mutationKey = ['backgroundJobsControllerEnqueueV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -200,7 +198,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueV1>>, {data: CreateBackgroundJobDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  backgroundJobsControllerEnqueueV1(data,requestOptions)
+          return  backgroundJobsControllerEnqueueV1(data,)
         }
 
 
@@ -215,7 +213,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type BackgroundJobsControllerEnqueueV1MutationError = unknown
 
     export const useBackgroundJobsControllerEnqueueV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueV1>>, TError,{data: CreateBackgroundJobDto}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueV1>>, TError,{data: CreateBackgroundJobDto}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof backgroundJobsControllerEnqueueV1>>,
         TError,
@@ -246,7 +244,7 @@ export const getBackgroundJobsControllerEnqueueAuditLogPruneV1Url = () => {
 
 export const backgroundJobsControllerEnqueueAuditLogPruneV1 = async ( options?: RequestInit): Promise<backgroundJobsControllerEnqueueAuditLogPruneV1Response> => {
 
-  return customInstance<backgroundJobsControllerEnqueueAuditLogPruneV1Response>(getBackgroundJobsControllerEnqueueAuditLogPruneV1Url(),
+  return fetchWithAuth<backgroundJobsControllerEnqueueAuditLogPruneV1Response>(getBackgroundJobsControllerEnqueueAuditLogPruneV1Url(),
   {
     ...options,
     method: 'POST'
@@ -259,15 +257,15 @@ export const backgroundJobsControllerEnqueueAuditLogPruneV1 = async ( options?: 
 
 
 export const getBackgroundJobsControllerEnqueueAuditLogPruneV1MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueAuditLogPruneV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueAuditLogPruneV1>>, TError,void, TContext>, }
 ): UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueAuditLogPruneV1>>, TError,void, TContext> => {
 
 const mutationKey = ['backgroundJobsControllerEnqueueAuditLogPruneV1'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
+const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+      : {mutation: { mutationKey, }};
 
 
 
@@ -275,7 +273,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueAuditLogPruneV1>>, void> = () => {
 
 
-          return  backgroundJobsControllerEnqueueAuditLogPruneV1(requestOptions)
+          return  backgroundJobsControllerEnqueueAuditLogPruneV1()
         }
 
 
@@ -290,7 +288,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type BackgroundJobsControllerEnqueueAuditLogPruneV1MutationError = unknown
 
     export const useBackgroundJobsControllerEnqueueAuditLogPruneV1 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueAuditLogPruneV1>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backgroundJobsControllerEnqueueAuditLogPruneV1>>, TError,void, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof backgroundJobsControllerEnqueueAuditLogPruneV1>>,
         TError,

@@ -83,7 +83,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       );
     }
 
-    response.status(status).json(payload);
+    response.status(status).send(payload);
   }
 
   private mapPrismaErrorToStatus(code: string): number {

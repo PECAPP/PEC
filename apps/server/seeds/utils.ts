@@ -69,47 +69,23 @@ export async function clearDatabase() {
      return;
   }
 
-  const prismaAny = prisma as any;
-  try {
-    await prisma.auditLog.deleteMany();
-    await prismaAny.backgroundJob.deleteMany();
-    await prismaAny.featureFlag.deleteMany();
-    await prisma.attendance.deleteMany();
-    await prisma.message.deleteMany();
-    await prismaAny.notice.deleteMany();
-    await prisma.clubJoinRequest.deleteMany();
-    await prisma.club.deleteMany();
-    await prisma.userChatRoom.deleteMany();
-    await prisma.chatRoom.deleteMany();
-    await prisma.enrollment.deleteMany();
-    await prisma.timetable.deleteMany();
-    await prisma.course.deleteMany();
-    await prisma.job.deleteMany();
-    await prisma.room.deleteMany();
-    await prismaAny.department.deleteMany();
-    await (prisma as any).financeTransaction.deleteMany();
-    await (prisma as any).feeRecord.deleteMany();
-    await prisma.facultyProfile.deleteMany();
-    await prisma.studentProfile.deleteMany();
-    await prisma.passwordResetToken.deleteMany();
-    await prisma.emailVerificationToken.deleteMany();
-    await prisma.refreshToken.deleteMany();
-    await prisma.userRole.deleteMany();
-    await prisma.role.deleteMany();
-    await (prisma as any).marketplaceMessage.deleteMany();
-    await (prisma as any).marketplaceChat.deleteMany();
-    await (prisma as any).marketplaceBookmark.deleteMany();
-    await (prisma as any).marketplaceListing.deleteMany();
-    await (prisma as any).hostelIssue.deleteMany();
-    await (prisma as any).canteenOrderItem.deleteMany();
-    await (prisma as any).canteenOrder.deleteMany();
-    await (prisma as any).canteenItem.deleteMany();
-    await prisma.user.deleteMany();
-    await (prisma as any).academicCalendarEvent.deleteMany();
-    console.log('Database wipe completed.');
-  } catch (error) {
-    console.warn('Wipe encountered issues, likely tables already empty or missing:', (error as any).message);
-  }
+  console.log('Starting full database wipe (Fast Truncate)...');
+  
+  await prisma.$transaction(async (tx) => {
+    // Disable postgres statement timeout for this transaction so it doesn't get killed
+    await tx.$executeRawUnsafe('SET LOCAL statement_timeout = 0;');
+    await tx.$executeRawUnsafe(`
+      DO $$ DECLARE
+        r RECORD;
+      BEGIN
+        FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema() AND tablename != '_prisma_migrations') LOOP
+          EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) || ' CASCADE';
+        END LOOP;
+      END $$;
+    `);
+  }, { timeout: 30000 });
+
+  console.log('Database wipe completed.');
 }
 
 export function encryptField(value: string) {

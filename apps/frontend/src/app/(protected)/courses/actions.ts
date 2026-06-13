@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { getServerSession } from '@/lib/server-auth';
+import { cookies } from 'next/headers';
 
 const enrollmentSchema = z.object({
   courseId: z.string().min(1),
@@ -38,7 +39,7 @@ export async function enrollInCourseAction(prevState: any, formData: FormData) {
         method: 'POST',
         headers: {
            'Content-Type': 'application/json',
-           'Authorization': `Bearer ${session.token}`
+           'Cookie': (await cookies()).toString()
         },
         body: JSON.stringify({
            studentId: session.uid,
@@ -57,7 +58,7 @@ export async function enrollInCourseAction(prevState: any, formData: FormData) {
      revalidatePath('/dashboard');
 
      return { success: true, error: null };
-  } catch (error) {
+  } catch (_error) {
      return { success: false, error: 'An unexpected error occurred' };
   }
 }
@@ -72,7 +73,7 @@ export async function dropCourseAction(courseId: string) {
      const response = await fetch(`${API_URL}/enrollments?studentId=${session.uid}&courseId=${courseId}`, {
         method: 'DELETE',
         headers: {
-           'Authorization': `Bearer ${session.token}`
+           'Cookie': (await cookies()).toString()
         },
      });
 
@@ -84,7 +85,7 @@ export async function dropCourseAction(courseId: string) {
      revalidatePath('/dashboard');
 
      return { success: true };
-  } catch (e) {
+  } catch (_e) {
      return { success: false, error: 'An unexpected error occurred' };
   }
 }

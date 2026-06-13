@@ -25,7 +25,7 @@ export function StatsSkeleton({ count = 2 }: { count?: number }) {
 
 export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number, cols?: number }) {
   return (
-    <div className="card-elevated overflow-hidden border-2 rounded-sm border-border/50">
+    <div className="card-elevated overflow-hidden border rounded-sm border-border/50">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-muted/50 border-b-2 border-border">
@@ -82,7 +82,7 @@ export function AttendanceManagerSkeleton() {
           <Skeleton className="h-11 w-28 bg-muted-foreground/5 rounded-sm" />
         </div>
       </div>
-      <div className="card-elevated p-10 border-2 border-primary/20 bg-muted/5 space-y-10">
+      <div className="card-elevated p-10 border border-primary/20 bg-muted/5 space-y-10">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 space-y-2">
             <Skeleton className="h-3 w-24 bg-muted-foreground/10" />
@@ -109,7 +109,7 @@ export function StudentAttendanceSkeleton() {
         </div>
         <Skeleton className="h-12 w-40 bg-muted-foreground/10 rounded-sm" />
       </div>
-      <div className="card-elevated p-12 border-2 border-primary/20 bg-muted/5 flex flex-col lg:flex-row items-center gap-16">
+      <div className="card-elevated p-12 border border-primary/20 bg-muted/5 flex flex-col lg:flex-row items-center gap-16">
         <Skeleton className="w-48 h-48 rounded-full bg-muted-foreground/10" />
         <div className="flex-1 grid grid-cols-2 gap-12">
           <div className="space-y-2"><Skeleton className="h-3 w-24 bg-muted-foreground/10" /><Skeleton className="h-12 w-16 bg-muted-foreground/10" /></div>
@@ -118,7 +118,7 @@ export function StudentAttendanceSkeleton() {
       </div>
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="card-elevated p-8 border-2 border-border/50 bg-muted/5 space-y-8">
+          <div key={i} className="card-elevated p-8 border border-border/50 bg-muted/5 space-y-8">
             <div className="flex justify-between border-b pb-4 border-border/50">
                <Skeleton className="h-6 w-24 bg-muted-foreground/10" />
                <Skeleton className="h-8 w-12 bg-muted-foreground/10" />

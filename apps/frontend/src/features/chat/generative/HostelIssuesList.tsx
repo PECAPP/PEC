@@ -21,7 +21,7 @@ export const HostelIssuesList = ({ data }: { data: HostelIssuesData }) => {
 
   if (issues.length === 0) {
     return (
-      <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-sm p-5 my-3 text-center text-sm text-gray-500">
         No maintenance issues reported.
       </div>
     );
@@ -51,7 +51,7 @@ export const HostelIssuesList = ({ data }: { data: HostelIssuesData }) => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden my-3">
       <div className="bg-gradient-to-r from-amber-600 to-orange-600 px-4 py-3 flex items-center justify-between text-white">
         <div className="flex items-center gap-2">
           <Wrench className="w-4 h-4" />
@@ -63,10 +63,10 @@ export const HostelIssuesList = ({ data }: { data: HostelIssuesData }) => {
       </div>
       <div className="p-3 space-y-3 max-h-[320px] overflow-y-auto">
         {issues.map((issue, idx) => (
-          <div key={idx} className="border border-gray-100 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors">
+          <div key={idx} className="border border-gray-100 dark:border-gray-700 rounded-sm p-3 hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors">
             <div className="flex justify-between items-start gap-2 mb-1.5">
               <h4 className="font-semibold text-xs text-gray-800 dark:text-gray-200 line-clamp-1">{issue.title || 'Untitled Issue'}</h4>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getStatusStyle(issue.status)}`}>
+              <span className={`text-sm font-medium px-2 py-0.5 rounded border ${getStatusStyle(issue.status)}`}>
                 {issue.status}
               </span>
             </div>
