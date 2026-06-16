@@ -46,7 +46,7 @@
     "@nest-lab/throttler-storage-redis": "^1.2.0",
     "@nestjs/cache-manager": "^3.1.2",
     "@nestjs/common": "^11.0.1",
-    "@nestjs/core": "^11.1.17",
+    "@nestjs/core": "^11.1.27",
     "@nestjs/cqrs": "^11.0.3",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/microservices": "^11.1.24",
