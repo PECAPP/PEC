@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ShieldPlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { safeDocument } from '@/lib/ssr-safe';
 
 interface CustomRoleModalProps {
   onSuccess: () => void;
@@ -43,9 +44,10 @@ export default function CustomRoleModal({ onSuccess }: CustomRoleModalProps) {
     if (!name) return;
     setLoading(true);
     try {
+      const csrfToken = safeDocument.getCookie('csrf_token') ?? '';
       const res = await fetch('/api/v1/roles', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
         body: JSON.stringify({ 
           name, 
           description, 

@@ -2,6 +2,7 @@ import { serverFetch } from '@/lib/server-data';
 import { getServerSession } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
 import { DepartmentsView } from './DepartmentsView';
+import { buildAbilityFor } from '@/lib/casl-ability';
 
 export const metadata = {
   title: 'Departments | PEC APP ERP',
@@ -15,7 +16,7 @@ export default async function DepartmentsPage() {
     redirect('/auth');
   }
 
-  const isAdmin = ['college_admin', 'super_admin'].includes(session.role || '');
+  const ability = buildAbilityFor(session.caslPermissions, session.role);
   
   // Pre-fetch departments on the server
   const departments = await serverFetch('/departments?limit=100');
@@ -23,7 +24,7 @@ export default async function DepartmentsPage() {
   return (
     <DepartmentsView 
       initialDepartments={departments || []} 
-      isAdmin={isAdmin}
+      isAdmin={ability.can('create', 'Department')}
     />
   );
 }

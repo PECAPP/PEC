@@ -5,9 +5,9 @@ import { prisma } from './seeds/utils';
  *
  * Hierarchy:  college_admin (100) > faculty (50) > student (10)
  *
- * college_admin → manage:all  (handled in CASL factory, no explicit rows needed
- *                              but we seed them anyway for the /roles API)
- * faculty       → academic write + institutional read
+ * college_admin → seeded with manage:all + every explicit permission by default,
+ *                  but fully controllable via the admin UI (no CASL hardcode).
+ * faculty       → academic write + institutional read (inherits from student)
  * student       → personal read + self-service writes
  */
 export async function seedPermissions() {
@@ -169,15 +169,22 @@ export async function seedPermissions() {
 
   const adminRole = await prisma.role.upsert({
     where: { name: 'college_admin' },
-    update: { hierarchy: 100, isSystem: true, isSystemAdmin: true, parentRoleId: facultyRole.id, description: 'Full system administrator' },
-    create: { name: 'college_admin', hierarchy: 100, isSystem: true, isSystemAdmin: true, parentRoleId: facultyRole.id, description: 'Full system administrator' },
+    // parentRoleId is intentionally NULL — admin does NOT inherit faculty permissions.
+    // Admin permissions are seeded explicitly below and are fully editable via the UI.
+    update: { hierarchy: 100, isSystem: true, isSystemAdmin: true, parentRoleId: null, description: 'Full system administrator' },
+    create: { name: 'college_admin', hierarchy: 100, isSystem: true, isSystemAdmin: true, description: 'Full system administrator' },
   });
 
 
-  // ─── 3. Admin → ALL permissions ───────────────────────────────────────────
-  // Note: Admin gets manage all automatically via CaslFactory's isSystemAdmin check,
-  // but we optionally seed it here if needed. We skip it to rely on isSystemAdmin.
-  console.log(`  ✓ college_admin granted manage all via isSystemAdmin flag.`);
+  // ─── 3. Admin → ALL permissions explicitly (✔ seeded, ✔ controllable via UI) ──────────
+  //
+  // college_admin is seeded with every permission (including manage:all).
+  // Because admin has NO parentRoleId, it does NOT inherit from faculty.
+  // All permissions here are explicit DB rows — fully editable in the admin UI.
+
+  const ALL_PERM_KEYS = Object.keys(createdPerms);
+  await grantToRole(adminRole.id, ALL_PERM_KEYS.map(k => createdPerms[k]));
+  console.log(`  ✓ college_admin explicitly granted ALL ${ALL_PERM_KEYS.length} permissions (fully controllable via UI).`);
 
 
   // ─── 4. Faculty → scoped permissions ─────────────────────────────────────
@@ -193,6 +200,9 @@ export async function seedPermissions() {
     perm('manage', 'Examination'),
     perm('manage', 'FacultyBio'),
     perm('manage', 'NightCanteenItem'),
+    perm('create', 'Timetable'),
+    perm('update', 'Timetable'),
+    perm('delete', 'Timetable'),
     // Read access — institutional data not covered by student
     perm('read', 'Admin'),       // read-only dashboard stats
     perm('read', 'Role'),        // read roles list

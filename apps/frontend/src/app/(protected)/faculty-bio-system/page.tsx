@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 import { toast } from 'sonner';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import api from "@pec/api";
 
 // Shared types
@@ -78,7 +78,7 @@ const emptyConsultationForm = {
 export default function FacultyBioSystemPage() {
   const router = useRouter();
   const { id } = useParams();
-  const { user, loading: authLoading } = usePermissions();
+  const { user, loading: authLoading, ability } = useAuth();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<FullProfile | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -128,8 +128,8 @@ export default function FacultyBioSystemPage() {
   };
 
   const isOwner = user?.uid === facultyId;
-  const isAdmin = user?.role?.includes('college_admin') || user?.role?.includes('super_admin');
-  const canEdit = isOwner || isAdmin;
+  const isSystemAdmin = ability?.can('manage', 'all');
+  const canEdit = (isOwner && ability?.can('manage', 'FacultyBio')) || isSystemAdmin || (ability?.can('manage', 'FacultyBio') && user?.role === 'college_admin');
 
   // Publication handlers
   const openCreatePublication = () => {

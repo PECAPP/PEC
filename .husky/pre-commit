@@ -9,3 +9,4 @@ if git diff --cached --name-only | grep -q "apps/server/src"; then
 fi
 
 npx lint-staged
+

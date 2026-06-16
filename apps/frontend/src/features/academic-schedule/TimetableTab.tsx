@@ -26,7 +26,7 @@ import { useRouter } from 'next/navigation';
 import api from "@pec/api";
 import {  isAuthError  } from "@pec/api";
 import { toast } from "sonner";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import {
   generateFullTimetable,
   type CourseSchedule,
@@ -130,12 +130,12 @@ const fetchAllPages = async <T,>(
 
 export default function TimetableTab() {
   const router = useRouter();
-  const { isFaculty, user, loading: authLoading } = usePermissions();
-  const userRole = user?.role || "";
-  const isCollegeAdmin = userRole === "college_admin";
-  const canAutoGenerate = isCollegeAdmin;
-  const canManageAllTimetable = isCollegeAdmin;
-  const canScheduleExtraClass = userRole === "faculty";
+  const { user, loading: authLoading, ability } = useAuth();
+  const isFaculty = user?.role === "faculty";
+  const isCollegeAdmin = user?.role === "college_admin";
+  const canAutoGenerate = ability?.can('create', 'Timetable') && ability?.can('delete', 'Timetable');
+  const canManageAllTimetable = ability?.can('update', 'Timetable');
+  const canScheduleExtraClass = ability?.can('create', 'Timetable');
   const facultyDisplayName = ((user as any)?.fullName || (user as any)?.name || "").trim();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<any[]>([]);

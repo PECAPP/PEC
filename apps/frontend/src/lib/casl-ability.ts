@@ -11,17 +11,16 @@ export interface CaslPermission {
 export function buildAbilityFor(permissions?: CaslPermission[], role?: string | null): AppAbility {
   const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
-  // ALWAYS grant full access to admins, regardless of what the backend DB says
-  // This prevents issues where the backend has stale or incorrect CASL rules.
-  if (role === 'college_admin') {
-    can('manage', 'all');
-  } else if (permissions && permissions.length > 0) {
+  if (permissions && permissions.length > 0) {
+    // Use DB-driven permissions for ALL roles (including college_admin)
     permissions.forEach((perm) => {
       can(perm.action, perm.subject, perm.conditions || undefined);
     });
   } else if (role) {
-    // Fallback frontend permissions for other roles if backend doesn't provide CASL rules
-    if (role === 'faculty') {
+    // Fallback frontend permissions only when backend provides NO CASL rules
+    if (role === 'college_admin') {
+      can('manage', 'all');
+    } else if (role === 'faculty') {
       can('read', 'User');
       can('read', 'Course');
       can('read', 'Timetable');

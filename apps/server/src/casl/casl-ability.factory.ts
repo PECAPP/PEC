@@ -4,20 +4,22 @@ import { PrismaQuery, createPrismaAbility } from '@casl/prisma';
 
 export type AppAbility = PureAbility<AbilityTuple, PrismaQuery>;
 
+/**
+ * ABAC ability factory — fully DB-driven for ALL roles including college_admin.
+ *
+ * college_admin is seeded with `manage:all` by default, giving it full access,
+ * but that permission can be edited via the admin UI just like any other role.
+ * There is NO hardcoded bypass here — permissions come entirely from the database.
+ */
 @Injectable()
 export class CaslAbilityFactory {
   createForUser(user: any): AppAbility {
     const { can, build } = new AbilityBuilder<AppAbility>(createPrismaAbility);
 
-    const roleFromPayload = user?.role || (user?.roles && user.roles[0]?.role?.name) || (user?.roles && user.roles[0]);
-    const normalizedRole = ['college_admin', 'super_admin'].includes(roleFromPayload) ? 'college_admin' : roleFromPayload;
-
-    if (normalizedRole === 'college_admin' || user?.isSystemAdmin) {
-      can('manage', 'all');
-    } else if (user && user.permissions) {
+    if (user && user.permissions) {
       user.permissions.forEach((perm: any) => {
         let conditions = perm.conditions;
-        
+
         if (conditions && typeof conditions === 'object') {
           // Replace placeholders like "{{id}}" with actual user properties
           try {

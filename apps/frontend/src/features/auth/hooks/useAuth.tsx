@@ -50,11 +50,18 @@ function isOnAuthPage(): boolean {
 
 let redirectInProgress = false;
 
-function safeRedirectToAuth(): void {
+async function safeRedirectToAuth(): Promise<void> {
   if (!isBrowser()) return;
   if (isOnAuthPage() || redirectInProgress) return;
   redirectInProgress = true;
-  safeWindow.navigate('/api/auth/clear-session');
+  try {
+    // Call clear-session via fetch so it clears HttpOnly cookies server-side,
+    // but we handle the navigation ourselves so the user never lands on /api/...
+    await fetch('/api/auth/clear-session', { redirect: 'manual' });
+  } catch {
+    // Best-effort — proceed with redirect regardless
+  }
+  safeWindow.navigate('/auth');
 }
 
 export function AuthProvider({ children, initialSession }: { children: ReactNode, initialSession: CurrentUser | null }) {
@@ -104,7 +111,7 @@ export function AuthProvider({ children, initialSession }: { children: ReactNode
     try { await authClient.logout(); } catch (_e) {}
     safeLocalStorage.remove('auth_user');
     setUser(null);
-    safeRedirectToAuth();
+    await safeRedirectToAuth();
   };
 
   const login = async (email: string, password: string) => {

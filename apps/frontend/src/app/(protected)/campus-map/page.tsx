@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MapPin,
@@ -52,8 +52,8 @@ type DrawMode = 'none' | 'building' | 'road';
 type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se' | null;
 
 export default function CampusMap() {
-  const { user } = useAuth();
-  const isAdmin = user?.role === 'college_admin';
+  const { user, ability } = useAuth();
+  const isAdmin = useMemo(() => ability?.can('update', 'CampusMap') ?? false, [ability]);
 
   const [regions, setRegions] = useState<MapRegion[]>([]);
   const [roads, setRoads] = useState<MapRoad[]>([]);

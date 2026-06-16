@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 import { toast } from 'sonner';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import api from "@pec/api";
 
 
@@ -50,7 +50,7 @@ const emptyForm = {
 
 export default function RoomsPage() {
   const router = useRouter();
-  const { user, loading: authLoading, isAdmin } = usePermissions();
+  const { user, loading: authLoading, ability } = useAuth();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -181,7 +181,7 @@ export default function RoomsPage() {
           subtitle="Manage campus rooms and facilities"
           badgeText="Infrastructure"
           actions={
-            isAdmin && (
+            ability?.can('create', 'Room') && (
               <Button size="sm" onClick={openCreate}>
                 <Plus className="w-4 h-4 mr-2" /> Add Room
               </Button>
@@ -283,14 +283,18 @@ export default function RoomsPage() {
               </div>
             )}
 
-            {isAdmin && (
+            {(ability?.can('update', 'Room') || ability?.can('delete', 'Room')) && (
               <div className="flex gap-2 pt-2 border-t">
-                <Button variant="outline" size="sm" className="flex-1" onClick={() => openEdit(room)}>
-                  <Edit2 className="w-3 h-3 mr-1" /> Edit
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(room.id)}>
-                  <Trash2 className="w-3 h-3" />
-                </Button>
+                {ability?.can('update', 'Room') && (
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => openEdit(room)}>
+                    <Edit2 className="w-3 h-3 mr-1" /> Edit
+                  </Button>
+                )}
+                {ability?.can('delete', 'Room') && (
+                  <Button variant="destructive" size="sm" onClick={() => handleDelete(room.id)}>
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                )}
               </div>
             )}
           </motion.div>

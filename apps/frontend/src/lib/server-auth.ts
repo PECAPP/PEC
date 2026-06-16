@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { getRolePermissions, UserRole } from '@/features/auth/lib/rolePermissions';
+import { resolveInternalApiBaseUrl } from './internal-api-url';
 
 export async function getServerSession() {
   try {
@@ -14,8 +15,8 @@ export async function getServerSession() {
     }
 
     // Attempt to fetch full profile and permissions using the access token
-    const internalApiUrl = process.env.INTERNAL_API_URL || 'http://localhost:4000';
-    const profileRes = await fetch(`${internalApiUrl}/v1/auth/profile`, {
+    const apiBaseUrl = resolveInternalApiBaseUrl();
+    const profileRes = await fetch(`${apiBaseUrl}/auth/profile`, {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: 'no-store', // Always fresh for SSR auth
     });
@@ -26,41 +27,15 @@ export async function getServerSession() {
 
     const payload = await profileRes.json();
 
-    const permsRes = await fetch(`${internalApiUrl}/v1/auth/me/permissions`, {
+    const permsRes = await fetch(`${apiBaseUrl}/auth/me/permissions`, {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: 'no-store',
     });
 
     const permsData = permsRes.ok ? await permsRes.json() : { permissions: [] };
-    let caslPermissions = permsData.permissions || [];
+    const caslPermissions = permsData.permissions || [];
 
     const role = payload.role;
-    const isAdmin = role === 'college_admin';
-
-    // DB Fallback if DB is completely empty of permissions
-    if (caslPermissions.length === 0) {
-      caslPermissions = isAdmin
-        ? [{ action: 'manage', subject: 'all' }]
-        : [
-            { action: 'read', subject: 'Attendance' },
-            { action: 'read', subject: 'AttendanceSession' },
-            { action: 'read', subject: 'Timetable' },
-            { action: 'read', subject: 'Course' },
-            { action: 'read', subject: 'Notice' },
-            { action: 'read', subject: 'FeeRecord' },
-            { action: 'read', subject: 'MarketplaceListing' },
-            { action: 'read', subject: 'HostelIssue' },
-            { action: 'read', subject: 'CanteenItem' },
-            { action: 'read', subject: 'Room' },
-            { action: 'read', subject: 'FeatureFlag' },
-            { action: 'read', subject: 'Examination' },
-            { action: 'read', subject: 'Enrollment' },
-            { action: 'read', subject: 'Department' },
-            { action: 'read', subject: 'CgpaEntry' },
-            { action: 'read', subject: 'CampusMap' },
-            { action: 'read', subject: 'CourseMaterial' },
-          ];
-    }
 
     const userId = payload.id || payload.uid || payload.sub;
     const fullName = payload.fullName || payload.name || 'User';

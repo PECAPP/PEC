@@ -2,6 +2,7 @@ import { getServerSession } from '@/lib/server-auth';
 import { cookies } from 'next/headers';
 import { redirect, notFound } from 'next/navigation';
 import { UserDetailView } from './UserDetailView';
+import { buildAbilityFor } from '@/lib/casl-ability';
 
 interface PageProps {
   params: Promise<{ userId: string }>;
@@ -60,8 +61,8 @@ export default async function UserDetailPage({ params }: PageProps) {
   const session = await getServerSession();
   if (!session) redirect('/auth');
 
-  // RBAC: Only admin, faculty, or the user themselves can view full detail
-  if (session.role !== 'college_admin' && session.role !== 'super_admin' && session.role !== 'faculty' && session.uid !== userId) {
+  const ability = buildAbilityFor(session.caslPermissions, session.role);
+  if (!ability.can('read', 'User') && session.uid !== userId) {
     redirect('/dashboard');
   }
 

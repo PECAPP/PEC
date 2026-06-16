@@ -16,8 +16,7 @@ export default function CanteenPage() {
     );
   }
 
-  // If the user has permission to manage all (or specifically the canteen), show the manager view
-  if (ability?.can('manage', 'all' as any)) {
+  if (ability?.can('manage', 'NightCanteenItem') || ability?.can('manage', 'all' as any)) {
     return <ManagerCanteenView />;
   }
 
