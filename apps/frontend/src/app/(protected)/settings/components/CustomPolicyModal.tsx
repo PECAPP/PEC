@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Key } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { safeDocument } from '@/lib/ssr-safe';
 
 interface CustomPolicyModalProps {
   onSuccess: () => void;
@@ -19,9 +20,10 @@ export default function CustomPolicyModal({ onSuccess }: CustomPolicyModalProps)
     if (!action || !subject) return;
     setLoading(true);
     try {
+      const csrfToken = safeDocument.getCookie('csrf_token') ?? '';
       const res = await fetch('/api/v1/permissions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
         body: JSON.stringify({ action, subject, description })
       });
       if (res.ok) {

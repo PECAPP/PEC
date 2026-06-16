@@ -14,13 +14,15 @@ const createPrismaClient = () => {
       dotenv.config();
     } catch (e) {}
   }
-  
+
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const adapter = new PrismaPg(pool);
-  
+
   const baseClient = new PrismaClient({ adapter, log: [] });
-  
-  const replicaPool = new Pool({ connectionString: process.env.REPLICA_URL || process.env.DATABASE_URL });
+
+  const replicaPool = new Pool({
+    connectionString: process.env.REPLICA_URL || process.env.DATABASE_URL,
+  });
   const replicaAdapter = new PrismaPg(replicaPool);
   const replicaClient = new PrismaClient({ adapter: replicaAdapter, log: [] });
 
@@ -43,7 +45,10 @@ const createPrismaClient = () => {
                 if ((model as string) === 'AcademicCalendar' && (args as any).data) {
                   const dataObj = (args as any).data;
                   if (Array.isArray(dataObj)) {
-                    (args as any).data = dataObj.map((d: any) => ({ ...d, createdBy: d.createdBy || userId }));
+                    (args as any).data = dataObj.map((d: any) => ({
+                      ...d,
+                      createdBy: d.createdBy || userId,
+                    }));
                   } else {
                     dataObj.createdBy = dataObj.createdBy || userId;
                   }
@@ -53,29 +58,52 @@ const createPrismaClient = () => {
 
             const modelsWithSoftDelete = ['Course', 'FeeRecord', 'Notice', 'ExamSchedule'];
             if (modelsWithSoftDelete.includes(model)) {
-              if (operation === 'findUnique' || operation === 'findFirst' || operation === 'findMany') {
-                args.where = { ...args.where, deletedAt: null };
+              if (
+                operation === 'findUnique' ||
+                operation === 'findFirst' ||
+                operation === 'findMany'
+              ) {
+                (args as any).where = { ...(args as any).where, deletedAt: null };
               }
             }
 
             // RLS Logic for students
-            if (context?.role === 'student' && ['findMany', 'findFirst', 'count'].includes(operation)) {
-              if (['Attendance', 'AttendanceSession', 'ScoreEntry', 'CgpaEntry'].includes(model as string)) {
-                args.where = args.where || {};
+            if (
+              context?.role === 'student' &&
+              ['findMany', 'findFirst', 'count'].includes(operation)
+            ) {
+              if (
+                ['Attendance', 'AttendanceSession', 'ScoreEntry', 'CgpaEntry'].includes(
+                  model as string
+                )
+              ) {
+                (args as any).where = (args as any).where || {};
                 if (model === 'CgpaEntry') {
-                  args.where.userId = userId;
+                  (args as any).where.userId = userId;
                 } else if (model === 'ScoreEntry' || model === 'Attendance') {
-                  args.where.studentId = userId;
+                  (args as any).where.studentId = userId;
                 }
               }
             }
 
             const criticalModels = ['FeeRecord', 'Course', 'User'];
-            const writeOperations = ['create', 'createMany', 'update', 'updateMany', 'delete', 'deleteMany', 'upsert'];
+            const writeOperations = [
+              'create',
+              'createMany',
+              'update',
+              'updateMany',
+              'delete',
+              'deleteMany',
+              'upsert',
+            ];
 
             const result = await query(args);
 
-            if (userId && criticalModels.includes(model as string) && writeOperations.includes(operation)) {
+            if (
+              userId &&
+              criticalModels.includes(model as string) &&
+              writeOperations.includes(operation)
+            ) {
               const action = operation.toUpperCase();
               let entityId: string | null = null;
 
@@ -88,19 +116,22 @@ const createPrismaClient = () => {
               // Fire and forget audit log creation
               Promise.resolve().then(() => {
                 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-                pool.query(
-                  'INSERT INTO "AuditLog" (id, "actorUserId", "actorRole", action, entity, "entityId", method, path, "createdAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())',
-                  [
-                    randomUUID(),
-                    userId,
-                    context?.role || 'system',
-                    action,
-                    model as string,
-                    entityId,
-                    'SYSTEM',
-                    'PRISMA_EXTENSION'
-                  ]
-                ).catch(e => console.error('Failed to write audit log', e)).finally(() => pool.end());
+                pool
+                  .query(
+                    'INSERT INTO "AuditLog" (id, "actorUserId", "actorRole", action, entity, "entityId", method, path, "createdAt") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())',
+                    [
+                      randomUUID(),
+                      userId,
+                      context?.role || 'system',
+                      action,
+                      model as string,
+                      entityId,
+                      'SYSTEM',
+                      'PRISMA_EXTENSION',
+                    ]
+                  )
+                  .catch((e) => console.error('Failed to write audit log', e))
+                  .finally(() => pool.end());
               });
             }
 

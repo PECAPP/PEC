@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { getRolePermissions, UserRole } from '@/features/auth/lib/rolePermissions';
+import { resolveInternalApiBaseUrl } from './internal-api-url';
 
 export async function getServerSession() {
   try {
@@ -14,8 +15,8 @@ export async function getServerSession() {
     }
 
     // Attempt to fetch full profile and permissions using the access token
-    const internalApiUrl = process.env.INTERNAL_API_URL || 'http://localhost:4000';
-    const profileRes = await fetch(`${internalApiUrl}/v1/auth/profile`, {
+    const apiBaseUrl = resolveInternalApiBaseUrl();
+    const profileRes = await fetch(`${apiBaseUrl}/auth/profile`, {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: 'no-store', // Always fresh for SSR auth
     });
@@ -26,7 +27,7 @@ export async function getServerSession() {
 
     const payload = await profileRes.json();
 
-    const permsRes = await fetch(`${internalApiUrl}/v1/auth/me/permissions`, {
+    const permsRes = await fetch(`${apiBaseUrl}/auth/me/permissions`, {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: 'no-store',
     });

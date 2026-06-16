@@ -22,7 +22,7 @@
     "db:clean:confirm": "node scripts/db-clean.js",
     "db:migrate-sqlite": "node scripts/migrate-sqlite-to-postgres.js",
     "start": "nest start",
-    "start:dev": "npx nodemon --signal SIGTERM --watch src -e ts --exec \"npx swc src -d dist && node dist/src/main.js\"",
+    "start:dev": "npx nodemon --signal SIGTERM --watch src -e ts --exec \"npx swc src -d dist && node --experimental-strip-types dist/src/main.js\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node -r tsconfig-paths/register dist/apps/server/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

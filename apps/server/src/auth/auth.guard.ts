@@ -23,10 +23,8 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    require('fs').appendFileSync('C:\\\\Users\\\\dubey\\\\PEC\\\\auth_debug.log', 'AuthGuard started\\n');
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      require('fs').appendFileSync('C:\\\\Users\\\\dubey\\\\PEC\\\\auth_debug.log', 'Token missing! Headers: ' + JSON.stringify(request.headers) + '\\n');
       throw new UnauthorizedException();
     }
 
@@ -57,8 +55,20 @@ export class AuthGuard implements CanActivate {
       if (origin) {
         try {
           const originUrl = new URL(origin as string);
-          const hostUrl = new URL(`${request.protocol}://${request.headers.host}`);
-          if (originUrl.hostname !== hostUrl.hostname) {
+          // Prefer X-Forwarded-Host (set by the Next.js rewrite proxy) over the
+          // raw Host header so that proxied requests are not rejected.
+          const effectiveHost =
+            (request.headers['x-forwarded-host'] as string) || request.headers.host;
+          const hostUrl = new URL(`${request.protocol}://${effectiveHost}`);
+
+          const isLocal = (h: string) =>
+            h === 'localhost' || h === '127.0.0.1' || h === '::1';
+
+          const hostsMatch =
+            originUrl.hostname === hostUrl.hostname ||
+            (!isProd && isLocal(originUrl.hostname) && isLocal(hostUrl.hostname));
+
+          if (!hostsMatch) {
             throw new ForbiddenException('CSRF Origin Mismatch');
           }
         } catch (e) {
@@ -94,7 +104,12 @@ export class AuthGuard implements CanActivate {
       let permissions = cachedData?.permissions;
       let isSystemAdmin = cachedData?.isSystemAdmin || false;
 
-      if (!permissions) {
+      // Re-fetch if cache is missing OR if permissions array is empty but not from an isSystemAdmin role
+      // (empty array was previously valid for admins using the hardcoded manage:all — no longer the case)
+      const cacheValid = cachedData !== undefined && cachedData !== null &&
+        (isSystemAdmin || (Array.isArray(permissions) && permissions.length > 0));
+
+      if (!cacheValid) {
         // 1. Fetch user's direct active roles
         const activeUserRoles = await this.prisma.userRole.findMany({
           where: {
@@ -180,7 +195,6 @@ export class AuthGuard implements CanActivate {
 
     } catch (e: any) {
       console.error(e);
-      require('fs').appendFileSync('C:\\\\Users\\\\dubey\\\\PEC\\\\auth_error.log', e.stack || e.toString() + '\\n');
       throw new UnauthorizedException(e.message || 'Unauthorized');
     }
     return true;
@@ -195,8 +209,9 @@ export class AuthGuard implements CanActivate {
     const cookiePrefix = isProd ? '__Host-' : '';
     const cookieName = `${cookiePrefix}access_token`;
 
-    if (request.cookies && request.cookies[cookieName]) {
-      return request.cookies[cookieName];
+    const reqAny = request as any;
+    if (reqAny.cookies && reqAny.cookies[cookieName]) {
+      return reqAny.cookies[cookieName];
     }
 
     const cookieHeader = request.headers.cookie;

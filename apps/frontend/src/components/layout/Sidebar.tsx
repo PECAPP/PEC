@@ -168,6 +168,13 @@ const navItems: NavItem[] = [
   // ── System ────────────────────────────────────────────────
   { icon: Settings, label: 'Settings', path: '/settings' },
   {
+    icon: Shield,
+    label: 'Roles & Permissions',
+    path: '/admin/role-management',
+    permission: { action: 'manage', subject: 'Role' },
+    roles: ['college_admin'] as UserRole[],
+  },
+  {
     icon: Activity,
     label: 'Observability',
     path: '/admin/observability',
@@ -192,7 +199,7 @@ const sectionConfig: Array<{ title: string; paths: string[] }> = [
   },
   {
     title: 'System',
-    paths: ['/settings', '/admin/observability', '/help'],
+    paths: ['/settings', '/admin/role-management', '/admin/observability', '/help'],
   },
 ];
 
