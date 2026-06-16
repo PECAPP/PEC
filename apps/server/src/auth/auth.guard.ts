@@ -64,9 +64,26 @@ export class AuthGuard implements CanActivate {
           const isLocal = (h: string) =>
             h === 'localhost' || h === '127.0.0.1' || h === '::1';
 
+          // Extract hostname from NEXT_PUBLIC_SITE_URL if defined
+          let siteUrlHostname: string | null = null;
+          if (process.env.NEXT_PUBLIC_SITE_URL) {
+            try {
+              siteUrlHostname = new URL(process.env.NEXT_PUBLIC_SITE_URL).hostname;
+            } catch (e) {
+              // Ignore invalid URL
+            }
+          }
+
+          const isInternalHost = hostUrl.hostname === 'backend' || isLocal(hostUrl.hostname);
+
           const hostsMatch =
             originUrl.hostname === hostUrl.hostname ||
-            (!isProd && isLocal(originUrl.hostname) && isLocal(hostUrl.hostname));
+            (!isProd && isLocal(originUrl.hostname) && isLocal(hostUrl.hostname)) ||
+            (siteUrlHostname && originUrl.hostname === siteUrlHostname) ||
+            (isInternalHost && (
+              isLocal(originUrl.hostname) ||
+              (siteUrlHostname && originUrl.hostname === siteUrlHostname)
+            ));
 
           if (!hostsMatch) {
             throw new ForbiddenException('CSRF Origin Mismatch');

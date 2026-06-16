@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { UserManagementView } from './UserManagementView';
 import { resolveInternalApiBaseUrl } from '@/lib/internal-api-url';
+import { buildAbilityFor } from '@/lib/casl-ability';
 
 export const metadata = {
   title: 'User Management | PEC APP ERP',
@@ -46,9 +47,8 @@ export default async function UsersPage() {
   const session = await getServerSession();
   if (!session) redirect('/auth');
 
-  // RBAC Check on Server
-  const isAdminUser = session.role === 'college_admin' || session.role === 'super_admin';
-  if (!isAdminUser && session.role !== 'faculty') {
+  const ability = buildAbilityFor(session.caslPermissions, session.role);
+  if (!ability.can('read', 'User')) {
     redirect('/dashboard');
   }
 
@@ -57,7 +57,7 @@ export default async function UsersPage() {
   return (
     <UserManagementView 
       initialUsers={users} 
-      isAdmin={isAdminUser} 
+      isAdmin={ability.can('create', 'User')} 
       isFaculty={session.role === 'faculty'} 
     />
   );

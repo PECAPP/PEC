@@ -17,7 +17,7 @@ import {
   ComposedChart,
 } from 'recharts';
 
-import { usePermissions } from '@/hooks/usePermissions';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 import api from "@pec/api";
 import { extractData } from '@/lib/utils';
@@ -60,7 +60,7 @@ const normalizeEntry = (raw: any): CgpaEntry => ({
 
 export default function ScoreSheetPage() {
   const router = useRouter();
-  const { user, isStudent, loading } = usePermissions();
+  const { user, loading: authLoading, ability } = useAuth();
   const [entries, setEntries] = useState<CgpaEntry[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -73,8 +73,8 @@ export default function ScoreSheetPage() {
   const [_financeLoading, setFinanceLoading] = useState(true);
 
   useEffect(() => {
-    if (loading) return;
-    if (!user || !isStudent) {
+    if (authLoading) return;
+    if (!user || !ability?.can('create', 'CgpaEntry')) {
       router.replace('/dashboard');
       return;
     }
@@ -117,10 +117,10 @@ export default function ScoreSheetPage() {
     return () => {
       active = false;
     };
-  }, [loading, user, isStudent, router]);
+  }, [authLoading, user, ability, router]);
 
   useEffect(() => {
-    if (loading || !user || !isStudent) return;
+    if (authLoading || !user || !ability?.can('create', 'CgpaEntry')) return;
 
     let active = true;
     const loadCourses = async () => {
@@ -158,7 +158,7 @@ export default function ScoreSheetPage() {
     return () => {
       active = false;
     };
-  }, [loading, user, isStudent]);
+  }, [authLoading, user, ability]);
 
   const stats = useMemo(() => {
     if (entries.length === 0) {
@@ -317,7 +317,7 @@ export default function ScoreSheetPage() {
     }
   };
 
-  if (apiLoading) {
+  if (authLoading || apiLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <AppShellSkeleton />

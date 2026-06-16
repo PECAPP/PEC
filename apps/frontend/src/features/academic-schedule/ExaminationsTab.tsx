@@ -54,7 +54,7 @@ const isUpcoming = (value: string) => {
 
 export default function ExaminationsTab() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, ability } = useAuth();
 
   useEffect(() => {
     if (authLoading) return;
@@ -69,26 +69,17 @@ export default function ExaminationsTab() {
     );
   }
 
-  const role = user.role;
-  const isCollegeAdmin = ['college_admin'].includes(role || '');
+  const canManageExams = ability?.can('create', 'Examination');
 
-  if (isCollegeAdmin) {
+  if (canManageExams) {
     return <CollegeAdminExaminations />;
   }
 
-  if (role === 'faculty' || role === 'student') {
-    return (
-      <DepartmentUpcomingExams
-        _role={role}
-        department={user.department || null}
-      />
-    );
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-muted-foreground">Access denied</p>
-    </div>
+    <DepartmentUpcomingExams
+      _role={user.role as any}
+      department={user.department || null}
+    />
   );
 }
 

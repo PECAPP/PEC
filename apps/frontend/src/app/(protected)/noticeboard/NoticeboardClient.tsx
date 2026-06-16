@@ -42,7 +42,7 @@ function fileToDataUrl(file: File): Promise<string> {
 
 export default function NoticeboardClient({ initialNotices, session }: { initialNotices: NoticeItem[], session: any }) {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, ability } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [notices, setNotices] = useState<NoticeItem[]>(initialNotices);
@@ -65,7 +65,9 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
   const [editMedia, setEditMedia] = useState<NoticeMedia[]>([]);
   const [savingEdit, setSavingEdit] = useState(false);
 
-  const isAdmin = useMemo(() => user?.role === 'college_admin', [user?.role]);
+  const canCreate = useMemo(() => ability?.can('create', 'Notice') ?? false, [ability]);
+  const canUpdate = useMemo(() => ability?.can('update', 'Notice') ?? false, [ability]);
+  const canDelete = useMemo(() => ability?.can('delete', 'Notice') ?? false, [ability]);
 
   const loadNotices = async () => {
     try {
@@ -292,7 +294,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
         badgeText="Communications"
         icon={<Megaphone className="w-7 h-7 text-primary" />}
         actions={
-          isAdmin && (
+          canCreate && (
             <Button
               onClick={() =>
                 document.getElementById('post-notice-form')?.scrollIntoView({ behavior: 'smooth' })
@@ -304,7 +306,7 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
         }
       />
 
-      {isAdmin && (
+      {canCreate && (
         <div
           id="post-notice-form"
           className="bg-card/60 border border-border/40 rounded-sm shadow-sm p-4 md:p-6 backdrop-blur-sm space-y-4"
@@ -488,32 +490,38 @@ export default function NoticeboardClient({ initialNotices, session }: { initial
                   </div>
                 </div>
 
-                {isAdmin && (
+                {(canUpdate || canDelete) && (
                   <div className="flex md:flex-col gap-2 shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEditModal(notice)}
-                      className="h-10 px-4 rounded-sm font-medium text-sm transition-all"
-                    >
-                      <Edit2 className="h-4 w-4 mr-2" /> Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => togglePin(notice.id, !notice.pinned)}
-                      className="h-10 px-4 rounded-sm font-medium text-sm  transition-all"
-                    >
-                      {notice.pinned ? 'Unpin' : 'Pin'}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeNotice(notice.id)}
-                      className="h-10 px-4 rounded-sm font-medium text-sm  text-destructive hover:bg-destructive/5 transition-all"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" /> Delete
-                    </Button>
+                    {canUpdate && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditModal(notice)}
+                          className="h-10 px-4 rounded-sm font-medium text-sm transition-all"
+                        >
+                          <Edit2 className="h-4 w-4 mr-2" /> Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => togglePin(notice.id, !notice.pinned)}
+                          className="h-10 px-4 rounded-sm font-medium text-sm  transition-all"
+                        >
+                          {notice.pinned ? 'Unpin' : 'Pin'}
+                        </Button>
+                      </>
+                    )}
+                    {canDelete && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeNotice(notice.id)}
+                        className="h-10 px-4 rounded-sm font-medium text-sm  text-destructive hover:bg-destructive/5 transition-all"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>

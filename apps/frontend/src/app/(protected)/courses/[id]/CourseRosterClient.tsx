@@ -28,7 +28,7 @@ interface CourseRosterProps {
 }
 
 export function CourseRosterClient({ courseId, courseName, courseCode }: CourseRosterProps) {
-  const { user } = useAuth();
+  const { user, ability } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,10 +41,10 @@ export function CourseRosterClient({ courseId, courseName, courseCode }: CourseR
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (user?.role === 'faculty' || user?.role === 'college_admin') {
+    if (ability?.can('read', 'Enrollment')) {
       fetchRoster();
     }
-  }, [user, courseId]);
+  }, [ability, courseId]);
 
   const fetchRoster = async () => {
     try {
@@ -104,7 +104,7 @@ export function CourseRosterClient({ courseId, courseName, courseCode }: CourseR
     }
   };
 
-  if (user?.role !== 'faculty' && user?.role !== 'college_admin') {
+  if (!ability?.can('read', 'Enrollment')) {
     return null;
   }
 
@@ -166,14 +166,16 @@ export function CourseRosterClient({ courseId, courseName, courseCode }: CourseR
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        onClick={() => setSelectedStudent(enrollment)}
-                        className="h-8 text-xs font-semibold"
-                      >
-                        Grade Student
-                      </Button>
+                      {ability?.can('create', 'Grade') && (
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => setSelectedStudent(enrollment)}
+                          className="h-8 text-xs font-semibold"
+                        >
+                          Grade Student
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -132,7 +132,7 @@ const navItems: NavItem[] = [
         icon: FileText,
         label: 'Score Sheet',
         path: '/score-sheet',
-        roles: ['college_admin', 'faculty'] as UserRole[],
+        permission: { action: 'read', subject: 'CgpaEntry' },
       },
     ],
   },

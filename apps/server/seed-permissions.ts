@@ -200,6 +200,9 @@ export async function seedPermissions() {
     perm('manage', 'Examination'),
     perm('manage', 'FacultyBio'),
     perm('manage', 'NightCanteenItem'),
+    perm('create', 'Timetable'),
+    perm('update', 'Timetable'),
+    perm('delete', 'Timetable'),
     // Read access — institutional data not covered by student
     perm('read', 'Admin'),       // read-only dashboard stats
     perm('read', 'Role'),        // read roles list

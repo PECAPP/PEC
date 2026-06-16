@@ -2,6 +2,7 @@
 import { Button, Input, Badge } from "@pec/ui";
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { 
   Plus, 
   Edit, 
@@ -23,6 +24,7 @@ interface CourseManagementProps {
 }
 
 export function CourseManagement({ initialCourses, _user }: CourseManagementProps) {
+  const { ability } = useAuth();
   const [courses, _setCourses] = useState(initialCourses);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -93,18 +95,27 @@ export function CourseManagement({ initialCourses, _user }: CourseManagementProp
     {
       id: 'operations',
       header: 'Operations',
-      cell: ({ row }) => (
-        <div className="flex justify-end gap-1.5">
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-sm hover:bg-primary/10 hover:text-primary transition-colors">
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-sm hover:bg-destructive/10 hover:text-destructive transition-colors">
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        </div>
-      )
+      cell: ({ row }) => {
+        const canUpdate = ability?.can('update', 'Course');
+        const canDelete = ability?.can('delete', 'Course');
+        if (!canUpdate && !canDelete) return null;
+        return (
+          <div className="flex justify-end gap-1.5">
+            {canUpdate && (
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-sm hover:bg-primary/10 hover:text-primary transition-colors">
+                <Edit className="w-4 h-4" />
+              </Button>
+            )}
+            {canDelete && (
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-sm hover:bg-destructive/10 hover:text-destructive transition-colors">
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        );
+      }
     }
-  ], []);
+  ], [ability]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -122,9 +133,11 @@ export function CourseManagement({ initialCourses, _user }: CourseManagementProp
             <Button variant="outline" className="flex-1 md:flex-none h-12 rounded-sm px-3 md:px-6 font-medium text-sm  border-border/60 hover:bg-muted/40 transition-all">
               <Download className="w-4 h-4 mr-2.5 opacity-60" /> Export Catalog
             </Button>
-            <Button className="flex-1 md:flex-none h-12 rounded-sm px-4 md:px-8 font-medium text-sm  bg-primary shadow-md border border-border/40 hover:scale-[1.02] transition-all">
-              <Plus className="w-4 h-4 mr-2.5" /> Add New Course
-            </Button>
+            {ability?.can('create', 'Course') && (
+              <Button className="flex-1 md:flex-none h-12 rounded-sm px-4 md:px-8 font-medium text-sm  bg-primary shadow-md border border-border/40 hover:scale-[1.02] transition-all">
+                <Plus className="w-4 h-4 mr-2.5" /> Add New Course
+              </Button>
+            )}
          </div>
       </div>
 

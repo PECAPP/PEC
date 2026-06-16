@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 import { toast } from 'sonner';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import api from "@pec/api";
 
 
@@ -51,7 +51,7 @@ const emptyForm = {
 
 export default function RoomsClient({ initialRooms, session }: { initialRooms: Room[], session: any }) {
   const router = useRouter();
-  const { user, loading: authLoading, isAdmin } = usePermissions();
+  const { user, loading: authLoading, ability } = useAuth();
   const [rooms, setRooms] = useState<Room[]>(initialRooms);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -181,7 +181,7 @@ export default function RoomsClient({ initialRooms, session }: { initialRooms: R
         badgeText="Infrastructure"
         icon={<Building2 className="w-7 h-7 text-primary" />}
         actions={
-          isAdmin && (
+          ability?.can('create', 'Room') && (
             <Button onClick={openCreate}>
               <Plus className="w-4 h-4 mr-2" /> Add Room
             </Button>
@@ -282,14 +282,18 @@ export default function RoomsClient({ initialRooms, session }: { initialRooms: R
               </div>
             )}
 
-            {isAdmin && (
+            {(ability?.can('update', 'Room') || ability?.can('delete', 'Room')) && (
               <div className="flex gap-2 pt-2 border-t">
-                <Button variant="outline" size="sm" className="flex-1" onClick={() => openEdit(room)}>
-                  <Edit2 className="w-3 h-3 mr-1" /> Edit
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(room.id)}>
-                  <Trash2 className="w-3 h-3" />
-                </Button>
+                {ability?.can('update', 'Room') && (
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => openEdit(room)}>
+                    <Edit2 className="w-3 h-3 mr-1" /> Edit
+                  </Button>
+                )}
+                {ability?.can('delete', 'Room') && (
+                  <Button variant="destructive" size="sm" onClick={() => handleDelete(room.id)}>
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                )}
               </div>
             )}
           </motion.div>

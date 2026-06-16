@@ -20,7 +20,7 @@ import {
 
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import api, { buildApiUrl } from "@pec/api";
 
 // Shared types and constants
@@ -38,8 +38,8 @@ import { AnimatedNumber } from './components/AnimatedNumber';
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function FinancePage() {
-  const { permissions, loading: permLoading } = usePermissions();
-  const _isAdmin = (permissions as any)?.isAdmin || (permissions as any)?.role === 'college_admin';
+  const { user, loading: authLoading, ability } = useAuth();
+  const _isAdmin = ability?.can('manage', 'all');
   const [tab, setTab] = useState('overview');
   const [feeCategory, setFeeCategory] = useState('');
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -57,7 +57,7 @@ export default function FinancePage() {
   const [txnTo, setTxnTo] = useState('');
   const [txnSearch, setTxnSearch] = useState('');
 
-  const adminRole = !permLoading && (permissions as any)?.role === 'college_admin';
+  const adminRole = ability?.can('manage', 'FeeRecord');
 
   const fetchSummary = useCallback(async () => {
     try {
@@ -106,15 +106,15 @@ export default function FinancePage() {
   }, [txnCat, txnStatus, txnFrom, txnTo]);
 
   useEffect(() => {
-    if (!permLoading) {
+    if (!authLoading) {
       fetchSummary();
       fetchFees();
     }
-  }, [permLoading, fetchSummary, fetchFees]);
+  }, [authLoading, fetchSummary, fetchFees]);
 
   useEffect(() => {
-    if (tab === 'transactions' && !permLoading) fetchTransactions();
-  }, [tab, permLoading, fetchTransactions]);
+    if (tab === 'transactions' && !authLoading) fetchTransactions();
+  }, [tab, authLoading, fetchTransactions]);
 
   const handleMarkPaid = async (feeId: string) => {
     try {
@@ -202,10 +202,19 @@ export default function FinancePage() {
       (t.feeRecord?.description ?? '').toLowerCase().includes(txnSearch.toLowerCase())
   );
 
-  if (permLoading) {
+  if (authLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <AppShellSkeleton />
+      </div>
+    );
+  }
+
+  if (!ability?.can('read', 'FeeRecord')) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-muted-foreground">
+        <Wallet className="w-12 h-12 mb-4 opacity-20" />
+        <p className="text-sm font-medium">You do not have permission to view financial records.</p>
       </div>
     );
   }
