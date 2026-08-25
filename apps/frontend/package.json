@@ -13,7 +13,7 @@
     "@casl/ability": "^7.0.0",
     "@casl/react": "^7.0.0",
     "@fontsource/dm-sans": "^5.2.8",
-    "@hookform/resolvers": "^3.10.0",
+    "@hookform/resolvers": "^5.9.1",
     "@pec/api": "workspace:*",
     "@pec/database": "workspace:*",
     "@pec/env": "workspace:*",
