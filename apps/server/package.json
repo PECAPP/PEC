@@ -110,7 +110,7 @@
     "@swc/core": "^1.15.40",
     "@types/bcrypt": "^6.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.10.7",
+    "@types/node": "^26.2.0",
     "@types/sanitize-html": "^2.16.1",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
