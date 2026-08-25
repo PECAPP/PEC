@@ -98,7 +98,7 @@
     "@angular-devkit/schematics-cli": "^21.2.5",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
-    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.8.0",
     "@faker-js/faker": "^10.4.0",
     "@nestjs/cli": "^11.0.17",
