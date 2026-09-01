@@ -6,12 +6,12 @@
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "^16.2.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "^7.34.0"
+    "eslint": "^10.9.1",
+    "eslint-config-next": "^16.3.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5"
   },
   "devDependencies": {
-    "eslint-plugin-boundaries": "^6.0.2"
+    "eslint-plugin-boundaries": "^7.2.0"
   }
 }
