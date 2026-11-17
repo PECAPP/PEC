@@ -54,7 +54,7 @@
     "@nestjs/platform-fastify": "^11.1.24",
     "@nestjs/platform-socket.io": "^11.1.26",
     "@nestjs/schedule": "^5.0.1",
-    "@nestjs/swagger": "^11.0.0",
+    "@nestjs/swagger": "^12.1.2",
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/websockets": "^11.1.26",
     "@opentelemetry/api": "^1.9.1",
